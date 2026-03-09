@@ -1,0 +1,20 @@
+# Topics to search for best practices
+topics:
+  - name: claude-code-skills
+    keywords: ["Claude Code skills best practices", "SKILL.md patterns"]
+    category: core
+  - name: claude-code-hooks
+    keywords: ["Claude Code hooks automation", "PreToolUse PostToolUse hooks"]
+    category: core
+  - name: claude-code-agents
+    keywords: ["Claude Code agents subagent patterns"]
+    category: core
+  - name: jetpack-compose-testing
+    keywords: ["Jetpack Compose testing patterns 2026", "Compose UI test best practices"]
+    category: stack:android-compose
+  - name: fastapi-patterns
+    keywords: ["FastAPI best practices 2026", "FastAPI testing patterns"]
+    category: stack:fastapi-python
+  - name: gemini-api
+    keywords: ["Google Gemini API structured output", "Gemini 2.5 Flash best practices"]
+    category: stack:ai-gemini

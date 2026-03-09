@@ -1,0 +1,5 @@
+# Registered project repos to scan for patterns
+repos:
+  - repo: abhayla/KKB
+    stacks: [android-compose, fastapi-python, ai-gemini, firebase-auth]
+    auto_sync: true

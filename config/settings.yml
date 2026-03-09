@@ -1,0 +1,22 @@
+# Global settings for the best practices hub
+scan:
+  project_schedule: "0 9 * * 1"
+  internet_schedule: "0 10 * * 1"
+  expire_schedule: "0 8 * * 1"
+
+limits:
+  max_prs_per_scan: 5
+  max_urls_per_scan: 20
+  max_semantic_comparisons: 50
+  claude_api_monthly_budget_usd: 5.0
+
+pr:
+  labels_project: ["auto-scan", "project-source"]
+  labels_internet: ["auto-scan", "internet-source"]
+  labels_contribution: ["contribution"]
+  labels_sync: ["best-practices", "auto-sync"]
+
+dedup:
+  semantic_threshold_strong: 85
+  semantic_threshold_weak: 70
+  structural_threshold: 3
