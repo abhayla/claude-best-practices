@@ -1,0 +1,7 @@
+name: fastapi-python
+description: Python FastAPI backend with SQLAlchemy async, PostgreSQL, Alembic migrations
+namespace: fastapi
+conflicts_with: []
+merges_with: [android-compose, superpowers, ai-gemini, firebase-auth]
+file_precedence: stack
+dependencies: []

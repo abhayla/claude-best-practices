@@ -1,0 +1,7 @@
+name: android-compose
+description: Android Jetpack Compose with Hilt DI, Room DB, Navigation Compose
+namespace: android
+conflicts_with: []
+merges_with: [fastapi-python, superpowers, ai-gemini, firebase-auth]
+file_precedence: stack
+dependencies: []

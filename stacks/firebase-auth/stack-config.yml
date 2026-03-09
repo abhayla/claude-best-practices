@@ -1,0 +1,7 @@
+name: firebase-auth
+description: Firebase Authentication (Phone OTP) with backend JWT verification
+namespace: firebase
+conflicts_with: []
+merges_with: [android-compose, fastapi-python, superpowers]
+file_precedence: stack
+dependencies: []

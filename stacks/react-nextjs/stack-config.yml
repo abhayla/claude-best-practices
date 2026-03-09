@@ -1,0 +1,7 @@
+name: react-nextjs
+description: React + Next.js frontend (future stack placeholder)
+namespace: react
+conflicts_with: [android-compose]
+merges_with: [fastapi-python, superpowers]
+file_precedence: stack
+dependencies: []

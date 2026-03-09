@@ -1,0 +1,7 @@
+name: ai-gemini
+description: Google Gemini API integration for AI-powered features (structured output, vision)
+namespace: gemini
+conflicts_with: []
+merges_with: [android-compose, fastapi-python, superpowers]
+file_precedence: stack
+dependencies: []
