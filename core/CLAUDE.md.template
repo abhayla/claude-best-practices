@@ -1,0 +1,45 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code when working with code in this repository.
+
+## Project Overview
+
+**{{PROJECT_NAME}}** — {{PROJECT_DESCRIPTION}}
+
+| Attribute | Details |
+|-----------|---------|
+| **Platform** | {{PLATFORM}} |
+| **Build Tools** | {{BUILD_TOOLS}} |
+
+## Architecture
+
+{{ARCHITECTURE_NOTES}}
+
+## Development Commands
+
+{{DEVELOPMENT_COMMANDS}}
+
+## Testing
+
+{{TESTING_COMMANDS}}
+
+## Environment Setup
+
+{{ENVIRONMENT_SETUP}}
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| | |
+
+## Rules for Claude
+
+1. **Bash Syntax**: Use forward slashes `/`, quote paths with spaces. Shell is Unix-style bash even on Windows.
+2. **Document Output**: Generated documents go to `docs/claude-docs/`.
+
+## Claude Code Configuration
+
+The `.claude/` directory contains skills, agents, hooks, and rules.
+Synced from: {{HUB_REPO}} ({{SELECTED_STACKS}})
+Last sync: {{LAST_SYNC_TIMESTAMP}}
