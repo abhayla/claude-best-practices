@@ -1,0 +1,9 @@
+urls:
+  - url: https://example.com/claude-tips
+    last_verified: "2026-01-01"
+    expires_after: 30d
+    trust_level: high
+  - url: https://example.com/old-post
+    last_verified: "2025-01-01"
+    expires_after: 30d
+    trust_level: low

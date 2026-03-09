@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head><title>Claude Code Tips</title></head>
+<body>
+<h1>Best Practices for Claude Code Skills</h1>
+<p>Here are some patterns:</p>
+<h2>Auto-Retry Hook</h2>
+<pre><code>#!/bin/bash
+# Auto-retry failed commands
+if [ $? -ne 0 ]; then
+  sleep 2 && "$@"
+fi
+</code></pre>
+<h2>Test Coverage Skill</h2>
+<p>A skill that checks test coverage before allowing commits.</p>
+<pre><code>---
+name: test-coverage
+description: Check test coverage before commits
+version: "1.0.0"
+---
+</code></pre>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "last_updated": "2026-03-09",
+    "total_patterns": 2
+  },
+  "fix-loop": {
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "type": "skill",
+    "category": "core",
+    "version": "1.2.0",
+    "source": "project:abhayla/KKB",
+    "discovered": "2026-02-10",
+    "last_updated": "2026-03-05",
+    "dependencies": ["hook-utils.sh"],
+    "visibility": "public",
+    "description": "Iterative test-fix cycle with thinking escalation",
+    "tags": ["testing", "debugging"],
+    "changelog": "v1.2: Added thinking escalation"
+  },
+  "auto-format": {
+    "hash": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:abhayla/KKB",
+    "discovered": "2026-02-10",
+    "last_updated": "2026-02-10",
+    "dependencies": ["hook-utils.sh"],
+    "visibility": "public",
+    "description": "Auto-format Python with Black and Ruff after edits",
+    "tags": ["formatting", "python"],
+    "changelog": "v1.0: Initial"
+  }
+}
