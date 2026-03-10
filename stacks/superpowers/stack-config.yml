@@ -1,7 +1,0 @@
-name: superpowers
-description: Brainstorming, TDD, debugging, code-review, and planning skills from the superpowers marketplace
-namespace: superpowers
-conflicts_with: []
-merges_with: [android-compose, fastapi-python, ai-gemini, firebase-auth, react-nextjs]
-file_precedence: stack
-dependencies: []

@@ -2,15 +2,17 @@
 
 ## Quick Start
 
-### Option A: GitHub Template
-1. Click **"Use this template"** on [abhayla/claude-best-practices](https://github.com/abhayla/claude-best-practices)
-2. Clone your new repo
-3. Run bootstrap:
+### Option A: Copy Everything
 ```bash
-python scripts/bootstrap.py --stacks ai-gemini,android-compose
+cp -r .claude/ /path/to/your/project/
 ```
 
-### Option B: Bootstrap Existing Project
+### Option B: Bootstrap with Stack Filtering
+```bash
+python scripts/bootstrap.py --stacks ai-gemini,android-compose --target /path/to/project
+```
+
+### Option C: Remote Bootstrap
 ```bash
 curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bootstrap.sh | bash -s -- --stacks ai-gemini,android-compose
 ```
@@ -19,18 +21,27 @@ curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bo
 
 | Stack | Description |
 |-------|-------------|
-| `ai-gemini` | See stack-config.yml for details |
-| `android-compose` | See stack-config.yml for details |
-| `fastapi-python` | See stack-config.yml for details |
-| `firebase-auth` | See stack-config.yml for details |
-| `react-nextjs` | See stack-config.yml for details |
-| `superpowers` | See stack-config.yml for details |
+| `ai-gemini` | Gemini API integration patterns |
+| `android-compose` | Jetpack Compose, Hilt, Room |
+| `fastapi-python` | FastAPI, SQLAlchemy, pytest, Alembic |
+| `firebase-auth` | Firebase Authentication |
+| `react-nextjs` | React + Next.js patterns |
+| `superpowers` | Advanced Claude Code automation |
 
-## Skills Included
+## What's Included
 
-| Skill | Purpose |
-|-------|---------|
-| `/update-practices` | Pull latest from hub |
-| `/contribute-practice` | Push pattern to hub |
-| `/scan-url` | Trigger internet scan |
-| `/scan-repo` | Trigger project scan |
+| Component | Count | Description |
+|-----------|-------|-------------|
+| Agents | 13 | Specialized sub-agents for code review, debugging, testing, etc. |
+| Skills | 26 | Slash-command workflows like `/implement`, `/fix-loop`, `/status` |
+| Rules | 10 | Scoped coding rules that activate based on file paths |
+| Hooks | — | Example hooks you can adapt (see `hooks/README.md`) |
+
+## Customization
+
+Delete files you don't need. For example, if you're not using FastAPI:
+```bash
+rm .claude/agents/fastapi-*
+rm -r .claude/skills/fastapi-*
+rm .claude/rules/fastapi-*
+```

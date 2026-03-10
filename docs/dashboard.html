@@ -29,7 +29,6 @@ h1 { color: var(--primary); }
 .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; overflow: hidden; }
 th { background: var(--primary-light); padding: 0.75rem; text-align: left; cursor: pointer; user-select: none; }
-th:hover { opacity: 0.8; }
 td { padding: 0.75rem; border-top: 1px solid var(--border); }
 tr:hover { background: var(--primary-light); }
 .badge { padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; color: white; }
@@ -38,14 +37,6 @@ tr:hover { background: var(--primary-light); }
 .badge-agent { background: var(--badge-agent); }
 .badge-rule { background: var(--badge-rule); }
 .badge-unknown { background: #6c757d; }
-.section { margin-top: 2rem; }
-.section h2 { margin-bottom: 1rem; cursor: pointer; }
-.section h2::before { content: "▼ "; font-size: 0.8em; }
-.section.collapsed h2::before { content: "▶ "; }
-.section.collapsed .section-content { display: none; }
-.stacks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-.stack-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
-.stack-card h3 { color: var(--primary); margin-bottom: 0.5rem; }
 .footer { margin-top: 3rem; text-align: center; font-size: 0.85rem; opacity: 0.6; }
 </style>
 </head>
@@ -54,90 +45,106 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-10 02:09 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-10 08:39 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">59</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">43</div><div class="label">Core</div></div>
-    <div class="stat-card"><div class="number">16</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">14</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">10</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">6</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">29</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">49</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">49</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">0</div><div class="label">Stack-specific</div></div>
+    <div class="stat-card"><div class="number">13</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">10</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">26</div><div class="label">Skills</div></div>
 </div>
 
-<div class="section" id="patterns-section">
-    <h2 onclick="toggleSection('patterns-section')">Pattern Inventory</h2>
-    <div class="section-content">
-        <input type="text" class="search" placeholder="Search patterns..." oninput="filterTable(this.value)">
-        <div class="filters">
-            <button class="filter-btn active" onclick="filterType('all', this)">All</button>
-            <button class="filter-btn" onclick="filterType('skill', this)">Skills</button>
-            <button class="filter-btn" onclick="filterType('hook', this)">Hooks</button>
-            <button class="filter-btn" onclick="filterType('agent', this)">Agents</button>
-            <button class="filter-btn" onclick="filterType('rule', this)">Rules</button>
-        </div>
-        <table id="patterns-table">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">Name</th>
-                    <th onclick="sortTable(1)">Type</th>
-                    <th onclick="sortTable(2)">Category</th>
-                    <th onclick="sortTable(3)">Version</th>
-                    <th onclick="sortTable(4)">Source</th>
-                    <th onclick="sortTable(5)">Dependencies</th>
-                    <th onclick="sortTable(6)">Tags</th>
-                </tr>
-            </thead>
-            <tbody>
-            <tr data-type="skill" data-category="stack:ai-gemini">
-                <td>Generate_Meal</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>stack:ai-gemini</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+<div id="patterns-section">
+    <h2>Pattern Inventory</h2>
+    <input type="text" class="search" placeholder="Search patterns..." oninput="filterTable(this.value)">
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterType('all', this)">All</button>
+        <button class="filter-btn" onclick="filterType('skill', this)">Skills</button>
+        <button class="filter-btn" onclick="filterType('agent', this)">Agents</button>
+        <button class="filter-btn" onclick="filterType('rule', this)">Rules</button>
+    </div>
+    <table id="patterns-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Name</th>
+                <th onclick="sortTable(1)">Type</th>
+                <th onclick="sortTable(2)">Category</th>
+                <th onclick="sortTable(3)">Version</th>
+                <th onclick="sortTable(4)">Source</th>
+                <th onclick="sortTable(5)">Dependencies</th>
+                <th onclick="sortTable(6)">Tags</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-type="rule" data-category="core">
+                <td>ai-gemini</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
-            <tr data-type="skill" data-category="stack:android-compose">
-                <td>adb-test</td>
+            <tr data-type="skill" data-category="core">
+                <td>ai-gemini-api</td>
                 <td><span class="badge badge-skill">skill</span></td>
-                <td>stack:android-compose</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
-            <tr data-type="rule" data-category="stack:android-compose">
+            <tr data-type="rule" data-category="core">
                 <td>android</td>
                 <td><span class="badge badge-rule">rule</span></td>
-                <td>stack:android-compose</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
-            <tr data-type="agent" data-category="stack:android-compose">
+            <tr data-type="skill" data-category="core">
+                <td>android-adb-test</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
                 <td>android-compose</td>
                 <td><span class="badge badge-agent">agent</span></td>
-                <td>stack:android-compose</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="agent" data-category="stack:fastapi-python">
-                <td>api-tester</td>
-                <td><span class="badge badge-agent">agent</span></td>
-                <td>stack:fastapi-python</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>auto-format</td>
-                <td><span class="badge badge-hook">hook</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>android-compose-ui</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>android-run-e2e</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>android-run-tests</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -145,17 +152,8 @@ tr:hover { background: var(--primary-light); }
                 <td>auto-verify</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="rule" data-category="stack:fastapi-python">
-                <td>backend</td>
-                <td><span class="badge badge-rule">rule</span></td>
-                <td>stack:fastapi-python</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -163,17 +161,8 @@ tr:hover { background: var(--primary-light); }
                 <td>claude-guardian</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="skill" data-category="core">
-                <td>clean-pyc</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -181,17 +170,8 @@ tr:hover { background: var(--primary-light); }
                 <td>code-reviewer</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="rule" data-category="stack:android-compose">
-                <td>compose-ui</td>
-                <td><span class="badge badge-rule">rule</span></td>
-                <td>stack:android-compose</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -199,8 +179,8 @@ tr:hover { background: var(--primary-light); }
                 <td>context-reducer</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -208,8 +188,8 @@ tr:hover { background: var(--primary-light); }
                 <td>continue</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -217,35 +197,8 @@ tr:hover { background: var(--primary-light); }
                 <td>contribute-practice</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="rule" data-category="stack:fastapi-python">
-                <td>database</td>
-                <td><span class="badge badge-rule">rule</span></td>
-                <td>stack:fastapi-python</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="agent" data-category="stack:fastapi-python">
-                <td>database-admin</td>
-                <td><span class="badge badge-agent">agent</span></td>
-                <td>stack:fastapi-python</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="skill" data-category="stack:fastapi-python">
-                <td>db-migrate</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>stack:fastapi-python</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -253,17 +206,8 @@ tr:hover { background: var(--primary-light); }
                 <td>debugger</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="skill" data-category="stack:fastapi-python">
-                <td>deploy</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>stack:fastapi-python</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -271,8 +215,80 @@ tr:hover { background: var(--primary-light); }
                 <td>docs-manager</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>fastapi-api-tester</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>fastapi-backend</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>fastapi-database</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>fastapi-database-admin</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>fastapi-db-migrate</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>fastapi-deploy</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>fastapi-run-backend-tests</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>firebase-auth</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -280,8 +296,8 @@ tr:hover { background: var(--primary-light); }
                 <td>fix-issue</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -289,17 +305,8 @@ tr:hover { background: var(--primary-light); }
                 <td>fix-loop</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="skill" data-category="stack:ai-gemini">
-                <td>gemini-api</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>stack:ai-gemini</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -307,17 +314,8 @@ tr:hover { background: var(--primary-light); }
                 <td>git-manager</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>hook-utils</td>
-                <td><span class="badge badge-hook">hook</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -325,26 +323,17 @@ tr:hover { background: var(--primary-light); }
                 <td>implement</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
-            <tr data-type="hook" data-category="core">
-                <td>log-workflow</td>
-                <td><span class="badge badge-hook">hook</span></td>
+            <tr data-type="skill" data-category="core">
+                <td>learn-n-improve</td>
+                <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="agent" data-category="stack:ai-gemini">
-                <td>meal-generation</td>
-                <td><span class="badge badge-agent">agent</span></td>
-                <td>stack:ai-gemini</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -352,8 +341,8 @@ tr:hover { background: var(--primary-light); }
                 <td>plan-executor</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -361,8 +350,8 @@ tr:hover { background: var(--primary-light); }
                 <td>plan-to-issues</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -370,17 +359,8 @@ tr:hover { background: var(--primary-light); }
                 <td>planner-researcher</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>post-anr-detection</td>
-                <td><span class="badge badge-hook">hook</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -388,80 +368,17 @@ tr:hover { background: var(--primary-light); }
                 <td>post-fix-pipeline</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
-            <tr data-type="hook" data-category="core">
-                <td>post-screenshot</td>
-                <td><span class="badge badge-hook">hook</span></td>
+            <tr data-type="rule" data-category="core">
+                <td>react-nextjs</td>
+                <td><span class="badge badge-rule">rule</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>post-test-update</td>
-                <td><span class="badge badge-hook">hook</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>pre-skill-fixloop-unblock</td>
-                <td><span class="badge badge-hook">hook</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="skill" data-category="core">
-                <td>reflect</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>resize_screenshot</td>
-                <td><span class="badge badge-hook">hook</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="skill" data-category="stack:android-compose">
-                <td>run-android-tests</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>stack:android-compose</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="skill" data-category="stack:fastapi-python">
-                <td>run-backend-tests</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>stack:fastapi-python</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="skill" data-category="stack:android-compose">
-                <td>run-e2e</td>
-                <td><span class="badge badge-skill">skill</span></td>
-                <td>stack:android-compose</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -469,8 +386,8 @@ tr:hover { background: var(--primary-light); }
                 <td>scan-repo</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -478,8 +395,8 @@ tr:hover { background: var(--primary-light); }
                 <td>scan-url</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -487,8 +404,8 @@ tr:hover { background: var(--primary-light); }
                 <td>session-summarizer</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -496,8 +413,8 @@ tr:hover { background: var(--primary-light); }
                 <td>skill-factory</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -505,8 +422,8 @@ tr:hover { background: var(--primary-light); }
                 <td>status</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -514,17 +431,17 @@ tr:hover { background: var(--primary-light); }
                 <td>strategic-architect</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
-            <tr data-type="skill" data-category="core">
-                <td>sync-check</td>
-                <td><span class="badge badge-skill">skill</span></td>
+            <tr data-type="rule" data-category="core">
+                <td>superpowers</td>
+                <td><span class="badge badge-rule">rule</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -532,8 +449,8 @@ tr:hover { background: var(--primary-light); }
                 <td>test-failure-analyzer</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -541,8 +458,8 @@ tr:hover { background: var(--primary-light); }
                 <td>test-knowledge</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -550,8 +467,8 @@ tr:hover { background: var(--primary-light); }
                 <td>tester</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -559,8 +476,8 @@ tr:hover { background: var(--primary-light); }
                 <td>testing</td>
                 <td><span class="badge badge-rule">rule</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -568,8 +485,8 @@ tr:hover { background: var(--primary-light); }
                 <td>ui-ux-pro-max</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -577,26 +494,8 @@ tr:hover { background: var(--primary-light); }
                 <td>update-practices</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>validate-workflow-step</td>
-                <td><span class="badge badge-hook">hook</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>verify-evidence-artifacts</td>
-                <td><span class="badge badge-hook">hook</span></td>
-                <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -604,8 +503,8 @@ tr:hover { background: var(--primary-light); }
                 <td>verify-screenshots</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -613,46 +512,13 @@ tr:hover { background: var(--primary-light); }
                 <td>workflow</td>
                 <td><span class="badge badge-rule">rule</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
-                <td>project:abhayla/KKB</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="section" id="stacks-section">
-    <h2 onclick="toggleSection('stacks-section')">Available Stacks</h2>
-    <div class="section-content">
-        <div class="stacks-grid">
-                    <div class="stack-card">
-                        <h3>ai-gemini</h3>
-                        <p>Google Gemini API integration for AI-powered features (structured output, vision)</p>
-                    </div>
-                    <div class="stack-card">
-                        <h3>android-compose</h3>
-                        <p>Android Jetpack Compose with Hilt DI, Room DB, Navigation Compose</p>
-                    </div>
-                    <div class="stack-card">
-                        <h3>fastapi-python</h3>
-                        <p>Python FastAPI backend with SQLAlchemy async, PostgreSQL, Alembic migrations</p>
-                    </div>
-                    <div class="stack-card">
-                        <h3>firebase-auth</h3>
-                        <p>Firebase Authentication (Phone OTP) with backend JWT verification</p>
-                    </div>
-                    <div class="stack-card">
-                        <h3>react-nextjs</h3>
-                        <p>React + Next.js frontend (future stack placeholder)</p>
-                    </div>
-                    <div class="stack-card">
-                        <h3>superpowers</h3>
-                        <p>Brainstorming, TDD, debugging, code-review, and planning skills from the superpowers marketplace</p>
-                    </div>
-        </div>
-    </div>
+        </tbody>
+    </table>
 </div>
 
 <div class="footer">
@@ -663,9 +529,6 @@ tr:hover { background: var(--primary-light); }
 function toggleTheme() {
     const html = document.documentElement;
     html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? '' : 'dark');
-}
-function toggleSection(id) {
-    document.getElementById(id).classList.toggle('collapsed');
 }
 function filterTable(query) {
     const rows = document.querySelectorAll('#patterns-table tbody tr');

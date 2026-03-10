@@ -36,13 +36,15 @@ class TestGenerateDashboardMd:
 
 class TestGenerateStackCatalog:
     def test_lists_stacks(self, tmp_path):
-        stack_dir = tmp_path / "stacks" / "android-compose"
-        stack_dir.mkdir(parents=True)
-        (stack_dir / "stack-config.yml").write_text(
-            "name: android-compose\ndescription: Android stack\n"
-        )
-        catalog = generate_stack_catalog(tmp_path / "stacks")
-        assert "android-compose" in catalog
+        """Stack catalog now uses .claude/ dir with prefix convention."""
+        claude_dir = tmp_path / ".claude"
+        (claude_dir / "agents").mkdir(parents=True)
+        (claude_dir / "agents" / "android-compose.md").write_text("# Android")
+        (claude_dir / "skills" / "android-run-tests").mkdir(parents=True)
+        (claude_dir / "skills" / "android-run-tests" / "SKILL.md").write_text("# Tests")
+        catalog = generate_stack_catalog(claude_dir)
+        assert "Android" in catalog
+        assert "android-" in catalog
 
 
 class TestGenerateGettingStarted:

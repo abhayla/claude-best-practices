@@ -24,6 +24,37 @@ def count_patterns(registry: dict) -> dict:
     return counts
 
 
+def scan_claude_dir(claude_dir: Path) -> dict:
+    """Scan .claude/ directory for pattern inventory."""
+    inventory = {"agents": [], "skills": [], "rules": [], "hooks": []}
+
+    if not claude_dir.exists():
+        return inventory
+
+    # Agents
+    agents_dir = claude_dir / "agents"
+    if agents_dir.exists():
+        for f in sorted(agents_dir.iterdir()):
+            if f.suffix == ".md" and f.name != "README.md":
+                inventory["agents"].append(f.stem)
+
+    # Skills
+    skills_dir = claude_dir / "skills"
+    if skills_dir.exists():
+        for d in sorted(skills_dir.iterdir()):
+            if d.is_dir() and (d / "SKILL.md").exists():
+                inventory["skills"].append(d.name)
+
+    # Rules
+    rules_dir = claude_dir / "rules"
+    if rules_dir.exists():
+        for f in sorted(rules_dir.iterdir()):
+            if f.suffix == ".md" and f.name != "README.md":
+                inventory["rules"].append(f.stem)
+
+    return inventory
+
+
 def generate_dashboard_md(registry: dict, scan_history: list, sync_status: dict) -> str:
     """Generate DASHBOARD.md content."""
     counts = count_patterns(registry)
@@ -61,8 +92,19 @@ def generate_dashboard_md(registry: dict, scan_history: list, sync_status: dict)
 
     lines.extend([
         "",
+        "## Quick Start",
+        "",
+        "Copy the `.claude/` directory to your project:",
+        "```bash",
+        "cp -r .claude/ /path/to/your/project/",
+        "```",
+        "",
+        "Or use bootstrap for stack-specific filtering:",
+        "```bash",
+        "python scripts/bootstrap.py --stacks fastapi-python,android-compose --target /path/to/project",
+        "```",
+        "",
         "## How to Use",
-        "- **Bootstrap new project:** `python scripts/bootstrap.py --stacks android-compose,fastapi-python`",
         "- **Update local practices:** Run `/update-practices` in any Claude Code session",
         "- **Contribute a pattern:** Run `/contribute-practice .claude/skills/my-skill/`",
         "- **Scan a URL:** `gh workflow run scan-internet.yml -f url=\"https://...\"`",
@@ -73,33 +115,40 @@ def generate_dashboard_md(registry: dict, scan_history: list, sync_status: dict)
     return "\n".join(lines)
 
 
-def generate_stack_catalog(stacks_dir: Path) -> str:
-    """Generate STACK-CATALOG.md content."""
-    lines = ["# Stack Catalog", "", "Available stacks and their contents.", ""]
+def generate_stack_catalog(claude_dir: Path) -> str:
+    """Generate STACK-CATALOG.md content from .claude/ directory using prefix convention."""
+    lines = [
+        "# Stack Catalog",
+        "",
+        "Patterns are organized in the `.claude/` directory. Stack-specific patterns use filename prefixes.",
+        "",
+    ]
 
-    if not stacks_dir.exists():
-        return "\n".join(lines + ["_No stacks found._"])
+    prefixes = {
+        "fastapi-": {"name": "FastAPI + Python", "desc": "Async backend patterns: SQLAlchemy, Pydantic, pytest, Alembic."},
+        "android-": {"name": "Android + Compose", "desc": "Jetpack Compose UI, Hilt DI, Room DB, Gradle."},
+        "ai-gemini-": {"name": "AI / Gemini", "desc": "Gemini structured output, prompt engineering, generation patterns."},
+        "firebase-": {"name": "Firebase Auth", "desc": "Phone OTP, token management, multi-environment setup."},
+        "react-": {"name": "React + Next.js", "desc": "Next.js App Router, server components, Tailwind."},
+        "superpowers-": {"name": "Superpowers", "desc": "Advanced Claude Code patterns: hooks, session analysis, automation."},
+    }
 
-    for stack_dir in sorted(stacks_dir.iterdir()):
-        if not stack_dir.is_dir():
-            continue
-        config_file = stack_dir / "stack-config.yml"
-        if config_file.exists():
-            with open(config_file) as f:
-                config = yaml.safe_load(f)
-            name = config.get("name", stack_dir.name)
-            desc = config.get("description", "")
-            lines.extend([f"## {name}", f"_{desc}_", ""])
+    for prefix, info in sorted(prefixes.items(), key=lambda x: x[1]["name"]):
+        lines.extend([f"## {info['name']}", f"_{info['desc']}_", ""])
+        lines.append(f"**Prefix:** `{prefix}*`", )
+        lines.append("")
 
-            claude_dir = stack_dir / ".claude"
-            if claude_dir.exists():
-                for subdir in ["skills", "agents", "hooks", "rules"]:
-                    sub = claude_dir / subdir
-                    if sub.exists():
-                        items = [f.name for f in sub.iterdir() if f.name != ".gitkeep"]
-                        if items:
-                            lines.append(f"**{subdir.title()}:** {', '.join(items)}")
-                lines.append("")
+        if claude_dir.exists():
+            for subdir in ["skills", "agents", "rules"]:
+                sub = claude_dir / subdir
+                if sub.exists():
+                    if subdir == "skills":
+                        items = [d.name for d in sub.iterdir() if d.is_dir() and d.name.startswith(prefix)]
+                    else:
+                        items = [f.stem for f in sub.iterdir() if f.stem.startswith(prefix)]
+                    if items:
+                        lines.append(f"**{subdir.title()}:** {', '.join(items)}")
+            lines.append("")
 
     return "\n".join(lines)
 
@@ -112,15 +161,17 @@ def generate_getting_started(hub_repo: str, available_stacks: list[str]) -> str:
         "",
         "## Quick Start",
         "",
-        "### Option A: GitHub Template",
-        f'1. Click **"Use this template"** on [{hub_repo}](https://github.com/{hub_repo})',
-        "2. Clone your new repo",
-        "3. Run bootstrap:",
+        "### Option A: Copy Everything",
         "```bash",
-        f"python scripts/bootstrap.py --stacks {stacks_str}",
+        "cp -r .claude/ /path/to/your/project/",
         "```",
         "",
-        "### Option B: Bootstrap Existing Project",
+        "### Option B: Bootstrap with Stack Filtering",
+        "```bash",
+        f"python scripts/bootstrap.py --stacks {stacks_str} --target /path/to/project",
+        "```",
+        "",
+        "### Option C: Remote Bootstrap",
         "```bash",
         f"curl -sL https://raw.githubusercontent.com/{hub_repo}/main/bootstrap.sh | bash -s -- --stacks {stacks_str}",
         "```",
@@ -131,26 +182,45 @@ def generate_getting_started(hub_repo: str, available_stacks: list[str]) -> str:
         "|-------|-------------|",
     ]
 
+    stack_descriptions = {
+        "ai-gemini": "Gemini API integration patterns",
+        "android-compose": "Jetpack Compose, Hilt, Room",
+        "fastapi-python": "FastAPI, SQLAlchemy, pytest, Alembic",
+        "firebase-auth": "Firebase Authentication",
+        "react-nextjs": "React + Next.js patterns",
+        "superpowers": "Advanced Claude Code automation",
+    }
+
     for stack in available_stacks:
-        lines.append(f"| `{stack}` | See stack-config.yml for details |")
+        desc = stack_descriptions.get(stack, "See .claude/ directory")
+        lines.append(f"| `{stack}` | {desc} |")
 
     lines.extend([
         "",
-        "## Skills Included",
+        "## What's Included",
         "",
-        "| Skill | Purpose |",
-        "|-------|---------|",
-        "| `/update-practices` | Pull latest from hub |",
-        "| `/contribute-practice` | Push pattern to hub |",
-        "| `/scan-url` | Trigger internet scan |",
-        "| `/scan-repo` | Trigger project scan |",
+        "| Component | Count | Description |",
+        "|-----------|-------|-------------|",
+        "| Agents | 13 | Specialized sub-agents for code review, debugging, testing, etc. |",
+        "| Skills | 26 | Slash-command workflows like `/implement`, `/fix-loop`, `/status` |",
+        "| Rules | 10 | Scoped coding rules that activate based on file paths |",
+        "| Hooks | — | Example hooks you can adapt (see `hooks/README.md`) |",
+        "",
+        "## Customization",
+        "",
+        "Delete files you don't need. For example, if you're not using FastAPI:",
+        "```bash",
+        "rm .claude/agents/fastapi-*",
+        "rm -r .claude/skills/fastapi-*",
+        "rm .claude/rules/fastapi-*",
+        "```",
         "",
     ])
 
     return "\n".join(lines)
 
 
-def generate_dashboard_html(registry: dict, stacks_dir: Path) -> str:
+def generate_dashboard_html(registry: dict, claude_dir: Path) -> str:
     """Generate an interactive HTML dashboard."""
     counts = count_patterns(registry)
     now = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
@@ -172,22 +242,6 @@ def generate_dashboard_html(registry: dict, stacks_dir: Path) -> str:
                 <td>{deps}</td>
                 <td>{tags}</td>
             </tr>""")
-
-    # Build stack sections
-    stack_sections = []
-    if stacks_dir.exists():
-        for stack_dir in sorted(stacks_dir.iterdir()):
-            if not stack_dir.is_dir():
-                continue
-            config_file = stack_dir / "stack-config.yml"
-            if config_file.exists():
-                with open(config_file) as f:
-                    config = yaml.safe_load(f)
-                stack_sections.append(f"""
-                    <div class="stack-card">
-                        <h3>{config.get('name', stack_dir.name)}</h3>
-                        <p>{config.get('description', '')}</p>
-                    </div>""")
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -220,7 +274,6 @@ h1 {{ color: var(--primary); }}
 .filter-btn.active {{ background: var(--primary); color: white; border-color: var(--primary); }}
 table {{ width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; overflow: hidden; }}
 th {{ background: var(--primary-light); padding: 0.75rem; text-align: left; cursor: pointer; user-select: none; }}
-th:hover {{ opacity: 0.8; }}
 td {{ padding: 0.75rem; border-top: 1px solid var(--border); }}
 tr:hover {{ background: var(--primary-light); }}
 .badge {{ padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; color: white; }}
@@ -229,14 +282,6 @@ tr:hover {{ background: var(--primary-light); }}
 .badge-agent {{ background: var(--badge-agent); }}
 .badge-rule {{ background: var(--badge-rule); }}
 .badge-unknown {{ background: #6c757d; }}
-.section {{ margin-top: 2rem; }}
-.section h2 {{ margin-bottom: 1rem; cursor: pointer; }}
-.section h2::before {{ content: "▼ "; font-size: 0.8em; }}
-.section.collapsed h2::before {{ content: "▶ "; }}
-.section.collapsed .section-content {{ display: none; }}
-.stacks-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }}
-.stack-card {{ background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }}
-.stack-card h3 {{ color: var(--primary); margin-bottom: 0.5rem; }}
 .footer {{ margin-top: 3rem; text-align: center; font-size: 0.85rem; opacity: 0.6; }}
 </style>
 </head>
@@ -254,41 +299,30 @@ tr:hover {{ background: var(--primary-light); }}
     {"".join(f'<div class="stat-card"><div class="number">{c}</div><div class="label">{t.title()}s</div></div>' for t, c in sorted(counts['by_type'].items()))}
 </div>
 
-<div class="section" id="patterns-section">
-    <h2 onclick="toggleSection('patterns-section')">Pattern Inventory</h2>
-    <div class="section-content">
-        <input type="text" class="search" placeholder="Search patterns..." oninput="filterTable(this.value)">
-        <div class="filters">
-            <button class="filter-btn active" onclick="filterType('all', this)">All</button>
-            <button class="filter-btn" onclick="filterType('skill', this)">Skills</button>
-            <button class="filter-btn" onclick="filterType('hook', this)">Hooks</button>
-            <button class="filter-btn" onclick="filterType('agent', this)">Agents</button>
-            <button class="filter-btn" onclick="filterType('rule', this)">Rules</button>
-        </div>
-        <table id="patterns-table">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">Name</th>
-                    <th onclick="sortTable(1)">Type</th>
-                    <th onclick="sortTable(2)">Category</th>
-                    <th onclick="sortTable(3)">Version</th>
-                    <th onclick="sortTable(4)">Source</th>
-                    <th onclick="sortTable(5)">Dependencies</th>
-                    <th onclick="sortTable(6)">Tags</th>
-                </tr>
-            </thead>
-            <tbody>{"".join(pattern_rows) if pattern_rows else "<tr><td colspan='7' style='text-align:center;opacity:0.5'>No patterns yet</td></tr>"}
-            </tbody>
-        </table>
+<div id="patterns-section">
+    <h2>Pattern Inventory</h2>
+    <input type="text" class="search" placeholder="Search patterns..." oninput="filterTable(this.value)">
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterType('all', this)">All</button>
+        <button class="filter-btn" onclick="filterType('skill', this)">Skills</button>
+        <button class="filter-btn" onclick="filterType('agent', this)">Agents</button>
+        <button class="filter-btn" onclick="filterType('rule', this)">Rules</button>
     </div>
-</div>
-
-<div class="section" id="stacks-section">
-    <h2 onclick="toggleSection('stacks-section')">Available Stacks</h2>
-    <div class="section-content">
-        <div class="stacks-grid">{"".join(stack_sections) if stack_sections else "<p>No stacks configured.</p>"}
-        </div>
-    </div>
+    <table id="patterns-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Name</th>
+                <th onclick="sortTable(1)">Type</th>
+                <th onclick="sortTable(2)">Category</th>
+                <th onclick="sortTable(3)">Version</th>
+                <th onclick="sortTable(4)">Source</th>
+                <th onclick="sortTable(5)">Dependencies</th>
+                <th onclick="sortTable(6)">Tags</th>
+            </tr>
+        </thead>
+        <tbody>{"".join(pattern_rows) if pattern_rows else "<tr><td colspan='7' style='text-align:center;opacity:0.5'>No patterns yet</td></tr>"}
+        </tbody>
+    </table>
 </div>
 
 <div class="footer">
@@ -299,9 +333,6 @@ tr:hover {{ background: var(--primary-light); }}
 function toggleTheme() {{
     const html = document.documentElement;
     html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? '' : 'dark');
-}}
-function toggleSection(id) {{
-    document.getElementById(id).classList.toggle('collapsed');
 }}
 function filterTable(query) {{
     const rows = document.querySelectorAll('#patterns-table tbody tr');
@@ -349,27 +380,25 @@ if __name__ == "__main__":
     with open(registry_path) as f:
         registry = json.load(f)
 
+    claude_dir = root / ".claude"
+
     dashboard = generate_dashboard_md(registry, [], {})
     (docs_dir / "DASHBOARD.md").write_text(dashboard)
     print("Generated docs/DASHBOARD.md")
 
-    catalog = generate_stack_catalog(root / "stacks")
+    catalog = generate_stack_catalog(claude_dir)
     (docs_dir / "STACK-CATALOG.md").write_text(catalog)
     print("Generated docs/STACK-CATALOG.md")
 
-    stacks = []
-    stacks_dir = root / "stacks"
-    if stacks_dir.exists():
-        for d in stacks_dir.iterdir():
-            if d.is_dir() and (d / "stack-config.yml").exists():
-                stacks.append(d.name)
+    from scripts.bootstrap import get_available_stacks
+    available_stacks = get_available_stacks()
 
-    getting_started = generate_getting_started("abhayla/claude-best-practices", sorted(stacks))
+    getting_started = generate_getting_started("abhayla/claude-best-practices", available_stacks)
     (docs_dir / "GETTING-STARTED.md").write_text(getting_started)
     print("Generated docs/GETTING-STARTED.md")
 
     # Generate HTML dashboard
-    dashboard_html = generate_dashboard_html(registry, root / "stacks")
+    dashboard_html = generate_dashboard_html(registry, claude_dir)
     (docs_dir / "dashboard.html").write_text(dashboard_html, encoding="utf-8")
     print("Generated docs/dashboard.html")
 

@@ -4,8 +4,7 @@ on:
     branches: [main]
     paths:
       - 'registry/patterns.json'
-      - 'stacks/**'
-      - 'core/**'
+      - '.claude/**'
   workflow_dispatch:
 
 permissions:

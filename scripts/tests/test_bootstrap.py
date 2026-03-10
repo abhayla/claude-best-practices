@@ -8,72 +8,111 @@ import pytest
 import yaml
 
 from scripts.bootstrap import (
-    load_stack_config,
     validate_stack_selection,
-    copy_layer,
+    copy_claude_dir,
     render_template,
     generate_sync_config,
+    get_available_stacks,
+    STACK_PREFIXES,
 )
 
 
-class TestLoadStackConfig:
-    def test_loads_valid_config(self, tmp_path):
-        config_file = tmp_path / "stack-config.yml"
-        config_file.write_text(yaml.dump({
-            "name": "test-stack",
-            "namespace": "test",
-            "conflicts_with": [],
-            "merges_with": [],
-        }))
-        config = load_stack_config(config_file)
-        assert config["name"] == "test-stack"
-
-    def test_missing_file_returns_none(self, tmp_path):
-        config = load_stack_config(tmp_path / "nonexistent.yml")
-        assert config is None
-
-
 class TestValidateStackSelection:
-    def test_no_conflicts_passes(self):
-        configs = {
-            "android": {"conflicts_with": []},
-            "fastapi": {"conflicts_with": []},
-        }
-        errors = validate_stack_selection(["android", "fastapi"], configs)
+    def test_valid_stacks_pass(self):
+        errors = validate_stack_selection(["fastapi-python", "android-compose"])
         assert len(errors) == 0
 
-    def test_conflict_detected(self):
-        configs = {
-            "android": {"conflicts_with": ["react"]},
-            "react": {"conflicts_with": ["android"]},
-        }
-        errors = validate_stack_selection(["android", "react"], configs)
-        assert len(errors) > 0
-
     def test_unknown_stack_rejected(self):
-        configs = {"android": {"conflicts_with": []}}
-        errors = validate_stack_selection(["android", "nonexistent"], configs)
+        errors = validate_stack_selection(["fastapi-python", "nonexistent"])
         assert any("nonexistent" in e for e in errors)
 
+    def test_empty_list_passes(self):
+        errors = validate_stack_selection([])
+        assert len(errors) == 0
 
-class TestCopyLayer:
-    def test_copies_files(self, tmp_path):
-        src = tmp_path / "src" / ".claude" / "skills" / "test"
-        src.mkdir(parents=True)
-        (src / "SKILL.md").write_text("# test")
+
+class TestGetAvailableStacks:
+    def test_returns_all_stacks(self):
+        stacks = get_available_stacks()
+        assert "fastapi-python" in stacks
+        assert "android-compose" in stacks
+        assert "ai-gemini" in stacks
+
+    def test_returns_sorted(self):
+        stacks = get_available_stacks()
+        assert stacks == sorted(stacks)
+
+
+class TestCopyClaudeDir:
+    def test_copies_core_files(self, tmp_path):
+        """Core (non-prefixed) files are always copied."""
+        hub = tmp_path / "hub"
+        (hub / ".claude" / "agents").mkdir(parents=True)
+        (hub / ".claude" / "agents" / "debugger.md").write_text("# Debugger")
+        (hub / ".claude" / "skills" / "fix-loop").mkdir(parents=True)
+        (hub / ".claude" / "skills" / "fix-loop" / "SKILL.md").write_text("# Fix Loop")
+
         dst = tmp_path / "dst"
         dst.mkdir()
-        copy_layer(tmp_path / "src", dst)
-        assert (dst / ".claude" / "skills" / "test" / "SKILL.md").exists()
+        copied = copy_claude_dir(hub, dst, ["fastapi-python"])
+
+        assert (dst / ".claude" / "agents" / "debugger.md").exists()
+        assert (dst / ".claude" / "skills" / "fix-loop" / "SKILL.md").exists()
+
+    def test_copies_matching_stack_files(self, tmp_path):
+        """Stack-prefixed files are copied when stack is selected."""
+        hub = tmp_path / "hub"
+        (hub / ".claude" / "agents").mkdir(parents=True)
+        (hub / ".claude" / "agents" / "fastapi-api-tester.md").write_text("# API Tester")
+        (hub / ".claude" / "skills" / "fastapi-db-migrate").mkdir(parents=True)
+        (hub / ".claude" / "skills" / "fastapi-db-migrate" / "SKILL.md").write_text("# DB Migrate")
+
+        dst = tmp_path / "dst"
+        dst.mkdir()
+        copied = copy_claude_dir(hub, dst, ["fastapi-python"])
+
+        assert (dst / ".claude" / "agents" / "fastapi-api-tester.md").exists()
+        assert (dst / ".claude" / "skills" / "fastapi-db-migrate" / "SKILL.md").exists()
+
+    def test_excludes_non_matching_stack_files(self, tmp_path):
+        """Stack-prefixed files are excluded when stack is not selected."""
+        hub = tmp_path / "hub"
+        (hub / ".claude" / "agents").mkdir(parents=True)
+        (hub / ".claude" / "agents" / "fastapi-api-tester.md").write_text("# API Tester")
+        (hub / ".claude" / "agents" / "android-compose.md").write_text("# Android")
+        (hub / ".claude" / "agents" / "debugger.md").write_text("# Debugger")
+
+        dst = tmp_path / "dst"
+        dst.mkdir()
+        copied = copy_claude_dir(hub, dst, ["android-compose"])
+
+        # Core file always copied
+        assert (dst / ".claude" / "agents" / "debugger.md").exists()
+        # Android file copied (selected stack)
+        assert (dst / ".claude" / "agents" / "android-compose.md").exists()
+        # FastAPI file NOT copied (not selected)
+        assert not (dst / ".claude" / "agents" / "fastapi-api-tester.md").exists()
 
     def test_skips_gitkeep(self, tmp_path):
-        src = tmp_path / "src" / ".claude" / "skills"
-        src.mkdir(parents=True)
-        (src / ".gitkeep").write_text("")
+        hub = tmp_path / "hub"
+        (hub / ".claude" / "skills").mkdir(parents=True)
+        (hub / ".claude" / "skills" / ".gitkeep").write_text("")
+
         dst = tmp_path / "dst"
         dst.mkdir()
-        copy_layer(tmp_path / "src", dst)
+        copied = copy_claude_dir(hub, dst, [])
+
         assert not (dst / ".claude" / "skills" / ".gitkeep").exists()
+
+    def test_handles_missing_claude_dir(self, tmp_path):
+        hub = tmp_path / "hub"
+        hub.mkdir()  # No .claude/ inside
+
+        dst = tmp_path / "dst"
+        dst.mkdir()
+        copied = copy_claude_dir(hub, dst, ["fastapi-python"])
+
+        assert len(copied) == 0
 
 
 class TestRenderTemplate:
@@ -96,3 +135,4 @@ class TestGenerateSyncConfig:
         parsed = yaml.safe_load(config)
         assert parsed["hub_repo"] == "owner/hub"
         assert "android-compose" in parsed["selected_stacks"]
+        assert "fastapi-python" in parsed["selected_stacks"]

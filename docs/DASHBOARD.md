@@ -1,16 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-10 02:09 UTC (auto-generated)
+> Last updated: 2026-03-10 08:39 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 59 |
-| Core (universal) | 43 |
-| Stack-specific | 16 |
-| Agents | 14 |
-| Hooks | 10 |
-| Rules | 6 |
-| Skills | 29 |
+| Total Patterns | 49 |
+| Core (universal) | 49 |
+| Stack-specific | 0 |
+| Agents | 13 |
+| Rules | 10 |
+| Skills | 26 |
 
 ## Pattern Inventory
 
@@ -18,52 +17,69 @@
 
 | Name | Type | Version | Source | Dependencies |
 |------|------|---------|--------|--------------|
-| auto-format | hook | 1.0.0 | project:abhayla/KKB | — |
-| auto-verify | skill | 1.0.0 | project:abhayla/KKB | — |
-| claude-guardian | skill | 1.0.0 | project:abhayla/KKB | — |
-| clean-pyc | skill | 1.0.0 | project:abhayla/KKB | — |
-| code-reviewer | agent | 1.0.0 | project:abhayla/KKB | — |
-| context-reducer | agent | 1.0.0 | project:abhayla/KKB | — |
-| continue | skill | 1.0.0 | project:abhayla/KKB | — |
-| contribute-practice | skill | 1.0.0 | project:abhayla/KKB | — |
-| debugger | agent | 1.0.0 | project:abhayla/KKB | — |
-| docs-manager | agent | 1.0.0 | project:abhayla/KKB | — |
-| fix-issue | skill | 1.0.0 | project:abhayla/KKB | — |
-| fix-loop | skill | 1.0.0 | project:abhayla/KKB | — |
-| git-manager | agent | 1.0.0 | project:abhayla/KKB | — |
-| hook-utils | hook | 1.0.0 | project:abhayla/KKB | — |
-| implement | skill | 1.0.0 | project:abhayla/KKB | — |
-| log-workflow | hook | 1.0.0 | project:abhayla/KKB | — |
-| plan-executor | agent | 1.0.0 | project:abhayla/KKB | — |
-| plan-to-issues | skill | 1.0.0 | project:abhayla/KKB | — |
-| planner-researcher | agent | 1.0.0 | project:abhayla/KKB | — |
-| post-anr-detection | hook | 1.0.0 | project:abhayla/KKB | — |
-| post-fix-pipeline | skill | 1.0.0 | project:abhayla/KKB | — |
-| post-screenshot | hook | 1.0.0 | project:abhayla/KKB | — |
-| post-test-update | hook | 1.0.0 | project:abhayla/KKB | — |
-| pre-skill-fixloop-unblock | hook | 1.0.0 | project:abhayla/KKB | — |
-| reflect | skill | 1.0.0 | project:abhayla/KKB | — |
-| resize_screenshot | hook | 1.0.0 | project:abhayla/KKB | — |
-| scan-repo | skill | 1.0.0 | project:abhayla/KKB | — |
-| scan-url | skill | 1.0.0 | project:abhayla/KKB | — |
-| session-summarizer | agent | 1.0.0 | project:abhayla/KKB | — |
-| skill-factory | skill | 1.0.0 | project:abhayla/KKB | — |
-| status | skill | 1.0.0 | project:abhayla/KKB | — |
-| strategic-architect | skill | 1.0.0 | project:abhayla/KKB | — |
-| sync-check | skill | 1.0.0 | project:abhayla/KKB | — |
-| test-failure-analyzer | agent | 1.0.0 | project:abhayla/KKB | — |
-| test-knowledge | skill | 1.0.0 | project:abhayla/KKB | — |
-| tester | agent | 1.0.0 | project:abhayla/KKB | — |
-| testing | rule | 1.0.0 | project:abhayla/KKB | — |
-| ui-ux-pro-max | skill | 1.0.0 | project:abhayla/KKB | — |
-| update-practices | skill | 1.0.0 | project:abhayla/KKB | — |
-| validate-workflow-step | hook | 1.0.0 | project:abhayla/KKB | — |
-| verify-evidence-artifacts | hook | 1.0.0 | project:abhayla/KKB | — |
-| verify-screenshots | skill | 1.0.0 | project:abhayla/KKB | — |
-| workflow | rule | 1.0.0 | project:abhayla/KKB | — |
+| ai-gemini | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| ai-gemini-api | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android-adb-test | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android-compose | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android-compose-ui | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android-run-e2e | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android-run-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| auto-verify | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| code-reviewer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| context-reducer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| continue | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| contribute-practice | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| debugger | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| docs-manager | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-api-tester | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-backend | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-database | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-database-admin | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-db-migrate | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-deploy | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-run-backend-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| firebase-auth | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fix-issue | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| fix-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| git-manager | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| implement | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| learn-n-improve | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| plan-executor | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| plan-to-issues | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| planner-researcher | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| post-fix-pipeline | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| react-nextjs | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| scan-repo | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| scan-url | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| session-summarizer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| skill-factory | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| status | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| superpowers | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| test-failure-analyzer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| tester | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| testing | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| update-practices | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| verify-screenshots | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| workflow | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+
+## Quick Start
+
+Copy the `.claude/` directory to your project:
+```bash
+cp -r .claude/ /path/to/your/project/
+```
+
+Or use bootstrap for stack-specific filtering:
+```bash
+python scripts/bootstrap.py --stacks fastapi-python,android-compose --target /path/to/project
+```
 
 ## How to Use
-- **Bootstrap new project:** `python scripts/bootstrap.py --stacks android-compose,fastapi-python`
 - **Update local practices:** Run `/update-practices` in any Claude Code session
 - **Contribute a pattern:** Run `/contribute-practice .claude/skills/my-skill/`
 - **Scan a URL:** `gh workflow run scan-internet.yml -f url="https://..."`

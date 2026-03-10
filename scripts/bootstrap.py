@@ -11,34 +11,52 @@ from typing import Optional
 import yaml
 
 
-def load_stack_config(config_path: Path) -> Optional[dict]:
-    """Load a stack's configuration file."""
-    if not config_path.exists():
-        return None
-    with open(config_path) as f:
-        return yaml.safe_load(f)
+# Stack prefixes for filtering .claude/ contents by stack
+STACK_PREFIXES = {
+    "fastapi-python": "fastapi-",
+    "android-compose": "android-",
+    "ai-gemini": "ai-gemini-",
+    "firebase-auth": "firebase-",
+    "react-nextjs": "react-",
+    "superpowers": "superpowers-",
+}
 
 
-def validate_stack_selection(stacks: list[str], configs: dict) -> list[str]:
-    """Validate that selected stacks are compatible."""
+def get_available_stacks() -> list[str]:
+    """Return list of available stack names."""
+    return sorted(STACK_PREFIXES.keys())
+
+
+def validate_stack_selection(stacks: list[str]) -> list[str]:
+    """Validate that selected stacks are known."""
     errors = []
+    available = get_available_stacks()
     for stack in stacks:
-        if stack not in configs:
-            errors.append(f"Unknown stack: '{stack}'. Available: {list(configs.keys())}")
-            continue
-        conflicts = configs[stack].get("conflicts_with", [])
-        for other in stacks:
-            if other in conflicts:
-                errors.append(f"Stack '{stack}' conflicts with '{other}'")
+        if stack not in STACK_PREFIXES:
+            errors.append(f"Unknown stack: '{stack}'. Available: {available}")
     return errors
 
 
-def copy_layer(src_dir: Path, dst_dir: Path) -> list[str]:
-    """Copy a layer's .claude/ contents to destination. Returns copied file paths."""
+def copy_claude_dir(hub_root: Path, target_dir: Path, stacks: list[str]) -> list[str]:
+    """Copy .claude/ contents to target, filtering by selected stacks.
+
+    - Files without a stack prefix are always copied (universal/core).
+    - Files with a stack prefix are only copied if that stack is selected.
+    """
     copied = []
-    claude_src = src_dir / ".claude"
+    claude_src = hub_root / ".claude"
     if not claude_src.exists():
         return copied
+
+    # Build set of allowed prefixes from selected stacks
+    allowed_prefixes = set()
+    for stack in stacks:
+        prefix = STACK_PREFIXES.get(stack)
+        if prefix:
+            allowed_prefixes.add(prefix)
+
+    # All known prefixes (to detect stack-specific files)
+    all_prefixes = set(STACK_PREFIXES.values())
 
     for src_file in claude_src.rglob("*"):
         if not src_file.is_file():
@@ -46,8 +64,23 @@ def copy_layer(src_dir: Path, dst_dir: Path) -> list[str]:
         if src_file.name == ".gitkeep":
             continue
 
-        rel = src_file.relative_to(src_dir)
-        dst_file = dst_dir / rel
+        # Determine if file is stack-specific
+        fname = src_file.name
+        # For skills, check the parent directory name (skill-name/SKILL.md)
+        if fname == "SKILL.md":
+            check_name = src_file.parent.name
+        else:
+            check_name = fname.replace(".md", "")
+
+        is_stack_specific = any(check_name.startswith(p) for p in all_prefixes)
+
+        if is_stack_specific:
+            # Only copy if its prefix is in the allowed set
+            if not any(check_name.startswith(p) for p in allowed_prefixes):
+                continue
+
+        rel = src_file.relative_to(hub_root)
+        dst_file = target_dir / rel
         dst_file.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src_file, dst_file)
         copied.append(str(rel))
@@ -79,16 +112,7 @@ def generate_sync_config(hub_repo: str, stacks: list[str], sync_target: str = "p
 
 def bootstrap(hub_root: Path, target_dir: Path, stacks: list[str], hub_repo: str, dry_run: bool = False):
     """Bootstrap a project from the hub."""
-    configs = {}
-    stacks_dir = hub_root / "stacks"
-    if stacks_dir.exists():
-        for stack_dir in stacks_dir.iterdir():
-            if stack_dir.is_dir():
-                cfg = load_stack_config(stack_dir / "stack-config.yml")
-                if cfg:
-                    configs[cfg["name"]] = cfg
-
-    errors = validate_stack_selection(stacks, configs)
+    errors = validate_stack_selection(stacks)
     if errors:
         print("Stack validation errors:")
         for e in errors:
@@ -97,21 +121,14 @@ def bootstrap(hub_root: Path, target_dir: Path, stacks: list[str], hub_repo: str
 
     if dry_run:
         print(f"DRY RUN: Would bootstrap {target_dir} with stacks: {stacks}")
-        print(f"  Core: {hub_root / 'core'}")
-        for s in stacks:
-            print(f"  Stack: {hub_root / 'stacks' / s}")
+        print(f"  Source: {hub_root / '.claude'}")
+        prefixes = [STACK_PREFIXES[s] for s in stacks if s in STACK_PREFIXES]
+        print(f"  Stack prefixes included: {prefixes}")
         return
 
-    print("Copying core patterns...")
-    copied = copy_layer(hub_root / "core", target_dir)
+    print(f"Copying .claude/ patterns (stacks: {', '.join(stacks)})...")
+    copied = copy_claude_dir(hub_root, target_dir, stacks)
     print(f"  Copied {len(copied)} files")
-
-    for stack in stacks:
-        stack_dir = hub_root / "stacks" / stack
-        if stack_dir.exists():
-            print(f"Copying {stack} stack...")
-            copied = copy_layer(stack_dir, target_dir)
-            print(f"  Copied {len(copied)} files")
 
     sync_config = generate_sync_config(hub_repo, stacks)
     sync_path = target_dir / ".claude" / "sync-config.yml"
@@ -119,7 +136,7 @@ def bootstrap(hub_root: Path, target_dir: Path, stacks: list[str], hub_repo: str
     sync_path.write_text(sync_config)
     print(f"Generated {sync_path}")
 
-    template_path = hub_root / "core" / "CLAUDE.md.template"
+    template_path = hub_root / "core" / "templates" / "CLAUDE.md.template"
     if template_path.exists():
         template = template_path.read_text()
         rendered = render_template(template, {

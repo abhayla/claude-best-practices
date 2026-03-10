@@ -1,94 +1,98 @@
 # Claude Best Practices Hub
 
-A curated collection of battle-tested patterns, templates, and automation for Claude Code projects. Extracted from real-world production use across multiple tech stacks.
-
-## What This Repo Does
-
-The Hub serves three roles:
-
-| Role | Description |
-|------|-------------|
-| **Template** | Provides a parameterized `CLAUDE.md` template and stack-specific configurations to bootstrap new projects in minutes. |
-| **Knowledge Base** | Collects proven patterns (hooks, skills, agents, rules) organized by tech stack, so you never re-discover the same solution twice. |
-| **Auto-Sync** | Keeps downstream projects up-to-date via a sync mechanism that merges hub improvements into your project's `.claude/` directory. |
+A curated collection of battle-tested agents, skills, rules, and hooks for Claude Code.
 
 ## Quick Start
 
-### Option 1: Start a New Project from Template
-
-Copy the `CLAUDE.md` template and fill in the `{{VARIABLES}}`:
-
 ```bash
-cp core/CLAUDE.md.template /path/to/your/project/CLAUDE.md
-# Edit the file and replace {{PROJECT_NAME}}, {{PLATFORM}}, etc.
+cp -r .claude/ /path/to/your/project/
 ```
 
-### Option 2: Bootstrap an Existing Project
+That's it. Delete what you don't need (e.g., `rm .claude/agents/fastapi-*` if not using FastAPI).
 
-Use the bootstrap script to select stacks and generate a tailored `.claude/` directory:
+## What's Inside
+
+| Component | Count | Description |
+|-----------|-------|-------------|
+| **Agents** | 13 | Sub-agents for code review, debugging, testing, git, planning, docs |
+| **Skills** | 26 | Slash-command workflows: `/implement`, `/fix-loop`, `/status`, and more |
+| **Rules** | 10 | Scoped coding rules for workflow, testing, FastAPI, Android, etc. |
+| **Hooks** | — | Example hooks (auto-format, test verification, workflow logging) |
+
+See [`.claude/README.md`](.claude/README.md) for the full catalog.
+
+## Alternative: Bootstrap with Stack Filtering
+
+If you only want patterns for specific stacks:
 
 ```bash
-./scripts/bootstrap.sh /path/to/your/project --stacks fastapi-python,android-compose
+# Remote bootstrap (one command)
+curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bootstrap.sh | \
+  bash -s -- --stacks fastapi-python,android-compose --target /path/to/project
+
+# Or locally
+python scripts/bootstrap.py --stacks fastapi-python --target /path/to/project
 ```
 
-### Option 3: Copy Individual Pieces
+### Available Stacks
 
-Browse `stacks/` and copy only the hooks, skills, or rules you need:
-
-```bash
-# Example: copy FastAPI testing rules
-cp stacks/fastapi-python/rules/testing.md /path/to/project/.claude/rules/
-```
+| Stack | Prefix | What it adds |
+|-------|--------|-------------|
+| `fastapi-python` | `fastapi-*` | API testing agent, DB admin agent, migration/deploy/test skills, backend rules |
+| `android-compose` | `android-*` | Compose agent, ADB testing/test runner skills, Android rules |
+| `ai-gemini` | `ai-gemini-*` | Gemini API reference skill, AI rules |
+| `firebase-auth` | `firebase-*` | Auth rules (placeholder) |
+| `react-nextjs` | `react-*` | React/Next.js rules (placeholder) |
+| `superpowers` | `superpowers-*` | Advanced patterns (placeholder) |
 
 ## Repository Structure
 
-| Directory | Purpose |
-|-----------|---------|
-| `core/` | Base `CLAUDE.md` template, shared rules, and universal patterns that apply to all projects. |
-| `stacks/` | Stack-specific configurations, rules, hooks, and examples (one subdirectory per stack). |
-| `config/` | Sync configuration, stack registry metadata, and version tracking. |
-| `registry/` | Machine-readable index of all available patterns, skills, and hooks with tags and descriptions. |
-| `scripts/` | Bootstrap, sync, and maintenance scripts. |
-| `docs/` | Architecture documentation, contribution guide, and sync protocol specification. |
-| `internet-sources/` | Curated external references and scraped best-practice content. |
+```
+.claude/                    # Copy this to your project
+  agents/                   # 13 specialized sub-agents
+  skills/                   # 26 slash-command workflows
+  rules/                    # 10 scoped coding rules
+  hooks/                    # Hook examples (README only)
+  README.md                 # Self-documenting index
+  settings.json             # Minimal defaults
 
-## Available Stacks
-
-| Stack | Directory | Description |
-|-------|-----------|-------------|
-| **FastAPI + Python** | `stacks/fastapi-python/` | Async backend patterns: SQLAlchemy, Pydantic, pytest fixtures, Alembic migrations. |
-| **Android + Compose** | `stacks/android-compose/` | Jetpack Compose UI, Hilt DI, Room DB, Gradle/KSP build config, E2E testing. |
-| **Firebase Auth** | `stacks/firebase-auth/` | Phone OTP auth, debug bypass patterns, token management, multi-environment setup. |
-| **AI / Gemini** | `stacks/ai-gemini/` | Gemini structured output, prompt engineering, generation tracking, retry strategies. |
-| **React + Next.js** | `stacks/react-nextjs/` | Next.js App Router, server components, Tailwind, Prisma, Playwright testing. |
-| **Superpowers** | `stacks/superpowers/` | Advanced Claude Code patterns: workflow hooks, session analysis, automation extraction. |
+core/templates/             # CLAUDE.md templates with TODOs
+config/                     # Hub configuration (repos, URLs, settings)
+registry/                   # Pattern index (patterns.json)
+scripts/                    # Bootstrap, sync, docs generation
+docs/                       # Dashboard, getting started, architecture
+```
 
 ## Skills
 
 | Skill | Description |
 |-------|-------------|
-| `/update-practices` | Pull latest patterns from the hub into your project's `.claude/` directory. |
-| `/contribute-practice` | Package a local pattern and submit it back to the hub. |
-| `/scan-url` | Scrape a URL for Claude Code best practices and add them to the knowledge base. |
-| `/scan-repo` | Analyze a repository's `.claude/` setup and extract reusable patterns. |
+| `/implement` | Structured feature implementation (TDD workflow) |
+| `/fix-issue` | Analyze and fix GitHub issues |
+| `/fix-loop` | Iterative fix cycle until tests pass |
+| `/continue` | Resume work from previous session |
+| `/status` | Quick project health snapshot |
+| `/update-practices` | Pull latest patterns from hub |
+| `/contribute-practice` | Submit a pattern to hub |
+
+See [`.claude/README.md`](.claude/README.md) for all 26 skills.
 
 ## Sync Architecture
 
-Projects that bootstrap from the hub can stay up-to-date by running `/update-practices`. The sync mechanism:
+Projects bootstrapped from the hub can stay updated:
 
-1. Compares local `.claude/` files against the hub registry
-2. Identifies new or updated patterns relevant to your selected stacks
-3. Merges changes with conflict detection (local overrides are preserved)
+1. Run `/update-practices` — compares local files against hub registry
+2. Reviews diffs and applies updates you approve
+3. Run `/contribute-practice` — submit local patterns back to the hub
 
-See [docs/SYNC-ARCHITECTURE.md](docs/SYNC-ARCHITECTURE.md) for the full protocol specification.
+See [docs/SYNC-ARCHITECTURE.md](docs/SYNC-ARCHITECTURE.md) for the full protocol.
 
 ## Contributing
 
-Found a pattern that saved you hours? Extracted a hook that catches common mistakes?
+Found a pattern that works well? Submit it:
 
-1. Add it to the appropriate `stacks/` directory
-2. Register it in `registry/`
-3. Open a PR
+1. Add it to `.claude/` (with appropriate prefix for stack-specific patterns)
+2. Run `/contribute-practice` or open a PR
 
 ## License
 

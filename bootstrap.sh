@@ -17,7 +17,7 @@ done
 if [ -z "$STACKS" ]; then
   echo "Usage: bootstrap.sh --stacks android-compose,fastapi-python [--target /path]"
   echo ""
-  echo "Available stacks: superpowers, android-compose, fastapi-python, ai-gemini, firebase-auth, react-nextjs"
+  echo "Available stacks: ai-gemini, android-compose, fastapi-python, firebase-auth, react-nextjs, superpowers"
   exit 1
 fi
 
@@ -35,4 +35,4 @@ PYTHONPATH=. python scripts/bootstrap.py --stacks "$STACKS" --target "$TARGET" -
 echo ""
 echo "Done! Next steps:"
 echo "  cd $TARGET"
-echo "  git add .claude/ CLAUDE.md && git commit -m 'chore: bootstrap best practices'"
+echo "  git add .claude/ CLAUDE.md && git commit -m 'feat: add Claude Code configuration'"

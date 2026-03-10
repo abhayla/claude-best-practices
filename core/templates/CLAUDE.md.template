@@ -1,0 +1,66 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**{{PROJECT_NAME}}** — {{PROJECT_DESCRIPTION}}
+
+| Attribute | Details |
+|-----------|---------|
+| **Platform** | {{PLATFORM}} |
+| **Build Tools** | {{BUILD_TOOLS}} |
+
+## Architecture
+
+<!-- TODO: Describe your project's architecture -->
+<!-- Example: "Monorepo with frontend (React) and backend (FastAPI) in separate directories" -->
+
+## Development Commands
+
+```bash
+# TODO: Add your most-used development commands
+# Example:
+# npm run dev          # Start development server
+# npm run build        # Production build
+# npm test             # Run tests
+```
+
+## Testing
+
+```bash
+# TODO: Add your test commands
+# Example:
+# npm test                    # All tests
+# npm test -- --watch         # Watch mode
+# npm test -- path/to/test    # Single test file
+```
+
+## Environment Setup
+
+<!-- TODO: Document environment setup steps -->
+<!-- Example:
+1. Install dependencies: `npm install`
+2. Copy `.env.example` to `.env` and fill in values
+3. Start database: `docker-compose up -d`
+-->
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| <!-- TODO: Add common issues --> | <!-- TODO: Add solutions --> |
+
+## Rules for Claude
+
+1. **Bash Syntax**: Use forward slashes `/`, quote paths with spaces. Shell is Unix-style bash even on Windows.
+2. **Testing**: Run relevant tests before committing changes.
+3. **Conventions**: Follow existing code patterns and naming conventions in this project.
+
+## Claude Code Configuration
+
+The `.claude/` directory contains skills, agents, and rules for Claude Code.
+
+<!-- These are auto-filled by bootstrap: -->
+Synced from: {{HUB_REPO}} ({{SELECTED_STACKS}})
+Last sync: {{LAST_SYNC_TIMESTAMP}}

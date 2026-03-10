@@ -1,33 +1,48 @@
 # Stack Catalog
 
-Available stacks and their contents.
+Patterns are organized in the `.claude/` directory. Stack-specific patterns use filename prefixes.
 
-## ai-gemini
-_Google Gemini API integration for AI-powered features (structured output, vision)_
+## AI / Gemini
+_Gemini structured output, prompt engineering, generation patterns._
 
-**Skills:** gemini-api, generate-meal
-**Agents:** meal-generation.md
+**Prefix:** `ai-gemini-*`
 
-## android-compose
-_Android Jetpack Compose with Hilt DI, Room DB, Navigation Compose_
+**Skills:** ai-gemini-api
 
-**Skills:** adb-test, run-android-tests, run-e2e
-**Agents:** android-compose.md
-**Rules:** android.md, compose-ui.md
+## Android + Compose
+_Jetpack Compose UI, Hilt DI, Room DB, Gradle._
 
-## fastapi-python
-_Python FastAPI backend with SQLAlchemy async, PostgreSQL, Alembic migrations_
+**Prefix:** `android-*`
 
-**Skills:** db-migrate, deploy, run-backend-tests
-**Agents:** api-tester.md, database-admin.md
-**Rules:** backend.md, database.md
+**Skills:** android-adb-test, android-run-e2e, android-run-tests
+**Agents:** android-compose
+**Rules:** android-compose-ui
 
-## firebase-auth
-_Firebase Authentication (Phone OTP) with backend JWT verification_
+## FastAPI + Python
+_Async backend patterns: SQLAlchemy, Pydantic, pytest, Alembic._
 
-## react-nextjs
-_React + Next.js frontend (future stack placeholder)_
+**Prefix:** `fastapi-*`
 
-## superpowers
-_Brainstorming, TDD, debugging, code-review, and planning skills from the superpowers marketplace_
+**Skills:** fastapi-db-migrate, fastapi-deploy, fastapi-run-backend-tests
+**Agents:** fastapi-api-tester, fastapi-database-admin
+**Rules:** fastapi-backend, fastapi-database
+
+## Firebase Auth
+_Phone OTP, token management, multi-environment setup._
+
+**Prefix:** `firebase-*`
+
+**Rules:** firebase-auth
+
+## React + Next.js
+_Next.js App Router, server components, Tailwind._
+
+**Prefix:** `react-*`
+
+**Rules:** react-nextjs
+
+## Superpowers
+_Advanced Claude Code patterns: hooks, session analysis, automation._
+
+**Prefix:** `superpowers-*`
 
