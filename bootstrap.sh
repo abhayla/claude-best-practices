@@ -35,4 +35,4 @@ PYTHONPATH=. python scripts/bootstrap.py --stacks "$STACKS" --target "$TARGET" -
 echo ""
 echo "Done! Next steps:"
 echo "  cd $TARGET"
-echo "  git add .claude/ CLAUDE.md && git commit -m 'feat: add Claude Code configuration'"
+echo "  git add .claude/ CLAUDE.md && git commit -m 'feat: add Claude Code configuration from best practices hub'"

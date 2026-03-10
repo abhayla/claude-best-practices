@@ -11,7 +11,7 @@ from typing import Optional
 import yaml
 
 
-# Stack prefixes for filtering .claude/ contents by stack
+# Stack prefixes for filtering core/.claude/ contents by stack
 STACK_PREFIXES = {
     "fastapi-python": "fastapi-",
     "android-compose": "android-",
@@ -38,13 +38,13 @@ def validate_stack_selection(stacks: list[str]) -> list[str]:
 
 
 def copy_claude_dir(hub_root: Path, target_dir: Path, stacks: list[str]) -> list[str]:
-    """Copy .claude/ contents to target, filtering by selected stacks.
+    """Copy core/.claude/ contents to target .claude/, filtering by selected stacks.
 
     - Files without a stack prefix are always copied (universal/core).
     - Files with a stack prefix are only copied if that stack is selected.
     """
     copied = []
-    claude_src = hub_root / ".claude"
+    claude_src = hub_root / "core" / ".claude"
     if not claude_src.exists():
         return copied
 
@@ -79,11 +79,11 @@ def copy_claude_dir(hub_root: Path, target_dir: Path, stacks: list[str]) -> list
             if not any(check_name.startswith(p) for p in allowed_prefixes):
                 continue
 
-        rel = src_file.relative_to(hub_root)
-        dst_file = target_dir / rel
+        rel = src_file.relative_to(claude_src)
+        dst_file = target_dir / ".claude" / rel
         dst_file.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src_file, dst_file)
-        copied.append(str(rel))
+        copied.append(str(Path(".claude") / rel))
 
     return copied
 
@@ -121,7 +121,7 @@ def bootstrap(hub_root: Path, target_dir: Path, stacks: list[str], hub_repo: str
 
     if dry_run:
         print(f"DRY RUN: Would bootstrap {target_dir} with stacks: {stacks}")
-        print(f"  Source: {hub_root / '.claude'}")
+        print(f"  Source: {hub_root / 'core' / '.claude'}")
         prefixes = [STACK_PREFIXES[s] for s in stacks if s in STACK_PREFIXES]
         print(f"  Stack prefixes included: {prefixes}")
         return
@@ -136,7 +136,7 @@ def bootstrap(hub_root: Path, target_dir: Path, stacks: list[str], hub_repo: str
     sync_path.write_text(sync_config)
     print(f"Generated {sync_path}")
 
-    template_path = hub_root / "core" / "templates" / "CLAUDE.md.template"
+    template_path = hub_root / "core" / ".claude" / "CLAUDE.md.template"
     if template_path.exists():
         template = template_path.read_text()
         rendered = render_template(template, {

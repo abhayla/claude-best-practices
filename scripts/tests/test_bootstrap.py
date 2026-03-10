@@ -47,10 +47,10 @@ class TestCopyClaudeDir:
     def test_copies_core_files(self, tmp_path):
         """Core (non-prefixed) files are always copied."""
         hub = tmp_path / "hub"
-        (hub / ".claude" / "agents").mkdir(parents=True)
-        (hub / ".claude" / "agents" / "debugger.md").write_text("# Debugger")
-        (hub / ".claude" / "skills" / "fix-loop").mkdir(parents=True)
-        (hub / ".claude" / "skills" / "fix-loop" / "SKILL.md").write_text("# Fix Loop")
+        (hub / "core" / ".claude" / "agents").mkdir(parents=True)
+        (hub / "core" / ".claude" / "agents" / "debugger.md").write_text("# Debugger")
+        (hub / "core" / ".claude" / "skills" / "fix-loop").mkdir(parents=True)
+        (hub / "core" / ".claude" / "skills" / "fix-loop" / "SKILL.md").write_text("# Fix Loop")
 
         dst = tmp_path / "dst"
         dst.mkdir()
@@ -62,10 +62,10 @@ class TestCopyClaudeDir:
     def test_copies_matching_stack_files(self, tmp_path):
         """Stack-prefixed files are copied when stack is selected."""
         hub = tmp_path / "hub"
-        (hub / ".claude" / "agents").mkdir(parents=True)
-        (hub / ".claude" / "agents" / "fastapi-api-tester.md").write_text("# API Tester")
-        (hub / ".claude" / "skills" / "fastapi-db-migrate").mkdir(parents=True)
-        (hub / ".claude" / "skills" / "fastapi-db-migrate" / "SKILL.md").write_text("# DB Migrate")
+        (hub / "core" / ".claude" / "agents").mkdir(parents=True)
+        (hub / "core" / ".claude" / "agents" / "fastapi-api-tester.md").write_text("# API Tester")
+        (hub / "core" / ".claude" / "skills" / "fastapi-db-migrate").mkdir(parents=True)
+        (hub / "core" / ".claude" / "skills" / "fastapi-db-migrate" / "SKILL.md").write_text("# DB Migrate")
 
         dst = tmp_path / "dst"
         dst.mkdir()
@@ -77,10 +77,10 @@ class TestCopyClaudeDir:
     def test_excludes_non_matching_stack_files(self, tmp_path):
         """Stack-prefixed files are excluded when stack is not selected."""
         hub = tmp_path / "hub"
-        (hub / ".claude" / "agents").mkdir(parents=True)
-        (hub / ".claude" / "agents" / "fastapi-api-tester.md").write_text("# API Tester")
-        (hub / ".claude" / "agents" / "android-compose.md").write_text("# Android")
-        (hub / ".claude" / "agents" / "debugger.md").write_text("# Debugger")
+        (hub / "core" / ".claude" / "agents").mkdir(parents=True)
+        (hub / "core" / ".claude" / "agents" / "fastapi-api-tester.md").write_text("# API Tester")
+        (hub / "core" / ".claude" / "agents" / "android-compose.md").write_text("# Android")
+        (hub / "core" / ".claude" / "agents" / "debugger.md").write_text("# Debugger")
 
         dst = tmp_path / "dst"
         dst.mkdir()
@@ -95,8 +95,8 @@ class TestCopyClaudeDir:
 
     def test_skips_gitkeep(self, tmp_path):
         hub = tmp_path / "hub"
-        (hub / ".claude" / "skills").mkdir(parents=True)
-        (hub / ".claude" / "skills" / ".gitkeep").write_text("")
+        (hub / "core" / ".claude" / "skills").mkdir(parents=True)
+        (hub / "core" / ".claude" / "skills" / ".gitkeep").write_text("")
 
         dst = tmp_path / "dst"
         dst.mkdir()
@@ -106,7 +106,7 @@ class TestCopyClaudeDir:
 
     def test_handles_missing_claude_dir(self, tmp_path):
         hub = tmp_path / "hub"
-        hub.mkdir()  # No .claude/ inside
+        hub.mkdir()  # No core/.claude/ inside
 
         dst = tmp_path / "dst"
         dst.mkdir()

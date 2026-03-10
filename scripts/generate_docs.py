@@ -94,9 +94,9 @@ def generate_dashboard_md(registry: dict, scan_history: list, sync_status: dict)
         "",
         "## Quick Start",
         "",
-        "Copy the `.claude/` directory to your project:",
+        "Copy the `core/.claude/` directory to your project:",
         "```bash",
-        "cp -r .claude/ /path/to/your/project/",
+        "cp -r core/.claude/ /path/to/your/project/.claude/",
         "```",
         "",
         "Or use bootstrap for stack-specific filtering:",
@@ -163,7 +163,7 @@ def generate_getting_started(hub_repo: str, available_stacks: list[str]) -> str:
         "",
         "### Option A: Copy Everything",
         "```bash",
-        "cp -r .claude/ /path/to/your/project/",
+        "cp -r core/.claude/ /path/to/your/project/.claude/",
         "```",
         "",
         "### Option B: Bootstrap with Stack Filtering",
@@ -380,7 +380,7 @@ if __name__ == "__main__":
     with open(registry_path) as f:
         registry = json.load(f)
 
-    claude_dir = root / ".claude"
+    claude_dir = root / "core" / ".claude"
 
     dashboard = generate_dashboard_md(registry, [], {})
     (docs_dir / "DASHBOARD.md").write_text(dashboard)

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A curated knowledge hub of Claude Code patterns (agents, skills, rules) organized by technology stack. It serves as both a template system for bootstrapping new projects and a continuously-updated registry of battle-tested patterns. Users copy the `.claude/` directory to their project with one command.
+A curated knowledge hub of Claude Code patterns (agents, skills, rules) organized by technology stack. It serves as both a template system for bootstrapping new projects and a continuously-updated registry of battle-tested patterns. Users copy the `core/.claude/` directory to their project with one command.
 
 ## Commands
 
@@ -44,15 +44,19 @@ PYTHONPATH=. python scripts/scan_web.py --all
 
 ### Pattern Organization
 
-- **`.claude/`** — All patterns live in a single flat directory at the repo root. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
+- **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
   - `agents/` — 13 agent definitions (10 universal + 3 stack-specific)
-  - `skills/` — 26 skill directories, each with a `SKILL.md`
+  - `skills/` — 24 skill directories, each with a `SKILL.md`
   - `rules/` — 10 rule files (2 universal + 4 stack-specific + 4 placeholders)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns
   - `settings.json` — Minimal defaults
+  - `CLAUDE.md.template` / `CLAUDE.local.md.template` — Pre-filled templates with TODOs
 
-- **`core/templates/`** — Pre-filled `CLAUDE.md.template` and `CLAUDE.local.md.template` with TODOs for project-specific sections.
+- **`.claude/`** — Hub-only operational config (not distributed). Contains:
+  - `skills/scan-repo/` — Scan downstream repos for patterns
+  - `skills/scan-url/` — Scan internet for patterns
+  - `settings.json` — Hub settings
 
 - **`registry/patterns.json`** — Machine-readable index of all patterns with hashes, versions, categories, and dependency info. Source of truth for sync operations.
 
@@ -84,7 +88,7 @@ The bootstrap script filters by these prefixes when copying patterns to a target
 ### Scripts (`scripts/`)
 
 All Python. Key modules:
-- `bootstrap.py` — Copies `.claude/` patterns to target project, filtering by stack prefix.
+- `bootstrap.py` — Copies `core/.claude/` patterns to target project, filtering by stack prefix.
 - `collate.py` — Extracts patterns from downstream project repos.
 - `dedup_check.py` — 3-level deduplication (SHA256 hash, structural similarity, semantic comparison).
 - `generate_docs.py` — Renders `docs/DASHBOARD.md`, `docs/STACK-CATALOG.md`, and `docs/dashboard.html` from registry data.

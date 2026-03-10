@@ -75,10 +75,10 @@ def find_updated_patterns(hub_registry: dict, local_dir: Path) -> list[dict]:
 def apply_update(hub_root: Path, project_dir: Path, pattern_name: str, pattern_type: str, category: str) -> bool:
     """Copy a pattern from hub to project. Returns True on success."""
     if pattern_type == "skill":
-        src = hub_root / ("core" if category == "core" else f"stacks/{category}") / ".claude" / "skills" / pattern_name
+        src = hub_root / "core" / ".claude" / "skills" / pattern_name
         dst = project_dir / ".claude" / "skills" / pattern_name
     elif pattern_type == "agent":
-        src_file = hub_root / ("core" if category == "core" else f"stacks/{category}") / ".claude" / "agents" / f"{pattern_name}.md"
+        src_file = hub_root / "core" / ".claude" / "agents" / f"{pattern_name}.md"
         dst = project_dir / ".claude" / "agents"
         dst.mkdir(parents=True, exist_ok=True)
         if src_file.exists():
@@ -86,7 +86,7 @@ def apply_update(hub_root: Path, project_dir: Path, pattern_name: str, pattern_t
             return True
         return False
     elif pattern_type == "hook":
-        src_file = hub_root / ("core" if category == "core" else f"stacks/{category}") / ".claude" / "hooks" / f"{pattern_name}.sh"
+        src_file = hub_root / "core" / ".claude" / "hooks" / f"{pattern_name}.sh"
         dst = project_dir / ".claude" / "hooks"
         dst.mkdir(parents=True, exist_ok=True)
         if src_file.exists():
@@ -94,7 +94,7 @@ def apply_update(hub_root: Path, project_dir: Path, pattern_name: str, pattern_t
             return True
         return False
     elif pattern_type == "rule":
-        src_file = hub_root / ("core" if category == "core" else f"stacks/{category}") / ".claude" / "rules" / f"{pattern_name}.md"
+        src_file = hub_root / "core" / ".claude" / "rules" / f"{pattern_name}.md"
         dst = project_dir / ".claude" / "rules"
         dst.mkdir(parents=True, exist_ok=True)
         if src_file.exists():

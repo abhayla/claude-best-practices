@@ -5,7 +5,7 @@ A curated collection of battle-tested agents, skills, rules, and hooks for Claud
 ## Quick Start
 
 ```bash
-cp -r .claude/ /path/to/your/project/
+cp -r core/.claude/ /path/to/your/project/.claude/
 ```
 
 That's it. Delete what you don't need (e.g., `rm .claude/agents/fastapi-*` if not using FastAPI).
@@ -15,11 +15,11 @@ That's it. Delete what you don't need (e.g., `rm .claude/agents/fastapi-*` if no
 | Component | Count | Description |
 |-----------|-------|-------------|
 | **Agents** | 13 | Sub-agents for code review, debugging, testing, git, planning, docs |
-| **Skills** | 26 | Slash-command workflows: `/implement`, `/fix-loop`, `/status`, and more |
+| **Skills** | 24 | Slash-command workflows: `/implement`, `/fix-loop`, `/status`, and more |
 | **Rules** | 10 | Scoped coding rules for workflow, testing, FastAPI, Android, etc. |
 | **Hooks** | — | Example hooks (auto-format, test verification, workflow logging) |
 
-See [`.claude/README.md`](.claude/README.md) for the full catalog.
+See [`core/.claude/README.md`](core/.claude/README.md) for the full catalog.
 
 ## Alternative: Bootstrap with Stack Filtering
 
@@ -48,15 +48,21 @@ python scripts/bootstrap.py --stacks fastapi-python --target /path/to/project
 ## Repository Structure
 
 ```
-.claude/                    # Copy this to your project
+core/.claude/               # Copy this to your project
   agents/                   # 13 specialized sub-agents
-  skills/                   # 26 slash-command workflows
+  skills/                   # 24 slash-command workflows
   rules/                    # 10 scoped coding rules
   hooks/                    # Hook examples (README only)
   README.md                 # Self-documenting index
   settings.json             # Minimal defaults
+  CLAUDE.md.template        # Template for project CLAUDE.md
+  CLAUDE.local.md.template  # Template for local overrides
 
-core/templates/             # CLAUDE.md templates with TODOs
+.claude/                    # Hub-only operational config
+  skills/scan-repo/         # Scan downstream repos for patterns
+  skills/scan-url/          # Scan internet for patterns
+  settings.json             # Hub settings
+
 config/                     # Hub configuration (repos, URLs, settings)
 registry/                   # Pattern index (patterns.json)
 scripts/                    # Bootstrap, sync, docs generation
@@ -75,7 +81,7 @@ docs/                       # Dashboard, getting started, architecture
 | `/update-practices` | Pull latest patterns from hub |
 | `/contribute-practice` | Submit a pattern to hub |
 
-See [`.claude/README.md`](.claude/README.md) for all 26 skills.
+See [`core/.claude/README.md`](core/.claude/README.md) for all 24 skills.
 
 ## Sync Architecture
 
@@ -91,7 +97,7 @@ See [docs/SYNC-ARCHITECTURE.md](docs/SYNC-ARCHITECTURE.md) for the full protocol
 
 Found a pattern that works well? Submit it:
 
-1. Add it to `.claude/` (with appropriate prefix for stack-specific patterns)
+1. Add it to `core/.claude/` (with appropriate prefix for stack-specific patterns)
 2. Run `/contribute-practice` or open a PR
 
 ## License
