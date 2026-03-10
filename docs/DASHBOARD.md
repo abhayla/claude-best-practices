@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-10 09:33 UTC (auto-generated)
+> Last updated: 2026-03-10 10:23 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -69,9 +69,9 @@
 
 ## Quick Start
 
-Copy the `.claude/` directory to your project:
+Copy the `core/.claude/` directory to your project:
 ```bash
-cp -r .claude/ /path/to/your/project/
+cp -r core/.claude/ /path/to/your/project/.claude/
 ```
 
 Or use bootstrap for stack-specific filtering:

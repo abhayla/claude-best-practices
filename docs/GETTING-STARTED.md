@@ -4,7 +4,7 @@
 
 ### Option A: Copy Everything
 ```bash
-cp -r .claude/ /path/to/your/project/
+cp -r core/.claude/ /path/to/your/project/.claude/
 ```
 
 ### Option B: Bootstrap with Stack Filtering
