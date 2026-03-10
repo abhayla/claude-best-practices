@@ -54,13 +54,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-10 01:59 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-10 02:05 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">0</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">0</div><div class="label">Core</div></div>
-    <div class="stat-card"><div class="number">0</div><div class="label">Stack-specific</div></div>
-    
+    <div class="stat-card"><div class="number">59</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">43</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">16</div><div class="label">Stack-specific</div></div>
+    <div class="stat-card"><div class="number">14</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">10</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">6</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">29</div><div class="label">Skills</div></div>
 </div>
 
 <div class="section" id="patterns-section">
@@ -86,7 +86,538 @@ tr:hover { background: var(--primary-light); }
                     <th onclick="sortTable(6)">Tags</th>
                 </tr>
             </thead>
-            <tbody><tr><td colspan='7' style='text-align:center;opacity:0.5'>No patterns yet</td></tr>
+            <tbody>
+            <tr data-type="skill" data-category="stack:ai-gemini">
+                <td>Generate_Meal</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>stack:ai-gemini</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="stack:android-compose">
+                <td>adb-test</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>stack:android-compose</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="stack:android-compose">
+                <td>android</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>stack:android-compose</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="stack:android-compose">
+                <td>android-compose</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>stack:android-compose</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="stack:fastapi-python">
+                <td>api-tester</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>stack:fastapi-python</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>auto-format</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>auto-verify</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="stack:fastapi-python">
+                <td>backend</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>stack:fastapi-python</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>claude-guardian</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>clean-pyc</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>code-reviewer</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="stack:android-compose">
+                <td>compose-ui</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>stack:android-compose</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>context-reducer</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>continue</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>contribute-practice</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="stack:fastapi-python">
+                <td>database</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>stack:fastapi-python</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="stack:fastapi-python">
+                <td>database-admin</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>stack:fastapi-python</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="stack:fastapi-python">
+                <td>db-migrate</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>stack:fastapi-python</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>debugger</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="stack:fastapi-python">
+                <td>deploy</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>stack:fastapi-python</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>docs-manager</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>fix-issue</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>fix-loop</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="stack:ai-gemini">
+                <td>gemini-api</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>stack:ai-gemini</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>git-manager</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>hook-utils</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>implement</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>log-workflow</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="stack:ai-gemini">
+                <td>meal-generation</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>stack:ai-gemini</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>plan-executor</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>plan-to-issues</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>planner-researcher</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>post-anr-detection</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>post-fix-pipeline</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>post-screenshot</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>post-test-update</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>pre-skill-fixloop-unblock</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>reflect</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>resize_screenshot</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="stack:android-compose">
+                <td>run-android-tests</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>stack:android-compose</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="stack:fastapi-python">
+                <td>run-backend-tests</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>stack:fastapi-python</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="stack:android-compose">
+                <td>run-e2e</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>stack:android-compose</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>scan-repo</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>scan-url</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>session-summarizer</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>skill-factory</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>status</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>strategic-architect</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>sync-check</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>test-failure-analyzer</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>test-knowledge</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>tester</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>testing</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>ui-ux-pro-max</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>update-practices</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>validate-workflow-step</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>verify-evidence-artifacts</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>verify-screenshots</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>workflow</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:abhayla/KKB</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
             </tbody>
         </table>
     </div>
