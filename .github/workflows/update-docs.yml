@@ -1,0 +1,33 @@
+name: Update Docs
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'registry/patterns.json'
+      - 'stacks/**'
+      - 'core/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r scripts/requirements.txt
+      - name: Generate docs
+        run: PYTHONPATH=. python scripts/generate_docs.py
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain docs/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add docs/
+            git commit -m "docs: auto-update dashboard and catalog"
+            git push
+          fi

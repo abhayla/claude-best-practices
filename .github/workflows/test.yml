@@ -1,0 +1,20 @@
+name: Tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+  pull_request:
+    paths:
+      - 'scripts/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r scripts/requirements.txt
+      - run: PYTHONPATH=. python -m pytest scripts/tests/ -v
