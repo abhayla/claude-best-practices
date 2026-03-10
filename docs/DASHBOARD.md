@@ -1,5 +1,5 @@
-# Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-10 08:39 UTC (auto-generated)
+# Claude Best Practices Hub â€” Dashboard
+> Last updated: 2026-03-10 09:33 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -17,55 +17,55 @@
 
 | Name | Type | Version | Source | Dependencies |
 |------|------|---------|--------|--------------|
-| ai-gemini | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| ai-gemini-api | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| android-adb-test | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| android-compose | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| android-compose-ui | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| android-run-e2e | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| android-run-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| auto-verify | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| code-reviewer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| context-reducer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| continue | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| contribute-practice | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| debugger | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| docs-manager | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-api-tester | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-backend | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-database | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-database-admin | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-db-migrate | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-deploy | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-run-backend-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| firebase-auth | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fix-issue | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fix-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| git-manager | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| implement | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| learn-n-improve | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| plan-executor | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| plan-to-issues | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| planner-researcher | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| post-fix-pipeline | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| react-nextjs | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| scan-repo | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| scan-url | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| session-summarizer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| skill-factory | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| status | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| superpowers | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| test-failure-analyzer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| tester | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| testing | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| update-practices | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| verify-screenshots | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| workflow | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| ai-gemini | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| ai-gemini-api | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| android | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| android-adb-test | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| android-compose | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| android-compose-ui | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| android-run-e2e | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| android-run-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| auto-verify | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| code-reviewer | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| context-reducer | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| continue | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| contribute-practice | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| debugger | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| docs-manager | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fastapi-api-tester | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fastapi-backend | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fastapi-database | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fastapi-database-admin | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fastapi-db-migrate | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fastapi-deploy | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fastapi-run-backend-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| firebase-auth | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fix-issue | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| fix-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| git-manager | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| implement | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| learn-n-improve | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| plan-executor | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| plan-to-issues | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| planner-researcher | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| post-fix-pipeline | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| react-nextjs | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| scan-repo | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| scan-url | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| session-summarizer | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| skill-factory | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| status | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| superpowers | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| test-failure-analyzer | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| tester | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| testing | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| update-practices | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| verify-screenshots | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
+| workflow | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
 
 ## Quick Start
 

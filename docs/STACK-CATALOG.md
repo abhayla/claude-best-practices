@@ -14,7 +14,7 @@ _Jetpack Compose UI, Hilt DI, Room DB, Gradle._
 
 **Prefix:** `android-*`
 
-**Skills:** android-adb-test, android-run-e2e, android-run-tests
+**Skills:** android-run-tests, android-adb-test, android-run-e2e
 **Agents:** android-compose
 **Rules:** android-compose-ui
 
@@ -23,8 +23,8 @@ _Async backend patterns: SQLAlchemy, Pydantic, pytest, Alembic._
 
 **Prefix:** `fastapi-*`
 
-**Skills:** fastapi-db-migrate, fastapi-deploy, fastapi-run-backend-tests
-**Agents:** fastapi-api-tester, fastapi-database-admin
+**Skills:** fastapi-deploy, fastapi-db-migrate, fastapi-run-backend-tests
+**Agents:** fastapi-database-admin, fastapi-api-tester
 **Rules:** fastapi-backend, fastapi-database
 
 ## Firebase Auth
