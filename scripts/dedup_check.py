@@ -120,7 +120,10 @@ def validate_registry(registry_path: Path, patterns_root: Path) -> list[str]:
 
 def scan_for_secrets(file_path: Path) -> list[str]:
     """Scan a file for common secret patterns."""
-    content = Path(file_path).read_text(encoding="utf-8")
+    try:
+        content = Path(file_path).read_text(encoding="utf-8")
+    except (UnicodeDecodeError, ValueError):
+        return []  # Skip binary/non-UTF-8 files
     findings = []
     patterns = [
         (r"sk-ant-[a-zA-Z0-9_-]{20,}", "Anthropic API key"),
