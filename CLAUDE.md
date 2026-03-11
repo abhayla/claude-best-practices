@@ -99,9 +99,20 @@ All Python. Key modules:
 
 Seven workflows: `test.yml` (CI on script changes), `scan-projects.yml` / `scan-internet.yml` (weekly scans), `validate-pr.yml`, `update-docs.yml`, `sync-to-projects.yml`, `expire-sources.yml`.
 
+## Testing
+
+- Test fixtures live in `scripts/tests/fixtures/` — shared fixtures are defined in `scripts/tests/conftest.py`.
+- Tests use `tmp_path` (pytest built-in) for temporary file operations and `sample_registry` fixture for registry-dependent tests.
+- Dependencies: `pyyaml`, `requests`, `beautifulsoup4`, `anthropic`, `pytest`, `jinja2` (see `scripts/requirements.txt`).
+
+## Bug Fixing Strategy
+
+When a bug is reported, don't start by trying to fix it. Instead, start by writing a test that reproduces the bug. Then have subagents try to fix the bug and prove it with a passing test.
+
 ## Key Conventions
 
+- **Two `.claude/` directories**: `core/.claude/` is the distributable template (what users copy). `.claude/` at repo root is hub-only operational config (scan skills, hub settings) — never distribute it.
 - Scripts use `PYTHONPATH=.` when run from the repo root (needed for cross-module imports).
 - Pattern dedup thresholds are configured in `config/settings.yml`: strong semantic ≥85, weak ≥70, structural ≥3 shared fields.
-- The `registry/patterns.json` must stay in sync with actual files — `generate_docs.py` reads it to produce dashboards.
+- The `registry/patterns.json` must stay in sync with actual files — `generate_docs.py` reads it to produce dashboards. After adding/removing patterns in `core/.claude/`, update the registry and re-run `python scripts/generate_docs.py`.
 - Stack-specific patterns are identified by filename prefix (e.g., `fastapi-backend.md` belongs to the `fastapi-python` stack).

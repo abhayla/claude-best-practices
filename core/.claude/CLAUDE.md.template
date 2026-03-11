@@ -16,6 +16,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 <!-- TODO: Describe your project's architecture -->
 <!-- Example: "Monorepo with frontend (React) and backend (FastAPI) in separate directories" -->
 
+<!-- TODO: Map domain terminology to code entities if naming is non-obvious.
+Example:
+- "Campaign" → `promotions` table, `CampaignService` class, `src/services/campaign/`
+- "Workspace" → `org_units` table, called "Team" in the UI
+-->
+
 ## Development Commands
 
 ```bash
@@ -51,11 +57,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 |-------|----------|
 | <!-- TODO: Add common issues --> | <!-- TODO: Add solutions --> |
 
+<!-- TODO: Document known gotchas — bugs that were fixed and patterns to avoid reintroducing them.
+Example:
+- Auth token refresh: MUST check expiry before request, not after 401 (fixed in #142)
+- CSV export: MUST use streaming for >10k rows — OOM crash fixed in commit abc123
+-->
+
+## Patterns We DON'T Use
+
+<!-- TODO: Explicitly list patterns you avoid WITH alternatives.
+Example:
+- We don't use Redux — use Zustand for state management
+- We don't use REST for internal services — use tRPC instead
+- We don't use raw SQL — use the ORM query builder
+-->
+
 ## Rules for Claude
 
-1. **Bash Syntax**: Use forward slashes `/`, quote paths with spaces. Shell is Unix-style bash even on Windows.
-2. **Testing**: Run relevant tests before committing changes.
-3. **Conventions**: Follow existing code patterns and naming conventions in this project.
+<!-- Project-specific rules go here. Behavioral, context, and meta rules are in .claude/rules/ -->
+
+1. **Bug Fixing**: Use `/fix-loop` or `/fix-issue`. Start by writing a test that reproduces the bug, then fix and prove with a passing test.
+
+<!-- TODO: Add project-specific rules here. Examples:
+- "MUST use pnpm, NOT npm or yarn"
+- "All API endpoints MUST have integration tests"
+- "Database migrations MUST be reversible"
+-->
+
+### Rules Reference
+
+Behavioral, context management, and rule-writing guidance are distributed across `.claude/rules/`:
+
+| Rule File | What It Covers |
+|-----------|---------------|
+| `rules/claude-behavior.md` | Task approach (plan first, break tasks, verify), git hygiene, bash syntax, conventions |
+| `rules/context-management.md` | Progressive disclosure, minimize imports, scratchpad, canonical examples |
+| `rules/rule-writing-meta.md` | RFC 2119 language, provide alternatives, hooks vs rules, skills vs CLAUDE.md, nested guards |
+| `rules/workflow.md` | 7-step development workflow (understand → test → implement → verify → commit) |
+| `rules/testing.md` | Test isolation, AAA pattern, fixtures, flaky test handling |
 
 ## Claude Code Configuration
 
