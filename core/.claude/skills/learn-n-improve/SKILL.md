@@ -175,6 +175,49 @@ Learning Update:
 
 ---
 
+## Semi-Automatic Invocation via Hook
+
+To run `learn-n-improve` automatically after every skill invocation, add a PostToolUse hook:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "command": ".claude/hooks/auto-learn.sh"
+      }
+    ]
+  }
+}
+```
+
+```bash
+#!/bin/bash
+# .claude/hooks/auto-learn.sh — Trigger learning capture after skill runs
+# Uses a counter to avoid running on every single skill invocation.
+# Default: runs learn-n-improve in session mode every 5th skill call.
+
+COUNTER_FILE="${TMPDIR:-/tmp}/claude-learn-counter.txt"
+FREQUENCY=${LEARN_FREQUENCY:-5}
+
+COUNT=0
+if [[ -f "$COUNTER_FILE" ]]; then
+  COUNT=$(cat "$COUNTER_FILE")
+fi
+COUNT=$((COUNT + 1))
+echo "$COUNT" > "$COUNTER_FILE"
+
+if [[ $((COUNT % FREQUENCY)) -eq 0 ]]; then
+  echo "Auto-learning: $COUNT skill invocations since last capture. Consider running /learn-n-improve session to record patterns."
+fi
+exit 0
+```
+
+This keeps learning semi-automatic — the hook reminds Claude to run the skill periodically rather than requiring the user to remember. Adjust `LEARN_FREQUENCY` via environment variable.
+
+---
+
 ## RULES
 
 - Never delete historical entries without evidence they're wrong

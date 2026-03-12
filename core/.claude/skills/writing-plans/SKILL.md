@@ -137,9 +137,9 @@ Do NOT dump the entire plan at once.
 
 ---
 
-## STEP 6: Save Plan
+## STEP 6: Save Plan and Companion Files
 
-Save the approved plan to a file:
+Save the approved plan and create companion files for persistent working memory:
 
 1. Ask the user for a save location
 2. If no preference, default to `docs/plans/<feature-name>-plan.md`
@@ -163,6 +163,47 @@ Save the approved plan to a file:
 - [ ] **Task 2:** <title>
   ...
 ```
+
+4. Create companion files alongside the plan:
+
+**`docs/plans/<feature-name>-findings.md`** — Research log for discoveries during implementation:
+```markdown
+# Findings: <Feature Name>
+
+## Discoveries
+<!-- Append findings here during research/implementation -->
+
+## Constraints Found
+<!-- Limitations, blockers, or unexpected dependencies -->
+
+## Key Code References
+<!-- Important files, functions, or patterns discovered -->
+```
+
+**`docs/plans/<feature-name>-progress.md`** — Running session log:
+```markdown
+# Progress: <Feature Name>
+
+## Session Log
+<!-- Append progress entries as work proceeds -->
+
+## Decisions Made
+<!-- Record decisions with reasoning during execution -->
+
+## Blockers
+<!-- Current blockers and their status -->
+```
+
+### The 2-Action Rule
+
+During research and implementation phases, apply the **2-Action Rule**: after every 2 browse, search, or read operations, immediately save key findings to the `findings.md` companion file. This prevents information loss when the context window compacts or the session ends unexpectedly.
+
+```
+Search codebase → Read file → SAVE to findings.md
+Browse docs → Read API → SAVE to findings.md
+```
+
+This is the filesystem-as-working-memory principle: **Context Window = RAM, Filesystem = Disk.** Anything important enough to remember MUST be written to disk, not held only in context.
 
 ---
 

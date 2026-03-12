@@ -1432,6 +1432,135 @@ npx playwright test --ui
 
 ---
 
+## Server Lifecycle Management
+
+When testing a web app, the dev server must be running before tests execute. Playwright's built-in `webServer` config handles this automatically:
+
+### Config-Based (Recommended)
+
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  webServer: {
+    command: 'npm run dev',           // Command to start the dev server
+    url: 'http://localhost:3000',      // URL to wait for before running tests
+    reuseExistingServer: !process.env.CI,  // Reuse in dev, fresh in CI
+    timeout: 30_000,                   // Max wait for server to start (ms)
+    stdout: 'pipe',                    // Capture output for debugging
+    stderr: 'pipe',
+  },
+  use: {
+    baseURL: 'http://localhost:3000',
+  },
+});
+```
+
+For **multiple servers** (e.g., frontend + API backend):
+
+```typescript
+webServer: [
+  {
+    command: 'npm run dev:api',
+    url: 'http://localhost:8080/health',
+    reuseExistingServer: !process.env.CI,
+  },
+  {
+    command: 'npm run dev:web',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+],
+```
+
+### Script-Based (For Complex Setups)
+
+When you need more control (database seeding, environment setup), use a helper script:
+
+```python
+# e2e/with_server.py — Start server, run tests, clean up
+import subprocess, time, sys, signal, requests
+
+def wait_for_server(url, timeout=30):
+    """Poll until the server responds or timeout."""
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            resp = requests.get(url, timeout=2)
+            if resp.status_code < 500:
+                return True
+        except requests.ConnectionError:
+            pass
+        time.sleep(1)
+    return False
+
+# 1. Setup (seed DB, etc.)
+subprocess.run(["python", "scripts/seed_test_db.py"], check=True)
+
+# 2. Start server
+server = subprocess.Popen(["npm", "run", "dev"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+try:
+    # 3. Wait for ready
+    if not wait_for_server("http://localhost:3000"):
+        print("Server failed to start within 30s")
+        sys.exit(1)
+
+    # 4. Run tests
+    result = subprocess.run(["npx", "playwright", "test"] + sys.argv[1:])
+    sys.exit(result.returncode)
+finally:
+    # 5. Cleanup
+    server.send_signal(signal.SIGTERM)
+    server.wait(timeout=10)
+```
+
+Usage: `python e2e/with_server.py --project=chromium`
+
+---
+
+## Reconnaissance-First Testing
+
+For dynamic web apps (SPAs, apps with conditional rendering, A/B tests), scan the page structure before writing assertions. This prevents brittle tests that break when the UI changes.
+
+### The Recon Pattern
+
+```typescript
+test('checkout flow adapts to user type', async ({ page }) => {
+  await page.goto('/checkout');
+
+  // RECON: Discover what's actually on the page
+  const hasGuestCheckout = await page.getByRole('button', { name: 'Guest Checkout' }).isVisible();
+  const hasExpressCheckout = await page.getByRole('button', { name: 'Express Checkout' }).isVisible();
+  const paymentMethods = await page.locator('[data-testid="payment-method"]').allTextContents();
+
+  // ACT: Branch based on what's rendered
+  if (hasExpressCheckout) {
+    await page.getByRole('button', { name: 'Express Checkout' }).click();
+    await expect(page).toHaveURL(/\/checkout\/express/);
+  } else if (hasGuestCheckout) {
+    await page.getByRole('button', { name: 'Guest Checkout' }).click();
+    await expect(page.getByLabel('Email')).toBeVisible();
+  }
+
+  // ASSERT: Verify based on discovered state
+  expect(paymentMethods.length).toBeGreaterThan(0);
+});
+```
+
+### When to Use Recon-First
+
+- Pages with feature flags or A/B tests (UI varies per session)
+- Dynamic dashboards where widgets load conditionally
+- Apps with role-based UI (admin sees different controls than user)
+- Third-party embedded content (may load differently each time)
+
+### When NOT to Use Recon-First
+
+- Static pages with predictable structure — just assert directly
+- Tests validating that specific elements MUST exist — recon would hide failures
+
+---
+
 ## CRITICAL RULES
 
 - NEVER use `page.waitForTimeout()` — use auto-wait assertions or `waitForSelector`/`waitForResponse` instead

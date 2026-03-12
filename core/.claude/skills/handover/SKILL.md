@@ -597,11 +597,17 @@ Compile all gathered information into a structured markdown document.
 - {Pattern discovered}
 - {Process improvement identified}
 
+## Handoff Mail
+{Free-form message from the outgoing session to the incoming session. Use this for
+anything that doesn't fit neatly into the structured sections above — warnings,
+hunches, morale notes, or "I was about to try X when time ran out."}
+
 ## References
 - **Scratchpad:** {path, if exists}
 - **Spec/Issue:** {link or path}
 - **PR:** {link, if applicable}
 - **Learning files:** {paths in .claude/memory/}
+- **Plan companion files:** {paths to findings.md, progress.md if they exist}
 - **Key files touched:** {list of important file paths}
 ```
 
@@ -636,7 +642,37 @@ Before saving, verify the handover passes these checks:
 
 ---
 
-## STEP 9: Save the Handover
+## STEP 9: Land the Plane
+
+Before saving the handover, ensure all work is safely persisted. Unpushed work blocks other agents and developers from continuing.
+
+### 9.0 Pre-Handover Checklist
+
+Run through this checklist and resolve each item:
+
+```bash
+# 1. Check for uncommitted changes
+git status --short
+
+# 2. Check if current branch is pushed
+git log --oneline @{u}..HEAD 2>/dev/null | head -5
+```
+
+| Check | Action if Failing |
+|-------|-------------------|
+| Uncommitted changes exist | Ask user: "Commit these changes before handover?" Stage and commit with a WIP message if approved. |
+| Unpushed commits exist | Ask user: "Push to remote before ending session?" Push if approved. |
+| Tests are failing | Record in handover state — do NOT block handover, but flag clearly. |
+| Stashed changes exist | List in handover document — easy to forget about stashes. |
+
+**Why this matters:** If work is not pushed, the next session (or another developer/agent) cannot access it. The handover document will reference commits and branches that only exist locally, making it useless for anyone else.
+
+If the user declines to commit or push, note it prominently in the handover:
+
+```markdown
+> ⚠ WARNING: Uncommitted changes exist that are NOT pushed to remote.
+> The next session MUST be on this same machine to access this work.
+```
 
 ### 9.1 Default Save Location
 
@@ -700,12 +736,43 @@ At the beginning of a new session, check:
 test -f .claude/handover.md && echo "HANDOVER EXISTS" || echo "NO HANDOVER"
 ```
 
-### 10.2 Resumption Protocol
+### 10.2 Recovery from Companion Files
+
+Even if no handover document exists (e.g., after `/clear` or a crash), check for persistent working-memory files that may contain recoverable context:
+
+```bash
+# Check for plan companion files
+ls docs/plans/*-findings.md docs/plans/*-progress.md 2>/dev/null
+
+# Check for scratchpad
+ls scratchpad.md .claude/scratchpad.md 2>/dev/null
+
+# Check for active plan files (most recently modified)
+ls -t docs/plans/*-plan.md 2>/dev/null | head -3
+```
+
+If companion files exist but no handover:
+1. Read the most recently modified plan, findings, and progress files
+2. Cross-reference with `git log --oneline -10` to understand recent work
+3. Present a reconstructed summary to the user:
+
+> No handover document found, but I recovered context from working files:
+>
+> **Active plan:** `docs/plans/{name}-plan.md` (last modified {date})
+> **Findings:** {count} entries in `{name}-findings.md`
+> **Progress:** Last entry: "{last progress line}"
+>
+> Would you like to continue from where this left off?
+
+This is a fallback — a proper `/handover` document is always preferred.
+
+### 10.3 Resumption Protocol
 
 If a handover exists:
 
 1. **Read the handover document**
-2. **Present a brief summary to the user:**
+2. **Read the Handoff Mail section first** — it contains the outgoing session's most important unstructured context
+3. **Present a brief summary to the user:**
 
    > Resuming from handover dated {date}.
    >
@@ -727,7 +794,7 @@ If a handover exists:
    - Start something entirely different
    - Ask for details on a specific section
 
-### 10.3 Stale Handover Detection
+### 10.4 Stale Handover Detection
 
 A handover may be stale if:
 
@@ -742,7 +809,7 @@ For stale handovers:
 2. Re-gather current state (git, tests, env) instead of trusting the handover's state section
 3. Cross-reference next steps against what has changed
 
-### 10.4 Multi-Developer Handover
+### 10.5 Multi-Developer Handover
 
 If the handover was written by a different developer or agent session:
 

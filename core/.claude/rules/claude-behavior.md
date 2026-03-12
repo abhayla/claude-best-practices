@@ -19,7 +19,16 @@ description: Universal behavioral rules for how Claude should approach all tasks
 
 6. **Git Checkpoints**: Before starting work, check `git status` — if there are uncommitted changes, ask the user to commit or stash first. During multi-step tasks, commit after each completed sub-task as a recovery checkpoint so mistakes can be rolled back without losing prior progress.
 
+## Code Comments
+
+7. **No Redundant Comments**: NEVER add comments that restate what the code already says (e.g., `// Initialize the variable`, `# Loop through items`, `// Import dependencies`). Only add comments where the logic is non-obvious — explain *why*, not *what*. Do not add docstrings, type annotations, or comments to code you did not change.
+
+## File Structure
+
+8. **No Catch-All Files**: NEVER create files named `utils`, `helpers`, `common`, `misc`, or `shared` (any extension). These become dumping grounds that grow unbounded and violate single responsibility. Instead, name files after what they do: `string-formatting.ts` instead of `utils.ts`, `date-calculations.py` instead of `helpers.py`. If a utility is used by only one module, put it in that module.
+9. **Keep Files Focused**: Each file should have a single clear purpose. When a file grows beyond ~300 lines, consider whether it's doing too many things and should be split. Exceptions: generated code, test fixtures, migrations, and configuration files.
+
 ## Environment
 
-7. **Bash Syntax**: Use forward slashes `/`, quote paths with spaces. Shell is Unix-style bash even on Windows.
-8. **Conventions**: Follow existing code patterns and naming conventions in this project.
+10. **Bash Syntax**: Use forward slashes `/`, quote paths with spaces. Shell is Unix-style bash even on Windows.
+11. **Conventions**: Follow existing code patterns and naming conventions in this project.

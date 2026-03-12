@@ -1,10 +1,89 @@
-# Hook Examples
+# Hooks
 
 Hooks are shell scripts that run in response to Claude Code events. They are project-specific and should be adapted for your needs.
 
-> **Note:** Hooks are configured in your project's `.claude/settings.json` or `~/.claude/settings.json`. The examples below show common patterns you can adapt.
+> **Note:** Hooks are configured in your project's `.claude/settings.json` or `~/.claude/settings.json`.
 
-## Example: Auto-Format on File Write
+## Included Hooks
+
+### Dangerous Command Blocker (`dangerous-command-blocker.sh`)
+
+PreToolUse hook on `Bash` that blocks catastrophic commands (`rm -rf /`, `dd`, `mkfs`), protects critical paths (`.git/`, `.claude/`, `.env`), blocks database destruction (`DROP DATABASE`, `TRUNCATE CASCADE`), prevents force pushes to main/master, warns about interactive command hangs (`cp`/`mv`/`rm` without `-f` that may hang from `-i` aliases), and blocks `gh run watch` (API rate limit exhaustion). Exit code 2 blocks the command and feeds the error message back to Claude.
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "command": ".claude/hooks/dangerous-command-blocker.sh"
+      }
+    ]
+  }
+}
+```
+
+### Secret Scanner (`secret-scanner.sh`)
+
+PreToolUse hook on `Write|Edit` that scans file content for leaked secrets before they're written to disk. Detects AWS keys, GitHub tokens, Google/Stripe/Slack/Anthropic/OpenAI API keys, private keys (PEM), database connection strings with passwords, JWTs, and hardcoded passwords. Skips safe file types (`.md`, `.txt`, images). Exit code 2 blocks the write and suggests using environment variables or a secrets manager.
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": ".claude/hooks/secret-scanner.sh"
+      }
+    ]
+  }
+}
+```
+
+### Context Window Monitor — two options
+
+Monitors context window usage and warns Claude when sessions get too long, preventing silent quality degradation. Choose ONE of the two approaches below.
+
+**Option A: Tool-Count Heuristic (`context-window-monitor.sh`)** — Portable, works everywhere. Counts tool invocations per session and warns at configurable thresholds (default: 50 = WARNING, 80 = CRITICAL). Less precise but zero dependencies.
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "command": ".claude/hooks/context-window-monitor.sh"
+      }
+    ]
+  }
+}
+```
+
+Environment variables: `CONTEXT_WARN_THRESHOLD` (default 50), `CONTEXT_CRIT_THRESHOLD` (default 80), `CONTEXT_DEBOUNCE` (default 10).
+
+**Option B: Statusline Bridge (`context-window-statusline.sh` + `context-window-statusline-hook.sh`)** — Precise % monitoring. The statusline script receives actual token counts from Claude Code, writes them to a bridge file. The hook reads the bridge file and warns at % thresholds (default: 35% remaining = WARNING, 25% = CRITICAL). Requires Claude Code statusline support.
+
+```json
+{
+  "statusline": ".claude/hooks/context-window-statusline.sh",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "command": ".claude/hooks/context-window-statusline-hook.sh"
+      }
+    ]
+  }
+}
+```
+
+Environment variables: `CONTEXT_WARN_PCT` (default 35), `CONTEXT_CRIT_PCT` (default 25), `CONTEXT_DEBOUNCE` (default 10).
+
+Both options integrate with your existing `context-management` rules and `context-reducer` agent — the warnings reference `/handover`, context-reducer, and subagent delegation.
+
+### Auto-Format on File Write (`auto-format.sh`)
+
+PostToolUse hook on `Write|Edit` that auto-formats files after Claude writes them. Supports Python (black/ruff), JS/TS/JSON/YAML/CSS/HTML (prettier), Kotlin (ktfmt), Go (gofmt), Rust (rustfmt), Swift (swift-format), and Shell (shfmt). Only runs formatters that are installed — missing ones are silently skipped. Always non-blocking (exit 0). Customize the formatters to match your project tooling.
 
 ```json
 {
@@ -12,27 +91,16 @@ Hooks are shell scripts that run in response to Claude Code events. They are pro
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
-        "command": "scripts/auto-format.sh"
+        "command": ".claude/hooks/auto-format.sh"
       }
     ]
   }
 }
 ```
 
-```bash
-#!/bin/bash
-# scripts/auto-format.sh — Auto-format files after Claude writes them
-FILE=$(echo "$TOOL_INPUT" | jq -r '.file_path // .path // empty')
-if [[ -z "$FILE" ]]; then exit 0; fi
+## Example Hooks
 
-case "$FILE" in
-  *.py)   black "$FILE" 2>/dev/null ;;
-  *.js|*.ts|*.tsx) npx prettier --write "$FILE" 2>/dev/null ;;
-  *.kt)   ktfmt "$FILE" 2>/dev/null ;;
-esac
-```
-
-## Example: Test Verification After Code Changes
+### Test Verification After Code Changes
 
 ```json
 {
