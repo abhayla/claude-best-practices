@@ -46,8 +46,8 @@ PYTHONPATH=. python scripts/scan_web.py --all
 
 - **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
   - `agents/` — 13 agent definitions (10 universal + 3 stack-specific)
-  - `skills/` — 24 skill directories, each with a `SKILL.md`
-  - `rules/` — 10 rule files (2 universal + 4 stack-specific + 4 placeholders)
+  - `skills/` — 73 skill directories, each with a `SKILL.md`
+  - `rules/` — 13 rule files (5 universal + 4 stack-specific + 4 placeholders)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns
   - `settings.json` — Minimal defaults

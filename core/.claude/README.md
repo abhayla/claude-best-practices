@@ -24,7 +24,7 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 | `fastapi-database-admin` | Database tasks — queries, migrations, schema management |
 | `android-compose` | Jetpack Compose UI — screens, state, design system |
 
-## Skills (24)
+## Skills (27)
 
 ### Universal Skills
 | Skill | Usage | Description |
@@ -65,12 +65,19 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 | `/android-run-tests` | Android test runner with class resolution |
 | `/android-run-e2e` | E2E tests by feature group |
 
+### Platform Skills
+| Skill | Usage | Description |
+|-------|-------|-------------|
+| `/github` | `/github search repos for claude skills --stars ">50"` | GitHub search and discovery — repos, code, deep inspect |
+| `/twitter-x` | `/twitter-x compose tweet about AI` | Twitter/X — read, compose, score, search, post, monitor |
+| `/reddit` | `/reddit search r/python for async patterns` | Reddit — read, compose, analyze, search, post, monitor |
+
 ### AI Skills
 | Skill | Description |
 |-------|-------------|
 | `/ai-gemini-api` | Gemini API reference and patterns |
 
-## Rules (10)
+## Rules (13)
 
 | Rule | Scope | Description |
 |------|-------|-------------|
