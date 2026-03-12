@@ -14,7 +14,7 @@ _Jetpack Compose UI, Hilt DI, Room DB, Gradle._
 
 **Prefix:** `android-*`
 
-**Skills:** android-run-tests, android-adb-test, android-run-e2e
+**Skills:** android-arch, android-gradle, android-run-tests, android-adb-test, android-run-e2e
 **Agents:** android-compose
 **Rules:** android-compose-ui
 
@@ -32,6 +32,7 @@ _Phone OTP, token management, multi-environment setup._
 
 **Prefix:** `firebase-*`
 
+**Skills:** firebase-data-connect, firebase-dev, firebase-ai
 **Rules:** firebase-auth
 
 ## React + Next.js
@@ -39,6 +40,7 @@ _Next.js App Router, server components, Tailwind._
 
 **Prefix:** `react-*`
 
+**Skills:** react-native-dev
 **Rules:** react-nextjs
 
 ## Superpowers
