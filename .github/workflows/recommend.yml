@@ -27,7 +27,7 @@ jobs:
         run: |
           if [ -n "${{ inputs.repo }}" ]; then
             echo "Running recommendations for ${{ inputs.repo }}"
-            PYTHONPATH=. python scripts/recommend.py --repo "${{ inputs.repo }}" --apply --use-config
+            PYTHONPATH=. python scripts/recommend.py --repo "${{ inputs.repo }}" --provision --use-config
           else
             echo "Running recommendations for all auto_sync repos"
             # Parse repos.yml and run for each repo with auto_sync: true
@@ -40,6 +40,6 @@ jobs:
                   print(entry['repo'])
           " | while read -r repo; do
               echo "=== Recommending for $repo ==="
-              PYTHONPATH=. python scripts/recommend.py --repo "$repo" --apply --use-config || echo "Failed for $repo, continuing..."
+              PYTHONPATH=. python scripts/recommend.py --repo "$repo" --provision --use-config || echo "Failed for $repo, continuing..."
             done
           fi

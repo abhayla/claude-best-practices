@@ -72,17 +72,21 @@ Example:
 - We don't use raw SQL — use the ORM query builder
 -->
 
-## Rules for Claude
-
-<!-- Project-specific rules go here. Behavioral, context, and meta rules are in .claude/rules/ -->
-
-1. **Bug Fixing**: Use `/fix-loop` or `/fix-issue`. Start by writing a test that reproduces the bug, then fix and prove with a passing test.
-
 <!-- TODO: Add project-specific rules here. Examples:
 - "MUST use pnpm, NOT npm or yarn"
 - "All API endpoints MUST have integration tests"
 - "Database migrations MUST be reversible"
 -->
+
+<!-- hub:best-practices:start -->
+
+<!-- PROTECTED SECTION — managed by claude-best-practices hub. -->
+<!-- Do NOT condense, rewrite, reorganize, or remove.          -->
+<!-- Any /init or optimization request must SKIP this section.  -->
+
+## Rules for Claude
+
+1. **Bug Fixing**: Use `/fix-loop` or `/fix-issue`. Start by writing a test that reproduces the bug, then fix and prove with a passing test.
 
 ### Rules Reference
 
@@ -99,6 +103,8 @@ Behavioral, context management, and rule-writing guidance are distributed across
 ## Claude Code Configuration
 
 The `.claude/` directory contains skills, agents, and rules for Claude Code.
+
+<!-- hub:best-practices:end -->
 
 <!-- These are auto-filled by bootstrap: -->
 Synced from: {{HUB_REPO}} ({{SELECTED_STACKS}})

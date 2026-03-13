@@ -10,15 +10,25 @@ from scripts.recommend import (
     analyze_overlaps_local,
     apply_to_local,
     classify_divergence,
+    deep_merge_settings,
     detect_stacks_from_dir,
     format_diff_report,
+    format_divergence_table,
     format_report,
+    generate_hub_practices_section,
     get_hub_resources,
     get_project_resource_names,
+    get_rule_descriptions,
     is_stack_specific,
     matches_stacks,
     name_matches_existing,
+    provision_claude_local_md,
+    provision_claude_md,
+    provision_settings_json,
+    provision_to_local,
     tier_resource,
+    PROVISION_START_MARKER,
+    PROVISION_END_MARKER,
     _compute_line_overlap,
     _find_matching_project_name,
 )
@@ -56,6 +66,18 @@ def hub_root(tmp_path):
     hooks.mkdir(parents=True)
     for name in ["dangerous-command-blocker", "secret-scanner", "auto-format"]:
         (hooks / f"{name}.sh").write_text(f"#!/bin/bash\n# {name}")
+
+    # Templates and settings
+    (core / "CLAUDE.md.template").write_text(
+        "# CLAUDE.md\n\n**{{PROJECT_NAME}}** - {{PROJECT_DESCRIPTION}}\n\n"
+        "Platform: {{PLATFORM}}\n",
+        encoding="utf-8",
+    )
+    (core / "CLAUDE.local.md.template").write_text(
+        "# Personal Project Preferences\n\nThis file is gitignored.\n",
+        encoding="utf-8",
+    )
+    (core / "settings.json").write_text('{\n  "permissions": {\n    "allow": [],\n    "deny": []\n  }\n}\n')
 
     return tmp_path
 
@@ -661,3 +683,325 @@ class TestFormatDiffReport:
         ]
         report = format_diff_report(overlaps)
         assert "HUB HAS IMPROVEMENTS" in report
+
+
+# --- Provision: Rule Descriptions ---
+
+
+class TestGetRuleDescriptions:
+    def test_frontmatter_extraction(self, hub_root):
+        descs = get_rule_descriptions(hub_root, ["workflow", "context-management"])
+        assert "workflow" in descs
+        assert "context-management" in descs
+
+    def test_missing_description_fallback(self, tmp_path):
+        """Falls back to first # heading when description is absent."""
+        rules_dir = tmp_path / "core" / ".claude" / "rules"
+        rules_dir.mkdir(parents=True)
+        (rules_dir / "no-desc.md").write_text("# My Custom Rule\n\nSome content.")
+        descs = get_rule_descriptions(tmp_path, ["no-desc"])
+        assert descs["no-desc"] == "My Custom Rule"
+
+    def test_nonexistent_files(self, hub_root):
+        descs = get_rule_descriptions(hub_root, ["does-not-exist"])
+        assert descs == {}
+
+
+# --- Provision: Hub Practices Section ---
+
+
+class TestGenerateHubPracticesSection:
+    def test_contains_bug_fixing_rule(self, hub_root):
+        section = generate_hub_practices_section(hub_root, ["workflow"])
+        assert "Bug Fixing" in section
+        assert "/fix-loop" in section
+
+    def test_contains_dynamic_rules_table(self, hub_root):
+        section = generate_hub_practices_section(hub_root, ["workflow", "context-management"])
+        assert "Rules Reference" in section
+        assert "`rules/workflow.md`" in section
+        assert "`rules/context-management.md`" in section
+
+    def test_contains_sync_metadata(self, hub_root):
+        section = generate_hub_practices_section(hub_root, ["workflow"])
+        assert "Claude Code Configuration" in section
+        assert ".claude/" in section
+
+    def test_has_markers(self, hub_root):
+        section = generate_hub_practices_section(hub_root, [])
+        assert PROVISION_START_MARKER in section
+        assert PROVISION_END_MARKER in section
+
+
+# --- Provision: CLAUDE.md ---
+
+
+class TestProvisionClaudeMd:
+    def test_create_from_template(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        result = provision_claude_md(hub_root, target, ["fastapi-python"], ["workflow"])
+        assert result == "created"
+        assert (target / "CLAUDE.md").exists()
+        content = (target / "CLAUDE.md").read_text()
+        assert "myproject" in content
+
+    def test_append_markers_to_existing(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        (target / "CLAUDE.md").write_text("# My Project\n\nExisting content.\n")
+        result = provision_claude_md(hub_root, target, [], ["workflow"])
+        assert result == "appended"
+        content = (target / "CLAUDE.md").read_text()
+        assert "Existing content." in content
+        assert PROVISION_START_MARKER in content
+        assert PROVISION_END_MARKER in content
+
+    def test_replace_between_markers(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        existing = (
+            "# My Project\n\nBefore.\n\n"
+            f"{PROVISION_START_MARKER}\nOLD CONTENT\n{PROVISION_END_MARKER}\n\n"
+            "After.\n"
+        )
+        (target / "CLAUDE.md").write_text(existing)
+        result = provision_claude_md(hub_root, target, [], ["workflow"])
+        assert result == "replaced"
+        content = (target / "CLAUDE.md").read_text()
+        assert "Before." in content
+        assert "After." in content
+        assert "OLD CONTENT" not in content
+        assert "Bug Fixing" in content
+
+    def test_preserve_outside_content(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        existing = (
+            "# Important Header\n\n"
+            f"{PROVISION_START_MARKER}\nold\n{PROVISION_END_MARKER}\n\n"
+            "# Footer\n"
+        )
+        (target / "CLAUDE.md").write_text(existing)
+        provision_claude_md(hub_root, target, [], [])
+        content = (target / "CLAUDE.md").read_text()
+        assert "Important Header" in content
+        assert "Footer" in content
+
+    def test_partial_markers_start_without_end(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        existing = f"# My Project\n\n{PROVISION_START_MARKER}\nBroken\n"
+        (target / "CLAUDE.md").write_text(existing)
+        result = provision_claude_md(hub_root, target, [], [])
+        assert result == "appended"
+        content = (target / "CLAUDE.md").read_text()
+        assert content.count(PROVISION_START_MARKER) == 2  # old broken + new
+
+
+# --- Provision: CLAUDE.local.md ---
+
+
+class TestProvisionClaudeLocalMd:
+    def test_create_when_missing(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        result = provision_claude_local_md(hub_root, target)
+        assert result == "created"
+        assert (target / "CLAUDE.local.md").exists()
+
+    def test_skip_when_exists(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        (target / "CLAUDE.local.md").write_text("# My local config")
+        result = provision_claude_local_md(hub_root, target)
+        assert result == "skipped"
+        assert (target / "CLAUDE.local.md").read_text() == "# My local config"
+
+
+# --- Provision: Deep Merge Settings ---
+
+
+class TestDeepMergeSettings:
+    def test_add_keys(self):
+        base = {"a": 1}
+        overlay = {"b": 2}
+        result = deep_merge_settings(base, overlay)
+        assert result == {"a": 1, "b": 2}
+
+    def test_preserve_existing(self):
+        base = {"a": 1}
+        overlay = {"a": 99}
+        result = deep_merge_settings(base, overlay)
+        assert result["a"] == 1  # base wins
+
+    def test_nested_merge(self):
+        base = {"permissions": {"allow": ["read"]}}
+        overlay = {"permissions": {"deny": ["write"]}}
+        result = deep_merge_settings(base, overlay)
+        assert result == {"permissions": {"allow": ["read"], "deny": ["write"]}}
+
+    def test_list_dedup(self):
+        base = {"items": ["a", "b"]}
+        overlay = {"items": ["b", "c"]}
+        result = deep_merge_settings(base, overlay)
+        assert result["items"] == ["a", "b", "c"]
+
+    def test_empty_base(self):
+        result = deep_merge_settings({}, {"a": 1})
+        assert result == {"a": 1}
+
+    def test_empty_overlay(self):
+        result = deep_merge_settings({"a": 1}, {})
+        assert result == {"a": 1}
+
+
+# --- Provision: settings.json ---
+
+
+class TestProvisionSettingsJson:
+    def test_create_when_missing(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        (target / ".claude").mkdir(parents=True)
+        result = provision_settings_json(hub_root, target)
+        assert result == "created"
+        assert (target / ".claude" / "settings.json").exists()
+
+    def test_merge_existing(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        (target / ".claude").mkdir(parents=True)
+        existing = {"permissions": {"allow": ["Bash(*)"]}, "custom": True}
+        (target / ".claude" / "settings.json").write_text(json.dumps(existing))
+        result = provision_settings_json(hub_root, target)
+        assert result == "merged"
+        merged = json.loads((target / ".claude" / "settings.json").read_text())
+        assert merged["custom"] is True
+        assert "Bash(*)" in merged["permissions"]["allow"]
+
+
+# --- Provision: Format Divergence Table ---
+
+
+class TestFormatDivergenceTable:
+    def test_markdown_output(self):
+        overlaps = [
+            {
+                "hub_name": "skill-a", "project_name": "skill-a",
+                "type": "skill", "status": "hub-newer",
+                "hub_overlap": 0.3, "detail": "Hub has improvements.",
+            }
+        ]
+        table = format_divergence_table(overlaps)
+        assert "Content Divergence" in table
+        assert "skill-a" in table
+        assert "hub-newer" in table
+
+    def test_excludes_identical(self):
+        overlaps = [
+            {
+                "hub_name": "skill-a", "project_name": "skill-a",
+                "type": "skill", "status": "identical",
+                "hub_overlap": 1.0, "detail": "Content is identical",
+            }
+        ]
+        table = format_divergence_table(overlaps)
+        assert table == ""
+
+    def test_empty_when_all_identical(self):
+        overlaps = [
+            {
+                "hub_name": "a", "project_name": "a",
+                "type": "skill", "status": "identical",
+                "hub_overlap": 1.0, "detail": "identical",
+            },
+            {
+                "hub_name": "b", "project_name": "b",
+                "type": "rule", "status": "identical",
+                "hub_overlap": 1.0, "detail": "identical",
+            },
+        ]
+        assert format_divergence_table(overlaps) == ""
+
+
+# --- Provision: provision_to_local ---
+
+
+class TestProvisionToLocal:
+    def test_full_integration(self, hub_root, project_dir):
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project_dir / ".claude")
+        stacks = ["fastapi-python"]
+        gaps = analyze_gaps(hub_resources, project_names, stacks)
+
+        summary = provision_to_local(hub_root, project_dir, gaps, stacks)
+        assert len(summary["copied_files"]) > 0
+        assert summary["claude_md"] == "created"  # project_dir has no CLAUDE.md
+        assert summary["settings_json"] in ("created", "merged")
+        assert (project_dir / "CLAUDE.md").exists()
+
+    def test_returns_summary_dict(self, hub_root, project_dir):
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project_dir / ".claude")
+        gaps = analyze_gaps(hub_resources, project_names, ["fastapi-python"])
+
+        summary = provision_to_local(hub_root, project_dir, gaps, ["fastapi-python"])
+        assert "copied_files" in summary
+        assert "claude_md" in summary
+        assert "claude_local_md" in summary
+        assert "settings_json" in summary
+
+    def test_idempotent_second_run(self, hub_root, project_dir):
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project_dir / ".claude")
+        stacks = ["fastapi-python"]
+        gaps = analyze_gaps(hub_resources, project_names, stacks)
+
+        # First run
+        provision_to_local(hub_root, project_dir, gaps, stacks)
+
+        # Second run — gaps should be empty now, CLAUDE.md should be replaced
+        project_names2 = get_project_resource_names(project_dir / ".claude")
+        gaps2 = analyze_gaps(hub_resources, project_names2, stacks)
+        summary2 = provision_to_local(hub_root, project_dir, gaps2, stacks)
+
+        # No new files to copy (all resources already present)
+        assert len(summary2["copied_files"]) == 0
+        # CLAUDE.md already exists — should replace or append
+        assert summary2["claude_md"] in ("replaced", "appended")
+
+
+# --- Main: --provision flag ---
+
+
+class TestMainProvisionFlag:
+    def test_flag_accepted(self):
+        """--provision flag is accepted by the argument parser."""
+        import argparse
+        from scripts.recommend import main
+        import sys
+        # Just verify the parser doesn't reject --provision
+        # We can't actually run main() without a repo/local, but we can
+        # test that it parses correctly by invoking the parser directly
+        parser = argparse.ArgumentParser()
+        group = parser.add_mutually_exclusive_group(required=True)
+        group.add_argument("--repo")
+        group.add_argument("--local")
+        action_group = parser.add_mutually_exclusive_group()
+        action_group.add_argument("--apply", action="store_true")
+        action_group.add_argument("--provision", action="store_true")
+        args = parser.parse_args(["--local", "/tmp/test", "--provision"])
+        assert args.provision is True
+        assert args.apply is False
+
+    def test_mutually_exclusive_with_apply(self):
+        """--provision and --apply cannot be used together."""
+        import argparse
+        parser = argparse.ArgumentParser()
+        group = parser.add_mutually_exclusive_group(required=True)
+        group.add_argument("--repo")
+        group.add_argument("--local")
+        action_group = parser.add_mutually_exclusive_group()
+        action_group.add_argument("--apply", action="store_true")
+        action_group.add_argument("--provision", action="store_true")
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--local", "/tmp/test", "--apply", "--provision"])

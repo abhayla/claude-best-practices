@@ -13,6 +13,10 @@ Usage:
     # Apply recommendations locally (copy files)
     PYTHONPATH=. python scripts/recommend.py --local /path/to/project --apply
 
+    # Provision project (apply + CLAUDE.md + settings.json)
+    PYTHONPATH=. python scripts/recommend.py --repo owner/name --provision
+    PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
+
     # Use stacks from repos.yml instead of auto-detection
     PYTHONPATH=. python scripts/recommend.py --repo owner/name --use-config
 
@@ -22,7 +26,10 @@ Usage:
 """
 
 import argparse
+import copy
 import json
+import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -31,7 +38,7 @@ from typing import Optional
 
 import yaml
 
-from scripts.bootstrap import STACK_PREFIXES, copy_claude_dir
+from scripts.bootstrap import STACK_PREFIXES, copy_claude_dir, render_template
 from scripts.collate import extract_patterns_from_dir
 
 
@@ -534,36 +541,40 @@ def apply_to_local(
                             rel = f.relative_to(src)
                             dest_file = dst / rel
                             dest_file.parent.mkdir(parents=True, exist_ok=True)
-                            import shutil
                             shutil.copy2(f, dest_file)
                             copied.append(str(Path(".claude/skills") / name / rel))
+                else:
+                    print(f"  WARNING: hub skill '{name}' not found at {src}")
 
             elif rtype == "agent":
                 src = claude_src / "agents" / f"{name}.md"
                 dst = target_dir / ".claude" / "agents" / f"{name}.md"
                 if src.exists():
                     dst.parent.mkdir(parents=True, exist_ok=True)
-                    import shutil
                     shutil.copy2(src, dst)
                     copied.append(f".claude/agents/{name}.md")
+                else:
+                    print(f"  WARNING: hub agent '{name}' not found at {src}")
 
             elif rtype == "rule":
                 src = claude_src / "rules" / f"{name}.md"
                 dst = target_dir / ".claude" / "rules" / f"{name}.md"
                 if src.exists():
                     dst.parent.mkdir(parents=True, exist_ok=True)
-                    import shutil
                     shutil.copy2(src, dst)
                     copied.append(f".claude/rules/{name}.md")
+                else:
+                    print(f"  WARNING: hub rule '{name}' not found at {src}")
 
             elif rtype == "hook":
                 src = claude_src / "hooks" / f"{name}.sh"
                 dst = target_dir / ".claude" / "hooks" / f"{name}.sh"
                 if src.exists():
                     dst.parent.mkdir(parents=True, exist_ok=True)
-                    import shutil
                     shutil.copy2(src, dst)
                     copied.append(f".claude/hooks/{name}.sh")
+                else:
+                    print(f"  WARNING: hub hook '{name}' not found at {src}")
 
     return copied
 
@@ -1013,6 +1024,410 @@ def format_diff_report(overlaps: list[dict]) -> str:
     return "\n".join(lines)
 
 
+# --- Provision ---
+
+PROVISION_START_MARKER = "<!-- hub:best-practices:start -->"
+PROVISION_END_MARKER = "<!-- hub:best-practices:end -->"
+
+
+def get_rule_descriptions(hub_root: Path, rule_names: list[str]) -> dict[str, str]:
+    """Parse YAML frontmatter description field from rule files.
+
+    Falls back to first # heading if description is missing.
+    """
+    descriptions = {}
+    rules_dir = hub_root / "core" / ".claude" / "rules"
+
+    for name in rule_names:
+        rule_file = rules_dir / f"{name}.md"
+        if not rule_file.exists():
+            continue
+
+        content = rule_file.read_text(encoding="utf-8", errors="ignore")
+        desc = None
+
+        # Try YAML frontmatter
+        if content.startswith("---"):
+            end = content.find("---", 3)
+            if end != -1:
+                frontmatter = content[3:end]
+                try:
+                    meta = yaml.safe_load(frontmatter)
+                    if isinstance(meta, dict):
+                        desc = meta.get("description")
+                except yaml.YAMLError:
+                    pass
+
+        # Fallback: first # heading
+        if not desc:
+            for line in content.splitlines():
+                line = line.strip()
+                if line.startswith("# "):
+                    desc = line[2:].strip()
+                    break
+
+        if desc:
+            descriptions[name] = desc
+
+    return descriptions
+
+
+def generate_hub_practices_section(
+    hub_root: Path, rules_present: list[str],
+) -> str:
+    """Build the hub best-practices section for CLAUDE.md.
+
+    Contains: Bug Fixing rule, dynamic Rules Reference table, sync metadata.
+    """
+    lines = []
+    lines.append(PROVISION_START_MARKER)
+    lines.append("")
+    lines.append("<!-- PROTECTED SECTION — managed by claude-best-practices hub. -->")
+    lines.append("<!-- Do NOT condense, rewrite, reorganize, or remove.          -->")
+    lines.append("<!-- Any /init or optimization request must SKIP this section.  -->")
+    lines.append("")
+    lines.append("## Rules for Claude")
+    lines.append("")
+    lines.append(
+        "1. **Bug Fixing**: Use `/fix-loop` or `/fix-issue`. "
+        "Start by writing a test that reproduces the bug, "
+        "then fix and prove with a passing test."
+    )
+    lines.append("")
+
+    # Dynamic rules reference table
+    if rules_present:
+        descriptions = get_rule_descriptions(hub_root, rules_present)
+        lines.append("### Rules Reference")
+        lines.append("")
+        lines.append("| Rule File | What It Covers |")
+        lines.append("|-----------|---------------|")
+        for name in sorted(rules_present):
+            desc = descriptions.get(name, name.replace("-", " ").title())
+            lines.append(f"| `rules/{name}.md` | {desc} |")
+        lines.append("")
+
+    lines.append("## Claude Code Configuration")
+    lines.append("")
+    lines.append("The `.claude/` directory contains skills, agents, and rules for Claude Code.")
+    lines.append("")
+    lines.append(PROVISION_END_MARKER)
+    return "\n".join(lines)
+
+
+def provision_claude_md(
+    hub_root: Path,
+    target_dir: Path,
+    stacks: list[str],
+    rules_present: list[str],
+) -> str:
+    """Provision CLAUDE.md in the target directory.
+
+    Three cases:
+    1. No CLAUDE.md exists → create from template
+    2. CLAUDE.md exists with markers → replace between markers
+    3. CLAUDE.md exists without markers → append section with markers
+    """
+    claude_md = target_dir / "CLAUDE.md"
+    hub_section = generate_hub_practices_section(hub_root, rules_present)
+
+    if not claude_md.exists():
+        # Case 1: Create from template
+        template_path = hub_root / "core" / ".claude" / "CLAUDE.md.template"
+        if template_path.exists():
+            from datetime import datetime
+            template = template_path.read_text(encoding="utf-8")
+            rendered = render_template(template, {
+                "PROJECT_NAME": target_dir.name,
+                "PROJECT_DESCRIPTION": "A new project",
+                "PLATFORM": ", ".join(stacks) if stacks else "general",
+                "BUILD_TOOLS": "See stack documentation",
+                "DEVELOPMENT_COMMANDS": "# Add your commands here",
+                "HUB_REPO": "abhayla/claude-best-practices",
+                "SELECTED_STACKS": ", ".join(stacks) if stacks else "none",
+                "LAST_SYNC_TIMESTAMP": datetime.utcnow().isoformat(),
+            })
+            claude_md.write_text(rendered, encoding="utf-8")
+            return "created"
+        else:
+            claude_md.write_text(f"# CLAUDE.md\n\n{hub_section}\n", encoding="utf-8")
+            return "created"
+
+    # File exists — read it
+    content = claude_md.read_text(encoding="utf-8")
+
+    start_idx = content.find(PROVISION_START_MARKER)
+    end_idx = content.find(PROVISION_END_MARKER)
+
+    if start_idx != -1 and end_idx != -1:
+        # Case 2: Both markers found → replace between them
+        before = content[:start_idx]
+        after = content[end_idx + len(PROVISION_END_MARKER):]
+        new_content = before + hub_section + after
+        claude_md.write_text(new_content, encoding="utf-8")
+        return "replaced"
+
+    # Case 3: No markers (or start without end) → append
+    if not content.endswith("\n"):
+        content += "\n"
+    content += "\n" + hub_section + "\n"
+    claude_md.write_text(content, encoding="utf-8")
+    return "appended"
+
+
+def provision_claude_local_md(hub_root: Path, target_dir: Path) -> str:
+    """Copy CLAUDE.local.md template if missing, skip if exists."""
+    local_md = target_dir / "CLAUDE.local.md"
+    if local_md.exists():
+        return "skipped"
+
+    template_path = hub_root / "core" / ".claude" / "CLAUDE.local.md.template"
+    if template_path.exists():
+        shutil.copy2(template_path, local_md)
+        return "created"
+
+    return "no-template"
+
+
+def deep_merge_settings(base: dict, overlay: dict) -> dict:
+    """Recursively merge overlay into base. Base wins at leaf values. Lists are deduplicated union."""
+    result = copy.deepcopy(base)
+
+    for key, overlay_val in overlay.items():
+        if key not in result:
+            result[key] = copy.deepcopy(overlay_val)
+        elif isinstance(result[key], dict) and isinstance(overlay_val, dict):
+            result[key] = deep_merge_settings(result[key], overlay_val)
+        elif isinstance(result[key], list) and isinstance(overlay_val, list):
+            # Deduplicated union, preserving order (base items first)
+            seen = set()
+            merged = []
+            for item in result[key] + overlay_val:
+                key_repr = json.dumps(item, sort_keys=True) if isinstance(item, dict) else str(item)
+                if key_repr not in seen:
+                    seen.add(key_repr)
+                    merged.append(item)
+            result[key] = merged
+        # else: base wins at leaves (do nothing)
+
+    return result
+
+
+def provision_settings_json(hub_root: Path, target_dir: Path) -> str:
+    """Provision .claude/settings.json by merging hub defaults with existing."""
+    hub_settings_path = hub_root / "core" / ".claude" / "settings.json"
+    target_settings_path = target_dir / ".claude" / "settings.json"
+
+    if not hub_settings_path.exists():
+        return "no-hub-settings"
+
+    hub_settings = json.loads(hub_settings_path.read_text(encoding="utf-8"))
+
+    if target_settings_path.exists():
+        existing = json.loads(target_settings_path.read_text(encoding="utf-8"))
+        merged = deep_merge_settings(existing, hub_settings)
+        target_settings_path.write_text(
+            json.dumps(merged, indent=2) + "\n", encoding="utf-8"
+        )
+        return "merged"
+
+    target_settings_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(hub_settings_path, target_settings_path)
+    return "created"
+
+
+def format_divergence_table(overlaps: list[dict]) -> str:
+    """Format overlaps as a markdown table for PR body. Skips identical items."""
+    non_identical = [o for o in overlaps if o["status"] != "identical"]
+    if not non_identical:
+        return ""
+
+    lines = []
+    lines.append("## Content Divergence")
+    lines.append("")
+    lines.append("| Resource | Type | Status | Overlap | Detail |")
+    lines.append("|----------|------|--------|---------|--------|")
+    for item in sorted(non_identical, key=lambda x: x["hub_name"]):
+        name = item["hub_name"]
+        if item.get("project_name") and item["project_name"] != name:
+            name = f"{name} (project: {item['project_name']})"
+        lines.append(
+            f"| {name} | {item['type']} | {item['status']} "
+            f"| {item['hub_overlap']:.0%} | {item['detail'][:80]} |"
+        )
+
+    return "\n".join(lines)
+
+
+def provision_to_local(
+    hub_root: Path,
+    target_dir: Path,
+    gaps: dict[str, list[dict]],
+    stacks: list[str],
+    tier: str = "must-have",
+) -> dict:
+    """Orchestrate full provisioning to a local directory.
+
+    Copies resources, provisions CLAUDE.md, CLAUDE.local.md, and settings.json.
+    Returns a summary dict.
+    """
+    # Step 1: Copy resources
+    copied = apply_to_local(hub_root, target_dir, gaps, tier)
+
+    # Determine which rules are present after copying
+    project_names = get_project_resource_names(target_dir / ".claude")
+    rules_present = sorted(project_names.get("rule", set()))
+
+    # Step 2: Provision CLAUDE.md
+    claude_md_status = provision_claude_md(hub_root, target_dir, stacks, rules_present)
+
+    # Step 3: Provision CLAUDE.local.md
+    claude_local_status = provision_claude_local_md(hub_root, target_dir)
+
+    # Step 4: Provision settings.json
+    settings_status = provision_settings_json(hub_root, target_dir)
+
+    return {
+        "copied_files": copied,
+        "claude_md": claude_md_status,
+        "claude_local_md": claude_local_status,
+        "settings_json": settings_status,
+    }
+
+
+def provision_to_repo(
+    hub_root: Path,
+    repo: str,
+    gaps: dict[str, list[dict]],
+    stacks: list[str],
+    hub_resources: dict[str, list[dict]],
+    project_names: dict[str, set[str]],
+    tier: str = "must-have",
+) -> Optional[str]:
+    """Clone a repo, provision resources + config files, and create a PR.
+
+    Returns the PR URL if successful.
+    """
+    from scripts.sync_to_projects import check_existing_pr
+
+    branch = "claude-provision"
+
+    if check_existing_pr(repo, branch):
+        print(f"PR already exists for branch '{branch}' on {repo}. Skipping.")
+        return None
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            subprocess.run(
+                ["git", "clone", f"https://github.com/{repo}.git", tmpdir],
+                capture_output=True, text=True, check=True, timeout=120,
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            print(f"Failed to clone {repo}: {e}")
+            return None
+
+        subprocess.run(
+            ["git", "-C", tmpdir, "checkout", "-b", branch],
+            capture_output=True, text=True, check=True,
+        )
+
+        # Full provision
+        summary = provision_to_local(hub_root, Path(tmpdir), gaps, stacks, tier)
+        copied = summary["copied_files"]
+
+        # Analyze overlaps for PR body
+        updated_project_names = get_project_resource_names(Path(tmpdir) / ".claude")
+        overlaps = analyze_overlaps_local(
+            hub_root, Path(tmpdir), hub_resources, updated_project_names
+        )
+        divergence_table = format_divergence_table(overlaps)
+
+        # Git add — only include tracked/trackable files
+        # Note: CLAUDE.local.md is typically gitignored (personal prefs), so skip it
+        add_paths = []
+        if (Path(tmpdir) / ".claude").exists():
+            add_paths.append(".claude/")
+        if (Path(tmpdir) / "CLAUDE.md").exists():
+            add_paths.append("CLAUDE.md")
+        if not add_paths:
+            print("Nothing to provision — no files to stage.")
+            return None
+        result = subprocess.run(
+            ["git", "-C", tmpdir, "add"] + add_paths,
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            print(f"git add failed: {result.stderr}")
+            return None
+
+        # Check if there are staged changes — skip PR if nothing changed
+        status_result = subprocess.run(
+            ["git", "-C", tmpdir, "diff", "--cached", "--quiet"],
+            capture_output=True, text=True,
+        )
+        if status_result.returncode == 0:
+            # No staged changes
+            print("Nothing to provision — project is already up to date.")
+            return None
+
+        must_count = len(gaps.get("must-have", []))
+        nice_count = len(gaps.get("nice-to-have", []))
+        commit_msg = (
+            f"feat: provision {len(copied)} Claude resources + config\n\n"
+            f"Added {must_count} must-have and "
+            f"{nice_count if tier == 'nice-to-have' else 0} nice-to-have resources.\n"
+            f"CLAUDE.md: {summary['claude_md']}\n"
+            f"CLAUDE.local.md: {summary['claude_local_md']}\n"
+            f"settings.json: {summary['settings_json']}\n\n"
+            f"Files:\n" + "\n".join(f"  - {f}" for f in copied[:20])
+        )
+        if len(copied) > 20:
+            commit_msg += f"\n  ... and {len(copied) - 20} more"
+
+        subprocess.run(
+            ["git", "-C", tmpdir, "commit", "-m", commit_msg],
+            capture_output=True, text=True, check=True,
+        )
+
+        subprocess.run(
+            ["git", "-C", tmpdir, "push", "-u", "origin", branch],
+            capture_output=True, text=True, check=True,
+        )
+
+        pr_body = (
+            "## Summary\n\n"
+            f"Auto-provisioned from [claude-best-practices]"
+            f"(https://github.com/abhayla/claude-best-practices) hub.\n\n"
+            f"- **{must_count}** must-have resources\n"
+            f"- **{nice_count if tier == 'nice-to-have' else 0}** nice-to-have resources\n"
+            f"- CLAUDE.md: {summary['claude_md']}\n"
+            f"- CLAUDE.local.md: {summary['claude_local_md']}\n"
+            f"- settings.json: {summary['settings_json']}\n\n"
+            "## Files added\n\n"
+            + "\n".join(f"- `{f}`" for f in copied[:30])
+        )
+        if len(copied) > 30:
+            pr_body += f"\n- ... and {len(copied) - 30} more"
+
+        if divergence_table:
+            pr_body += f"\n\n{divergence_table}"
+
+        result = subprocess.run(
+            ["gh", "pr", "create",
+             "--repo", repo,
+             "--head", branch,
+             "--title", f"feat: provision {len(copied)} Claude resources + config",
+             "--body", pr_body],
+            capture_output=True, text=True, timeout=30,
+        )
+
+        if result.returncode == 0:
+            return result.stdout.strip()
+        else:
+            print(f"PR creation failed: {result.stderr}")
+            return None
+
+
 # --- Main ---
 
 
@@ -1024,8 +1439,11 @@ def main():
     group.add_argument("--repo", help="GitHub repo (owner/name)")
     group.add_argument("--local", help="Local project directory path")
 
-    parser.add_argument("--apply", action="store_true",
-                        help="Apply recommendations (copy files or create PR)")
+    action_group = parser.add_mutually_exclusive_group()
+    action_group.add_argument("--apply", action="store_true",
+                              help="Apply recommendations (copy files or create PR)")
+    action_group.add_argument("--provision", action="store_true",
+                              help="Provision project (apply + CLAUDE.md + settings.json)")
     parser.add_argument("--tier", choices=["must-have", "nice-to-have"],
                         default="must-have",
                         help="Minimum tier to apply (default: must-have)")
@@ -1089,6 +1507,25 @@ def main():
                 print(f"  + {f}")
         else:
             pr_url = apply_to_repo(hub_root, args.repo, gaps, args.tier)
+            if pr_url:
+                print(f"PR created: {pr_url}")
+
+    # Step 6b: Provision if requested
+    if args.provision:
+        print(f"\nProvisioning {args.tier} tier resources + config files...")
+        if args.local:
+            summary = provision_to_local(hub_root, Path(args.local), gaps, stacks, args.tier)
+            print(f"Copied {len(summary['copied_files'])} files to {args.local}/.claude/")
+            for f in summary["copied_files"]:
+                print(f"  + {f}")
+            print(f"CLAUDE.md: {summary['claude_md']}")
+            print(f"CLAUDE.local.md: {summary['claude_local_md']}")
+            print(f"settings.json: {summary['settings_json']}")
+        else:
+            pr_url = provision_to_repo(
+                hub_root, args.repo, gaps, stacks,
+                hub_resources, project_names, args.tier,
+            )
             if pr_url:
                 print(f"PR created: {pr_url}")
 

@@ -60,9 +60,9 @@ PYTHONPATH=. python scripts/recommend.py --local /path/to/project --diff
 ### Pattern Organization
 
 - **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
-  - `agents/` — 14 agent definitions (11 universal + 3 stack-specific)
-  - `skills/` — 74 skill directories, each with a `SKILL.md`
-  - `rules/` — 13 rule files (5 universal + 4 stack-specific + 4 placeholders)
+  - `agents/` — 16 agent definitions (11 universal + 5 stack-specific)
+  - `skills/` — 76 skill directories, each with a `SKILL.md`
+  - `rules/` — 14 rule files (6 universal + 4 stack-specific + 4 placeholders)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns
   - `settings.json` — Minimal defaults
@@ -114,7 +114,7 @@ All Python. Key modules:
 
 ### GitHub Actions (`.github/workflows/`)
 
-Seven workflows: `test.yml` (CI on script changes), `scan-projects.yml` / `scan-internet.yml` (weekly scans), `validate-pr.yml`, `update-docs.yml`, `sync-to-projects.yml`, `expire-sources.yml`.
+Eight workflows: `test.yml` (CI on script changes), `scan-projects.yml` / `scan-internet.yml` (weekly scans), `validate-pr.yml`, `update-docs.yml`, `sync-to-projects.yml`, `expire-sources.yml`, `recommend.yml`.
 
 ## Testing
 
@@ -125,6 +125,12 @@ Seven workflows: `test.yml` (CI on script changes), `scan-projects.yml` / `scan-
 ## Bug Fixing Strategy
 
 When a bug is reported, don't start by trying to fix it. Instead, start by writing a test that reproduces the bug. Then have subagents try to fix the bug and prove it with a passing test.
+
+## Pattern Curation Policy
+
+Rules and skills added to `core/.claude/` must be **reactive, not speculative** — every addition must originate from a real correction, observed failure, or documented community pattern with evidence. Before adding, provide: (1) source, (2) problem it solves, (3) proof it's not already covered by existing patterns.
+
+For new skills: perform a gap analysis against ALL existing skills first. Each skill must be self-contained — never spread a concept across multiple skills.
 
 ## Key Conventions
 
