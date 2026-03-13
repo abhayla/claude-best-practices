@@ -8,6 +8,114 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+                    ┌─────────────────────────┐
+                    │  Gather Working Code     │
+                    │  + Test Suite             │
+                    │  (from ST7 + ST6)        │
+                    └────────────┬────────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │  Run Full Test Suite     │
+                    │  (unit + API + E2E)      │
+                    └────────────┬────────────┘
+                                 │
+                       ┌─────────┴─────────┐
+                       │                   │
+                   ✅ ALL PASS         ❌ FAILURES
+                       │                   │
+                       │                   ▼
+                       │         ┌──────────────────┐
+                       │         │  Analyze Failures │
+                       │         │  (categorize:     │
+                       │         │   code vs test)   │
+                       │         └────────┬─────────┘
+                       │                  │
+                       │                  ▼
+                       │         ┌──────────────────┐
+                       │         │  Fix & Retry      │
+                       │         │  (fix-loop, up to │
+                       │         │   3 attempts)     │
+                       │         └────────┬─────────┘
+                       │                  │
+                       │                  └──→ (re-run suite)
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Run Extended Test Types   │
+          │  ▓ E2E (Playwright)        │
+          │  ▓ Visual (screenshots)    │
+          │  ▓ Performance (k6)        │
+          │  ▓ Security (SAST + DAST)  │
+          │  ▓ Accessibility (axe)     │
+          │  ▓ Chaos (resilience)      │
+          └────────────┬───────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Coverage Check            │
+          │  (≥80% line, ≥70% branch)  │
+          └────────────┬───────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Generate Test Results     │
+          │  Report + Coverage Report  │
+          └────────────────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░  UPSTREAM INPUTS                                                      ░
+ ░                                                                       ░
+ ░  ┌───────────────────┐        ┌───────────────────┐                   ░
+ ░  │  ST 7: IMPL       │        │  ST 6: PRE-TESTS  │                   ░
+ ░  │                   │        │                   │                   ░
+ ░  │  source code      │        │  tests/unit/      │                   ░
+ ░  │  (all unit tests  │        │  tests/api/       │                   ░
+ ░  │   passing)        │        │  tests/e2e/       │                   ░
+ ░  │                   │        │  tests/perf/      │                   ░
+ ░  │                   │        │  tests/security/  │                   ░
+ ░  └────────┬──────────┘        └────────┬──────────┘                   ░
+ ░           │                            │                              ░
+ ░░░░░░░░░░░░┼░░░░░░░░░░░░░░░░░░░░░░░░░░░┼░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+              │                            │
+              ▼                            ▼
+ ┌────────────────────────────────────────────────────────────────┐
+ │                                                                │
+ │               STAGE 8: POST-IMPLEMENTATION TESTS               │
+ │               (E2E, Visual, Perf, Security)                    │
+ │                                                                │
+ │  █ playwright  █ verify-screenshots  █ web-quality             │
+ │  █ security-audit  █ dast-scan  █ chaos-resilience             │
+ │  █ a11y-audit  █ perf-test  █ supply-chain-audit               │
+ │                                                                │
+ └──────┬──────────┬──────────┬──────────┬────────────────────────┘
+        │          │          │          │
+        ▼          ▼          ▼          ▼
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░  DOWNSTREAM OUTPUTS                                                   ░
+ ░                                                                       ░
+ ░  playwright-     tests/visual/    results/      tests/security/       ░
+ ░  report/         baselines/       perf.json     threat-model.md       ░
+ ░  (HTML)          (PNG)            (metrics)     (STRIDE)              ░
+ ░     │               │                │              │                 ░
+ ░     ▼               ▼                ▼              ▼                 ░
+ ░  ┌──────────────────────────────────────────────────────────┐         ░
+ ░  │  ST 9: REVIEW                                            │         ░
+ ░  │  (E2E evidence, perf evidence, security sign-off,        │         ░
+ ░  │   overall quality verdict)                               │         ░
+ ░  └──────────────────────────────────────────────────────────┘         ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |
@@ -25,9 +133,9 @@
 | 11 | DAST (Dynamic Application Security Testing) | `dast-scan` skill (ZAP, Nuclei, headers, sessions, fuzzing) | ✅ Covered | **OWASP DAST** |
 | 12 | Chaos / resilience testing | `chaos-resilience` skill (failure injection, degradation, gameday) | ✅ Covered | **Chaos Engineering (Netflix)** |
 | 13 | Compliance testing (GDPR, SOC2, HIPAA) | None | ❌ Missing | **Regulatory Compliance** |
-| 14 | API fuzz testing | None — manual SQL injection/XSS but no automated fuzzing | ❌ Missing | **Fuzz Testing** |
-| 15 | Accessibility E2E testing (automated) | `web-quality` covers Lighthouse a11y score, but no dedicated a11y E2E | ⚠️ Partial | **WCAG 2.1 AA** |
-| 16 | Test flakiness detection | None — no retry/flake analysis | ❌ Missing | **Test Reliability** |
+| 14 | API fuzz testing | `dast-scan` skill Step 6 (SQL injection, XSS, path traversal, command injection, SSRF payloads) | ⚠️ Partial | **Fuzz Testing** |
+| 15 | Accessibility E2E testing (automated) | `a11y-audit` skill (axe-core + Playwright + WCAG 2.1 AA checklist + manual review) | ✅ Covered | **WCAG 2.1 AA** |
+| 16 | Test flakiness detection | `testing.md` rule (Flaky Test Prevention: auto-wait, state isolation, deterministic data, clock mocking) — no automated detection/quarantine | ⚠️ Partial | **Test Reliability** |
 | 17 | Coverage diff (new code coverage) | None — overall coverage exists but no diff-coverage for new code | ⚠️ Partial | **Incremental Coverage** |
 
 ## SE Best Practices Validation
@@ -37,9 +145,9 @@
 | **OWASP Testing Guide** | SAST + DAST + manual testing | ✅ SAST via `security-audit`, DAST via `dast-scan`, manual via Stage 8 prompt |
 | **Chaos Engineering (Netflix)** | Resilience under failure conditions | ✅ `chaos-resilience` skill with failure injection, graceful degradation, gameday planning |
 | **GDPR / SOC2 / HIPAA** | Compliance-specific test suites | ❌ No compliance testing framework |
-| **Fuzz Testing** | Automated random input generation to find crashes/security bugs | ❌ Manual injection tests only |
-| **WCAG 2.1 AA** | Automated accessibility testing in E2E flows | ⚠️ Lighthouse score exists but no axe-core integration in Playwright |
-| **Test Reliability** | Flake detection, retry policies, quarantine for flaky tests | ❌ No flakiness analysis |
+| **Fuzz Testing** | Automated random input generation to find crashes/security bugs | ⚠️ `dast-scan` covers security-focused API fuzzing; no general-purpose fuzz automation |
+| **WCAG 2.1 AA** | Automated accessibility testing in E2E flows | ✅ `a11y-audit` skill with axe-core + Playwright + WCAG 2.1 AA checklist |
+| **Test Reliability** | Flake detection, retry policies, quarantine for flaky tests | ⚠️ Prevention guidance in `testing.md` rule; no automated detection/quarantine |
 | **Incremental Coverage** | Coverage only on changed/new lines | ⚠️ Overall coverage measured but no diff-coverage |
 
 ## Gap Proposals
@@ -104,7 +212,7 @@
 
 ## Autonomy Verdict
 
-**✅ Can run autonomously.** Excellent skill coverage: `playwright`, `verify-screenshots`, `web-quality`, `security-audit`, `supply-chain-audit`, `semgrep-rules`, `dast-scan`, plus `security-auditor` and `tester` agents. DAST gap resolved with ZAP/Nuclei scanning, header security, session management, and API fuzzing. P2 gaps resolved: `chaos-resilience` for failure injection and `perf-test` for dedicated performance testing. Remaining minor gap: compliance testing (GDPR/SOC2/HIPAA).
+**✅ Can run autonomously.** Excellent skill coverage: `playwright`, `verify-screenshots`, `web-quality`, `security-audit`, `supply-chain-audit`, `semgrep-rules`, `dast-scan`, `a11y-audit`, plus `security-auditor` and `tester` agents. DAST gap resolved with ZAP/Nuclei scanning, header security, session management, and API fuzzing. P2 gaps resolved: `chaos-resilience` for failure injection and `perf-test` for dedicated performance testing. Accessibility E2E now fully covered by `a11y-audit`. Remaining gaps: compliance testing (GDPR/SOC2/HIPAA), general-purpose fuzz automation, and automated flake detection/quarantine.
 
 ---
 
@@ -116,3 +224,4 @@
 | 2026-03-13 | Rewritten as AUDIT with capability checklist, SE best practices, gap proposals |
 | 2026-03-13 | P1 gap resolved: `dast-scan` skill created with ZAP, Nuclei, header security, session testing, API fuzzing, CI integration — DAST ❌ flipped to ✅ |
 | 2026-03-13 | P2 gaps resolved: `chaos-resilience` and `perf-test` skills created |
+| 2026-03-13 | Audit refresh: row 14 ❌→⚠️ (`dast-scan` has API fuzzing), row 15 ⚠️→✅ (`a11y-audit` skill exists), row 16 ❌→⚠️ (`testing.md` rule covers prevention) |

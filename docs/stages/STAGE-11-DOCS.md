@@ -8,6 +8,118 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+                    ┌─────────────────────────┐
+                    │  Verify Deployment       │
+                    │  (ST10 complete, prod    │
+                    │   running with monitors) │
+                    └────────────┬────────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │  Generate README         │
+                    │  (setup, usage, badges,  │
+                    │   architecture overview) │
+                    └────────────┬────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Generate Architecture Docs       │
+               │                                   │
+               │  ▓ Mermaid diagrams               │
+               │  ▓ ADR index (docs/adr/)          │
+               │  ▓ diataxis-docs (4 quadrants)    │
+               └────────────────┬─────────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Generate API Documentation       │
+               │                                   │
+               │  ▓ api-docs-generator             │
+               │    (OpenAPI auto-gen + Redoc)     │
+               └────────────────┬─────────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Generate Operational Docs        │
+               │                                   │
+               │  ▓ changelog-contributing          │
+               │    (CHANGELOG.md + CONTRIBUTING)  │
+               │  ▓ Monitoring/deploy/rollback     │
+               └────────────────┬─────────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Pipeline Summary & Handover      │
+               │                                   │
+               │  ▓ handover skill                 │
+               │  ▓ learn-n-improve                │
+               │  ▓ Pipeline summary report        │
+               └────────────────┬─────────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Output: All documentation        │
+               │  committed + learnings captured   │
+               └──────────────────────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░  UPSTREAM INPUTS                                                      ░
+ ░                                                                       ░
+ ░  ┌───────────────────┐  ┌───────────────────┐  ┌──────────────────┐   ░
+ ░  │  ST 10: DEPLOY    │  │  ST 9: REVIEW     │  │  ST 1: PRD       │   ░
+ ░  │                   │  │                   │  │                  │   ░
+ ░  │  deployment URL   │  │  review report    │  │  prd.md          │   ░
+ ░  │  CI/CD pipeline   │  │  ADR statuses     │  │  requirements    │   ░
+ ░  │  K8s manifests    │  │  PR URL           │  │  .json           │   ░
+ ░  │  dashboards       │  │                   │  │                  │   ░
+ ░  │  runbooks         │  │                   │  │                  │   ░
+ ░  │  SLO defs         │  │                   │  │                  │   ░
+ ░  └────────┬──────────┘  └────────┬──────────┘  └────────┬─────────┘   ░
+ ░           │                      │                      │             ░
+ ░░░░░░░░░░░░┼░░░░░░░░░░░░░░░░░░░░░┼░░░░░░░░░░░░░░░░░░░░░┼░░░░░░░░░░░░░
+              │                      │                      │
+              ▼                      ▼                      ▼
+ ┌────────────────────────────────────────────────────────────────┐
+ │                                                                │
+ │              STAGE 11: DOCUMENTATION & HANDOVER                │
+ │                                                                │
+ │  █ handover  █ learn-n-improve  █ api-docs-generator           │
+ │  █ changelog-contributing  █ diataxis-docs                     │
+ │                                                                │
+ └──────┬──────────┬──────────┬──────────┬──────────┬─────────────┘
+        │          │          │          │          │
+        ▼          ▼          ▼          ▼          ▼
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░  FINAL OUTPUTS (no downstream stage)                                  ░
+ ░                                                                       ░
+ ░  README.md        docs/             docs/         docs/stages/        ░
+ ░                   ARCHITECTURE.md   API.md        PIPELINE-           ░
+ ░                   (+ Mermaid)       (OpenAPI)     SUMMARY.md          ░
+ ░                                                                       ░
+ ░  docs/            CHANGELOG.md      CONTRIBUTING  .claude/            ░
+ ░  HANDOVER.md                        .md           learnings.json      ░
+ ░                                                                       ░
+ ░  ┌──────────────────────────────────────────────────────────┐         ░
+ ░  │  CONSUMERS                                               │         ░
+ ░  │                                                          │         ░
+ ░  │  ▓ Developers (README, ARCHITECTURE, onboarding)         │         ░
+ ░  │  ▓ API consumers (API.md, OpenAPI spec)                  │         ░
+ ░  │  ▓ Operations (runbooks, dashboards, SLOs)               │         ░
+ ░  │  ▓ Stakeholders (PIPELINE-SUMMARY, CHANGELOG)            │         ░
+ ░  │  ▓ Future Claude Code sessions (HANDOVER, learnings)     │         ░
+ ░  └──────────────────────────────────────────────────────────┘         ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |

@@ -8,6 +8,132 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+ ┌─────────────────────────────────────────────────────────────────┐
+ │          STAGE 5: SCHEMA DESIGN & MIGRATIONS                    │
+ └─────────────────────────────────────────────────────────────────┘
+
+        ┌───────────────────────┐
+        │  Read Plan from ST2   │
+        │  + Scaffold from ST3  │
+        └───────────┬───────────┘
+                    │
+                    ▼
+  ┌──────────────────────────────┐
+  │  Entity-Relationship Design  │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  schema-designer skill       │
+  │  • Entity identification     │
+  │  • Relationship mapping      │
+  │  • PII column flagging       │
+  │  • Audit columns (timestamps)│
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Normalization Check         │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • 1NF → 2NF → 3NF verify   │
+  │  • Denormalize with reason   │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Index & Security Design     │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  • Index strategy + reasons  │
+  │  • RLS policies              │
+  │  • Column encryption plan    │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Migration Generation        │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  db-migrate / fastapi-db-    │
+  │  migrate skill               │
+  │  • UP + DOWN migrations      │
+  │  • Expand-contract pattern   │
+  │  • Separate DDL / DML        │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Seed Data & Fixtures        │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • Dev seed script           │
+  │  • Test factory functions    │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  API Alignment & Gate        │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • DB types ↔ API types      │
+  │  • Query plan check (pg-qry) │
+  │  • ERD documentation         │
+  └──────────────┬───────────────┘
+                 │
+            PASS │ / FAIL → retry
+                 ▼
+       ┌──────────────────┐
+       │  Schema Output    │
+       │  ████████████████ │
+       └──────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+                          INPUTS
+ ┌──────────────────────────────────────────────┐
+ │                                              │
+ │  ┌──────────────────┐ ┌──────────────────┐   │
+ │  │ From ST2: plan.md│ │ From ST3:        │   │
+ │  │  • Data model    │ │  • Project struct│   │
+ │  │    details       │ │  • DB service    │   │
+ │  │  • Task breakdown│ │    (Docker)      │   │
+ │  └────────┬─────────┘ └────────┬─────────┘   │
+ │           │                    │              │
+ └───────────┼────────────────────┼──────────────┘
+             │                    │
+             └─────────┬──────────┘
+                       │
+                       ▼
+        ┌───────────────────────────────┐
+        │                               │
+        │  ███ STAGE 5: SCHEMA ███      │
+        │                               │
+        │  schema-designer              │
+        │  db-migrate                   │
+        │  fastapi-db-migrate           │
+        │  pg-query                     │
+        │                               │
+        └──────────────┬────────────────┘
+                       │
+         ┌─────────────┼──────────┬──────────────┐
+         │             │          │              │
+         ▼             ▼          ▼              ▼
+ ┌────────────┐ ┌───────────┐ ┌──────────┐ ┌──────────┐
+ │ erd.md     │ │ Migration │ │ Seed     │ │ Test     │
+ │ (text ERD  │ │ files     │ │ script   │ │ fixtures │
+ │  diagram)  │ │ (UP+DOWN) │ │ (dev     │ │ /factory │
+ │            │ │           │ │  data)   │ │ funcs    │
+ └─────┬──────┘ └─────┬─────┘ └────┬─────┘ └────┬─────┘
+       │              │            │             │
+       ▼              ▼            ▼             ▼
+ ┌──────────┐  ┌──────────┐ ┌──────────┐  ┌──────────┐
+ │ ST6 Tests│  │ ST7 Impl │ │ ST7 Impl │  │ ST6 Tests│
+ │ ST7 Impl │  │ ST10 Depl│ │          │  │ ST8 Post │
+ │ ST11 Docs│  │          │ │          │  │          │
+ └──────────┘  └──────────┘ └──────────┘  └──────────┘
+                   OUTPUTS
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |

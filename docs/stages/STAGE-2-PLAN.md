@@ -8,6 +8,129 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+ ┌─────────────────────────────────────────────────────────────────┐
+ │               STAGE 2: PLAN & TASK DECOMPOSITION                │
+ └─────────────────────────────────────────────────────────────────┘
+
+        ┌───────────────────────┐
+        │   Read PRD from ST1   │
+        │   (prd.md, risk reg.) │
+        └───────────┬───────────┘
+                    │
+                    ▼
+  ┌──────────────────────────────┐
+  │  Architecture Research       │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  planner-researcher agent    │
+  │  • Codebase analysis         │
+  │  • ADR generation            │
+  │  • Tech stack decisions      │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  WBS Decomposition           │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  writing-plans skill         │
+  │  • Epic → Feature → Task     │
+  │  • 5-element task format     │
+  │  • PERT 3-point estimates    │
+  │  • Rollback plan per task    │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Dependency Mapping          │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • Build dependency graph    │
+  │  • Identify critical path    │
+  │  • Compute execution waves   │
+  │  • 20% buffer allocation     │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Risk Mitigation Tasks       │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  For each P×I ≥ 8 risk:     │
+  │  generate mitigation task    │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  PRD Traceability Check      │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  Every REQ-xxx → Task N      │
+  │  Every AC-xxx → Test ID      │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+       ┌─────────────────┐
+       │  Plan → Issues   │
+       │  plan-to-issues  │
+       │  skill (gh CLI)  │
+       └────────┬────────┘
+                │
+           PASS │ / FAIL → retry
+                ▼
+       ┌─────────────────┐
+       │   Plan Output   │
+       │   █████████████  │
+       └─────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+                          INPUTS
+ ┌──────────────────────────────────────────────┐
+ │                                              │
+ │  ┌───────────────────────────────────────┐   │
+ │  │ From ST1: prd.md                      │   │
+ │  │   • User stories (US-xxx)             │   │
+ │  │   • Acceptance criteria (AC-xxx)      │   │
+ │  │   • NFRs, risk register              │   │
+ │  │   • Requirements traceability matrix  │   │
+ │  └───────────────────┬───────────────────┘   │
+ │                      │                       │
+ └──────────────────────┼───────────────────────┘
+                        │
+                        ▼
+          ┌───────────────────────────┐
+          │                           │
+          │   ███ STAGE 2: PLAN ███   │
+          │                           │
+          │  writing-plans            │
+          │  planner-researcher       │
+          │  plan-to-issues           │
+          │                           │
+          └──────────┬────────────────┘
+                     │
+         ┌───────────┼───────────┬──────────────┐
+         │           │           │              │
+         ▼           ▼           ▼              ▼
+ ┌────────────┐┌──────────┐┌──────────┐ ┌───────────┐
+ │ plan.md    ││ findings ││ ADR-*.md │ │ GitHub    │
+ │ (tasks,    ││ .md      ││ (Nygard  │ │ Issues    │
+ │  deps,     ││ research ││  format) │ │ (epics +  │
+ │  waves,    ││ log      ││          │ │  tasks)   │
+ │  estimates)││          ││          │ │           │
+ └─────┬──────┘└────┬─────┘└────┬─────┘ └─────┬────┘
+       │            │           │              │
+       ▼            ▼           ▼              ▼
+ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+ │ ST5 Schma│ │ ST7 Impl │ │ ST9 Revw │ │ ST7 Impl │
+ │ ST6 Tests│ │          │ │ ST11 Docs│ │ ST9 Revw │
+ │ ST7 Impl │ │          │ │          │ │          │
+ └──────────┘ └──────────┘ └──────────┘ └──────────┘
+                   OUTPUTS
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |
@@ -32,13 +155,13 @@
 
 | Standard | Relevant Aspect | Coverage |
 |----------|----------------|----------|
-| **WBS (PMI PMBOK)** | Hierarchical decomposition: Phase → Deliverable → Work Package → Activity | ❌ Flat task list with no hierarchy above "atomic plan group" |
-| **Critical Path Method** | Float/slack calculation, resource leveling | ⚠️ Critical path identified but no float analysis |
-| **PERT** | Optimistic/pessimistic/expected time estimates, buffer allocation | ❌ Single point estimates only ("~N min") |
-| **V-Model** | Each requirement level maps to a test level | ⚠️ Tasks have verification but no formal test-level mapping |
+| **WBS (PMI PMBOK)** | Hierarchical decomposition: Phase → Deliverable → Work Package → Activity | ✅ `writing-plans` Step 2.2: Epic → Feature → Task hierarchy |
+| **Critical Path Method** | Float/slack calculation, resource leveling | ⚠️ Critical path identified with 20% buffer but no formal float analysis |
+| **PERT** | Optimistic/pessimistic/expected time estimates, buffer allocation | ✅ `writing-plans` PERT 3-point estimates with 20% buffer on critical path |
+| **V-Model** | Each requirement level maps to a test level | ✅ Requirement field traces tasks to PRD acceptance criteria (AC-xxx) |
 | **ADR (Nygard)** | Lightweight architecture decisions with status tracking | ✅ Covered in Step 2 |
-| **Agile (Scrum)** | Story points, velocity, sprint capacity | ⚠️ Time estimates exist but no story point abstraction |
-| **Change Management** | Rollback/revert strategy per change | ❌ No rollback plan per task |
+| **Agile (Scrum)** | Story points, velocity, sprint capacity | ✅ PERT 3-point estimation per task |
+| **Change Management** | Rollback/revert strategy per change | ✅ Rollback field per task in `writing-plans` |
 
 ## Gap Proposals
 

@@ -8,6 +8,127 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+ ┌─────────────────────────────────────────────────────────────────┐
+ │                     STAGE 1: PRD GENERATION                     │
+ └─────────────────────────────────────────────────────────────────┘
+
+        ┌───────────────────────┐
+        │   User Input          │
+        │   (brief / idea /     │
+        │    existing PRD /     │
+        │    GitHub Issue)      │
+        └───────────┬───────────┘
+                    │
+                    ▼
+        ┌───────────────────────┐
+        │  Detect Input Type    │
+        │  ░░░░░░░░░░░░░░░░░░░ │
+        │  brief? existing PRD? │
+        │  GitHub Issue?        │
+        └───────────┬───────────┘
+                    │
+           ┌────────┼────────┐
+           │        │        │
+           ▼        ▼        ▼
+      ┌────────┐┌────────┐┌────────┐
+      │ Brief  ││ Parse  ││ Issue  │
+      │ Mode   ││ Mode   ││ Mode   │
+      │        ││(prd-   ││(gh api)│
+      │brainstm││parser) ││        │
+      └───┬────┘└───┬────┘└───┬────┘
+          │         │         │
+          └────┬────┘─────────┘
+               │
+               ▼
+  ┌──────────────────────────────┐
+  │  Socratic Elicitation        │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  brainstorm skill            │
+  │  5 probing questions         │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  PRD Generation              │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  • User stories (US-xxx)     │
+  │  • Acceptance criteria       │
+  │  • NFRs (ISO 25010)         │
+  │  • IEEE 830 sections        │
+  │  • Risk register (P×I)      │
+  │  • RACI matrix              │
+  │  • Traceability matrix      │
+  │  • Glossary (DDD)           │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Validation Gate             │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • Testability audit of ACs  │
+  │  • MoSCoW tier check         │
+  │  • Requirement ID uniqueness │
+  │  • Dependency mapping        │
+  └──────────────┬───────────────┘
+                 │
+            PASS │ / FAIL → retry
+                 ▼
+        ┌────────────────┐
+        │   PRD Output   │
+        │   █████████████ │
+        └────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+                          INPUTS
+ ┌──────────────────────────────────────────────┐
+ │                                              │
+ │  ┌────────────────┐   ┌──────────────────┐   │
+ │  │ User Brief /   │   │ Existing PRD /   │   │
+ │  │ Product Idea   │   │ GitHub Issue URL │   │
+ │  │ (human input)  │   │ (human input)    │   │
+ │  └───────┬────────┘   └────────┬─────────┘   │
+ │          │                     │              │
+ └──────────┼─────────────────────┼──────────────┘
+            │                     │
+            └──────────┬──────────┘
+                       │
+                       ▼
+         ┌───────────────────────────┐
+         │                           │
+         │    ███ STAGE 1: PRD ███   │
+         │                           │
+         │  brainstorm (PRD mode)    │
+         │  prd-parser               │
+         │                           │
+         └─────────────┬─────────────┘
+                       │
+            ┌──────────┼──────────────┐
+            │          │              │
+            ▼          ▼              ▼
+ ┌──────────────┐ ┌──────────┐ ┌──────────────┐
+ │ prd.md       │ │ Require- │ │ Risk         │
+ │ (US-xxx,     │ │ ments    │ │ Register     │
+ │  AC-xxx,     │ │ Trace-   │ │ (P×I scores) │
+ │  NFR-xxx)    │ │ ability  │ │              │
+ │              │ │ Matrix   │ │              │
+ └──────┬───────┘ └────┬─────┘ └──────┬───────┘
+        │              │              │
+        ▼              ▼              ▼
+  ┌──────────┐  ┌───────────┐  ┌───────────────┐
+  │ ST2 Plan │  │ ST6 Tests │  │ ST9 Review    │
+  │ ST3 Scaf │  │ ST8 Post  │  │ ST10 Deploy   │
+  └──────────┘  └───────────┘  └───────────────┘
+                   OUTPUTS
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |
@@ -31,13 +152,13 @@
 
 | Standard | Relevant Aspect | Coverage |
 |----------|----------------|----------|
-| **IEEE 830 (SRS)** | Structured SRS with scope, definitions, assumptions, specific requirements | ⚠️ Has user stories + ACs but missing: scope boundaries, definitions/glossary, assumptions/constraints, external interface requirements |
-| **ISO 25010** | 8 quality characteristics: Functional Suitability, Performance Efficiency, Compatibility, Usability, Reliability, Security, Maintainability, Portability | ⚠️ Covers 4/8 (Perf, Security, Usability via a11y, Scalability ≈ Performance). Missing: Compatibility, Reliability, Maintainability, Portability |
+| **IEEE 830 (SRS)** | Structured SRS with scope, definitions, assumptions, specific requirements | ✅ `brainstorm` PRD mode includes Scope, Glossary, Assumptions & Constraints, External Interfaces |
+| **ISO 25010** | 8 quality characteristics: Functional Suitability, Performance Efficiency, Compatibility, Usability, Reliability, Security, Maintainability, Portability | ✅ All 8 characteristics covered with measurable targets in `brainstorm` PRD mode |
 | **MoSCoW** | Prioritization framework | ✅ Requirement tiers map to Must/Should/Won't |
-| **RACI Matrix** | Stakeholder responsibility assignment | ❌ No stakeholder identification at all |
-| **PMI Risk Management** | Probability × Impact scoring, mitigation strategies | ❌ Has "Risks" section but no scoring framework |
-| **Requirements Traceability Matrix** | Bidirectional trace: requirement → design → test → code | ⚠️ Forward numbering (US→AC) exists but no trace to test IDs or code |
-| **DDD Ubiquitous Language** | Shared glossary preventing term ambiguity | ❌ No glossary |
+| **RACI Matrix** | Stakeholder responsibility assignment | ✅ `brainstorm` PRD mode includes Stakeholders & RACI table |
+| **PMI Risk Management** | Probability × Impact scoring, mitigation strategies | ✅ `brainstorm` PRD mode includes Risk Register with P(1-5) × I(1-5) scoring |
+| **Requirements Traceability Matrix** | Bidirectional trace: requirement → design → test → code | ✅ `brainstorm` PRD mode includes Requirements Traceability Matrix (REQ → AC → TEST-ID) |
+| **DDD Ubiquitous Language** | Shared glossary preventing term ambiguity | ✅ `brainstorm` PRD mode includes Glossary section |
 
 ## Gap Proposals
 

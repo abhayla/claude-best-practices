@@ -8,6 +8,142 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+ ┌─────────────────────────────────────────────────────────────────┐
+ │           STAGE 6: PRE-IMPLEMENTATION TESTS (TDD RED)           │
+ └─────────────────────────────────────────────────────────────────┘
+
+        ┌───────────────────────┐
+        │  Read Plan from ST2   │
+        │  + Schema from ST5    │
+        └───────────┬───────────┘
+                    │
+                    ▼
+  ┌──────────────────────────────┐
+  │  Test Matrix Generation      │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  test-generator skill        │
+  │  • Map PRD REQ → test cases  │
+  │  • Test pyramid distribution │
+  │  • Coverage target: 80% line │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Unit Test Stubs (Red)       │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  tdd skill (AAA pattern)     │
+  │  • All tests MUST FAIL       │
+  │  • Arrange-Act-Assert        │
+  │  • Property-based (Hypothesis│
+  │    / fast-check)             │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  API Test Stubs              │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • CRUD operations           │
+  │  • Auth / permissions        │
+  │  • Contract tests (Pact)     │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  BDD / Gherkin Scenarios     │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • Feature files             │
+  │  • Step definitions          │
+  │  • Given/When/Then format    │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  E2E + Perf + Security Stubs │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • Playwright POM skeletons  │
+  │  • k6 performance stubs      │
+  │  • Security checklist        │
+  │  • a11y test stubs (axe)     │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Mutation Testing Setup      │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • mutmut (Python)           │
+  │  • Stryker (JS/TS)           │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Red Phase Gate              │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  All tests run and FAIL      │
+  │  (no implementation yet)     │
+  └──────────────┬───────────────┘
+                 │
+            PASS │ / FAIL → retry
+                 ▼
+       ┌──────────────────┐
+       │  Test Suite Out   │
+       │  ████████████████ │
+       └──────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+                          INPUTS
+ ┌──────────────────────────────────────────────┐
+ │                                              │
+ │  ┌──────────────────┐ ┌──────────────────┐   │
+ │  │ From ST2: plan.md│ │ From ST5:        │   │
+ │  │  • Task list     │ │  • DB models     │   │
+ │  │  • Test types    │ │  • Test fixtures  │   │
+ │  │  • REQ→AC map    │ │  • Factory funcs  │   │
+ │  └────────┬─────────┘ └────────┬─────────┘   │
+ │           │                    │              │
+ └───────────┼────────────────────┼──────────────┘
+             │                    │
+             └─────────┬──────────┘
+                       │
+                       ▼
+      ┌──────────────────────────────────┐
+      │                                  │
+      │  ███ STAGE 6: PRE-TESTS ███      │
+      │                                  │
+      │  test-generator                  │
+      │  tdd                             │
+      │  contract-test                   │
+      │  playwright                      │
+      │                                  │
+      └──────────────┬───────────────────┘
+                     │
+       ┌─────────────┼──────────┬──────────────┐
+       │             │          │              │
+       ▼             ▼          ▼              ▼
+ ┌───────────┐┌───────────┐┌──────────┐ ┌───────────┐
+ │ tests/    ││ tests/    ││ tests/   │ │ tests/    │
+ │ unit/     ││ api/      ││ e2e/     │ │ perf/     │
+ │ (failing) ││ (failing) ││ (skipped │ │ (k6 stubs)│
+ │           ││ + Pact    ││  stubs)  │ │ security/ │
+ │           ││ contracts ││          │ │ checklist │
+ └─────┬─────┘└─────┬─────┘└────┬─────┘ └─────┬─────┘
+       │            │           │              │
+       ▼            ▼           ▼              ▼
+ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+ │ ST7 Impl │ │ ST7 Impl │ │ ST8 Post │ │ ST8 Post │
+ │ (make    │ │ (make    │ │ (fill in │ │ (execute │
+ │  pass)   │ │  pass)   │ │  & run)  │ │  checks) │
+ └──────────┘ └──────────┘ └──────────┘ └──────────┘
+                   OUTPUTS
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |

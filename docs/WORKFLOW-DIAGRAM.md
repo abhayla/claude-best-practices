@@ -31,6 +31,78 @@
   ✅ = Well covered    ⚠️ = Partially covered    ❌ = Gap
 ```
 
+### Lifecycle ↔ Pipeline Stage Mapping
+
+```
+ LIFECYCLE PHASES                          PIPELINE STAGES (ST0─ST11)
+ ════════════════                          ══════════════════════════
+
+                                    ┌──────────────────────────────────┐
+                                    │ ST0  MASTER ORCHESTRATOR         │
+                                    │      (coordinates all stages)    │
+                                    └──────────────┬───────────────────┘
+                                                   │
+ ┌─────────────────────┐            ┌──────────────▼───────────────────┐
+ │ 1. IDEATE & SCOPE   │░░░░░░░░░░▶│ ST1  PRD                        │
+ │                      │           │      Parse/normalize requirements│
+ └─────────────────────┘            └──────────────┬───────────────────┘
+                                                   │
+ ┌─────────────────────┐            ┌──────────────▼───────────────────┐
+ │ 2. PLAN             │░░░░░░░░░░▶│ ST2  PLAN                       │
+ │                      │           │      Task breakdown & sequencing │
+ └─────────────────────┘            └──────────────┬───────────────────┘
+                                                   │
+ ┌─────────────────────┐            ┌──────────────▼───────────────────┐
+ │ 3. DESIGN           │░░░░░░░░░░▶│ ST3  SCAFFOLD                   │
+ │                      │──────────▶│      Project skeleton & config   │
+ │                      │           ├──────────────────────────────────┤
+ │                      │           │ ST4  HTML DEMO                   │
+ │                      │           │      Interactive prototype       │
+ │                      │           ├──────────────────────────────────┤
+ │                      │           │ ST5  SCHEMA                      │
+ │                      │           │      DB models & migrations      │
+ └─────────────────────┘            └──────────────┬───────────────────┘
+                                                   │
+ ┌─────────────────────┐            ┌──────────────▼───────────────────┐
+ │ 5. TEST & DEBUG      │░░░░░░░░░░▶│ ST6  PRE-IMPL TESTS             │
+ │                      │           │      Write tests before code     │
+ └──────────┬──────────┘            └──────────────┬───────────────────┘
+            │                                      │
+ ┌──────────▼──────────┐            ┌──────────────▼───────────────────┐
+ │ 4. IMPLEMENT        │░░░░░░░░░░▶│ ST7  IMPLEMENTATION              │
+ │                      │           │      Write code to pass tests    │
+ └─────────────────────┘            └──────────────┬───────────────────┘
+                                                   │
+ ┌─────────────────────┐            ┌──────────────▼───────────────────┐
+ │ 5. TEST & DEBUG      │░░░░░░░░░░▶│ ST8  POST-IMPL TESTS            │
+ │   (continued)        │           │      Integration, E2E, edge cases│
+ └─────────────────────┘            └──────────────┬───────────────────┘
+                                                   │
+ ┌─────────────────────┐            ┌──────────────▼───────────────────┐
+ │ 6. REVIEW           │░░░░░░░░░░▶│ ST9  REVIEW                     │
+ │                      │           │      Automated code review       │
+ └─────────────────────┘            └──────────────┬───────────────────┘
+                                                   │
+ ┌─────────────────────┐            ┌──────────────▼───────────────────┐
+ │ 7. DEPLOY           │░░░░░░░░░░▶│ ST10 DEPLOY                     │
+ │                      │           │      CI/CD & infrastructure      │
+ └─────────────────────┘            └──────────────┬───────────────────┘
+                                                   │
+ ┌─────────────────────┐            ┌──────────────▼───────────────────┐
+ │ 9. LEARN & IMPROVE  │░░░░░░░░░░▶│ ST11 DOCS                       │
+ │                      │           │      API docs, README, changelog │
+ └─────────────────────┘            └──────────────────────────────────┘
+
+ ▓▓▓ LIFECYCLE PHASES WITH NO DIRECT PIPELINE STAGE ▓▓▓
+ ┌─────────────────────┐
+ │ 8. MONITOR/MAINTAIN │  No pipeline stage — operational concern (post-delivery)
+ ├─────────────────────┤
+ │ 10. SESSION MGMT    │  No pipeline stage — developer workflow concern
+ ├─────────────────────┤
+ │ 11. HUB SYNC        │  No pipeline stage — meta/registry concern
+ └─────────────────────┘
+```
+
 ---
 
 ## Phase-by-Phase Breakdown

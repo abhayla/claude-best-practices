@@ -10,44 +10,203 @@
 
 Each stage runs in its **own Claude Code context window**. Stages communicate via hybrid protocol: structured JSON returns to orchestrator + detailed docs on disk for audit trail. The orchestrator manages `.pipeline/state.json` for tracking.
 
+### Diagram 1 — What Stage 0 Is (Orchestrator Role)
+
 ```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                      STAGE 0: MASTER ORCHESTRATOR                           │
-└──┬──────┬──────┬──────────────────────────────────────────────────────────┬──┘
-   │      │      │                                                          │
-   ▼      │      │     WAVE 1 (no deps)                                    │
- ST 1     │      │                                                          │
- PRD      │      │                                                          │
-   │      ▼      ▼                                                          │
-   │  ┌──────┐ ┌──────┐  WAVE 2 (after Stage 1)                           │
-   ├─→│ ST 2 │ │ ST 3 │  Plan + Scaffold in parallel                      │
-   │  │ PLAN │ │SCAFF │                                                     │
-   │  └──┬───┘ └──┬───┘                                                    │
-   │     │    ┌───┘                                                         │
-   │     │    ▼                                                             │
-   │     │  ST 4 DEMO     WAVE 3 (after Stages 1 + 3)                     │
-   │     │    │                                                             │
-   │     ▼    │                                                             │
-   │  ST 5 SCHEMA         WAVE 4 (after Stages 2 + 3)                     │
-   │     │                                                                  │
-   │     ▼                                                                  │
-   │  ST 6 PRE-TESTS      WAVE 5 (after Stages 2 + 5)                     │
-   │     │                                                                  │
-   │     ▼                                                                  │
-   │  ST 7 IMPL           WAVE 6 (after Stage 6)                          │
-   │     │                                                                  │
-   │     ▼                                                                  │
-   │  ST 8 POST-TESTS     WAVE 7 (after Stage 7)                          │
-   │     │                                                                  │
-   │     ▼                                                                  │
-   │  ST 9 REVIEW         WAVE 8 (after Stage 8)                          │
-   │     │                                                                  │
-   │     ▼                                                                  │
-   │  ST 10 DEPLOY        WAVE 9 (after Stage 9)                          │
-   │     │                                                                  │
-   │     ▼                                                                  │
-   └─→ST 11 DOCS          WAVE 10 (after Stage 10)                        │
+                        ┌─────────────────────────┐
+                        │    YOU (or CI trigger)   │
+                        │   provide a PRD / idea   │
+                        └────────────┬────────────┘
+                                     │
+                                     ▼
+        ┌────────────────────────────────────────────────────────┐
+        │              STAGE 0: MASTER ORCHESTRATOR              │
+        │                                                        │
+        │  • Reads pipeline-config.json (stage DAG)              │
+        │  • Computes wave execution order                       │
+        │  • Spawns each stage in its own Claude Code window     │
+        │  • Validates artifact contracts at gate boundaries     │
+        │  • Retries failed stages (up to 3x)                   │
+        │  • Rolls back on unrecoverable failure                 │
+        │  • Writes state.json + event-log.jsonl continuously    │
+        └──┬──────┬──────┬──────┬──────┬──────┬──────┬──────┬───┘
+           │      │      │      │      │      │      │      │
+           ▼      ▼      ▼      ▼      ▼      ▼      ▼      ▼
+        ┌────┐┌────┐┌────┐┌────┐┌────┐┌────┐┌────┐  ...
+        │ST 1││ST 2││ST 3││ST 4││ST 5││ST 6││ST 7│  (11 stages)
+        │    ││    ││    ││    ││    ││    ││    │
+        └────┘└────┘└────┘└────┘└────┘└────┘└────┘
+         Each runs in an isolated Claude Code context window
 ```
+
+> **Key insight:** Stage 0 never writes application code. It only coordinates — dispatching stages, checking gates, managing state.
+
+### Diagram 2 — Wave Execution Order (DAG)
+
+Stages run in **waves**. Stages within a wave execute in parallel. A wave starts only after all its dependencies complete.
+
+```
+ WAVE 1 ──────────────────────────────────────────────────────────
+  │
+  │  ┌───────────┐
+  │  │  ST 1     │  Parse/normalize PRD
+  │  │  PRD      │──────────────────────────────────────────┐
+  │  └─────┬─────┘                                          │
+  │        │                                                │
+ WAVE 2 ───┼────────────────────────────────────────────────┼─
+  │        │                                                │
+  │   ┌────▼─────┐   ┌───────────┐                         │
+  │   │  ST 2    │   │  ST 3     │  ◄── both need ST 1     │
+  │   │  PLAN    │   │  SCAFFOLD │      run in parallel     │
+  │   └────┬─────┘   └─────┬─────┘                         │
+  │        │          ┌─────┘                               │
+ WAVE 3 ───┼──────────┼────────────────────────────────────┼─
+  │        │          │                                     │
+  │        │     ┌────▼─────┐                               │
+  │        │     │  ST 4    │  ◄── needs ST 1 + ST 3       │
+  │        │     │  DEMO    │  (skippable for CLI projects) │
+  │        │     └──────────┘                               │
+  │        │          │                                     │
+ WAVE 4 ───┼──────────┼────────────────────────────────────┼─
+  │   ┌────▼─────┐    │                                     │
+  │   │  ST 5    │    │  ◄── needs ST 2 + ST 3             │
+  │   │  SCHEMA  │    │                                     │
+  │   └────┬─────┘    │                                     │
+  │        │          │                                     │
+ WAVE 5 ───┼──────────┼─────────────────────────────────────
+  │   ┌────▼─────┐                                          │
+  │   │  ST 6    │  ◄── needs ST 2 + ST 5                  │
+  │   │ PRE-TEST │  Write tests BEFORE implementation       │
+  │   └────┬─────┘                                          │
+  │        │                                                │
+ WAVE 6 ───┼─────────────────────────────────────────────────
+  │   ┌────▼─────┐                                          │
+  │   │  ST 7    │  ◄── needs ST 6                         │
+  │   │  IMPL    │  Write code to pass pre-written tests    │
+  │   └────┬─────┘                                          │
+  │        │                                                │
+ WAVE 7 ───┼─────────────────────────────────────────────────
+  │   ┌────▼─────┐                                          │
+  │   │  ST 8    │  ◄── needs ST 7                         │
+  │   │POST-TEST │  Integration, E2E, edge cases            │
+  │   └────┬─────┘                                          │
+  │        │                                                │
+ WAVE 8 ───┼─────────────────────────────────────────────────
+  │   ┌────▼─────┐                                          │
+  │   │  ST 9    │  ◄── needs ST 8                         │
+  │   │  REVIEW  │  Automated code review                   │
+  │   └────┬─────┘                                          │
+  │        │                                                │
+ WAVE 9 ───┼─────────────────────────────────────────────────
+  │   ┌────▼─────┐                                          │
+  │   │  ST 10   │  ◄── needs ST 9                         │
+  │   │  DEPLOY  │  CI/CD, infrastructure                   │
+  │   └────┬─────┘                                          │
+  │        │                                                │
+ WAVE 10 ──┼─────────────────────────────────────────────────
+  │   ┌────▼─────┐                                          │
+  │   │  ST 11   │  ◄── needs ST 10 + ST 1 (for PRD refs) │
+  │   │  DOCS    │  API docs, README, changelog             │
+  │   └──────────┘                                          │
+```
+
+> **Critical path:** ST 1 → ST 2 → ST 5 → ST 6 → ST 7 → ST 8 → ST 9 → ST 10 → ST 11 (the longest chain determines minimum pipeline duration)
+
+### Diagram 3 — Artifact Flow Between Stages
+
+Each stage consumes artifacts from upstream and produces artifacts for downstream. Stage 0 validates contracts at every gate.
+
+```
+  ST 1 PRD
+    │
+    ├──produces──→  prd.md, requirements.json
+    │
+    ▼
+  ST 2 PLAN                          ST 3 SCAFFOLD
+    │                                   │
+    ├──produces──→  plan.md,            ├──produces──→  project skeleton,
+    │               task-breakdown.json │               config files
+    │                                   │
+    ▼                                   ▼
+  ST 5 SCHEMA                        ST 4 DEMO
+    │                                   │
+    ├──produces──→  schema.sql,         ├──produces──→  demo.html
+    │               models/*, migrations│
+    │                                   │
+    ▼
+  ST 6 PRE-TESTS
+    │
+    ├──produces──→  test files (failing — no impl yet)
+    │
+    ▼
+  ST 7 IMPLEMENTATION
+    │
+    ├──produces──→  source code (tests now pass)
+    │
+    ▼
+  ST 8 POST-TESTS
+    │
+    ├──produces──→  integration/E2E tests, coverage report
+    │
+    ▼
+  ST 9 REVIEW
+    │
+    ├──produces──→  review-report.md, fix commits
+    │
+    ▼
+  ST 10 DEPLOY
+    │
+    ├──produces──→  deployment artifacts, health check results
+    │
+    ▼
+  ST 11 DOCS
+    │
+    └──produces──→  API docs, README, CHANGELOG, architecture docs
+```
+
+### Diagram 4 — Failure Handling Lifecycle
+
+What happens when a stage fails:
+
+```
+                 Stage N dispatched
+                        │
+                        ▼
+               ┌─────────────────┐
+               │  Execute Stage  │
+               └────────┬────────┘
+                        │
+                   ┌────▼────┐
+                   │  Gate   │
+                   │  Check  │
+                   └────┬────┘
+                        │
+              ┌─────────┼─────────┐
+              │         │         │
+           ✅ PASS   ⚠️ WARN   ❌ FAIL
+              │         │         │
+              ▼         ▼         ▼
+         Record in   Record +   Retry (up to 3x)
+         state.json  continue        │
+              │         │        ┌───▼───┐
+              ▼         │     Still fails?
+         Dispatch       │        │       │
+         next wave      │       NO      YES
+              │         │        │       │
+              │         │        ▼       ▼
+              │         │     Continue  Compensating
+              │         │     (retry    Rollback
+              │         │      worked)     │
+              │         │        │         ▼
+              │         │        │    git revert to
+              │         │        │    last checkpoint
+              │         │        │         │
+              │         │        │         ▼
+              └─────────┴────────┴──→ Pipeline complete
+                                      or halted
+```
+
+> **Idempotency:** Every stage can be safely re-run. The orchestrator tags git checkpoints before each stage, so rollback reverts to a known-good state.
 
 ---
 
@@ -72,12 +231,12 @@ Each stage runs in its **own Claude Code context window**. Stages communicate vi
 
 | Standard | Relevant Aspect | Coverage |
 |----------|----------------|----------|
-| **PMI PMBOK** | WBS for stage decomposition, critical path analysis | ❌ No DAG or critical-path analysis |
-| **Design by Contract (Meyer)** | Pre/post-conditions per stage, typed artifact schemas | ❌ No contract definitions |
-| **Saga Pattern** | Compensating transactions on stage failure | ❌ No rollback mechanism |
-| **Event Sourcing** | Immutable pipeline state log | ❌ No state persistence |
-| **Workflow Patterns (van der Aalst)** | Exclusive/parallel/conditional routing | ⚠️ Parallel exists, no conditional |
-| **Observability (Charity Majors)** | Structured logs, stage timing, error categorization | ❌ No pipeline-level telemetry |
+| **PMI PMBOK** | WBS for stage decomposition, critical path analysis | ✅ `pipeline-orchestrator` builds DAG from stage dependencies, computes execution waves with topological ordering, and identifies critical path |
+| **Design by Contract (Meyer)** | Pre/post-conditions per stage, typed artifact schemas | ✅ `pipeline-orchestrator` defines typed `artifacts_in`/`artifacts_out` per stage with schema definitions; pre-dispatch validation ensures all inputs exist before downstream stages run |
+| **Saga Pattern** | Compensating transactions on stage failure | ✅ `pipeline-orchestrator` implements git-based compensating rollback with checkpoint tags for idempotent re-execution |
+| **Event Sourcing** | Immutable pipeline state log | ✅ `pipeline-orchestrator` maintains `.pipeline/state.json` as single source of truth + append-only `.pipeline/event-log.jsonl` for immutable audit trail |
+| **Workflow Patterns (van der Aalst)** | Exclusive/parallel/conditional routing | ✅ `pipeline-orchestrator` supports `skip_when` conditions for conditional execution, parallel wave dispatch, and dependency-aware routing |
+| **Observability (Charity Majors)** | Structured logs, stage timing, error categorization | ✅ `pipeline-orchestrator` emits structured JSONL events with timestamps, duration, token usage, retry counts, and renders a progress dashboard |
 
 ## Gap Proposals
 

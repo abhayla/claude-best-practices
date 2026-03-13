@@ -8,6 +8,141 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+ ┌─────────────────────────────────────────────────────────────────┐
+ │              STAGE 3: PROJECT SCAFFOLDING                        │
+ └─────────────────────────────────────────────────────────────────┘
+
+        ┌───────────────────────┐
+        │  Read PRD from ST1    │
+        │  (detect tech stack)  │
+        └───────────┬───────────┘
+                    │
+                    ▼
+  ┌──────────────────────────────┐
+  │  Stack Detection             │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  Python? Node? Android?      │
+  │  Go? Rust? React?            │
+  └──────────────┬───────────────┘
+                 │
+        ┌────────┼────────┬────────┐
+        │        │        │        │
+        ▼        ▼        ▼        ▼
+   ┌────────┐┌────────┐┌────────┐┌────────┐
+   │Python  ││Node/TS ││Android ││Go/Rust │
+   │pyproj  ││pkg.json││Gradle  ││go.mod/ │
+   │toml    ││        ││        ││Cargo   │
+   └───┬────┘└───┬────┘└───┬────┘└───┬────┘
+       └─────┬───┘────┬────┘─────────┘
+             │        │
+             ▼        │
+  ┌──────────────────────────────┐
+  │  Project Initialization      │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  project-scaffold skill      │
+  │  • Package manifests         │
+  │  • Clean Architecture dirs   │
+  │  • .editorconfig             │
+  │  • License file              │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Tooling Setup               │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  • Linter + formatter        │
+  │  • Commitlint (conventional) │
+  │  • Semantic-release / SemVer │
+  │  • Pre-commit hooks          │
+  │  • Test framework config     │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Infrastructure Setup        │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • Docker Compose dev env    │
+  │  • CI skeleton (ci-cd-setup) │
+  │  • .env.example              │
+  │  • Health check endpoint     │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Security Baseline           │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • Dependabot / Renovate     │
+  │  • SAST (Semgrep) in CI      │
+  │  • .gitignore audit          │
+  │  • Dependency audit          │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  12-Factor Audit Gate        │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  All 12 factors verified     │
+  │  Lockfile exists? Build OK?  │
+  └──────────────┬───────────────┘
+                 │
+            PASS │ / FAIL → retry
+                 ▼
+       ┌──────────────────┐
+       │  Scaffold Output  │
+       │  ████████████████ │
+       └──────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+                          INPUTS
+ ┌──────────────────────────────────────────────┐
+ │                                              │
+ │  ┌───────────────────────────────────────┐   │
+ │  │ From ST1: prd.md                      │   │
+ │  │   • Tech stack requirements           │   │
+ │  │   • NFRs (performance, security)      │   │
+ │  └───────────────────────────────────────┘   │
+ │                                              │
+ └──────────────────────┬───────────────────────┘
+                        │
+                        ▼
+        ┌───────────────────────────────┐
+        │                               │
+        │  ███ STAGE 3: SCAFFOLDING ███ │
+        │                               │
+        │  project-scaffold             │
+        │  ci-cd-setup                  │
+        │                               │
+        └──────────────┬────────────────┘
+                       │
+         ┌─────────────┼──────────┬──────────────┐
+         │             │          │              │
+         ▼             ▼          ▼              ▼
+ ┌────────────┐ ┌───────────┐ ┌──────────┐ ┌──────────┐
+ │ Project    │ │ ci.yml    │ │ docker-  │ │ .env     │
+ │ skeleton   │ │ (CI       │ │ compose  │ │ .example │
+ │ (dirs,     │ │  skeleton)│ │ .yml     │ │ smoke    │
+ │  manifests,│ │           │ │          │ │ test     │
+ │  configs)  │ │           │ │          │ │          │
+ └─────┬──────┘ └─────┬─────┘ └────┬─────┘ └────┬─────┘
+       │              │            │             │
+       ▼              ▼            ▼             ▼
+ ┌──────────┐  ┌──────────┐ ┌──────────┐  ┌──────────┐
+ │ ST4 Demo │  │ ST10     │ │ ST7 Impl │  │ ST6 Tests│
+ │ ST5 Schma│  │ Deploy   │ │ ST8 Post │  │ ST7 Impl │
+ │ ST6 Tests│  │ (extends)│ │          │  │ ST10 Depl│
+ │ ST7 Impl │  │          │ │          │  │          │
+ └──────────┘  └──────────┘ └──────────┘  └──────────┘
+                   OUTPUTS
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |

@@ -8,6 +8,109 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+                    ┌─────────────────────────┐
+                    │  Gather All Artifacts    │
+                    │  (code, tests, PRD,      │
+                    │   test results, reports) │
+                    └────────────┬────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Multi-Layer Code Review          │
+               │                                   │
+               │  ▓ adversarial-review (3 roles)   │
+               │  ▓ security-auditor (OWASP)       │
+               │  ▓ code-reviewer (lint/type/build) │
+               └────────────────┬─────────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Test Review                      │
+               │                                   │
+               │  ▓ Coverage vs thresholds         │
+               │  ▓ E2E / perf / security results  │
+               │  ▓ Flakiness assessment            │
+               └────────────────┬─────────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Architecture & Standards Check   │
+               │                                   │
+               │  ▓ architecture-fitness            │
+               │  ▓ change-risk-scoring             │
+               │  ▓ pr-standards                    │
+               └────────────────┬─────────────────┘
+                                 │
+                                 ▼
+               ┌──────────────────────────────────┐
+               │  Issue Flagging & Fix Loop        │
+               │  (fix-loop + auto-verify)         │
+               └────────────────┬─────────────────┘
+                                 │
+                       ┌─────────┴─────────┐
+                       │                   │
+                 ✅ APPROVED          ❌ REJECTED
+                       │                   │
+                       ▼                   ▼
+              ┌──────────────┐   ┌──────────────────┐
+              │ Create PR    │   │ Return to ST7/ST8 │
+              │ + review     │   │ with findings for  │
+              │ report       │   │ remediation        │
+              └──────────────┘   └──────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░  UPSTREAM INPUTS                                                      ░
+ ░                                                                       ░
+ ░  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                 ░
+ ░  │  ST 7: IMPL  │  │ ST 6: TESTS  │  │  ST 1: PRD   │                 ░
+ ░  │              │  │ ST 8: POST   │  │              │                 ░
+ ░  │  source      │  │              │  │  prd.md      │                 ░
+ ░  │  code        │  │  test suite  │  │  requirements│                 ░
+ ░  │              │  │  test results│  │  .json       │                 ░
+ ░  │              │  │  coverage    │  │              │                 ░
+ ░  │              │  │  perf.json   │  │              │                 ░
+ ░  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘                 ░
+ ░         │                 │                 │                          ░
+ ░░░░░░░░░░┼░░░░░░░░░░░░░░░░┼░░░░░░░░░░░░░░░░┼░░░░░░░░░░░░░░░░░░░░░░░░░
+            │                 │                 │
+            ▼                 ▼                 ▼
+ ┌────────────────────────────────────────────────────────────────┐
+ │                                                                │
+ │                STAGE 9: CODE REVIEW & QUALITY GATES            │
+ │                                                                │
+ │  █ adversarial-review  █ security-auditor  █ code-reviewer     │
+ │  █ architecture-fitness  █ change-risk-scoring                 │
+ │  █ pr-standards  █ fix-loop  █ merge-strategy                  │
+ │                                                                │
+ └──────┬──────────┬──────────┬──────────┬────────────────────────┘
+        │          │          │          │
+        ▼          ▼          ▼          ▼
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░  DOWNSTREAM OUTPUTS                                                   ░
+ ░                                                                       ░
+ ░  review-report    PR URL         tech debt        updated             ░
+ ░  (findings +      (GitHub)       issues           ADR statuses        ░
+ ░   fixes)                         (gh issue)       (docs/adr/)         ░
+ ░     │                │               │                │               ░
+ ░     ▼                ▼               ▼                ▼               ░
+ ░  ┌──────────┐  ┌──────────┐  ┌──────────────┐  ┌──────────┐         ░
+ ░  │ ST 10    │  │ ST 10    │  │ Future       │  │ ST 11    │         ░
+ ░  │ DEPLOY   │  │ DEPLOY   │  │ Sprints      │  │ DOCS     │         ░
+ ░  │(go/no-go)│  │(what to  │  │              │  │          │         ░
+ ░  │          │  │ deploy)  │  │              │  │          │         ░
+ ░  └──────────┘  └──────────┘  └──────────────┘  └──────────┘         ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |
@@ -25,8 +128,8 @@
 | 11 | ADR review (decisions still valid) | None — ADRs created in Stage 2 but not re-validated during review | ⚠️ Partial | **ADR (Nygard)** |
 | 12 | Change risk scoring | `change-risk-scoring` skill (composite score, hotspot analysis) | ✅ Covered | **Change Risk Analysis** |
 | 13 | Merge strategy decision | `merge-strategy` skill (squash/merge/rebase by branch type) | ✅ Covered | **Git Workflow** |
-| 14 | Approval workflow (multi-approver) | None — single AI reviewer, no multi-stakeholder sign-off | ❌ Missing | **Code Review Best Practices** |
-| 15 | Post-merge verification plan | None — PR merged but no smoke test plan for after merge | ⚠️ Partial | **Continuous Integration** |
+| 14 | Approval workflow (multi-approver) | Out of scope — multi-stakeholder sign-off is a human-org concern enforced by GitHub branch protection / CODEOWNERS, not an AI skill | 🚫 Out of Scope | **Code Review Best Practices** |
+| 15 | Post-merge verification plan | `merge-strategy` skill Step 5 (smoke tests, deploy verification, rollback) | ✅ Covered | **Continuous Integration** |
 
 ## SE Best Practices Validation
 
@@ -36,8 +139,8 @@
 | **ADR Lifecycle** | ADR status updated (Proposed → Accepted → Deprecated) during review | ⚠️ ADRs created but never re-validated |
 | **Change Risk Analysis** | Quantified risk score based on files changed, complexity, test coverage delta | ✅ Composite risk score with hotspot analysis in `change-risk-scoring` |
 | **Git Workflow** | Merge strategy (squash for feature branches, merge for release) | ✅ Branch-type-aware squash/merge/rebase guidance in `merge-strategy` |
-| **Code Review Best Practices (Google)** | Reviewer rotation, review response time SLA, small PRs | ⚠️ Multi-reviewer exists but all are AI — no human-in-the-loop guidance |
-| **Continuous Integration** | Post-merge smoke test, deploy verification | ⚠️ Tests run pre-merge but no post-merge verification step |
+| **Code Review Best Practices (Google)** | Reviewer rotation, review response time SLA, small PRs | 🚫 Multi-approver sign-off is out of scope for AI — enforced by GitHub branch protection / CODEOWNERS at the org level |
+| **Continuous Integration** | Post-merge smoke test, deploy verification | ✅ `merge-strategy` Step 5 covers post-merge smoke tests, deploy pipeline verification, and rollback on failure |
 
 ## Gap Proposals
 
@@ -106,3 +209,4 @@ Universal — code review is stack-agnostic. The `adversarial-review` skill and 
 | 2026-03-13 | Rewritten as AUDIT with capability checklist, SE best practices, gap proposals |
 | 2026-03-13 | P1 gap resolved: `architecture-fitness` skill created with dependency direction, circular deps, coupling metrics, ADR review — architecture conformance ❌ flipped to ✅ |
 | 2026-03-13 | P2 gaps resolved: `change-risk-scoring` skill (composite score, hotspot analysis) and `merge-strategy` skill (squash/merge/rebase by branch type) — SE practices ❌ flipped to ✅ |
+| 2026-03-13 | Row 15 flipped ⚠️→✅ (post-merge covered by `merge-strategy` Step 5). Row 14 marked 🚫 Out of Scope (multi-approver is a human-org concern, not an AI skill) |

@@ -8,6 +8,120 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+                    ┌─────────────────────────┐
+                    │  Verify Review Approval  │
+                    │  (ST9 gate passed)       │
+                    └────────────┬────────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │  Production Readiness    │
+                    │  Review (PRR checklist)  │
+                    └────────────┬────────────┘
+                                 │
+                       ┌─────────┴─────────┐
+                       │                   │
+                   ✅ READY           ❌ NOT READY
+                       │                   │
+                       │                   ▼
+                       │         ┌──────────────────┐
+                       │         │ Flag blockers,    │
+                       │         │ return to ST9     │
+                       │         └──────────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Build & Package           │
+          │  ▓ docker-optimize         │
+          │  ▓ ci-cd-setup             │
+          └────────────┬───────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Deploy Infrastructure     │
+          │  ▓ iac-deploy (Terraform)  │
+          │  ▓ k8s-deploy (manifests)  │
+          │  ▓ deploy-strategy         │
+          │    (GitOps / canary)       │
+          └────────────┬───────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Database Migration        │
+          │  (expand-contract pattern) │
+          └────────────┬───────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Deployment Verification   │
+          │  ▓ Health checks           │
+          │  ▓ Smoke tests             │
+          │  ▓ monitoring-setup        │
+          │    (Prometheus/Grafana)     │
+          └────────────┬───────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Output: Deployment URL,   │
+          │  CI/CD pipeline, K8s       │
+          │  manifests, dashboards,    │
+          │  runbooks, SLO defs        │
+          └────────────────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░  UPSTREAM INPUTS                                                      ░
+ ░                                                                       ░
+ ░  ┌───────────────────┐        ┌───────────────────┐                   ░
+ ░  │  ST 9: REVIEW     │        │  ALL PRIOR STAGES │                   ░
+ ░  │                   │        │                   │                   ░
+ ░  │  review report    │        │  source code      │                   ░
+ ░  │  (approved)       │        │  test suite       │                   ░
+ ░  │  PR URL           │        │  schema/migrations│                   ░
+ ░  │  merge strategy   │        │  config files     │                   ░
+ ░  └────────┬──────────┘        └────────┬──────────┘                   ░
+ ░           │                            │                              ░
+ ░░░░░░░░░░░░┼░░░░░░░░░░░░░░░░░░░░░░░░░░░┼░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+              │                            │
+              ▼                            ▼
+ ┌────────────────────────────────────────────────────────────────┐
+ │                                                                │
+ │              STAGE 10: DEPLOYMENT & MONITORING                 │
+ │                                                                │
+ │  █ ci-cd-setup  █ docker-optimize  █ k8s-deploy               │
+ │  █ iac-deploy  █ deploy-strategy  █ monitoring-setup           │
+ │  █ incident-response  █ disaster-recovery                      │
+ │                                                                │
+ └──────┬──────────┬──────────┬──────────┬──────────┬─────────────┘
+        │          │          │          │          │
+        ▼          ▼          ▼          ▼          ▼
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░  DOWNSTREAM OUTPUTS                                                   ░
+ ░                                                                       ░
+ ░  Deployment   .github/       k8s/ or     Grafana     docs/           ░
+ ░  URL          workflows/     helm/       dashboards  runbooks/       ░
+ ░               ci.yml         manifests   (JSON)      *.md            ░
+ ░     │            │              │            │           │            ░
+ ░     ▼            ▼              ▼            ▼           ▼            ░
+ ░  ┌──────────────────────────────────────────────────────────┐         ░
+ ░  │  ST 11: DOCS                                             │         ░
+ ░  │  (link in documentation, operational docs, SLO refs,     │         ░
+ ░  │   architecture diagrams, handover)                       │         ░
+ ░  └──────────────────────────────────────────────────────────┘         ░
+ ░                                                                       ░
+ ░  SLO definitions ──→ Operations (Prometheus recording rules)          ░
+ ░  Incident runbooks ──→ Operations (on-call reference)                 ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |

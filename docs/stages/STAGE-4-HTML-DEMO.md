@@ -8,6 +8,127 @@
 
 ---
 
+## Diagrams
+
+### Diagram A — Internal Workflow Flow
+
+```
+ ┌─────────────────────────────────────────────────────────────────┐
+ │               STAGE 4: INTERACTIVE HTML DEMO                    │
+ └─────────────────────────────────────────────────────────────────┘
+
+        ┌───────────────────────┐
+        │  Read PRD from ST1    │
+        │  + Scaffold from ST3  │
+        └───────────┬───────────┘
+                    │
+                    ▼
+  ┌──────────────────────────────┐
+  │  Skip Check                  │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  CLI-only project?           │
+  │  ┌─── YES ──→ skip stage     │
+  │  └─── NO  ──→ continue       │
+  └──────────────┬───────────────┘
+                 │ (NO)
+                 ▼
+  ┌──────────────────────────────┐
+  │  Sample Data Generation      │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  • Realistic mock data       │
+  │  • Per user story dataset    │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  HTML Prototype Build        │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+  │  html-prototype skill        │
+  │  • Single-file HTML          │
+  │  • Tailwind CSS + Alpine.js  │
+  │  • Design tokens (CSS vars)  │
+  │  • Dark mode toggle          │
+  │  • 4 responsive breakpoints  │
+  │  • data-req="US-xxx" attrs   │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  UI/UX Enrichment            │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  ui-ux-pro-max skill         │
+  │  • Component patterns        │
+  │  • Interaction design        │
+  │  • Stakeholder overlay       │
+  └──────────────┬───────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────┐
+  │  Validation Gate             │
+  │  ░░░░░░░░░░░░░░░░░░░░░░░░░  │
+  │  • a11y-audit (axe-core)     │
+  │  • Nielsen's 10 heuristics   │
+  │  • Performance budget check  │
+  │  • verify-screenshots        │
+  └──────────────┬───────────────┘
+                 │
+            PASS │ / FAIL → retry
+                 ▼
+       ┌──────────────────┐
+       │   Demo Output     │
+       │   ████████████████ │
+       └──────────────────┘
+```
+
+### Diagram B — I/O Artifact Contract
+
+```
+                          INPUTS
+ ┌──────────────────────────────────────────────┐
+ │                                              │
+ │  ┌──────────────────┐ ┌──────────────────┐   │
+ │  │ From ST1: prd.md │ │ From ST3:        │   │
+ │  │  • User stories  │ │  • Design context│   │
+ │  │  • Requirement   │ │  • Project type  │   │
+ │  │    IDs (US-xxx)  │ │  • Stack info    │   │
+ │  └────────┬─────────┘ └────────┬─────────┘   │
+ │           │                    │              │
+ └───────────┼────────────────────┼──────────────┘
+             │                    │
+             └─────────┬──────────┘
+                       │
+                       ▼
+        ┌───────────────────────────────┐
+        │                               │
+        │  ███ STAGE 4: HTML DEMO ███   │
+        │                               │
+        │  html-prototype               │
+        │  ui-ux-pro-max                │
+        │  a11y-audit                   │
+        │  verify-screenshots           │
+        │                               │
+        └──────────────┬────────────────┘
+                       │
+            ┌──────────┼──────────┐
+            │          │          │
+            ▼          ▼          ▼
+ ┌──────────────┐┌───────────┐┌──────────────┐
+ │ demo.html    ││screenshots││ Design       │
+ │ (single-file ││ (PNG)     ││ decisions    │
+ │  prototype   ││           ││ (colors,     │
+ │  with data-  ││           ││  components) │
+ │  req attrs)  ││           ││              │
+ └──────┬───────┘└─────┬─────┘└──────┬───────┘
+        │              │             │
+        ▼              ▼             ▼
+  ┌──────────┐  ┌───────────┐  ┌──────────┐
+  │ ST7 Impl │  │ ST9 Revw  │  │ ST7 Impl │
+  │ (UI ref) │  │ (visual   │  │ (UI impl │
+  │          │  │  ref)     │  │  guide)  │
+  └──────────┘  └───────────┘  └──────────┘
+                   OUTPUTS
+```
+
 ## Capability Checklist
 
 | # | Capability | Existing Skill/Agent | Status | SE Standard |
