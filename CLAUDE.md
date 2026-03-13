@@ -47,6 +47,10 @@ PYTHONPATH=. python scripts/recommend.py --local /path/to/project
 PYTHONPATH=. python scripts/recommend.py --repo owner/name --apply
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --apply
 
+# Provision project (apply + generate CLAUDE.md + settings.json)
+PYTHONPATH=. python scripts/recommend.py --repo owner/name --provision
+PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
+
 # Use stacks from repos.yml config instead of auto-detection
 PYTHONPATH=. python scripts/recommend.py --repo owner/name --use-config
 
@@ -61,7 +65,7 @@ PYTHONPATH=. python scripts/recommend.py --local /path/to/project --diff
 
 - **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
   - `agents/` — 16 agent definitions (11 universal + 5 stack-specific)
-  - `skills/` — 76 skill directories, each with a `SKILL.md`
+  - `skills/` — 98 skill directories, each with a `SKILL.md`
   - `rules/` — 14 rule files (6 universal + 4 stack-specific + 4 placeholders)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns

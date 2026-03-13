@@ -102,7 +102,22 @@ Behavioral, context management, and rule-writing guidance are distributed across
 
 ## Claude Code Configuration
 
-The `.claude/` directory contains skills, agents, and rules for Claude Code.
+The `.claude/` directory contains 98 skills, 16 agents, and 14 rules for Claude Code.
+
+### Key Skills Available
+
+| Category | Skills |
+|----------|--------|
+| **Pipeline** | `/pipeline-orchestrator` (PRD-to-production), `/brainstorm`, `/writing-plans`, `/executing-plans` |
+| **Implementation** | `/implement`, `/tdd`, `/fix-loop`, `/fix-issue`, `/code-quality-gate` |
+| **Testing** | `/test-generator`, `/playwright`, `/perf-test`, `/a11y-audit`, `/auto-verify` |
+| **Security** | `/security-audit` (SAST), `/dast-scan` (DAST), `/supply-chain-audit`, `/chaos-resilience` |
+| **Architecture** | `/architecture-fitness`, `/schema-designer`, `/project-scaffold` |
+| **Review & PR** | `/adversarial-review`, `/request-code-review`, `/change-risk-scoring`, `/merge-strategy` |
+| **DevOps** | `/ci-cd-setup`, `/docker-optimize`, `/k8s-deploy`, `/deploy-strategy`, `/monitoring-setup` |
+| **Documentation** | `/api-docs-generator`, `/diataxis-docs`, `/changelog-contributing`, `/handover` |
+
+Run `/skill-master` to discover all available skills dynamically.
 
 <!-- hub:best-practices:end -->
 

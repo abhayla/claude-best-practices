@@ -51,7 +51,24 @@ Break the feature into bite-sized tasks. Each task should take **2-5 minutes** t
 - [ ] Task 4 ...
 ```
 
-For each task, include all five elements:
+### 2.2 WBS Hierarchy
+
+Organize tasks into a Work Breakdown Structure before detailing individual tasks:
+
+```markdown
+## Epic: <Milestone from PRD> [M1]
+### Feature: <Feature group> [REQ-M001, REQ-M002]
+#### Task 1: <specific task>
+#### Task 2: <specific task>
+### Feature: <Feature group> [REQ-M003]
+#### Task 3: <specific task>
+```
+
+This hierarchy maps directly to PRD milestones → requirements → tasks, maintaining full traceability.
+
+### 2.3 Task Format
+
+For each task, include all seven elements:
 
 | Element | Description |
 |---------|-------------|
@@ -59,7 +76,9 @@ For each task, include all five elements:
 | **File paths** | Exact paths to create or modify (verified against codebase) |
 | **Code snippet** | Snippet or pseudocode showing the change |
 | **Verification** | Command to confirm the task is complete (test, build, curl, etc.) |
-| **Estimated time** | 2-5 minutes per task |
+| **Estimate (PERT)** | Three-point: optimistic / expected / pessimistic (e.g., 2 / 3 / 7 min) |
+| **Requirement** | PRD traceability: REQ-M001, AC-001 |
+| **Rollback** | How to undo this task if it fails or needs reverting |
 
 Order tasks by dependency — no task should reference work from a later task.
 
@@ -68,6 +87,7 @@ Order tasks by dependency — no task should reference work from a later task.
 ```markdown
 ### Task N: <short title>
 
+**Requirement:** REQ-M001, AC-001
 **Description:** <what to do and why>
 
 **Files:**
@@ -84,8 +104,25 @@ Order tasks by dependency — no task should reference work from a later task.
 <command that proves this task is done>
 ```
 
-**Time:** ~N min
+**Estimate:** O: ~2m | E: ~3m | P: ~7m
 **Depends on:** Task X, Task Y (or "None")
+**Rollback:** `git checkout HEAD -- path/to/file.ext` or "delete path/to/new-file.ext"
+```
+
+### 2.4 Risk Mitigation Tasks
+
+If the PRD includes a risk register, generate a mitigation task for each risk with Probability × Impact ≥ 8:
+
+```markdown
+### Task R1: Mitigate RISK-001 — <risk description>
+
+**Requirement:** RISK-001 (from PRD Risk Register)
+**Description:** <implement the mitigation strategy from the risk register>
+**Files:** <files that implement the mitigation>
+**Verify:** <command that proves the mitigation works>
+**Estimate:** O: ~5m | E: ~10m | P: ~20m
+**Depends on:** <task that creates the component being protected>
+**Rollback:** <how to revert>
 ```
 
 ---
@@ -106,6 +143,31 @@ Task 2 → Task 4 ↗
 Task 6 (independent, parallelizable)
 ```
 
+### 3.2 PERT Estimation & Buffer Allocation
+
+Using the three-point estimates from each task, calculate:
+
+```
+PERT expected = (Optimistic + 4×Expected + Pessimistic) / 6
+Standard deviation = (Pessimistic - Optimistic) / 6
+```
+
+For the critical path:
+- Sum all PERT expected times = **expected total**
+- Add 20% buffer to the critical path = **buffered total**
+- Report both: "Expected: ~35m | With buffer: ~42m"
+
+```
+Critical Path Time Budget:
+  Task 1: O:2 E:3 P:7  → PERT: 3.5m
+  Task 3: O:3 E:5 P:10 → PERT: 5.5m
+  Task 5: O:2 E:3 P:5  → PERT: 3.2m
+  Task 7: O:5 E:8 P:15 → PERT: 8.7m
+  ─────────────────────────────
+  Expected: ~21m | Buffer (20%): ~25m
+  Parallelizable: 40% (Tasks 2, 4, 6 off critical path)
+```
+
 ---
 
 ## STEP 4: Review Plan Quality
@@ -119,6 +181,12 @@ Before presenting the plan, run through this self-review checklist:
 - [ ] Task ordering respects dependencies — no forward references
 - [ ] No duplicate work across tasks
 - [ ] Total plan covers the full scope from Step 1
+- [ ] Every task traces to ≥1 PRD requirement (REQ-xxx or AC-xxx)
+- [ ] Every task has a rollback strategy
+- [ ] PERT estimates provided (optimistic / expected / pessimistic)
+- [ ] Critical path has 20% buffer allocated
+- [ ] Risk mitigation tasks generated for high-scoring PRD risks (P×I ≥ 8)
+- [ ] WBS hierarchy maps to PRD milestones
 
 Fix any issues found before proceeding.
 

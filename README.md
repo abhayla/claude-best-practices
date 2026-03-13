@@ -14,9 +14,9 @@ That's it. Delete what you don't need (e.g., `rm .claude/agents/fastapi-*` if no
 
 | Component | Count | Description |
 |-----------|-------|-------------|
-| **Agents** | 13 | Sub-agents for code review, debugging, testing, git, planning, docs |
-| **Skills** | 24 | Slash-command workflows: `/implement`, `/fix-loop`, `/status`, and more |
-| **Rules** | 10 | Scoped coding rules for workflow, testing, FastAPI, Android, etc. |
+| **Agents** | 16 | Sub-agents for code review, debugging, testing, git, planning, docs |
+| **Skills** | 76 | Slash-command workflows: `/implement`, `/fix-loop`, `/status`, and more |
+| **Rules** | 14 | Scoped coding rules for workflow, testing, FastAPI, Android, etc. |
 | **Hooks** | — | Example hooks (auto-format, test verification, workflow logging) |
 
 See [`core/.claude/README.md`](core/.claude/README.md) for the full catalog.
@@ -49,9 +49,9 @@ python scripts/bootstrap.py --stacks fastapi-python --target /path/to/project
 
 ```
 core/.claude/               # Copy this to your project
-  agents/                   # 13 specialized sub-agents
-  skills/                   # 24 slash-command workflows
-  rules/                    # 10 scoped coding rules
+  agents/                   # 16 specialized sub-agents
+  skills/                   # 76 slash-command workflows
+  rules/                    # 14 scoped coding rules
   hooks/                    # Hook examples (README only)
   README.md                 # Self-documenting index
   settings.json             # Minimal defaults
@@ -81,7 +81,7 @@ docs/                       # Dashboard, getting started, architecture
 | `/update-practices` | Pull latest patterns from hub |
 | `/contribute-practice` | Submit a pattern to hub |
 
-See [`core/.claude/README.md`](core/.claude/README.md) for all 24 skills.
+See [`core/.claude/README.md`](core/.claude/README.md) for all 76 skills.
 
 ## Sync Architecture
 

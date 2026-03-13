@@ -121,43 +121,109 @@ The spec is a living document — update it as understanding evolves during impl
 
 If the user needs formal requirements (for team handoff, stakeholder review, or project tracking), produce a PRD instead of a spec. Ask: "Do you need a spec (technical) or PRD (product-facing)?"
 
-PRD format:
+PRD format (IEEE 830 aligned):
 
 ```markdown
 # PRD: <Feature Name>
 
+## Meta
+- Author: <name or "Claude Code">
+- Date: <ISO-8601>
+- Status: DRAFT | REVIEW | APPROVED
+- Version: 1.0
+
+## Scope
+<What is included AND what is explicitly excluded. Define system boundaries.>
+
+## Glossary
+Define domain-specific terms to prevent ambiguity (DDD ubiquitous language):
+| Term | Definition |
+|------|-----------|
+| <term> | <precise definition used throughout this PRD> |
+
+## Stakeholders & RACI
+| Role | Person/Team | R(esponsible) | A(ccountable) | C(onsulted) | I(nformed) |
+|------|------------|:---:|:---:|:---:|:---:|
+| Product Owner | <name> | | A | | |
+| Engineering | <team> | R | | | |
+| Design | <team> | | | C | |
+| QA | <team> | R | | | |
+
 ## Overview
 <1-paragraph summary of what we're building and why>
 
+## Problem Statement
+<What problem exists? What happens without this feature? Who is affected?>
+
+## Assumptions & Constraints
+- **Assumptions:** <what we believe to be true but haven't verified>
+- **Constraints:** <technical, business, regulatory limitations>
+- **Dependencies:** <external systems, teams, or timelines we depend on>
+
 ## User Stories
-- As a <role>, I want to <action>, so that <benefit>
-- As a <role>, I want to <action>, so that <benefit>
+- US-001: As a <role>, I want to <action>, so that <benefit>
+- US-002: As a <role>, I want to <action>, so that <benefit>
+(Number every story for traceability)
 
 ## Acceptance Criteria
-For each user story:
-- [ ] Given <precondition>, when <action>, then <expected result>
-- [ ] Given <precondition>, when <action>, then <expected result>
+For each user story (every criterion MUST be testable — specific, measurable, automatable):
+- AC-001 (US-001): Given <precondition>, when <action>, then <expected result>
+- AC-002 (US-001): Given <precondition>, when <action>, then <expected result>
 
-## Non-Functional Requirements
-- **Performance:** <response time, throughput targets>
-- **Security:** <auth, data protection requirements>
-- **Scalability:** <expected load, growth projections>
-- **Accessibility:** <WCAG level, screen reader support>
+## Non-Functional Requirements (ISO 25010)
+All 8 quality characteristics — provide specific measurable targets:
+
+| ID | Characteristic | Requirement | Target |
+|----|---------------|-------------|--------|
+| NFR-001 | **Functional Suitability** | <completeness, correctness, appropriateness> | <metric> |
+| NFR-002 | **Performance Efficiency** | Response time, throughput, resource utilization | p95 < Xms, Xrps |
+| NFR-003 | **Compatibility** | Co-existence with other systems, interoperability | <specific systems> |
+| NFR-004 | **Usability** | Learnability, operability, error protection, accessibility | WCAG 2.1 AA |
+| NFR-005 | **Reliability** | Maturity, availability, fault tolerance, recoverability | X% uptime, RTO Xm |
+| NFR-006 | **Security** | Confidentiality, integrity, non-repudiation, accountability | <auth method, encryption> |
+| NFR-007 | **Maintainability** | Modularity, reusability, analysability, modifiability, testability | <coverage %, complexity> |
+| NFR-008 | **Portability** | Adaptability, installability, replaceability | <platforms, environments> |
+
+## External Interfaces
+- **User Interfaces:** <screens, CLI commands, API consumers>
+- **System Interfaces:** <external APIs, databases, message queues>
+- **Hardware Interfaces:** <if applicable>
+- **Communication Interfaces:** <protocols, data formats>
+
+## Risk Register
+| ID | Risk | Probability (1-5) | Impact (1-5) | Score | Mitigation |
+|----|------|:-:|:-:|:-:|-----------|
+| RISK-001 | <description> | 3 | 4 | 12 | <mitigation strategy> |
+| RISK-002 | <description> | 2 | 5 | 10 | <mitigation strategy> |
+
+## Requirements Traceability Matrix
+| Requirement | User Story | Acceptance Criteria | Test ID (TBD) | Status |
+|------------|-----------|-------------------|--------------|--------|
+| REQ-M001 | US-001 | AC-001, AC-002 | — | Draft |
+| REQ-M002 | US-002 | AC-003 | — | Draft |
+
+## Requirement Tiers (MoSCoW)
+### Must Have (MVP)
+- REQ-M001: <requirement> [US-001, AC-001]
+### Should Have (v1.1)
+- REQ-S001: <requirement> [US-003]
+### Could Have (future)
+- REQ-C001: <requirement>
+### Won't Have (out of scope)
+- REQ-W001: <what and why excluded>
 
 ## Milestones
-| Milestone | Scope | Target |
-|-----------|-------|--------|
-| M1: MVP | <core user stories> | <date/sprint> |
-| M2: Enhancement | <additional stories> | <date/sprint> |
-
-## Requirement Tiers
-- **Must:** <from Step 5.4>
-- **Nice:** <from Step 5.4>
-- **Out of Scope:** <from Step 5.4>
+| ID | Milestone | Scope | Requirements | Target |
+|----|-----------|-------|-------------|--------|
+| M1 | MVP | <core stories> | REQ-M001..M005 | <date> |
+| M2 | Enhancement | <additional> | REQ-S001..S003 | <date> |
 
 ## Success Metrics
 - <measurable outcome 1>
 - <measurable outcome 2>
+
+## Open Questions
+- <anything unresolved — must be empty before PRD is APPROVED>
 ```
 
 Save the PRD to `docs/specs/{feature-name}-prd.md`.
