@@ -1,15 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-13 00:44 UTC (auto-generated)
+> Last updated: 2026-03-13 01:18 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 97 |
-| Core (universal) | 97 |
+| Total Patterns | 98 |
+| Core (universal) | 98 |
 | Stack-specific | 0 |
 | Agents | 13 |
 | Rules | 10 |
-| Skills | 74 |
+| Skills | 75 |
 
 ## Pattern Inventory
 
@@ -85,6 +85,7 @@
 | redis-patterns | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | remotion-video | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | request-code-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| scan-discovery-report | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | scan-repo | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | scan-url | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | security-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |

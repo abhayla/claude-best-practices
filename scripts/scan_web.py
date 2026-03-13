@@ -98,41 +98,102 @@ def extract_patterns_from_content(content: str, source_url: str) -> list[dict]:
     return patterns
 
 
+def build_search_urls(topic: str) -> list[str]:
+    """Build search URLs from a topic string or topic name from config.
+
+    Accepts either:
+      - A topic name matching config/topics.yml (e.g., "jetpack-compose-testing")
+      - A free-text search query (e.g., "android kotlin claude code skills")
+
+    Returns a list of URLs to scan (GitHub search, raw content pages).
+    """
+    root = Path(__file__).parent.parent
+    urls = []
+
+    # Check if topic matches a configured topic name
+    topics_path = root / "config" / "topics.yml"
+    keywords = []
+    if topics_path.exists():
+        with open(topics_path, encoding="utf-8") as f:
+            config = yaml.safe_load(f) or {}
+        for t in config.get("topics", []):
+            if t.get("name") == topic:
+                keywords = t.get("keywords", [])
+                break
+
+    # If no config match, treat the entire topic string as a keyword
+    if not keywords:
+        keywords = [topic]
+
+    for kw in keywords:
+        # GitHub code search — look for CLAUDE.md, SKILL.md, agents with these keywords
+        query = kw.replace(" ", "+")
+        urls.append(f"https://github.com/search?q={query}+path%3A.claude&type=code")
+        urls.append(f"https://github.com/search?q={query}+SKILL.md&type=code")
+        # GitHub repo search
+        urls.append(f"https://github.com/search?q={query}&type=repositories")
+
+    return urls
+
+
+def scan_url(url: str) -> list[dict]:
+    """Scan a single URL and return discovered patterns."""
+    print(f"Scanning URL: {url}")
+    content = fetch_url(url)
+    if content:
+        patterns = extract_patterns_from_content(content, url)
+        print(f"  Found {len(patterns)} potential patterns")
+        for p in patterns:
+            print(f"    - {p['name']} ({p['type']}) from {p['source_url']}")
+        return patterns
+    else:
+        print("  Failed to fetch URL")
+        return []
+
+
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Scan internet for best practices")
     parser.add_argument("--url", help="Specific URL to scan")
-    parser.add_argument("--topic", help="Topic to search")
+    parser.add_argument("--topic", help="Topic name (from config/topics.yml) or free-text search query")
     parser.add_argument("--all", action="store_true", help="Scan all from config")
     args = parser.parse_args()
 
     root = Path(__file__).parent.parent
+    all_patterns = []
 
     if args.url:
-        print(f"Scanning URL: {args.url}")
-        content = fetch_url(args.url)
-        if content:
-            patterns = extract_patterns_from_content(content, args.url)
-            print(f"Found {len(patterns)} potential patterns")
-            for p in patterns:
-                print(f"  - {p['name']} ({p['type']}) from {p['source_url']}")
-        else:
-            print("Failed to fetch URL")
+        all_patterns = scan_url(args.url)
+    elif args.topic:
+        search_urls = build_search_urls(args.topic)
+        print(f"Topic: {args.topic}")
+        print(f"Generated {len(search_urls)} search URLs")
+        for url in search_urls:
+            all_patterns.extend(scan_url(url))
+        print(f"\nTotal patterns found for topic '{args.topic}': {len(all_patterns)}")
     elif args.all:
         urls_path = root / "config" / "urls.yml"
         if urls_path.exists():
-            with open(urls_path) as f:
+            with open(urls_path, encoding="utf-8") as f:
                 config = yaml.safe_load(f)
             sources = config.get("urls", [])
             active = [s for s in sources if not is_source_expired(s)]
             active = filter_by_trust_level(active)
             print(f"Scanning {len(active)} active sources...")
             for source in active:
-                print(f"  Fetching {source['url']}...")
-                content = fetch_url(source["url"])
-                if content:
-                    patterns = extract_patterns_from_content(content, source["url"])
-                    print(f"    Found {len(patterns)} patterns")
+                all_patterns.extend(scan_url(source["url"]))
+        # Also scan all configured topics
+        topics_path = root / "config" / "topics.yml"
+        if topics_path.exists():
+            with open(topics_path, encoding="utf-8") as f:
+                config = yaml.safe_load(f) or {}
+            for t in config.get("topics", []):
+                topic_name = t.get("name", "")
+                print(f"\nScanning topic: {topic_name}")
+                search_urls = build_search_urls(topic_name)
+                for url in search_urls:
+                    all_patterns.extend(scan_url(url))
+        print(f"\nTotal patterns found: {len(all_patterns)}")
     else:
         print("Usage: scan_web.py --url URL | --topic TOPIC | --all")

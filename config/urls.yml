@@ -12,3 +12,28 @@ urls:
     last_verified: "2026-03-09"
     expires_after: 60d
     trust_level: high
+  # Android/Kotlin Claude Code pattern sources
+  - url: https://raw.githubusercontent.com/anthropics/claude-code-example-configs/main/android/CLAUDE.md
+    last_verified: "2026-03-13"
+    expires_after: 60d
+    trust_level: high
+  - url: https://github.com/nickcounts/claude-code-android-example
+    last_verified: "2026-03-13"
+    expires_after: 60d
+    trust_level: medium
+  - url: https://github.com/nickcounts/awesome-claude-code
+    last_verified: "2026-03-13"
+    expires_after: 60d
+    trust_level: medium
+  - url: https://raw.githubusercontent.com/anthropics/claude-code-example-configs/main/kotlin/CLAUDE.md
+    last_verified: "2026-03-13"
+    expires_after: 60d
+    trust_level: high
+  - url: https://developer.android.com/develop/ui/compose/testing
+    last_verified: "2026-03-13"
+    expires_after: 90d
+    trust_level: high
+  - url: https://developer.android.com/studio/test/advanced-test-setup
+    last_verified: "2026-03-13"
+    expires_after: 90d
+    trust_level: high
