@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-13",
-    "total_patterns": 99
+    "total_patterns": 100
   },
   "android-compose": {
     "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
@@ -1422,5 +1422,25 @@
       "kmp"
     ],
     "changelog": "v1.0.0: Initial \u2014 adapted from everything-claude-code kotlin-reviewer"
+  },
+  "android-kotlin": {
+    "hash": "a248798ea4e4bf0532595fca1992cc31b72507adb7fd2206c791b48b1f708654",
+    "type": "rule",
+    "category": "android-compose",
+    "version": "1.0.0",
+    "source": "scan:affaan-m/everything-claude-code",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Kotlin idioms, null safety, scope functions, DSL patterns, KMP testing conventions",
+    "tags": [
+      "android",
+      "kotlin",
+      "kmp",
+      "coding-style",
+      "testing"
+    ],
+    "changelog": "v1.0.0: Initial \u2014 consolidated from 4 kotlin rule files in everything-claude-code"
   }
 }

@@ -16,7 +16,7 @@ _Jetpack Compose UI, Hilt DI, Room DB, Gradle._
 
 **Skills:** android-adb-test, android-arch, android-gradle, android-run-e2e, android-run-tests
 **Agents:** android-compose, android-kotlin-reviewer
-**Rules:** android-compose-ui
+**Rules:** android-compose-ui, android-kotlin
 
 ## FastAPI + Python
 _Async backend patterns: SQLAlchemy, Pydantic, pytest, Alembic._
