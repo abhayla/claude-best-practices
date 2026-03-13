@@ -65,6 +65,34 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
 
 **Rule:** Push state as high as needed, but no higher. If only one child needs state, keep it there.
 
+### Event Sink Pattern
+
+For complex screens, use a sealed interface for events instead of multiple callback lambdas:
+
+```kotlin
+sealed interface ProfileEvent {
+    data class UpdateName(val name: String) : ProfileEvent
+    data class UpdateEmail(val email: String) : ProfileEvent
+    data object Save : ProfileEvent
+    data object Delete : ProfileEvent
+}
+
+// In ViewModel
+fun onEvent(event: ProfileEvent) {
+    when (event) {
+        is ProfileEvent.UpdateName -> _state.update { it.copy(name = event.name) }
+        is ProfileEvent.UpdateEmail -> _state.update { it.copy(email = event.email) }
+        is ProfileEvent.Save -> save()
+        is ProfileEvent.Delete -> delete()
+    }
+}
+
+// In Composable — single lambda instead of many
+ProfileContent(state = state, onEvent = viewModel::onEvent)
+```
+
+Use this when a screen has 4+ distinct user actions. For simple screens with 1-2 callbacks, individual lambdas are clearer.
+
 ---
 
 ## STEP 2: Modifiers
@@ -121,6 +149,30 @@ fun Modifier.cardStyle() = this
     .padding(horizontal = 16.dp, vertical = 8.dp)
     .clip(RoundedCornerShape(12.dp))
 ```
+
+### Slot-Based APIs
+
+Design reusable composables with slot parameters for maximum flexibility:
+
+```kotlin
+@Composable
+fun AppCard(
+    modifier: Modifier = Modifier,
+    header: @Composable () -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit,
+    actions: @Composable RowScope.() -> Unit = {}
+) {
+    Card(modifier = modifier) {
+        Column {
+            header()
+            Column(content = content)
+            Row(horizontalArrangement = Arrangement.End, content = actions)
+        }
+    }
+}
+```
+
+Slot parameters let callers inject arbitrary composables without the component needing to know their structure.
 
 ---
 
@@ -446,6 +498,26 @@ NavHost(navController = navController, startDestination = Home) {
 @Serializable object Register
 ```
 
+### Dialog Navigation
+
+Use `dialog()` for declarative dialog routing instead of imperative show/hide:
+
+```kotlin
+@Serializable data class ConfirmDelete(val itemId: String)
+
+NavHost(navController, startDestination = Home) {
+    composable<Home> { /* ... */ }
+    dialog<ConfirmDelete> { backStackEntry ->
+        val route = backStackEntry.toRoute<ConfirmDelete>()
+        ConfirmDeleteDialog(
+            itemId = route.itemId,
+            onConfirm = { navController.popBackStack() },
+            onDismiss = { navController.popBackStack() }
+        )
+    }
+}
+```
+
 ### Adaptive NavigationSuiteScaffold
 
 Use `NavigationSuiteScaffold` for responsive navigation (bottom bar on phones, rail on tablets):
@@ -547,6 +619,33 @@ class MyApplication : Application(), ImageLoaderFactory {
 - Always enable `crossfade(true)` for smoother transitions.
 - Always provide a meaningful `contentDescription` (or `null` for decorative images).
 - Avoid `SubcomposeAsyncImage` inside `LazyColumn`/`LazyRow` -- subcomposition is slower.
+
+---
+
+## KMP Platform-Specific Composables
+
+When using Compose Multiplatform, use `expect/actual` for platform-specific UI:
+
+```kotlin
+// commonMain
+@Composable
+expect fun PlatformStatusBar(darkIcons: Boolean)
+
+// androidMain
+@Composable
+actual fun PlatformStatusBar(darkIcons: Boolean) {
+    val systemUiController = rememberSystemUiController()
+    SideEffect { systemUiController.setStatusBarColor(Color.Transparent, darkIcons) }
+}
+
+// iosMain
+@Composable
+actual fun PlatformStatusBar(darkIcons: Boolean) {
+    // iOS handles via UIKit interop or Info.plist
+}
+```
+
+Keep shared composables in `commonMain`, platform-specific implementations in `androidMain`/`iosMain`/`desktopMain`.
 
 ---
 
