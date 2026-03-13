@@ -651,3 +651,123 @@ This architecture ensures:
 - **Navigation is coordinated centrally** (app module)
 - **Data flows through defined layers** (UI → Domain → Data)
 - **Each concern has clear boundaries** (navigation vs. business logic vs. UI rendering)
+
+---
+
+## KMP (Kotlin Multiplatform) Extensions
+
+These patterns extend the Android-first architecture above for Kotlin Multiplatform projects sharing code across Android, iOS, Desktop, and Web.
+
+### SQLDelight (KMP Database)
+
+Replace Room with SQLDelight for multiplatform local storage:
+
+```sql
+-- Item.sq
+CREATE TABLE ItemEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    tags TEXT NOT NULL,
+    status TEXT NOT NULL,
+    category TEXT NOT NULL
+);
+
+getByCategory:
+SELECT * FROM ItemEntity WHERE category = ?;
+
+upsert:
+INSERT OR REPLACE INTO ItemEntity (id, title, description, tags, status, category)
+VALUES (?, ?, ?, ?, ?, ?);
+
+observeAll:
+SELECT * FROM ItemEntity;
+```
+
+### Ktor HttpClient (KMP Networking)
+
+Replace Retrofit with Ktor for multiplatform networking:
+
+```kotlin
+class ItemRemoteDataSource(private val client: HttpClient) {
+    suspend fun fetchItems(category: String): List<ItemDto> {
+        return client.get("api/items") {
+            parameter("category", category)
+        }.body()
+    }
+}
+
+val httpClient = HttpClient {
+    install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+    install(Logging) { level = LogLevel.HEADERS }
+    defaultRequest { url("https://api.example.com/") }
+}
+```
+
+### Koin DI (KMP-friendly)
+
+Replace Hilt with Koin for multiplatform dependency injection:
+
+```kotlin
+val domainModule = module {
+    factory { GetItemsByCategoryUseCase(get()) }
+    factory { ObserveUserProgressUseCase(get()) }
+}
+
+val dataModule = module {
+    single<ItemRepository> { ItemRepositoryImpl(get(), get()) }
+    single { ItemLocalDataSource(get()) }
+    single { ItemRemoteDataSource(get()) }
+}
+
+val presentationModule = module {
+    viewModelOf(::ItemListViewModel)
+}
+```
+
+### Custom Sealed Error Types
+
+Use a sealed error hierarchy instead of raw exceptions for typed error propagation:
+
+```kotlin
+sealed interface AppError {
+    data class Network(val message: String) : AppError
+    data class Database(val message: String) : AppError
+    data object Unauthorized : AppError
+}
+
+sealed interface Try<out T> {
+    data class Success<T>(val value: T) : Try<T>
+    data class Failure(val error: AppError) : Try<Nothing>
+}
+
+// In ViewModel
+viewModelScope.launch {
+    when (val result = getItems(category)) {
+        is Try.Success -> _state.update { it.copy(items = result.value) }
+        is Try.Failure -> _state.update { it.copy(error = result.error.toMessage()) }
+    }
+}
+```
+
+### KMP Convention Plugin
+
+Reduce build file duplication across KMP modules:
+
+```kotlin
+// build-logic/src/main/kotlin/kmp-library.gradle.kts
+plugins {
+    id("org.jetbrains.kotlin.multiplatform")
+}
+
+kotlin {
+    androidTarget()
+    iosX64(); iosArm64(); iosSimulatorArm64()
+    sourceSets {
+        commonMain.dependencies { /* shared deps */ }
+        commonTest.dependencies { implementation(kotlin("test")) }
+    }
+}
+```
+
+Apply in modules: `plugins { id("kmp-library") }`
