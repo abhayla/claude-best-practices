@@ -4,9 +4,9 @@ description: >
   Android Clean Architecture with Hilt DI, ViewModel + StateFlow, offline-first data layer
   (Room + Retrofit), Kotlin coroutines/concurrency, accessibility, and ADB debugging.
   Use for building, refactoring, or debugging modern Android apps following Google's
-  Guide to App Architecture.
+  Guide to App Architecture. Includes 24 deep-dive references and Gradle convention plugin templates.
 allowed-tools: "Bash Read Write Edit Grep Glob"
-triggers: "android architecture, clean architecture, viewmodel, stateflow, room, retrofit, repository pattern, kotlin coroutines, offline-first, hilt, android debug"
+triggers: "android architecture, clean architecture, viewmodel, stateflow, room, retrofit, repository pattern, kotlin coroutines, offline-first, hilt, android debug, compose patterns, navigation, gradle convention, android security, android performance, android testing"
 argument-hint: "<feature-name or 'setup' or 'debug' or 'offline-sync'>"
 ---
 
@@ -15,6 +15,75 @@ argument-hint: "<feature-name or 'setup' or 'debug' or 'offline-sync'>"
 Build modern Android applications with Clean Architecture, Hilt DI, offline-first data, and structured concurrency.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Deep-Dive References
+
+For detailed guidance on specific topics, read the relevant reference file:
+
+| Task | Reference File |
+|------|----------------|
+| Project structure & modules | [modularization.md](references/modularization.md) |
+| Architecture layers (UI, Domain, Data) | [architecture.md](references/architecture.md) |
+| Jetpack Compose patterns, animations, effects | [compose-patterns.md](references/compose-patterns.md) |
+| Navigation3 & type-safe routes | [android-navigation.md](references/android-navigation.md) |
+| Testing (unit, integration, screenshot) | [testing.md](references/testing.md) |
+| Security (encryption, biometrics, pinning) | [android-security.md](references/android-security.md) |
+| Performance & recomposition optimization | [android-performance.md](references/android-performance.md) |
+| Material 3 theming & dynamic colors | [android-theming.md](references/android-theming.md) |
+| Accessibility & TalkBack | [android-accessibility.md](references/android-accessibility.md) |
+| Kotlin idioms & best practices | [kotlin-patterns.md](references/kotlin-patterns.md) |
+| Coroutines & Flow deep-dive | [coroutines-patterns.md](references/coroutines-patterns.md) |
+| Gradle & build configuration | [gradle-setup.md](references/gradle-setup.md) |
+| Dependency management | [dependencies.md](references/dependencies.md) |
+| Code quality (Detekt) | [code-quality.md](references/code-quality.md) |
+| Code coverage (JaCoCo) | [android-code-coverage.md](references/android-code-coverage.md) |
+| Crash reporting (Crashlytics) | [crashlytics.md](references/crashlytics.md) |
+| Internationalization & localization | [android-i18n.md](references/android-i18n.md) |
+| Notifications & foreground services | [android-notifications.md](references/android-notifications.md) |
+| Runtime permissions | [android-permissions.md](references/android-permissions.md) |
+| Data sync & offline patterns | [android-data-sync.md](references/android-data-sync.md) |
+| Icons, graphics, custom drawing | [android-graphics.md](references/android-graphics.md) |
+| StrictMode guardrails | [android-strictmode.md](references/android-strictmode.md) |
+| Kotlin delegation patterns | [kotlin-delegation.md](references/kotlin-delegation.md) |
+| Design patterns in Kotlin | [design-patterns.md](references/design-patterns.md) |
+
+### Gradle Convention Plugin Templates
+
+Ready-to-use convention plugins in `templates/convention/`. See [QUICK_REFERENCE.md](templates/convention/QUICK_REFERENCE.md) for setup.
+
+### Project Scaffolding Templates
+
+- `templates/libs.versions.toml.template` — Version catalog
+- `templates/settings.gradle.kts.template` — Settings with module includes
+- `templates/proguard-rules.pro.template` — R8/ProGuard rules
+- `templates/detekt.yml.template` — Detekt configuration
+
+## Workflow Decision Tree
+
+**Creating a new project?**
+→ Start with `templates/settings.gradle.kts.template` and `templates/libs.versions.toml.template`
+→ Copy convention plugins from `templates/convention/` to `build-logic/convention/`
+→ Read [modularization.md](references/modularization.md) for structure
+
+**Adding a new feature/module?**
+→ Follow patterns in [architecture.md](references/architecture.md)
+→ Create Screen + ViewModel + UiState in the feature module
+
+**Building UI screens?**
+→ Read [compose-patterns.md](references/compose-patterns.md)
+→ Use [android-theming.md](references/android-theming.md) for Material 3
+
+**Setting up navigation?**
+→ Read [android-navigation.md](references/android-navigation.md) for Navigation3
+
+**Configuring Gradle?**
+→ Use [gradle-setup.md](references/gradle-setup.md) and convention plugin templates
+
+**Debugging or testing?**
+→ See [testing.md](references/testing.md) for test strategy
+→ See ADB Debugging section below for device testing
 
 ---
 

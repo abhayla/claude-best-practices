@@ -757,18 +757,27 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
   "android-arch": {
-    "hash": "f5d20fbc971a8faf71f9808f2745ddb0306c717e854b910c3133ff600fbac8fe",
+    "hash": "1819b0f7fe22d07d8e3d2ea78c7f98c67158d0cad66bf0f808d9aca5d5305467",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-13",
     "dependencies": [],
     "visibility": "public",
-    "description": "Android Clean Architecture, MVVM, offline-first, Compose navigation",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "description": "Android architecture with 24 deep-dive references and Gradle convention plugin templates",
+    "tags": [
+      "android",
+      "kotlin",
+      "compose",
+      "architecture",
+      "navigation",
+      "security",
+      "testing",
+      "gradle"
+    ],
+    "changelog": "v2.0.0: Merged with claude-android-ninja references and templates"
   },
   "android-gradle": {
     "hash": "d838b576a813474079eb8965f9ba19c3c24a66d15087f1cc4a33b03c5596c542",
