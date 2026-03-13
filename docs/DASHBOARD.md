@@ -1,13 +1,13 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-13 02:23 UTC (auto-generated)
+> Last updated: 2026-03-13 03:00 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 98 |
+| Total Patterns | 99 |
 | Core (universal) | 98 |
-| Stack-specific | 0 |
-| Agents | 13 |
+| Stack-specific | 1 |
+| Agents | 14 |
 | Rules | 10 |
 | Skills | 75 |
 

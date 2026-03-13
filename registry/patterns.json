@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-13",
-    "total_patterns": 98
+    "total_patterns": 99
   },
   "android-compose": {
     "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
@@ -1401,5 +1401,26 @@
       "twitter"
     ],
     "changelog": "v1.0.0: Initial creation"
+  },
+  "android-kotlin-reviewer": {
+    "hash": "6f54c0a1c173f0f12aa66fc4b0500d87cbb229fb92a5548dc5d06740d898c041",
+    "type": "agent",
+    "category": "android-compose",
+    "version": "1.0.0",
+    "source": "scan:affaan-m/everything-claude-code",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Kotlin/Android/KMP code reviewer with 24+ domain-specific checks",
+    "tags": [
+      "android",
+      "kotlin",
+      "code-review",
+      "compose",
+      "coroutines",
+      "kmp"
+    ],
+    "changelog": "v1.0.0: Initial \u2014 adapted from everything-claude-code kotlin-reviewer"
   }
 }
