@@ -1,0 +1,45 @@
+name: Recommend Resources
+on:
+  schedule:
+    - cron: '0 9 * * 3'  # Wednesday 9am UTC
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: 'Specific repo to recommend for (owner/repo)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  recommend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r scripts/requirements.txt
+      - name: Run recommendations
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ inputs.repo }}" ]; then
+            echo "Running recommendations for ${{ inputs.repo }}"
+            PYTHONPATH=. python scripts/recommend.py --repo "${{ inputs.repo }}" --apply --use-config
+          else
+            echo "Running recommendations for all auto_sync repos"
+            # Parse repos.yml and run for each repo with auto_sync: true
+            python -c "
+          import yaml
+          with open('config/repos.yml') as f:
+              data = yaml.safe_load(f)
+          for entry in data.get('repos', []):
+              if entry.get('auto_sync', False):
+                  print(entry['repo'])
+          " | while read -r repo; do
+              echo "=== Recommending for $repo ==="
+              PYTHONPATH=. python scripts/recommend.py --repo "$repo" --apply --use-config || echo "Failed for $repo, continuing..."
+            done
+          fi
