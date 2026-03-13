@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-13",
-    "total_patterns": 100
+    "total_patterns": 102
   },
   "android-compose": {
     "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
@@ -1442,5 +1442,48 @@
       "testing"
     ],
     "changelog": "v1.0.0: Initial \u2014 consolidated from 4 kotlin rule files in everything-claude-code"
+  },
+  "android-mvi-scaffold": {
+    "hash": "8e4e7b4fe979d67fdf3af6cea3b179476d12e12c31e2db68e1e3ad25fda82885",
+    "type": "skill",
+    "category": "android-compose",
+    "version": "1.0.0",
+    "source": "scan:ChrisWW/claude-code-android-skills+TaeseongYun/everything-claude-code-android",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "MVI feature scaffolder \u2014 generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
+    "tags": [
+      "android",
+      "kotlin",
+      "mvi",
+      "scaffold",
+      "compose",
+      "architecture"
+    ],
+    "changelog": "v1.0.0: Initial \u2014 consolidated from ChrisWW + TaeseongYun repos"
+  },
+  "android-build-fixer": {
+    "hash": "608284a1954fff8c6dcb3c30ee02b3d7e76a0a0bf8cb242d6ddb519a4e29a0a8",
+    "type": "agent",
+    "category": "android-compose",
+    "version": "1.0.0",
+    "source": "scan:TaeseongYun/everything-claude-code-android",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Android Gradle build failure diagnostics \u2014 10 common issue categories with solutions",
+    "tags": [
+      "android",
+      "gradle",
+      "build",
+      "debugging",
+      "ksp",
+      "hilt",
+      "room"
+    ],
+    "changelog": "v1.0.0: Initial \u2014 adapted from TaeseongYun build-fixer agent"
   }
 }
