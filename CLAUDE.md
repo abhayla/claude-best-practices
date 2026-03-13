@@ -38,6 +38,21 @@ PYTHONPATH=. python scripts/collate.py --all
 
 # Scan internet sources
 PYTHONPATH=. python scripts/scan_web.py --all
+
+# Recommend resources for a project (report only)
+PYTHONPATH=. python scripts/recommend.py --repo owner/name
+PYTHONPATH=. python scripts/recommend.py --local /path/to/project
+
+# Recommend and apply resources (copy files or create PR)
+PYTHONPATH=. python scripts/recommend.py --repo owner/name --apply
+PYTHONPATH=. python scripts/recommend.py --local /path/to/project --apply
+
+# Use stacks from repos.yml config instead of auto-detection
+PYTHONPATH=. python scripts/recommend.py --repo owner/name --use-config
+
+# Compare content of overlapping resources (detect divergence)
+PYTHONPATH=. python scripts/recommend.py --repo owner/name --diff
+PYTHONPATH=. python scripts/recommend.py --local /path/to/project --diff
 ```
 
 ## Architecture
@@ -45,8 +60,8 @@ PYTHONPATH=. python scripts/scan_web.py --all
 ### Pattern Organization
 
 - **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
-  - `agents/` — 13 agent definitions (10 universal + 3 stack-specific)
-  - `skills/` — 73 skill directories, each with a `SKILL.md`
+  - `agents/` — 14 agent definitions (11 universal + 3 stack-specific)
+  - `skills/` — 74 skill directories, each with a `SKILL.md`
   - `rules/` — 13 rule files (5 universal + 4 stack-specific + 4 placeholders)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns
@@ -77,13 +92,14 @@ Stack-specific patterns use filename prefixes instead of separate directories:
 
 The bootstrap script filters by these prefixes when copying patterns to a target project.
 
-### Sync Flows (5 total, defined in `docs/SYNC-ARCHITECTURE.md`)
+### Sync Flows (6 total, defined in `docs/SYNC-ARCHITECTURE.md`)
 
 1. **Project → Hub**: `scripts/collate.py` extracts patterns from registered repos, deduplicates, creates PRs.
 2. **Internet → Hub**: `scripts/scan_web.py` discovers patterns from URLs/topics with 3-level dedup.
 3. **Hub → Local**: `/update-practices` skill compares local `.claude/` against registry, copies updates.
 4. **Hub → Registered Projects**: `scripts/sync_to_projects.py` creates per-project PRs on hub changes.
 5. **Local → Hub**: `/contribute-practice` skill validates and submits local patterns as hub PRs.
+6. **Hub → Project (Advisory)**: `scripts/recommend.py` auto-detects stacks, compares project `.claude/` against hub, outputs tiered gap report, optionally applies via PR or local copy.
 
 ### Scripts (`scripts/`)
 
@@ -94,6 +110,7 @@ All Python. Key modules:
 - `generate_docs.py` — Renders `docs/DASHBOARD.md`, `docs/STACK-CATALOG.md`, and `docs/dashboard.html` from registry data.
 - `sync_to_local.py` / `sync_to_projects.py` — Sync implementations for flows 3 and 4.
 - `check_freshness.py` — Flags patterns that haven't been updated within configured staleness thresholds.
+- `recommend.py` — Auto-detects a project's tech stacks, diffs its `.claude/` against the hub, and produces a tiered recommendation (must-have / nice-to-have / skip). Supports `--apply` to copy files locally or create a PR.
 
 ### GitHub Actions (`.github/workflows/`)
 
