@@ -50,6 +50,65 @@ For each screen:
 - ExposedDropdownMenu popups cannot be interacted with via ADB
 - Use backend API to set values that can't be set through UI
 
+## Emulator Setup & Profiling
+
+### Create and Manage Emulators
+
+```bash
+# List available system images
+sdkmanager --list | grep "system-images"
+
+# Create AVD
+avdmanager create avd -n test_device -k "system-images;android-34;google_apis;x86_64" -d pixel_6
+
+# Start with cold boot (no snapshot)
+emulator -avd test_device -no-snapshot-load
+
+# Start with snapshot (fast boot)
+emulator -avd test_device
+
+# Save snapshot
+adb emu avd snapshot save clean_state
+
+# Load snapshot
+adb emu avd snapshot load clean_state
+```
+
+### Logcat Filtering
+
+```bash
+# Filter by app package
+adb logcat --pid=$(adb shell pidof com.app.package)
+
+# Filter by tag and priority
+adb logcat -s MyTag:D ActivityManager:I
+
+# Clear and capture fresh logs
+adb logcat -c && adb logcat -v time > logcat.txt
+```
+
+### Performance Profiling
+
+```bash
+# Record Perfetto trace (10 seconds)
+adb shell perfetto -o /data/misc/perfetto-traces/trace.pb -t 10s sched freq idle am wm gfx view
+
+# Pull trace for analysis
+adb pull /data/misc/perfetto-traces/trace.pb ./trace.pb
+
+# Open in ui.perfetto.dev or Android Studio Profiler
+```
+
+### App Startup Timing
+
+```bash
+# Cold start timing
+adb shell am force-stop com.app.package
+adb shell am start-activity -W -S com.app.package/.MainActivity
+
+# Output includes: TotalTime (ms) — the metric that matters
+```
+
 ## Report
 
 ```
