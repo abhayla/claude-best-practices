@@ -7,6 +7,18 @@ Use coroutines in a testable, lifecycle-aware way. Highlights from Android guida
 
 **Data Synchronization:** For retry mechanisms with exponential backoff and background sync patterns, see `references/android-data-sync.md`.
 
+### Scope Hierarchy
+
+```
+Application
+  └── viewModelScope (ViewModel lifecycle)
+        └── coroutineScope { } (structured child)
+              ├── async { } (concurrent task A)
+              └── async { } (concurrent task B)
+```
+
+All coroutines should be scoped to a lifecycle owner. Use `viewModelScope` in ViewModels, `lifecycleScope` in Activities/Fragments, and `LaunchedEffect`/`rememberCoroutineScope` in Compose. Never use `GlobalScope`.
+
 ### Inject Dispatchers (Avoid Hardcoding)
 
 Inject `CoroutineDispatcher` (or a small wrapper) so production and test behavior are consistent.
@@ -27,6 +39,8 @@ class AuthRepository @Inject constructor(
         }
 }
 ```
+
+**KMP Note:** In Kotlin Multiplatform projects, `Dispatchers.Default` and `Dispatchers.Main` are available on all platforms. `Dispatchers.IO` is JVM/Android-only — on other platforms, use `Dispatchers.Default` or provide a platform-specific dispatcher via DI.
 
 ### Use `limitedParallelism` for Custom Dispatcher Pools
 
@@ -678,6 +692,24 @@ fastProducer()
         heavyProcessing(item)
     }
 ```
+
+### `retryWhen` with Exponential Backoff
+
+Use `retryWhen` for transient failures (network, server errors) with capped exponential backoff:
+
+```kotlin
+fun fetchWithRetry(): Flow<Data> = flow { emit(api.fetch()) }
+    .retryWhen { cause, attempt ->
+        if (cause is IOException && attempt < 3) {
+            delay(1000L * (1 shl attempt.toInt()))  // 1s, 2s, 4s
+            true
+        } else {
+            false
+        }
+    }
+```
+
+For more complex retry and background sync patterns, see `references/android-data-sync.md`.
 
 ### Prefer `suspend` for One-Off Values
 
