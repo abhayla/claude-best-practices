@@ -65,7 +65,7 @@ PYTHONPATH=. python scripts/recommend.py --local /path/to/project --diff
 
 - **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
   - `agents/` — 16 agent definitions (11 universal + 5 stack-specific)
-  - `skills/` — 98 skill directories, each with a `SKILL.md`
+  - `skills/` — 99 skill directories, each with a `SKILL.md`
   - `rules/` — 14 rule files (6 universal + 4 stack-specific + 4 placeholders)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns

@@ -27,7 +27,7 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 | `android-compose` | Jetpack Compose UI — screens, state, design system |
 | `android-kotlin-reviewer` | Kotlin code review with Android best practices |
 
-## Skills (98)
+## Skills (99)
 
 ### Pipeline & Orchestration
 | Skill | Description |
@@ -159,6 +159,7 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 | `/android-adb-test` | E2E testing via ADB (uiautomator, screencap, input) |
 | `/android-run-tests` | Android test runner with class name resolution |
 | `/android-run-e2e` | E2E tests by feature group with auto-fix |
+| `/android-test-patterns` | Test writing: JUnit 5, Compose UI, Espresso, Room, coroutines |
 
 ### Mobile (Cross-Platform)
 | Skill | Description |

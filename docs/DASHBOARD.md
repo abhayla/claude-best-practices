@@ -1,15 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-13 14:54 UTC (auto-generated)
+> Last updated: 2026-03-13 15:05 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 124 |
-| Core (universal) | 120 |
+| Total Patterns | 125 |
+| Core (universal) | 121 |
 | Stack-specific | 4 |
 | Agents | 15 |
 | Rules | 11 |
-| Skills | 98 |
+| Skills | 99 |
 
 ## Pattern Inventory
 
@@ -29,6 +29,7 @@
 | android-gradle | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | android-run-e2e | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-run-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android-test-patterns | skill | 1.0.0 | hub:pipeline-audit | android-run-tests, android-run-e2e |
 | api-docs-generator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-verify | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |

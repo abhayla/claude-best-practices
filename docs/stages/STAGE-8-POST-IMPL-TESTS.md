@@ -98,7 +98,7 @@
 |-------|-------------|-------|
 | Web (any) | ✅ Playwright + Lighthouse + k6 | Full E2E + perf + quality |
 | API (any) | ✅ k6 + security-audit | Load + SAST |
-| Android | ❌ | No Espresso/Compose test runner, no Android perf profiling |
+| Android | ⚠️ `android-test-patterns` + `android-run-tests` | Test patterns + runner covered; no Android perf profiling |
 | Mobile E2E | ❌ | No Appium/Detox |
 | Desktop | ❌ | No Electron/Tauri testing |
 

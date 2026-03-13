@@ -92,7 +92,7 @@
 | Node/TypeScript | ✅ Jest/Vitest | Mentioned in prompt |
 | E2E (any web) | ✅ Playwright | `playwright` skill |
 | Performance | ✅ k6 | Stubs in prompt |
-| Android | ❌ | No JUnit/Espresso/Compose test patterns |
+| Android | ✅ `android-test-patterns` | JUnit 5, Compose UI, Espresso, Room, coroutine test patterns |
 | Mobile E2E | ❌ | No Appium/Detox patterns |
 
 ## Autonomy Verdict

@@ -102,7 +102,7 @@ Behavioral, context management, and rule-writing guidance are distributed across
 
 ## Claude Code Configuration
 
-The `.claude/` directory contains 98 skills, 16 agents, and 14 rules for Claude Code.
+The `.claude/` directory contains 99 skills, 16 agents, and 14 rules for Claude Code.
 
 ### Key Skills Available
 

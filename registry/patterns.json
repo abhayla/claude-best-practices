@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-13",
-    "total_patterns": 124
+    "total_patterns": 125
   },
   "android-compose": {
     "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
@@ -241,6 +241,20 @@
     "description": "",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "android-test-patterns": {
+    "hash": "ff1c54e05be1da65da47efe51683b35b3063f6927d02611fca5f10705472fd97",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:pipeline-audit",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": ["android-run-tests", "android-run-e2e"],
+    "visibility": "public",
+    "description": "Android test writing patterns: JUnit 5, Compose UI tests, Espresso, Hilt test modules, Room testing, coroutine test utilities, test factories",
+    "tags": ["android", "testing", "junit", "espresso", "compose-test", "turbine", "mockk"],
+    "changelog": "v1.0.0: Initial — JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns"
   },
   "auto-verify": {
     "hash": "af66c188e68cb2b2a4478f388e8b74446ce4968ba6c13e833d7f6f1d43aa532f",

@@ -14,7 +14,7 @@ _Jetpack Compose UI, Hilt DI, Room DB, Gradle._
 
 **Prefix:** `android-*`
 
-**Skills:** android-adb-test, android-arch, android-gradle, android-mvi-scaffold, android-run-e2e, android-run-tests
+**Skills:** android-adb-test, android-arch, android-gradle, android-mvi-scaffold, android-run-e2e, android-run-tests, android-test-patterns
 **Agents:** android-build-fixer, android-compose, android-kotlin-reviewer
 **Rules:** android-compose-ui, android-kotlin
 
