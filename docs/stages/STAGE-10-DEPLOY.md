@@ -13,64 +13,111 @@
 ### Diagram A — Internal Workflow Flow
 
 ```
-                    ┌─────────────────────────┐
-                    │  Verify Review Approval  │
-                    │  (ST9 gate passed)       │
-                    └────────────┬────────────┘
-                                 │
-                                 ▼
-                    ┌─────────────────────────┐
-                    │  Production Readiness    │
-                    │  Review (PRR checklist)  │
-                    └────────────┬────────────┘
-                                 │
-                       ┌─────────┴─────────┐
-                       │                   │
-                   ✅ READY           ❌ NOT READY
-                       │                   │
-                       │                   ▼
-                       │         ┌──────────────────┐
-                       │         │ Flag blockers,    │
-                       │         │ return to ST9     │
-                       │         └──────────────────┘
-                       │
-                       ▼
           ┌────────────────────────────┐
-          │  Build & Package           │
+          │  Step 0: Pre-Flight        │
+          │  ▓ Verify ST9 gate         │
+          │  ▓ Detect deploy target    │
+          │  ▓ Check tools + creds     │
+          └────────────┬───────────────┘
+                       │
+              ┌────────┴────────┐
+              │                 │
+          ✅ READY         ❌ MISSING
+              │                 │
+              │                 ▼
+              │       ┌──────────────────┐
+              │       │ gate: FAILED     │
+              │       │ (list blockers)  │
+              │       └──────────────────┘
+              ▼
+          ┌────────────────────────────┐
+          │  Step 1: PRR Checklist     │
+          │  ▓ deploy-strategy Step 5  │
+          └────────────┬───────────────┘
+                       │
+              ┌────────┴────────┐
+              │                 │
+          ✅ READY         ❌ RED
+              │                 │
+              │                 ▼
+              │       ┌──────────────────┐
+              │       │ gate: FAILED     │
+              │       │ return to ST9    │
+              │       └──────────────────┘
+              ▼
+          ┌────────────────────────────┐
+          │  Step 2: Build & Package   │
           │  ▓ docker-optimize         │
           │  ▓ ci-cd-setup             │
+          │  (skip if serverless/      │
+          │   static/mobile)           │
           └────────────┬───────────────┘
                        │
                        ▼
           ┌────────────────────────────┐
-          │  Deploy Infrastructure     │
+          │  Step 3: Infra + Deploy    │
           │  ▓ iac-deploy (Terraform)  │
           │  ▓ k8s-deploy (manifests)  │
           │  ▓ deploy-strategy         │
           │    (GitOps / canary)       │
+          │  (branch by deploy target) │
           └────────────┬───────────────┘
                        │
                        ▼
           ┌────────────────────────────┐
-          │  Database Migration        │
+          │  Step 4: DB Migration      │
           │  (expand-contract pattern) │
+          │  (skip if no migrations)   │
           └────────────┬───────────────┘
                        │
                        ▼
           ┌────────────────────────────┐
-          │  Deployment Verification   │
+          │  Step 5: Deploy & Verify   │
           │  ▓ Health checks           │
           │  ▓ Smoke tests             │
+          └────────────┬───────────────┘
+                       │
+              ┌────────┴────────┐
+              │                 │
+          ✅ PASS          ❌ FAIL
+              │                 │
+              │                 ▼
+              │       ┌──────────────────┐
+              │       │ Rollback deploy  │
+              │       │ Capture logs     │
+              │       │ gate: FAILED     │
+              │       └──────────────────┘
+              ▼
+          ┌────────────────────────────┐
+          │  Step 6: Monitoring        │
           │  ▓ monitoring-setup        │
-          │    (Prometheus/Grafana)     │
+          │    (golden signals, SLOs)  │
+          │  ▓ Grafana dashboards      │
           └────────────┬───────────────┘
                        │
                        ▼
           ┌────────────────────────────┐
-          │  Output: Deployment URL,   │
-          │  CI/CD pipeline, K8s       │
-          │  manifests, dashboards,    │
-          │  runbooks, SLO defs        │
+          │  Step 7: Runbooks          │
+          │  ▓ incident-response       │
+          │  (links to Step 6          │
+          │   dashboards + alerts)     │
+          └────────────┬───────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Step 8: DR Plan           │
+          │  ▓ disaster-recovery       │
+          │  (links to Steps 6+7)      │
+          └────────────┬───────────────┘
+                       │
+                       ▼
+          ┌────────────────────────────┐
+          │  Step 11: Gate Result      │
+          │  ▓ Verify all artifacts    │
+          │  ▓ Return PASSED/FAILED    │
+          │  Output: URL, pipeline,    │
+          │  dashboards, runbooks,     │
+          │  SLOs, DR runbook          │
           └────────────────────────────┘
 ```
 
