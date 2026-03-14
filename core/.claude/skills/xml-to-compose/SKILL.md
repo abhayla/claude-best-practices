@@ -7,6 +7,8 @@ description: >
 triggers: "xml to compose, migrate xml, convert layout, xml migration, view to compose"
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<xml-file-path or 'plan' or 'audit' or 'interop'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # XML to Compose Migration

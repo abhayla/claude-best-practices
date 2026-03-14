@@ -7,6 +7,8 @@ description: >
   or full visual regression pipelines.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<screenshot-path or directory> [--update-baselines] [--strict] [--threshold=N]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Verify Screenshots — Visual Regression Testing

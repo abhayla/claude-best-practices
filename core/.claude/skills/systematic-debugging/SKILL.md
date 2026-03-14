@@ -13,6 +13,8 @@ triggers:
   - why is this failing
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<bug-description, error message, or failing test command>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Systematic Debugging

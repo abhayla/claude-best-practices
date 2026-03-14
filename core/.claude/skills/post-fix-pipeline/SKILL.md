@@ -6,6 +6,8 @@ description: >
   no regressions before committing.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[fixes_applied] [test_suite_commands] [commit_format]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Post-Fix Pipeline

@@ -13,6 +13,8 @@ triggers:
   - changelog contributing
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--changelog-only | --contributing-only] [--since <tag-or-date>] [--unreleased] [--output-dir <path>]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Changelog & Contributing Generator

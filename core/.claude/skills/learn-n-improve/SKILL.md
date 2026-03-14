@@ -6,6 +6,8 @@ description: >
   (recent work), deep (modify skills), meta (learning effectiveness), test-run (dry run).
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: session|deep|meta|test-run>"
+version: "2.0.0"
+type: workflow
 ---
 
 # Learn & Improve — Session Reflection
@@ -109,10 +111,22 @@ After every 10th entry in `.claude/learnings.json`, scan for systemic patterns:
    - Frequent test failures → suggest testing rule enhancement
    - Frequent API errors → suggest validation middleware
 
-4. **Propose rules** — For patterns that appear 5+ times, suggest a new rule for `.claude/rules/`:
+4. **Propose rules** — For patterns that appear 5+ times, suggest a new rule for `.claude/rules/`. Every proposed rule MUST include:
+   - A `description:` field in frontmatter
+   - A `globs:` field scoping it to relevant file patterns, OR `# Scope: global` if it applies everywhere
+   - Actionable content (not placeholder/TODO stubs)
+
    ```
    Pattern detected: "null-handling" appears in 8 learnings.
-   Suggested rule: "All ORM queries MUST check for None/null before accessing attributes."
+   Suggested rule:
+   ---
+   description: Enforce null-safety checks on ORM query results.
+   globs: ["**/*.py", "**/*.ts"]
+   ---
+   # ORM Null Safety
+   All ORM queries MUST check for None/null before accessing attributes.
+   Use Optional types and guard clauses instead of bare attribute access.
+
    Add to: .claude/rules/ ? (requires user approval)
    ```
 

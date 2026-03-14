@@ -14,6 +14,8 @@ triggers:
   - fault injection
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<target-service> [--type crash|network|latency|disk|oom|dependency] [--env local|k8s] [--duration 60s] [--abort-on-critical]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Chaos Resilience — Failure Injection and Resilience Verification

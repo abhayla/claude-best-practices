@@ -6,6 +6,8 @@ description: >
   transactions, realtime listeners, indexes). Use when building Firebase-backed apps.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<what to set up or implement — e.g. 'add Google auth' or 'create Firestore rules for user posts'>"
+version: "1.0.0"
+type: reference
 ---
 
 # Firebase Core Development

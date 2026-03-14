@@ -10,6 +10,8 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "security audit, vulnerability, codeql, semgrep, sarif, static analysis, security review, insecure defaults"
 argument-hint: "<'full-audit' or 'diff-review' or 'variant <CVE/pattern>' or 'actions-audit'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Security Audit

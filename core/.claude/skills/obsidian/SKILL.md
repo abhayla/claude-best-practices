@@ -13,6 +13,8 @@ triggers:
   - PKM
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<action: create|edit|search|daily|canvas|base|organize|log> <details>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Obsidian — Vault Management & Dev Brain

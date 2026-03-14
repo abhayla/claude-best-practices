@@ -6,6 +6,8 @@ description: >
   queries, mutations, security, vector search, or deploying web apps to Firebase.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<what to build — e.g. 'create movie review schema' or 'deploy Next.js app'>"
+version: "1.0.0"
+type: reference
 ---
 
 # Firebase Data Connect & Hosting

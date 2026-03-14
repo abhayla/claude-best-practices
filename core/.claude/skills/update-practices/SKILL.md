@@ -5,6 +5,8 @@ description: >
   Compares local files against hub registry, shows diffs, and copies updates.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--check-only] [--force]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Update Practices — Pull Latest from Hub

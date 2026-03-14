@@ -13,6 +13,8 @@ triggers:
   - review-ready pr
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<branch-name or description of changes to prepare for review>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Request Code Review

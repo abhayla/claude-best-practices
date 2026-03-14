@@ -16,6 +16,8 @@ triggers:
   - worktree isolation
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<task requiring isolated parallel development or worktree management>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Git Worktrees — Isolated Parallel Development

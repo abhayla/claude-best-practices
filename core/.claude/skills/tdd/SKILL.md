@@ -11,6 +11,8 @@ triggers:
   - red-green-refactor
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<feature-or-behavior-description>"
+version: "1.0.0"
+type: reference
 ---
 
 # Test-Driven Development (Red-Green-Refactor)

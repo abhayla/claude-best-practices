@@ -11,6 +11,8 @@ triggers:
   - mobile e2e
   - e2e test android
 argument-hint: "[feature-group|all] [--maestro|--gradle]"
+version: "1.0.0"
+type: reference
 ---
 
 # Run Android E2E Tests by Feature Group

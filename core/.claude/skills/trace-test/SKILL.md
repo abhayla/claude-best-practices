@@ -12,6 +12,8 @@ triggers:
   - distributed trace
   - observability test
 argument-hint: "<test-file|endpoint|all> [--verify-spans] [--verify-logs]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Trace-Based Testing

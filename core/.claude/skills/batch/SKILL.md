@@ -21,6 +21,8 @@ triggers:
   - replace deprecated
 allowed-tools: "Bash Read Write Edit Grep Glob Agent Skill"
 argument-hint: "<description of codebase-wide change, e.g. 'rename UserService to AccountService' or 'migrate from axios v0.x to v1.x'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Batch — Parallel Codebase-Wide Changes

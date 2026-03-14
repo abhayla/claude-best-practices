@@ -6,6 +6,8 @@ description: >
   Two modes: enhance-and-place a rough rule idea, or audit all config files.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<rough rule text> | audit"
+version: "1.0.0"
+type: reference
 ---
 
 # Claude Guardian — Config Rule Placement & Audit

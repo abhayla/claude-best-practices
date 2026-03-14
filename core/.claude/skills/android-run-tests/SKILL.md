@@ -5,6 +5,8 @@ description: >
   Auto-detects test type from class name pattern. Suggests /fix-loop on failure.
 allowed-tools: "Bash Read Grep Glob Skill"
 argument-hint: "<TestClassName> [--unit|--ui|--e2e] [-x]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Run Android Tests

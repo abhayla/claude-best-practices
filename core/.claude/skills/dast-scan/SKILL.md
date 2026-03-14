@@ -18,6 +18,8 @@ triggers:
   - mutation testing
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<target URL (http://localhost:8000), or 'all endpoints' with base URL>"
+version: "1.0.0"
+type: workflow
 ---
 
 # DAST Scan — Dynamic Application Security Testing

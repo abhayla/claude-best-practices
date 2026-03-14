@@ -13,6 +13,8 @@ triggers:
   - entity relationship
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<PRD file path, data model description, or existing schema to evolve>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Schema Designer — Holistic Database Schema Design

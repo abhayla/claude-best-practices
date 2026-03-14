@@ -7,6 +7,8 @@ description: >
   anti-pattern detection, and language-specific optimizations.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<dockerfile-path-or-optimization-goal>"
+version: "1.0.0"
+type: workflow
 triggers:
   - docker optimize
   - dockerfile

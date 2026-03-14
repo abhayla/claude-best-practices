@@ -14,6 +14,8 @@ triggers:
   - /finalize
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "'create <feature-name>' | 'finish <branch-name or PR-number>'"
+version: "1.0.0"
+type: workflow
 ---
 
 # Branching — Full Branch Lifecycle

@@ -15,6 +15,8 @@ triggers:
   - pre-merge review
 allowed-tools: "Bash Read Write Edit Grep Glob Agent Skill"
 argument-hint: "[--skip <skill1,skill2>] [--fix] [--pr] [--threshold <0-100>]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Review Gate — Stage 9 Orchestrator

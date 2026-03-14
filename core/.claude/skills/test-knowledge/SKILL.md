@@ -6,6 +6,8 @@ description: >
   base of testing facts. Modes: search, add, review, seed, digest, stats.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode> [query or entry]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Test Knowledge — Self-Improving Testing Knowledge Base

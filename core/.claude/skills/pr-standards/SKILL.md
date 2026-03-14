@@ -15,6 +15,8 @@ triggers:
   - pre-review check
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[PR-number] [--fix] [--strict] [--rules-file <path>]"
+version: "1.0.0"
+type: workflow
 ---
 
 # PR Standards Check

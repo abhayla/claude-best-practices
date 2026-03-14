@@ -12,6 +12,8 @@ triggers:
   - accessibility check
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<URL or path/to/file.html> [--scope page|site] [--threshold 90]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Accessibility Audit (WCAG 2.1 AA)

@@ -13,6 +13,8 @@ triggers:
   - prd parser
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<path to PRD file or directory>"
+version: "1.0.0"
+type: workflow
 ---
 
 # PRD Parser — Normalize & Validate Existing PRDs

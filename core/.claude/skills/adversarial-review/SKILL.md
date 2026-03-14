@@ -15,6 +15,8 @@ triggers:
   - challenge this code
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<file-path, plan-path, or PR-diff> [--mode plan|code] [--severity-filter critical|major|minor] [--max-rounds 1-3]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Adversarial Review

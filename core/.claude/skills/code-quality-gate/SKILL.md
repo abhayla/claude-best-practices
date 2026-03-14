@@ -15,6 +15,8 @@ triggers:
   - refactor phase
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<file paths, directory, or 'all changed files'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Code Quality Gate — Post-Implementation Quality Enforcement

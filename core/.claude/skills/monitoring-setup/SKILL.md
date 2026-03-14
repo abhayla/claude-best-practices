@@ -7,6 +7,8 @@ description: >
   Use when adding observability to a new or existing service.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<service-or-component-to-monitor>"
+version: "1.0.0"
+type: workflow
 triggers:
   - /monitoring
   - /observability

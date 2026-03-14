@@ -6,6 +6,8 @@ description: >
   with Gemini-powered features.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: ""
+version: "1.0.0"
+type: reference
 ---
 
 # Gemini API Reference

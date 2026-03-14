@@ -15,6 +15,8 @@ triggers:
   - review response
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<PR-number or PR-url> [--reviewer <name>] [--round <N>]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Receive & Address Code Review

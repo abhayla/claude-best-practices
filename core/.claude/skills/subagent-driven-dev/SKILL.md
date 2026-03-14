@@ -16,6 +16,8 @@ triggers:
   - orchestrate agents
 allowed-tools: "Bash Read Write Edit Grep Glob Agent Skill"
 argument-hint: "<task description or plan with parallelizable subtasks>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Subagent-Driven Development — Parallel Task Orchestration

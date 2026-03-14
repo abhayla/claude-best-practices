@@ -12,6 +12,8 @@ triggers:
   - cdc-test
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<consumer-name> <provider-name> [language: js|python|jvm] [broker-url]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Consumer-Driven Contract Testing with Pact

@@ -9,6 +9,8 @@ description: >
 allowed-tools: "Bash Read Grep Glob"
 triggers: "supply chain, dependency audit, npm audit, pip audit, typosquatting, vulnerable dependency, CVE"
 argument-hint: "<'full-audit' or 'scan <package-name>' or 'license-check' or 'lockfile-verify'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Supply Chain Audit

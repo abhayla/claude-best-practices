@@ -15,6 +15,8 @@ triggers:
   - test matrix
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<PRD file path, plan file path, schema file path, or feature description>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Test Generator — Requirements-Driven Test Suite Generation

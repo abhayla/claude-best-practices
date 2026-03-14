@@ -7,6 +7,8 @@ description: >
 triggers: "jetpack compose, compose ui, compose navigation, compose performance, recomposition, compose theming, material3, coil"
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<composable-name or 'navigation' or 'performance' or 'theme' or 'images'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Compose UI

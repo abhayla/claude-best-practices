@@ -8,6 +8,8 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "android architecture, clean architecture, viewmodel, stateflow, room, retrofit, repository pattern, kotlin coroutines, offline-first, hilt, android debug, compose patterns, navigation, gradle convention, android security, android performance, android testing"
 argument-hint: "<feature-name or 'setup' or 'debug' or 'offline-sync'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Android Architecture

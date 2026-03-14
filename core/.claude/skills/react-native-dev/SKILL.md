@@ -9,6 +9,8 @@ description: >
 triggers: "react native, react-native, expo, metro, react navigation, hermes, flipper, brownfield"
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<feature-description or 'setup' or 'test' or 'optimize' or 'upgrade' or 'brownfield'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # React Native Development

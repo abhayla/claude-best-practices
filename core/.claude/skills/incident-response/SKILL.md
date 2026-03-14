@@ -7,6 +7,8 @@ description: >
   on-call handoff documents.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<incident-description or 'postmortem' or 'runbook <failure-mode>' or 'handoff'>"
+version: "1.0.0"
+type: reference
 triggers:
   - /incident
   - /incident-response

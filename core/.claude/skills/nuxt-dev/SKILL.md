@@ -7,6 +7,8 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "nuxt, nuxt4, nuxt module, nuxthub, nuxt content, nuxt ui, nuxt auth, server routes, SSR"
 argument-hint: "<feature-description or 'setup' or 'api' or 'module' or 'deploy'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Nuxt Development

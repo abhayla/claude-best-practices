@@ -1,5 +1,6 @@
 ---
 description: Meta-guidance for writing effective CLAUDE.md rules, choosing config file placement, and structuring project instructions.
+globs: [".claude/**/*.md", "CLAUDE.md", "CLAUDE.local.md"]
 ---
 
 # Rule Writing Meta-Guide

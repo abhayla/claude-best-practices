@@ -17,6 +17,8 @@ triggers:
   - ERC-721
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<action: audit|develop|test|deploy|upgrade|optimize> <contract or description>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Solidity Audit — Smart Contract Development & Security

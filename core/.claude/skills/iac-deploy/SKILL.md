@@ -12,6 +12,8 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "iac, terraform, pulumi, infrastructure, infrastructure as code, tf plan, tf apply, cloud provisioning"
 argument-hint: "<'plan' or 'write <resource>' or 'review' or 'migrate-state' or 'modularize' or 'drift-check'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Infrastructure as Code — Terraform & Pulumi

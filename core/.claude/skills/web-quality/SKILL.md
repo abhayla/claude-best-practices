@@ -6,6 +6,8 @@ description: >
   findings with fix guidance. Inspired by Addy Osmani's web-quality-skills (Google Chrome team).
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<url-or-file-path> [--focus=vitals|a11y|seo|perf|responsive|all]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Web Quality Audit

@@ -15,6 +15,8 @@ triggers:
   - run pipeline
 allowed-tools: "Bash Read Write Edit Grep Glob Agent Skill"
 argument-hint: "<feature description, PRD file path, or GitHub Issue URL>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Pipeline Orchestrator — DAG-Based Multi-Stage Coordination

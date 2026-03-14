@@ -11,6 +11,8 @@ triggers:
   - rn e2e
   - react native visual
 argument-hint: "<test-file|feature-name|all> [--platform android|ios] [--visual]"
+version: "1.0.0"
+type: workflow
 ---
 
 # React Native E2E Testing

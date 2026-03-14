@@ -13,6 +13,8 @@ triggers:
   - animation
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<action: create|animate|render|caption|3d|chart|batch> <description>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Remotion Video — Programmatic Video with React

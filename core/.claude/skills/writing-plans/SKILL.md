@@ -12,6 +12,8 @@ triggers:
   - detailed plan
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<feature description, spec file path, or brainstorm output>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Writing Plans — Detailed Implementation Planning

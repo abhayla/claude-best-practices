@@ -16,6 +16,8 @@ triggers:
   - app demo
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<PRD/spec file path, screen name, or feature description>"
+version: "1.0.0"
+type: workflow
 ---
 
 # HTML Prototype — Multi-File Working Demo

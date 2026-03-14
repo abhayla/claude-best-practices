@@ -13,6 +13,8 @@ triggers:
   - docs framework
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "[docs-directory-path] [--audit-only] [--skip-templates]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Diataxis Documentation Organization

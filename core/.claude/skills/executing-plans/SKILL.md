@@ -13,6 +13,8 @@ triggers:
   - work through plan
 allowed-tools: "Bash Read Write Edit Grep Glob Skill Agent"
 argument-hint: "<plan-file-path or inline plan>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Executing Plans — Step-by-Step Plan Execution

@@ -6,6 +6,8 @@ description: >
   (no retest) does one pass. Use when tests fail, build breaks, or runtime errors.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Fix Loop — Iterative Fix Cycle

@@ -15,6 +15,8 @@ triggers:
   - nfr thresholds
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<project directory, PRD path, or baseline results path>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Performance Testing — k6 + Lighthouse + Bundle Analysis

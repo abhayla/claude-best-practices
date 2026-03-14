@@ -16,6 +16,8 @@ triggers:
   - help me pick a skill
 allowed-tools: "Bash Read Grep Glob Skill"
 argument-hint: "<request or 'list'|'catalog'|'help'> [--workflow] [--chain]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Skill Master — Dynamic Skill Router & Orchestrator

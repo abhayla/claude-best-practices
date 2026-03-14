@@ -7,6 +7,8 @@ description: >
 triggers: "gradle, build-logic, convention plugin, build performance, gradle optimization, version catalog, libs.versions.toml"
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<task-description or 'setup' or 'optimize' or 'diagnose'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Android Gradle Build System

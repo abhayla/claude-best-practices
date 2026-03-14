@@ -7,6 +7,8 @@ description: >
 allowed-tools: "Bash Read Grep Glob Write Edit"
 triggers: "flutter, dart, widget, riverpod, bloc, gorouter, cross-platform mobile"
 argument-hint: "<feature-description or 'setup' or 'test' or 'optimize'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Flutter Development

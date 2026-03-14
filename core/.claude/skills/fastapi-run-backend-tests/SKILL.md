@@ -5,6 +5,8 @@ description: >
   Resolves short names like "auth" to test_auth.py. Suggests /fix-loop on failure.
 allowed-tools: "Bash Read Grep Glob Skill"
 argument-hint: "[test_path] [--coverage] [--collect-only] [-x] [--file <name>] [--func <name>]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Run Backend Tests (FastAPI + pytest)

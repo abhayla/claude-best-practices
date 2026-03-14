@@ -6,6 +6,8 @@ description: >
   or validating user flows manually.
 allowed-tools: "Bash Read Grep Glob Skill"
 argument-hint: "[screen-name|flow-name|all]"
+version: "1.0.0"
+type: reference
 ---
 
 # ADB Manual E2E Testing

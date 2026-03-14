@@ -7,6 +7,8 @@ description: >
   CI/CD pipelines.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<platform: github-actions|gitlab-ci> [options: stages, caching, secrets, deploy, matrix, notifications]"
+version: "1.0.0"
+type: workflow
 triggers:
   - ci cd setup
   - github actions

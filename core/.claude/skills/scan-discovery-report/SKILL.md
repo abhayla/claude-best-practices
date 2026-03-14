@@ -13,6 +13,8 @@ triggers:
   - what did the scan find
 allowed-tools: "Bash Read Grep Glob Agent WebFetch"
 argument-hint: "<workflow-run-ids or 'latest' or source filter: github|reddit|twitter|all>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Scan Discovery Report

@@ -14,6 +14,8 @@ triggers:
   - android test patterns
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<feature-name|test-type> [--unit|--ui|--e2e|--all]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Android Test Patterns

@@ -26,6 +26,8 @@ triggers:
   - compose reddit
   - reddit engagement
 argument-hint: "<action> [options] — e.g., 'read https://reddit.com/r/...', 'compose post about AI for r/programming', 'analyze thread https://...', 'search r/python for async patterns', 'monitor r/startups for my-product'"
+version: "1.0.0"
+type: reference
 allowed-tools: "Bash Read Write Edit Grep Glob WebFetch WebSearch Agent"
 ---
 

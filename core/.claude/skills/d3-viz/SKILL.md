@@ -15,6 +15,8 @@ triggers:
   - treemap
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<chart-type: bar|line|scatter|pie|heatmap|chord|force|treemap|choropleth> <description>"
+version: "1.0.0"
+type: workflow
 ---
 
 # D3.js — Interactive Data Visualization

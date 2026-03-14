@@ -23,6 +23,8 @@ triggers:
   - twitter monitor
 allowed-tools: "Bash Read Write Edit Grep Glob WebFetch WebSearch Agent"
 argument-hint: "<action> [options] — e.g., 'read https://x.com/user/status/123', 'compose tweet about AI', 'score my tweet', 'search AI agents', 'post Hello world'"
+version: "1.0.0"
+type: reference
 ---
 
 # Twitter/X Comprehensive Skill

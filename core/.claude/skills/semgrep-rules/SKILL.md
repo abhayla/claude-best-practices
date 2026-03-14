@@ -9,6 +9,8 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "semgrep, semgrep rule, custom rule, code pattern, linter rule, security pattern"
 argument-hint: "<'create <pattern-description>' or 'port <rule-id> to <language>' or 'optimize <rule-file>' or 'test <rule-file>'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Semgrep Rule Development

@@ -13,6 +13,8 @@ triggers:
   - api reference
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<project directory, framework name, or existing OpenAPI spec path>"
+version: "1.0.0"
+type: workflow
 ---
 
 # API Docs Generator — OpenAPI from Code

@@ -7,6 +7,8 @@ description: >
   "project health check", or "create a roadmap".
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: diagnose|check-in|reassess> [context]"
+version: "1.0.0"
+type: reference
 ---
 
 # Strategic Architect — Project Diagnostics & Planning

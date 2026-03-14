@@ -18,7 +18,6 @@ STACK_PREFIXES = {
     "ai-gemini": "ai-gemini-",
     "firebase-auth": "firebase-",
     "react-nextjs": "react-",
-    "superpowers": "superpowers-",
 }
 
 

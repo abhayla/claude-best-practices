@@ -16,5 +16,7 @@ jobs:
         run: PYTHONPATH=. python scripts/dedup_check.py --validate-all
       - name: Secret scan
         run: PYTHONPATH=. python scripts/dedup_check.py --secret-scan
+      - name: Validate pattern quality
+        run: PYTHONPATH=. python scripts/validate_patterns.py
       - name: Run tests
         run: PYTHONPATH=. python -m pytest scripts/tests/ -v

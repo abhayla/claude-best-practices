@@ -7,6 +7,8 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "vue, vue3, composition api, composable, vue component, vue router, reka-ui"
 argument-hint: "<feature-description or 'setup' or 'test' or 'composable' or 'component'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Vue 3 Development

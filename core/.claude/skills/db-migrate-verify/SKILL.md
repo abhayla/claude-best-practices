@@ -12,6 +12,8 @@ triggers:
   - alembic verify
   - flyway verify
 argument-hint: "[migration-id|all|latest] [--rollback] [--seed-data]"
+version: "1.0.0"
+type: workflow
 ---
 
 # DB Migration Verify

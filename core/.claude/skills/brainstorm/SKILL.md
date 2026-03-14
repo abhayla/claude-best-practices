@@ -14,6 +14,8 @@ triggers:
   - approaches
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<feature or problem description>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Brainstorm — Socratic Exploration & Spec Writing

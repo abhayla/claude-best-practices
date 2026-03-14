@@ -6,6 +6,8 @@ description: >
   security, and observability. Use when designing or optimizing Redis-backed features.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<redis-task-or-question>"
+version: "1.0.0"
+type: reference
 ---
 
 # Redis Patterns Reference

@@ -7,6 +7,8 @@ description: >
 triggers: "mvi, scaffold feature, create feature, new feature module, android mvi"
 allowed-tools: "Read Write Edit Grep Glob Bash"
 argument-hint: "<feature name to scaffold, e.g., 'ItemList' or 'UserProfile'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # MVI Feature Scaffolder

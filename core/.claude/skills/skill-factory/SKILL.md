@@ -6,6 +6,8 @@ description: >
   list (show existing skills).
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: scan|propose|create|list> [details]"
+type: workflow
+version: "2.0.0"
 ---
 
 # Skill Factory — Pattern Detector & Skill Creator
@@ -61,24 +63,48 @@ Proposed Skills:
 Create a new skill following the SKILL.md format:
 
 1. Create directory: `.claude/skills/{name}/`
-2. Write `SKILL.md` with proper frontmatter
-3. Include: name, description, allowed-tools, argument-hint
-4. Add clear step-by-step instructions
-5. Add critical rules section
+2. Write `SKILL.md` with proper frontmatter (all required fields)
+3. Determine skill type: `workflow` (multi-step procedure) or `reference` (knowledge base)
+4. For workflow skills: add numbered `## STEP N:` sections with verb-phrase titles
+5. For reference skills: add organized `##` sections (no step numbering required)
+6. Add `## CRITICAL RULES` or `## MUST DO` / `## MUST NOT DO` section at the end
+7. Apply least-privilege to `allowed-tools` — only list tools the skill actually uses
+8. Validate with `/writing-skills` quality checklist before saving
 
 Template:
 ```markdown
 ---
 name: {name}
 description: >
-  {description}
-allowed-tools: "Bash Read Grep Glob Write Edit"
-argument-hint: "{args}"
+  {description — start with a verb, 1-3 sentences}
+allowed-tools: "{minimal set of tools actually used}"
+argument-hint: "<{required}> [{optional}]"
+type: {workflow|reference}
+version: "1.0.0"
 ---
 
 # {Title}
 
-{Instructions}
+{One-sentence purpose.}
+
+**Request:** $ARGUMENTS
+
+---
+
+## STEP 1: {Verb Phrase}
+
+1. {Specific action}
+2. {Specific action}
+
+## STEP 2: {Verb Phrase}
+
+1. {Specific action}
+2. {Specific action}
+
+## CRITICAL RULES
+
+- {Rule with consequence of violation}
+- {Rule with alternative action}
 ```
 
 ## List Mode

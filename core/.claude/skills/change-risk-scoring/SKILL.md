@@ -14,6 +14,8 @@ triggers:
   - change risk score
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<branch, commit range, or 'staged'> [--threshold 50] [--format json|markdown]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Change Risk Scoring — Quantified Deploy Go/No-Go

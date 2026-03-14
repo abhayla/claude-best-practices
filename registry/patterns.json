@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-14",
-    "total_patterns": 143
+    "total_patterns": 142
   },
   "android-compose": {
     "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
@@ -627,19 +627,47 @@
     ],
     "changelog": "v1.0.0: Initial registry entry"
   },
-  "ai-gemini": {
-    "hash": "44e5b7374fa5814e7c1a1ce6d75afc2512a44ff9f64b24ea5c56de17264658a7",
+  "pattern-portability": {
+    "hash": "54b47f8c0f77848e52b4da6f3cc5c7dd46b4993560dbc2674de1f2ef63be3df7",
     "type": "rule",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "description": "Portability standards for distributed patterns",
+    "tags": ["quality", "validation"],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "pattern-structure": {
+    "hash": "492206f6b064e182673772163b55aa233f3f9039736aad98bc533cd118c89569",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Structural requirements for skills, agents, and rules",
+    "tags": ["quality", "validation"],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "pattern-self-containment": {
+    "hash": "5e2b834bfef80bdb14389db7e1bb89f6b6279be55eacdc9404a90f4af8a64656",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Self-containment and completeness standards for patterns",
+    "tags": ["quality", "validation"],
+    "changelog": "v1.0.0: Initial creation"
   },
   "android-compose-ui": {
     "hash": "ca8a9d00a52d13a89fb3a205d13d2cfa678872b908fb15271667d09985fa152b",
@@ -685,48 +713,6 @@
   },
   "fastapi-database": {
     "hash": "9ba81856021e55bc0f65c030ac7e3439f54045d4301bccaec5ea990ae296641d",
-    "type": "rule",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "firebase-auth": {
-    "hash": "906ecceff258304f08f987bd816ff9b82f126a6450e9c7a8d9c4de065cfbae95",
-    "type": "rule",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "react-nextjs": {
-    "hash": "33aefa8375b76bd9956d6ceded46f33c5167fb28ab9b61ba278716a68c6dcff6",
-    "type": "rule",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "superpowers": {
-    "hash": "b5431f4ab81c933dee071f83e2525007405845a22c4a09a5abf0a4ec7ad89745",
     "type": "rule",
     "category": "core",
     "version": "2.0.0",

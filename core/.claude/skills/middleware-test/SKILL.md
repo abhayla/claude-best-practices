@@ -11,6 +11,8 @@ triggers:
   - rate limit test
   - cache test
 argument-hint: "<middleware-type: auth|rate-limit|cache|validation|all>"
+version: "1.0.0"
+type: reference
 ---
 
 # Middleware Testing Patterns

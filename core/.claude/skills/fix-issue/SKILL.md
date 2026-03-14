@@ -6,6 +6,8 @@ description: >
   and runs post-fix-pipeline. Use when user says "fix issue #N".
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<issue-number or issue-url>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Fix GitHub Issue

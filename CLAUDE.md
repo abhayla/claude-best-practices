@@ -65,8 +65,8 @@ PYTHONPATH=. python scripts/recommend.py --local /path/to/project --diff
 
 - **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
   - `agents/` — 16 agent definitions (11 universal + 5 stack-specific)
-  - `skills/` — 99 skill directories, each with a `SKILL.md`
-  - `rules/` — 14 rule files (6 universal + 4 stack-specific + 4 placeholders)
+  - `skills/` — 105 skill directories, each with a `SKILL.md`
+  - `rules/` — 14 rule files (9 universal + 5 stack-specific)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns
   - `settings.json` — Minimal defaults
@@ -90,9 +90,8 @@ Stack-specific patterns use filename prefixes instead of separate directories:
 | FastAPI + Python | `fastapi-` | `fastapi-api-tester.md`, `fastapi-db-migrate/` |
 | Android + Compose | `android-` | `android-compose.md`, `android-run-tests/` |
 | AI / Gemini | `ai-gemini-` | `ai-gemini-api/` |
-| Firebase Auth | `firebase-` | `firebase-auth.md` (rule placeholder) |
-| React + Next.js | `react-` | `react-nextjs.md` (rule placeholder) |
-| Superpowers | `superpowers-` | `superpowers.md` (rule placeholder) |
+| Firebase Auth | `firebase-` | `firebase-dev/`, `firebase-ai/` |
+| React + Next.js | `react-` | `react-native-dev/`, `react-native-e2e/` |
 
 The bootstrap script filters by these prefixes when copying patterns to a target project.
 

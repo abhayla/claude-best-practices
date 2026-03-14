@@ -11,6 +11,8 @@ triggers:
   - model context protocol
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<what the MCP server should do, e.g., 'connect to Jira API' or 'manage Docker containers'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # MCP Server Builder

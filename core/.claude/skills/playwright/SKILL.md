@@ -11,6 +11,8 @@ triggers:
   - e2e-web
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<user-flow-or-test-description>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Playwright E2E Testing

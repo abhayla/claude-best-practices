@@ -12,6 +12,8 @@ triggers:
   - rto rpo
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<prd-or-nfr-path> [--scope db|storage|secrets|all] [--multi-region] [--drill]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Disaster Recovery Plan

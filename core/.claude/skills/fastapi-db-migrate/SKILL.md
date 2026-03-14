@@ -5,6 +5,8 @@ description: >
   auto-updates model import locations. Use when adding or modifying SQLAlchemy models.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<model-name or 'run' or 'status' or 'check'>"
+version: "1.0.0"
+type: reference
 ---
 
 # Database Migration Helper (FastAPI + Alembic)

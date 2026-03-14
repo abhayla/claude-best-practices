@@ -11,6 +11,8 @@ triggers:
   - wrap-up
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<optional: focus area or notes for next session>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Session Handover

@@ -23,6 +23,8 @@ triggers:
   - fastlane
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<deployment target description, or 'review current strategy'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Deploy Strategy — GitOps, Progressive Delivery & Zero-Downtime Migrations

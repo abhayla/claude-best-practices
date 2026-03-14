@@ -7,6 +7,8 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "expo, expo router, expo sdk, eas build, eas submit, app store deploy, expo upgrade"
 argument-hint: "<feature-description or 'setup' or 'deploy' or 'upgrade' or 'navigate'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Expo Development

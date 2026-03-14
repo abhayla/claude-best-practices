@@ -6,6 +6,8 @@ description: >
   Use when deploying, configuring, or troubleshooting Kubernetes workloads.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<deployment-task-or-question>"
+version: "1.0.0"
+type: reference
 triggers:
   - kubernetes deploy
   - k8s deploy

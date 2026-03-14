@@ -6,6 +6,8 @@ description: >
   Use when user requests new functionality or structured bug fixes.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<feature-description>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Implement Feature/Fix

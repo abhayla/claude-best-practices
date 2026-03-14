@@ -5,6 +5,8 @@ description: >
   Supports text input or file path. Max 20 issues per invocation.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<plan-file-path or plan text>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Plan to Issues

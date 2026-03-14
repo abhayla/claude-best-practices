@@ -14,6 +14,8 @@ triggers:
   - author skill
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
+type: workflow
+version: "2.0.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -59,6 +61,8 @@ triggers:
   - natural language phrase 3
 allowed-tools: "Tool1 Tool2 Tool3"
 argument-hint: "<required-arg> [optional-arg]"
+type: workflow
+version: "1.0.0"
 ---
 ```
 
@@ -71,6 +75,8 @@ argument-hint: "<required-arg> [optional-arg]"
 | `triggers` | Recommended | 3-6 entries. Mix of slash commands and natural language phrases. |
 | `allowed-tools` | Yes | Space-separated list. Use the minimal set needed. Never include tools you do not use. |
 | `argument-hint` | Yes | Show required args in `<angle-brackets>`, optional in `[square-brackets]`. Use descriptive placeholder names. |
+| `type` | Yes | `workflow` (multi-step procedure with numbered STEP sections) or `reference` (knowledge base / lookup guide with organized sections, no step numbering required). |
+| `version` | Yes | SemVer format (`"1.0.0"`). Bump MAJOR for breaking output/arg changes, MINOR for new optional content, PATCH for wording fixes. |
 
 #### Allowed-Tools Selection Guide
 
@@ -357,9 +363,12 @@ Before saving the skill, validate every item. Do NOT skip this step.
 | YAML frontmatter is valid | All required fields present, YAML parses without error |
 | `name` matches directory name | `name: foo-bar` lives in `skills/foo-bar/SKILL.md` |
 | `description` starts with a verb | "Debug...", "Generate...", "Analyze..." |
+| `type` is declared | `workflow` or `reference` — determines required body structure |
+| `version` is valid SemVer | Format: `"1.0.0"` — required for version tracking |
 | `triggers` has 3-6 entries | Mix of slash commands and natural language |
-| `allowed-tools` is minimal | No unused tools listed |
+| `allowed-tools` is minimal | No unused tools listed. Read-only skills MUST NOT include `Write`, `Edit`, or `Bash` |
 | `argument-hint` uses `<>` and `[]` correctly | Required in angle brackets, optional in square brackets |
+| No placeholder markers | No `<!-- TODO: -->`, `<!-- FIXME: -->`, `<!-- PLACEHOLDER -->` in the body |
 
 ### 5.2 Content Validation
 
@@ -398,11 +407,22 @@ If overlap is found:
 
 | Length | Assessment |
 |--------|-----------|
-| <100 lines | Too short — probably missing steps or guardrails. Consider if this should be a rule instead. |
-| 100-200 lines | Acceptable for simple, focused skills |
-| 200-400 lines | Ideal range for standard skills |
-| 400-600 lines | Acceptable for complex, multi-mode skills |
-| >600 lines | Too long — split into multiple skills or extract sub-workflows |
+| <50 lines | Suspiciously short — verify it's not a stub. May belong as a rule instead of a skill. |
+| 50-200 lines | Acceptable for simple, focused skills |
+| 200-500 lines | Ideal range for standard skills |
+| 500-1000 lines | Warning zone — consider splitting reference material into `references/` subdirectory |
+| >1000 lines | Too long — MUST split into smaller skills or extract reference material into `skill-name/references/*.md` |
+
+For skills with extensive reference material, use this directory structure:
+```
+skill-name/
+  SKILL.md           # Core workflow (under 500 lines)
+  references/        # Supplementary knowledge (loaded on-demand)
+    setup-guide.md
+    api-reference.md
+  templates/         # Reusable templates
+    config.yaml
+```
 
 ---
 
@@ -487,7 +507,12 @@ If the skill is valuable enough to share across projects via the hub.
 | Tested with 3 scenarios (Step 6) | All pass |
 | Not a duplicate | Run: `PYTHONPATH=. python scripts/dedup_check.py` |
 | Follows naming conventions (Step 4) | Directory and name match, correct prefix if stack-specific |
+| `version` field present | SemVer format in frontmatter |
+| `type` field present | `workflow` or `reference` declared |
+| `allowed-tools` is least-privilege | Read-only skills don't include Write/Edit/Bash |
 | No project-specific hardcoded paths | Replace with `$ARGUMENTS` or documented placeholders |
+| No placeholder markers | No `<!-- TODO: -->` or stub content |
+| Under size limit | SKILL.md under 1000 lines; use `references/` for supplementary material |
 | No secrets or credentials | Scan for API keys, tokens, passwords |
 
 ### 7.2 Add to Registry
@@ -527,6 +552,8 @@ triggers:
   - {natural-language-2}
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<{primary-input}>"
+type: workflow
+version: "1.0.0"
 ---
 
 # {Title}
@@ -602,6 +629,8 @@ triggers:
   - {natural-language-2}
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<{description-of-what-to-analyze}>"
+type: workflow
+version: "1.0.0"
 ---
 
 # {Title}
@@ -683,6 +712,8 @@ triggers:
   - {natural-language-2}
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<{what-to-generate}>"
+type: workflow
+version: "1.0.0"
 ---
 
 # {Title}
@@ -758,6 +789,8 @@ triggers:
   - test {component}
 allowed-tools: "Bash Read Edit Grep Glob"
 argument-hint: "<test-target or 'all'> [--fix]"
+type: workflow
+version: "1.0.0"
 ---
 
 # {Title}
@@ -854,6 +887,8 @@ triggers:
   - ship {target}
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<target> <environment: staging|production>"
+type: workflow
+version: "1.0.0"
 ---
 
 # {Title}
@@ -938,6 +973,8 @@ triggers:
   - upgrade {subject}
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<source-path or description> [--dry-run]"
+type: workflow
+version: "1.0.0"
 ---
 
 # {Title}
@@ -1013,6 +1050,83 @@ For each item:
 - MUST NOT migrate without analyzing edge cases first — they cause silent data corruption
 - MUST NOT skip the count verification (input items == output items)
 ```
+
+### Template G: Reference Skill
+
+Knowledge base or lookup guide (like `/ai-gemini-api`). No step-by-step workflow — organized sections for quick reference.
+
+```markdown
+---
+name: {name}
+description: >
+  {Subject} reference guide covering {topic1}, {topic2}, and {topic3}.
+  Use as a lookup when working with {technology/domain}.
+triggers:
+  - {slash-command}
+  - {natural-language-1}
+  - {natural-language-2}
+allowed-tools: "Read Grep Glob"
+argument-hint: "<topic or 'all' for full reference>"
+type: reference
+version: "1.0.0"
+---
+
+# {Title} — Reference Guide
+
+Quick reference for {subject}. Look up specific topics or browse the full guide.
+
+**Topic:** $ARGUMENTS
+
+---
+
+## {Section 1: Core Concepts}
+
+{Concise explanation with code examples}
+
+## {Section 2: Common Patterns}
+
+| Pattern | When to Use | Example |
+|---------|------------|---------|
+| {pattern} | {context} | {code} |
+
+## {Section 3: Troubleshooting}
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| {error} | {why} | {fix} |
+
+## {Section 4: Known Issues}
+
+- {issue with workaround}
+
+---
+
+## CRITICAL RULES
+
+- This is a read-only reference — do NOT modify project files based on this guide alone
+- Always verify code examples against the project's actual version/configuration
+- If a pattern conflicts with project conventions, follow project conventions
+```
+
+---
+
+## Deprecation Workflow
+
+When a skill is being replaced by a better version:
+
+1. **Add deprecation fields** to the old skill's frontmatter:
+   ```yaml
+   deprecated: true
+   deprecated_by: replacement-skill-name
+   ```
+
+2. **Keep the deprecated skill** for 2 version cycles — downstream projects may still reference it
+
+3. **Update the replacement skill's description** to mention it replaces the old one
+
+4. **After 2 cycles**, remove the deprecated skill and update the registry
+
+MUST NOT delete a skill without the deprecation lifecycle. Abrupt removal breaks downstream projects that depend on it.
 
 ---
 

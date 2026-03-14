@@ -5,6 +5,8 @@ description: >
   in a single report. Use when starting a session or checking project health.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: ""
+version: "1.0.0"
+type: reference
 ---
 
 # Status — Project Health Snapshot

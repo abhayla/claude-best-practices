@@ -14,6 +14,8 @@ triggers:
   - migration status
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<migration description, or 'run' or 'rollback' or 'status'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Database Migration Helper (Stack-Neutral)

@@ -13,6 +13,8 @@ triggers:
   - project skeleton
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<stack name and project description, or PRD file path>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Project Scaffold — Full Project Initialization

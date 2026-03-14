@@ -7,6 +7,8 @@ description: >
   Use after making code changes to verify correctness.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[--files <paths>] [--full-suite]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Auto-Verify — Post-Change Verification

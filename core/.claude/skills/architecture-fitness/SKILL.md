@@ -14,6 +14,8 @@ triggers:
   - layer violations
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<directory to analyze, or 'all changed files'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Architecture Fitness — Automated Conformance Checks

@@ -12,6 +12,8 @@ triggers:
   - how should I merge
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<branch-name or PR-number> [--strategy squash|merge|rebase|auto]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Merge Strategy

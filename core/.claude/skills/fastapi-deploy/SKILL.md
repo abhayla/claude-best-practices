@@ -5,6 +5,8 @@ description: >
   restarts server, and performs health checks.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[--skip-seed] [--skip-migrate] [--port 8000]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Deploy Backend (FastAPI)

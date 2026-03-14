@@ -19,6 +19,8 @@ triggers:
   - github.com
 allowed-tools: "Bash Read Write Edit Grep Glob WebFetch WebSearch Agent"
 argument-hint: "<action> [options] — e.g., 'search repos for claude skills --stars \">100\"', 'search code \"allowed-tools\" --filename SKILL.md', 'inspect owner/repo --files \"*.md\"'"
+version: "1.0.0"
+type: workflow
 ---
 
 # GitHub Search & Discovery Skill

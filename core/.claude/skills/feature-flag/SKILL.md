@@ -13,6 +13,8 @@ triggers:
   - feature gate
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<feature-name> [--type release|experiment|ops|permission] [--provider env|launchdarkly|unleash|custom]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Feature Flag Implementation

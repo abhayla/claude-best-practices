@@ -7,6 +7,8 @@ description: >
 triggers: "postgresql postgres pg database query schema explain sql"
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<sql-query or question about database schema/performance>"
+version: "1.0.0"
+type: reference
 ---
 
 # PostgreSQL Read-Only Query Assistant

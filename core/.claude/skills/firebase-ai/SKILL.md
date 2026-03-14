@@ -7,6 +7,8 @@ description: >
   Firebase web or mobile apps.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<what to implement — e.g. 'add text generation' or 'set up multimodal chat with images'>"
+version: "1.0.0"
+type: reference
 ---
 
 # Firebase AI Logic (Gemini API)

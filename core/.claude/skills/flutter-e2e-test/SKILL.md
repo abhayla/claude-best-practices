@@ -7,6 +7,8 @@ description: >
 triggers: "flutter test, e2e, integration test, end-to-end, widget test, UI test"
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<test-scope: 'all' | feature-name | 'setup' | 'visual' | 'monkey'>"
+version: "1.0.0"
+type: workflow
 ---
 
 # Flutter E2E Testing

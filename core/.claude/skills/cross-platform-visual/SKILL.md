@@ -11,6 +11,8 @@ triggers:
   - platform comparison
   - design parity
 argument-hint: "<feature-name|screen-name> [--platforms android,web,flutter] [--threshold=N]"
+version: "1.0.0"
+type: workflow
 ---
 
 # Cross-Platform Visual Consistency

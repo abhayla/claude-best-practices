@@ -6,6 +6,8 @@ description: >
   Use when starting a new conversation or returning after a break.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: ""
+version: "1.0.0"
+type: workflow
 ---
 
 # Continue — Resume Previous Work
