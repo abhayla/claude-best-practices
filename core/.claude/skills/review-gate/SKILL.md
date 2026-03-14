@@ -13,9 +13,9 @@ triggers:
   - review pipeline
   - quality gate pipeline
   - pre-merge review
-allowed-tools: "Bash Read Write Edit Grep Glob Agent Skill"
+allowed-tools: "Bash Read Grep Glob Skill"
 argument-hint: "[--skip <skill1,skill2>] [--fix] [--pr] [--threshold <0-100>]"
-version: "1.0.0"
+version: "2.0.0"
 type: workflow
 ---
 
@@ -107,20 +107,20 @@ Sub-skill results will be collected below.
 
 ---
 
-## STEP 1: Code Quality Gate
+## STEP 1: Batch A — Code Quality + Architecture (Parallel)
 
-Run `code-quality-gate` for complexity, duplication, SOLID, logging, error handling, and coverage diff checks.
-
-**Important:** Pass `--skip-layer-check` context to avoid duplicating the layer validation that `architecture-fitness` will perform in Step 2. Specifically, skip Step 5 (Clean Architecture Layer Validation) of `code-quality-gate` — that check is subsumed by the deeper analysis in `architecture-fitness`.
+Launch code-quality-gate and architecture-fitness as parallel subagents. These are independent static analysis checks with no side effects.
 
 ```
-Skill("code-quality-gate", args="all changed files")
+Agent(prompt="Run /code-quality-gate on all changed files between $BASE_BRANCH and HEAD. Skip Step 5 (layer validation) — architecture-fitness handles that. Return structured results: status (PASS/WARN/BLOCK), complexity, duplication, SOLID issues, PII leaks, swallowed exceptions, coverage diff, blocking count.")
+
+Agent(prompt="Run /architecture-fitness on all changed files between $BASE_BRANCH and HEAD. This is the authoritative layer/dependency check. Return structured results: status (PASS/WARN/BLOCK), dependency violations, circular deps, coupling, module size, ADR drift, blocking count.")
 ```
 
-### 1.1 Record Result
+### 1.1 Record Results
 
 ```
-STEP 1: Code Quality Gate
+BATCH A — Code Quality Gate:
   Status: {PASS / WARN / BLOCK}
   Complexity: {max CC and file}
   Duplication: {percentage}
@@ -129,28 +129,8 @@ STEP 1: Code Quality Gate
   Error handling: {swallowed exceptions count}
   Coverage diff: {percentage on new lines}
   Blocking issues: {count}
-```
 
-If the result is BLOCK and `--fix` is enabled, invoke `/fix-loop` for each blocking issue before proceeding.
-
-If the result is BLOCK and `--fix` is not enabled, record the block and continue — the final verdict will aggregate all blocks.
-
----
-
-## STEP 2: Architecture Fitness
-
-Run `architecture-fitness` for dependency direction, circular deps, coupling metrics, module boundaries, and ADR lifecycle.
-
-This is the authoritative check for architectural conformance — it supersedes the layer validation in `code-quality-gate` Step 5.
-
-```
-Skill("architecture-fitness", args="all changed files")
-```
-
-### 2.1 Record Result
-
-```
-STEP 2: Architecture Fitness
+BATCH A — Architecture Fitness:
   Status: {PASS / WARN / BLOCK}
   Dependency direction: {violations count}
   Circular dependencies: {cycles count}
@@ -160,69 +140,32 @@ STEP 2: Architecture Fitness
   Blocking issues: {count}
 ```
 
+If either result is BLOCK and `--fix` is enabled, invoke `/fix-loop` for each blocking issue before proceeding.
+
 ---
 
-## STEP 3: Security Audit
+## STEP 2: Batch B — Security + Risk Scoring (Parallel)
 
-Launch the `security-auditor` agent for a dedicated security assessment. This runs deeper than the `code-reviewer` agent's security section — it performs threat modeling, OWASP Top 10 scanning, and static analysis triage.
-
-```
-Agent(subagent_type="general-purpose", prompt="Run /security-audit on all changed files between $BASE_BRANCH and HEAD. Produce a structured security audit report with findings categorized by CVSS severity.")
-```
-
-### 3.1 Record Result
+Launch security-audit and change-risk-scoring as parallel subagents. Both are read-only analysis with no side effects.
 
 ```
-STEP 3: Security Audit
+Agent(prompt="Run /security-audit on all changed files between $BASE_BRANCH and HEAD. Produce a structured security audit report with findings categorized by CVSS severity. Return: status (PASS/WARN/BLOCK), critical/high/medium/low finding counts, blocking count.")
+
+Skill("change-risk-scoring", args="--format json")
+```
+
+### 2.1 Record Results
+
+```
+BATCH B — Security Audit:
   Status: {PASS / WARN / BLOCK}
   Critical findings: {count}
   High findings: {count}
   Medium findings: {count}
   Low findings: {count}
   Blocking issues: {count}
-```
 
-If any Critical findings exist, this step is automatically BLOCK regardless of other results.
-
----
-
-## STEP 4: Adversarial Review
-
-Run `adversarial-review` in code review mode. This launches a subagent with a dedicated reviewer persona to find flaws through structured debate.
-
-```
-Skill("adversarial-review", args="--mode code")
-```
-
-### 4.1 Record Result
-
-```
-STEP 4: Adversarial Review
-  Status: {PASSED / PASSED WITH CAVEATS / BLOCKED}
-  Rounds completed: {1-3}
-  Issues found: {total}
-    Critical: {count} ({resolved} resolved)
-    Major: {count} ({resolved} resolved)
-    Minor: {count} ({resolved} resolved)
-  Unresolved critical: {count}
-  Deferred with tracking: {count}
-  Blocking issues: {count}
-```
-
----
-
-## STEP 5: Change Risk Scoring
-
-Run `change-risk-scoring` to compute a quantified risk score (0-100) for the changeset.
-
-```
-Skill("change-risk-scoring", args="--format json")
-```
-
-### 5.1 Record Result
-
-```
-STEP 5: Change Risk Scoring
+BATCH B — Change Risk Scoring:
   Risk score: {0-100}
   Classification: {LOW / MEDIUM / HIGH / CRITICAL}
   Recommendation: {AUTO-DEPLOY / HUMAN REVIEW / EXTRA TESTING / HOLD}
@@ -230,7 +173,9 @@ STEP 5: Change Risk Scoring
   Top risk files: {list}
 ```
 
-### 5.2 Threshold Check
+If any Critical security findings exist, this step is automatically BLOCK regardless of other results.
+
+### 2.2 Threshold Check
 
 Compare the risk score against the threshold (default: 50):
 
@@ -242,18 +187,41 @@ Compare the risk score against the threshold (default: 50):
 
 ---
 
-## STEP 6: PR Standards
+## STEP 3: Batch C — Adversarial Review → PR Standards (Sequential)
 
-Run `pr-standards` to check the diff against team standards and built-in rules.
+Run adversarial-review with findings from Batches A+B as context, then pr-standards. These are sequential because adversarial-review benefits from knowing what earlier checks found.
+
+### 3.1 Adversarial Review
+
+```
+Skill("adversarial-review", args="--mode code")
+```
+
+Record result:
+
+```
+BATCH C — Adversarial Review:
+  Status: {PASSED / PASSED WITH CAVEATS / BLOCKED}
+  Rounds completed: {1-3}
+  Issues found: {total}
+    Critical: {count} ({resolved} resolved)
+    Major: {count} ({resolved} resolved)
+    Minor: {count} ({resolved} resolved)
+  Unresolved critical: {count}
+  Deferred with tracking: {count}
+  Blocking issues: {count}
+```
+
+### 3.2 PR Standards
 
 ```
 Skill("pr-standards", args="")
 ```
 
-### 6.1 Record Result
+Record result:
 
 ```
-STEP 6: PR Standards
+BATCH C — PR Standards:
   Status: {PASS / FAIL / WARN}
   Critical violations: {count}
   Warning violations: {count}
@@ -275,13 +243,13 @@ Skill("pr-standards", args="")
 
 ---
 
-## STEP 7: Fix Loop (Conditional)
+## STEP 4: Fix Loop (Conditional)
 
 This step runs ONLY if:
 1. Any previous step produced BLOCK status, AND
 2. `--fix` flag is enabled
 
-### 7.1 Collect All Blocking Findings
+### 4.1 Collect All Blocking Findings
 
 Gather all BLOCK/CRITICAL findings from Steps 1-6 into a single fix list:
 
@@ -293,7 +261,7 @@ BLOCKING FINDINGS TO FIX:
   [PS-1] Debugger statement in src/routes/users.py:45
 ```
 
-### 7.2 Apply Fixes
+### 4.2 Apply Fixes
 
 For each blocking finding:
 
@@ -310,7 +278,7 @@ Skill("auto-verify", args="--files <fixed_files>")
 Skill("fix-loop", args="retest_command: <TEST_CMD> max_iterations: 3")
 ```
 
-### 7.3 Re-Run Failed Checks
+### 4.3 Re-Run Failed Checks
 
 After fixing, re-run ONLY the sub-skills that produced BLOCK status. Do NOT re-run passing checks — this avoids wasting time.
 
@@ -325,11 +293,11 @@ Update the recorded results with the re-run outcomes.
 
 ---
 
-## STEP 8: Generate Consolidated Review Report
+## STEP 5: Generate Consolidated Review Report
 
 Aggregate all sub-skill results into a single report. This is the artifact consumed by Stage 10 (Deploy) for go/no-go decisions.
 
-### 8.1 Consolidated Report Format
+### 5.1 Consolidated Report Format
 
 ```markdown
 # Review Gate Report
@@ -374,7 +342,7 @@ Aggregate all sub-skill results into a single report. This is the artifact consu
 - {If REJECTED: "Address N blocking issues before re-running /review-gate."}
 ```
 
-### 8.2 Machine-Readable Output
+### 5.2 Machine-Readable Output
 
 Write the consolidated results to `test-results/review-gate.json` for programmatic consumption by Stage 10:
 
@@ -405,7 +373,7 @@ Write the consolidated results to `test-results/review-gate.json` for programmat
 }
 ```
 
-### 8.3 Verdict Logic
+### 5.3 Verdict Logic
 
 ```
 IF any check has unresolved BLOCK status:
@@ -420,13 +388,13 @@ ELSE:
 
 ---
 
-## STEP 9: PR Creation (Conditional)
+## STEP 6: PR Creation (Conditional)
 
 This step runs ONLY if:
 1. The verdict is APPROVED or APPROVED WITH CAVEATS, AND
 2. `--pr` flag is enabled
 
-### 9.1 Create PR with Review Context
+### 6.1 Create PR with Review Context
 
 Invoke `request-code-review` and include the consolidated review report in the PR description:
 
@@ -452,7 +420,7 @@ Append the consolidated review summary to the PR body:
 Full report: see `test-results/review-gate.json`
 ```
 
-### 9.2 Record PR URL
+### 6.2 Record PR URL
 
 ```
 STEP 9: PR Creation
@@ -463,7 +431,7 @@ STEP 9: PR Creation
 
 ---
 
-## STEP 10: Post-Review Feedback Loop (Conditional)
+## STEP 7: Post-Review Feedback Loop (Conditional)
 
 This step runs when invoked after a PR has received review feedback.
 
@@ -492,34 +460,31 @@ Then re-run only the sub-skills affected by the changes made during feedback res
  │  STEP 0: Validate preconditions (branch, commits, tests)       │
  │     │                                                           │
  │     ▼                                                           │
- │  STEP 1: /code-quality-gate (skip layer check)                 │
+ │  STEP 1: BATCH A (parallel agents)                             │
+ │     ├── /code-quality-gate (skip layer check)                  │
+ │     └── /architecture-fitness (authoritative layer check)      │
  │     │                                                           │
  │     ▼                                                           │
- │  STEP 2: /architecture-fitness (authoritative layer check)     │
+ │  STEP 2: BATCH B (parallel)                                    │
+ │     ├── /security-audit (via agent)                            │
+ │     └── /change-risk-scoring                                   │
  │     │                                                           │
  │     ▼                                                           │
- │  STEP 3: /security-audit (via security-auditor agent)          │
+ │  STEP 3: BATCH C (sequential, uses A+B context)                │
+ │     ├── /adversarial-review --mode code                        │
+ │     └── /pr-standards                                          │
  │     │                                                           │
  │     ▼                                                           │
- │  STEP 4: /adversarial-review --mode code                       │
+ │  STEP 4: /fix-loop + /auto-verify (if --fix and blocks exist)  │
  │     │                                                           │
  │     ▼                                                           │
- │  STEP 5: /change-risk-scoring                                  │
+ │  STEP 5: Consolidated report → test-results/review-gate.json   │
  │     │                                                           │
  │     ▼                                                           │
- │  STEP 6: /pr-standards                                         │
+ │  STEP 6: /request-code-review (if --pr and verdict ≠ REJECTED) │
  │     │                                                           │
  │     ▼                                                           │
- │  STEP 7: /fix-loop + /auto-verify (if --fix and blocks exist)  │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 8: Consolidated report → test-results/review-gate.json   │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 9: /request-code-review (if --pr and verdict ≠ REJECTED) │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 10: /receive-code-review (when feedback arrives)         │
+ │  STEP 7: /receive-code-review (when feedback arrives)          │
  │                                                                 │
  └─────────────────────────────────────────────────────────────────┘
 ```
@@ -528,27 +493,15 @@ Then re-run only the sub-skills affected by the changes made during feedback res
 
 ## Parallelization Strategy
 
-Steps 1-6 can be partially parallelized since they analyze the same changeset independently. The recommended grouping:
+The 6 analysis checks are grouped into 3 batches for optimal throughput:
 
-| Batch | Steps | Rationale |
-|-------|-------|-----------|
-| Batch A (parallel) | 1 (code-quality-gate), 2 (architecture-fitness) | Both are static analysis, no side effects |
-| Batch B (parallel) | 3 (security-audit), 5 (change-risk-scoring) | Both are read-only analysis |
-| Sequential | 4 (adversarial-review) | Needs findings from batches A+B as context |
-| Sequential | 6 (pr-standards) | Quick check, runs after review fixes |
-| Conditional | 7 (fix-loop) | Only if blocks exist |
-| Final | 8 (report), 9 (PR), 10 (feedback) | Sequential, depends on all prior results |
-
-When using subagents, launch Batch A and Batch B concurrently:
-
-```
-Agent(prompt="Run /code-quality-gate on all changed files, skipping Step 5 layer validation")
-Agent(prompt="Run /architecture-fitness on all changed files")
-Agent(prompt="Run /security-audit on all changed files")
-Agent(prompt="Run /change-risk-scoring")
-```
-
-Then run adversarial-review with the collected findings as context, followed by pr-standards.
+| Batch | Checks | Execution | Rationale |
+|-------|--------|-----------|-----------|
+| Batch A | code-quality-gate + architecture-fitness | Parallel agents | Both are static analysis, no side effects |
+| Batch B | security-audit + change-risk-scoring | Parallel (agent + skill) | Both are read-only analysis |
+| Batch C | adversarial-review → pr-standards | Sequential after A+B | Adversarial review benefits from A+B findings as context |
+| Fix loop | fix-loop + auto-verify | Conditional after A+B+C | Only if --fix flag and blocking findings exist |
+| Final | report → PR → feedback | Sequential | Depends on all prior results |
 
 ---
 

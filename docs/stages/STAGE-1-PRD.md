@@ -198,6 +198,30 @@ Universal — PRD format is stack-agnostic. Stack-specific NFRs (e.g., Android b
 
 ---
 
+## Orchestration Dispatch
+
+When the pipeline-orchestrator dispatches this stage, the stage agent executes:
+
+```
+# 1. Determine input type and route accordingly
+IF input_type == "prd_file":
+  Skill("prd-parser", args="<prd_file_path>")
+ELIF input_type == "github_issue":
+  # Fetch issue, expand into brief
+  Skill("brainstorm", args="--mode prd <expanded_issue_text>")
+ELSE:
+  # Free text description — full PRD generation
+  Skill("brainstorm", args="--mode prd <feature_description>")
+
+# 2. Validate PRD output
+# Verify: US-xxx IDs, AC-xxx IDs, NFR-xxx IDs, MoSCoW tiers,
+#          requirements traceability matrix, risk register
+```
+
+**Artifact validation:** Verify `docs/plans/<feature>-prd.md` exists, contains numbered requirement IDs, and includes IEEE 830 sections.
+
+---
+
 ## Update Log
 
 | Date | Change |

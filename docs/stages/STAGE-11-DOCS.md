@@ -213,6 +213,34 @@ Universal — documentation is stack-agnostic. API docs format varies by stack (
 
 ---
 
+## Orchestration Dispatch
+
+When the pipeline-orchestrator dispatches this stage, the stage agent executes:
+
+```
+# 1. Read upstream artifacts
+# Read: deployment URL (from Stage 10)
+# Read: review report (from Stage 9)
+# Read: docs/plans/<feature>-prd.md (from Stage 1)
+# Read: all docs/adr/ADR-*.md (from Stage 2)
+
+# 2. Generate documentation using Diátaxis framework
+Skill("diataxis-docs", args="<project_root>")
+
+# 3. Generate CHANGELOG.md and CONTRIBUTING.md
+Skill("changelog-contributing", args="<project_root>")
+
+# 4. Generate session handover document
+Skill("handover", args="<project_root>")
+
+# 5. Capture learnings for future pipeline runs
+Skill("learn-n-improve", args="session")
+```
+
+**Artifact validation:** Verify `README.md`, `docs/ARCHITECTURE.md`, `docs/HANDOVER.md`, `CHANGELOG.md`, `CONTRIBUTING.md` exist. Verify `docs/stages/PIPELINE-SUMMARY.md` is generated with all stage results consolidated.
+
+---
+
 ## Update Log
 
 | Date | Change |

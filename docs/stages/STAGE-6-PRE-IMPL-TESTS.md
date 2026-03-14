@@ -256,6 +256,35 @@
 
 ---
 
+## Orchestration Dispatch
+
+When the pipeline-orchestrator dispatches this stage, the stage agent executes:
+
+```
+# 1. Read upstream artifacts
+# Read: docs/plans/<feature>-plan.md (from Stage 2 — task list with test types)
+# Read: docs/schema/erd.md (from Stage 5 — DB models for test fixtures)
+
+# 2. Generate comprehensive test suite (all test types)
+Skill("test-generator", args="docs/plans/<feature>-plan.md")
+
+# This generates:
+#   - tests/unit/ (failing unit tests — AAA pattern)
+#   - tests/api/ (failing API tests — CRUD + auth + contracts)
+#   - tests/e2e/ (skipped stubs with Page Objects)
+#   - tests/bdd/ (Gherkin feature files + step definitions)
+#   - tests/property/ (Hypothesis/fast-check stubs)
+#   - tests/perf/ (k6 stubs)
+#   - test-results/test-generator.json (gate result)
+
+# 3. Red phase gate: verify ALL tests fail or are skipped
+# Run test suite — assert 0 passing tests (100% fail/skip)
+```
+
+**Artifact validation:** Verify `tests/unit/`, `tests/api/`, `tests/e2e/` directories exist and contain test files. Verify `test-results/test-generator.json` exists with gate result. Verify red phase: running tests produces 0 passes (all fail or skip).
+
+---
+
 ## Update Log
 
 | Date | Change |

@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-14",
-    "total_patterns": 162
+    "total_patterns": 165
   },
   "android-compose": {
     "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
@@ -1574,25 +1574,24 @@
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d covers Python, Node/TS, Android, Go, Rust"
   },
   "pipeline-orchestrator": {
-    "hash": "2d24d13e3eea51ad1b8c98229f45bb6dffabc56c4f3ba418509e66ed2a16b23c",
+    "hash": "568cdd4d1c1320cf0740b37cf9eaad5dae6582faf6db6fbad09b9bb65725964f",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "last_updated": "2026-03-14",
     "dependencies": [
-      "subagent-driven-dev",
-      "executing-plans"
+      "pipeline-orchestrator-agent"
     ],
     "visibility": "public",
-    "description": "DAG-based multi-stage pipeline orchestrator with typed artifact contracts, state persistence, conditional branching, idempotency, observability, and compensating rollback",
+    "description": "Thin skill wrapper that dispatches the pipeline-orchestrator agent for DAG-based multi-stage pipeline coordination",
     "tags": [
       "pipeline",
       "orchestration",
       "DAG"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d PRD-to-Production pipeline coordination"
+    "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent"
   },
   "pr-standards": {
     "hash": "d7c7936965d28a27fa20ab17515e6664c1104be00172ba0f7059a8b0841dcd08",
@@ -1735,18 +1734,22 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
   "subagent-driven-dev": {
-    "hash": "6d1e5b20f3a4eaccfcfe25eb0a52b048ffe56df6368921083535cebcf9d54648",
+    "hash": "88eaf83bd7dba0d7501a7bf2bc43952125ac0746f286fae5b949a6ed73f9402d",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Orchestration patterns for delegating work to subagents",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "description": "Orchestration patterns for delegating work to subagents with file conflict avoidance and advanced dispatch patterns",
+    "tags": [
+      "subagent",
+      "orchestration",
+      "parallel"
+    ],
+    "changelog": "v1.1.0: Extracted Steps 8-10 to references/orchestration-patterns.md, trimmed to ~400 lines"
   },
   "supply-chain-audit": {
     "hash": "007fee0dcdce1ad75ebbb544b6377cd5654e9d65142001888c6522ebf3ce3cf6",
@@ -2148,18 +2151,29 @@
     "changelog": "v1.0.0: Initial registration"
   },
   "review-gate": {
-    "hash": "6b18615e57d597766d2fc5c96210e7ba88e11e6f273cc8e299884e7b0be1ec51",
+    "hash": "bbccd2ec0387d55e2264e986fe2863000fffb97d8567ad53842d83af52dafc6c",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
     "last_updated": "2026-03-14",
-    "dependencies": [],
+    "dependencies": [
+      "code-quality-gate",
+      "architecture-fitness",
+      "security-audit",
+      "adversarial-review",
+      "change-risk-scoring",
+      "pr-standards"
+    ],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
+    "description": "Stage 9 review orchestrator with parallelized sub-skill batches, fix loop, and consolidated verdict",
+    "tags": [
+      "review",
+      "orchestration",
+      "quality-gate"
+    ],
+    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps"
   },
   "rule-writing-meta": {
     "hash": "db207c1af29b887861ac2212246ac63b20781fc4d07d6e24f013975b5169c726",
@@ -2578,5 +2592,63 @@
       "typescript"
     ],
     "changelog": "v1.0.0: Initial creation"
+  },
+  "agent-orchestration": {
+    "hash": "7147db1c5caa751d232b84ccb1d42b004936d22e94b41c534a47322f59e49f4b",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "8 constraints for multi-agent orchestration: 2-level hierarchy, no subagent-spawning, externalized DAGs, global retry budget, single state location",
+    "tags": [
+      "orchestration",
+      "agents",
+      "constraints"
+    ],
+    "changelog": "v1.0.0: Initial creation — Anthropic-aligned orchestration constraints"
+  },
+  "pipeline-orchestrator-agent": {
+    "hash": "ee4649ce489dc96ce7dc1aa9b7a3c0541754202cf1ede8702cb672b9665cb7f2",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [
+      "agent-orchestration"
+    ],
+    "visibility": "public",
+    "description": "DAG-based multi-stage pipeline orchestrator agent for PRD-to-Production delivery with typed artifact contracts and state persistence",
+    "tags": [
+      "pipeline",
+      "orchestration",
+      "DAG",
+      "agent"
+    ],
+    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill — orchestration logic now lives in the agent"
+  },
+  "agent-orchestration-guide": {
+    "hash": "3c9ecc8e03902fef6cb38ec6182eee589ab980f52215c1622357f5d84bfa0ded",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Reference guide covering Anthropic's 5 workflow patterns, agent vs skill decision framework, orchestration architecture, anti-patterns, and context management",
+    "tags": [
+      "orchestration",
+      "reference",
+      "patterns",
+      "agents"
+    ],
+    "changelog": "v1.0.0: Initial creation — comprehensive orchestration reference"
   }
 }

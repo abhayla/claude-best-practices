@@ -1,0 +1,212 @@
+# Pipeline Stage Definitions — DAG Configuration
+# Read by pipeline-orchestrator agent at runtime.
+# Edit this file to add/remove stages or change dependencies.
+
+pipeline:
+  max_retries_per_stage: 3
+  global_retry_budget: 15
+  timeout_default_minutes: 30
+
+stages:
+  - id: stage_1_prd
+    name: "Requirements → PRD"
+    depends_on: []
+    skip_when: "input_type == 'prd_file' AND prd_valid == true"
+    artifacts_out:
+      prd:
+        path: "docs/plans/<feature>-prd.md"
+        schema: prd_v1
+    timeout_minutes: 30
+
+  - id: stage_2_plan
+    name: "PRD → Plan"
+    depends_on: [stage_1_prd]
+    artifacts_in:
+      prd: "stage_1_prd.artifacts_out.prd"
+    artifacts_out:
+      plan:
+        path: "docs/plans/<feature>-plan.md"
+        schema: plan_v1
+      adrs:
+        path: "docs/adr/ADR-*.md"
+        schema: adr_v1
+    timeout_minutes: 30
+
+  - id: stage_3_scaffold
+    name: "Scaffolding"
+    depends_on: [stage_1_prd]
+    skip_when: "project_already_scaffolded == true"
+    artifacts_out:
+      skeleton:
+        path: "<project_root>"
+        schema: scaffold_v1
+    timeout_minutes: 20
+
+  - id: stage_4_demo
+    name: "HTML Demo"
+    depends_on: [stage_1_prd, stage_3_scaffold]
+    skip_when: "project_type IN ('cli', 'library', 'api_only', 'backend', 'data_pipeline', 'infrastructure')"
+    artifacts_in:
+      prd: "stage_1_prd.artifacts_out.prd"
+      skeleton: "stage_3_scaffold.artifacts_out.skeleton"
+    artifacts_out:
+      screens:
+        path: "demos/<feature>/index.html"
+        schema: html_screens_v1
+        note: "index.html + N screen HTML files"
+      design_system_css:
+        path: "demos/<feature>/shared.css"
+        schema: css_v1
+      design_system_js:
+        path: "demos/<feature>/shared.js"
+        schema: js_v1
+      impl_mapping:
+        path: "demos/<feature>/IMPL-MAPPING.md"
+        schema: impl_mapping_v1
+      screenshots:
+        path: "docs/stages/screenshots/stage-4/*.png"
+        schema: image_v1
+    timeout_minutes: 30
+
+  - id: stage_5_schema
+    name: "Schema & Migrations"
+    depends_on: [stage_2_plan, stage_3_scaffold]
+    skip_when: "no_database == true"
+    artifacts_out:
+      erd:
+        path: "docs/schema/erd.md"
+        schema: erd_v1
+      migrations:
+        path: "migrations/"
+        schema: migration_v1
+      seeds:
+        path: "scripts/seed.*"
+        schema: seed_v1
+    timeout_minutes: 25
+
+  - id: stage_6_pre_tests
+    name: "Pre-Impl Tests (TDD Red)"
+    depends_on: [stage_2_plan, stage_5_schema]
+    artifacts_out:
+      test_matrix:
+        path: "docs/stages/STAGE-6-PRE-IMPL-TESTS.md#test-matrix"
+        schema: test_matrix_v1
+      unit_tests:
+        path: "tests/unit/"
+        schema: test_files_v1
+      api_tests:
+        path: "tests/api/"
+        schema: test_files_v1
+      e2e_stubs:
+        path: "tests/e2e/"
+        schema: test_files_v1
+    timeout_minutes: 30
+
+  - id: stage_7_impl
+    name: "Implementation (TDD Green)"
+    depends_on: [stage_6_pre_tests]
+    artifacts_in:
+      plan: "stage_2_plan.artifacts_out.plan"
+      unit_tests: "stage_6_pre_tests.artifacts_out.unit_tests"
+      api_tests: "stage_6_pre_tests.artifacts_out.api_tests"
+      erd: "stage_5_schema.artifacts_out.erd"
+      migrations: "stage_5_schema.artifacts_out.migrations"
+    artifacts_out:
+      source_code:
+        path: "src/"
+        schema: source_v1
+      progress:
+        path: "docs/plans/<feature>-progress.md"
+        schema: progress_v1
+      quality_report:
+        path: "test-results/code-quality-gate.json"
+        schema: quality_gate_v1
+    timeout_minutes: 60
+
+  - id: stage_8_post_tests
+    name: "Post-Impl Tests"
+    depends_on: [stage_7_impl]
+    artifacts_out:
+      e2e_report:
+        path: "playwright-report/"
+        schema: report_v1
+      perf_results:
+        path: "results/perf.json"
+        schema: perf_v1
+      security_report:
+        path: "tests/security/threat-model.md"
+        schema: threat_model_v1
+    timeout_minutes: 45
+
+  - id: stage_9_review
+    name: "Code Review"
+    depends_on: [stage_8_post_tests]
+    artifacts_out:
+      review_report:
+        path: "docs/stages/STAGE-9-REVIEW.md"
+        schema: review_v1
+      pr_url:
+        type: string
+        schema: url
+    timeout_minutes: 30
+
+  - id: stage_10_deploy
+    name: "Deploy & Monitor"
+    depends_on: [stage_9_review]
+    artifacts_in:
+      pr_url: "stage_9_review.artifacts_out.pr_url"
+      source: "stage_3_scaffold.artifacts_out.skeleton"
+      migrations: "stage_5_schema.artifacts_out.migrations"
+    artifacts_out:
+      deploy_url:
+        type: string
+        schema: url
+      ci_pipeline:
+        path: ".github/workflows/ci.yml"
+        schema: ci_v1
+      monitoring_dashboards:
+        path: "monitoring/dashboards/"
+        schema: grafana_json_v1
+      runbooks:
+        path: "docs/runbooks/"
+        schema: runbook_v1
+      slo_definitions:
+        path: "monitoring/slo-rules.yml"
+        schema: prometheus_rules_v1
+      dr_runbook:
+        path: "docs/DR-RUNBOOK.md"
+        schema: dr_runbook_v1
+    timeout_minutes: 45
+
+  - id: stage_11_docs
+    name: "Docs & Handover"
+    depends_on: [stage_10_deploy]
+    artifacts_out:
+      readme:
+        path: "README.md"
+        schema: readme_v1
+      architecture:
+        path: "docs/ARCHITECTURE.md"
+        schema: arch_doc_v1
+      handover:
+        path: "docs/HANDOVER.md"
+        schema: handover_v1
+      summary:
+        path: "docs/stages/PIPELINE-SUMMARY.md"
+        schema: summary_v1
+    timeout_minutes: 30
+
+# Wave computation (derived from depends_on):
+#
+# Wave 1:  Stage 1 (PRD)
+# Wave 2:  Stage 2 (Plan) + Stage 3 (Scaffold)
+# Wave 3:  Stage 4 (Demo)
+# Wave 4:  Stage 5 (Schema)
+# Wave 5:  Stage 6 (Pre-Tests)
+# Wave 6:  Stage 7 (Implementation)
+# Wave 7:  Stage 8 (Post-Tests)
+# Wave 8:  Stage 9 (Review)
+# Wave 9:  Stage 10 (Deploy)
+# Wave 10: Stage 11 (Docs)
+#
+# Critical path: 1 → 2 → 5 → 6 → 7 → 8 → 9 → 10 → 11

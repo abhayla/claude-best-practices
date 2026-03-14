@@ -240,6 +240,25 @@
 
 ---
 
+## Orchestration Dispatch
+
+When the pipeline-orchestrator dispatches this stage, the stage agent executes:
+
+```
+# 1. Read upstream PRD to detect tech stack
+# Read: docs/plans/<feature>-prd.md (from Stage 1)
+
+# 2. Initialize project skeleton with detected stacks
+Skill("project-scaffold", args="<detected_stacks>")
+
+# 3. Set up CI/CD pipeline skeleton
+Skill("ci-cd-setup", args="<detected_stacks>")
+```
+
+**Artifact validation:** Verify project skeleton exists (package manifests, folder structure, linter config, test framework config). Verify `.github/workflows/ci.yml` exists. Run `<stack_build_command>` to verify the skeleton compiles.
+
+---
+
 ## Update Log
 
 | Date | Change |

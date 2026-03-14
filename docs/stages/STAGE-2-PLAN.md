@@ -202,6 +202,25 @@ Universal — task decomposition is stack-agnostic. Stack-specific consideration
 
 ---
 
+## Orchestration Dispatch
+
+When the pipeline-orchestrator dispatches this stage, the stage agent executes:
+
+```
+# 1. Read upstream PRD artifact
+# Read: docs/plans/<feature>-prd.md (from Stage 1)
+
+# 2. Generate implementation plan with WBS, dependencies, estimates
+Skill("writing-plans", args="<prd_file_path>")
+
+# 3. Convert plan tasks to GitHub Issues with epics
+Skill("plan-to-issues", args="docs/plans/<feature>-plan.md")
+```
+
+**Artifact validation:** Verify `docs/plans/<feature>-plan.md` exists with Task N format, dependency graph, and execution waves. Verify `docs/adr/ADR-*.md` files exist if architectural decisions were made.
+
+---
+
 ## Update Log
 
 | Date | Change |

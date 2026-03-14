@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-14 12:35 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-14 19:37 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">162</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">157</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">165</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">160</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">5</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">20</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">6</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">18</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">118</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">21</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">6</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">19</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">119</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -93,6 +93,24 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>agent-orchestration</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, agents, constraints</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>agent-orchestration-guide</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, reference, patterns, agents</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>ai-gemini-api</td>
@@ -980,10 +998,19 @@ tr:hover { background: var(--primary-light); }
                 <td>pipeline-orchestrator</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
+                <td>2.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>pipeline-orchestrator-agent</td>
+                <td>pipeline, orchestration, DAG</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>pipeline-orchestrator-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
                 <td>1.0.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
-                <td>subagent-driven-dev, executing-plans</td>
-                <td>pipeline, orchestration, DAG</td>
+                <td>agent-orchestration</td>
+                <td>pipeline, orchestration, DAG, agent</td>
             </tr>
             <tr data-type="agent" data-category="core">
                 <td>plan-executor</td>
@@ -1160,10 +1187,10 @@ tr:hover { background: var(--primary-light); }
                 <td>review-gate</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
+                <td>2.0.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
-                <td>—</td>
-                <td>—</td>
+                <td>code-quality-gate, architecture-fitness, security-audit, adversarial-review, change-risk-scoring, pr-standards</td>
+                <td>review, orchestration, quality-gate</td>
             </tr>
             <tr data-type="rule" data-category="core">
                 <td>rule-writing-meta</td>
@@ -1304,10 +1331,10 @@ tr:hover { background: var(--primary-light); }
                 <td>subagent-driven-dev</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
+                <td>1.1.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
-                <td>—</td>
+                <td>subagent, orchestration, parallel</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>supply-chain-audit</td>
