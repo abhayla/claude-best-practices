@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-14 07:07 UTC (auto-generated)
+> Last updated: 2026-03-14 09:23 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 145 |
-| Core (universal) | 140 |
+| Total Patterns | 154 |
+| Core (universal) | 149 |
 | Stack-specific | 5 |
-| Agents | 19 |
+| Agents | 20 |
 | Hooks | 6 |
-| Rules | 13 |
-| Skills | 107 |
+| Rules | 17 |
+| Skills | 111 |
 
 ## Pattern Inventory
 
@@ -76,11 +76,14 @@
 | fastapi-deploy | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-run-backend-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | feature-flag | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| firebase | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-ai | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-data-connect | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | fix-issue | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | fix-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| flutter | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| flutter-dart | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-e2e-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | git-manager | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -97,6 +100,8 @@
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | middleware-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | monitoring-setup | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| nextjs-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| node-backend-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | nuxt-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | obsidian | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | parallel-worktree-orchestrator | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -116,6 +121,7 @@
 | project-scaffold | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup |
 | quality-gate-evaluator | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | react-native-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| react-nextjs | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | receive-code-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | reddit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | redis-patterns | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -140,6 +146,7 @@
 | subagent-driven-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | supply-chain-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | systematic-debugging | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| tailwind-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | tdd | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-failure-analyzer | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-generator | skill | 1.0.0 | hub:abhayla/claude-best-practices | tdd, playwright |
@@ -151,6 +158,8 @@
 | ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | update-practices | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | verify-screenshots | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| vitest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| vue | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | vue-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | web-quality | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | web-research-specialist | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |

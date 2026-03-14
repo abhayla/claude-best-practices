@@ -40,3 +40,4 @@ _React Native dev, E2E testing, Next.js patterns._
 **Prefix:** `react-*`
 
 **Skills:** react-native-e2e, react-native-dev
+**Rules:** react-nextjs
