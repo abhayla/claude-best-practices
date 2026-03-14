@@ -26,7 +26,6 @@ curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bo
 | `fastapi-python` | FastAPI, SQLAlchemy, pytest, Alembic |
 | `firebase-auth` | Firebase Authentication |
 | `react-nextjs` | React + Next.js patterns |
-| `superpowers` | Advanced Claude Code automation |
 
 ## What's Included
 

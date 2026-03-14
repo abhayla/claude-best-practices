@@ -33,7 +33,6 @@ _Phone OTP, token management, multi-environment setup._
 **Prefix:** `firebase-*`
 
 **Skills:** firebase-data-connect, firebase-dev, firebase-ai
-**Rules:** firebase-auth
 
 ## React + Next.js
 _Next.js App Router, server components, Tailwind._
@@ -41,7 +40,6 @@ _Next.js App Router, server components, Tailwind._
 **Prefix:** `react-*`
 
 **Skills:** react-native-e2e, react-native-dev
-**Rules:** react-nextjs
 
 ## Superpowers
 _Advanced Claude Code patterns: hooks, session analysis, automation._

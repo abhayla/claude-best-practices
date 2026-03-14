@@ -1,15 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-14 04:19 UTC (auto-generated)
+> Last updated: 2026-03-14 06:12 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 143 |
-| Core (universal) | 138 |
+| Total Patterns | 142 |
+| Core (universal) | 137 |
 | Stack-specific | 5 |
 | Agents | 16 |
 | Hooks | 6 |
-| Rules | 14 |
+| Rules | 13 |
 | Skills | 107 |
 
 ## Pattern Inventory
@@ -20,7 +20,6 @@
 |------|------|---------|--------|--------------|
 | a11y-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | playwright |
 | adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| ai-gemini | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | ai-gemini-api | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-adb-test | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -78,7 +77,6 @@
 | fastapi-run-backend-tests | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | feature-flag | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-ai | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| firebase-auth | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-data-connect | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | fix-issue | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -101,6 +99,9 @@
 | monitoring-setup | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | nuxt-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | obsidian | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| pattern-portability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| pattern-self-containment | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| pattern-structure | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | perf-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | web-quality |
 | pg-query | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pipeline-orchestrator | skill | 1.0.0 | hub:abhayla/claude-best-practices | subagent-driven-dev, executing-plans |
@@ -113,7 +114,6 @@
 | prd-parser | skill | 1.0.0 | hub:abhayla/claude-best-practices | brainstorm |
 | project-scaffold | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup |
 | react-native-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| react-nextjs | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | receive-code-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | reddit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | redis-patterns | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -136,7 +136,6 @@
 | status | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | subagent-driven-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| superpowers | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | supply-chain-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | systematic-debugging | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | tdd | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
