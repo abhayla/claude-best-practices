@@ -1,6 +1,7 @@
 ---
 name: android-compose
 description: Use this agent for Compose UI work — building screens, fixing UI bugs, implementing design system changes, or reviewing Compose code for performance and correctness. Scoped to the presentation layer.
+tools: ["Read", "Grep", "Glob", "Bash", "Edit", "Write"]
 model: sonnet
 ---
 

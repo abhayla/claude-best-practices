@@ -1,6 +1,7 @@
 ---
 name: security-auditor
 description: Use this agent for dedicated security assessments — OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Runs deeper than the code-reviewer's security section. For the full workflow, invokes the /security-audit skill.
+tools: ["Read", "Grep", "Glob", "Bash"]
 model: sonnet
 ---
 

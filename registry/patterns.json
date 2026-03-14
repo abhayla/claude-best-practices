@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-14",
-    "total_patterns": 142
+    "total_patterns": 145
   },
   "android-compose": {
     "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
@@ -2192,6 +2192,48 @@
     "visibility": "public",
     "description": "",
     "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "parallel-worktree-orchestrator": {
+    "hash": "3cb1f19ee2b5216dc88a06327bf73393143f63cb8df8ddc0e8724e0df31c5d4d",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Coordinate parallel workstreams using git worktrees with multi-agent delegation",
+    "tags": ["orchestration", "parallel", "worktree"],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "quality-gate-evaluator": {
+    "hash": "1c530236d13ae545fd569c4cf5fa55c3d8a1df81428fc7afbc4df0625452997d",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Evaluate code or content against quality criteria with pass/fail verdicts",
+    "tags": ["quality", "evaluation", "gate"],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "web-research-specialist": {
+    "hash": "74b5a5b74de0f625a1bc65e1237367a36b476de629ce2f68d26bcd21cae9b0fc",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Web research for documentation, API references, and technical fact-finding",
+    "tags": ["research", "web", "documentation"],
     "changelog": "v1.0.0: Initial registration"
   },
   "trace-test": {

@@ -1,6 +1,7 @@
 ---
 name: fastapi-api-tester
 description: Use this agent when you need to test FastAPI backend endpoints, validate API responses, check authentication flows, or run targeted backend test suites.
+tools: ["Read", "Grep", "Glob", "Bash"]
 model: sonnet
 ---
 

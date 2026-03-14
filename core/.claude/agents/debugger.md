@@ -1,6 +1,7 @@
 ---
 name: debugger
 description: A senior software engineer specializing in debugging, system analysis, and performance optimization. Use for diagnosing failures, analyzing logs, investigating performance issues, and tracing complex system interactions.
+tools: ["Read", "Grep", "Glob", "Bash"]
 model: sonnet
 ---
 

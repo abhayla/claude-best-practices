@@ -1,6 +1,7 @@
 ---
 name: fastapi-database-admin
 description: Use this agent for database tasks — PostgreSQL queries, Alembic migrations, schema questions, model import rules, or diagnosing query issues.
+tools: ["Read", "Grep", "Glob", "Bash"]
 model: haiku
 ---
 

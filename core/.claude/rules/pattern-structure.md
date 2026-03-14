@@ -44,11 +44,26 @@ Every agent in `.claude/agents/*.md` MUST have:
 ---
 name: agent-name
 description: When and why to use this agent.
-model: inherit                   # inherit | sonnet | haiku | opus
+tools: ["Read", "Grep", "Glob"]   # JSON array, least-privilege set
+model: inherit                     # inherit | sonnet | haiku | opus
 ---
 ```
 
 Plus `## Core Responsibilities` and `## Output Format` sections in the body.
+
+### Agent Tool Scoping
+
+The `tools` field MUST be present and follow least-privilege — only grant tools the agent's workflow actually uses. Omitting `tools` grants ALL tools, which violates least-privilege.
+
+| Agent Role | Recommended Tools |
+|-----------|------------------|
+| Read-only (reviewers, analyzers, summarizers) | `["Read", "Grep", "Glob"]` |
+| Diagnostic (debuggers, testers) | `["Read", "Grep", "Glob", "Bash"]` |
+| Writers (docs, UI builders) | `["Read", "Grep", "Glob", "Edit", "Write"]` or add `"Bash"` |
+| Research (web lookup) | `["Read", "Grep", "Glob", "WebFetch", "WebSearch"]` |
+| Orchestrators | `["Read", "Grep", "Glob", "Bash", "Agent"]` |
+
+Use JSON array format `["Tool1", "Tool2"]` — not space-separated strings.
 
 ## Rule Structure
 

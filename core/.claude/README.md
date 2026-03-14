@@ -6,7 +6,7 @@ This directory contains agents, skills, rules, and hooks for Claude Code. Copy i
 cp -r core/.claude/ /path/to/your/project/.claude/
 ```
 
-## Agents (16)
+## Agents (19)
 
 | Agent | Description |
 |-------|-------------|
@@ -15,12 +15,15 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 | `debugger` | Systematic debugging, log analysis, performance optimization |
 | `docs-manager` | Keep project documentation accurate and up-to-date |
 | `git-manager` | Secure git operations with secret scanning |
+| `parallel-worktree-orchestrator` | Coordinate parallel workstreams using git worktrees |
 | `plan-executor` | Parse and execute multi-step implementation plans |
 | `planner-researcher` | Technical research, architecture design, task decomposition |
+| `quality-gate-evaluator` | Evaluate code/content against quality criteria with pass/fail verdicts |
 | `security-auditor` | Security review, STRIDE threat modeling, OWASP checks |
 | `session-summarizer` | Auto-generate session summaries for handoff |
 | `tester` | Run tests, analyze coverage, validate builds |
 | `test-failure-analyzer` | Diagnose test failures and suggest targeted fixes |
+| `web-research-specialist` | Web research for docs, API references, and technical fact-finding |
 | `fastapi-api-tester` | FastAPI endpoint testing and validation |
 | `fastapi-database-admin` | Database tasks — queries, migrations, schema management |
 | `android-build-fixer` | Android build error diagnosis and fix |

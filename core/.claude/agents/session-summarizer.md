@@ -1,6 +1,7 @@
 ---
 name: session-summarizer
 description: Use this agent to auto-generate session summary updates at session end. Reads session artifacts, diffs against current state, and produces a summary ready for handoff. Use before ending a session or when continuation docs are stale.
+tools: ["Read", "Grep", "Glob"]
 model: haiku
 ---
 

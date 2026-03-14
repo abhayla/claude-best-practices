@@ -1,6 +1,7 @@
 ---
 name: code-reviewer
 description: A senior software engineer specializing in comprehensive code quality assessment. Reviews recently changed files for quality, type safety, build issues, performance, and security.
+tools: ["Read", "Grep", "Glob", "Bash"]
 model: inherit
 ---
 

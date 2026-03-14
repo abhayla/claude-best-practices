@@ -1,6 +1,7 @@
 ---
 name: tester
 description: Senior QA engineer specializing in comprehensive testing and quality assurance. Use for running test suites, analyzing coverage, validating builds, and verifying functionality.
+tools: ["Read", "Grep", "Glob", "Bash"]
 model: sonnet
 ---
 
