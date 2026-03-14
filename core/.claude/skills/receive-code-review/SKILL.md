@@ -142,8 +142,15 @@ Handle all blocking comments first. These prevent merge.
 2. **Understand the reviewer's concern** — what is the specific risk or bug?
 3. **Determine the fix approach** — what is the minimal change that addresses the concern?
 4. **Implement the fix** — make the code change
-5. **Verify the fix** — run related tests to confirm the fix works and does not break anything
-6. **Write a response** — explain what was done
+5. **Verify the fix** — invoke `/auto-verify` to run targeted tests on the changed files and confirm no regressions:
+   ```
+   Skill("auto-verify", args="--files <fixed_files>")
+   ```
+   If `auto-verify` reports failures, invoke `/fix-loop` to iterate:
+   ```
+   Skill("fix-loop", args="retest_command: <project_test_cmd> max_iterations: 3")
+   ```
+6. **Write a response** — explain what was done (include verification status)
 
 ### 2.2 Must-Fix Response Template
 
