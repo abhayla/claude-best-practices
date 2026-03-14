@@ -1,5 +1,5 @@
 ---
-name: agent-orchestration-guide
+name: anthropic-agent-orchestration-guide
 description: >
   Reference guide for designing multi-agent orchestration systems. Covers
   Anthropic's 5 workflow patterns, agent vs skill decision framework,

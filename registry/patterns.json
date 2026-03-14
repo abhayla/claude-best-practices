@@ -2632,8 +2632,8 @@
     ],
     "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill — orchestration logic now lives in the agent"
   },
-  "agent-orchestration-guide": {
-    "hash": "3c9ecc8e03902fef6cb38ec6182eee589ab980f52215c1622357f5d84bfa0ded",
+  "anthropic-agent-orchestration-guide": {
+    "hash": "44939f9bcd3e0044064e5a917f91876dda92663c773010f1f1a5e21b6c216bdf",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
