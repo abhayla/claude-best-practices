@@ -3,7 +3,8 @@ name: dast-scan
 description: >
   Dynamic Application Security Testing against a running application.
   OWASP ZAP / Nuclei scanning, header security checks, session management
-  testing, API fuzzing, and DAST CI integration. Use after deployment to dev/staging.
+  testing, API + property-based + mutation fuzz testing, and DAST CI integration.
+  Use after deployment to dev/staging.
 triggers:
   - dast scan
   - runtime security
@@ -12,6 +13,9 @@ triggers:
   - nuclei scan
   - header security
   - session security
+  - fuzz testing
+  - property based testing
+  - mutation testing
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<target URL (http://localhost:8000), or 'all endpoints' with base URL>"
 ---
@@ -227,9 +231,9 @@ For JWT/API token authentication:
 
 ---
 
-## STEP 6: API Fuzz Testing
+## STEP 6: Fuzz Testing (API + Property-Based + Mutation)
 
-### 6.1 Input Fuzzing
+### 6.1 API Input Fuzzing
 
 Test each API endpoint with malicious inputs:
 
@@ -251,14 +255,147 @@ curl -s <target>/api/process -d '{"cmd": "test; cat /etc/passwd"}' -w "%{http_co
 curl -s <target>/api/fetch?url=http://169.254.169.254/ -w "%{http_code}"
 ```
 
-### 6.2 Expected Results
-
 All injection attempts MUST return:
 - 400/422 (bad input) or be safely escaped in response
 - NEVER return 200 with injected content executed
 - NEVER return internal error messages or stack traces
 
-### 6.3 Automated Fuzzing (optional)
+### 6.2 Property-Based Testing
+
+Use generative testing to find edge cases that hand-written tests miss. Property-based tests generate thousands of random inputs and verify invariants hold.
+
+| Stack | Library | Install |
+|-------|---------|---------|
+| Python | Hypothesis | `pip install hypothesis` |
+| TypeScript/JS | fast-check | `npm install fast-check` |
+| Kotlin/JVM | Kotest Property | `testImplementation("io.kotest:kotest-property")` |
+| Go | rapid | `go get pgregory.net/rapid` |
+| Rust | proptest | `cargo add proptest --dev` |
+
+#### Python (Hypothesis)
+
+```python
+from hypothesis import given, strategies as st, settings
+
+# Test: serialization roundtrip preserves data
+@given(st.text(), st.integers(), st.booleans())
+def test_user_serialization_roundtrip(name, age, active):
+    user = User(name=name, age=age, active=active)
+    serialized = user.to_dict()
+    restored = User.from_dict(serialized)
+    assert restored == user
+
+# Test: API always returns valid JSON for any valid input
+@given(st.text(min_size=1, max_size=200))
+@settings(max_examples=500)
+def test_search_always_returns_valid_response(search_term):
+    response = client.get(f"/api/search?q={search_term}")
+    assert response.status_code in (200, 400, 422)
+    assert response.headers["content-type"] == "application/json"
+
+# Test: price calculation invariant (total >= sum of items)
+@given(st.lists(st.floats(min_value=0.01, max_value=9999.99), min_size=1, max_size=50))
+def test_order_total_never_negative(prices):
+    order = create_order(prices)
+    assert order.total >= 0
+    assert order.total >= sum(prices) * 0.8  # minimum after max discount
+```
+
+#### TypeScript (fast-check)
+
+```typescript
+import fc from 'fast-check';
+
+// Test: encode/decode roundtrip
+fc.assert(
+  fc.property(fc.string(), (input) => {
+    expect(decode(encode(input))).toEqual(input);
+  })
+);
+
+// Test: sorted output is always sorted
+fc.assert(
+  fc.property(fc.array(fc.integer()), (arr) => {
+    const sorted = sortFunction(arr);
+    for (let i = 1; i < sorted.length; i++) {
+      expect(sorted[i]).toBeGreaterThanOrEqual(sorted[i - 1]);
+    }
+  })
+);
+
+// Test: API validates all inputs (no 500s)
+fc.assert(
+  fc.property(fc.record({ name: fc.string(), email: fc.emailAddress() }), async (input) => {
+    const res = await fetch('/api/users', { method: 'POST', body: JSON.stringify(input) });
+    expect(res.status).not.toBe(500); // Must validate, not crash
+  }),
+  { numRuns: 1000 }
+);
+```
+
+#### Kotlin (Kotest Property)
+
+```kotlin
+class UserPropertyTest : FunSpec({
+    test("serialization roundtrip preserves data") {
+        checkAll(Arb.string(), Arb.int(), Arb.boolean()) { name, age, active ->
+            val user = User(name, age, active)
+            val restored = User.fromJson(user.toJson())
+            restored shouldBe user
+        }
+    }
+
+    test("repository never returns more items than limit") {
+        checkAll(Arb.int(1..100)) { limit ->
+            val results = repository.search("test", limit = limit)
+            results.size shouldBeLessThanOrEqual limit
+        }
+    }
+})
+```
+
+#### Common Properties to Test
+
+| Property | Description | Example |
+|----------|-------------|---------|
+| **Roundtrip** | encode(decode(x)) == x | Serialization, encryption, compression |
+| **Invariant** | f(x) satisfies condition for ALL x | Total >= 0, list length preserved |
+| **Idempotent** | f(f(x)) == f(x) | Formatting, normalization, dedup |
+| **Commutative** | f(a, b) == f(b, a) | Merge, union, max |
+| **No crash** | f(x) doesn't throw for any valid x | API validation, parser |
+| **Monotonic** | x <= y -> f(x) <= f(y) | Pricing, sorting |
+
+### 6.3 Mutation Testing
+
+Verify that tests actually catch bugs by injecting small mutations into source code and checking if tests fail.
+
+| Stack | Tool | Command |
+|-------|------|---------|
+| Python | mutmut | `mutmut run --paths-to-mutate=src/` |
+| TypeScript/JS | Stryker | `npx stryker run` |
+| Kotlin/JVM | PIT (pitest) | `./gradlew pitest` |
+| Go | go-mutesting | `go-mutesting ./...` |
+| Rust | cargo-mutants | `cargo mutants` |
+
+#### Interpreting Results
+
+| Metric | Threshold | Meaning |
+|--------|-----------|---------|
+| Mutation score >= 80% | Pass | Tests catch 80%+ of injected bugs |
+| Mutation score 60-79% | Review | Tests miss common fault patterns |
+| Mutation score < 60% | Fail | Tests provide false confidence |
+
+#### Common Surviving Mutations (fix priorities)
+
+| Mutation | What Survived | Fix |
+|----------|--------------|-----|
+| `>` -> `>=` | Boundary condition not tested | Add boundary value test |
+| `+` -> `-` | Arithmetic not verified | Assert on computed values |
+| `true` -> `false` | Boolean logic untested | Test both branches |
+| Remove method call | Side effect not verified | Assert the side effect occurred |
+| Empty return | Return value not checked | Assert return value |
+
+### 6.4 Automated Fuzzing Tools (optional)
 
 ```bash
 # Using ffuf for endpoint discovery
@@ -383,3 +520,71 @@ Present findings as a structured security report:
 - MUST NOT duplicate SAST findings — this skill covers RUNTIME issues only
 - MUST NOT skip header checks even if ZAP is not available — manual curl checks are always possible
 - MUST NOT leave ZAP Docker container running after scan completes
+
+---
+
+## COMBINED CONFORMANCE + SECURITY SCANNING
+
+Run API conformance and security testing in a single pass using the OpenAPI spec.
+
+### Pattern: Spec-Driven Security
+
+```bash
+# Use the OpenAPI spec to drive both conformance and security tests
+# 1. Verify API matches spec (conformance)
+specmatic test --contract openapi.yaml --host localhost --port 8000
+
+# 2. Security scan against the same spec
+# OWASP ZAP reads OpenAPI and tests all endpoints for vulnerabilities
+docker run --rm -v $(pwd):/zap/wrk owasp/zap2docker-stable zap-api-scan.py \
+  -t http://host.docker.internal:8000/openapi.json \
+  -f openapi \
+  -r security-report.html
+
+# 3. Fuzz testing of all endpoints discovered from spec
+docker run --rm -v $(pwd):/zap/wrk owasp/zap2docker-stable zap-api-scan.py \
+  -t http://host.docker.internal:8000/openapi.json \
+  -f openapi \
+  -c zap-fuzz-config.conf
+```
+
+### OWASP API Top 10 Mapping
+
+Map tests to OWASP API Security Top 10 categories:
+
+| OWASP Category | Test Approach | Automated |
+|---------------|---------------|-----------|
+| API1: Broken Object Level Auth | Request resource with different user's token | Yes |
+| API2: Broken Authentication | Token expiry, brute force, credential stuffing | Yes |
+| API3: Broken Object Property Level Auth | Modify read-only fields in PATCH/PUT | Yes |
+| API4: Unrestricted Resource Consumption | Exceed rate limits, large payloads | Yes |
+| API5: Broken Function Level Auth | Access admin endpoints with user token | Yes |
+| API6: Unrestricted Access to Sensitive Business Flows | Automate business-critical flows | Partial |
+| API7: Server Side Request Forgery | SSRF payloads in URL parameters | Yes |
+| API8: Security Misconfiguration | Check headers, CORS, error disclosure | Yes |
+| API9: Improper Inventory Management | Undocumented endpoints, old API versions | Yes |
+| API10: Unsafe Consumption of APIs | Third-party API response validation | Partial |
+
+### CI Integration
+
+```yaml
+security-scan:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Conformance test
+      run: specmatic test --contract openapi.yaml --host localhost --port 8000
+
+    - name: OWASP ZAP API scan
+      uses: zaproxy/action-api-scan@v0.7.0
+      with:
+        target: 'http://localhost:8000/openapi.json'
+        format: openapi
+        fail_action: true  # Fail CI on HIGH/CRITICAL findings
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-report
+        path: report_html.html
+```

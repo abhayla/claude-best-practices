@@ -233,29 +233,141 @@ cat src/domain/__init__.py  # Should export only public types
 
 ---
 
-## STEP 6: ADR Review
+## STEP 6: ADR Lifecycle Review
 
-If ADRs exist, verify they are still valid:
+Full Architecture Decision Record validation: verify existing ADRs are still valid, detect when code contradicts decisions, update statuses, and flag when new ADRs are needed.
+
+### 6.1 Inventory Existing ADRs
 
 ```bash
 # Find all ADRs
-find docs/adr/ -name "ADR-*.md" 2>/dev/null
+find docs/adr/ -name "ADR-*.md" -o -name "*.adr.md" 2>/dev/null
+
+# Extract status from each ADR
+for adr in $(find docs/adr/ -name "ADR-*.md" 2>/dev/null); do
+  status=$(grep -i "^status:" "$adr" | head -1)
+  title=$(grep -i "^# \|^title:" "$adr" | head -1)
+  echo "$adr | $status | $title"
+done
 ```
 
-For each ADR, check:
-- [ ] Status is current (not superseded without replacement)
-- [ ] Decision is still reflected in the code
-- [ ] Context hasn't changed (new constraints, new requirements)
-- [ ] Consequences identified in ADR are observable in implementation
+### 6.2 Validate Each ADR Against Current Code
+
+For each ADR with status `Accepted` or `Active`, verify:
+
+| Check | How to Verify | If Failed |
+|-------|--------------|-----------|
+| **Decision reflected in code** | Search codebase for the decision's implementation (e.g., ADR says "use UUID" → check all PKs are UUID) | Flag as ⚠️ Drift — code contradicts decision |
+| **Context still valid** | Compare ADR's context section against current constraints (new requirements, team size, scale changes) | Flag as ⚠️ Stale Context — may need re-evaluation |
+| **Consequences observable** | Check if the expected consequences (positive + negative) actually occurred | Flag as 📝 Informational |
+| **No superseding decision** | Check if a later ADR or code change implicitly overrides this decision | Flag as ❌ Superseded — needs status update |
+| **Alternatives still rejected** | Verify the rejected alternatives are still inferior given current context | Flag as ⚠️ Revisit — rejected alternative may now be better |
+
+```bash
+# Example: ADR-001 says "Use PostgreSQL" — verify no other DB is used
+grep -rn "mongodb\|dynamodb\|mysql\|sqlite" src/ --include="*.py" --include="*.ts" --include="*.kt" --include="*.yaml" 2>/dev/null
+
+# Example: ADR-005 says "Use REST" — verify no GraphQL added
+grep -rn "graphql\|apollo\|@Query\|@Mutation" src/ --include="*.py" --include="*.ts" --include="*.kt" 2>/dev/null
+```
+
+### 6.3 Detect Missing ADRs
+
+Scan recent changes for significant architectural decisions that lack an ADR:
+
+| Signal in Code | Missing ADR Topic |
+|----------------|-------------------|
+| New database/cache/queue dependency added | Technology choice ADR |
+| New authentication method introduced | Auth strategy ADR |
+| Switching from monolith to microservice (or vice versa) | Architecture style ADR |
+| New third-party API integration | Vendor selection ADR |
+| Major refactoring of module boundaries | Module structure ADR |
+| New data storage pattern (event sourcing, CQRS) | Data architecture ADR |
+| Framework or language change | Technology migration ADR |
+
+```bash
+# Detect new dependencies in recent changes
+git diff origin/main...HEAD -- "*requirements*.txt" "*package.json" "*build.gradle*" "*go.mod" "*Cargo.toml" 2>/dev/null | grep "^+"
+
+# Detect new infrastructure (Docker services, cloud resources)
+git diff origin/main...HEAD -- "*docker-compose*" "*terraform*" "*pulumi*" "*.tf" 2>/dev/null | grep "^+"
+```
+
+For each detected significant decision without an ADR, generate a stub:
 
 ```markdown
-## ADR Review
+## Recommended New ADR
 
-| ADR | Title | Status | Still Valid? |
-|-----|-------|--------|-------------|
-| ADR-001 | Use UUID for primary keys | Accepted | ✅ All tables use UUID |
-| ADR-002 | Use Redis for caching | Accepted | ⚠️ Some endpoints bypass cache |
-| ADR-003 | Monorepo structure | Proposed | ❌ Superseded — now multi-repo |
+**ADR-NNN: [Decision Title]**
+
+**Status:** Proposed
+**Date:** <date>
+**Context:** [What change triggered this — from git diff]
+**Decision:** [What was decided — from code analysis]
+**Consequences:**
+- [Positive: ...]
+- [Negative: ...]
+- [Risk: ...]
+
+> Save to: `docs/adr/ADR-NNN-<title>.md`
+```
+
+### 6.4 Update ADR Statuses
+
+Apply lifecycle transitions based on findings:
+
+```
+                    ┌───────────┐
+                    │ Proposed  │
+                    └─────┬─────┘
+                          │ review accepts
+                          ▼
+                    ┌───────────┐
+           ┌──────▶│ Accepted  │◀──────┐
+           │       └─────┬─────┘       │
+           │             │             │
+     re-evaluate    code contradicts   │
+           │             │             │
+           │             ▼             │
+           │       ┌───────────┐       │
+           └───────│ Deprecated│       │
+                   └─────┬─────┘       │
+                         │             │
+                    replaced by        │
+                         │             │
+                         ▼             │
+                   ┌───────────┐       │
+                   │Superseded │───────┘
+                   │ by ADR-NNN│  (new ADR accepted)
+                   └───────────┘
+```
+
+When updating an ADR status:
+1. Change the `Status:` field in the ADR file
+2. Add a dated note explaining why the status changed
+3. If superseding, link to the replacement ADR
+4. If deprecating, document what replaces the decision (even if no formal ADR)
+
+### 6.5 ADR Conformance Report
+
+```markdown
+## ADR Lifecycle Review
+
+| ADR | Title | Status | Conformance | Action |
+|-----|-------|--------|-------------|--------|
+| ADR-001 | Use UUID for primary keys | Accepted | ✅ All tables use UUID | None |
+| ADR-002 | Use Redis for caching | Accepted | ⚠️ 3 endpoints bypass cache | Investigate — intentional or drift? |
+| ADR-003 | Monorepo structure | Accepted | ❌ Code now multi-repo | Update status → Superseded |
+| ADR-004 | REST over GraphQL | Accepted | ✅ No GraphQL imports found | None |
+| — | New: Added MongoDB dependency | — | — | 🆕 Create ADR for NoSQL addition |
+
+### Status Updates Applied
+- ADR-003: `Accepted` → `Superseded by ADR-007`
+- ADR-002: Added note: "Cache bypass on /health and /metrics is intentional (2026-03-14)"
+
+### Missing ADRs (recommended)
+1. **ADR-NNN: Add MongoDB for analytics** — New `pymongo` dependency detected in `requirements.txt`
+2. **ADR-NNN: Switch to event-driven auth** — New `kafka` consumer in `auth/events.py`
 ```
 
 ---
@@ -299,7 +411,9 @@ Present the comprehensive fitness report:
 - Always check dependency direction against the architecture's constraints
 - Always scan for circular dependencies
 - Always compute coupling metrics for changed modules
-- Always review ADR validity if ADRs exist
+- Always review ADR validity if ADRs exist — check code conformance, context validity, and status accuracy
+- Always detect missing ADRs for significant architectural decisions in recent changes
+- Always update ADR statuses when code contradicts or supersedes decisions
 - Always produce a structured fitness report (Step 7)
 
 ## MUST NOT DO
@@ -309,3 +423,5 @@ Present the comprehensive fitness report:
 - MUST NOT block on coupling metrics alone — they are directional indicators, not hard rules
 - MUST NOT duplicate layer validation from `code-quality-gate` Step 5 — this skill provides deeper analysis (coupling, ADR review, boundary analysis)
 - MUST NOT report generated code or third-party libraries as violations
+- MUST NOT deprecate an ADR without documenting what replaces the decision
+- MUST NOT create ADR stubs for trivial decisions (library minor version bumps, config changes)

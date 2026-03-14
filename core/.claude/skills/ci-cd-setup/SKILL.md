@@ -7,6 +7,12 @@ description: >
   CI/CD pipelines.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<platform: github-actions|gitlab-ci> [options: stages, caching, secrets, deploy, matrix, notifications]"
+triggers:
+  - ci cd setup
+  - github actions
+  - gitlab ci
+  - pipeline setup
+  - ci pipeline
 ---
 
 # CI/CD Pipeline Setup

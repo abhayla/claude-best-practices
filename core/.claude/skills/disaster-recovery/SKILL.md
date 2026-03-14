@@ -192,6 +192,123 @@ After each drill, produce a report containing: date, type, participants, scenari
 
 ---
 
+## STEP 7A: Backup Encryption & Key Management
+
+### Encryption at Rest
+
+| Backup Type | Encryption Method | Key Management |
+|-------------|------------------|----------------|
+| Database dumps | GPG/age encryption before upload | Key stored in separate secret store from backups |
+| WAL archives | Server-side encryption (SSE-S3, SSE-KMS) | KMS key with rotation enabled |
+| Object storage | Bucket-level SSE with customer-managed keys | KMS key per environment, auto-rotate annually |
+| Vault snapshots | Built-in AES-256-GCM | Unseal keys in separate, geographically distributed storage |
+
+### Key Rotation for Backup Encryption
+
+1. Generate new encryption key in KMS/secret store
+2. Re-encrypt the latest full backup with the new key — verify decryption succeeds
+3. Update backup scripts to use new key ID
+4. Retain old key until all backups encrypted with it have expired per retention policy
+5. Decommission old key only after zero backups reference it
+
+### Compliance Considerations
+
+| Requirement | Implementation |
+|-------------|---------------|
+| **GDPR data residency** | Backups MUST reside in the same regulatory region as the primary data. Cross-region DR copies require a Data Processing Agreement with the secondary region's provider |
+| **SOC 2 backup verification** | Monthly restore tests with documented evidence (drill reports from Step 7) |
+| **HIPAA encryption** | AES-256 at rest, TLS 1.2+ in transit, key management via FIPS 140-2 validated HSM |
+| **PCI-DSS** | Cardholder data backups encrypted, access logged, retention per PCI schedule (usually 1 year) |
+
+If compliance requirements are not specified in the PRD, flag this as a question to the user — do not assume no compliance applies.
+
+---
+
+## STEP 7B: Restore Verification Testing
+
+Automated monthly restore verification — ensures backups are not silently corrupted.
+
+### Verification Script Template
+
+```bash
+#!/bin/bash
+# restore-verify.sh — Run monthly via cron or CI scheduled job
+set -euo pipefail
+
+BACKUP_FILE=$(ls -t /backups/full/*.dump | head -1)
+TEST_DB="restore_verify_$(date +%Y%m%d)"
+REPORT_FILE="docs/dr-reports/restore-verify-$(date +%Y%m%d).md"
+
+echo "## Restore Verification Report" > "$REPORT_FILE"
+echo "Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$REPORT_FILE"
+echo "Backup: $BACKUP_FILE" >> "$REPORT_FILE"
+
+# 1. Create isolated test database
+createdb "$TEST_DB"
+trap "dropdb --if-exists $TEST_DB" EXIT
+
+# 2. Restore backup
+START=$(date +%s)
+pg_restore -d "$TEST_DB" -j 4 "$BACKUP_FILE" 2>> "$REPORT_FILE"
+DURATION=$(( $(date +%s) - START ))
+echo "Restore duration: ${DURATION}s" >> "$REPORT_FILE"
+
+# 3. Validate row counts against expected minimums
+psql "$TEST_DB" -t -c "
+  SELECT tablename, n_live_tup
+  FROM pg_stat_user_tables
+  ORDER BY n_live_tup DESC
+  LIMIT 20;
+" >> "$REPORT_FILE"
+
+# 4. Validate schema matches production
+pg_dump --schema-only "$TEST_DB" > /tmp/restored_schema.sql
+pg_dump --schema-only "$PROD_DB" > /tmp/prod_schema.sql
+if diff -q /tmp/restored_schema.sql /tmp/prod_schema.sql > /dev/null; then
+  echo "Schema: MATCH" >> "$REPORT_FILE"
+else
+  echo "Schema: DIVERGED — investigate immediately" >> "$REPORT_FILE"
+  diff /tmp/restored_schema.sql /tmp/prod_schema.sql >> "$REPORT_FILE"
+fi
+
+# 5. Run application smoke test against restored DB
+DATABASE_URL="postgresql://localhost/$TEST_DB" pytest tests/smoke/ -q >> "$REPORT_FILE" 2>&1
+
+echo "Result: PASSED" >> "$REPORT_FILE"
+```
+
+### CI Integration
+
+```yaml
+# .github/workflows/restore-verify.yml
+name: Monthly Restore Verification
+on:
+  schedule:
+    - cron: '0 3 1 * *'  # First day of each month at 3 AM
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: test
+        ports: ['5432:5432']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download latest backup
+        run: aws s3 cp s3://$BACKUP_BUCKET/latest/full.dump ./backup.dump
+      - name: Run restore verification
+        run: bash scripts/restore-verify.sh
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: restore-report
+          path: docs/dr-reports/restore-verify-*.md
+```
+
+---
+
 ## MUST DO
 
 - MUST derive RTO/RPO from actual NFR documents or SLAs, not arbitrary defaults

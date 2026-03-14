@@ -35,6 +35,9 @@ Scan the project to determine which migration tool is in use:
 ls -la prisma/schema.prisma knexfile.js knexfile.ts manage.py \
   ormconfig.ts ormconfig.json tsconfig.json drizzle.config.ts \
   drizzle.config.json alembic.ini alembic/ migrations/ 2>/dev/null
+
+# Also check for Android Room
+grep -rl "androidx.room" build.gradle build.gradle.kts app/build.gradle app/build.gradle.kts 2>/dev/null
 ```
 
 ### Auto-Detection Table
@@ -47,6 +50,7 @@ ls -la prisma/schema.prisma knexfile.js knexfile.ts manage.py \
 | `ormconfig.ts` or `data-source.ts` with `typeorm` | **TypeORM** | Node.js / TypeScript |
 | `drizzle.config.ts` or `drizzle.config.json` | **Drizzle** | Node.js / TypeScript |
 | `alembic.ini` or `alembic/` directory | **Alembic** (SQLAlchemy) | Python |
+| `build.gradle*` with `androidx.room` dependency | **Room** | Android / Kotlin |
 | `migrations/*.sql` with no ORM config | **Raw SQL** | Any |
 
 If multiple tools are detected, ask the user which one to use.
@@ -153,6 +157,112 @@ alembic revision -m "<migration_description>"
 
 Verify the generated `upgrade()` and `downgrade()` functions in `alembic/versions/`.
 
+#### Android Room
+
+Room uses `@Database(version = N)` annotations and `Migration(startVersion, endVersion)` classes.
+There is no CLI command to auto-generate migrations — migrations are hand-written Kotlin/Java.
+
+**Step 1: Update the `@Database` version:**
+
+```kotlin
+// app/src/main/java/com/example/data/AppDatabase.kt
+@Database(
+    entities = [UserEntity::class, ProjectEntity::class],
+    version = 2,  // Increment from previous version
+    exportSchema = true  // Required for migration testing
+)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun userDao(): UserDao
+    abstract fun projectDao(): ProjectDao
+}
+```
+
+**Step 2: Write the Migration class:**
+
+```kotlin
+// app/src/main/java/com/example/data/migrations/Migration1To2.kt
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // UP: Add new table
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS projects (
+                id TEXT NOT NULL PRIMARY KEY,
+                name TEXT NOT NULL,
+                owner_id TEXT NOT NULL,
+                created_at INTEGER NOT NULL,
+                FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """)
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_projects_owner ON projects(owner_id)")
+    }
+}
+```
+
+**Step 3: Register the migration in the database builder:**
+
+```kotlin
+Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
+    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+    .build()
+```
+
+**Step 4: Write a DOWN migration (for dev/test rollback only):**
+
+Room does not natively support DOWN migrations. For development, create a helper:
+
+```kotlin
+// Only used in tests — never in production
+fun rollbackMigration2To1(db: SupportSQLiteDatabase) {
+    db.execSQL("DROP TABLE IF EXISTS projects")
+}
+```
+
+**Auto-migrations (Room 2.4+):**
+
+For simple additive changes (new column, new table), use Room's auto-migration:
+
+```kotlin
+@Database(
+    version = 3,
+    autoMigrations = [
+        AutoMigration(from = 2, to = 3)  // Room generates the SQL
+    ]
+)
+abstract class AppDatabase : RoomDatabase()
+```
+
+Auto-migration works for: adding columns (with default values), adding tables, adding indexes.
+Auto-migration does NOT work for: renaming columns/tables, deleting columns, changing types.
+For those, use `@RenameColumn`, `@DeleteColumn`, or `@RenameTable` annotations with an `AutoMigrationSpec`.
+
+**Step 5: Test the migration:**
+
+```kotlin
+@RunWith(AndroidJUnit4::class)
+class MigrationTest {
+    @get:Rule
+    val helper = MigrationTestHelper(
+        InstrumentationRegistry.getInstrumentation(),
+        AppDatabase::class.java,
+    )
+
+    @Test
+    fun migrate1To2() {
+        // Create database at version 1
+        helper.createDatabase("test-db", 1).apply {
+            execSQL("INSERT INTO users (id, email) VALUES ('u1', 'test@example.com')")
+            close()
+        }
+        // Run migration to version 2
+        val db = helper.runMigrationsAndValidate("test-db", 2, true, MIGRATION_1_2)
+        // Verify data survived
+        val cursor = db.query("SELECT * FROM users WHERE id = 'u1'")
+        assertThat(cursor.count).isEqualTo(1)
+        cursor.close()
+    }
+}
+```
+
 #### Raw SQL
 
 Create two files per migration:
@@ -192,6 +302,7 @@ After generating, verify both directions work:
 | TypeORM | `npx typeorm migration:run -d src/data-source.ts` |
 | Drizzle | `npx drizzle-kit push` |
 | Alembic | `alembic upgrade head` |
+| Room | `./gradlew :app:connectedDebugAndroidTest --tests *MigrationTest` |
 | Raw SQL | `psql -f migrations/<file>.up.sql` (or equivalent) |
 
 ### 3.2 Run DOWN (rollback)
@@ -204,6 +315,7 @@ After generating, verify both directions work:
 | TypeORM | `npx typeorm migration:revert -d src/data-source.ts` |
 | Drizzle | Manual: apply the `.down.sql` file |
 | Alembic | `alembic downgrade -1` |
+| Room | Manual: call `rollbackMigrationNToM()` helper in test (Room has no native rollback) |
 | Raw SQL | `psql -f migrations/<file>.down.sql` (or equivalent) |
 
 ### 3.3 Round-Trip Test
@@ -229,6 +341,7 @@ If the round-trip fails, the DOWN migration is incomplete or incorrect.
 | TypeORM | `npx typeorm migration:show -d src/data-source.ts` |
 | Drizzle | `npx drizzle-kit check` |
 | Alembic | `alembic current && alembic history --verbose` |
+| Room | Check `@Database(version = N)` annotation + `room_master_table` in SQLite |
 | Raw SQL | Check a `schema_migrations` table or equivalent tracking |
 
 ---

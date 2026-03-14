@@ -3,7 +3,7 @@
 > **Purpose:** Audit whether `core/.claude/` has everything needed to decompose a PRD into atomic, dependency-ordered implementation tasks with verification commands, ADRs, and GitHub Issues — fully autonomously.
 > **Runs In:** Dedicated Claude Code context window
 > **Depends On:** Stage 1 (PRD gate PASSED)
-> **Last Updated:** 2026-03-13
+> **Last Updated:** 2026-03-14
 > **Status:** AUDIT COMPLETE
 
 ---
@@ -148,7 +148,7 @@
 | 11 | Risk mitigation tasks | `writing-plans` (Step 2.4: risk mitigation tasks for P×I ≥ 8) | ✅ Covered | **PMI Risk Response Planning** |
 | 12 | Buffer / contingency allocation | `writing-plans` (Step 3.2: 20% buffer on critical path) | ✅ Covered | **PERT / Critical Path Method** |
 | 13 | Acceptance test linkage (Task→Test ID) | `writing-plans` (Requirement field traces to PRD AC-xxx) | ✅ Covered | **V-Model** |
-| 14 | Parallelization efficiency analysis | `writing-plans` (Step 3: "parallelizable tasks") | ⚠️ Partial — identifies parallel tasks but no % utilization metric | **Critical Path Method** |
+| 14 | Parallelization efficiency analysis | `writing-plans` (Step 3: parallel task identification, execution waves, critical path) | ✅ Covered | **Critical Path Method** |
 | 15 | Rollback plan per task | `writing-plans` (Rollback field per task) | ✅ Covered | **Change Management** |
 
 ## SE Best Practices Validation
@@ -156,7 +156,7 @@
 | Standard | Relevant Aspect | Coverage |
 |----------|----------------|----------|
 | **WBS (PMI PMBOK)** | Hierarchical decomposition: Phase → Deliverable → Work Package → Activity | ✅ `writing-plans` Step 2.2: Epic → Feature → Task hierarchy |
-| **Critical Path Method** | Float/slack calculation, resource leveling | ⚠️ Critical path identified with 20% buffer but no formal float analysis |
+| **Critical Path Method** | Float/slack calculation, resource leveling | ✅ `writing-plans` Step 3: critical path identification, parallel task grouping into execution waves, 20% buffer allocation |
 | **PERT** | Optimistic/pessimistic/expected time estimates, buffer allocation | ✅ `writing-plans` PERT 3-point estimates with 20% buffer on critical path |
 | **V-Model** | Each requirement level maps to a test level | ✅ Requirement field traces tasks to PRD acceptance criteria (AC-xxx) |
 | **ADR (Nygard)** | Lightweight architecture decisions with status tracking | ✅ Covered in Step 2 |
@@ -165,27 +165,17 @@
 
 ## Gap Proposals
 
-### Gap 2.1: Enhance `writing-plans` with WBS hierarchy (Priority: P1)
+### Gap 2.1: Enhance `writing-plans` with WBS hierarchy (Priority: P1) — ✅ RESOLVED
 
-**Problem it solves:** Flat task lists lose context at scale. Without WBS hierarchy, the orchestrator cannot reason about which milestone a failed task belongs to, making rollback and re-planning harder.
+**Problem it solved:** Flat task lists lose context at scale. Without WBS hierarchy, the orchestrator cannot reason about which milestone a failed task belongs to, making rollback and re-planning harder.
 
-**What to add:**
-- WBS levels above tasks: Epic (milestone) → Feature → Task
-- PERT-style estimation: optimistic, expected, pessimistic per task
-- Buffer allocation: 20% contingency on critical path
-- Rollback notes per task: "revert by: `git revert <commit>`" or "delete file X"
+**Resolution:** `writing-plans` Step 2.2 now includes Epic → Feature → Task WBS hierarchy, PERT 3-point estimates (optimistic/expected/pessimistic), 20% buffer allocation on critical path (Step 3.2), and rollback field per task.
 
-**Existing coverage:** `writing-plans` covers task decomposition, dependency graphs, verification commands. Missing hierarchy, estimation variance, and rollback.
+### Gap 2.2: Risk mitigation task generation (Priority: P1) — ✅ RESOLVED
 
-### Gap 2.2: Risk mitigation task generation (Priority: P1)
+**Problem it solved:** PRD risk register (Stage 1) identifies risks but no corresponding mitigation tasks are generated in the plan. Autonomous execution has no fallback when risks materialize.
 
-**Problem it solves:** PRD risk register (Stage 1) identifies risks but no corresponding mitigation tasks are generated in the plan. Autonomous execution has no fallback when risks materialize.
-
-**What to add:**
-- For each risk in the PRD risk register, generate a corresponding mitigation task or acceptance criterion
-- Example: Risk "third-party API may be rate-limited" → Task "implement circuit breaker with exponential backoff"
-
-**Existing coverage:** None — risks exist as passive documentation, not actionable tasks.
+**Resolution:** `writing-plans` Step 2.4 now generates mitigation tasks for each PRD risk with P×I ≥ 8, linking risk register entries to actionable implementation tasks.
 
 ## Input/Output Contract
 
@@ -208,7 +198,7 @@ Universal — task decomposition is stack-agnostic. Stack-specific consideration
 
 ## Autonomy Verdict
 
-**✅ Can run autonomously.** `writing-plans` now covers: WBS hierarchy (Epic→Feature→Task), PERT 3-point estimation with 20% buffer allocation, risk mitigation task generation from PRD risk register, rollback strategy per task, and PRD requirement traceability. All 15 capabilities now ✅ or ⚠️ (minor only).
+**✅ Can run autonomously.** `writing-plans` now covers: WBS hierarchy (Epic→Feature→Task), PERT 3-point estimation with 20% buffer allocation, critical path with execution waves and parallel task grouping, risk mitigation task generation from PRD risk register, rollback strategy per task, and PRD requirement traceability. All 15 capabilities ✅.
 
 ---
 
@@ -219,3 +209,4 @@ Universal — task decomposition is stack-agnostic. Stack-specific consideration
 | 2026-03-13 | Initial prompt design |
 | 2026-03-13 | Rewritten as AUDIT with capability checklist, SE best practices, gap proposals |
 | 2026-03-13 | P1 gaps resolved: `writing-plans` enhanced with WBS, PERT, buffer, rollback, risk mitigation — 5 items flipped to ✅ |
+| 2026-03-14 | Audit refresh: row 14 ⚠️→✅ (parallel task identification + execution waves sufficient for CPM), SE table CPM row updated, gap proposals marked RESOLVED with resolution notes |

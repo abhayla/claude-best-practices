@@ -3,9 +3,10 @@ name: security-audit
 description: >
   Comprehensive security audit workflow: static analysis with CodeQL and Semgrep,
   SARIF triage, variant analysis, differential security review, insecure defaults
-  detection, false-positive gating, and GitHub Actions hardening. Based on
-  Trail of Bits security research patterns. Use for security audits, vulnerability
-  discovery, code review, or compliance checks.
+  detection, false-positive gating, GitHub Actions hardening, and regulatory
+  compliance testing (GDPR, SOC2, HIPAA). Based on Trail of Bits security research
+  patterns. Use for security audits, vulnerability discovery, code review, or
+  compliance checks.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "security audit, vulnerability, codeql, semgrep, sarif, static analysis, security review, insecure defaults"
 argument-hint: "<'full-audit' or 'diff-review' or 'variant <CVE/pattern>' or 'actions-audit'>"
@@ -276,6 +277,105 @@ Cross-reference findings against OWASP Top 10 (2021):
 
 ---
 
+## STEP 9: Compliance Testing (GDPR / SOC2 / HIPAA)
+
+Verify regulatory compliance requirements through automated checks and structured audits. Skip sections not applicable to the project's regulatory scope.
+
+### 9.1 Detect Applicable Regulations
+
+| Signal | Regulation | Trigger |
+|--------|-----------|---------|
+| Stores EU user data | GDPR | User location, `.eu` domains, EU payment processors |
+| Handles payment/financial data | SOC2 | Stripe, payment endpoints, financial records |
+| Stores health/medical data | HIPAA | Patient records, health APIs, medical terminology in schemas |
+| Stores children's data | COPPA | Age gates, parental consent flows |
+| Processes biometric data | BIPA / GDPR Art.9 | Face recognition, fingerprint, voice data |
+
+### 9.2 GDPR Compliance Checklist
+
+```bash
+# Find personal data storage (PII columns)
+grep -rn "email\|phone\|address\|birth\|ssn\|passport\|ip_address\|location" --include="*.py" --include="*.ts" --include="*.kt" --include="*.sql" src/ 2>/dev/null
+
+# Check for consent collection
+grep -rn "consent\|gdpr\|opt.in\|opt.out\|privacy.policy\|cookie.consent" --include="*.py" --include="*.ts" --include="*.kt" --include="*.html" src/ 2>/dev/null
+
+# Check for data deletion endpoints
+grep -rn "delete.*account\|delete.*user\|right.to.be.forgotten\|erasure\|anonymize\|purge" --include="*.py" --include="*.ts" --include="*.kt" src/ 2>/dev/null
+```
+
+| Requirement | Check | Pass Criteria |
+|-------------|-------|---------------|
+| **Lawful basis** | Consent collected before data processing | Consent endpoint exists, recorded in DB with timestamp |
+| **Right to access** | Data export endpoint | User can download their data in machine-readable format (JSON/CSV) |
+| **Right to erasure** | Account deletion endpoint | Hard-delete or anonymize all PII; cascade to backups within 30 days |
+| **Data minimization** | Only necessary fields collected | No PII columns beyond what features require |
+| **Purpose limitation** | Data used only for stated purpose | No PII in analytics, logs, or third-party calls without consent |
+| **Breach notification** | Incident response process exists | Alert mechanism for data breaches within 72 hours |
+| **Data portability** | Export in standard format | JSON/CSV export of user data |
+| **Privacy by design** | PII encrypted at rest and in transit | Column encryption for PII, TLS enforced |
+
+### 9.3 SOC2 Trust Principles Checklist
+
+| Principle | Check | Verification |
+|-----------|-------|-------------|
+| **Security** | Access controls, encryption, vulnerability management | Auth on all endpoints, RBAC implemented, dependencies patched |
+| **Availability** | Uptime monitoring, disaster recovery | Health check endpoint, backup/restore tested, SLA defined |
+| **Processing integrity** | Input validation, error handling, audit logs | Validation on all inputs, structured error responses, audit trail |
+| **Confidentiality** | Data classification, encryption, access logging | PII marked and encrypted, access logged, least privilege |
+| **Privacy** | Notice, consent, collection limitation | Privacy policy, consent mechanism, data retention policy |
+
+### 9.4 HIPAA Compliance Checklist (PHI — Protected Health Information)
+
+| Safeguard | Check | Verification |
+|-----------|-------|-------------|
+| **Access control** | Unique user IDs, emergency access, auto-logoff | Per-user auth, session timeout ≤15min, break-glass procedure |
+| **Audit controls** | All PHI access logged | Immutable audit log with user, timestamp, action, resource |
+| **Integrity** | PHI not improperly altered | Checksums on PHI records, change tracking |
+| **Transmission security** | PHI encrypted in transit | TLS 1.2+ enforced, no plaintext PHI in URLs/headers |
+| **Encryption at rest** | PHI encrypted in storage | AES-256 for PHI columns, encrypted backups |
+| **BAA** | Business Associate Agreements | All third-party services handling PHI have signed BAAs |
+| **Minimum necessary** | Only required PHI accessed | Role-based PHI access, field-level permissions |
+
+### 9.5 Automated Data Flow Mapping
+
+For each PII/PHI field identified, trace the full data flow:
+
+```markdown
+## Data Flow: user.email
+
+| Stage | Location | Protection | Compliant |
+|-------|----------|------------|-----------|
+| Collection | POST /api/register | TLS, input validation | ✅ |
+| Storage | users.email column | AES-256 column encryption | ✅ |
+| Processing | send_welcome_email() | In-memory only, not logged | ✅ |
+| Sharing | Stripe API (payment) | BAA signed, encrypted | ✅ |
+| Logging | app.log | ❌ Email appears in logs | ❌ FIX |
+| Retention | No auto-delete policy | — | ❌ FIX |
+| Deletion | DELETE /api/account | Cascades to all tables | ✅ |
+```
+
+### 9.6 Compliance Report Section
+
+Add to the security report output:
+
+```markdown
+### Compliance Status
+
+| Regulation | Applicable | Status | Issues |
+|-----------|-----------|--------|--------|
+| GDPR | ✅ Yes | ⚠️ 2 issues | Missing data export, PII in logs |
+| SOC2 | ✅ Yes | ✅ Pass | — |
+| HIPAA | ❌ N/A | — | — |
+
+### Data Flow Audit
+- PII fields found: 5 (email, phone, name, address, DOB)
+- Fully traced: 4/5
+- Issues: 1 field (email) appears in application logs — MUST mask
+```
+
+---
+
 ## Output Format: Security Report
 
 Structure findings in this format:
@@ -338,6 +438,8 @@ Structure findings in this format:
 - Search for variants after every confirmed vulnerability (Step 3)
 - Provide specific, actionable remediation with code examples for each finding
 - Exclude test/fixture/example files from vulnerability counts (flag as informational only)
+- Run compliance checks (Step 9) when the project stores user PII, health data, or financial data
+- Trace data flow for every PII/PHI field identified — collection through deletion
 
 ### MUST NOT DO
 
@@ -349,3 +451,5 @@ Structure findings in this format:
 - Run CodeQL or Semgrep without capturing SARIF output — raw console output is not auditable
 - Report findings in test files at the same severity as production code — use informational severity instead
 - Omit remediation steps from findings — every finding MUST include a specific fix
+- MUST NOT skip compliance checks for projects that handle user data — regulatory fines far exceed technical debt costs
+- MUST NOT mark compliance as "pass" without verifying data deletion and export endpoints actually work

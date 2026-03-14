@@ -297,6 +297,8 @@ If the failure is complex (e.g., multiple cascading errors, unclear root cause),
 Skill("fix-loop", args="failure_output: {error_output} retest_command: {verify_command} max_iterations: 3")
 ```
 
+**Retry budget:** Each of the 3 fix attempts (Step 4.1) may delegate to `/fix-loop` with `max_iterations: 3`. This means the total maximum attempts per task is **9** (3 attempts × 3 fix-loop iterations each). The `/fix-loop` skill's default of 5 iterations is overridden to 3 when called from `/executing-plans` to keep the total bounded. If all 9 attempts fail, escalate per Step 4.3.
+
 ### 4.3 Escalation After 3 Failures
 
 If a task fails all 3 fix attempts:

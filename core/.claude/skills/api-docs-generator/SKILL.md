@@ -25,7 +25,32 @@ Auto-generate, validate, and serve API documentation from code annotations.
 
 ## STEP 1: Detect API Framework
 
-Scan the project to identify the API framework and existing documentation:
+Scan the project to automatically identify the API framework:
+
+### 1.1 Automated Detection
+
+Run these checks in order — use the first match:
+
+```bash
+# FastAPI (Python)
+grep -rl "from fastapi" src/ app/ --include="*.py" 2>/dev/null && echo "FRAMEWORK=fastapi"
+
+# NestJS (TypeScript)
+grep -rl "@ApiTags\|@ApiProperty\|@nestjs/swagger" src/ --include="*.ts" 2>/dev/null && echo "FRAMEWORK=nestjs"
+
+# Express (JavaScript/TypeScript)
+grep -rl "express()\|app\.get(\|app\.post(" src/ --include="*.ts" --include="*.js" 2>/dev/null && echo "FRAMEWORK=express"
+
+# Spring Boot (Java/Kotlin)
+grep -rl "@RestController\|@GetMapping\|@PostMapping" src/ --include="*.kt" --include="*.java" 2>/dev/null && echo "FRAMEWORK=spring"
+
+# Go (net/http, gin, chi, echo)
+grep -rl "http\.HandleFunc\|gin\.Default\|chi\.NewRouter\|echo\.New" --include="*.go" 2>/dev/null && echo "FRAMEWORK=go"
+```
+
+If no framework detected, check if an `openapi.json` or `openapi.yaml` already exists in `docs/`. If so, use spec-first mode. Otherwise, report "No API framework detected — skipping API docs generation."
+
+### 1.2 Detection Report
 
 | Indicator | Framework | OpenAPI Support |
 |-----------|-----------|----------------|

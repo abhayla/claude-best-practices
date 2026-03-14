@@ -120,6 +120,51 @@ Create the folder structure following Clean Architecture layer separation:
 └── README.md
 ```
 
+**React (Next.js + TypeScript):**
+```
+<project>/
+├── src/
+│   ├── app/                 # App Router (Next.js 13+)
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── api/
+│   │   │   └── health/
+│   │   │       └── route.ts
+│   │   └── (routes)/        # Route groups
+│   ├── components/
+│   │   ├── ui/              # Reusable UI primitives
+│   │   └── features/        # Feature-specific components
+│   ├── lib/                 # Shared utilities, API clients
+│   ├── hooks/               # Custom React hooks
+│   └── types/               # TypeScript type definitions
+├── public/
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/                 # Playwright tests
+├── next.config.ts
+├── package.json
+├── package-lock.json
+├── tsconfig.json
+├── tailwind.config.ts       # If using Tailwind
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+├── .env.local.example
+├── .editorconfig
+├── .gitignore
+├── .husky/
+│   └── pre-commit
+├── .github/
+│   ├── workflows/ci.yml
+│   └── dependabot.yml
+├── .semgrepconfig.yml
+├── commitlint.config.js
+├── playwright.config.ts     # E2E test config
+├── LICENSE
+└── README.md
+```
+
 **Android (Compose + Kotlin):**
 ```
 <project>/
@@ -582,6 +627,33 @@ http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 })
 ```
 
+**Android (Kotlin — for apps with an embedded HTTP server or health check Activity):**
+```kotlin
+// If using Ktor embedded server or similar:
+get("/health") {
+    call.respond(mapOf("status" to "healthy", "version" to BuildConfig.VERSION_NAME))
+}
+
+// If no HTTP server, create a health-check mechanism via a ContentProvider or WorkManager diagnostic:
+class HealthCheckProvider : ContentProvider() {
+    override fun call(method: String, arg: String?, extras: Bundle?): Bundle {
+        return Bundle().apply { putString("status", "healthy") }
+    }
+    // ... other required overrides return null/false/0
+}
+```
+
+**Rust (Actix Web):**
+```rust
+#[get("/health")]
+async fn health() -> impl Responder {
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "healthy",
+        "version": env!("CARGO_PKG_VERSION")
+    }))
+}
+```
+
 The health endpoint MUST:
 - Return HTTP 200 when the service is ready
 - Include version information
@@ -662,7 +734,19 @@ docker compose up -d
 
 ## STEP 11: Verify & Gate
 
-Run the scaffold gate check:
+Run the scaffold gate check using the stack-specific commands:
+
+### Stack-Specific Gate Commands
+
+| Check | Python | Node/React | Android | Go | Rust |
+|-------|--------|-----------|---------|-----|------|
+| Build | `python -m py_compile src/**/*.py` | `npm run build` | `./gradlew assembleDebug` | `go build ./...` | `cargo build` |
+| Lint | `ruff check .` | `npx eslint .` | `./gradlew ktlintCheck` | `golangci-lint run` | `cargo clippy -- -D warnings` |
+| Test | `pytest tests/ -x` | `npm test` | `./gradlew testDebugUnitTest` | `go test ./...` | `cargo test` |
+| Lockfile | `requirements.txt` or `uv.lock` | `package-lock.json` | `gradle.lockfile` (optional) | `go.sum` | `Cargo.lock` |
+| Health | `curl localhost:8000/health` | `curl localhost:3000/api/health` | `adb shell am broadcast` (if applicable) | `curl localhost:8080/health` | `curl localhost:8080/health` |
+
+### Gate Check Script
 
 ```bash
 # 1. Build succeeds
@@ -674,7 +758,7 @@ Run the scaffold gate check:
 # 3. Tests pass (smoke test at minimum)
 <test command>
 
-# 4. Docker builds
+# 4. Docker builds (skip for Android)
 docker build -t <project>:dev .
 
 # 5. .gitignore covers secrets
@@ -683,7 +767,7 @@ grep -q ".env" .gitignore && echo "PASS: .env in .gitignore"
 # 6. Lockfile exists
 test -f <lockfile> && echo "PASS: Lockfile exists"
 
-# 7. Health endpoint responds
+# 7. Health endpoint responds (skip for Android if no HTTP server)
 docker compose up -d && curl -s http://localhost:${PORT:-8000}/health
 ```
 

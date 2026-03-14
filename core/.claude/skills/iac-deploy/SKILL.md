@@ -4,7 +4,10 @@ description: >
   Infrastructure as Code deployment skill covering Terraform and Pulumi.
   Handles provider configuration, resource management, state backends,
   module composition, environment management, drift detection, security
-  hardening, CI/CD integration, and common cloud resource patterns.
+  hardening, CI/CD integration, common cloud resource patterns, FinOps
+  (cost estimation with Infracost, right-sizing, budget alerts), serverless
+  deployment (Lambda/Cloud Functions), and static site deployment
+  (Vercel/Netlify/Cloudflare Pages/Firebase Hosting).
   Use for any IaC planning, writing, reviewing, or troubleshooting.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "iac, terraform, pulumi, infrastructure, infrastructure as code, tf plan, tf apply, cloud provisioning"
@@ -1342,6 +1345,262 @@ pulumi state delete urn:pulumi:prod::project::aws:s3/bucket:Bucket::legacy
 
 ---
 
+## STEP 13: FinOps — Cost Estimation & Optimization
+
+### 13.1 Infracost Integration
+
+Estimate infrastructure cost changes per PR before apply.
+
+```bash
+# Install infracost
+curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
+
+# Generate cost estimate
+infracost breakdown --path=infrastructure/ --format=table
+
+# Compare cost between main and current branch
+infracost diff --path=infrastructure/ --compare-to=infracost-base.json --format=table
+```
+
+### 13.2 CI/CD Cost Check
+
+```yaml
+# .github/workflows/infracost.yml
+name: Infracost
+on: [pull_request]
+jobs:
+  infracost:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+      - run: infracost breakdown --path=infrastructure/ --format=json --out-file=/tmp/infracost.json
+      - uses: infracost/actions/comment@v3
+        with:
+          path: /tmp/infracost.json
+          behavior: update
+```
+
+### 13.3 Resource Right-Sizing
+
+| Resource | Check | Tool |
+|----------|-------|------|
+| EC2/GCE instances | CPU/memory utilization < 20% avg | AWS Compute Optimizer, `kubectl top` |
+| RDS/CloudSQL | Storage auto-scaling enabled, CPU < 50% | CloudWatch, Performance Insights |
+| Lambda functions | Memory over-provisioned, cold starts | AWS Lambda Power Tuning |
+| K8s pods | requests >> actual usage | `kubectl top pods`, VPA recommendations |
+| S3/GCS | Lifecycle policies for old objects | S3 Analytics, GCS Lifecycle |
+
+```bash
+# Kubernetes: compare requested vs actual resource usage
+kubectl top pods -n production --sort-by=cpu
+kubectl get pods -n production -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].resources.requests.cpu}{"\t"}{.spec.containers[0].resources.requests.memory}{"\n"}{end}'
+```
+
+### 13.4 Cost Tagging Strategy
+
+```hcl
+# Enforce cost allocation tags on all resources
+provider "aws" {
+  default_tags {
+    tags = {
+      Environment = var.environment
+      Project     = var.project_name
+      Team        = var.team_name
+      CostCenter  = var.cost_center
+      ManagedBy   = "terraform"
+    }
+  }
+}
+```
+
+| Tag | Purpose | Example Values |
+|-----|---------|---------------|
+| `Environment` | Filter cost by env | `dev`, `staging`, `prod` |
+| `Project` | Allocate cost to project | `my-app`, `data-pipeline` |
+| `Team` | Allocate cost to team | `backend`, `platform`, `ml` |
+| `CostCenter` | Finance cost center | `CC-1234` |
+| `ManagedBy` | Distinguish IaC vs manual | `terraform`, `pulumi`, `manual` |
+
+### 13.5 Budget Alerts
+
+```hcl
+# AWS Budget with alert
+resource "aws_budgets_budget" "monthly" {
+  name         = "${local.name_prefix}-monthly-budget"
+  budget_type  = "COST"
+  limit_amount = var.monthly_budget_usd
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
+
+  notification {
+    comparison_operator       = "GREATER_THAN"
+    threshold                 = 80  # Alert at 80% of budget
+    threshold_type            = "PERCENTAGE"
+    notification_type         = "ACTUAL"
+    subscriber_email_addresses = var.budget_alert_emails
+  }
+
+  notification {
+    comparison_operator       = "GREATER_THAN"
+    threshold                 = 100  # Alert at 100% forecasted
+    threshold_type            = "PERCENTAGE"
+    notification_type         = "FORECASTED"
+    subscriber_email_addresses = var.budget_alert_emails
+  }
+}
+```
+
+### 13.6 Cost Optimization Checklist
+
+- [ ] Reserved Instances or Savings Plans for steady-state workloads (30-60% savings)
+- [ ] Spot Instances for fault-tolerant batch jobs (60-90% savings)
+- [ ] S3 Intelligent-Tiering or lifecycle policies for infrequently accessed data
+- [ ] Right-size instances based on actual utilization metrics
+- [ ] Delete unused EBS volumes, snapshots, and unattached EIPs
+- [ ] Use `NAT Instance` instead of `NAT Gateway` for dev environments ($30/mo vs $1/day)
+- [ ] Schedule non-production environments to shut down outside business hours
+
+---
+
+## STEP 14: Serverless & Static Site Deployment
+
+### 14.1 Serverless Functions (AWS Lambda / GCP Cloud Functions / Azure Functions)
+
+```hcl
+# Terraform: AWS Lambda function
+resource "aws_lambda_function" "api" {
+  function_name = "${local.name_prefix}-api"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "index.handler"
+  runtime       = "nodejs20.x"
+  timeout       = 30
+  memory_size   = 256
+
+  filename         = "lambda.zip"
+  source_code_hash = filebase64sha256("lambda.zip")
+
+  environment {
+    variables = {
+      NODE_ENV     = var.environment
+      DATABASE_URL = aws_secretsmanager_secret_version.db_url.secret_string
+    }
+  }
+
+  tracing_config {
+    mode = "Active"  # X-Ray tracing
+  }
+}
+
+resource "aws_lambda_function_url" "api" {
+  function_name      = aws_lambda_function.api.function_name
+  authorization_type = "NONE"  # Or "AWS_IAM" for authenticated
+}
+
+# API Gateway integration
+resource "aws_apigatewayv2_api" "api" {
+  name          = "${local.name_prefix}-api"
+  protocol_type = "HTTP"
+}
+
+resource "aws_apigatewayv2_integration" "lambda" {
+  api_id                 = aws_apigatewayv2_api.api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.api.invoke_arn
+  payload_format_version = "2.0"
+}
+```
+
+```python
+# Pulumi: GCP Cloud Function
+import pulumi_gcp as gcp
+
+function = gcp.cloudfunctions.Function(
+    "api-function",
+    runtime="python312",
+    entry_point="handler",
+    source_archive_bucket=source_bucket.name,
+    source_archive_object=source_archive.name,
+    trigger_http=True,
+    available_memory_mb=256,
+    timeout=60,
+    environment_variables={
+        "ENV": pulumi.get_stack(),
+    },
+)
+```
+
+### 14.2 Static Site / SSR Deployment
+
+| Platform | Best For | Deploy Method |
+|----------|---------|-------------|
+| Vercel | Next.js, SSR, edge functions | `vercel --prod` or Git integration |
+| Netlify | Static sites, Jamstack, forms | `netlify deploy --prod` or Git integration |
+| Cloudflare Pages | Static + Workers, global edge | `wrangler pages deploy` or Git integration |
+| AWS S3 + CloudFront | Full control, AWS-native | Terraform + `aws s3 sync` |
+| Firebase Hosting | Google ecosystem, preview channels | `firebase deploy --only hosting` |
+
+```bash
+# Vercel: deploy from CI
+npx vercel --prod --token=$VERCEL_TOKEN
+
+# Netlify: deploy from CI
+npx netlify deploy --prod --dir=dist --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+
+# Cloudflare Pages: deploy from CI
+npx wrangler pages deploy dist --project-name=my-site
+
+# AWS S3 + CloudFront: deploy from CI
+aws s3 sync dist/ s3://$BUCKET_NAME --delete
+aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*"
+
+# Firebase Hosting
+firebase deploy --only hosting --token=$FIREBASE_TOKEN
+```
+
+### 14.3 SSR Deployment (Next.js / Nuxt)
+
+```yaml
+# GitHub Actions: Vercel deployment
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+```
+
+### 14.4 Preview Deployments
+
+Every PR gets its own preview URL for stakeholder review:
+
+| Platform | Preview URL Pattern | Setup |
+|----------|-------------------|-------|
+| Vercel | `<branch>.vercel.app` | Automatic with Git integration |
+| Netlify | `deploy-preview-<N>.netlify.app` | Automatic with Git integration |
+| Firebase | `<channel>--<project>.web.app` | `firebase hosting:channel:deploy pr-<N>` |
+| Cloudflare Pages | `<hash>.<project>.pages.dev` | Automatic with Git integration |
+
+---
+
 ## Quick Reference
 
 ### Terraform Command Cheat Sheet
@@ -1415,3 +1674,9 @@ infrastructure/
 - ALWAYS review destroy/replace actions in plan output before applying
 - Mark all sensitive variables and outputs as `sensitive = true`
 - Use OIDC federation in CI/CD — no long-lived access keys
+- ALWAYS run `infracost diff` on PRs that change infrastructure — cost surprises are deployment blockers
+- ALWAYS tag all resources with Environment, Project, Team, and CostCenter
+- ALWAYS configure budget alerts before provisioning production infrastructure
+- ALWAYS use preview deployments for static sites — every PR gets a reviewable URL
+- MUST NOT provision production infrastructure without a monthly cost estimate
+- MUST NOT use NAT Gateway in dev environments — use NAT Instance or VPC endpoints instead

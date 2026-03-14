@@ -106,13 +106,37 @@ Verification: PASSED
 
 If any check fails after fix attempts, escalate to user with the report showing what passed and what failed.
 
-4. Review changes with `/post-fix-pipeline` if significant changes were made
+4. If significant changes were made (3+ files or complex logic), review with `/post-fix-pipeline`
 5. Summarize what was implemented and any decisions made
 
-## STEP 7: Post-Implementation
+## STEP 7: Post-Implementation (Optional)
 
-1. Invoke `/learn-n-improve session` to capture learnings
+1. If running standalone (not inside `/executing-plans`), invoke `/learn-n-improve session` to capture learnings
 2. Provide summary of changes to the user
+
+## STEP 8: Structured Output
+
+Write machine-readable results to `test-results/implement.json`:
+
+```json
+{
+  "skill": "implement",
+  "timestamp": "<ISO-8601>",
+  "result": "PASSED|FAILED",
+  "summary": {
+    "total_tests": "<count>",
+    "passed": "<count>",
+    "failed": "<count>",
+    "fix_iterations": "<count>"
+  },
+  "quality_gate": "PASSED|WARNED|SKIPPED",
+  "failures": [],
+  "warnings": [],
+  "duration_ms": "<elapsed>"
+}
+```
+
+Create `test-results/` directory if it doesn't exist. This JSON is consumed by stage gates.
 
 ---
 

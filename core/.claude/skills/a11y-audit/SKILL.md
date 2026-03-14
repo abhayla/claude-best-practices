@@ -185,6 +185,133 @@ After the audit, clean up: `rm -f a11y-axe-audit.mjs axe-results.json lighthouse
 
 ---
 
+## MOBILE ACCESSIBILITY TESTING
+
+### Android — Espresso AccessibilityChecks
+
+Enable automated accessibility checks in Espresso instrumented tests:
+
+```kotlin
+// In test setup — enables a11y checks on every ViewAction
+@Before
+fun setUp() {
+    AccessibilityChecks.enable().apply {
+        setRunChecksFromRootView(true)  // Check entire view hierarchy
+        // Optional: suppress known issues during migration
+        // setSuppressingResultMatcher(
+        //     anyOf(
+        //         matchesCheck(SpeakableTextPresentCheck::class.java),
+        //         matchesCheck(TouchTargetSizeCheck::class.java)
+        //     )
+        // )
+    }
+}
+
+@Test
+fun loginScreen_passesAccessibilityChecks() {
+    // Every Espresso ViewAction now automatically runs a11y checks
+    onView(withId(R.id.email_field)).perform(typeText("test@example.com"))
+    onView(withId(R.id.login_button)).perform(click())
+    // If any a11y violation found → test FAILS automatically
+}
+```
+
+```bash
+# Run with accessibility checks enabled
+cd android && ./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=com.example.LoginA11yTest
+```
+
+### Android — Accessibility Scanner CLI
+
+```bash
+# Dump accessibility node tree for analysis
+adb shell uiautomator dump /sdcard/a11y_tree.xml
+adb pull /sdcard/a11y_tree.xml
+
+# Check for common violations in the dump
+grep -E 'content-desc=""' a11y_tree.xml  # Missing content descriptions
+grep -E 'clickable="true".*content-desc=""' a11y_tree.xml  # Clickable without label
+```
+
+### iOS — XCTest Accessibility Audits (iOS 17+)
+
+```swift
+// Built-in accessibility auditing in XCTest
+func testHomeScreen_passesAccessibilityAudit() throws {
+    let app = XCUIApplication()
+    app.launch()
+
+    // Runs Apple's full accessibility audit — fails on violations
+    try app.performAccessibilityAudit()
+}
+
+// Audit with specific categories
+func testLoginScreen_passesAudit() throws {
+    let app = XCUIApplication()
+    app.launch()
+
+    try app.performAccessibilityAudit(for: [
+        .dynamicType,      // Text scales properly
+        .contrast,         // Color contrast meets WCAG
+        .hitRegion,        // Touch targets ≥ 44pt
+        .sufficientElementDescription  // Elements have labels
+    ])
+}
+
+// Audit with known issue suppression
+func testSettings_passesAudit() throws {
+    let app = XCUIApplication()
+    app.launch()
+    app.buttons["Settings"].tap()
+
+    try app.performAccessibilityAudit { issue in
+        // Suppress known third-party SDK issues
+        issue.element?.identifier == "third_party_banner"
+    }
+}
+```
+
+### Mobile A11y Checklist (WCAG 2.2)
+
+| Check | Android | iOS | Automated |
+|-------|---------|-----|-----------|
+| Touch target ≥ 48dp / 44pt | `AccessibilityChecks` | `.hitRegion` audit | Yes |
+| Content descriptions on images | `SpeakableTextPresentCheck` | `.sufficientElementDescription` | Yes |
+| Color contrast ≥ 4.5:1 | Manual or Accessibility Scanner | `.contrast` audit | Partial |
+| Text scales with system settings | Manual test with large font | `.dynamicType` audit | iOS only |
+| Screen reader navigation order | TalkBack manual test | VoiceOver manual test | No |
+| Focus management after navigation | Espresso focus assertions | XCTest focus assertions | Yes |
+| Error messages announced | TalkBack announcements | VoiceOver announcements | Manual |
+
+### CI Integration
+
+```yaml
+# GitHub Actions: Android a11y checks
+a11y-android:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 34
+        script: |
+          ./gradlew :app:connectedDebugAndroidTest \
+            -Pandroid.testInstrumentationRunnerArguments.annotation=com.example.A11yTest
+
+# iOS a11y checks (requires macOS runner)
+a11y-ios:
+  runs-on: macos-latest
+  steps:
+    - run: |
+        xcodebuild test \
+          -project MyApp.xcodeproj \
+          -scheme MyApp \
+          -destination 'platform=iOS Simulator,name=iPhone 15' \
+          -only-testing:MyAppUITests/AccessibilityTests
+```
+
+---
+
 ## MUST DO
 
 - Run BOTH axe-core AND Lighthouse — they catch different issue classes

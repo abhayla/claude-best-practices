@@ -210,3 +210,98 @@ For coordinated team chaos exercises, define before starting:
 - MUST NOT ignore cascade effects — always verify services outside the blast radius remain healthy.
 - MUST NOT treat a passing experiment as proof of total resilience — it only proves resilience against that specific failure mode.
 - MUST NOT run resource exhaustion experiments (OOM, CPU, disk fill) without container resource limits — unbounded consumption can crash the host.
+
+---
+
+## CI-EMBEDDED CHAOS EXPERIMENTS
+
+Run chaos experiments as pipeline stages — every deployment is resilient by design.
+
+### Pipeline Integration Pattern
+
+```yaml
+# GitHub Actions: chaos gate before production deploy
+chaos-gate:
+  needs: [e2e-tests]
+  runs-on: ubuntu-latest
+  steps:
+    - name: Deploy to staging
+      run: kubectl apply -f k8s/ --namespace staging
+
+    - name: Run chaos experiments
+      run: |
+        # Kill a random pod in the service
+        kubectl delete pod -l app=api-server -n staging --grace-period=0 --wait=false
+        sleep 10
+        # Verify service recovered
+        curl --retry 5 --retry-delay 2 http://staging:8000/health | grep "ok"
+
+    - name: Network partition test
+      run: |
+        # Simulate network partition to database
+        kubectl exec -n staging deploy/api-server -- \
+          iptables -A OUTPUT -p tcp --dport 5432 -j DROP
+        sleep 5
+        # Verify circuit breaker activated (503, not 500)
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://staging:8000/api/users)
+        [ "$STATUS" = "503" ] || exit 1
+        # Restore network
+        kubectl exec -n staging deploy/api-server -- \
+          iptables -D OUTPUT -p tcp --dport 5432 -j DROP
+```
+
+### LocalStack Chaos (AWS Services)
+
+Test AWS failure modes locally without cloud costs:
+
+```bash
+# Enable LocalStack chaos extension
+export LOCALSTACK_CHAOS_ENABLED=1
+
+# Simulate S3 failures
+curl -X POST http://localhost:4566/_chaos/faults \
+  -d '{"service": "s3", "operation": "GetObject", "error_code": 500, "percentage": 50}'
+
+# Simulate DynamoDB throttling
+curl -X POST http://localhost:4566/_chaos/faults \
+  -d '{"service": "dynamodb", "operation": "PutItem", "error_code": "ProvisionedThroughputExceededException", "percentage": 30}'
+
+# Simulate Lambda timeouts
+curl -X POST http://localhost:4566/_chaos/faults \
+  -d '{"service": "lambda", "operation": "Invoke", "latency_ms": 30000}'
+
+# Run tests against chaos-injected services
+pytest tests/resilience/ --tb=short
+# Verify: retries work, circuit breakers activate, fallbacks return gracefully
+
+# Clear all faults
+curl -X DELETE http://localhost:4566/_chaos/faults
+```
+
+### Resilience Assertions
+
+```python
+# Define resilience requirements as testable assertions
+def test_service_recovers_from_db_failure():
+    """Service recovers within 30s of database failure."""
+    # Inject fault
+    inject_db_failure()
+
+    # Verify circuit breaker activates (503, not 500)
+    response = requests.get(f"{BASE_URL}/api/users")
+    assert response.status_code == 503
+
+    # Restore database
+    restore_db()
+
+    # Verify recovery within 30s
+    recovered = False
+    for _ in range(30):
+        response = requests.get(f"{BASE_URL}/api/users")
+        if response.status_code == 200:
+            recovered = True
+            break
+        time.sleep(1)
+
+    assert recovered, "Service did not recover within 30 seconds"
+```

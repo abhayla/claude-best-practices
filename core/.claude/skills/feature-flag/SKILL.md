@@ -27,6 +27,20 @@ Implement feature flags for gradual rollout, experimentation, or incomplete feat
 
 Before adding a flag, determine whether one is actually warranted.
 
+### 1.1 Decision Logic
+
+Answer these questions in order — stop at the first YES:
+
+1. **Is this a one-time migration or deploy step?** → NO FLAG. Use a migration script or deploy step instead. Stop.
+2. **Is this a config value that rarely changes?** → NO FLAG. Use an environment variable directly. Stop.
+3. **Is this work-in-progress that will be complete before merge?** → NO FLAG. Use a feature branch. Stop.
+4. **Does this need gradual rollout to % of users?** → YES: release toggle.
+5. **Does this need A/B testing with metrics?** → YES: experiment toggle.
+6. **Is this a circuit breaker or kill switch?** → YES: ops toggle.
+7. **Is this role-based or tier-based access?** → YES: permission toggle.
+
+### 1.2 Reference Table
+
 | Scenario | Use a Flag? | Alternative |
 |----------|-------------|-------------|
 | Gradual rollout to % of users | Yes (release toggle) | — |
@@ -37,7 +51,7 @@ Before adding a flag, determine whether one is actually warranted.
 | One-time migration switch | No | Use a deploy script or migration step |
 | Config that rarely changes | No | Use environment variables directly |
 
-If no flag is needed, recommend the alternative and stop.
+If no flag is needed, recommend the alternative and stop — do NOT proceed to Step 2.
 
 ## STEP 2: Choose Flag Type
 

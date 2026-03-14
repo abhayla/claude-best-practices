@@ -315,6 +315,89 @@ testGoldens('login screen golden', (tester) async {
 flutter test --update-goldens test/goldens/
 ```
 
+### Autonomous Pass/Fail Determination
+
+Golden file tests AUTOMATICALLY fail when the rendered widget differs from the stored baseline.
+The test framework performs pixel-by-pixel comparison:
+
+- If baseline exists and matches → TEST PASSES
+- If baseline exists and differs → TEST FAILS with diff output
+- If baseline does not exist → TEST FAILS with "Golden file not found"
+
+No human intervention needed for pass/fail — the framework handles it.
+
+### Threshold Configuration
+
+```dart
+// Configure comparison tolerance in flutter_test_config.dart
+import 'package:flutter_test/flutter_test.dart';
+
+Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  // Allow 0.5% pixel difference (anti-aliasing, font rendering)
+  goldenFileComparator = LocalFileComparator.forDirectory(
+    Uri.parse('test/goldens'),
+  )..threshold = 0.005; // 0.5% tolerance
+  await testMain();
+}
+```
+
+Threshold guidelines:
+
+| Mode | Threshold | Use Case |
+|------|-----------|----------|
+| Strict | 0.0 | Design system components, icons |
+| Standard | 0.005 | General UI screens |
+| Tolerant | 0.02 | Screens with minor rendering variance |
+
+### Masking Dynamic Content
+
+```dart
+// Mask timestamps, avatars, and other dynamic content before golden comparison
+testGoldens('dashboard with masked dynamic content', (tester) async {
+  await loadAppFonts();
+  await tester.pumpWidgetBuilder(
+    const DashboardScreen(),
+    wrapper: materialAppWrapper(theme: AppTheme.light()),
+    surfaceSize: const Size(375, 812),
+  );
+
+  // Replace dynamic elements with placeholders before capture
+  // Option 1: Use a test-mode flag to show static content
+  // Option 2: Use golden_toolkit's customPump to freeze animations
+  await screenMatchesGolden(tester, 'dashboard_masked');
+});
+```
+
+Common items to mask:
+- Timestamps and relative dates → use frozen clock (`clock` package)
+- User avatars → use deterministic test data with fixed URLs
+- Animations → use `tester.binding.setSurfaceSize()` and disable animations in test mode
+- Random content → use seeded random generators
+
+### CI Golden Comparison
+
+```yaml
+# In the GitHub Actions workflow, add golden comparison step:
+      - name: Run golden tests
+        run: flutter test test/goldens/ --reporter github
+
+      - name: Upload golden diffs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-diffs
+          path: test/goldens/failures/
+          retention-days: 14
+```
+
+```bash
+# Update goldens after intentional UI changes (review before committing)
+flutter test --update-goldens test/goldens/
+git diff test/goldens/  # Review changes visually
+git add test/goldens/
+git commit -m "chore(visual): update golden files — new dashboard layout"
+```
+
 ---
 
 ## STEP 5: Monkey / Fuzz Testing

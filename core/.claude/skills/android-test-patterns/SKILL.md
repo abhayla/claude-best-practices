@@ -279,6 +279,149 @@ class FeatureScreenTest {
 | `.performTouchInput { swipeUp() }` | Gesture |
 | `.performImeAction()` | Submit keyboard action |
 
+## Compose Preview Screenshot Testing
+
+Google's official host-side screenshot testing for Compose — runs WITHOUT an emulator, generates HTML diff reports.
+
+### Setup
+
+```kotlin
+// build.gradle.kts (app module)
+plugins {
+    id("com.google.android.compose.screenshot") version "0.0.1-alpha07"
+}
+
+android {
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+}
+```
+
+### Writing Screenshot Tests
+
+Annotate existing `@Preview` composables with `@PreviewTest`:
+
+```kotlin
+import com.google.android.screenshottesting.PreviewTest
+
+@PreviewTest
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    AppTheme {
+        LoginScreen(state = LoginState.Idle, onIntent = {})
+    }
+}
+
+@PreviewTest
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun LoginScreenDarkPreview() {
+    AppTheme(darkTheme = true) {
+        LoginScreen(state = LoginState.Idle, onIntent = {})
+    }
+}
+
+// Test multiple states
+@PreviewTest
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenErrorPreview() {
+    AppTheme {
+        LoginScreen(state = LoginState.Error("Invalid credentials"), onIntent = {})
+    }
+}
+```
+
+### Running Tests
+
+```bash
+# Validate screenshots against baselines (CI mode)
+./gradlew validateDebugScreenshotTest
+
+# Update baselines after intentional UI changes
+./gradlew updateDebugScreenshotTest
+
+# Results: app/build/reports/screenshotTest/
+```
+
+### Alternative: Paparazzi (JVM-based, no emulator)
+
+```kotlin
+// build.gradle.kts
+plugins {
+    id("app.cash.paparazzi") version "1.3.4"
+}
+
+// Test file
+class LoginScreenTest {
+    @get:Rule
+    val paparazzi = Paparazzi(
+        deviceConfig = DeviceConfig.PIXEL_6,
+        theme = "android:Theme.Material3.Light",
+    )
+
+    @Test
+    fun loginScreen_idle() {
+        paparazzi.snapshot {
+            AppTheme {
+                LoginScreen(state = LoginState.Idle, onIntent = {})
+            }
+        }
+    }
+}
+```
+
+```bash
+# Validate against golden files
+./gradlew :app:testDebugUnitTest --tests "*LoginScreenTest*"
+
+# Record new golden files
+./gradlew :app:recordPaparazziDebug
+
+# Verify against recorded golden files
+./gradlew :app:verifyPaparazziDebug
+```
+
+### Alternative: Roborazzi (Robolectric-based)
+
+```kotlin
+// build.gradle.kts
+plugins {
+    id("io.github.takahirom.roborazzi") version "1.26.0"
+}
+
+// Test file (runs on JVM via Robolectric)
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+class HomeScreenRoborazziTest {
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    @Test
+    fun homeScreen() {
+        composeTestRule.setContent {
+            AppTheme { HomeScreen() }
+        }
+        composeTestRule.onRoot().captureRoboImage()
+    }
+}
+```
+
+```bash
+./gradlew recordRoborazziDebug    # Record baselines
+./gradlew verifyRoborazziDebug    # Verify against baselines
+./gradlew compareRoborazziDebug   # Generate diff report
+```
+
+### Which Tool to Use
+
+| Tool | Emulator Required | Speed | Best For |
+|------|-------------------|-------|----------|
+| Compose Preview Screenshot | No | Fast | Preview-annotated composables |
+| Paparazzi | No | Fast | Compose + View screenshots, device configs |
+| Roborazzi | No (Robolectric) | Medium | Full screen tests, interaction-based captures |
+| Espresso + Dropshots | Yes | Slow | Integration tests with real device rendering |
+
 ## STEP 5: Write Hilt-Injected Tests
 
 ```kotlin

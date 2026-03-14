@@ -3,7 +3,7 @@
 > **Purpose:** Audit whether `core/.claude/` has everything needed to generate or parse a complete, unambiguous PRD with user stories, acceptance criteria, NFRs, and requirement tiers — fully autonomously.
 > **Runs In:** Dedicated Claude Code context window
 > **Depends On:** None (Wave 1)
-> **Last Updated:** 2026-03-13
+> **Last Updated:** 2026-03-14
 > **Status:** AUDIT COMPLETE
 
 ---
@@ -135,11 +135,11 @@
 |---|-----------|---------------------|--------|-------------|
 | 1 | Socratic requirements elicitation | `brainstorm` (Step 1: 5 probing questions) | ✅ Covered | — |
 | 2 | PRD generation (user stories, ACs, NFRs) | `brainstorm` (Step 5 Alt: PRD mode) | ✅ Covered | — |
-| 3 | Existing PRD parsing & normalization | Stage 1 prompt handles this | ✅ Covered | — |
+| 3 | Existing PRD parsing & normalization | `prd-parser` skill (multi-format: Markdown, Notion, Jira, Google Docs → normalized PRD with IEEE 830 validation) | ✅ Covered | — |
 | 4 | GitHub Issue → PRD expansion | Stage 1 prompt handles this | ✅ Covered | — |
 | 5 | Requirement tiers (Must/Nice/OOS) | `brainstorm` (Step 5.4) | ✅ Covered | **MoSCoW Prioritization** |
 | 6 | Testability audit of ACs | Stage 1 prompt (Step 3.1) | ✅ Covered | — |
-| 7 | Requirement dependency mapping | Stage 1 prompt (Step 3.3) | ⚠️ Partial — no traceability matrix | **IEEE 830 (SRS)** |
+| 7 | Requirement dependency mapping | `brainstorm` PRD mode (Requirements Traceability Matrix: REQ → AC → TEST-ID) | ✅ Covered | **IEEE 830 (SRS)** |
 | 8 | IEEE 830 SRS compliance | `brainstorm` PRD mode (Scope, Glossary, Assumptions, External Interfaces) | ✅ Covered | **IEEE 830** |
 | 9 | ISO 25010 quality attributes coverage | `brainstorm` PRD mode (all 8 characteristics with targets) | ✅ Covered | **ISO 25010** |
 | 10 | Stakeholder identification & RACI | `brainstorm` PRD mode (Stakeholders & RACI table) | ✅ Covered | **RACI Matrix (PMI)** |
@@ -162,24 +162,17 @@
 
 ## Gap Proposals
 
-### Gap 1.1: Enhance `brainstorm` skill PRD mode (Priority: P1)
+### Gap 1.1: Enhance `brainstorm` skill PRD mode (Priority: P1) — ✅ RESOLVED
 
-**Problem it solves:** PRD mode produces a solid base but misses IEEE 830 sections (scope, glossary, assumptions, external interfaces), full ISO 25010 coverage (4/8 characteristics missing), risk scoring, stakeholder RACI, and requirements traceability matrix.
+**Problem it solved:** PRD mode produced a solid base but missed IEEE 830 sections (scope, glossary, assumptions, external interfaces), full ISO 25010 coverage (4/8 characteristics missing), risk scoring, stakeholder RACI, and requirements traceability matrix.
 
-**What to add:**
-- IEEE 830 sections: Scope, Definitions/Glossary, Assumptions & Constraints, External Interfaces
-- Expand NFRs to cover all 8 ISO 25010 characteristics (add Compatibility, Reliability, Maintainability, Portability)
-- Risk register template with Probability (1-5) × Impact (1-5) scoring
-- Stakeholder section with RACI roles
-- Requirements traceability matrix stub (forward-linking AC IDs to future test IDs)
+**Resolution:** `brainstorm` PRD mode (Step 5 Alt) now includes: IEEE 830 sections (Scope, Glossary, Assumptions & Constraints, External Interfaces), all 8 ISO 25010 characteristics with measurable targets, Risk Register with P(1-5) × I(1-5) scoring, RACI stakeholder matrix, Requirements Traceability Matrix (REQ → AC → TEST-ID), and DDD glossary.
 
-**Existing coverage:** `brainstorm` Step 5 Alt covers user stories, ACs, NFRs (4 types), milestones, requirement tiers.
+### Gap 1.2: `prd-parser` skill (Priority: P2) — ✅ RESOLVED
 
-### Gap 1.2: `prd-parser` skill (Priority: P2)
+**Problem it solved:** No dedicated skill for ingesting existing PRDs in various formats and normalizing to the pipeline's standard format with IEEE 830 validation.
 
-**Problem it solves:** No dedicated skill for ingesting existing PRDs in various formats (markdown, Notion export, Jira export, Google Docs) and normalizing to the pipeline's standard format with IEEE 830 validation.
-
-**Existing coverage:** Stage 1 prompt has inline logic for parsing existing PRDs, but it's not reusable outside the pipeline.
+**Resolution:** `prd-parser` skill created with 6-format detection (Markdown, Notion, Jira CSV, Jira JSON, Google Docs, custom), ID normalization (US-xxx, AC-xxx, NFR-xxx, REQ-xxx), 10-section IEEE 830 validation checklist with scoring, and standalone output with no pipeline dependency.
 
 ## Input/Output Contract
 
@@ -213,3 +206,4 @@ Universal — PRD format is stack-agnostic. Stack-specific NFRs (e.g., Android b
 | 2026-03-13 | Rewritten as AUDIT with capability checklist, SE best practices, gap proposals |
 | 2026-03-13 | P1 gap resolved: `brainstorm` PRD mode enhanced with IEEE 830, ISO 25010, RACI, risk scoring, traceability, glossary — all 7 ❌ items now ✅ |
 | 2026-03-13 | P2 gap resolved: `prd-parser` skill created for multi-format PRD normalization with IEEE 830 validation |
+| 2026-03-14 | Audit refresh: row 3 now credits `prd-parser` skill (was "Stage 1 prompt"), row 7 ⚠️→✅ (traceability matrix exists in `brainstorm` PRD mode), gap proposals updated with resolution notes |

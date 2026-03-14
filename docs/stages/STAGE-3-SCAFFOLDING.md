@@ -3,7 +3,7 @@
 > **Purpose:** Audit whether `core/.claude/` has everything needed to initialize a fully configured, buildable, lintable, testable project skeleton — fully autonomously.
 > **Runs In:** Dedicated Claude Code context window
 > **Depends On:** Stage 1 (PRD — to know the tech stack)
-> **Last Updated:** 2026-03-13
+> **Last Updated:** 2026-03-14
 > **Status:** AUDIT COMPLETE
 
 ---
@@ -225,18 +225,18 @@
 
 ## Stack Coverage
 
-| Stack | Covered in Prompt | Notes |
-|-------|------------------|-------|
-| Python (FastAPI/Django) | ✅ | pyproject.toml, ruff, pytest, mypy |
-| Node/TypeScript | ✅ | package.json, ESLint/Biome, Vitest/Jest |
-| Android (Compose) | ❌ | No Gradle setup, no Android manifest |
-| React (Next.js) | ❌ | No Next.js config template |
-| Go | ❌ | Mentioned in linter section only |
-| Rust | ❌ | Mentioned in linter section only |
+| Stack | Covered in `project-scaffold` | Notes |
+|-------|------------------------------|-------|
+| Python (FastAPI/Django) | ✅ | pyproject.toml, ruff, pytest, mypy, health endpoint |
+| Node/TypeScript | ✅ | package.json, ESLint/Biome, Vitest/Jest, health endpoint |
+| Android (Compose) | ✅ | build.gradle.kts, settings.gradle.kts, AndroidManifest.xml, Clean Architecture dirs, health check |
+| Go | ✅ | go.mod, .golangci.yml, health endpoint |
+| Rust | ✅ | Cargo.toml, clippy.toml, Clean Architecture dirs, health endpoint (Actix Web) |
+| React (Next.js) | ✅ | next.config.ts, App Router structure, Playwright E2E, Tailwind config, health API route |
 
 ## Autonomy Verdict
 
-**✅ Can run autonomously.** `project-scaffold` skill now covers: multi-stack initialization (Python, Node/TS, Android, Go, Rust), Clean Architecture folder structure, 12-factor compliance audit (all 12 factors), commitlint + semantic versioning, security baseline (dependency audit, SAST, Dependabot), .editorconfig, health endpoint, Docker dev environment, and gate verification. All 17 capabilities now ✅.
+**✅ Can run autonomously.** `project-scaffold` skill covers: multi-stack initialization (Python, Node/TS, React/Next.js, Android, Go, Rust), Clean Architecture folder structure, 12-factor compliance audit (all 12 factors), commitlint + semantic versioning, security baseline (dependency audit, SAST, Dependabot), .editorconfig, health endpoints (all 6 stacks), Docker dev environment, stack-specific gate commands, and gate verification. All 17 capabilities ✅ with full stack coverage.
 
 ---
 
@@ -247,3 +247,5 @@
 | 2026-03-13 | Initial prompt design |
 | 2026-03-13 | Rewritten as AUDIT with capability checklist, SE best practices, gap proposals |
 | 2026-03-13 | P1 gaps resolved: `project-scaffold` skill created with multi-stack init, 12-factor audit, security baseline, commitlint, SemVer, .editorconfig, health endpoint — all 9 ❌/⚠️ items flipped to ✅ |
+| 2026-03-14 | Comprehensive review: Fixed stale Stack Coverage table — Android, Go, Rust flipped ❌→✅ (actually covered in `project-scaffold`). Identified 3 gaps |
+| 2026-03-14 | Gaps fixed in `project-scaffold`: (1) Added health endpoints for Android (ContentProvider/Ktor) and Rust (Actix Web), (2) Added dedicated React/Next.js template with App Router, Playwright, Tailwind — ⚠️→✅, (3) Added stack-specific gate commands table (build/lint/test/lockfile/health per stack). All 6 stacks now fully covered |

@@ -90,9 +90,17 @@ Define stages with dependencies and conditional skip rules:
       "id": "stage_4_demo",
       "name": "HTML Demo",
       "depends_on": ["stage_1_prd", "stage_3_scaffold"],
-      "skip_when": "project_type == 'cli' OR project_type == 'library'",
+      "skip_when": "project_type IN ('cli', 'library', 'api_only', 'backend', 'data_pipeline', 'infrastructure')",
+      "artifacts_in": {
+        "prd": "stage_1_prd.artifacts_out.prd",
+        "skeleton": "stage_3_scaffold.artifacts_out.skeleton"
+      },
       "artifacts_out": {
-        "demo": { "path": "demos/<feature>-demo.html", "schema": "html_demo_v1" }
+        "screens": { "path": "demos/<feature>/index.html", "schema": "html_screens_v1", "note": "index.html + N screen HTML files (auth-*.html, main-*.html, etc.)" },
+        "design_system_css": { "path": "demos/<feature>/shared.css", "schema": "css_v1" },
+        "design_system_js": { "path": "demos/<feature>/shared.js", "schema": "js_v1" },
+        "impl_mapping": { "path": "demos/<feature>/IMPL-MAPPING.md", "schema": "impl_mapping_v1" },
+        "screenshots": { "path": "docs/stages/screenshots/stage-4/*.png", "schema": "image_v1" }
       },
       "timeout_minutes": 30
     },
@@ -124,9 +132,17 @@ Define stages with dependencies and conditional skip rules:
       "id": "stage_7_impl",
       "name": "Implementation (TDD Green)",
       "depends_on": ["stage_6_pre_tests"],
+      "artifacts_in": {
+        "plan": "stage_2_plan.artifacts_out.plan",
+        "unit_tests": "stage_6_pre_tests.artifacts_out.unit_tests",
+        "api_tests": "stage_6_pre_tests.artifacts_out.api_tests",
+        "erd": "stage_5_schema.artifacts_out.erd",
+        "migrations": "stage_5_schema.artifacts_out.migrations"
+      },
       "artifacts_out": {
         "source_code": { "path": "src/", "schema": "source_v1" },
-        "progress": { "path": "docs/plans/<feature>-progress.md", "schema": "progress_v1" }
+        "progress": { "path": "docs/plans/<feature>-progress.md", "schema": "progress_v1" },
+        "quality_report": { "path": "test-results/code-quality-gate.json", "schema": "quality_gate_v1" }
       },
       "timeout_minutes": 60
     },
@@ -155,9 +171,19 @@ Define stages with dependencies and conditional skip rules:
       "id": "stage_10_deploy",
       "name": "Deploy & Monitor",
       "depends_on": ["stage_9_review"],
+      "artifacts_in": {
+        "pr_url": "stage_9_review.artifacts_out.pr_url",
+        "source": "stage_3_scaffold.artifacts_out.skeleton",
+        "migrations": "stage_5_schema.artifacts_out.migrations",
+        "test_results": "stage_8_post_tests.artifacts_out.test_results"
+      },
       "artifacts_out": {
         "deploy_url": { "type": "string", "schema": "url" },
-        "runbooks": { "path": "docs/runbooks/", "schema": "runbook_v1" }
+        "ci_pipeline": { "path": ".github/workflows/ci.yml", "schema": "ci_v1" },
+        "monitoring_dashboards": { "path": "monitoring/dashboards/", "schema": "grafana_json_v1" },
+        "runbooks": { "path": "docs/runbooks/", "schema": "runbook_v1" },
+        "slo_definitions": { "path": "monitoring/slo-rules.yml", "schema": "prometheus_rules_v1" },
+        "dr_runbook": { "path": "docs/DR-RUNBOOK.md", "schema": "dr_runbook_v1" }
       },
       "timeout_minutes": 45
     },
@@ -180,7 +206,7 @@ Define stages with dependencies and conditional skip rules:
 ### 1.4 Evaluate Skip Conditions
 
 For each stage with `skip_when`, evaluate the condition:
-- `project_type == 'cli'` → skip Stage 4 (HTML Demo)
+- `project_type IN ('cli', 'library', 'api_only', 'backend', 'data_pipeline', 'infrastructure')` → skip Stage 4 (HTML Demo)
 - `no_database == true` → skip Stage 5 (Schema)
 - `input_type == 'prd_file'` → skip PRD generation, parse instead
 - `project_already_scaffolded == true` → skip Stage 3

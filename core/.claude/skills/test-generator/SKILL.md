@@ -2,8 +2,10 @@
 name: test-generator
 description: >
   Auto-generate test suites from PRD requirements, schema, or API specs.
-  Produces unit, API, E2E stubs with BDD/Gherkin, coverage thresholds,
-  property-based testing, and mutation testing setup. Use before implementation (TDD red phase).
+  Produces shared test infrastructure (conftest.py/setupTests.ts), unit, API,
+  E2E stubs (skipped with Page Objects), BDD/Gherkin, property-based, snapshot tests,
+  coverage thresholds, mutation testing setup, red phase gate verification, and
+  structured JSON output for stage gate validation. Use before implementation (TDD red phase).
 triggers:
   - generate tests
   - test stubs
@@ -71,11 +73,58 @@ If no framework detected, recommend one based on the stack and set it up.
 
 ---
 
-## STEP 3: Generate Unit Tests
+## STEP 3: Generate Shared Test Infrastructure
+
+Before generating test files, create the shared fixtures/setup file that wires factories and fixtures to the test framework.
+
+### 3.0 conftest.py / setupTests Generation
+
+**Python (conftest.py):**
+```python
+# tests/conftest.py
+
+import pytest
+from tests.factories import *  # noqa: F401,F403 — export all factories as fixtures
+
+@pytest.fixture(autouse=True)
+def _db_transaction(db_session):
+    """Wrap each test in a transaction and roll back after."""
+    yield
+    db_session.rollback()
+
+@pytest.fixture
+def client(app):
+    """Async test client for API tests."""
+    from httpx import AsyncClient, ASGITransport
+    transport = ASGITransport(app=app)
+    return AsyncClient(transport=transport, base_url="http://test")
+```
+
+**JavaScript (setupTests.ts):**
+```typescript
+// tests/setupTests.ts
+
+import { beforeEach, afterEach } from "vitest";
+import { resetDatabase } from "./helpers/db";
+
+beforeEach(async () => {
+  await resetDatabase();
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+```
+
+Adapt imports and fixtures to the project's actual app factory, database session, and ORM. If Stage 5 produced factory functions, import them here.
+
+---
+
+## STEP 4: Generate Unit Tests
 
 For each domain entity and use case, generate test stubs:
 
-### 3.1 Test Structure
+### 4.1 Test Structure
 
 ```python
 # tests/unit/test_<entity>.py (Python/pytest example)
@@ -108,7 +157,7 @@ class TestCreate<Entity>:
             Entity.create(name="")
 ```
 
-### 3.2 Edge Cases to Generate
+### 4.2 Edge Cases to Generate
 
 For each entity, auto-generate tests for:
 - **Empty/null inputs** — Every required field with empty/null value
@@ -117,7 +166,7 @@ For each entity, auto-generate tests for:
 - **Duplicate handling** — Unique constraint violations
 - **Relationship integrity** — FK references that don't exist
 
-### 3.3 Test Data Factories
+### 4.3 Test Data Factories
 
 Generate factory functions for test data:
 
@@ -137,7 +186,7 @@ def make_user(**overrides):
 
 ---
 
-## STEP 4: Generate API Tests
+## STEP 5: Generate API Tests
 
 For each API endpoint extracted from PRD or API spec:
 
@@ -178,11 +227,95 @@ Generate tests for all CRUD operations + auth + error cases per endpoint.
 
 ---
 
-## STEP 5: Generate BDD Scenarios
+## STEP 6: Generate E2E Test Stubs
+
+Generate E2E test stubs using the Page Object Model pattern from the `playwright` skill. E2E tests at this stage are **skipped stubs** — they define test intent but do NOT contain assertions. Stage 8 fills in assertions and runs them against working code.
+
+### 6.1 Stub Format
+
+E2E stubs MUST follow this exact format:
+
+**Python (pytest + Playwright):**
+```python
+# tests/e2e/test_<flow>.py
+
+import pytest
+from tests.e2e.pages.<page> import <Page>
+
+@pytest.mark.skip(reason="E2E stub — fill in at Stage 8")
+class TestUserRegistrationFlow:
+    """E2E: AC-001 — User can register and receive confirmation."""
+
+    def test_successful_registration(self, page):
+        """Given new user, when completing registration, then sees welcome page."""
+        # Page Objects are fully defined — test body is a stub
+        # TODO: Add navigation + assertions in Stage 8
+        pass
+
+    def test_duplicate_email_shows_error(self, page):
+        """Given existing user, when registering same email, then sees error."""
+        # TODO: Add navigation + assertions in Stage 8
+        pass
+```
+
+**JavaScript (Playwright Test):**
+```typescript
+// tests/e2e/user-registration.spec.ts
+
+import { test } from "@playwright/test";
+
+test.describe("User Registration Flow", () => {
+  test.skip("successful registration", async ({ page }) => {
+    // AC-001: User can register and receive confirmation
+    // TODO: Add navigation + assertions in Stage 8
+  });
+
+  test.skip("duplicate email shows error", async ({ page }) => {
+    // AC-002: Duplicate email rejection
+    // TODO: Add navigation + assertions in Stage 8
+  });
+});
+```
+
+### 6.2 Page Object Classes (Fully Defined)
+
+Page Objects are NOT stubs — define them completely so Stage 8 only needs to write test logic:
+
+```python
+# tests/e2e/pages/registration_page.py
+
+class RegistrationPage:
+    def __init__(self, page):
+        self.page = page
+        self.email_input = page.locator("[data-testid='email-input']")
+        self.password_input = page.locator("[data-testid='password-input']")
+        self.submit_button = page.locator("[data-testid='register-button']")
+        self.error_message = page.locator("[data-testid='error-message']")
+
+    async def goto(self):
+        await self.page.goto("/register")
+
+    async def register(self, email: str, password: str):
+        await self.email_input.fill(email)
+        await self.password_input.fill(password)
+        await self.submit_button.click()
+```
+
+### 6.3 Rules
+
+- Test functions use `@pytest.mark.skip` (Python) or `test.skip()` (JS) — NOT empty bodies without skip markers
+- Each skip includes `reason="E2E stub — fill in at Stage 8"`
+- Page Object classes are fully defined with locators and actions
+- One test file per user flow, one Page Object per page/screen
+- Test IDs in the test matrix use status `STUB` (not `RED`) for E2E tests
+
+---
+
+## STEP 7: Generate BDD Scenarios
 
 For stakeholder-readable specs, generate Gherkin-style scenarios:
 
-### 5.1 Feature Files
+### 7.1 Feature Files
 
 ```gherkin
 # tests/bdd/features/user_registration.feature
@@ -221,7 +354,7 @@ Feature: User Registration
       | Valid1!  | (accepted) |
 ```
 
-### 5.2 Step Definitions
+### 7.2 Step Definitions
 
 Generate step definition stubs for each unique step:
 
@@ -245,7 +378,7 @@ def verify_message(browser, message):
     assert browser.text_content("body").find(message) != -1
 ```
 
-### 5.3 Framework Setup
+### 7.3 Framework Setup
 
 | Language | BDD Framework | Install |
 |----------|-------------|---------|
@@ -255,11 +388,25 @@ def verify_message(browser, message):
 
 ---
 
-## STEP 6: Property-Based Tests
+### 7.4 When BDD Is Required
+
+Generate BDD/Gherkin scenarios for:
+- **User-facing features** — Any AC that describes end-user behavior (registration, checkout, search)
+- **Multi-step workflows** — Features involving state transitions (order lifecycle, approval flows)
+- **Stakeholder-visible behavior** — Features that non-technical stakeholders need to verify
+
+Skip BDD for:
+- Internal infrastructure (DB migrations, caching, logging)
+- Pure computation (math functions, data transformations)
+- Developer-facing APIs with no UI (unless consumer contracts apply)
+
+---
+
+## STEP 8: Property-Based Tests
 
 For domain logic with complex input spaces, generate property-based tests:
 
-### 6.1 Python (Hypothesis)
+### 8.1 Python (Hypothesis)
 
 ```python
 # tests/property/test_<entity>_properties.py
@@ -286,7 +433,7 @@ def test_order_total_is_non_negative(amount):
     assert order.total >= 0
 ```
 
-### 6.2 JavaScript/TypeScript (fast-check)
+### 8.2 JavaScript/TypeScript (fast-check)
 
 ```typescript
 // tests/property/user.property.test.ts
@@ -303,20 +450,30 @@ test("email normalization is idempotent", () => {
 });
 ```
 
-### 6.3 When to Use Property-Based Tests
+### 8.3 When Property-Based Tests Are Required
 
-Generate property tests for:
+Property-based tests are **mandatory** for domain logic with these patterns:
 - **Serialization roundtrips** — `deserialize(serialize(x)) == x`
 - **Idempotent operations** — `f(f(x)) == f(x)`
 - **Invariants** — "balance is never negative", "list is always sorted after sort"
 - **Commutativity** — `merge(a, b) == merge(b, a)`
 - **Domain constraints** — "age is between 0 and 150", "price is non-negative"
 
+Skip property-based tests for:
+- Simple CRUD with no domain logic (pass-through to DB)
+- UI rendering (use visual snapshot tests instead)
+- External API wrappers (use contract tests instead)
+
 ---
 
-## STEP 7: Coverage Configuration
+## STEP 9: Coverage Configuration
 
-### 7.1 Coverage Thresholds
+### 9.1 Coverage Thresholds
+
+Read coverage thresholds from these sources (in priority order):
+1. **Plan file** — If Stage 2 plan specifies coverage targets, use those
+2. **Project config** — `pyproject.toml` / `vitest.config.ts` existing thresholds
+3. **Defaults** — Fall back to the targets below
 
 Configure minimum coverage enforcement:
 
@@ -354,7 +511,7 @@ export default defineConfig({
 });
 ```
 
-### 7.2 Coverage Targets
+### 9.2 Coverage Targets
 
 | Metric | Minimum | Stretch Goal |
 |--------|---------|-------------|
@@ -368,11 +525,11 @@ Domain logic (entities, use cases) MUST have higher coverage than infrastructure
 
 ---
 
-## STEP 8: Mutation Testing Setup
+## STEP 10: Mutation Testing Setup
 
 Configure mutation testing to validate test suite quality:
 
-### 8.1 Python (mutmut)
+### 10.1 Python (mutmut)
 
 ```toml
 # pyproject.toml
@@ -389,7 +546,7 @@ mutmut results
 # Target: >70% mutation score (killed / total mutants)
 ```
 
-### 8.2 JavaScript/TypeScript (Stryker)
+### 10.2 JavaScript/TypeScript (Stryker)
 
 ```json
 // stryker.conf.json
@@ -405,7 +562,7 @@ mutmut results
 }
 ```
 
-### 8.3 Interpreting Results
+### 10.3 Interpreting Results
 
 | Mutation Score | Quality |
 |---------------|---------|
@@ -419,7 +576,58 @@ For surviving mutants, either:
 
 ---
 
-## STEP 9: Accessibility Test Stubs
+## STEP 11: Snapshot Test Stubs
+
+For projects with UI, generate data and visual snapshot test stubs:
+
+### 11.1 Data Snapshots (Jest/Vitest)
+
+```typescript
+// tests/snapshots/api-responses.test.ts
+
+import { describe, test, expect } from "vitest";
+
+describe("API Response Snapshots", () => {
+  test("GET /users/:id response shape", async () => {
+    const response = await client.get("/users/1");
+    // Snapshot locks down the response shape — breaks if fields change
+    expect(response.json()).toMatchSnapshot();
+  });
+
+  test("error response shape", async () => {
+    const response = await client.get("/users/nonexistent");
+    expect(response.json()).toMatchSnapshot();
+  });
+});
+```
+
+### 11.2 Data Snapshots (pytest)
+
+```python
+# tests/snapshots/test_api_responses.py
+
+def test_user_response_shape(client, snapshot):
+    """Snapshot test: GET /users/:id response shape."""
+    response = client.get("/users/1")
+    assert response.json() == snapshot
+```
+
+Requires `pytest-snapshot` or `syrupy`. Generate one snapshot test per API endpoint response shape and per serialized domain entity.
+
+### 11.3 When to Use Snapshot Tests
+
+- **API response shapes** — Lock down JSON structure to catch unintended changes
+- **Serialized domain entities** — Ensure serialization format doesn't drift
+- **Configuration output** — Generated config files, migration SQL
+- **Visual regression** — Delegate to `verify-screenshots` skill (already covered)
+
+Skip snapshot tests for:
+- Frequently changing output (timestamps, IDs) — use selective snapshots
+- Large binary output — use hash comparison instead
+
+---
+
+## STEP 12: Accessibility Test Stubs
 
 For projects with UI, generate a11y test stubs:
 
@@ -442,7 +650,45 @@ Generate one a11y test per page/screen identified in the PRD.
 
 ---
 
-## STEP 10: Output Summary
+## STEP 13: Red Phase Gate Verification
+
+After generating all test files, run the test suite to verify every test either FAILS or is SKIPPED (E2E stubs). No test may pass — passing tests indicate implementation already exists or tests are vacuous.
+
+### 13.1 Run Tests
+
+```bash
+# Python
+pytest tests/unit/ tests/api/ tests/property/ tests/bdd/ -v --tb=short 2>&1 | tail -20
+
+# JavaScript
+npx vitest run tests/unit/ tests/api/ tests/property/ --reporter=verbose 2>&1 | tail -20
+
+# Android
+./gradlew :app:testDebugUnitTest 2>&1 | tail -20
+```
+
+### 13.2 Validate Results
+
+Count results by status:
+- **FAILED** — Expected. These are RED tests waiting for implementation.
+- **SKIPPED** — Expected for E2E stubs (`@pytest.mark.skip` / `test.skip()`).
+- **ERROR** — Acceptable if caused by missing imports (module doesn't exist yet). Fix if caused by syntax errors in test files.
+- **PASSED** — NOT acceptable. A passing test means either the implementation already exists or the test asserts nothing. Investigate and fix.
+
+### 13.3 Gate Decision
+
+| Condition | Result |
+|-----------|--------|
+| All non-skipped tests FAIL or ERROR (missing import) | ✅ PASS — proceed to Step 14 |
+| Any test PASSES | ❌ FAIL — investigate and fix the passing test |
+| Test files have syntax errors | ❌ FAIL — fix syntax errors |
+| Test collection fails entirely | ❌ FAIL — fix framework configuration |
+
+---
+
+## STEP 14: Output Summary & Structured Results
+
+### 14.1 Human-Readable Summary
 
 After generating all test files, present:
 
@@ -458,12 +704,14 @@ After generating all test files, present:
 | API | 3 | 15 | 80% line |
 | BDD | 2 features | 8 scenarios | — |
 | Property | 2 | 6 | — |
-| E2E | 1 | 3 stubs | — |
+| E2E | 1 | 3 stubs (skipped) | — |
+| Snapshot | 2 | 4 | — |
 | A11y | 1 | 2 | WCAG 2.1 AA |
-| **Total** | **14** | **57** | — |
+| **Total** | **15** | **61** | — |
 
 **Mutation testing:** Configured (mutmut / Stryker)
 **Coverage enforcement:** 80% line, 70% branch
+**Red phase gate:** ✅ All tests FAIL or SKIPPED (no passing tests)
 
 ### Requirement Traceability
 | Requirement | Tests | Coverage |
@@ -478,17 +726,105 @@ After generating all test files, present:
 - **Run tests** — `<test command>` (all should FAIL — red phase)
 ```
 
+### 14.2 Structured JSON Output
+
+Write machine-readable results to `test-results/test-generator.json` for stage gate validation:
+
+```json
+{
+  "skill": "test-generator",
+  "timestamp": "2026-03-14T10:30:00Z",
+  "result": "PASSED",
+  "summary": {
+    "total": 61,
+    "passed": 0,
+    "failed": 54,
+    "skipped": 3,
+    "error": 4,
+    "flaky": 0
+  },
+  "quality_gate": "PASSED",
+  "contract_check": "SKIPPED",
+  "perf_baseline": "SKIPPED",
+  "red_phase_gate": {
+    "status": "PASSED",
+    "passing_tests": [],
+    "failing_tests": 54,
+    "skipped_stubs": 3,
+    "import_errors": 4
+  },
+  "test_matrix": {
+    "requirements_covered": 12,
+    "requirements_total": 12,
+    "unmapped_requirements": []
+  },
+  "artifacts": [
+    "tests/unit/",
+    "tests/api/",
+    "tests/e2e/",
+    "tests/bdd/",
+    "tests/property/",
+    "tests/snapshots/",
+    "tests/a11y/",
+    "tests/conftest.py",
+    "tests/factories.py"
+  ],
+  "failures": [],
+  "warnings": [],
+  "duration_ms": 8500
+}
+```
+
+The `result` field is `PASSED` when:
+- All non-skipped tests FAIL or ERROR (no passing tests)
+- Every requirement in the PRD maps to at least one test
+- Test files have no syntax errors
+
+The `result` field is `FAILED` when:
+- Any test passes (red phase violation)
+- Requirements exist with no mapped tests
+- Test files cannot be collected
+
+---
+
+## Contract Test Decision Criteria
+
+Use the `contract-test` skill (Pact) when:
+- **Multi-service architecture** — 2+ services communicating via HTTP/gRPC/messaging
+- **Separate deploy cycles** — Consumer and provider deploy independently
+- **Cross-team API boundaries** — Different teams own consumer vs provider
+
+Skip contract tests for:
+- **Monoliths** — Single deployable unit with no service boundaries
+- **Internal modules** — Modules within the same service (use unit tests instead)
+- **Third-party APIs** — You don't control the provider (use integration tests with recorded responses)
+
+---
+
+## Test File Naming Convention
+
+Follow the project's existing convention. If no convention exists, use:
+
+| Language | Test Files | Test Classes/Functions |
+|----------|-----------|----------------------|
+| Python | `test_<entity>.py` | `class Test<Entity>:` / `def test_<behavior>():` |
+| JavaScript | `<entity>.test.ts` | `describe("<Entity>")` / `test("<behavior>")` |
+| Kotlin | `<Entity>Test.kt` | `class <Entity>Test` / `fun \`should <behavior>\`()` |
+
 ---
 
 ## MUST DO
 
 - Always build a test matrix mapping every requirement to tests (Step 1)
-- Always generate test data factories (Step 3.3)
+- Always generate shared test infrastructure before test files (Step 3)
+- Always generate test data factories (Step 4.3)
 - Always include edge case tests (empty, null, boundary, invalid type)
-- Always configure coverage thresholds (Step 7)
+- Always configure coverage thresholds (Step 9) — read from plan/config before using defaults
 - Always trace tests back to PRD requirements
-- Always generate BDD scenarios for user-facing features (Step 5)
-- Always verify all generated tests FAIL (TDD red phase)
+- Always generate BDD scenarios for user-facing features (Step 7)
+- Always generate E2E stubs with `skip` markers and fully-defined Page Objects (Step 6)
+- Always run the red phase gate (Step 13) to verify all tests FAIL
+- Always write structured JSON output to `test-results/test-generator.json` (Step 14)
 
 ## MUST NOT DO
 
@@ -499,3 +835,5 @@ After generating all test files, present:
 - MUST NOT duplicate `playwright` skill's E2E patterns — generate stubs that follow its conventions
 - MUST NOT generate flaky tests — follow rules from `testing.md` (no sleep, deterministic data, isolated state)
 - MUST NOT begin implementation during this skill — this skill produces failing tests, not passing code
+- MUST NOT write E2E test bodies — only skipped stubs with Page Objects. Stage 8 fills in assertions
+- MUST NOT skip the red phase gate — a passing test at this stage is a bug in the test

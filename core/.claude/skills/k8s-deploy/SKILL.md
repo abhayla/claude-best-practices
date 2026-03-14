@@ -6,6 +6,12 @@ description: >
   Use when deploying, configuring, or troubleshooting Kubernetes workloads.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<deployment-task-or-question>"
+triggers:
+  - kubernetes deploy
+  - k8s deploy
+  - kubectl
+  - helm chart
+  - k8s manifests
 ---
 
 # Kubernetes Deployment

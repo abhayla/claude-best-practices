@@ -402,3 +402,263 @@ Both consumer and provider MUST pass `can-i-deploy` before deploying to any shar
 - MUST NOT ignore verification failures — a failing contract means a real integration risk
 - MUST NOT use `can-i-deploy` without publishing verification results from the provider side
 - MUST NOT treat contract tests as optional — if two services communicate, they need a contract
+
+---
+
+## SPEC-AS-CONTRACT TESTING (Specmatic)
+
+Specmatic uses OpenAPI/AsyncAPI specs as executable contracts — zero test code needed.
+
+### How It Works
+
+The API specification IS the contract. No separate contract language, no consumer/provider test code.
+
+```bash
+# Install Specmatic
+npm install -g specmatic
+# or
+brew install specmatic
+
+# Run contract tests against your API (reads OpenAPI spec)
+specmatic test --contract openapi.yaml --host localhost --port 8000
+
+# Generate stub server from spec (for consumer testing)
+specmatic stub --contract openapi.yaml --port 9000
+```
+
+### Auto-Generated Tests
+
+Specmatic reads your OpenAPI spec and automatically generates:
+- **Positive tests** — valid requests for every endpoint/method/parameter combination
+- **Negative tests** — invalid types, missing required fields, boundary values
+- **Auth tests** — requests with/without required auth headers
+
+```yaml
+# openapi.yaml — this IS your contract
+openapi: 3.0.0
+paths:
+  /users/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+# Specmatic auto-generates tests for:
+# - GET /users/123 → expects 200 with User schema
+# - GET /users/abc → expects 400 (id must be integer)
+# - GET /users/ → expects 404 or 400 (missing required param)
+```
+
+### CI Integration
+
+```yaml
+# GitHub Actions
+contract-test:
+  steps:
+    - run: specmatic test --contract openapi.yaml --host localhost --port 8000
+    - run: specmatic backward-compatibility-check --contract openapi.yaml
+```
+
+### When to Use Specmatic vs Pact
+
+| Criteria | Specmatic | Pact |
+|----------|-----------|------|
+| Contract source | OpenAPI/AsyncAPI spec | Consumer-generated expectations |
+| Test code needed | None | Yes (consumer + provider) |
+| Supports | REST, gRPC, GraphQL, Kafka | REST, GraphQL, messages |
+| Breaking change detection | Built-in backward compatibility check | Via Pact broker `can-i-deploy` |
+| Best for | API-first teams with maintained specs | Teams without formal API specs |
+
+---
+
+## GRAPHQL SCHEMA VERIFICATION
+
+### GraphQL Inspector — CI Breaking Change Detection
+
+Automatically detect breaking changes in GraphQL schemas on every PR:
+
+```bash
+# Install
+npm install -g @graphql-inspector/cli
+
+# Compare schemas (local files)
+graphql-inspector diff old-schema.graphql new-schema.graphql
+
+# Compare against a remote endpoint
+graphql-inspector diff https://api.example.com/graphql new-schema.graphql
+
+# Lint schema for best practices
+graphql-inspector lint schema.graphql
+
+# Validate operations against schema
+graphql-inspector validate "src/**/*.graphql" schema.graphql
+```
+
+### Breaking vs Non-Breaking Changes
+
+| Change | Breaking | Why |
+|--------|----------|-----|
+| Remove field | Yes | Existing queries will fail |
+| Remove type | Yes | Dependent queries/mutations break |
+| Change field type | Yes | Client deserialization breaks |
+| Add optional field | No | Existing queries unaffected |
+| Add new type | No | No existing queries reference it |
+| Deprecate field | No | Field still works, warns consumers |
+| Add required argument | Yes | Existing mutations missing the arg |
+
+### CI Integration
+
+```yaml
+graphql-check:
+  steps:
+    - run: |
+        graphql-inspector diff \
+          "git:origin/main:schema.graphql" \
+          "schema.graphql" \
+          --rule suppressRemovalOfDeprecatedField
+```
+
+---
+
+## GRPC PROTOBUF VERIFICATION
+
+### buf — Lint and Breaking Change Detection
+
+```bash
+# Install buf
+brew install bufbuild/buf/buf
+
+# Lint proto files for style and correctness
+buf lint
+
+# Check for breaking changes against the main branch
+buf breaking --against '.git#branch=main'
+
+# Generate code (replaces protoc)
+buf generate
+```
+
+### buf.yaml Configuration
+
+```yaml
+version: v2
+lint:
+  use:
+    - DEFAULT          # Standard lint rules
+    - COMMENTS         # Require comments on services/messages
+  except:
+    - PACKAGE_VERSION_SUFFIX  # Allow unversioned packages
+breaking:
+  use:
+    - FILE             # Detect breaking changes per file
+```
+
+### Breaking Change Rules
+
+| Change | Breaking | Safe Alternative |
+|--------|----------|-----------------|
+| Remove field | Yes | Mark as reserved, keep field number |
+| Rename field | Yes | Add new field, deprecate old |
+| Change field type | Yes | Add new field with new type |
+| Change field number | Yes | Never reuse field numbers |
+| Remove service/RPC | Yes | Deprecate first, remove in next major |
+| Add required field | Yes (proto3: all optional) | All fields optional in proto3 |
+
+### CI Integration
+
+```yaml
+proto-check:
+  steps:
+    - uses: bufbuild/buf-setup-action@v1
+    - run: buf lint
+    - run: buf breaking --against 'https://github.com/$REPO.git#branch=main'
+```
+
+---
+
+## EVENT-DRIVEN CONTRACT TESTING
+
+### Pact for Async Messages
+
+Test that producers emit events matching consumer expectations:
+
+```python
+# Consumer: define expected message format
+@message_handler("UserCreated")
+def handle_user_created(message):
+    assert "userId" in message
+    assert "email" in message
+    assert isinstance(message["timestamp"], str)
+
+# Provider: verify messages match consumer expectations
+pact_verifier.verify_with_broker(
+    provider_name="user-service",
+    provider_version=git_version,
+    consumer_version_selectors=[{"mainBranch": True}],
+    message_providers={
+        "UserCreated": lambda: {
+            "userId": "123",
+            "email": "test@example.com",
+            "timestamp": "2026-03-14T10:00:00Z"
+        }
+    }
+)
+```
+
+### Specmatic + AsyncAPI for Kafka
+
+```yaml
+# asyncapi.yaml — contract for Kafka topics
+asyncapi: 2.6.0
+channels:
+  user.created:
+    publish:
+      message:
+        payload:
+          type: object
+          required: [userId, email]
+          properties:
+            userId: { type: string }
+            email: { type: string, format: email }
+```
+
+```bash
+# Validate Kafka messages against AsyncAPI spec
+specmatic test --contract asyncapi.yaml --kafka-bootstrap-servers localhost:9092
+```
+
+### Event Replay and Idempotency Testing
+
+```python
+# Test idempotency: replay same event twice, verify no duplicate side effects
+async def test_event_idempotency():
+    event = {"userId": "123", "email": "test@example.com", "eventId": "evt-001"}
+
+    await handler.process(event)  # First processing
+    count_after_first = await db.users.count()
+
+    await handler.process(event)  # Replay same event
+    count_after_replay = await db.users.count()
+
+    assert count_after_first == count_after_replay, "Event processed twice — not idempotent"
+```
+
+### Message Isolation in Shared Environments
+
+When testing against shared Kafka/SQS brokers, isolate messages per test:
+
+- Use unique topic suffixes per test run: `user.created.test-{uuid}`
+- Use message headers with test correlation IDs
+- Filter consumers to only process messages from current test run
+- Clean up test topics after test suite completes

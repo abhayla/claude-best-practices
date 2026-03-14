@@ -109,6 +109,81 @@ adb shell am start-activity -W -S com.app.package/.MainActivity
 # Output includes: TotalTime (ms) — the metric that matters
 ```
 
+## Monkey Testing (Autonomous Crash Detection)
+
+Use Android's built-in `monkey` tool to send random UI events and detect crashes/ANRs without writing test code.
+
+### Basic Crash Detection
+
+```bash
+# Send 1000 random events to the app (touches, gestures, system keys)
+adb shell monkey -p com.example.app -v 1000 --throttle 100 \
+  --pct-touch 40 --pct-motion 25 --pct-nav 15 \
+  --pct-syskeys 5 --pct-appswitch 10 --pct-anyevent 5 \
+  --kill-process-after-error 2>&1 | tee monkey_log.txt
+
+# Check for crashes and ANRs
+grep -E "CRASH|ANR|Exception|FATAL" monkey_log.txt
+echo "Exit code: $?"  # Non-zero = crash detected
+```
+
+### Event Distribution
+
+| Parameter | Default | Recommended | Description |
+|-----------|---------|-------------|-------------|
+| `--pct-touch` | — | 40% | Tap events |
+| `--pct-motion` | — | 25% | Drag/swipe gestures |
+| `--pct-nav` | — | 15% | Navigation (back, menu) |
+| `--pct-syskeys` | — | 5% | System keys (home, volume) |
+| `--pct-appswitch` | — | 10% | Activity switches |
+| `--pct-anyevent` | — | 5% | Other events |
+| `--throttle` | 0 | 100 | Delay between events (ms) |
+
+### Reproducible Runs
+
+```bash
+# Use a fixed seed for deterministic reproduction
+adb shell monkey -p com.example.app -s 42 -v 5000 --throttle 100 \
+  --kill-process-after-error 2>&1 | tee monkey_seed42.txt
+
+# If crash found, replay with same seed to reproduce
+adb shell monkey -p com.example.app -s 42 -v 5000 --throttle 100
+```
+
+### CI Integration
+
+```bash
+# Run monkey test, fail CI if crash detected
+adb shell monkey -p com.example.app -s $RANDOM_SEED -v 2000 \
+  --throttle 50 --kill-process-after-error 2>&1 | tee monkey_ci.txt
+
+CRASHES=$(grep -c "CRASH\|ANR\|FATAL" monkey_ci.txt || true)
+if [ "$CRASHES" -gt 0 ]; then
+  echo "FAILED: $CRASHES crash(es) detected"
+  # Capture logcat for debugging
+  adb logcat -d > crash_logcat.txt
+  exit 1
+fi
+echo "PASSED: No crashes in 2000 events"
+```
+
+### Extended Stress Test
+
+```bash
+# Long-running stability test (10000 events, ~15 minutes)
+adb shell monkey -p com.example.app -s 12345 -v 10000 \
+  --throttle 200 \
+  --pct-touch 35 --pct-motion 20 --pct-nav 20 \
+  --pct-syskeys 5 --pct-appswitch 15 --pct-anyevent 5 \
+  --ignore-timeouts --ignore-security-exceptions \
+  --kill-process-after-error 2>&1 | tee monkey_stress.txt
+
+# Parse results
+EVENTS=$(grep "Events injected:" monkey_stress.txt | awk '{print $3}')
+CRASHES=$(grep -c "CRASH\|ANR" monkey_stress.txt || true)
+echo "Stability: $EVENTS events, $CRASHES crashes"
+```
+
 ## Report
 
 ```
