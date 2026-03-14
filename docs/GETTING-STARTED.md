@@ -24,8 +24,8 @@ curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bo
 | `ai-gemini` | Gemini API integration patterns |
 | `android-compose` | Jetpack Compose, Hilt, Room |
 | `fastapi-python` | FastAPI, SQLAlchemy, pytest, Alembic |
-| `firebase-auth` | Firebase Authentication |
-| `react-nextjs` | React + Next.js patterns |
+| `firebase-auth` | Firebase dev, AI, Data Connect |
+| `react-nextjs` | React Native dev, E2E testing |
 
 ## What's Included
 

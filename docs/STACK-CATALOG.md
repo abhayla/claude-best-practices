@@ -27,22 +27,16 @@ _Async backend patterns: SQLAlchemy, Pydantic, pytest, Alembic._
 **Agents:** fastapi-database-admin, fastapi-api-tester
 **Rules:** fastapi-backend, fastapi-database
 
-## Firebase Auth
-_Phone OTP, token management, multi-environment setup._
+## Firebase
+_Firebase dev, AI integration, Data Connect, Auth._
 
 **Prefix:** `firebase-*`
 
 **Skills:** firebase-data-connect, firebase-dev, firebase-ai
 
 ## React + Next.js
-_Next.js App Router, server components, Tailwind._
+_React Native dev, E2E testing, Next.js patterns._
 
 **Prefix:** `react-*`
 
 **Skills:** react-native-e2e, react-native-dev
-
-## Superpowers
-_Advanced Claude Code patterns: hooks, session analysis, automation._
-
-**Prefix:** `superpowers-*`
-
