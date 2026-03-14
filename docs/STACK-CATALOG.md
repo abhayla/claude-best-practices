@@ -40,7 +40,7 @@ _Next.js App Router, server components, Tailwind._
 
 **Prefix:** `react-*`
 
-**Skills:** react-native-dev
+**Skills:** react-native-e2e, react-native-dev
 **Rules:** react-nextjs
 
 ## Superpowers
