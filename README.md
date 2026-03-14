@@ -40,10 +40,9 @@ python scripts/bootstrap.py --stacks fastapi-python --target /path/to/project
 |-------|--------|-------------|
 | `fastapi-python` | `fastapi-*` | API testing agent, DB admin agent, migration/deploy/test skills, backend rules |
 | `android-compose` | `android-*` | Compose agent, ADB testing/test runner skills, Android rules |
-| `ai-gemini` | `ai-gemini-*` | Gemini API reference skill, AI rules |
-| `firebase-auth` | `firebase-*` | Auth rules (placeholder) |
-| `react-nextjs` | `react-*` | React/Next.js rules (placeholder) |
-| `superpowers` | `superpowers-*` | Advanced patterns (placeholder) |
+| `ai-gemini` | `ai-gemini-*` | Gemini API reference skill |
+| `firebase-auth` | `firebase-*` | Firebase dev, AI, Data Connect skills |
+| `react-nextjs` | `react-*` | React Native dev and E2E skills |
 
 ## Repository Structure
 

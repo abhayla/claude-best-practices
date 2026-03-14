@@ -27,7 +27,7 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 | `android-compose` | Jetpack Compose UI — screens, state, design system |
 | `android-kotlin-reviewer` | Kotlin code review with Android best practices |
 
-## Skills (99)
+## Skills (105)
 
 ### Pipeline & Orchestration
 | Skill | Description |
@@ -207,9 +207,17 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 |------|-------|-------------|
 | `claude-behavior.md` | All files | Task approach, git hygiene, code comments, file structure |
 | `context-management.md` | All files | Progressive disclosure, scratchpad, subagent delegation |
-| `rule-writing-meta.md` | All files | RFC 2119, instruction budget, hooks vs rules vs skills |
+| `rule-writing-meta.md` | `.claude/**`, `CLAUDE.md` | RFC 2119, instruction budget, hooks vs rules vs skills |
 | `workflow.md` | All files | 7-step development workflow |
-| `testing.md` | All files | Test isolation, AAA, fixtures, flaky test prevention |
+| `testing.md` | Test files | Test isolation, AAA, fixtures, flaky test prevention |
+| `tdd.md` | Test + source files | Red-green-refactor TDD cycle |
+
+### Quality Standards
+| Rule | Scope | Description |
+|------|-------|-------------|
+| `pattern-portability.md` | `.claude/**/*.md` | No hardcoded paths, least-privilege tools, no project-specific refs |
+| `pattern-structure.md` | `.claude/**/*.md` | Frontmatter schema, SemVer, type classification, deprecation |
+| `pattern-self-containment.md` | `.claude/**/*.md` | No placeholders, size limits, cross-reference integrity |
 
 ### Stack-Specific
 | Rule | Scope | Description |
@@ -219,14 +227,6 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 | `android.md` | `android/**/*.kt` | Android/Kotlin conventions |
 | `android-compose-ui.md` | `**/presentation/**/*.kt` | Compose UI patterns |
 | `android-kotlin.md` | `**/*.kt` | Kotlin language conventions |
-
-### Placeholders
-| Rule | Status | Description |
-|------|--------|-------------|
-| `react-nextjs.md` | Placeholder | React + Next.js |
-| `firebase-auth.md` | Placeholder | Firebase Auth |
-| `ai-gemini.md` | Placeholder | AI/Gemini |
-| `superpowers.md` | Placeholder | Advanced patterns |
 
 ## Hooks
 

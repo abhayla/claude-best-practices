@@ -128,9 +128,8 @@ def generate_stack_catalog(claude_dir: Path) -> str:
         "fastapi-": {"name": "FastAPI + Python", "desc": "Async backend patterns: SQLAlchemy, Pydantic, pytest, Alembic."},
         "android-": {"name": "Android + Compose", "desc": "Jetpack Compose UI, Hilt DI, Room DB, Gradle."},
         "ai-gemini-": {"name": "AI / Gemini", "desc": "Gemini structured output, prompt engineering, generation patterns."},
-        "firebase-": {"name": "Firebase Auth", "desc": "Phone OTP, token management, multi-environment setup."},
-        "react-": {"name": "React + Next.js", "desc": "Next.js App Router, server components, Tailwind."},
-        "superpowers-": {"name": "Superpowers", "desc": "Advanced Claude Code patterns: hooks, session analysis, automation."},
+        "firebase-": {"name": "Firebase", "desc": "Firebase dev, AI integration, Data Connect, Auth."},
+        "react-": {"name": "React + Next.js", "desc": "React Native dev, E2E testing, Next.js patterns."},
     }
 
     for prefix, info in sorted(prefixes.items(), key=lambda x: x[1]["name"]):
@@ -186,9 +185,8 @@ def generate_getting_started(hub_repo: str, available_stacks: list[str]) -> str:
         "ai-gemini": "Gemini API integration patterns",
         "android-compose": "Jetpack Compose, Hilt, Room",
         "fastapi-python": "FastAPI, SQLAlchemy, pytest, Alembic",
-        "firebase-auth": "Firebase Authentication",
-        "react-nextjs": "React + Next.js patterns",
-        "superpowers": "Advanced Claude Code automation",
+        "firebase-auth": "Firebase dev, AI, Data Connect",
+        "react-nextjs": "React Native dev, E2E testing",
     }
 
     for stack in available_stacks:

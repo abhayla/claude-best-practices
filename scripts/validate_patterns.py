@@ -30,7 +30,7 @@ SIZE_FAIL = 1000
 STUB_MIN_LINES = 30
 
 # Known stack prefixes
-STACK_PREFIXES = ["fastapi-", "android-", "ai-gemini-", "firebase-", "react-", "superpowers-", "flutter-", "vue-", "nuxt-", "expo-"]
+STACK_PREFIXES = ["fastapi-", "android-", "ai-gemini-", "firebase-", "react-", "flutter-", "vue-", "nuxt-", "expo-"]
 
 # Portability: patterns that indicate hardcoded paths (not in code blocks)
 HARDCODED_PATH_PATTERNS = [
