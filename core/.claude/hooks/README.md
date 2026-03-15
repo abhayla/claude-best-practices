@@ -8,7 +8,7 @@ Hooks are shell scripts that run in response to Claude Code events. They are pro
 
 ### Dangerous Command Blocker (`dangerous-command-blocker.sh`)
 
-PreToolUse hook on `Bash` that blocks catastrophic commands (`rm -rf /`, `dd`, `mkfs`), protects critical paths (`.git/`, `.claude/`, `.env`), blocks database destruction (`DROP DATABASE`, `TRUNCATE CASCADE`), prevents force pushes to main/master, warns about interactive command hangs (`cp`/`mv`/`rm` without `-f` that may hang from `-i` aliases), and blocks `gh run watch` (API rate limit exhaustion). Exit code 2 blocks the command and feeds the error message back to Claude.
+PreToolUse hook on `Bash` that blocks catastrophic commands (`rm -rf /`, `dd`, `mkfs`), protects critical paths (`.git/`, `.claude/`, `.env`), blocks database destruction (`DROP DATABASE`, `TRUNCATE CASCADE`), prevents force pushes to main/master, blocks CI bypass attempts (`--no-verify`, `[skip ci]`), warns about interactive command hangs (`cp`/`mv`/`rm` without `-f` that may hang from `-i` aliases), and blocks `gh run watch` (API rate limit exhaustion). Exit code 2 blocks the command and feeds the error message back to Claude.
 
 ```json
 {

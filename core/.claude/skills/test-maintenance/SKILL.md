@@ -8,7 +8,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "[test_directory] [framework: pytest|jest|vitest] [focus: audit|dead|dupes|slow|readability|optimize|all]"
-version: "1.1.0"
+version: "1.2.0"
 triggers:
   - test maintenance
   - test cleanup
@@ -430,6 +430,89 @@ ESTIMATED TOTAL SAVINGS: <time> per CI run
 
 Present the report to the user. If `--apply` or `focus` was specified, offer to
 execute the recommended changes interactively, one batch at a time.
+
+---
+
+## STEP 8: Quarantine Age Audit
+
+Scan the test suite for quarantined and flaky test markers, then check how long
+each test has been quarantined. Stale quarantines indicate forgotten failures that
+erode test confidence.
+
+### 8a. Scan for quarantine markers
+
+**Python (pytest):**
+```bash
+# Find flaky-marked tests
+grep -rn "@pytest.mark.flaky" <test_directory>/ 2>/dev/null
+
+# Find skip markers with quarantine reasons
+grep -rn "@pytest.mark.skip.*quarantine\|@pytest.mark.skip.*flaky" <test_directory>/ 2>/dev/null
+
+# Find xfail markers
+grep -rn "@pytest.mark.xfail" <test_directory>/ 2>/dev/null
+```
+
+**JavaScript/TypeScript (jest/vitest):**
+```bash
+# Find skip markers with quarantine/flaky comments
+grep -rn "test\.skip\|it\.skip\|describe\.skip" <test_directory>/ 2>/dev/null | grep -i "quarantine\|flaky"
+
+# Find all skip markers (review for quarantine intent)
+grep -rn "test\.skip(\|it\.skip(\|describe\.skip(" <test_directory>/ 2>/dev/null
+```
+
+### 8b. Check quarantine age via git blame
+
+For each quarantined test found in 8a, use `git blame` to determine when the
+skip/flaky marker was introduced:
+
+```bash
+# Get the commit date for the quarantine marker line
+git blame -L <line>,<line> -- <file> --date=short 2>/dev/null
+```
+
+Parse the blame date and calculate days since quarantine relative to today.
+
+### 8c. Apply quarantine age thresholds
+
+Classify each quarantined test by age:
+
+| Days Since Quarantine | Status | Action |
+|-----------------------|--------|--------|
+| 0-7 days | OK | Recently quarantined, no action needed |
+| 8-14 days | WARN | Approaching staleness, schedule fix |
+| >14 days | BLOCK | Must be either fixed or permanently removed with justification |
+
+Tests in BLOCK status represent forgotten failures. They must be resolved before
+the next audit cycle completes.
+
+### 8d. Quarantine report
+
+Generate a table of all quarantined tests:
+
+```
+QUARANTINE AUDIT
+  Quarantined tests:  <count>
+  Oldest quarantine:  <N> days (<file>:<line>)
+
+  | Test | File | Line | Quarantine Date | Age (days) | Reason | Status |
+  |------|------|------|-----------------|------------|--------|--------|
+  | test_flaky_api | tests/test_api.py | 42 | 2026-02-28 | 15 | JIRA-1234 timeout | BLOCK |
+  | test_race_cond | tests/test_sync.py | 88 | 2026-03-10 | 5 | race condition | OK |
+```
+
+Add the quarantine count and oldest quarantine age to the STEP 7 health report
+under a `QUARANTINE` section:
+
+```
+QUARANTINE
+  Quarantined tests:  <count> (<percentage>% of suite)
+  Oldest quarantine:  <N> days
+  WARN (8-14 days):   <count>
+  BLOCK (>14 days):   <count>
+  Quarantine status:  <OK | WARN if any 8-14 day | BLOCK if any >14 day>
+```
 
 ---
 

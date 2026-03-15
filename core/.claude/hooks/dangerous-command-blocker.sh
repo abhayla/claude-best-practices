@@ -120,6 +120,22 @@ if echo "$COMMAND" | grep -qE '^\s*(cp|mv|rm)\s' && \
   fi
 fi
 
+# --- CI bypass prevention (--no-verify, [skip ci]) ---
+# testing.md rule #7: PRs MUST NOT use --no-verify, [skip ci], or [ci skip] to bypass gates
+if echo "$COMMAND" | grep -qE 'git commit.*--no-verify|git push.*--no-verify'; then
+  echo "BLOCKED: '--no-verify' skips pre-commit hooks and test gates."
+  echo "If a hook is failing, fix the underlying issue instead of bypassing it."
+  echo "If you need to skip hooks intentionally, ask the user for explicit approval."
+  exit 2
+fi
+
+if echo "$COMMAND" | grep -qiE 'git commit.*\[(skip ci|ci skip)\]'; then
+  echo "BLOCKED: '[skip ci]' / '[ci skip]' in commit message bypasses CI pipeline."
+  echo "All commits must pass CI. If CI is broken, fix it — do not skip it."
+  echo "Only documentation-only changes may skip CI, and the user must approve."
+  exit 2
+fi
+
 # --- Block gh run watch (GitHub API rate limit exhaustion) ---
 # gh run watch polls every 3 seconds = 1200 requests/hour.
 # GitHub's rate limit is 5000/hour — a single watch can exhaust 24% of it.

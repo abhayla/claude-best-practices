@@ -3,8 +3,8 @@ name: code-quality-gate
 description: >
   Post-implementation code quality enforcement: cyclomatic complexity,
   duplication detection, SOLID checklist, structured logging audit, error
-  handling strategy audit, TDD refactor phase, and clean architecture
-  layer validation.
+  handling strategy audit, dead code detection, TDD refactor phase, and
+  clean architecture layer validation.
 triggers:
   - code quality
   - quality gate
@@ -15,7 +15,7 @@ triggers:
   - refactor phase
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<file paths, directory, or 'all changed files'>"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -680,7 +680,89 @@ After all tests pass (green), execute the refactor phase:
 
 ---
 
-## STEP 10: Quality Report
+## STEP 10: Dead Code Detection
+
+Detect unused code in changed files to surface maintenance risks. Dead code findings are informational (non-blocking).
+
+### 10.1 Detect Language and Tool
+
+| Stack | Tool | Install Command |
+|-------|------|-----------------|
+| Python | vulture | `pip install vulture` |
+| JavaScript/TS | ts-prune | `npm install -g ts-prune` |
+
+Check if the tool is available before running. If not installed, install it:
+
+```bash
+# Python
+command -v vulture >/dev/null 2>&1 || pip install vulture
+
+# JavaScript/TypeScript
+command -v ts-prune >/dev/null 2>&1 || npm install -g ts-prune
+```
+
+### 10.2 Run on Changed Files Only
+
+Scope dead code detection to files changed in the current branch — do not scan the entire codebase:
+
+**Python (vulture):**
+```bash
+# Get changed Python files
+CHANGED_PY=$(git diff --name-only origin/main...HEAD -- '*.py' | grep -v test | grep -v __pycache__)
+
+# Run vulture with 80% minimum confidence to reduce false positives
+if [ -n "$CHANGED_PY" ]; then
+  vulture $CHANGED_PY --min-confidence 80
+fi
+```
+
+**JavaScript/TypeScript (ts-prune):**
+```bash
+# Get changed JS/TS files
+CHANGED_TS=$(git diff --name-only origin/main...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' | grep -v test | grep -v spec | grep -v node_modules)
+
+# Run ts-prune and filter output to changed files only
+if [ -n "$CHANGED_TS" ]; then
+  ts-prune --project tsconfig.json 2>/dev/null | while read line; do
+    for f in $CHANGED_TS; do
+      echo "$line" | grep -q "$f" && echo "$line"
+    done
+  done
+fi
+```
+
+### 10.3 Classify Findings
+
+Report unused exports, functions, variables, and classes found in changed files:
+
+```markdown
+## Dead Code Report
+
+**Tool:** vulture / ts-prune
+**Files scanned:** <count>
+**Dead code items found:** <count>
+
+| File | Line | Type | Name | Confidence |
+|------|------|------|------|------------|
+| src/services/<module>.py | 34 | function | `old_calculate()` | 90% |
+| src/domain/<module>.py | 78 | variable | `LEGACY_FLAG` | 85% |
+| src/utils/<module>.ts | 12 | export | `deprecatedHelper` | — |
+```
+
+### 10.4 Gate Behavior
+
+Dead code detection is **WARN only** — it does not block the gate. Dead code is informational and may include false positives (e.g., dynamically referenced symbols, plugin entry points).
+
+| Dead Code Items | Status | Action |
+|----------------|--------|--------|
+| 0 | ✅ Pass | No dead code detected |
+| 1+ | ⚠️ Warn | Review flagged items — remove if genuinely unused |
+
+Include the dead code count in the structured output (Step 12).
+
+---
+
+## STEP 11: Quality Report
 
 Present a summary gate report:
 
@@ -701,6 +783,7 @@ Present a summary gate report:
 | Logging | ✅ Pass | All structured, no PII |
 | Error handling | ✅ Pass | Typed errors, no swallowed exceptions, timeouts set |
 | Coverage diff | ✅ Pass | 85% diff coverage (threshold: 80%) |
+| Dead code | ⚠️ Warn | 2 unused functions detected (non-blocking) |
 | Refactoring | ✅ Done | 3 extract-method refactorings applied |
 
 ### Gate Decision
@@ -712,7 +795,7 @@ Present a summary gate report:
    **Fix:** Inject `UserRepository` via constructor
 ```
 
-## STEP 11: Structured Output
+## STEP 12: Structured Output
 
 Write machine-readable results to `test-results/code-quality-gate.json`:
 
@@ -729,6 +812,8 @@ Write machine-readable results to `test-results/code-quality-gate.json`:
     "logging": "PASS|WARN",
     "error_handling": "PASS|WARN|BLOCK",
     "coverage_diff": "PASS|WARN|BLOCK",
+    "dead_code": "PASS|WARN",
+    "dead_code_count": 0,
     "refactoring": "DONE|SKIPPED"
   },
   "gate_decision": "PASS|BLOCK",
@@ -754,6 +839,7 @@ Use this matrix to determine the `gate_decision` value. Any single BLOCK → ove
 | Logging | All structured, no PII | Missing correlation ID on some logs | PII detected in log output |
 | Error handling | Typed errors, timeouts set, no swallowed exceptions | Missing circuit breaker for external deps | Empty catch/except block, generic Exception catch at non-top-level |
 | Coverage diff | ≥80% on new/changed code | 60-79% on new/changed code | <60% on new code OR new file with 0% coverage |
+| Dead code | 0 items found | 1+ items found (informational) | — (dead code is never BLOCK) |
 | Refactoring | Refactor phase completed | — | — (refactoring is always DONE or SKIPPED, never BLOCK) |
 
 **Overall gate:**
@@ -772,9 +858,10 @@ WARN items are reported for Stage 9 (Review) to address but do not block the imp
 - Always audit logging for PII leaks
 - Always audit error handling: no swallowed exceptions, typed error hierarchies, timeouts on external calls
 - Always check diff coverage on changed/new code (threshold: 80% on new lines)
+- Always run dead code detection on changed files (non-blocking, informational only)
 - Always run the TDD refactor phase after green
 - Always re-run tests after every refactoring step
-- Always report results as a structured gate report (Step 10)
+- Always report results as a structured gate report (Step 11)
 
 ## MUST NOT DO
 
