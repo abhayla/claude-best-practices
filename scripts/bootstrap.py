@@ -111,6 +111,8 @@ def generate_sync_config(hub_repo: str, stacks: list[str], sync_target: str = "p
 
 def bootstrap(hub_root: Path, target_dir: Path, stacks: list[str], hub_repo: str, dry_run: bool = False):
     """Bootstrap a project from the hub."""
+    print("DEPRECATED: Use 'python scripts/recommend.py --provision' or the /synthesize-project skill instead.")
+    print("bootstrap.py will be removed in a future version.\n")
     errors = validate_stack_selection(stacks)
     if errors:
         print("Stack validation errors:")
