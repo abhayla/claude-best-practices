@@ -64,9 +64,9 @@ PYTHONPATH=. python scripts/recommend.py --local /path/to/project --diff
 ### Pattern Organization
 
 - **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
-  - `agents/` — 20 agent definitions (14 universal + 6 stack-specific)
-  - `skills/` — 116 skill directories, each with a `SKILL.md`
-  - `rules/` — 19 rule files (9 universal + 10 stack-specific)
+  - `agents/` — 21 agent definitions (15 universal + 6 stack-specific)
+  - `skills/` — 117 skill directories, each with a `SKILL.md`
+  - `rules/` — 20 rule files (9 universal + 11 stack-specific)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns
   - `settings.json` — Minimal defaults
@@ -92,6 +92,9 @@ Stack-specific patterns use filename prefixes instead of separate directories:
 | AI / Gemini | `ai-gemini-` | `ai-gemini-api/` |
 | Firebase Auth | `firebase-` | `firebase-dev/`, `firebase-ai/` |
 | React + Next.js | `react-` | `react-native-dev/`, `react-native-e2e/` |
+| Flutter | `flutter-` | `flutter-dev/`, `flutter-e2e-test/` |
+| Vue + Nuxt | `vue-` / `nuxt-` | `vue-dev/`, `nuxt-dev/` |
+| Bun + Elysia | `bun-elysia-` | `bun-elysia.md` |
 
 The bootstrap script filters by these prefixes when copying patterns to a target project.
 
@@ -113,7 +116,8 @@ All Python. Key modules:
 - `generate_docs.py` — Renders `docs/DASHBOARD.md`, `docs/STACK-CATALOG.md`, and `docs/dashboard.html` from registry data.
 - `sync_to_local.py` / `sync_to_projects.py` — Sync implementations for flows 3 and 4.
 - `check_freshness.py` — Flags patterns that haven't been updated within configured staleness thresholds.
-- `recommend.py` — Auto-detects a project's tech stacks, diffs its `.claude/` against the hub, and produces a tiered recommendation (must-have / nice-to-have / skip). Supports `--apply` to copy files locally or create a PR.
+- `validate_patterns.py` — Lints patterns against structure/portability/self-containment rules before merge.
+- `recommend.py` — Auto-detects a project's tech stacks, diffs its `.claude/` against the hub, and produces a tiered recommendation (must-have / nice-to-have / skip). Supports `--apply` (copy/PR), `--provision` (apply + generate CLAUDE.md + settings.json), and `--diff` (compare overlapping content).
 
 ### GitHub Actions (`.github/workflows/`)
 

@@ -1,0 +1,129 @@
+Enhanced Prompt                                                                                                                                                                                                                                                                                                     
+Conduct a comprehensive gap analysis of this project's Claude Code tooling (core/.claude/) to determine whether it provides everything needed to take a  
+new or existing project from PRD to production deployment fully autonomously — with zero human intervention between stages.                                                                                                                                                                                         
+Scope of Analysis                                                                                                                                        
+
+Evaluate the complete pipeline across these 7 stages, checking each sub-capability:
+
+Stage 1: Requirements → PRD
+- Can brainstorm generate a formal PRD with user stories, acceptance criteria, and non-functional requirements?
+- Is there a skill to parse an existing external PRD (from a PM, Google Doc, etc.) into structured requirements? (Currently missing — brainstorm         
+generates PRDs but can't ingest them)
+- Can requirements be tiered (must-have / nice-to-have / deferred)?
+
+Stage 2: PRD → Tasks & Plan
+- Can writing-plans decompose a PRD into bite-sized implementation tasks with dependencies?
+- Can plan-to-issues convert those tasks into GitHub Issues with epics, labels, and milestones?
+- Is there an end-to-end orchestrator that chains PRD → plan → issues without manual handoff? (Check subagent-driven-dev, executing-plans, plan-executor 
+agent)
+- Does strategic-architect provide architectural decisions (ADRs) before implementation begins?
+
+Stage 3: Requirements → Fully Functional HTML UI Demo
+- Can the system generate a standalone, self-contained HTML file with sample/mock data that stakeholders can open in a browser to preview the product    
+before coding begins?
+- ui-ux-pro-max provides design systems (50 styles, 21 palettes, 50 font pairings) — but does it output HTML?
+- d3-viz generates D3.js charts — but can it produce a complete page layout, not just charts?
+- Gap check: Is there a skill that generates a full interactive HTML prototype (forms, navigation, tables, modals) with embedded sample data? (This      
+appears to be a gap)
+
+Stage 4: Tasks → Tests (before implementation)
+- Can tdd generate failing tests from task descriptions before any code is written?
+- Can implement create/update tests as its first step (Step 2)?
+- Is there a skill for batch test case generation from acceptance criteria or a requirements doc — producing all test files at once rather than
+one-at-a-time TDD cycles?
+- Cover ALL test types:
+  - Unit tests: tdd, implement, testing rule — covered?
+  - E2E tests: playwright (web), android-adb-test / android-run-e2e / flutter-e2e-test (mobile) — covered?
+  - API tests: fastapi-run-backend-tests is FastAPI-only — is there a generic API/REST/GraphQL test skill? (Appears missing)
+  - Performance/load tests: Is there ANY skill for K6, Locust, JMeter, Lighthouse CI, or equivalent? (Appears missing — web-quality checks vitals but    
+doesn't run load tests)
+  - Security tests: security-audit (CodeQL + Semgrep), supply-chain-audit — covered?
+  - Visual regression tests: verify-screenshots — covered?
+  - Contract/schema tests: OpenAPI spec validation, API contract testing? (Check if missing)
+
+Stage 5: Tasks → Implementation (coding + verification)
+- Can implement execute tasks with test-first coding?
+- Can executing-plans work through a plan step-by-step with the plan-executor agent?
+- Can subagent-driven-dev parallelize work across multiple agents?
+- Can auto-verify map changed files to targeted tests and run them?
+- Can verify-screenshots provide visual proof (screenshot comparison) that UI changes are correct?
+- Can fix-loop / fix-issue handle failures iteratively?
+- Does batch handle codebase-wide changes with impact analysis?
+- Is there a skill for database migrations during implementation? (fastapi-db-migrate for Alembic — generic equivalent?)
+
+Stage 6: Quality Gates & Review
+- Can adversarial-review do structured adversarial code review?
+- Can code-reviewer agent assess quality, security, and performance?
+- Can request-code-review create review-optimized PRs?
+- Can receive-code-review triage and act on review feedback?
+- Can pr-standards enforce team standards against PR diffs?
+- Can security-auditor agent do STRIDE threat modeling?
+- Can web-quality audit Core Web Vitals, accessibility, SEO?
+
+Stage 7: Deployment & Operations
+- Can ci-cd-setup configure GitHub Actions / GitLab CI?
+- Can docker-optimize produce production Dockerfiles?
+- Can k8s-deploy handle Kubernetes manifests, Helm, RBAC?
+- Can iac-deploy manage Terraform/Pulumi infrastructure?
+- Can fastapi-deploy run migrations, seeding, health checks?
+- Can monitoring-setup configure Prometheus, Grafana, alerting, SLOs?
+- Can incident-response handle detection, triage, mitigation, post-mortem?
+
+Cross-Cutting Concerns to Check
+
+- Session continuity: Can continue + handover + session-summarizer agent maintain state across sessions?
+- Self-improvement: Can learn-n-improve + skill-factory + test-knowledge accumulate learnings?
+- Orchestration: Is there a master orchestrator skill/agent that can drive the entire PRD→Prod pipeline autonomously, or must a human manually invoke    
+each stage? (This is the critical gap question)
+- Stack coverage: Which stacks have deep support (FastAPI, Android/Compose) vs. placeholder-only (React/Next.js, Firebase, Go)?
+
+Expected Output
+
+Produce a structured report with:
+1. Coverage matrix: Each capability above rated as ✅ Full / ⚠️ Partial / ❌ Missing
+2. Gap list: Every missing or weak capability, ranked by impact on autonomous operation
+3. Chain analysis: For each stage, show the exact skill/agent chain needed (e.g., brainstorm → writing-plans → plan-to-issues → implement → auto-verify →   request-code-review → ci-cd-setup → k8s-deploy)
+4. Proposed new skills/agents: For each ❌ gap, propose a new skill or agent with:
+  - Name, trigger, description
+  - What it would do
+  - Which existing skills it would integrate with
+5. Autonomy assessment: A final verdict — what percentage of the PRD→Prod pipeline can run without human intervention today, and what's needed to reach  
+100%?
+
+*********************
+**Question**
+
+Before starting, clarify requirements by asking me questions one at a time.  
+How to ask:
+
+- State how many questions remain (e.g., "Question 3 of ~6")
+- For each question, provide your recommendation with reasoning (cite industry standards, codebase patterns, or docs
+  you've read)
+- Before each question, read relevant files/docs in the codebase to ground your recommendation in what actually exists —
+  don't ask me things you can answer by reading code
+- Present the plan section by section for my review (not all at once)
+- For each section, wait for my approval or feedback before showing the next
+- Only finalize the complete plan after all sections are approved
+
+What NOT to do:
+
+- Don't ask generic questions you could resolve by reading the codebase (e.g., "What tech stack do you use?" — that's in
+  CLAUDE.md)
+- Don't ask me to confirm things that have obvious best-practice answers — just state your recommendation and ask if I  
+  disagree
+- Don't present the entire plan in one shot expecting blanket approval
+
+*********************
+Claude Code Prompt:What is the single smartest and most radically innovative and accretive and useful and compelling addition you could make to the project at this point?
+*********************
+
+Check for each tech stack it should work - 
+Android ✅
+  Kotlin ✅
+  Flutter ✅
+Vue ✅
+Backend (FastAPI) ✅
+
+skills
+  Pydantic
+  FastAPI
