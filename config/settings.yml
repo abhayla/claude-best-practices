@@ -20,3 +20,21 @@ dedup:
   semantic_threshold_strong: 85
   semantic_threshold_weak: 70
   structural_threshold: 3
+
+synthesis:
+  max_conventions: 20
+  # Gold standard patterns used as few-shot examples during /synthesize-project.
+  # Criteria: follows all structure standards, 100-300 lines, demonstrates
+  # project-specific language (not generic advice), includes clear "why" reasoning.
+  gold_standards:
+    rules:
+      - pattern-structure        # Universal rule — shows required frontmatter, scope, versioning
+      - fastapi-backend          # Stack-specific rule — shows how to be project-specific
+    skills:
+      - tdd                      # Workflow type — shows numbered steps, critical rules section
+      - test-knowledge           # Reference type — shows organized sections without step numbering
+    agents:
+      - code-reviewer            # Shows agent structure: model, core responsibilities, output format
+
+clustering:
+  min_cluster_size: 3

@@ -859,17 +859,17 @@ clustering:
 | `/synthesize-hub` skill | **DONE** | `.claude/skills/synthesize-hub/SKILL.md` — 9-step workflow, 261 lines, passes validation |
 | Level 1-2 helpers | **Built into skill** | `/synthesize-hub` uses inline Bash commands for hash + structural grouping — no separate Python helpers needed |
 | `synthesized: true` frontmatter flag | **Built into skill** | `/synthesize-project` Step 5 adds `synthesized: true` to all generated patterns |
-| Gold standard pattern curation | **TODO** | Select and maintain 5 gold standard patterns in `config/settings.yml` for few-shot examples |
-| Few-shot selection algorithm | **Built into skill** | `/synthesize-project` Step 4 loads stack-matched + universal examples, capped at 8 |
-| Sensitive keyword auto-flagging | **Built into skill** | `/synthesize-project` Step 5 scans for auth/secret/billing/payment keywords, sets `private: true` |
-| Sanitization pass | **TODO** | Strip project-specific identifiers from patterns before contribution via `/contribute-practice` |
-| `.claude/synthesis-config.yml` generation | **Built into skill** | `/synthesize-project` Step 6 generates config with `allow_hub_sharing: false` on first run |
-| `share_synthesized` flag in `repos.yml` | **TODO** | Hub-side opt-in flag — needs to be added to `repos.yml` schema |
+| Gold standard pattern curation | **DONE** | 5 gold standard patterns configured in `config/settings.yml` under `synthesis.gold_standards` |
+| Few-shot selection algorithm | **Built into skill** | `/synthesize-project` Step 5 loads stack-matched + universal examples, capped at 8 |
+| Sensitive keyword auto-flagging | **Built into skill** | `/synthesize-project` Step 6 scans for auth/secret/billing/payment keywords, sets `private: true` |
+| Sanitization pass | **DONE** | `/contribute-practice` Step 4 strips project-specific identifiers, shows preview before submission |
+| `.claude/synthesis-config.yml` generation | **Built into skill** | `/synthesize-project` Step 8 generates config with `allow_hub_sharing: false` on first run |
+| `share_synthesized` flag in `repos.yml` | **DONE** | Hub-side opt-in flag added to `repos.yml` schema with dual-consent documentation |
 | Dual-consent check in `/synthesize-hub` | **Built into skill** | `/synthesize-hub` Step 1 verifies both hub-side and project-side flags |
-| `/contribute-practice` sanitization step | **TODO** | Preview sanitized pattern and show what gets stripped before submission |
-| Terminal onboarding output | **Built into skill** | `/synthesize-project` Step 7 prints flywheel box on first run, status line on subsequent |
-| Sync PR attribution | **TODO** | PR body should include which project patterns contributed to each generalization |
-| Scan log (opt-in) | **TODO** | `.claude/scan-log.yml` generation when `scan_log: true` — delivered via sync PR |
+| `/contribute-practice` sanitization step | **DONE** | Step 4 added: scan, replace, preview sanitized pattern, wait for user confirmation |
+| Terminal onboarding output | **Built into skill** | `/synthesize-project` Step 9 prints flywheel box on first run, status line on subsequent |
+| Sync PR attribution | **DONE** | `sync_to_projects.py` `build_pr_body()` includes which project patterns contributed to each generalization |
+| Scan log (opt-in) | **DONE** | `/synthesize-hub` Step 9 generates `.claude/scan-log.yml` entries for projects with `scan_log: true` |
 
 ---
 

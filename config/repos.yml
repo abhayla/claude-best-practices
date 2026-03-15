@@ -1,5 +1,15 @@
 # Registered project repos to scan for patterns
+#
+# Fields:
+#   repo:               GitHub owner/name (required)
+#   stacks:             List of stack names for prefix filtering (required)
+#   auto_sync:          Push hub pattern updates via PR (default: false)
+#   share_synthesized:  Hub-side opt-in to scan this repo's synthesized patterns
+#                       via /synthesize-hub. Requires BOTH this flag AND the
+#                       project's .claude/synthesis-config.yml allow_hub_sharing: true.
+#                       Either side can veto independently. (default: false)
 repos:
   - repo: abhayla/KKB
     stacks: [android-compose, fastapi-python, ai-gemini, firebase-auth]
     auto_sync: true
+    share_synthesized: true

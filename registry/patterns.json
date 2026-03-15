@@ -2,193 +2,98 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-15",
-    "total_patterns": 181
+    "total_patterns": 182
   },
-  "android-compose": {
-    "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
-    "type": "agent",
+  "a11y-audit": {
+    "hash": "6b3a5bc0f276397c8a86837dd779a91454f8c0961a6b31f73fa1ff63dc7149ce",
+    "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "playwright"
+    ],
+    "visibility": "public",
+    "description": "Automated WCAG 2.1 AA compliance checking with axe-core and Lighthouse integration for prototypes and production pages",
+    "tags": [
+      "accessibility",
+      "WCAG",
+      "a11y",
+      "axe-core",
+      "Lighthouse"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d axe-core, Lighthouse a11y, WCAG checklist"
+  },
+  "adr": {
+    "hash": "1900013d1bcfd25bf035fb99a0ddc40ed5238a198ec71e8f019ba2c9d1995eb1",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "description": "Create and manage Architecture Decision Records (ADRs) using the Michael Nygard template. Initialize, create, list, supersede, deprecate, and index ADRs.",
+    "tags": [
+      "documentation",
+      "architecture",
+      "ADR",
+      "decisions"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Michael Nygard template, lifecycle management, index generation"
   },
-  "code-reviewer": {
-    "hash": "0846cee33e976c874f23956d467fbbf659f18e1928c3b7a6232af15003f782cd",
-    "type": "agent",
+  "adversarial-review": {
+    "hash": "cf52244037d8356738d81edff04dd903ed1afe5fc8da80dca908056e0f2327c7",
+    "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
+    "description": "Cross-model multi-round debate for plans and code review",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
-  "context-reducer": {
-    "hash": "481ab9eb6f30902c6d9f2833db7d0179d7456f3b87d6348447dc3f8e8a68e8a2",
-    "type": "agent",
+  "agent-orchestration": {
+    "hash": "7147db1c5caa751d232b84ccb1d42b004936d22e94b41c534a47322f59e49f4b",
+    "type": "rule",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "debugger": {
-    "hash": "c04d0847b6ef07eaed7e4cd9f5c9af202fdada3ff1b31567c2f79f52dbad9620",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "docs-manager": {
-    "hash": "faad06fa134a5087f6089498991e8a3a823090f70e7f97d2d6be066a759e69c8",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "fastapi-api-tester": {
-    "hash": "489e986b8a4329dd878399d31209bca7f270fde56c5f2e424033c9b2f2114940",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "fastapi-database-admin": {
-    "hash": "29f34f65dab9a0b53798d62362cd653d47d3894f91fec1e57c351236780050c0",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "git-manager": {
-    "hash": "80f06f402bf49e18bedb0645440d6723630372b388e11baf14a58bfffbc01887",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "plan-executor": {
-    "hash": "2cb957f9d2f11ab1293eb9cdfe1aba63d1d6caf9be590ed24654b809ea266a2b",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "planner-researcher": {
-    "hash": "2e8df8f8e32fc19ef820ce4eae9ff0e707471a9a83b27d746b6b70effd400a94",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "session-summarizer": {
-    "hash": "a7bf7570fde9b777ccb4ac4461e8be229d8add3dc7e21ff0d8152a2ede9e6986",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "test-failure-analyzer": {
-    "hash": "b206088193f531e0294cfcf03e88179a95d4c199b6835894322f67f94fe212c9",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "tester": {
-    "hash": "5f3ba21eb7c0fc7526579d1a969af778bef4e0be4b509e95c25abc06ca9c3a0c",
-    "type": "agent",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "description": "8 constraints for multi-agent orchestration: 2-level hierarchy, no subagent-spawning, externalized DAGs, global retry budget, single state location",
+    "tags": [
+      "orchestration",
+      "agents",
+      "constraints"
+    ],
+    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d Anthropic-aligned orchestration constraints"
   },
   "ai-gemini-api": {
     "hash": "dee9b9fc4bbbceabb4adb418c2c58e7a97821e5f182569e7028b690bc01f6390",
     "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "android": {
+    "hash": "c7572078c79447a97f1f787d65d6569ed76d465e3fc2b125e7a3edb9a2444e70",
+    "type": "rule",
     "category": "core",
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
@@ -213,6 +118,155 @@
     "description": "",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "android-arch": {
+    "hash": "1819b0f7fe22d07d8e3d2ea78c7f98c67158d0cad66bf0f808d9aca5d5305467",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Android architecture with 24 deep-dive references and Gradle convention plugin templates",
+    "tags": [
+      "android",
+      "kotlin",
+      "compose",
+      "architecture",
+      "navigation",
+      "security",
+      "testing",
+      "gradle"
+    ],
+    "changelog": "v2.0.0: Merged with claude-android-ninja references and templates"
+  },
+  "android-build-fixer": {
+    "hash": "608284a1954fff8c6dcb3c30ee02b3d7e76a0a0bf8cb242d6ddb519a4e29a0a8",
+    "type": "agent",
+    "category": "android-compose",
+    "version": "1.0.0",
+    "source": "scan:TaeseongYun/everything-claude-code-android",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Android Gradle build failure diagnostics \u2014 10 common issue categories with solutions",
+    "tags": [
+      "android",
+      "gradle",
+      "build",
+      "debugging",
+      "ksp",
+      "hilt",
+      "room"
+    ],
+    "changelog": "v1.0.0: Initial \u2014 adapted from TaeseongYun build-fixer agent"
+  },
+  "android-compose": {
+    "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "android-compose-ui": {
+    "hash": "ca8a9d00a52d13a89fb3a205d13d2cfa678872b908fb15271667d09985fa152b",
+    "type": "rule",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "android-gradle": {
+    "hash": "d838b576a813474079eb8965f9ba19c3c24a66d15087f1cc4a33b03c5596c542",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Android Gradle build optimization and plugin configuration",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "android-kotlin": {
+    "hash": "a248798ea4e4bf0532595fca1992cc31b72507adb7fd2206c791b48b1f708654",
+    "type": "rule",
+    "category": "android-compose",
+    "version": "1.0.0",
+    "source": "scan:affaan-m/everything-claude-code",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Kotlin idioms, null safety, scope functions, DSL patterns, KMP testing conventions",
+    "tags": [
+      "android",
+      "kotlin",
+      "kmp",
+      "coding-style",
+      "testing"
+    ],
+    "changelog": "v1.0.0: Initial \u2014 consolidated from 4 kotlin rule files in everything-claude-code"
+  },
+  "android-kotlin-reviewer": {
+    "hash": "6f54c0a1c173f0f12aa66fc4b0500d87cbb229fb92a5548dc5d06740d898c041",
+    "type": "agent",
+    "category": "android-compose",
+    "version": "1.0.0",
+    "source": "scan:affaan-m/everything-claude-code",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Kotlin/Android/KMP code reviewer with 24+ domain-specific checks",
+    "tags": [
+      "android",
+      "kotlin",
+      "code-review",
+      "compose",
+      "coroutines",
+      "kmp"
+    ],
+    "changelog": "v1.0.0: Initial \u2014 adapted from everything-claude-code kotlin-reviewer"
+  },
+  "android-mvi-scaffold": {
+    "hash": "8e4e7b4fe979d67fdf3af6cea3b179476d12e12c31e2db68e1e3ad25fda82885",
+    "type": "skill",
+    "category": "android-compose",
+    "version": "1.0.0",
+    "source": "scan:ChrisWW/claude-code-android-skills+TaeseongYun/everything-claude-code-android",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "MVI feature scaffolder \u2014 generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
+    "tags": [
+      "android",
+      "kotlin",
+      "mvi",
+      "scaffold",
+      "compose",
+      "architecture"
+    ],
+    "changelog": "v1.0.0: Initial \u2014 consolidated from ChrisWW + TaeseongYun repos"
   },
   "android-run-e2e": {
     "hash": "5bdb4fba01a2bb3d370dcb69c8181253dc984c33d590fb59f109760fbce78510",
@@ -267,6 +321,77 @@
     ],
     "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns"
   },
+  "anthropic-agent-orchestration-guide": {
+    "hash": "44939f9bcd3e0044064e5a917f91876dda92663c773010f1f1a5e21b6c216bdf",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Reference guide covering Anthropic's 5 workflow patterns, agent vs skill decision framework, orchestration architecture, anti-patterns, and context management",
+    "tags": [
+      "orchestration",
+      "reference",
+      "patterns",
+      "agents"
+    ],
+    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d comprehensive orchestration reference"
+  },
+  "api-docs-generator": {
+    "hash": "7a9fab9fc54dc8a082b2dbf1efb564cf5b5c20ab842083aebac7eca9121b0945",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Auto-generate OpenAPI docs from code annotations (FastAPI, Express, NestJS, Go), validate against API tests, generate Redoc/Swagger UI, API versioning and deprecation docs",
+    "tags": [
+      "API",
+      "OpenAPI",
+      "Swagger",
+      "documentation"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-framework OpenAPI generation, validation, CI integration"
+  },
+  "architecture-fitness": {
+    "hash": "26ff3f9a6a693d5c8a4d0612156b5f8443e35c186422c210d13b75ff10ec40b4",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Architecture conformance checks: dependency direction validation, circular dependency detection, coupling/cohesion metrics, module boundary analysis, and ADR review",
+    "tags": [
+      "architecture",
+      "fitness-functions",
+      "coupling",
+      "dependencies"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dependency direction, circular deps, coupling, ADR review"
+  },
+  "auto-format": {
+    "hash": "256b760022b946b6fdf28cc37e6c1a7aede4a1322a83c0250c1981c4aef5d1d6",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
   "auto-verify": {
     "hash": "af66c188e68cb2b2a4478f388e8b74446ce4968ba6c13e833d7f6f1d43aa532f",
     "type": "skill",
@@ -280,6 +405,169 @@
     "description": "",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "batch": {
+    "hash": "33d4b0c87a6290f3f684819ff4c49532c2bd0da22cccb49f7f79b4bed38e74b6",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Parallel codebase-wide changes, renames, API migrations",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "brainstorm": {
+    "hash": "b316371e9251dedb4bfb14fd0f20d999c19041e4529aa6a28c890e5102f69c11",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "branching": {
+    "hash": "0093f3e5af07083e7ad47d0bedc3d34ced96890048d91683dce6cc6ae32d88d9",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Full branch lifecycle: create with naming conventions + finish with merge",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "bun-elysia": {
+    "hash": "2a347eb121ca2ba6e6cd7ac77dbe440b6afd9bdd45cc5585bf5b67b24f664a96",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Bun runtime and ElysiaJS framework patterns",
+    "tags": [
+      "bun",
+      "elysia",
+      "typescript"
+    ],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "bun-elysia-test": {
+    "hash": "7ae21ae5f4e33709314d0051742472edb72ab4bbab663dc10061a4fc29913682",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Bun + Elysia testing workflow with bun:test, Eden treaty client, plugin and WebSocket testing",
+    "tags": [
+      "bun",
+      "elysia",
+      "testing"
+    ],
+    "changelog": "v1.0.0: Initial creation from testing gap audit"
+  },
+  "change-risk-scoring": {
+    "hash": "50e0c104e1ab8f859e667502baa7c28ddd4bc1bcc73d478a88b7f8fdc5642535",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Quantified change risk score (files \u00c3\u2014 complexity \u00c3\u2014 inverse coverage) for deploy go/no-go decisions with hotspot analysis",
+    "tags": [
+      "risk",
+      "change-management",
+      "deploy",
+      "metrics"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d composite risk scoring, hotspot analysis"
+  },
+  "changelog-contributing": {
+    "hash": "df799475ed1153f1273a41676d26cd369cd5612b7e0a4a87ab4335bf1b79dc4b",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Auto-generate CHANGELOG from conventional commits and CONTRIBUTING.md with project-specific guidelines",
+    "tags": [
+      "changelog",
+      "contributing",
+      "conventional-commits",
+      "documentation"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d CHANGELOG + CONTRIBUTING generation"
+  },
+  "chaos-resilience": {
+    "hash": "8a9c51f03bb40493c0fff901874fc5a6ecc0e0ee61ec2faf72ec7eec49ca9c7f",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Chaos engineering and resilience testing: failure injection, graceful degradation, circuit breaker validation, gameday planning",
+    "tags": [
+      "chaos",
+      "resilience",
+      "failure-injection",
+      "circuit-breaker"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure injection, degradation verification, gameday"
+  },
+  "ci-cd-setup": {
+    "hash": "896c76480d817ef418001697770dc2cb16de4cd7bdae1e4092f03206fa1c2ed0",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "GitHub Actions, GitLab CI, pipeline stages, environment promotion",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "claude-behavior": {
+    "hash": "8e0db9f88037e71992fac9757a778c2c89d87f5cd42f14d9eb6442edef2f4803",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
   },
   "claude-guardian": {
     "hash": "04fc7e96af6b15f77dffca30deab08fb86409e32f9cdca8dea8fb1dd8626def7",
@@ -295,6 +583,124 @@
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
   },
+  "code-quality-gate": {
+    "hash": "cde71e0efce441eadf04472e96afef64ce032ebdb5decd2cc51e827daab76441",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Post-implementation code quality enforcement with cyclomatic complexity, duplication detection, SOLID checklist, structured logging audit, TDD refactor phase, and clean architecture layer validation",
+    "tags": [
+      "quality",
+      "SOLID",
+      "complexity",
+      "refactoring",
+      "logging"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d complexity, duplication, SOLID, logging, refactor, layer checks"
+  },
+  "code-reviewer": {
+    "hash": "0846cee33e976c874f23956d467fbbf659f18e1928c3b7a6232af15003f782cd",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "compose-ui": {
+    "hash": "48aa706a047d7995afe07c31c25d3474c229fc4aef2001ce95fd016ea78b560a",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Jetpack Compose UI patterns, theming, accessibility",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "context-management": {
+    "hash": "13dd282f064755f2967f19613b41328bbfe9a973bc90a40b8fc2ef9be683595b",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "context-reducer": {
+    "hash": "481ab9eb6f30902c6d9f2833db7d0179d7456f3b87d6348447dc3f8e8a68e8a2",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "context-window-monitor": {
+    "hash": "fd891a2cece0a03669a42198acd7f1bb8ed804e87e21198b37a9fa97d61c9583",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "context-window-statusline": {
+    "hash": "5faf0cab3c3ae2808060418818054d8b576fcfa6528bdfe9005d976acc1a86cd",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "context-window-statusline-hook": {
+    "hash": "35d56ec6a9faad22e964e126f89077b5a6bf0183afc66069d81f1d627a6a4f1e",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
   "continue": {
     "hash": "1ea609acf8d853e8fae8786962c2c2050842a1f87cbbf76fc75a5929671d9d67",
     "type": "skill",
@@ -309,9 +715,399 @@
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
   },
+  "contract-test": {
+    "hash": "3817d33492de55e0638b29653cf2742762b8595f1e95ea17e5d2ddf9c933449a",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Consumer-driven contract testing with Pact, provider verification, contract broker integration, and CI can-i-deploy workflow",
+    "tags": [
+      "testing",
+      "contract",
+      "Pact",
+      "API",
+      "consumer-driven"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Pact consumer/provider, broker, CI integration"
+  },
   "contribute-practice": {
     "hash": "1239a9b6e61440b981bf52623f4ee694c9f9119922a68941feb8d90fc9dd3245",
     "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "coverage-analysis": {
+    "hash": "a01d0e18e80d660e2b1fd08e1207647a5fc8de7a10e1ce0a24880f3f395a6428",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Analyze test coverage across a project, identify gaps in critical code paths, and prioritize which files and functions to test next.",
+    "tags": [
+      "testing",
+      "coverage",
+      "quality"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "cross-platform-visual": {
+    "hash": "2cb58ce289eccf451af993bb5a945da7c90f6c3edd3adf996d920f78ebb0a6e5",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "d3-viz": {
+    "hash": "8f85f3d70099a3ba0d99668cb3c12615d0c7e1c967e4bebbe7c9ae756b4c07f3",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "D3.js data visualization: selections, scales, 9 chart types, interactions",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "dangerous-command-blocker": {
+    "hash": "7b16349564768f5dd73f61db891b51b91da29480f8bc58f747752334268996f2",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "dast-scan": {
+    "hash": "b538bea11b0ec50513d5dcba0a6b0adae7a2030ede67745cde80f8504fc1249e",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "security-audit"
+    ],
+    "visibility": "public",
+    "description": "Dynamic Application Security Testing with OWASP ZAP, Nuclei scanning, header security audit, session management testing, API fuzzing, and CI integration",
+    "tags": [
+      "security",
+      "DAST",
+      "OWASP",
+      "ZAP",
+      "nuclei",
+      "fuzzing"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ZAP, Nuclei, headers, sessions, fuzzing, CI"
+  },
+  "db-migrate": {
+    "hash": "1ef74f8a7a8f00ce2fc9768196e8dd8ed6743c56e7a4059ba950cfc81b3d9cae",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "schema-designer"
+    ],
+    "visibility": "public",
+    "description": "Stack-neutral database migration supporting Prisma, Knex, Django, TypeORM, Drizzle, SQLAlchemy/Alembic, and raw SQL",
+    "tags": [
+      "database",
+      "migration",
+      "ORM",
+      "Prisma",
+      "Django",
+      "TypeORM"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-ORM migration with safety rules"
+  },
+  "db-migrate-verify": {
+    "hash": "0d2d7e360de52bf730fe0143d9c4147c9a62965ae2198a8b11cdf4cbd44b74fb",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "debugger": {
+    "hash": "c04d0847b6ef07eaed7e4cd9f5c9af202fdada3ff1b31567c2f79f52dbad9620",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "deploy-strategy": {
+    "hash": "8916b811ca24a7a5874e6050f4f4e48abec67e36e2eaf79349e824e323e7f20e",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "ci-cd-setup",
+      "k8s-deploy"
+    ],
+    "visibility": "public",
+    "description": "Advanced deployment strategies: GitOps (ArgoCD/Flux), progressive delivery (canary/blue-green with Flagger/Argo Rollouts), zero-downtime DB migrations (expand-contract), and production readiness review",
+    "tags": [
+      "deployment",
+      "GitOps",
+      "canary",
+      "progressive-delivery",
+      "zero-downtime",
+      "PRR"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d GitOps, canary, blue-green, DB migration ordering, PRR"
+  },
+  "diataxis-docs": {
+    "hash": "5287d419170173c2d6c35690e8c9e9d1a4c47b9615812d40a9f1488b027e8ff0",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Organize documentation using the Di\u00c3\u00a1taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
+    "tags": [
+      "documentation",
+      "Diataxis",
+      "tutorials",
+      "reference"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Di\u00c3\u00a1taxis categorization, templates, migration"
+  },
+  "disaster-recovery": {
+    "hash": "735daa59b1ef1b0f067204a720f135ba3939f8a2952b44d9a5eecacb80f154f0",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "monitoring-setup",
+      "incident-response"
+    ],
+    "visibility": "public",
+    "description": "Disaster recovery planning with RTO/RPO targets, backup strategies, restore procedures, failover runbooks, and DR drill scheduling",
+    "tags": [
+      "DR",
+      "disaster-recovery",
+      "backup",
+      "failover",
+      "RTO",
+      "RPO"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d RTO/RPO, backup, restore, failover, DR drills"
+  },
+  "doc-staleness": {
+    "hash": "8495d0fcd3db3ddfbb4b5a4516719e8ef85d9c2c86c195acee9cf5416991cd80",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Detect documentation that has drifted from the codebase \u00e2\u20ac\u201d stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
+    "tags": [
+      "documentation",
+      "staleness",
+      "drift-detection",
+      "quality"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d file/symbol/command/link staleness detection, severity-prioritized report"
+  },
+  "doc-structure-enforcer": {
+    "hash": "ed21cb6e8213bca75f599461d5f5157e8c9317c097652054cfc70be2a09bda4b",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Enforce stage-based documentation folder structure via config-driven rules. Two modes: audit (report misplaced files) or enforce (git mv + update references). Aligns with pipeline-orchestrator-agent.",
+    "tags": [
+      "documentation",
+      "structure",
+      "enforcement",
+      "pipeline-stages",
+      "folder-management"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d stage-based folder structure, pattern + content classification, git mv + ref updates"
+  },
+  "docker-optimize": {
+    "hash": "fb2f27d131f37ec43eb4d3f8f40b5c7251409a8b613f7d1e94a70196274de8a0",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Multi-stage Docker builds, layer caching, security scanning",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "docs-manager": {
+    "hash": "faad06fa134a5087f6089498991e8a3a823090f70e7f97d2d6be066a759e69c8",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "drizzle-orm": {
+    "hash": "3842a374b2b406532ceb29ab28250aa5f9b90dcc86e085b9952ad110d96445e4",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Drizzle ORM schema, migrations, queries for TypeScript",
+    "tags": [
+      "orm",
+      "typescript",
+      "database"
+    ],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "executing-plans": {
+    "hash": "da7ad7dfa00db286bb0399a6399c8a7d64245793940240f0ed1e29c0d31ac94d",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Bridge writing-plans to plan-to-issues pipeline with execution tracking",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "expo-dev": {
+    "hash": "97931c9405a83b52bc3e9aa2b021eb6a7e414aeed3236233a39656b5e7651d4e",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Expo/React Native development, routing, deployment",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "fastapi-api-tester": {
+    "hash": "489e986b8a4329dd878399d31209bca7f270fde56c5f2e424033c9b2f2114940",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "fastapi-backend": {
+    "hash": "38a08f21a39828fb09a69fa96a3c3fc2a27f691dc799b75ff0dd18b1f0ad793e",
+    "type": "rule",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "fastapi-database": {
+    "hash": "9ba81856021e55bc0f65c030ac7e3439f54045d4301bccaec5ea990ae296641d",
+    "type": "rule",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "fastapi-database-admin": {
+    "hash": "29f34f65dab9a0b53798d62362cd653d47d3894f91fec1e57c351236780050c0",
+    "type": "agent",
     "category": "core",
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
@@ -365,565 +1161,41 @@
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
   },
-  "fix-issue": {
-    "hash": "cea223fbbef429d53257046363d8a729243765e1054f1e77213d47f4df299c0d",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "fix-loop": {
-    "hash": "5eba614f84c4581ec099652c85fc178b9f7f8f9b893c000e0b92746dca389e48",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "implement": {
-    "hash": "e91e1e4b0d8f92937c4e3c068cbca48bc6d58f7199843aebdd976ff4e47d7efb",
-    "type": "skill",
-    "category": "core",
-    "version": "2.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
-  },
-  "learn-n-improve": {
-    "hash": "8c54e897568d4cc7cf7c19f253e272bec2190b142014e44270d2587b0351549c",
-    "type": "skill",
-    "category": "core",
-    "version": "2.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
-  },
-  "plan-to-issues": {
-    "hash": "3f7c53da64bbc9b410d530f2c761f67f957df9c40e4ee4f6274bcc3b77764109",
-    "type": "skill",
-    "category": "core",
-    "version": "2.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
-  },
-  "post-fix-pipeline": {
-    "hash": "fe4562dc891f8779ce7767dbde7472f6ec02ea06ee44406c765b54e1964e1e01",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "scan-repo": {
-    "hash": "ec521888561d0430074a0a2a7980d42489b4d1f3a6f87d41fbe3b267f3e159fe",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "scan-url": {
-    "hash": "83e17812248a6a1745858c65f4ea2d963977140086af7f5a660304c5db09f46d",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "skill-factory": {
-    "hash": "c9487d713b342cd12e06659c6f52e2981e542e9e025969e2cafd7c78d8951af5",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "status": {
-    "hash": "0a53ff596a634ee72bd90e317bd22f16cf22bdea44787355e6796e2371542bde",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "strategic-architect": {
-    "hash": "b602d35799ee2a1a9c176e7fab9b345813ff9d333c99b95cb6c27d1f6cd8817a",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "test-knowledge": {
-    "hash": "78ce58fe35da2a0e0e8f6cecfe2f3b6c653aa8640d9378d0a7213f2fba69d3d4",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "ui-ux-pro-max": {
-    "hash": "5e31fcb34b63f84447854afe25c8e359261ad552c20c49d0f96d4768e5966899",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "update-practices": {
-    "hash": "d9c2d880600822abd45df2e967abb40f96aa98a58dcaf8510a7e404261cde0f2",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "verify-screenshots": {
-    "hash": "f25efb1d1ee9053c08ca8c9c2abcc071ef9abd5f99efcf115ce613336d49b4da",
-    "type": "skill",
-    "category": "core",
-    "version": "2.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
-  },
-  "github": {
-    "hash": "35ff44849c65e23e0d2942ff4924ae28b0b8f16733ae1bb5ac33dba18a92054b",
+  "feature-flag": {
+    "hash": "c5844dcc92cd5763b0a3613660accf535931c6cc137464f26b904b0e9491e4d2",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-11",
-    "last_updated": "2026-03-11",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "GitHub search and discovery: search repos, search code, deep-inspect repositories",
-    "tags": [
-      "github",
-      "search",
-      "discovery"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d repo search, code search, deep inspect modes"
-  },
-  "reddit": {
-    "hash": "4e991b282039cd8075375b1d57cb0e764db035a3bb6559afc5215be018b3b037",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-11",
-    "last_updated": "2026-03-11",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Comprehensive Reddit skill: read, compose, analyze, search, post, monitor",
-    "tags": [
-      "reddit",
-      "social"
-    ],
-    "changelog": "v1.0.0: Initial registry entry"
-  },
-  "twitter-x": {
-    "hash": "e0b585c4647f010ffcdd8100861da813612d21fdb883fd885349c1b77a1aef2b",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-11",
-    "last_updated": "2026-03-11",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Comprehensive Twitter/X skill: read, compose, score, search, post, monitor",
-    "tags": [
-      "twitter",
-      "social"
-    ],
-    "changelog": "v1.0.0: Initial registry entry"
-  },
-  "pattern-portability": {
-    "hash": "54b47f8c0f77848e52b4da6f3cc5c7dd46b4993560dbc2674de1f2ef63be3df7",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Portability standards for distributed patterns",
-    "tags": [
-      "quality",
-      "validation"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "pattern-structure": {
-    "hash": "492206f6b064e182673772163b55aa233f3f9039736aad98bc533cd118c89569",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Structural requirements for skills, agents, and rules",
-    "tags": [
-      "quality",
-      "validation"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "pattern-self-containment": {
-    "hash": "5e2b834bfef80bdb14389db7e1bb89f6b6279be55eacdc9404a90f4af8a64656",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Self-containment and completeness standards for patterns",
-    "tags": [
-      "quality",
-      "validation"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "android-compose-ui": {
-    "hash": "ca8a9d00a52d13a89fb3a205d13d2cfa678872b908fb15271667d09985fa152b",
-    "type": "rule",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "android": {
-    "hash": "c7572078c79447a97f1f787d65d6569ed76d465e3fc2b125e7a3edb9a2444e70",
-    "type": "rule",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "fastapi-backend": {
-    "hash": "38a08f21a39828fb09a69fa96a3c3fc2a27f691dc799b75ff0dd18b1f0ad793e",
-    "type": "rule",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "fastapi-database": {
-    "hash": "9ba81856021e55bc0f65c030ac7e3439f54045d4301bccaec5ea990ae296641d",
-    "type": "rule",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "testing": {
-    "hash": "c23f2b7153f8f3a8235e11adc3434252b9b93d096900176ff4562e6c739046db",
-    "type": "rule",
-    "category": "core",
-    "version": "2.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "workflow": {
-    "hash": "fa5c37985ea8d12065925f35c74df874c9b7cae824392a292ab620f37a1c49c0",
-    "type": "rule",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
-  },
-  "adversarial-review": {
-    "hash": "cf52244037d8356738d81edff04dd903ed1afe5fc8da80dca908056e0f2327c7",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Cross-model multi-round debate for plans and code review",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "android-arch": {
-    "hash": "1819b0f7fe22d07d8e3d2ea78c7f98c67158d0cad66bf0f808d9aca5d5305467",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
+    "discovered": "2026-03-13",
     "last_updated": "2026-03-13",
     "dependencies": [],
     "visibility": "public",
-    "description": "Android architecture with 24 deep-dive references and Gradle convention plugin templates",
+    "description": "Feature toggle patterns (release, experiment, ops, permission) with LaunchDarkly, Unleash, env-var flags, and cleanup checklist",
     "tags": [
-      "android",
-      "kotlin",
-      "compose",
-      "architecture",
-      "navigation",
-      "security",
-      "testing",
-      "gradle"
+      "feature-flags",
+      "toggles",
+      "gradual-rollout"
     ],
-    "changelog": "v2.0.0: Merged with claude-android-ninja references and templates"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d flag types, implementation patterns, cleanup"
   },
-  "android-gradle": {
-    "hash": "d838b576a813474079eb8965f9ba19c3c24a66d15087f1cc4a33b03c5596c542",
-    "type": "skill",
+  "firebase": {
+    "hash": "7d173bc7ec83fbadf36727425a02753bb5ed984179927970722d749d1e8c39ae",
+    "type": "rule",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Android Gradle build optimization and plugin configuration",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "batch": {
-    "hash": "33d4b0c87a6290f3f684819ff4c49532c2bd0da22cccb49f7f79b4bed38e74b6",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Parallel codebase-wide changes, renames, API migrations",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "branching": {
-    "hash": "0093f3e5af07083e7ad47d0bedc3d34ced96890048d91683dce6cc6ae32d88d9",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Full branch lifecycle: create with naming conventions + finish with merge",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "ci-cd-setup": {
-    "hash": "896c76480d817ef418001697770dc2cb16de4cd7bdae1e4092f03206fa1c2ed0",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "GitHub Actions, GitLab CI, pipeline stages, environment promotion",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "compose-ui": {
-    "hash": "48aa706a047d7995afe07c31c25d3474c229fc4aef2001ce95fd016ea78b560a",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Jetpack Compose UI patterns, theming, accessibility",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "d3-viz": {
-    "hash": "8f85f3d70099a3ba0d99668cb3c12615d0c7e1c967e4bebbe7c9ae756b4c07f3",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "D3.js data visualization: selections, scales, 9 chart types, interactions",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "docker-optimize": {
-    "hash": "fb2f27d131f37ec43eb4d3f8f40b5c7251409a8b613f7d1e94a70196274de8a0",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Multi-stage Docker builds, layer caching, security scanning",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "executing-plans": {
-    "hash": "da7ad7dfa00db286bb0399a6399c8a7d64245793940240f0ed1e29c0d31ac94d",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Bridge writing-plans to plan-to-issues pipeline with execution tracking",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "expo-dev": {
-    "hash": "97931c9405a83b52bc3e9aa2b021eb6a7e414aeed3236233a39656b5e7651d4e",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Expo/React Native development, routing, deployment",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "description": "Firebase Auth, Firestore, token verification patterns",
+    "tags": [
+      "firebase",
+      "auth",
+      "rule"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in KKB + cric patterns"
   },
   "firebase-ai": {
     "hash": "6ab2091e9f609a3d494acf42eeccb30c8deb2ff773a0a65fce3aaee0458091fb",
@@ -967,6 +1239,89 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "firebase-test": {
+    "hash": "1ff4941b5012db065476ffbeb27131729a8a844b867d49d451fc815b201514c5",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Firebase testing workflow with Emulator Suite, Firestore rules, Cloud Functions, and Auth triggers",
+    "tags": [
+      "firebase",
+      "testing",
+      "emulator",
+      "firestore"
+    ],
+    "changelog": "v1.0.0: Initial creation from testing gap audit"
+  },
+  "fix-issue": {
+    "hash": "cea223fbbef429d53257046363d8a729243765e1054f1e77213d47f4df299c0d",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "fix-loop": {
+    "hash": "5eba614f84c4581ec099652c85fc178b9f7f8f9b893c000e0b92746dca389e48",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "flutter": {
+    "hash": "8950357292c51ea894a0c0b84febaa53315d5c2eda4e0656d4b3f95745c32fe3",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Flutter/Dart conventions: clean architecture, Riverpod, Drift, code generation",
+    "tags": [
+      "flutter",
+      "dart",
+      "rule"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns"
+  },
+  "flutter-dart": {
+    "hash": "f7924430ccab1d770896e1779e90316acb08b662946c46be7c02f924c44136df",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Flutter/Dart specialist: Riverpod, GoRouter, Drift, Freezed, Material Design 3",
+    "tags": [
+      "flutter",
+      "dart",
+      "mobile"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns"
+  },
   "flutter-dev": {
     "hash": "4d392f1ea6bacd58379dbc1d8ca0b8f68d3ceca69a37c1867efe79beede34289",
     "type": "skill",
@@ -995,6 +1350,20 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "git-manager": {
+    "hash": "80f06f402bf49e18bedb0645440d6723630372b388e11baf14a58bfffbc01887",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
   "git-worktrees": {
     "hash": "17239bd496ca62a6b53b565993a861b8851d63115e666f1d2e1759ddb9d705d4",
     "type": "skill",
@@ -1008,6 +1377,24 @@
     "description": "Git worktree isolation patterns for parallel development",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "github": {
+    "hash": "35ff44849c65e23e0d2942ff4924ae28b0b8f16733ae1bb5ac33dba18a92054b",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-11",
+    "last_updated": "2026-03-11",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "GitHub search and discovery: search repos, search code, deep-inspect repositories",
+    "tags": [
+      "github",
+      "search",
+      "discovery"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d repo search, code search, deep inspect modes"
   },
   "handover": {
     "hash": "242061f77881bd8b378363ae31fc67085059c82f77e6d5785ef5620eee9d19bf",
@@ -1023,138 +1410,23 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
-  "iac-deploy": {
-    "hash": "b882c572b27d62aa7be1ab115aa82b8a75e670697d7ba6da1aad5390ea0b46d4",
+  "hono-backend": {
+    "hash": "2bd03db7ae2f1b7ec4cc7cbb7db06f4ab5c618ce7224e7795f7aaceb8de35fe1",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Infrastructure as Code: Terraform, Pulumi, state management",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "incident-response": {
-    "hash": "2f2a05da07fa5a839a22b72ef87648bb117254e0d596411a90eba492b3339cbf",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Incident triage, mitigation, communication, post-mortem",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "k8s-deploy": {
-    "hash": "97aabf9c3b8958eb888c3cdbee6b54bc558f479d7b6cc08de3f65e01e7344682",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Kubernetes manifests, probes, HPA, RBAC, Helm charts",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "monitoring-setup": {
-    "hash": "811996d585d12b1cc5b224a5ea1c3402c6b9cc08dc4065943a02e6d852cfb678",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Prometheus, Grafana, alerting, SLO/SLI dashboards",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "nuxt-dev": {
-    "hash": "90dd70bfad2e813d7f4d1755ce2394830675a8e29a435a361960372608b3449c",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Nuxt 3 development: SSR, server routes, modules, deployment",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "obsidian": {
-    "hash": "9c15369802f3c056726a7177c2eebdc8d6a15138828b4b2785d667c1ae4cd76f",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Obsidian vault management: .md, .base, .canvas, CLI, dev brain logging",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "pg-query": {
-    "hash": "2223e3dc00884e318199dac97f9055f28b3dcca97680820fcca76a20ba91f898",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "PostgreSQL read-only queries with validation and timeouts",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "playwright": {
-    "hash": "bab716d15d701a0d08fba28c6a00e01f27c291872ff4eef0c6377131d424cb14",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Browser automation, E2E test generation, Page Object Model",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "prd-parser": {
-    "hash": "9129603c17a4d9aafcda1d5ac0616215fbe63e513c35091c662c799da69236ab",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "brainstorm"
-    ],
-    "visibility": "public",
-    "description": "Parse and normalize existing PRDs from various formats (markdown, Notion, Jira, Google Docs) with IEEE 830 validation",
+    "description": "Hono web framework patterns for TypeScript backends",
     "tags": [
-      "PRD",
-      "requirements",
-      "IEEE-830",
-      "parser"
+      "hono",
+      "typescript",
+      "backend"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-format PRD parsing and normalization"
+    "changelog": "v1.0.0: Initial creation"
   },
   "html-prototype": {
     "hash": "cc772da147c169632fc293fcdbc1ad5d2ae34471e63e888838f6e096d81d91c0",
@@ -1176,326 +1448,47 @@
     ],
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d single-file prototypes with heuristic validation"
   },
-  "a11y-audit": {
-    "hash": "6b3a5bc0f276397c8a86837dd779a91454f8c0961a6b31f73fa1ff63dc7149ce",
+  "iac-deploy": {
+    "hash": "b882c572b27d62aa7be1ab115aa82b8a75e670697d7ba6da1aad5390ea0b46d4",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "playwright"
-    ],
-    "visibility": "public",
-    "description": "Automated WCAG 2.1 AA compliance checking with axe-core and Lighthouse integration for prototypes and production pages",
-    "tags": [
-      "accessibility",
-      "WCAG",
-      "a11y",
-      "axe-core",
-      "Lighthouse"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d axe-core, Lighthouse a11y, WCAG checklist"
-  },
-  "db-migrate": {
-    "hash": "1ef74f8a7a8f00ce2fc9768196e8dd8ed6743c56e7a4059ba950cfc81b3d9cae",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "schema-designer"
-    ],
-    "visibility": "public",
-    "description": "Stack-neutral database migration supporting Prisma, Knex, Django, TypeORM, Drizzle, SQLAlchemy/Alembic, and raw SQL",
-    "tags": [
-      "database",
-      "migration",
-      "ORM",
-      "Prisma",
-      "Django",
-      "TypeORM"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-ORM migration with safety rules"
-  },
-  "contract-test": {
-    "hash": "3817d33492de55e0638b29653cf2742762b8595f1e95ea17e5d2ddf9c933449a",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
     "dependencies": [],
     "visibility": "public",
-    "description": "Consumer-driven contract testing with Pact, provider verification, contract broker integration, and CI can-i-deploy workflow",
-    "tags": [
-      "testing",
-      "contract",
-      "Pact",
-      "API",
-      "consumer-driven"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Pact consumer/provider, broker, CI integration"
+    "description": "Infrastructure as Code: Terraform, Pulumi, state management",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
-  "feature-flag": {
-    "hash": "c5844dcc92cd5763b0a3613660accf535931c6cc137464f26b904b0e9491e4d2",
+  "implement": {
+    "hash": "e91e1e4b0d8f92937c4e3c068cbca48bc6d58f7199843aebdd976ff4e47d7efb",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-12",
     "dependencies": [],
     "visibility": "public",
-    "description": "Feature toggle patterns (release, experiment, ops, permission) with LaunchDarkly, Unleash, env-var flags, and cleanup checklist",
-    "tags": [
-      "feature-flags",
-      "toggles",
-      "gradual-rollout"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d flag types, implementation patterns, cleanup"
+    "description": "",
+    "tags": [],
+    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
   },
-  "chaos-resilience": {
-    "hash": "8a9c51f03bb40493c0fff901874fc5a6ecc0e0ee61ec2faf72ec7eec49ca9c7f",
+  "incident-response": {
+    "hash": "2f2a05da07fa5a839a22b72ef87648bb117254e0d596411a90eba492b3339cbf",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
     "dependencies": [],
     "visibility": "public",
-    "description": "Chaos engineering and resilience testing: failure injection, graceful degradation, circuit breaker validation, gameday planning",
-    "tags": [
-      "chaos",
-      "resilience",
-      "failure-injection",
-      "circuit-breaker"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure injection, degradation verification, gameday"
-  },
-  "perf-test": {
-    "hash": "08b7397f54e35a6a767c58eb973269e889d33c93d67f913773ba8702f516163e",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "web-quality"
-    ],
-    "visibility": "public",
-    "description": "Performance testing with k6 load tests, Lighthouse web perf, bundle analysis, baseline comparison, and NFR threshold extraction",
-    "tags": [
-      "performance",
-      "load-testing",
-      "k6",
-      "Lighthouse",
-      "bundle"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d k6, Lighthouse, bundle analysis, baseline comparison"
-  },
-  "change-risk-scoring": {
-    "hash": "50e0c104e1ab8f859e667502baa7c28ddd4bc1bcc73d478a88b7f8fdc5642535",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Quantified change risk score (files \u00c3\u2014 complexity \u00c3\u2014 inverse coverage) for deploy go/no-go decisions with hotspot analysis",
-    "tags": [
-      "risk",
-      "change-management",
-      "deploy",
-      "metrics"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d composite risk scoring, hotspot analysis"
-  },
-  "merge-strategy": {
-    "hash": "39789e88eb87ccc8942d2c77f6ceb5d5da9e48737a04852cd25c73e2c07fcdd1",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "branching"
-    ],
-    "visibility": "public",
-    "description": "Merge strategy guidance (squash/merge/rebase by branch type) with post-merge smoke test planning and branch cleanup",
-    "tags": [
-      "git",
-      "merge",
-      "branching",
-      "post-merge"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d strategy matrix, pre/post-merge checklists"
-  },
-  "disaster-recovery": {
-    "hash": "735daa59b1ef1b0f067204a720f135ba3939f8a2952b44d9a5eecacb80f154f0",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "monitoring-setup",
-      "incident-response"
-    ],
-    "visibility": "public",
-    "description": "Disaster recovery planning with RTO/RPO targets, backup strategies, restore procedures, failover runbooks, and DR drill scheduling",
-    "tags": [
-      "DR",
-      "disaster-recovery",
-      "backup",
-      "failover",
-      "RTO",
-      "RPO"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d RTO/RPO, backup, restore, failover, DR drills"
-  },
-  "changelog-contributing": {
-    "hash": "df799475ed1153f1273a41676d26cd369cd5612b7e0a4a87ab4335bf1b79dc4b",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Auto-generate CHANGELOG from conventional commits and CONTRIBUTING.md with project-specific guidelines",
-    "tags": [
-      "changelog",
-      "contributing",
-      "conventional-commits",
-      "documentation"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d CHANGELOG + CONTRIBUTING generation"
-  },
-  "diataxis-docs": {
-    "hash": "5287d419170173c2d6c35690e8c9e9d1a4c47b9615812d40a9f1488b027e8ff0",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Organize documentation using the Di\u00c3\u00a1taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
-    "tags": [
-      "documentation",
-      "Diataxis",
-      "tutorials",
-      "reference"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Di\u00c3\u00a1taxis categorization, templates, migration"
-  },
-  "api-docs-generator": {
-    "hash": "7a9fab9fc54dc8a082b2dbf1efb564cf5b5c20ab842083aebac7eca9121b0945",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Auto-generate OpenAPI docs from code annotations (FastAPI, Express, NestJS, Go), validate against API tests, generate Redoc/Swagger UI, API versioning and deprecation docs",
-    "tags": [
-      "API",
-      "OpenAPI",
-      "Swagger",
-      "documentation"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-framework OpenAPI generation, validation, CI integration"
-  },
-  "doc-staleness": {
-    "hash": "8495d0fcd3db3ddfbb4b5a4516719e8ef85d9c2c86c195acee9cf5416991cd80",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Detect documentation that has drifted from the codebase \u00e2\u20ac\u201d stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
-    "tags": [
-      "documentation",
-      "staleness",
-      "drift-detection",
-      "quality"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d file/symbol/command/link staleness detection, severity-prioritized report"
-  },
-  "doc-structure-enforcer": {
-    "hash": "ed21cb6e8213bca75f599461d5f5157e8c9317c097652054cfc70be2a09bda4b",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Enforce stage-based documentation folder structure via config-driven rules. Two modes: audit (report misplaced files) or enforce (git mv + update references). Aligns with pipeline-orchestrator-agent.",
-    "tags": [
-      "documentation",
-      "structure",
-      "enforcement",
-      "pipeline-stages",
-      "folder-management"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d stage-based folder structure, pattern + content classification, git mv + ref updates"
-  },
-  "adr": {
-    "hash": "1900013d1bcfd25bf035fb99a0ddc40ed5238a198ec71e8f019ba2c9d1995eb1",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Create and manage Architecture Decision Records (ADRs) using the Michael Nygard template. Initialize, create, list, supersede, deprecate, and index ADRs.",
-    "tags": [
-      "documentation",
-      "architecture",
-      "ADR",
-      "decisions"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Michael Nygard template, lifecycle management, index generation"
-  },
-  "coverage-analysis": {
-    "hash": "a01d0e18e80d660e2b1fd08e1207647a5fc8de7a10e1ce0a24880f3f395a6428",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Analyze test coverage across a project, identify gaps in critical code paths, and prioritize which files and functions to test next.",
-    "tags": [
-      "testing",
-      "coverage",
-      "quality"
-    ],
-    "changelog": "v1.0.0: Initial release"
+    "description": "Incident triage, mitigation, communication, post-mortem",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
   "integration-test": {
     "hash": "88d80c09726e7ff1ff110d07a7853873a22859c5abd49f4fb6829949f5ba35d7",
@@ -1533,6 +1526,83 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release"
+  },
+  "k8s-deploy": {
+    "hash": "97aabf9c3b8958eb888c3cdbee6b54bc558f479d7b6cc08de3f65e01e7344682",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Kubernetes manifests, probes, HPA, RBAC, Helm charts",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "learn-n-improve": {
+    "hash": "8c54e897568d4cc7cf7c19f253e272bec2190b142014e44270d2587b0351549c",
+    "type": "skill",
+    "category": "core",
+    "version": "2.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
+  },
+  "mcp-server-builder": {
+    "hash": "fa961d74de6642de2ce957f23379946ea2311c39980559ac86305c72c0794fab",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "merge-strategy": {
+    "hash": "39789e88eb87ccc8942d2c77f6ceb5d5da9e48737a04852cd25c73e2c07fcdd1",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "branching"
+    ],
+    "visibility": "public",
+    "description": "Merge strategy guidance (squash/merge/rebase by branch type) with post-merge smoke test planning and branch cleanup",
+    "tags": [
+      "git",
+      "merge",
+      "branching",
+      "post-merge"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d strategy matrix, pre/post-merge checklists"
+  },
+  "middleware-test": {
+    "hash": "d3d45997747557aea04c1bc8414dbcf1a2b999f2d6d675c99619a68cc0140eae",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
   },
   "mobile-a11y-test": {
     "hash": "523a349b2afbcb59c263dcb026d9791758e1cb1628028a8fb79f51653c683cd6",
@@ -1573,169 +1643,175 @@
     ],
     "changelog": "v1.0.0: Initial release"
   },
-  "pytest-dev": {
-    "hash": "6e055340e1d72b56b8b9fa67ae4ac0df17f68be9e00e28717580be8bf0ec9b2e",
+  "monitoring-setup": {
+    "hash": "811996d585d12b1cc5b224a5ea1c3402c6b9cc08dc4065943a02e6d852cfb678",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
     "dependencies": [],
     "visibility": "public",
-    "description": "Pytest testing reference: configuration, fixtures, parametrize, markers, async testing, mocking.",
-    "tags": [
-      "testing",
-      "pytest",
-      "python",
-      "reference"
-    ],
-    "changelog": "v1.0.0: Initial release"
+    "description": "Prometheus, Grafana, alerting, SLO/SLI dashboards",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
-  "regression-test": {
-    "hash": "3dcbb92af155cc15810bc99035320888324d0c2a3c42c308b574afd4567576db",
+  "monorepo": {
+    "hash": "3ef118a1c0545ec36bdeb2c8063e83d8759525faacb68abd3b1690bd7b5cd681",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Run targeted regression tests based on code changes. Analyze git diffs to identify affected source files and map them to tests.",
+    "description": "Monorepo management for npm/pnpm/yarn workspaces",
     "tags": [
-      "testing",
-      "regression",
-      "git"
+      "monorepo",
+      "workspaces",
+      "turborepo"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial creation"
   },
-  "test-data-management": {
-    "hash": "bf22b4bf2c241370710b7d980aa9a2bd39e6a38c200427960dba59d42b8fb45b",
+  "nextjs-dev": {
+    "hash": "0127fb820f36bfd978182196778e1f49cf27f47146df8a2badc58104ad640865",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Manage test data across Python and TypeScript projects using factories, fakers, seeders, builders, and fixtures.",
+    "description": "Next.js 14/15 App Router: RSC, route handlers, middleware, SEO, shadcn/ui",
     "tags": [
-      "testing",
-      "test-data",
-      "fixtures",
-      "factories"
+      "nextjs",
+      "react",
+      "frontend"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in BestDematAccount + IPODhan patterns"
   },
-  "test-maintenance": {
-    "hash": "16a8f4726bd3c5aded97fe66b1266405af1fcdd923ac967c2e798e8e1b76d6c0",
+  "node-backend-dev": {
+    "hash": "c18c72de006cf77a915cc143f2b807a4a3b950cf8503457504440458380e83c7",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Audit, clean up, and optimize a test suite. Identifies dead tests, duplicates, slow tests, and readability issues.",
+    "description": "Node.js backends: Express, Hono, ElysiaJS \u00e2\u20ac\u201d routing, middleware, DB, auth, WebSocket",
     "tags": [
-      "testing",
-      "maintenance",
-      "cleanup",
-      "optimization"
+      "nodejs",
+      "backend",
+      "express",
+      "hono",
+      "elysia"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + BestDematAccount + cric patterns"
   },
-  "deploy-strategy": {
-    "hash": "8916b811ca24a7a5874e6050f4f4e48abec67e36e2eaf79349e824e323e7f20e",
+  "nuxt-dev": {
+    "hash": "90dd70bfad2e813d7f4d1755ce2394830675a8e29a435a361960372608b3449c",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "ci-cd-setup",
-      "k8s-deploy"
-    ],
-    "visibility": "public",
-    "description": "Advanced deployment strategies: GitOps (ArgoCD/Flux), progressive delivery (canary/blue-green with Flagger/Argo Rollouts), zero-downtime DB migrations (expand-contract), and production readiness review",
-    "tags": [
-      "deployment",
-      "GitOps",
-      "canary",
-      "progressive-delivery",
-      "zero-downtime",
-      "PRR"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d GitOps, canary, blue-green, DB migration ordering, PRR"
-  },
-  "architecture-fitness": {
-    "hash": "26ff3f9a6a693d5c8a4d0612156b5f8443e35c186422c210d13b75ff10ec40b4",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
     "dependencies": [],
     "visibility": "public",
-    "description": "Architecture conformance checks: dependency direction validation, circular dependency detection, coupling/cohesion metrics, module boundary analysis, and ADR review",
-    "tags": [
-      "architecture",
-      "fitness-functions",
-      "coupling",
-      "dependencies"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dependency direction, circular deps, coupling, ADR review"
+    "description": "Nuxt 3 development: SSR, server routes, modules, deployment",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
-  "dast-scan": {
-    "hash": "b538bea11b0ec50513d5dcba0a6b0adae7a2030ede67745cde80f8504fc1249e",
+  "obsidian": {
+    "hash": "9c15369802f3c056726a7177c2eebdc8d6a15138828b4b2785d667c1ae4cd76f",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "security-audit"
-    ],
-    "visibility": "public",
-    "description": "Dynamic Application Security Testing with OWASP ZAP, Nuclei scanning, header security audit, session management testing, API fuzzing, and CI integration",
-    "tags": [
-      "security",
-      "DAST",
-      "OWASP",
-      "ZAP",
-      "nuclei",
-      "fuzzing"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ZAP, Nuclei, headers, sessions, fuzzing, CI"
-  },
-  "code-quality-gate": {
-    "hash": "cde71e0efce441eadf04472e96afef64ce032ebdb5decd2cc51e827daab76441",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
     "dependencies": [],
     "visibility": "public",
-    "description": "Post-implementation code quality enforcement with cyclomatic complexity, duplication detection, SOLID checklist, structured logging audit, TDD refactor phase, and clean architecture layer validation",
+    "description": "Obsidian vault management: .md, .base, .canvas, CLI, dev brain logging",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "parallel-worktree-orchestrator": {
+    "hash": "3cb1f19ee2b5216dc88a06327bf73393143f63cb8df8ddc0e8724e0df31c5d4d",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Coordinate parallel workstreams using git worktrees with multi-agent delegation",
+    "tags": [
+      "orchestration",
+      "parallel",
+      "worktree"
+    ],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "pattern-portability": {
+    "hash": "54b47f8c0f77848e52b4da6f3cc5c7dd46b4993560dbc2674de1f2ef63be3df7",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Portability standards for distributed patterns",
     "tags": [
       "quality",
-      "SOLID",
-      "complexity",
-      "refactoring",
-      "logging"
+      "validation"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d complexity, duplication, SOLID, logging, refactor, layer checks"
+    "changelog": "v1.0.0: Initial creation"
   },
-  "test-generator": {
-    "hash": "be775c8fad92ac9918759cf0f49a7dee658794aab01bf6ac6243f1d631db08dd",
+  "pattern-self-containment": {
+    "hash": "5e2b834bfef80bdb14389db7e1bb89f6b6279be55eacdc9404a90f4af8a64656",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Self-containment and completeness standards for patterns",
+    "tags": [
+      "quality",
+      "validation"
+    ],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "pattern-structure": {
+    "hash": "492206f6b064e182673772163b55aa233f3f9039736aad98bc533cd118c89569",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Structural requirements for skills, agents, and rules",
+    "tags": [
+      "quality",
+      "validation"
+    ],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "perf-test": {
+    "hash": "08b7397f54e35a6a767c58eb973269e889d33c93d67f913773ba8702f516163e",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -1743,22 +1819,178 @@
     "discovered": "2026-03-13",
     "last_updated": "2026-03-13",
     "dependencies": [
-      "tdd",
-      "playwright"
+      "web-quality"
     ],
     "visibility": "public",
-    "description": "Auto-generate test suites from PRD requirements, schema, or API specs with BDD/Gherkin, property-based testing, coverage thresholds, mutation testing, and a11y stubs",
+    "description": "Performance testing with k6 load tests, Lighthouse web perf, bundle analysis, baseline comparison, and NFR threshold extraction",
     "tags": [
-      "testing",
-      "TDD",
-      "BDD",
-      "coverage",
-      "mutation-testing"
+      "performance",
+      "load-testing",
+      "k6",
+      "Lighthouse",
+      "bundle"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d unit, API, BDD, property, mutation, a11y test generation"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d k6, Lighthouse, bundle analysis, baseline comparison"
   },
-  "schema-designer": {
-    "hash": "b011534ed043bfead089917ea1ff80014b73b4b132634ce233677f9d43d07f76",
+  "pg-query": {
+    "hash": "2223e3dc00884e318199dac97f9055f28b3dcca97680820fcca76a20ba91f898",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "PostgreSQL read-only queries with validation and timeouts",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "pipeline-orchestrator": {
+    "hash": "568cdd4d1c1320cf0740b37cf9eaad5dae6582faf6db6fbad09b9bb65725964f",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-14",
+    "dependencies": [
+      "pipeline-orchestrator-agent"
+    ],
+    "visibility": "public",
+    "description": "Thin skill wrapper that dispatches the pipeline-orchestrator agent for DAG-based multi-stage pipeline coordination",
+    "tags": [
+      "pipeline",
+      "orchestration",
+      "DAG"
+    ],
+    "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent"
+  },
+  "pipeline-orchestrator-agent": {
+    "hash": "ee4649ce489dc96ce7dc1aa9b7a3c0541754202cf1ede8702cb672b9665cb7f2",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [
+      "agent-orchestration"
+    ],
+    "visibility": "public",
+    "description": "DAG-based multi-stage pipeline orchestrator agent for PRD-to-Production delivery with typed artifact contracts and state persistence",
+    "tags": [
+      "pipeline",
+      "orchestration",
+      "DAG",
+      "agent"
+    ],
+    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent"
+  },
+  "plan-executor": {
+    "hash": "2cb957f9d2f11ab1293eb9cdfe1aba63d1d6caf9be590ed24654b809ea266a2b",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "plan-to-issues": {
+    "hash": "3f7c53da64bbc9b410d530f2c761f67f957df9c40e4ee4f6274bcc3b77764109",
+    "type": "skill",
+    "category": "core",
+    "version": "2.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
+  },
+  "planner-researcher": {
+    "hash": "2e8df8f8e32fc19ef820ce4eae9ff0e707471a9a83b27d746b6b70effd400a94",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "playwright": {
+    "hash": "bab716d15d701a0d08fba28c6a00e01f27c291872ff4eef0c6377131d424cb14",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Browser automation, E2E test generation, Page Object Model",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "pm2-deploy": {
+    "hash": "f74011ab07f5a39fcfab1c16f7a83f32610cc9d8aa33b151a3f191caa2af19d5",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "PM2 process management and deployment patterns",
+    "tags": [
+      "deployment",
+      "pm2",
+      "nodejs"
+    ],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "post-fix-pipeline": {
+    "hash": "fe4562dc891f8779ce7767dbde7472f6ec02ea06ee44406c765b54e1964e1e01",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "pr-standards": {
+    "hash": "d7c7936965d28a27fa20ab17515e6664c1104be00172ba0f7059a8b0841dcd08",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-12",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Team standards enforcement against PR diffs",
+    "tags": [],
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "prd-parser": {
+    "hash": "9129603c17a4d9aafcda1d5ac0616215fbe63e513c35091c662c799da69236ab",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -1766,18 +1998,36 @@
     "discovered": "2026-03-13",
     "last_updated": "2026-03-13",
     "dependencies": [
-      "pg-query",
-      "fastapi-db-migrate"
+      "brainstorm"
     ],
     "visibility": "public",
-    "description": "Holistic database schema design with ER modeling, normalization, PII identification, evolutionary strategy (expand-contract), query plan analysis, API contract alignment, and multi-DB support",
+    "description": "Parse and normalize existing PRDs from various formats (markdown, Notion, Jira, Google Docs) with IEEE 830 validation",
     "tags": [
-      "schema",
-      "database",
-      "migration",
-      "data-modeling"
+      "PRD",
+      "requirements",
+      "IEEE-830",
+      "parser"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ER design, PII, evolution, API alignment"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-format PRD parsing and normalization"
+  },
+  "prisma-orm": {
+    "hash": "297d2c27b6e475a8da10086c534f4f8032b5064a59ae90b9b5eeee5565858579",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Prisma ORM schema, migrations, queries for TypeScript",
+    "tags": [
+      "orm",
+      "prisma",
+      "typescript",
+      "database"
+    ],
+    "changelog": "v1.0.0: Initial creation"
   },
   "project-scaffold": {
     "hash": "9eb048c24c21565188be4fc1ea47491c12bfbc82aa7ae146c6d7f8c626898dd2",
@@ -1800,39 +2050,42 @@
     ],
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d covers Python, Node/TS, Android, Go, Rust"
   },
-  "pipeline-orchestrator": {
-    "hash": "568cdd4d1c1320cf0740b37cf9eaad5dae6582faf6db6fbad09b9bb65725964f",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-14",
-    "dependencies": [
-      "pipeline-orchestrator-agent"
-    ],
-    "visibility": "public",
-    "description": "Thin skill wrapper that dispatches the pipeline-orchestrator agent for DAG-based multi-stage pipeline coordination",
-    "tags": [
-      "pipeline",
-      "orchestration",
-      "DAG"
-    ],
-    "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent"
-  },
-  "pr-standards": {
-    "hash": "d7c7936965d28a27fa20ab17515e6664c1104be00172ba0f7059a8b0841dcd08",
+  "pytest-dev": {
+    "hash": "6e055340e1d72b56b8b9fa67ae4ac0df17f68be9e00e28717580be8bf0ec9b2e",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
     "dependencies": [],
     "visibility": "public",
-    "description": "Team standards enforcement against PR diffs",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "description": "Pytest testing reference: configuration, fixtures, parametrize, markers, async testing, mocking.",
+    "tags": [
+      "testing",
+      "pytest",
+      "python",
+      "reference"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "quality-gate-evaluator": {
+    "hash": "1c530236d13ae545fd569c4cf5fa55c3d8a1df81428fc7afbc4df0625452997d",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Evaluate code or content against quality criteria with pass/fail verdicts",
+    "tags": [
+      "quality",
+      "evaluation",
+      "gate"
+    ],
+    "changelog": "v1.0.0: Initial registration"
   },
   "react-native-dev": {
     "hash": "19b4ce5e9921c6f26f854f4974a2ee52b9b3c8a12e935ce3738c216bd6230866",
@@ -1848,6 +2101,57 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "react-native-e2e": {
+    "hash": "f7f21c4fd2bfba3421dcea7e3d927baba01919aaae2aa4846132e107caade020",
+    "type": "skill",
+    "category": "stack:react-nextjs",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "react-nextjs": {
+    "hash": "1e41489400f486be78d60482e8b35cbc13395d5ea0001f58ac7a9e238e5c85cd",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Next.js App Router conventions: RSC boundaries, route files, data fetching, middleware",
+    "tags": [
+      "nextjs",
+      "react",
+      "rule"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d replaces placeholder"
+  },
+  "react-test-patterns": {
+    "hash": "4c4da888ca4f3818d18856dc4cbb9f52129beb10d64b0a12bfd95464e4ff0889",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Advanced React testing patterns with RTL, Server Components, hooks, forms, and state management",
+    "tags": [
+      "react",
+      "testing",
+      "rtl",
+      "nextjs"
+    ],
+    "changelog": "v1.0.0: Initial creation from testing gap audit"
+  },
   "receive-code-review": {
     "hash": "9deb29df3eca8094e9ee1b1559facbf5ba40ad20add2d61f7ee24354146d681c",
     "type": "skill",
@@ -1862,6 +2166,23 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "reddit": {
+    "hash": "4e991b282039cd8075375b1d57cb0e764db035a3bb6559afc5215be018b3b037",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-11",
+    "last_updated": "2026-03-11",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Comprehensive Reddit skill: read, compose, analyze, search, post, monitor",
+    "tags": [
+      "reddit",
+      "social"
+    ],
+    "changelog": "v1.0.0: Initial registry entry"
+  },
   "redis-patterns": {
     "hash": "879b922ef2817db2566705f80609f23ab04d76eb8ad251397cc83db349a45b41",
     "type": "skill",
@@ -1875,6 +2196,24 @@
     "description": "Redis 7+ patterns: caching, rate limiting, pub/sub, vector search",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "regression-test": {
+    "hash": "3dcbb92af155cc15810bc99035320888324d0c2a3c42c308b574afd4567576db",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Run targeted regression tests based on code changes. Analyze git diffs to identify affected source files and map them to tests.",
+    "tags": [
+      "testing",
+      "regression",
+      "git"
+    ],
+    "changelog": "v1.0.0: Initial release"
   },
   "remotion-video": {
     "hash": "ccdb1e85e0477881fbacbd647507470a3d92f42d0dfb60d0c5a431c83c304bee",
@@ -1904,6 +2243,130 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "review-gate": {
+    "hash": "bbccd2ec0387d55e2264e986fe2863000fffb97d8567ad53842d83af52dafc6c",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [
+      "code-quality-gate",
+      "architecture-fitness",
+      "security-audit",
+      "adversarial-review",
+      "change-risk-scoring",
+      "pr-standards"
+    ],
+    "visibility": "public",
+    "description": "Stage 9 review orchestrator with parallelized sub-skill batches, fix loop, and consolidated verdict",
+    "tags": [
+      "review",
+      "orchestration",
+      "quality-gate"
+    ],
+    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps"
+  },
+  "rule-writing-meta": {
+    "hash": "db207c1af29b887861ac2212246ac63b20781fc4d07d6e24f013975b5169c726",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "scan-discovery-report": {
+    "hash": "e9c9363732815cf91f45e72c43ebd48b33741b39e547591496343cfabdcbf318",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Comprehensive report generator for scan results from GitHub, Reddit, X/Twitter",
+    "tags": [
+      "scan",
+      "report",
+      "analysis",
+      "github",
+      "reddit",
+      "twitter"
+    ],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "scan-repo": {
+    "hash": "ec521888561d0430074a0a2a7980d42489b4d1f3a6f87d41fbe3b267f3e159fe",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "scan-url": {
+    "hash": "83e17812248a6a1745858c65f4ea2d963977140086af7f5a660304c5db09f46d",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "schema-designer": {
+    "hash": "b011534ed043bfead089917ea1ff80014b73b4b132634ce233677f9d43d07f76",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "pg-query",
+      "fastapi-db-migrate"
+    ],
+    "visibility": "public",
+    "description": "Holistic database schema design with ER modeling, normalization, PII identification, evolutionary strategy (expand-contract), query plan analysis, API contract alignment, and multi-DB support",
+    "tags": [
+      "schema",
+      "database",
+      "migration",
+      "data-modeling"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ER design, PII, evolution, API alignment"
+  },
+  "secret-scanner": {
+    "hash": "3bfde1461a2fa6a48552d9abb4a3e676d547b15cf2c7fa55c4cb8a1565e9689e",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
   "security-audit": {
     "hash": "64de0a0c025c409a371296f0401604c347f8c35226ffffed271d626212977f38",
     "type": "skill",
@@ -1918,6 +2381,20 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "security-auditor": {
+    "hash": "730badc4225d38cfce925f9aa1459a9623dc41028e151ac228d4f87ef8ee83ab",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
   "semgrep-rules": {
     "hash": "083b2e4bb4a2d1a99717923ae012a88868f0e6af0fc03fed176a8a8a96bd6b9d",
     "type": "skill",
@@ -1931,6 +2408,34 @@
     "description": "Semgrep custom rule creation and security pattern matching",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "session-summarizer": {
+    "hash": "a7bf7570fde9b777ccb4ac4461e8be229d8add3dc7e21ff0d8152a2ede9e6986",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "skill-factory": {
+    "hash": "c9487d713b342cd12e06659c6f52e2981e542e9e025969e2cafd7c78d8951af5",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
   },
   "skill-master": {
     "hash": "b567178cabb6f37bc0b122d2277e4e6a25ecf32dc0cdd7d86cbb31f80d5508df",
@@ -1959,6 +2464,34 @@
     "description": "Solidity smart contract security: CEI, Foundry, UUPS, gas optimization",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "status": {
+    "hash": "0a53ff596a634ee72bd90e317bd22f16cf22bdea44787355e6796e2371542bde",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "strategic-architect": {
+    "hash": "b602d35799ee2a1a9c176e7fab9b345813ff9d333c99b95cb6c27d1f6cd8817a",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
   },
   "subagent-driven-dev": {
     "hash": "88eaf83bd7dba0d7501a7bf2bc43952125ac0746f286fae5b949a6ed73f9402d",
@@ -1992,6 +2525,24 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "synthesize-project": {
+    "hash": "8bfe6580c14469c7f36965c5c7ca6de91a8c56dce7c8348bc3578b134cbb08b4",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Provision hub patterns and generate project-specific .claude/ patterns from a codebase.",
+    "tags": [
+      "synthesis",
+      "provisioning",
+      "unified-flow"
+    ],
+    "changelog": "v2.0.0: Unified hub provisioning + code synthesis"
+  },
   "systematic-debugging": {
     "hash": "5e1801f0ab6999d877e91473f485240736d263827a157d52b7ec9535e7ab938d",
     "type": "skill",
@@ -2005,6 +2556,24 @@
     "description": "Structured root cause analysis with past learnings search",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "tailwind-dev": {
+    "hash": "b27a9ce22261d59dcf2a09b4ad41af51cd3aef78eecc41d8c19396586a37dfbc",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Tailwind CSS v3/v4: setup, CVA variants, cn() utility, theming, migration",
+    "tags": [
+      "tailwind",
+      "css",
+      "frontend"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in AlgoChanakya + IPODhan patterns"
   },
   "tdd": {
     "hash": "61a6167ff953369950aab7feca078e351bf277b355177c6526afdfc4d3e5e552",
@@ -2020,6 +2589,232 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "test-data-management": {
+    "hash": "bf22b4bf2c241370710b7d980aa9a2bd39e6a38c200427960dba59d42b8fb45b",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Manage test data across Python and TypeScript projects using factories, fakers, seeders, builders, and fixtures.",
+    "tags": [
+      "testing",
+      "test-data",
+      "fixtures",
+      "factories"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "test-failure-analyzer": {
+    "hash": "b206088193f531e0294cfcf03e88179a95d4c199b6835894322f67f94fe212c9",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "test-generator": {
+    "hash": "be775c8fad92ac9918759cf0f49a7dee658794aab01bf6ac6243f1d631db08dd",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "tdd",
+      "playwright"
+    ],
+    "visibility": "public",
+    "description": "Auto-generate test suites from PRD requirements, schema, or API specs with BDD/Gherkin, property-based testing, coverage thresholds, mutation testing, and a11y stubs",
+    "tags": [
+      "testing",
+      "TDD",
+      "BDD",
+      "coverage",
+      "mutation-testing"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d unit, API, BDD, property, mutation, a11y test generation"
+  },
+  "test-knowledge": {
+    "hash": "78ce58fe35da2a0e0e8f6cecfe2f3b6c653aa8640d9378d0a7213f2fba69d3d4",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "test-maintenance": {
+    "hash": "16a8f4726bd3c5aded97fe66b1266405af1fcdd923ac967c2e798e8e1b76d6c0",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Audit, clean up, and optimize a test suite. Identifies dead tests, duplicates, slow tests, and readability issues.",
+    "tags": [
+      "testing",
+      "maintenance",
+      "cleanup",
+      "optimization"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "tester": {
+    "hash": "5f3ba21eb7c0fc7526579d1a969af778bef4e0be4b509e95c25abc06ca9c3a0c",
+    "type": "agent",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "testing": {
+    "hash": "c23f2b7153f8f3a8235e11adc3434252b9b93d096900176ff4562e6c739046db",
+    "type": "rule",
+    "category": "core",
+    "version": "2.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "trace-test": {
+    "hash": "c2d15044ac27c3a6b52497a27546db92fe270180a55cc503fb26817873129d79",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "twitter-x": {
+    "hash": "e0b585c4647f010ffcdd8100861da813612d21fdb883fd885349c1b77a1aef2b",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-11",
+    "last_updated": "2026-03-11",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Comprehensive Twitter/X skill: read, compose, score, search, post, monitor",
+    "tags": [
+      "twitter",
+      "social"
+    ],
+    "changelog": "v1.0.0: Initial registry entry"
+  },
+  "ui-ux-pro-max": {
+    "hash": "5e31fcb34b63f84447854afe25c8e359261ad552c20c49d0f96d4768e5966899",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "update-practices": {
+    "hash": "d9c2d880600822abd45df2e967abb40f96aa98a58dcaf8510a7e404261cde0f2",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "verify-screenshots": {
+    "hash": "f25efb1d1ee9053c08ca8c9c2abcc071ef9abd5f99efcf115ce613336d49b4da",
+    "type": "skill",
+    "category": "core",
+    "version": "2.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
+  },
+  "vitest-dev": {
+    "hash": "9fcc330d0316ad19bfabcf20dfbca8b796b2518823390258f14ca2df551b506b",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Vitest testing: config, mocking, coverage, workspace, React/Vue integration",
+    "tags": [
+      "vitest",
+      "testing",
+      "vite"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya + IPODhan patterns"
+  },
+  "vue": {
+    "hash": "5009cb248f5765545f29fa9a2df68502cea34772d0d24e12a885f2b006c51647",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Vue 3 Composition API conventions: script setup, Pinia stores, composables, router",
+    "tags": [
+      "vue",
+      "frontend",
+      "rule"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya patterns"
+  },
   "vue-dev": {
     "hash": "3bd7337071e783ded324e0b15e763019e44d9d10a1d2fe1e6daca5236d1cfc4b",
     "type": "skill",
@@ -2034,6 +2829,25 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "vue-test": {
+    "hash": "5bdeb413dcbf9e3f24749dadb336c4a0c1f3227e904850b29f7891fd87c6fe01",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Vue.js testing workflow with Vitest, Vue Test Utils, Pinia store testing, composable testing, and Nuxt support",
+    "tags": [
+      "vue",
+      "testing",
+      "vitest",
+      "pinia"
+    ],
+    "changelog": "v1.0.0: Initial creation from testing gap audit"
+  },
   "web-quality": {
     "hash": "a2db1cd7c47b90be456cb995481c88f1e3c63ae4b5f606a8e1662b152d325244",
     "type": "skill",
@@ -2047,6 +2861,73 @@
     "description": "Core Web Vitals, accessibility, SEO, performance, responsive design",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "web-research-specialist": {
+    "hash": "74b5a5b74de0f625a1bc65e1237367a36b476de629ce2f68d26bcd21cae9b0fc",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Web research for documentation, API references, and technical fact-finding",
+    "tags": [
+      "research",
+      "web",
+      "documentation"
+    ],
+    "changelog": "v1.0.0: Initial registration"
+  },
+  "web-scraper": {
+    "hash": "47ad01d7f11438e865bd9c5d1fcdc251274a02ce93f6daa5648678280649b082",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Web scraping with Puppeteer, Cheerio, and pipelines",
+    "tags": [
+      "scraping",
+      "puppeteer",
+      "cheerio"
+    ],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "websocket-patterns": {
+    "hash": "870951aff778168a6d060c01f668da5c949a62a0814d3e2d1cde30cd046e256a",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "WebSocket implementation patterns for real-time features",
+    "tags": [
+      "websocket",
+      "realtime"
+    ],
+    "changelog": "v1.0.0: Initial creation"
+  },
+  "workflow": {
+    "hash": "fa5c37985ea8d12065925f35c74df874c9b7cae824392a292ab620f37a1c49c0",
+    "type": "rule",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-03-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "",
+    "tags": [],
+    "changelog": "v2.0.0: Genericized and restructured"
   },
   "writing-plans": {
     "hash": "ac7c4f31df5f4d5e3f9b3ba91c92586e407fe6478a1e75681a7b06f7de75098e",
@@ -2089,868 +2970,5 @@
     "description": "Android XML layout to Jetpack Compose migration",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
-  },
-  "scan-discovery-report": {
-    "hash": "e9c9363732815cf91f45e72c43ebd48b33741b39e547591496343cfabdcbf318",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Comprehensive report generator for scan results from GitHub, Reddit, X/Twitter",
-    "tags": [
-      "scan",
-      "report",
-      "analysis",
-      "github",
-      "reddit",
-      "twitter"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "android-kotlin-reviewer": {
-    "hash": "6f54c0a1c173f0f12aa66fc4b0500d87cbb229fb92a5548dc5d06740d898c041",
-    "type": "agent",
-    "category": "android-compose",
-    "version": "1.0.0",
-    "source": "scan:affaan-m/everything-claude-code",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Kotlin/Android/KMP code reviewer with 24+ domain-specific checks",
-    "tags": [
-      "android",
-      "kotlin",
-      "code-review",
-      "compose",
-      "coroutines",
-      "kmp"
-    ],
-    "changelog": "v1.0.0: Initial \u2014 adapted from everything-claude-code kotlin-reviewer"
-  },
-  "android-kotlin": {
-    "hash": "a248798ea4e4bf0532595fca1992cc31b72507adb7fd2206c791b48b1f708654",
-    "type": "rule",
-    "category": "android-compose",
-    "version": "1.0.0",
-    "source": "scan:affaan-m/everything-claude-code",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Kotlin idioms, null safety, scope functions, DSL patterns, KMP testing conventions",
-    "tags": [
-      "android",
-      "kotlin",
-      "kmp",
-      "coding-style",
-      "testing"
-    ],
-    "changelog": "v1.0.0: Initial \u2014 consolidated from 4 kotlin rule files in everything-claude-code"
-  },
-  "android-mvi-scaffold": {
-    "hash": "8e4e7b4fe979d67fdf3af6cea3b179476d12e12c31e2db68e1e3ad25fda82885",
-    "type": "skill",
-    "category": "android-compose",
-    "version": "1.0.0",
-    "source": "scan:ChrisWW/claude-code-android-skills+TaeseongYun/everything-claude-code-android",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "MVI feature scaffolder \u2014 generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
-    "tags": [
-      "android",
-      "kotlin",
-      "mvi",
-      "scaffold",
-      "compose",
-      "architecture"
-    ],
-    "changelog": "v1.0.0: Initial \u2014 consolidated from ChrisWW + TaeseongYun repos"
-  },
-  "android-build-fixer": {
-    "hash": "608284a1954fff8c6dcb3c30ee02b3d7e76a0a0bf8cb242d6ddb519a4e29a0a8",
-    "type": "agent",
-    "category": "android-compose",
-    "version": "1.0.0",
-    "source": "scan:TaeseongYun/everything-claude-code-android",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Android Gradle build failure diagnostics \u2014 10 common issue categories with solutions",
-    "tags": [
-      "android",
-      "gradle",
-      "build",
-      "debugging",
-      "ksp",
-      "hilt",
-      "room"
-    ],
-    "changelog": "v1.0.0: Initial \u2014 adapted from TaeseongYun build-fixer agent"
-  },
-  "auto-format": {
-    "hash": "256b760022b946b6fdf28cc37e6c1a7aede4a1322a83c0250c1981c4aef5d1d6",
-    "type": "hook",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "brainstorm": {
-    "hash": "b316371e9251dedb4bfb14fd0f20d999c19041e4529aa6a28c890e5102f69c11",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "claude-behavior": {
-    "hash": "8e0db9f88037e71992fac9757a778c2c89d87f5cd42f14d9eb6442edef2f4803",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "context-management": {
-    "hash": "13dd282f064755f2967f19613b41328bbfe9a973bc90a40b8fc2ef9be683595b",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "context-window-monitor": {
-    "hash": "fd891a2cece0a03669a42198acd7f1bb8ed804e87e21198b37a9fa97d61c9583",
-    "type": "hook",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "context-window-statusline": {
-    "hash": "5faf0cab3c3ae2808060418818054d8b576fcfa6528bdfe9005d976acc1a86cd",
-    "type": "hook",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "context-window-statusline-hook": {
-    "hash": "35d56ec6a9faad22e964e126f89077b5a6bf0183afc66069d81f1d627a6a4f1e",
-    "type": "hook",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "cross-platform-visual": {
-    "hash": "2cb58ce289eccf451af993bb5a945da7c90f6c3edd3adf996d920f78ebb0a6e5",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "dangerous-command-blocker": {
-    "hash": "7b16349564768f5dd73f61db891b51b91da29480f8bc58f747752334268996f2",
-    "type": "hook",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "db-migrate-verify": {
-    "hash": "0d2d7e360de52bf730fe0143d9c4147c9a62965ae2198a8b11cdf4cbd44b74fb",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "mcp-server-builder": {
-    "hash": "fa961d74de6642de2ce957f23379946ea2311c39980559ac86305c72c0794fab",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "middleware-test": {
-    "hash": "d3d45997747557aea04c1bc8414dbcf1a2b999f2d6d675c99619a68cc0140eae",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "react-native-e2e": {
-    "hash": "f7f21c4fd2bfba3421dcea7e3d927baba01919aaae2aa4846132e107caade020",
-    "type": "skill",
-    "category": "stack:react-nextjs",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "review-gate": {
-    "hash": "bbccd2ec0387d55e2264e986fe2863000fffb97d8567ad53842d83af52dafc6c",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [
-      "code-quality-gate",
-      "architecture-fitness",
-      "security-audit",
-      "adversarial-review",
-      "change-risk-scoring",
-      "pr-standards"
-    ],
-    "visibility": "public",
-    "description": "Stage 9 review orchestrator with parallelized sub-skill batches, fix loop, and consolidated verdict",
-    "tags": [
-      "review",
-      "orchestration",
-      "quality-gate"
-    ],
-    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps"
-  },
-  "rule-writing-meta": {
-    "hash": "db207c1af29b887861ac2212246ac63b20781fc4d07d6e24f013975b5169c726",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "secret-scanner": {
-    "hash": "3bfde1461a2fa6a48552d9abb4a3e676d547b15cf2c7fa55c4cb8a1565e9689e",
-    "type": "hook",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "security-auditor": {
-    "hash": "730badc4225d38cfce925f9aa1459a9623dc41028e151ac228d4f87ef8ee83ab",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "parallel-worktree-orchestrator": {
-    "hash": "3cb1f19ee2b5216dc88a06327bf73393143f63cb8df8ddc0e8724e0df31c5d4d",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Coordinate parallel workstreams using git worktrees with multi-agent delegation",
-    "tags": [
-      "orchestration",
-      "parallel",
-      "worktree"
-    ],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "quality-gate-evaluator": {
-    "hash": "1c530236d13ae545fd569c4cf5fa55c3d8a1df81428fc7afbc4df0625452997d",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Evaluate code or content against quality criteria with pass/fail verdicts",
-    "tags": [
-      "quality",
-      "evaluation",
-      "gate"
-    ],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "web-research-specialist": {
-    "hash": "74b5a5b74de0f625a1bc65e1237367a36b476de629ce2f68d26bcd21cae9b0fc",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Web research for documentation, API references, and technical fact-finding",
-    "tags": [
-      "research",
-      "web",
-      "documentation"
-    ],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "trace-test": {
-    "hash": "c2d15044ac27c3a6b52497a27546db92fe270180a55cc503fb26817873129d79",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
-  },
-  "flutter-dart": {
-    "hash": "f7924430ccab1d770896e1779e90316acb08b662946c46be7c02f924c44136df",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Flutter/Dart specialist: Riverpod, GoRouter, Drift, Freezed, Material Design 3",
-    "tags": [
-      "flutter",
-      "dart",
-      "mobile"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns"
-  },
-  "nextjs-dev": {
-    "hash": "0127fb820f36bfd978182196778e1f49cf27f47146df8a2badc58104ad640865",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Next.js 14/15 App Router: RSC, route handlers, middleware, SEO, shadcn/ui",
-    "tags": [
-      "nextjs",
-      "react",
-      "frontend"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in BestDematAccount + IPODhan patterns"
-  },
-  "tailwind-dev": {
-    "hash": "b27a9ce22261d59dcf2a09b4ad41af51cd3aef78eecc41d8c19396586a37dfbc",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Tailwind CSS v3/v4: setup, CVA variants, cn() utility, theming, migration",
-    "tags": [
-      "tailwind",
-      "css",
-      "frontend"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in AlgoChanakya + IPODhan patterns"
-  },
-  "vitest-dev": {
-    "hash": "9fcc330d0316ad19bfabcf20dfbca8b796b2518823390258f14ca2df551b506b",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Vitest testing: config, mocking, coverage, workspace, React/Vue integration",
-    "tags": [
-      "vitest",
-      "testing",
-      "vite"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya + IPODhan patterns"
-  },
-  "node-backend-dev": {
-    "hash": "c18c72de006cf77a915cc143f2b807a4a3b950cf8503457504440458380e83c7",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Node.js backends: Express, Hono, ElysiaJS \u00e2\u20ac\u201d routing, middleware, DB, auth, WebSocket",
-    "tags": [
-      "nodejs",
-      "backend",
-      "express",
-      "hono",
-      "elysia"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + BestDematAccount + cric patterns"
-  },
-  "react-nextjs": {
-    "hash": "1e41489400f486be78d60482e8b35cbc13395d5ea0001f58ac7a9e238e5c85cd",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Next.js App Router conventions: RSC boundaries, route files, data fetching, middleware",
-    "tags": [
-      "nextjs",
-      "react",
-      "rule"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d replaces placeholder"
-  },
-  "flutter": {
-    "hash": "8950357292c51ea894a0c0b84febaa53315d5c2eda4e0656d4b3f95745c32fe3",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Flutter/Dart conventions: clean architecture, Riverpod, Drift, code generation",
-    "tags": [
-      "flutter",
-      "dart",
-      "rule"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns"
-  },
-  "vue": {
-    "hash": "5009cb248f5765545f29fa9a2df68502cea34772d0d24e12a885f2b006c51647",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Vue 3 Composition API conventions: script setup, Pinia stores, composables, router",
-    "tags": [
-      "vue",
-      "frontend",
-      "rule"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya patterns"
-  },
-  "firebase": {
-    "hash": "7d173bc7ec83fbadf36727425a02753bb5ed984179927970722d749d1e8c39ae",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Firebase Auth, Firestore, token verification patterns",
-    "tags": [
-      "firebase",
-      "auth",
-      "rule"
-    ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in KKB + cric patterns"
-  },
-  "drizzle-orm": {
-    "hash": "3842a374b2b406532ceb29ab28250aa5f9b90dcc86e085b9952ad110d96445e4",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Drizzle ORM schema, migrations, queries for TypeScript",
-    "tags": [
-      "orm",
-      "typescript",
-      "database"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "pm2-deploy": {
-    "hash": "f74011ab07f5a39fcfab1c16f7a83f32610cc9d8aa33b151a3f191caa2af19d5",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "PM2 process management and deployment patterns",
-    "tags": [
-      "deployment",
-      "pm2",
-      "nodejs"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "websocket-patterns": {
-    "hash": "870951aff778168a6d060c01f668da5c949a62a0814d3e2d1cde30cd046e256a",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "WebSocket implementation patterns for real-time features",
-    "tags": [
-      "websocket",
-      "realtime"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "hono-backend": {
-    "hash": "2bd03db7ae2f1b7ec4cc7cbb7db06f4ab5c618ce7224e7795f7aaceb8de35fe1",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Hono web framework patterns for TypeScript backends",
-    "tags": [
-      "hono",
-      "typescript",
-      "backend"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "prisma-orm": {
-    "hash": "297d2c27b6e475a8da10086c534f4f8032b5064a59ae90b9b5eeee5565858579",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Prisma ORM schema, migrations, queries for TypeScript",
-    "tags": [
-      "orm",
-      "prisma",
-      "typescript",
-      "database"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "web-scraper": {
-    "hash": "47ad01d7f11438e865bd9c5d1fcdc251274a02ce93f6daa5648678280649b082",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Web scraping with Puppeteer, Cheerio, and pipelines",
-    "tags": [
-      "scraping",
-      "puppeteer",
-      "cheerio"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "monorepo": {
-    "hash": "3ef118a1c0545ec36bdeb2c8063e83d8759525faacb68abd3b1690bd7b5cd681",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Monorepo management for npm/pnpm/yarn workspaces",
-    "tags": [
-      "monorepo",
-      "workspaces",
-      "turborepo"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "bun-elysia": {
-    "hash": "2a347eb121ca2ba6e6cd7ac77dbe440b6afd9bdd45cc5585bf5b67b24f664a96",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Bun runtime and ElysiaJS framework patterns",
-    "tags": [
-      "bun",
-      "elysia",
-      "typescript"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "agent-orchestration": {
-    "hash": "7147db1c5caa751d232b84ccb1d42b004936d22e94b41c534a47322f59e49f4b",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "8 constraints for multi-agent orchestration: 2-level hierarchy, no subagent-spawning, externalized DAGs, global retry budget, single state location",
-    "tags": [
-      "orchestration",
-      "agents",
-      "constraints"
-    ],
-    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d Anthropic-aligned orchestration constraints"
-  },
-  "pipeline-orchestrator-agent": {
-    "hash": "ee4649ce489dc96ce7dc1aa9b7a3c0541754202cf1ede8702cb672b9665cb7f2",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [
-      "agent-orchestration"
-    ],
-    "visibility": "public",
-    "description": "DAG-based multi-stage pipeline orchestrator agent for PRD-to-Production delivery with typed artifact contracts and state persistence",
-    "tags": [
-      "pipeline",
-      "orchestration",
-      "DAG",
-      "agent"
-    ],
-    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent"
-  },
-  "anthropic-agent-orchestration-guide": {
-    "hash": "44939f9bcd3e0044064e5a917f91876dda92663c773010f1f1a5e21b6c216bdf",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Reference guide covering Anthropic's 5 workflow patterns, agent vs skill decision framework, orchestration architecture, anti-patterns, and context management",
-    "tags": [
-      "orchestration",
-      "reference",
-      "patterns",
-      "agents"
-    ],
-    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d comprehensive orchestration reference"
-  },
-  "vue-test": {
-    "hash": "5bdeb413dcbf9e3f24749dadb336c4a0c1f3227e904850b29f7891fd87c6fe01",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Vue.js testing workflow with Vitest, Vue Test Utils, Pinia store testing, composable testing, and Nuxt support",
-    "tags": [
-      "vue",
-      "testing",
-      "vitest",
-      "pinia"
-    ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit"
-  },
-  "firebase-test": {
-    "hash": "1ff4941b5012db065476ffbeb27131729a8a844b867d49d451fc815b201514c5",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Firebase testing workflow with Emulator Suite, Firestore rules, Cloud Functions, and Auth triggers",
-    "tags": [
-      "firebase",
-      "testing",
-      "emulator",
-      "firestore"
-    ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit"
-  },
-  "bun-elysia-test": {
-    "hash": "7ae21ae5f4e33709314d0051742472edb72ab4bbab663dc10061a4fc29913682",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Bun + Elysia testing workflow with bun:test, Eden treaty client, plugin and WebSocket testing",
-    "tags": [
-      "bun",
-      "elysia",
-      "testing"
-    ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit"
-  },
-  "react-test-patterns": {
-    "hash": "4c4da888ca4f3818d18856dc4cbb9f52129beb10d64b0a12bfd95464e4ff0889",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Advanced React testing patterns with RTL, Server Components, hooks, forms, and state management",
-    "tags": [
-      "react",
-      "testing",
-      "rtl",
-      "nextjs"
-    ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit"
   }
 }

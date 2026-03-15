@@ -70,7 +70,9 @@ If `--repo owner/name` is provided, set up remote file access. Otherwise, use lo
 
 ## STEP 1: Provision Hub Patterns
 
-**Skip this step if:** `--skip-hub` is set, OR `--update` is set (hub patterns were already provisioned on first run).
+**Skip this step if:** `--skip-hub` is set, OR `--update` is set (hub patterns were already provisioned on first run), OR `--dry-run` is set (preview mode — do not provision, just note that hub provisioning would run).
+
+If `--dry-run`: Print "Would run: recommend.py --provision for [project]" and skip to Step 2. Do NOT execute recommend.py.
 
 Run `recommend.py --provision` to copy matching hub patterns and generate CLAUDE.md/settings.json for the project.
 

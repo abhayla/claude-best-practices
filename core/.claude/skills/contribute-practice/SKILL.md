@@ -49,16 +49,76 @@ Compare against hub registry:
 
 If duplicate found, report and suggest updating existing pattern instead.
 
-## STEP 4: Create PR
+## STEP 4: Sanitize Pattern
+
+Strip project-specific identifiers before submission to make the pattern portable.
+
+1. **Read `synthesis-config.yml`** (if it exists) for the `strip_before_sharing` list. Default categories: `file_paths`, `class_names`, `env_vars`.
+
+2. **Scan and replace** project-specific references:
+
+   | Category | Example before | Example after |
+   |----------|---------------|---------------|
+   | `file_paths` | `src/core/result.py` | `<module_path>` |
+   | `class_names` | `ApiResult` | `<ClassName>` |
+   | `env_vars` | `DATABASE_URL` | `$VARIABLE_NAME` |
+   | Private pattern refs | `rules/internal-auth-flow.md` | `<private-pattern>` |
+
+3. **Check `private_patterns` list** — if the pattern being contributed is listed in `private_patterns` or has `private: true` in frontmatter, **STOP and warn the user**:
+   ```
+   WARNING: This pattern is marked private. Remove it from private_patterns
+   or set private: false before contributing.
+   ```
+
+4. **Show sanitization preview** to the user before proceeding:
+
+   ```
+   The following pattern will be submitted to the hub:
+
+     {pattern-path}
+
+     Project-specific details that will be stripped:
+     - src/core/result.py → <module_path>
+     - ApiResult → <ClassName>
+     - DATABASE_URL → $VARIABLE_NAME
+
+     Preview of sanitized pattern:
+     [show first 30 lines of sanitized content]
+
+     Continue with submission? [y/n]
+   ```
+
+5. Wait for user confirmation. If denied, stop.
+
+## STEP 5: Create PR
 
 1. Fork/clone the hub repo
-2. Add the pattern to the appropriate directory
+2. Add the **sanitized** pattern to the appropriate directory
 3. Update `registry/patterns.json`
 4. Create PR with pattern description
 
 ```bash
 gh pr create --title "feat: add {pattern-name} {pattern-type}" \
-  --body "## New Pattern\n- **Name:** {name}\n- **Type:** {type}\n- **Description:** {description}"
+  --body "$(cat <<'EOF'
+## New Pattern
+
+- **Name:** {name}
+- **Type:** {type}
+- **Description:** {description}
+- **Source:** Contributed from downstream project via /contribute-practice
+- **Sanitized:** Yes — project-specific paths, class names, and env vars replaced with placeholders
+
+## Sanitization Summary
+
+{list of replacements made}
+
+## Review Checklist
+
+- [ ] Pattern is portable (no project-specific references remain)
+- [ ] Pattern is not a stub (>30 lines of content)
+- [ ] No sensitive information (auth, secrets, billing)
+EOF
+)"
 ```
 
 ## Report
@@ -68,5 +128,6 @@ Contribute Practice:
   Pattern: {name} ({type})
   Validation: PASSED/FAILED
   Duplicate check: UNIQUE/DUPLICATE
+  Sanitization: {N} replacements made
   PR: #{number} — {url}
 ```
