@@ -32,12 +32,12 @@ _Firebase dev, AI integration, Data Connect, Auth._
 
 **Prefix:** `firebase-*`
 
-**Skills:** firebase-data-connect, firebase-dev, firebase-ai
+**Skills:** firebase-data-connect, firebase-test, firebase-dev, firebase-ai
 
 ## React + Next.js
 _React Native dev, E2E testing, Next.js patterns._
 
 **Prefix:** `react-*`
 
-**Skills:** react-native-e2e, react-native-dev
+**Skills:** react-native-e2e, react-test-patterns, react-native-dev
 **Rules:** react-nextjs
