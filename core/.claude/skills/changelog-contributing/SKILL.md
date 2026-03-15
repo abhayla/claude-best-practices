@@ -194,3 +194,12 @@ Changelog & Contributing: GENERATED
 - MUST NOT generate a CONTRIBUTING.md that contradicts existing project conventions (check CLAUDE.md, .editorconfig, linter configs)
 - MUST NOT hardcode tool-specific commands (e.g., `npm test`) without verifying the project actually uses that tool
 - MUST NOT skip the `[Unreleased]` section — commits after the latest tag always go here
+
+## See Also
+
+- `/api-docs-generator` — Generate API reference docs alongside the changelog to give a complete picture of API evolution
+- `/diataxis-docs` — Place the generated CHANGELOG.md and CONTRIBUTING.md into the Diataxis docs structure (reference category)
+- `/doc-structure-enforcer` — CHANGELOG.md and CONTRIBUTING.md are root docs (allowed at project root, not enforced into `docs/`)
+- `/doc-staleness` — Detect when changelog or contributing docs have drifted from actual project conventions
+- `/adr` — Major architectural decisions often correspond to changelog entries
+- `docs-manager` agent — Orchestrates project-wide documentation updates, delegates changelog generation to this skill

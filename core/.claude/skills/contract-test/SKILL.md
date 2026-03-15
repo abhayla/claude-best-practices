@@ -12,7 +12,7 @@ triggers:
   - cdc-test
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<consumer-name> <provider-name> [language: js|python|jvm] [broker-url]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -349,6 +349,96 @@ Provider CI:  test → verify pacts → publish results → can-i-deploy → dep
 ```
 
 Both consumer and provider MUST pass `can-i-deploy` before deploying to any shared environment.
+
+---
+
+## STEP 6.5: Update Downstream Mocks
+
+After provider verification (STEP 4), if verification reveals changed response shapes — new fields, removed fields, or type changes — consumer test mocks will be stale. This step identifies and flags those mocks for update.
+
+### 6.5.1 Detect Changed Response Shapes
+
+Compare the current Pact file against the previous version to identify response shape changes:
+
+```bash
+# Compare current vs previous Pact file (if version-controlled)
+git diff origin/main -- pacts/*.json | grep -E '^\+.*"body"|^\-.*"body"'
+
+# Or compare against the broker's last verified version
+pact-broker describe-version \
+  --pacticipant=<provider-name> \
+  --version=$(git rev-parse --short HEAD~1) \
+  --broker-base-url=$PACT_BROKER_URL 2>/dev/null
+```
+
+If provider verification failed or passed with warnings about changed fields, extract the list of affected endpoints and changed fields from the verification output.
+
+### 6.5.2 Scan Consumer Tests for Stale Mocks
+
+For each endpoint with a changed response shape, search consumer test files for mocks of the same endpoint:
+
+**Python:**
+```bash
+# Find mock definitions that reference the changed endpoint path
+grep -rn "mock.*<endpoint-path>\|patch.*<endpoint-path>\|responses\.add.*<endpoint-path>\|return_value.*<field-name>" tests/ 2>/dev/null
+```
+
+**JavaScript/TypeScript:**
+```bash
+# Find mock/stub definitions referencing the changed endpoint
+grep -rn "mockResolvedValue\|nock.*<endpoint-path>\|msw.*<endpoint-path>\|jest\.fn.*<field-name>\|vi\.fn.*<field-name>" tests/ __tests__/ 2>/dev/null
+```
+
+**Java/Kotlin:**
+```bash
+# Find Mockito/WireMock stubs referencing the changed endpoint
+grep -rn "when(.*<endpoint-path>\|stubFor.*<endpoint-path>\|willReturn.*<field-name>" src/test/ 2>/dev/null
+```
+
+### 6.5.3 Generate Mock Update Checklist
+
+For each stale mock found, produce a checklist entry:
+
+```markdown
+## Stale Mock Checklist
+
+Provider `<provider-name>` verification revealed changed response shapes.
+The following consumer mocks reference affected endpoints and may need updates:
+
+| Consumer | Test File | Line | Endpoint | Stale Field(s) | Action |
+|----------|-----------|------|----------|-----------------|--------|
+| <consumer-name> | tests/unit/test_inventory_client.py | 34 | GET /api/products/:id/stock | `updatedAt` (type changed) | Update mock return value |
+| <consumer-name> | tests/unit/test_order_service.py | 78 | POST /api/orders | `discount` (field added) | Add field to mock response |
+| <consumer-name> | __tests__/api/inventory.test.ts | 22 | GET /api/products/:id/stock | `warehouse` (field removed) | Remove field from mock |
+
+### How to Update
+
+1. Open each flagged test file
+2. Locate the mock definition at the specified line
+3. Update the mock return value / response body to match the new contract shape
+4. Re-run consumer tests to verify mocks are consistent
+5. Re-run consumer contract tests to regenerate Pact files with updated expectations
+```
+
+### 6.5.4 Automated Validation
+
+After updating mocks, verify consistency:
+
+```bash
+# Re-run consumer unit tests (mocks should match new shapes)
+# Python
+pytest tests/unit/ -v -k "<consumer-module>"
+
+# JavaScript
+npx jest --testPathPattern="<consumer-module>"
+
+# Re-run consumer contract tests to regenerate Pact files
+pytest tests/pact/ -v
+# or
+npm test -- --testPathPattern=pact
+```
+
+If consumer unit tests fail after mock updates, the consumer code itself may need updating to handle the new response shape.
 
 ---
 

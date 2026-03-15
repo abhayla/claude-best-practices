@@ -7,7 +7,7 @@ description: >
   Use after making code changes to verify correctness.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[--files <paths>] [--full-suite]"
-version: "1.0.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -16,6 +16,32 @@ type: workflow
 Automatically verify code changes by running targeted tests and analyzing results.
 
 **Arguments:** $ARGUMENTS
+
+---
+
+## STEP 0: Gate Check — Read Upstream Results
+
+Before running verification, check if the upstream `fix-loop` stage passed:
+
+1. If `test-results/fix-loop.json` exists, read it
+2. Parse the `result` field
+3. If `result` is `FAILED` or `FLAKY`:
+   - Report: "BLOCKED: fix-loop reported {result} — resolve upstream failures before running auto-verify."
+   - Exit immediately — do not proceed to change identification
+4. If `result` is `PASSED`, `FIXED`, or the file does not exist → proceed to STEP 1
+
+```bash
+if [ -f test-results/fix-loop.json ]; then
+  UPSTREAM_RESULT=$(python3 -c "import json; print(json.load(open('test-results/fix-loop.json'))['result'])")
+  if [ "$UPSTREAM_RESULT" = "FAILED" ] || [ "$UPSTREAM_RESULT" = "FLAKY" ]; then
+    echo "BLOCKED: fix-loop reported $UPSTREAM_RESULT"
+    exit 1
+  fi
+  echo "fix-loop result: $UPSTREAM_RESULT — proceeding"
+else
+  echo "No fix-loop results found — proceeding without gate check"
+fi
+```
 
 ---
 
@@ -60,19 +86,64 @@ If no test files are found for a changed file, flag it: "No tests found for `<fi
 
 ## STEP 3: Run Targeted Tests
 
-Run only the tests related to changed files first:
+### 3.0 Risk Classification and Auto-Escalation
 
-1. Execute mapped test files
-2. If all pass and `--full-suite` not specified → report success
+Before running tests, classify each changed file by risk level:
+
+| Risk Level | Module Patterns | Action |
+|------------|----------------|--------|
+| CRITICAL | `auth/*`, `payment/*`, `crypto/*`, `security/*`, `token/*`, `oauth/*`, `billing/*` | Auto-escalate to full suite |
+| HIGH | `models/*`, `migrations/*`, `database/*`, `db/*`, `schema/*`, `entities/*` | Auto-escalate to full suite |
+| MEDIUM | `routes/*`, `controllers/*`, `handlers/*`, `api/*`, `endpoints/*`, `views/*` | Run targeted tests + related integration tests |
+| LOW | `utils/*`, `helpers/*`, `configs/*`, `constants/*`, `types/*`, `interfaces/*` | Run targeted tests only |
+
+If ANY changed file is classified as HIGH or CRITICAL, auto-escalate to full test suite regardless of whether `--full-suite` was specified. Log the escalation reason:
+
+```
+Risk escalation: <file> classified as <CRITICAL|HIGH> — running full test suite
+```
+
+### 3.1 Execute Tests
+
+Run only the tests related to changed files first (unless escalated to full suite):
+
+1. Execute mapped test files (or full suite if risk >= HIGH)
+2. If all pass and `--full-suite` not specified and risk < HIGH → report success
 3. If any fail → analyze and attempt fix
 
 ## STEP 4: Analyze Failures
 
 For each failure:
 1. Read the test and source code
-2. Determine if the failure is from our change or pre-existing
+2. Determine if the failure is from our change or pre-existing using git-stash verification
 3. If from our change → suggest fix
 4. If pre-existing → note it but don't block
+
+### 4.1 Git-Stash Verification for Pre-Existing Failures
+
+For every failing test, verify whether the failure is pre-existing or caused by our changes using a stash-based comparison:
+
+```bash
+# 1. Stash our changes to restore clean state
+git stash
+
+# 2. Run the specific failing test against clean state
+<test_runner> <failing_test_file>::<failing_test_name>
+
+# 3. Restore our changes
+git stash pop
+```
+
+**Decision logic:**
+
+| Test on clean state | Test with our changes | Verdict | Action |
+|--------------------|-----------------------|---------|--------|
+| FAILS | FAILS | Pre-existing failure | Note it, do not block |
+| PASSES | FAILS | Our change caused it | BLOCK — must fix before proceeding |
+| PASSES | PASSES | Not a real failure | Likely flaky — log and re-run |
+| FAILS | PASSES | Our change fixed it | Note as incidental fix |
+
+If `git stash` fails (e.g., no changes to stash, merge conflicts), fall back to heuristic analysis: check `git log` for recent changes to the failing test's source files and classify based on recency.
 
 ### Content Verification Note
 

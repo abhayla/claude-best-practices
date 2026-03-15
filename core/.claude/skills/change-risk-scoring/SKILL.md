@@ -14,7 +14,7 @@ triggers:
   - change risk score
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<branch, commit range, or 'staged'> [--threshold 50] [--format json|markdown]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -358,6 +358,7 @@ If `--format json` is specified, output machine-readable results:
 - Always list the top 3-5 riskiest files with specific reasons
 - Always use git log data from the actual repository — do not estimate churn
 - Always note when a factor could not be measured (e.g., no coverage tool) and use fallback heuristics
+- When computing risk, check for other open PRs targeting the same base branch (`gh pr list --base <branch>`). If >3 open PRs exist, add +10 to the base score. If any open PR touches the same files, add +15 (concurrent modification risk)
 
 ## MUST NOT DO
 

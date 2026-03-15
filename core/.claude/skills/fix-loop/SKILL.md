@@ -6,7 +6,7 @@ description: >
   (no retest) does one pass. Use when tests fail, build breaks, or runtime errors.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -72,7 +72,7 @@ Before applying a fix, check if the failure is flaky:
    - Do NOT apply a code fix
    - Tag with `@pytest.mark.flaky` / `@RepeatedTest` / `test.retry()`
    - Log a tracking issue
-   - Report as FLAKY (not FAILED) in the final report
+   - Report as FAILED with `flaky_detected: true` in the structured output — flaky is a failure category, not an acceptable outcome
 4. Continue to STEP 2 only for non-flaky failures
 
 ## STEP 2: Apply Fix
@@ -120,7 +120,8 @@ Write machine-readable results to `test-results/fix-loop.json`:
 {
   "skill": "fix-loop",
   "timestamp": "<ISO-8601>",
-  "result": "PASSED|FAILED|FLAKY",
+  "result": "PASSED|FAILED",
+  "flaky_detected": true,
   "summary": {
     "iterations": "<N>",
     "max_iterations": "<max>",

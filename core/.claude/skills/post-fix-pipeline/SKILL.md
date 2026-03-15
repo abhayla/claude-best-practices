@@ -6,7 +6,7 @@ description: >
   no regressions before committing.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[fixes_applied] [test_suite_commands] [commit_format]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -26,6 +26,32 @@ Verify fixes don't cause regressions, update docs, and commit.
 | `test_suite_commands` | — | Commands to run for full test suite verification |
 | `commit_format` | `fix(scope): description` | Commit message format |
 | `push` | false | Whether to push after commit |
+
+---
+
+## STEP 0: Gate Check — Read Upstream Results
+
+Before running the pipeline, check if the upstream `auto-verify` stage passed:
+
+1. If `test-results/auto-verify.json` exists, read it
+2. Parse the `result` field
+3. If `result` is `FAILED`:
+   - Report: "BLOCKED: auto-verify reported FAILED — resolve upstream failures before running post-fix-pipeline."
+   - Exit immediately — do not proceed to regression testing
+4. If `result` is `PASSED`, `FIXED`, or the file does not exist → proceed to STEP 1
+
+```bash
+if [ -f test-results/auto-verify.json ]; then
+  UPSTREAM_RESULT=$(python3 -c "import json; print(json.load(open('test-results/auto-verify.json'))['result'])")
+  if [ "$UPSTREAM_RESULT" = "FAILED" ]; then
+    echo "BLOCKED: auto-verify reported FAILED"
+    exit 1
+  fi
+  echo "auto-verify result: $UPSTREAM_RESULT — proceeding"
+else
+  echo "No auto-verify results found — proceeding without gate check"
+fi
+```
 
 ---
 
@@ -68,6 +94,52 @@ If gates fail:
 ## STEP 5: Learning Capture
 
 Invoke `/learn-n-improve session` to record the fix for future reference.
+
+## STEP 5.5: Structured JSON Output
+
+Write machine-readable results to `test-results/post-fix-pipeline.json`:
+
+```json
+{
+  "skill": "post-fix-pipeline",
+  "result": "PASSED|FAILED",
+  "timestamp": "<ISO-8601>",
+  "details": {
+    "regression_tests": "PASSED|FAILED",
+    "test_suite": "PASSED|PASSED_AFTER_FIX|FAILED",
+    "documentation": "UPDATED|SKIPPED",
+    "commit": "<hash>|BLOCKED",
+    "learning_capture": "RECORDED|SKIPPED",
+    "upstream_gate": "PASSED|SKIPPED"
+  }
+}
+```
+
+Create `test-results/` directory if it doesn't exist. This JSON is consumed by downstream stage gates.
+
+```bash
+mkdir -p test-results
+python3 -c "
+import json, datetime
+result = {
+    'skill': 'post-fix-pipeline',
+    'result': '<PASSED_or_FAILED>',
+    'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'details': {
+        'regression_tests': '<status>',
+        'test_suite': '<status>',
+        'documentation': '<status>',
+        'commit': '<hash_or_BLOCKED>',
+        'learning_capture': '<status>',
+        'upstream_gate': '<status>'
+    }
+}
+with open('test-results/post-fix-pipeline.json', 'w') as f:
+    json.dump(result, f, indent=2)
+"
+```
+
+---
 
 ## Report
 

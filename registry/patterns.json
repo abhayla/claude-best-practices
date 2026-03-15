@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.0.0",
-    "last_updated": "2026-03-14",
-    "total_patterns": 165
+    "last_updated": "2026-03-15",
+    "total_patterns": 181
   },
   "android-compose": {
     "hash": "63606dd9feb1159a51b5f2da6a9aae6ad612729a3b95633041adc958c0fc2470",
@@ -61,7 +61,7 @@
     "changelog": "v2.0.0: Genericized and restructured"
   },
   "docs-manager": {
-    "hash": "a1d90e899193896f4d040ceeb254da7ece380a389588f00280f6cdc090b39830",
+    "hash": "faad06fa134a5087f6089498991e8a3a823090f70e7f97d2d6be066a759e69c8",
     "type": "agent",
     "category": "core",
     "version": "2.0.0",
@@ -1365,13 +1365,13 @@
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d RTO/RPO, backup, restore, failover, DR drills"
   },
   "changelog-contributing": {
-    "hash": "d511ba3b4b77f12ed3748191f90318fd21759505a4f964ab3ab10ff657183030",
+    "hash": "df799475ed1153f1273a41676d26cd369cd5612b7e0a4a87ab4335bf1b79dc4b",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "last_updated": "2026-03-15",
     "dependencies": [],
     "visibility": "public",
     "description": "Auto-generate CHANGELOG from conventional commits and CONTRIBUTING.md with project-specific guidelines",
@@ -1384,7 +1384,7 @@
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d CHANGELOG + CONTRIBUTING generation"
   },
   "diataxis-docs": {
-    "hash": "e9a6e62f0024b17d21ef536ed1561c6cebce4c09488af6bcd7756d5c724eb341",
+    "hash": "5287d419170173c2d6c35690e8c9e9d1a4c47b9615812d40a9f1488b027e8ff0",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -1403,13 +1403,13 @@
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Di\u00c3\u00a1taxis categorization, templates, migration"
   },
   "api-docs-generator": {
-    "hash": "dc1c1c80028843862018f12087fd2efe651f2aa3680bfc7095b08ab60f555f4e",
+    "hash": "7a9fab9fc54dc8a082b2dbf1efb564cf5b5c20ab842083aebac7eca9121b0945",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "last_updated": "2026-03-15",
     "dependencies": [],
     "visibility": "public",
     "description": "Auto-generate OpenAPI docs from code annotations (FastAPI, Express, NestJS, Go), validate against API tests, generate Redoc/Swagger UI, API versioning and deprecation docs",
@@ -1420,6 +1420,233 @@
       "documentation"
     ],
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-framework OpenAPI generation, validation, CI integration"
+  },
+  "doc-staleness": {
+    "hash": "8495d0fcd3db3ddfbb4b5a4516719e8ef85d9c2c86c195acee9cf5416991cd80",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Detect documentation that has drifted from the codebase \u00e2\u20ac\u201d stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
+    "tags": [
+      "documentation",
+      "staleness",
+      "drift-detection",
+      "quality"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d file/symbol/command/link staleness detection, severity-prioritized report"
+  },
+  "doc-structure-enforcer": {
+    "hash": "ed21cb6e8213bca75f599461d5f5157e8c9317c097652054cfc70be2a09bda4b",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Enforce stage-based documentation folder structure via config-driven rules. Two modes: audit (report misplaced files) or enforce (git mv + update references). Aligns with pipeline-orchestrator-agent.",
+    "tags": [
+      "documentation",
+      "structure",
+      "enforcement",
+      "pipeline-stages",
+      "folder-management"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d stage-based folder structure, pattern + content classification, git mv + ref updates"
+  },
+  "adr": {
+    "hash": "1900013d1bcfd25bf035fb99a0ddc40ed5238a198ec71e8f019ba2c9d1995eb1",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Create and manage Architecture Decision Records (ADRs) using the Michael Nygard template. Initialize, create, list, supersede, deprecate, and index ADRs.",
+    "tags": [
+      "documentation",
+      "architecture",
+      "ADR",
+      "decisions"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Michael Nygard template, lifecycle management, index generation"
+  },
+  "coverage-analysis": {
+    "hash": "a01d0e18e80d660e2b1fd08e1207647a5fc8de7a10e1ce0a24880f3f395a6428",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Analyze test coverage across a project, identify gaps in critical code paths, and prioritize which files and functions to test next.",
+    "tags": [
+      "testing",
+      "coverage",
+      "quality"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "integration-test": {
+    "hash": "88d80c09726e7ff1ff110d07a7853873a22859c5abd49f4fb6829949f5ba35d7",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Reference guide for integration testing patterns across service boundaries. Covers database, cache, queue, and external API testing.",
+    "tags": [
+      "testing",
+      "integration",
+      "reference"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "jest-dev": {
+    "hash": "ee6585a8de53876ede803fe69d96cc8ef6f25d18b8f020852b5d28c26ad91683",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Jest testing reference: configuration, mocking, snapshot testing, coverage, and debugging.",
+    "tags": [
+      "testing",
+      "jest",
+      "javascript",
+      "reference"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "mobile-a11y-test": {
+    "hash": "523a349b2afbcb59c263dcb026d9791758e1cb1628028a8fb79f51653c683cd6",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Run mobile accessibility tests for Android (Compose/XML) and Flutter projects. Detects platform, runs automated checks.",
+    "tags": [
+      "testing",
+      "accessibility",
+      "mobile",
+      "android",
+      "flutter"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "mock-server": {
+    "hash": "c8531ff79ccdbc3d2352258e59fe9bd65b6919b3264fe715aa3d82e05c2f44f7",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Set up and configure API mock/stub servers for development and testing. Covers MSW, WireMock, nock, VCR/cassette patterns.",
+    "tags": [
+      "testing",
+      "mocking",
+      "API",
+      "development"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "pytest-dev": {
+    "hash": "6e055340e1d72b56b8b9fa67ae4ac0df17f68be9e00e28717580be8bf0ec9b2e",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Pytest testing reference: configuration, fixtures, parametrize, markers, async testing, mocking.",
+    "tags": [
+      "testing",
+      "pytest",
+      "python",
+      "reference"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "regression-test": {
+    "hash": "3dcbb92af155cc15810bc99035320888324d0c2a3c42c308b574afd4567576db",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Run targeted regression tests based on code changes. Analyze git diffs to identify affected source files and map them to tests.",
+    "tags": [
+      "testing",
+      "regression",
+      "git"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "test-data-management": {
+    "hash": "bf22b4bf2c241370710b7d980aa9a2bd39e6a38c200427960dba59d42b8fb45b",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Manage test data across Python and TypeScript projects using factories, fakers, seeders, builders, and fixtures.",
+    "tags": [
+      "testing",
+      "test-data",
+      "fixtures",
+      "factories"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "test-maintenance": {
+    "hash": "16a8f4726bd3c5aded97fe66b1266405af1fcdd923ac967c2e798e8e1b76d6c0",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Audit, clean up, and optimize a test suite. Identifies dead tests, duplicates, slow tests, and readability issues.",
+    "tags": [
+      "testing",
+      "maintenance",
+      "cleanup",
+      "optimization"
+    ],
+    "changelog": "v1.0.0: Initial release"
   },
   "deploy-strategy": {
     "hash": "8916b811ca24a7a5874e6050f4f4e48abec67e36e2eaf79349e824e323e7f20e",
@@ -2609,7 +2836,7 @@
       "agents",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation — Anthropic-aligned orchestration constraints"
+    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d Anthropic-aligned orchestration constraints"
   },
   "pipeline-orchestrator-agent": {
     "hash": "ee4649ce489dc96ce7dc1aa9b7a3c0541754202cf1ede8702cb672b9665cb7f2",
@@ -2630,7 +2857,7 @@
       "DAG",
       "agent"
     ],
-    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill — orchestration logic now lives in the agent"
+    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent"
   },
   "anthropic-agent-orchestration-guide": {
     "hash": "44939f9bcd3e0044064e5a917f91876dda92663c773010f1f1a5e21b6c216bdf",
@@ -2649,6 +2876,81 @@
       "patterns",
       "agents"
     ],
-    "changelog": "v1.0.0: Initial creation — comprehensive orchestration reference"
+    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d comprehensive orchestration reference"
+  },
+  "vue-test": {
+    "hash": "5bdeb413dcbf9e3f24749dadb336c4a0c1f3227e904850b29f7891fd87c6fe01",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Vue.js testing workflow with Vitest, Vue Test Utils, Pinia store testing, composable testing, and Nuxt support",
+    "tags": [
+      "vue",
+      "testing",
+      "vitest",
+      "pinia"
+    ],
+    "changelog": "v1.0.0: Initial creation from testing gap audit"
+  },
+  "firebase-test": {
+    "hash": "1ff4941b5012db065476ffbeb27131729a8a844b867d49d451fc815b201514c5",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Firebase testing workflow with Emulator Suite, Firestore rules, Cloud Functions, and Auth triggers",
+    "tags": [
+      "firebase",
+      "testing",
+      "emulator",
+      "firestore"
+    ],
+    "changelog": "v1.0.0: Initial creation from testing gap audit"
+  },
+  "bun-elysia-test": {
+    "hash": "7ae21ae5f4e33709314d0051742472edb72ab4bbab663dc10061a4fc29913682",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Bun + Elysia testing workflow with bun:test, Eden treaty client, plugin and WebSocket testing",
+    "tags": [
+      "bun",
+      "elysia",
+      "testing"
+    ],
+    "changelog": "v1.0.0: Initial creation from testing gap audit"
+  },
+  "react-test-patterns": {
+    "hash": "4c4da888ca4f3818d18856dc4cbb9f52129beb10d64b0a12bfd95464e4ff0889",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-15",
+    "last_updated": "2026-03-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Advanced React testing patterns with RTL, Server Components, hooks, forms, and state management",
+    "tags": [
+      "react",
+      "testing",
+      "rtl",
+      "nextjs"
+    ],
+    "changelog": "v1.0.0: Initial creation from testing gap audit"
   }
 }

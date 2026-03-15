@@ -11,7 +11,7 @@ triggers:
   - api documentation
   - generate api spec
   - api reference
-allowed-tools: "Bash Read Write Edit Grep Glob Agent"
+allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<project directory, framework name, or existing OpenAPI spec path>"
 version: "1.0.0"
 type: workflow
@@ -490,3 +490,12 @@ jobs:
 - MUST NOT document internal/private endpoints in public-facing docs
 - MUST NOT include secrets or real credentials in example requests
 - MUST NOT generate docs without checking alignment with actual implementation
+
+## See Also
+
+- `/diataxis-docs` — After generating API docs, use this to place the API reference into the correct Diataxis category (`docs/reference/`)
+- `/doc-structure-enforcer` — Enforces that generated API docs land in `docs/api/` when using pipeline stages
+- `/changelog-contributing` — Generate a CHANGELOG.md alongside API docs to document endpoint changes over time
+- `/doc-staleness` — Detect when API documentation has drifted from the actual implementation
+- `/adr` — Record the decision to adopt a specific API documentation strategy
+- `docs-manager` agent — Orchestrates documentation updates across the project, delegates API doc generation to this skill

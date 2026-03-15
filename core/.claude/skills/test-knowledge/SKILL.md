@@ -48,7 +48,7 @@ A searchable knowledge base of testing patterns and lessons learned.
 
 ## Storage
 
-Knowledge is stored in `.claude/skills/test-knowledge/knowledge.md` as a structured markdown file.
+Knowledge is stored in `.claude/test-knowledge.md` in the project root's `.claude/` directory (not inside the skill template). This keeps project-specific knowledge separate from the distributed skill definition.
 
 ## Entry Format
 
@@ -70,15 +70,36 @@ Parse `$ARGUMENTS` to determine the mode.
 
 ### Search Mode
 ```bash
-grep -i "$QUERY" .claude/skills/test-knowledge/knowledge.md
+grep -i "$QUERY" .claude/test-knowledge.md
 ```
 Return matching entries with context.
 
 ### Add Mode
-Append a new entry in the standard format to `knowledge.md`.
+Append a new entry in the standard format to `.claude/test-knowledge.md`.
 
 ### Seed Mode
-Create initial `knowledge.md` with category headers and a few generic entries.
+Create initial `.claude/test-knowledge.md` with category headers and a few generic entries.
+
+### Review Mode
+Read all entries in `.claude/test-knowledge.md`, flag any that are outdated (referenced APIs changed, patterns superseded), and suggest removals or updates.
+
+### Digest Mode
+Summarize the knowledge base into a concise digest grouped by category. Output the top 3 most-referenced patterns and any recurring themes.
 
 ### Stats Mode
 Count entries per category and report.
+
+---
+
+## MUST DO
+
+- Always use the standard entry format (category code, context, pattern, example, date)
+- Always store knowledge in `.claude/test-knowledge.md` — never inside the skill template directory
+- Always check for duplicate entries before adding (search by title keywords first)
+- Always include a concrete code or command example in every entry
+
+## MUST NOT DO
+
+- MUST NOT store project-specific knowledge inside `core/.claude/` — use the project's own `.claude/` directory
+- MUST NOT add speculative entries — only record patterns that solved a real problem
+- MUST NOT delete entries without review — use review mode to flag candidates first

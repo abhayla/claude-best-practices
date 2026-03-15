@@ -15,7 +15,7 @@ triggers:
   - nfr thresholds
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<project directory, PRD path, or baseline results path>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -438,6 +438,74 @@ Budget config for Lighthouse CI:
 ### Regressions Found
 - /dashboard LCP is 2.9s (target < 2.5s) — investigate image loading
 ```
+
+---
+
+## Baseline Management Policy
+
+Performance baselines are critical reference points. Uncontrolled updates mask regressions and erode the value of baseline comparisons.
+
+### 1. No Auto-Update in CI
+
+Baselines MUST NOT be auto-updated in CI pipelines. Updating baselines requires an explicit `--update-baseline` flag passed by a developer who has reviewed the performance delta. CI runs compare against the existing baseline and report regressions — they never silently adopt new numbers as the baseline.
+
+```bash
+# Manual baseline update (developer-initiated only)
+python3 perf/compare-baseline.py --update-baseline
+
+# CI mode (default): compare only, never update
+python3 perf/compare-baseline.py
+```
+
+### 2. Delta Logging Before Update
+
+Before any baseline update, log the delta between old and new values as a permanent record. This creates an audit trail of intentional performance changes:
+
+```bash
+# Append delta to persistent log before overwriting baseline
+python3 -c "
+import json, datetime
+old = json.load(open('perf/baselines/load-summary.json'))
+new = json.load(open('perf/results/load-summary.json'))
+entry = {
+    'date': datetime.datetime.utcnow().isoformat() + 'Z',
+    'metrics': {}
+}
+for metric in ['http_req_duration', 'http_req_failed']:
+    for stat in ['p(95)', 'p(99)', 'med', 'rate']:
+        key = f'{metric}.{stat}'
+        old_val = old.get('metrics', {}).get(metric, {}).get('values', {}).get(stat)
+        new_val = new.get('metrics', {}).get(metric, {}).get('values', {}).get(stat)
+        if old_val is not None and new_val is not None:
+            entry['metrics'][key] = {'old': old_val, 'new': new_val, 'delta_pct': round(((new_val - old_val) / old_val) * 100, 2) if old_val else 0}
+import os
+log_path = 'perf/baselines/update-log.jsonl'
+os.makedirs(os.path.dirname(log_path), exist_ok=True)
+with open(log_path, 'a') as f:
+    f.write(json.dumps(entry) + '\n')
+print('Baseline delta logged to ' + log_path)
+"
+```
+
+### 3. Stale Baseline Re-Benchmark
+
+Baselines older than 90 days should trigger a full re-benchmark. Stale baselines may reflect infrastructure, dependency, or runtime conditions that no longer apply:
+
+```bash
+# Check baseline age
+BASELINE_AGE_DAYS=$(python3 -c "
+import os, datetime
+mtime = os.path.getmtime('perf/baselines/load-summary.json')
+age = (datetime.datetime.now() - datetime.datetime.fromtimestamp(mtime)).days
+print(age)
+")
+
+if [ "$BASELINE_AGE_DAYS" -gt 90 ]; then
+  echo "WARNING: Baseline is ${BASELINE_AGE_DAYS} days old (> 90 day threshold). Run a full re-benchmark before trusting comparisons."
+fi
+```
+
+When a baseline exceeds 90 days, run all test types (smoke, load, stress) and update the baseline with the `--update-baseline` flag after verifying results are consistent across multiple runs.
 
 ---
 

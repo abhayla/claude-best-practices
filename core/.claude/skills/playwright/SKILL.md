@@ -11,7 +11,7 @@ triggers:
   - e2e-web
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<user-flow-or-test-description>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -1643,6 +1643,198 @@ test('checkout flow adapts to user type', async ({ page }) => {
 
 - Static pages with predictable structure — just assert directly
 - Tests validating that specific elements MUST exist — recon would hide failures
+
+---
+
+## STEP 13: Advanced Browser Capabilities
+
+### 13.1 Shadow DOM
+
+Web components encapsulate DOM inside shadow roots. Use the `>> shadow=` piercing selector
+to reach elements inside shadow DOM:
+
+```typescript
+// Pierce a single shadow root
+const inner = page.locator('my-component >> shadow=.inner-class');
+await expect(inner).toBeVisible();
+
+// Chain through nested shadow roots
+const deepElement = page.locator('outer-host >> shadow=inner-host >> shadow=.target');
+await expect(deepElement).toHaveText('Expected content');
+
+// Combine with role-based selectors inside shadow DOM
+const button = page.locator('my-toolbar >> shadow=button[aria-label="Save"]');
+await button.click();
+```
+
+### 13.2 WebSocket Testing
+
+Intercept and mock WebSocket connections to test real-time features without a live server:
+
+```typescript
+test('receives real-time notifications', async ({ page }) => {
+  // Intercept WebSocket connections matching a URL pattern
+  await page.routeWebSocket('**/ws/notifications', (ws) => {
+    ws.onMessage((message) => {
+      // Echo back or respond with mock data
+      if (message === 'ping') {
+        ws.send('pong');
+      }
+    });
+
+    // Simulate a server-sent message after connection
+    setTimeout(() => {
+      ws.send(JSON.stringify({ type: 'alert', text: 'New message' }));
+    }, 500);
+  });
+
+  await page.goto('/dashboard');
+  await expect(page.getByText('New message')).toBeVisible();
+});
+```
+
+### 13.3 Geolocation and Permissions
+
+Override geolocation and grant browser permissions to test location-aware features:
+
+```typescript
+test('shows nearby stores based on location', async ({ browser }) => {
+  const context = await browser.newContext({
+    geolocation: { latitude: 40.7128, longitude: -74.0060 },
+    permissions: ['geolocation'],
+  });
+  const page = await context.newPage();
+
+  await page.goto('/store-finder');
+  await page.getByRole('button', { name: 'Use my location' }).click();
+  await expect(page.getByText('Stores near New York')).toBeVisible();
+
+  // Change location mid-test
+  await context.setGeolocation({ latitude: 34.0522, longitude: -118.2437 });
+  await page.getByRole('button', { name: 'Refresh' }).click();
+  await expect(page.getByText('Stores near Los Angeles')).toBeVisible();
+
+  await context.close();
+});
+
+// Grant other permissions (camera, microphone, notifications)
+const context = await browser.newContext({
+  permissions: ['geolocation', 'notifications'],
+});
+```
+
+### 13.4 Cookie Management
+
+Manipulate cookies directly for testing auth flows, consent banners, or session handling:
+
+```typescript
+test('respects cookie consent preferences', async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  // Pre-set cookies before navigation
+  await context.addCookies([
+    { name: 'consent', value: 'accepted', domain: 'localhost', path: '/' },
+    { name: 'session_id', value: 'test-session-abc', domain: 'localhost', path: '/' },
+  ]);
+
+  await page.goto('/');
+  // Consent banner should not appear since cookie is set
+  await expect(page.getByRole('dialog', { name: 'Cookie consent' })).toBeHidden();
+
+  // Read cookies to verify application behavior
+  const cookies = await context.cookies();
+  const trackingCookie = cookies.find(c => c.name === 'analytics_id');
+  expect(trackingCookie).toBeDefined();
+
+  // Clear cookies to simulate logged-out state
+  await context.clearCookies();
+  await page.reload();
+  await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
+
+  await context.close();
+});
+```
+
+### 13.5 Drag and Drop
+
+Test drag-and-drop interactions using the built-in `dragTo` method or manual mouse control:
+
+```typescript
+test('reorder items via drag and drop', async ({ page }) => {
+  await page.goto('/kanban');
+
+  // Simple drag-to-target
+  const card = page.getByText('Task A');
+  const targetColumn = page.getByTestId('column-done');
+  await card.dragTo(targetColumn);
+  await expect(targetColumn.getByText('Task A')).toBeVisible();
+});
+
+test('precise drag with mouse control', async ({ page }) => {
+  await page.goto('/canvas-editor');
+
+  // Manual drag for pixel-level precision or custom drag behavior
+  const source = page.getByTestId('draggable-widget');
+  const box = await source.boundingBox();
+  if (box) {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 200, box.y + 100, { steps: 10 });
+    await page.mouse.up();
+  }
+
+  await expect(page.getByTestId('draggable-widget')).toHaveCSS('transform', /translate/);
+});
+```
+
+### 13.6 Performance Metrics
+
+Collect JavaScript heap size, DOM node counts, and code coverage for performance budgets:
+
+```typescript
+test('page meets performance budget', async ({ page }) => {
+  await page.goto('/');
+
+  // Collect CDP metrics (Chromium only)
+  const client = await page.context().newCDPSession(page);
+  await client.send('Performance.enable');
+  const { metrics } = await client.send('Performance.getMetrics');
+
+  const jsHeap = metrics.find(m => m.name === 'JSHeapUsedSize');
+  const domNodes = metrics.find(m => m.name === 'Nodes');
+
+  // Assert against performance budgets
+  expect(jsHeap?.value).toBeLessThan(50 * 1024 * 1024); // < 50MB JS heap
+  expect(domNodes?.value).toBeLessThan(1500);            // < 1500 DOM nodes
+});
+
+test('measure JS coverage', async ({ page }) => {
+  // Start JS coverage collection
+  await page.coverage.startJSCoverage();
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Features' }).click();
+
+  const coverage = await page.coverage.stopJSCoverage();
+
+  // Calculate total bytes vs used bytes
+  let totalBytes = 0;
+  let usedBytes = 0;
+  for (const entry of coverage) {
+    totalBytes += entry.text.length;
+    for (const range of entry.ranges) {
+      usedBytes += range.end - range.start;
+    }
+  }
+
+  const usagePercent = (usedBytes / totalBytes) * 100;
+  console.log(`JS coverage: ${usagePercent.toFixed(1)}% of ${(totalBytes / 1024).toFixed(0)}KB used`);
+  expect(usagePercent).toBeGreaterThan(50); // At least 50% of loaded JS is used
+});
+```
+
+Note: `page.coverage` and CDP sessions are **Chromium-only** features. Gate these tests to run
+only against the Chromium project in your Playwright config.
 
 ---
 

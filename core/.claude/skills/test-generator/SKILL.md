@@ -14,8 +14,8 @@ triggers:
   - write tests from requirements
   - test matrix
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
-argument-hint: "<PRD file path, plan file path, schema file path, or feature description>"
-version: "1.0.0"
+argument-hint: "<PRD file path, plan file path, schema file path, feature description, or coverage gap report>"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -35,6 +35,7 @@ Read and extract testable requirements from available sources:
 2. **Plan** — Task verification commands, file paths, expected behavior
 3. **Schema** — Entity definitions, constraints, relationships, seed data
 4. **API spec** — Endpoints, request/response shapes, error codes, auth requirements
+5. **Coverage gap report** — File paths with uncovered lines from `/coverage-analysis` output. Parse the gap report to extract file paths, line ranges, and branch coverage gaps. Generate targeted tests that exercise the specific uncovered code paths identified in the report. Prioritize gaps in domain and service layers over infrastructure code
 
 Build the test matrix:
 
@@ -827,6 +828,7 @@ Follow the project's existing convention. If no convention exists, use:
 - Always generate E2E stubs with `skip` markers and fully-defined Page Objects (Step 6)
 - Always run the red phase gate (Step 13) to verify all tests FAIL
 - Always write structured JSON output to `test-results/test-generator.json` (Step 14)
+- After implementation, re-validate the test matrix by scanning test docstrings and comments for requirement IDs (AC-xxx, NFR-xxx). Flag any requirement that has lost its test mapping — a requirement without a corresponding test is a coverage regression that must be fixed before the PR merges
 
 ## MUST NOT DO
 

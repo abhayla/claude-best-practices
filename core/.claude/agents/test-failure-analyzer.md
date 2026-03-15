@@ -3,6 +3,7 @@ name: test-failure-analyzer
 description: Use this agent to diagnose test failures — reads test output, classifies by root cause, suggests targeted fixes. Read-only analysis only; does not modify files or run tests. Complements /fix-loop which applies fixes.
 tools: ["Read", "Grep", "Glob"]
 model: sonnet
+version: "1.1.0"
 ---
 
 You are a test failure diagnosis specialist. Your role is to analyze test failures and provide targeted fix suggestions.
@@ -29,6 +30,11 @@ NOT: Modify files, run tests, or apply fixes (use /fix-loop for that).
 | `AUTH_ERROR` | Authentication or authorization failure (token expired, permission denied, 401/403) |
 | `VISUAL_REGRESSION` | Screenshot differs from visual baseline |
 | `SCHEMA_VALIDATION` | Request/response doesn't match schema (Pydantic, JSON Schema, OpenAPI) |
+| `PERFORMANCE_REGRESSION` | Test passes but exceeds performance threshold (p95 latency, response time) |
+| `RESOURCE_LEAK` | Unclosed files, connections, or handles detected in teardown (ResourceWarning) |
+| `CONCURRENCY_ERROR` | Deadlock, race condition, or thread-safety violation |
+| `TEST_POLLUTION` | Test passes in isolation but fails when run with other tests (shared state leak) |
+| `EMPTY_ASSERTION` | Test has no assertions or only trivial assertions — passes without testing anything |
 
 ## Backend-Specific Error Patterns
 
@@ -47,6 +53,11 @@ Recognize these common backend error signatures and map to the correct category:
 | `uuid.UUID: badly formed` | `RUNTIME_EXCEPTION` | UUID type mismatch (string vs UUID object) |
 | `asyncio.TimeoutError` | `TIMEOUT` | Async operation exceeded deadline |
 | `Screenshot differs from baseline` | `VISUAL_REGRESSION` | UI change not reflected in baselines |
+| `ResourceWarning: unclosed` | `RESOURCE_LEAK` | File/socket/connection not closed in teardown |
+| `threading.DeadlockError` / hangs indefinitely | `CONCURRENCY_ERROR` | Thread deadlock or actor mailbox overflow |
+| Test passes alone, fails in suite | `TEST_POLLUTION` | Shared mutable state between tests |
+| `assert True` / no `assert` in test body | `EMPTY_ASSERTION` | Vacuous test — rewrite with real assertions |
+| `response time 12s (threshold 5s)` | `PERFORMANCE_REGRESSION` | Code change degraded performance |
 
 ## Analysis Process
 

@@ -8,18 +8,22 @@ globs: ["**/test_*", "**/*_test.*", "**/tests/**", "**/*.test.*", "**/*.spec.*"]
 ## General Principles
 
 1. **Test Isolation** — Each test should be independent; no shared mutable state
-2. **Descriptive Names** — Test names should describe the scenario and expected outcome
+2. **Descriptive Names** — Test names should describe the scenario and expected outcome: `test_<method>_<condition>_<expected>` (Python), `should <verb> when <condition>` (JS)
 3. **Arrange-Act-Assert** — Structure tests clearly with setup, action, and verification
 4. **One Assertion Focus** — Each test should verify one behavior (multiple asserts OK if related)
-5. **No Test Interdependence** — Tests must pass in any order
+5. **No Test Interdependence** — Tests must pass in any order; use `--randomly` / `--randomize` to verify
+6. **No Empty Assertions** — Every test MUST contain at least one meaningful assertion. Tests with no `assert` / `expect` / `verify`, or with trivial assertions (`assert True`, `expect(1).toBe(1)`) are bugs — they pass without testing anything
+7. **CI Is Mandatory** — PRs MUST NOT merge with failing tests. MUST NOT use `--no-verify`, `[skip ci]`, or `[ci skip]` to bypass test gates. If a test blocks CI, fix the test — do not skip the gate
 
-## Test Categories
+## Test Categories & Pyramid
 
-| Category | Purpose | Speed |
-|----------|---------|-------|
-| Unit | Individual functions/methods | Fast (ms) |
-| Integration | Component interactions | Medium (seconds) |
-| E2E | Full user flows | Slow (minutes) |
+| Category | Purpose | Speed | Target Ratio |
+|----------|---------|-------|-------------|
+| Unit | Individual functions/methods | Fast (ms) | ~70% of tests |
+| Integration | Component interactions | Medium (seconds) | ~20% of tests |
+| E2E | Full user flows | Slow (minutes) | ~10% of tests |
+
+If E2E tests outnumber unit tests, the pyramid is inverted — refactor to push coverage down to unit level. Prefer unit tests for logic, integration tests for boundaries, E2E tests only for critical user flows.
 
 ## Running Tests
 
@@ -114,6 +118,54 @@ diff run_1.txt run_2.txt
 | Tests in quarantine | < 10 | Review quarantine list weekly |
 | False failure rate in CI | < 2% | Investigate if > 5% |
 
+## Coverage Regression Prevention
+
+- Coverage MUST NOT decrease on a PR. Use ratcheting: the new coverage must be >= the previous value.
+- Enforce via CI: `--cov-fail-under` (pytest), `coverageThreshold` (Jest/Vitest), `jacocoTestReport` minimum.
+- New/changed code MUST have >= 80% line coverage and >= 70% branch coverage.
+- Security-critical paths (auth, payment, crypto) MUST have >= 90% coverage — no exceptions.
+
+## Test Timeouts
+
+- Unit tests: MUST complete in < 5 seconds per test. Flag any unit test exceeding 2 seconds.
+- Integration tests: MUST complete in < 30 seconds per test.
+- E2E tests: MUST complete in < 5 minutes per test.
+- Set framework-level defaults: `timeout = 5000` (Vitest/Jest), `--timeout=5000` (pytest-timeout).
+- If a test needs a longer timeout, it belongs in a higher test category — not a longer timeout.
+
+## Parallel Test Safety
+
+- Tests MUST be safe to run in parallel (`pytest-xdist`, `jest --maxWorkers`, `vitest --pool=threads`).
+- MUST NOT rely on fixed port numbers, shared temp files, or global singletons across tests.
+- Database tests MUST use per-test transactions or isolated schemas — never a shared database state.
+- If a test cannot run in parallel, mark it explicitly (`@pytest.mark.serial`, `test.concurrent.skip`).
+
+## Security Testing
+
+- Auth/authorization endpoints MUST have tests for: no token (401), expired token (401), wrong scope (403), valid token (200).
+- Input validation endpoints MUST have tests for: SQL injection payloads, XSS strings, oversized payloads, malformed JSON.
+- Payment/financial endpoints MUST have tests for: negative amounts, zero amounts, currency edge cases, idempotency.
+- New security-critical paths without tests MUST block the PR.
+
+## Mock Drift Prevention
+
+- Unit-level mocks MUST match the real implementation's return type/shape. Use typed mocks where possible (`jest.mocked<T>()`, `mocker.patch() -> MagicMock(spec=RealClass)`).
+- Periodically verify mocks against real implementations — run integration tests alongside unit tests in CI.
+- When a real API changes, update all mocks that reference it in the same PR. Never change an API without updating its mocks.
+- Contract tests (Pact/Specmatic) MUST be used for cross-service API boundaries — unit mocks alone are insufficient.
+
+## Test Pollution Detection
+
+- Run tests with `--randomly` (pytest-randomly) or `--randomize` (Jest) in CI at least weekly.
+- When a test fails only when run with other tests, isolate it: run the failing test alone, then with its predecessor. Fix the shared state leak.
+- MUST NOT use `beforeAll` / `session`-scoped fixtures for mutable state — use `beforeEach` / `function`-scoped instead.
+
+## Warnings as Signals
+
+- `ResourceWarning` (unclosed files/connections), `DeprecationWarning`, and framework warnings MUST NOT be ignored.
+- Configure `-W error::ResourceWarning` (Python) or equivalent to promote resource leaks to failures.
+- Review `DeprecationWarning` before each major dependency upgrade — they signal upcoming breakage.
+
 ## Documentation
 
 - Add brief comments explaining non-obvious test setups
@@ -207,7 +259,9 @@ Write to `test-results/{skill-name}.json` after each verification run:
 
 | Field | Values | Meaning |
 |-------|--------|---------|
-| `result` | `PASSED`, `FAILED`, `FIXED`, `FLAKY` | Overall verification outcome |
+| `result` | `PASSED`, `FAILED`, `FIXED` | Overall verification outcome |
+FLAKY tests are reported as FAILED with `flaky_detected: true`. There is no separate FLAKY result — flaky is a failure category, not an acceptable outcome.
+
 | `quality_gate` | `PASSED`, `WARNED`, `FAILED`, `SKIPPED` | Code quality check result |
 | `contract_check` | `PASSED`, `FAILED`, `SKIPPED` | Contract test result |
 | `perf_baseline` | `PASSED`, `REGRESSED`, `SKIPPED` | Performance baseline comparison |
@@ -226,21 +280,61 @@ Write to `test-results/{skill-name}.json` after each verification run:
 
 ### Stage Gate Usage
 
-Downstream stages read `test-results/*.json` to determine if verification passed:
+The stage gate aggregator is the SINGLE source of truth for pipeline pass/fail decisions. Individual skill results are inputs to the aggregator, not standalone verdicts. No downstream stage should read a single skill's JSON file to make a go/no-go decision — the aggregator's output is the only authoritative verdict.
+
+Downstream stages read ALL `test-results/*.json` files to determine if verification passed:
 
 ```bash
-# Check if all verification passed
+# Aggregate ALL verification results — the union of failures determines the verdict
 python -c "
-import json, glob, sys
-results = [json.load(open(f)) for f in glob.glob('test-results/*.json')]
-failed = [r for r in results if r['result'] == 'FAILED']
-if failed:
-    for r in failed:
-        print(f\"BLOCKED: {r['skill']} — {r['result']}\")
+import json, glob, sys, os
+
+result_files = glob.glob('test-results/*.json')
+if not result_files:
+    print('ERROR: No test-results/*.json files found — cannot determine verification status')
     sys.exit(1)
-print('All verification gates passed')
+
+results = []
+for f in result_files:
+    try:
+        results.append(json.load(open(f)))
+    except (json.JSONDecodeError, KeyError) as e:
+        print(f'ERROR: Could not parse {f}: {e}')
+        sys.exit(1)
+
+# Check for contradictory results across skills
+statuses = {r['skill']: r['result'] for r in results}
+pass_skills = {s for s, v in statuses.items() if v in ('PASSED', 'FIXED')}
+fail_skills = {s for s, v in statuses.items() if v == 'FAILED'}
+
+# Detect contradictions: if skill A says PASSED but skill B says FAILED for overlapping concerns
+contradictions = []
+if 'auto-verify' in pass_skills and 'contract-test' in fail_skills:
+    contradictions.append('auto-verify reports PASSED but contract-test reports FAILED — investigate API compatibility')
+if 'auto-verify' in pass_skills and 'perf-test' in fail_skills:
+    contradictions.append('auto-verify reports PASSED but perf-test reports FAILED — investigate performance regression')
+
+# Report all failures (union, not first-match)
+all_failures = []
+for r in results:
+    if r['result'] == 'FAILED':
+        all_failures.append(r)
+        print(f\"BLOCKED: {r['skill']} — {r['result']}\")
+        for failure in r.get('failures', []):
+            print(f\"  - {failure.get('test', 'unknown')}: {failure.get('message', 'no message')}\")
+
+for c in contradictions:
+    print(f'CONTRADICTION: {c}')
+
+if all_failures or contradictions:
+    print(f'\\nTotal blocked skills: {len(all_failures)}, contradictions: {len(contradictions)}')
+    sys.exit(1)
+
+print(f'All {len(results)} verification gates passed')
 "
 ```
+
+The aggregator MUST read ALL JSON files and report the union of failures. Skipping a file or stopping at the first failure masks downstream problems.
 
 ### Directory Convention
 

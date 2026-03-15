@@ -5,9 +5,9 @@ description: >
   element recognition, integration_test package workflows, self-healing selectors,
   visual regression, monkey testing, and CI/CD integration. Based on ai-dashboad/flutter-skill.
 triggers: "flutter test, e2e, integration test, end-to-end, widget test, UI test"
-allowed-tools: "Bash Read Grep Glob Write Edit"
+allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<test-scope: 'all' | feature-name | 'setup' | 'visual' | 'monkey'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -624,6 +624,49 @@ flutter test integration_test/ --reporter github
 | `setState() called after dispose()` | Async callback fires after screen transition | Guard with `mounted` check; use Riverpod for async state |
 | Flaky scroll tests | Scroll delta too small or list length varies | Increase delta; use `maxScrolls` parameter; assert item count before scrolling |
 | Android `INSTALL_FAILED_INSUFFICIENT_STORAGE` | Emulator disk full | Wipe emulator data: `emulator -avd <name> -wipe-data` |
+
+---
+
+## STEP 8: Structured JSON Output
+
+Write machine-readable results to `test-results/flutter-e2e-test.json`:
+
+```json
+{
+  "skill": "flutter-e2e-test",
+  "result": "PASSED|FAILED",
+  "timestamp": "<ISO-8601>",
+  "tests_run": "<total_count>",
+  "tests_failed": "<failed_count>",
+  "failures": [
+    {
+      "test": "<test_description>",
+      "category": "ASSERTION_FAILURE|WIDGET_NOT_FOUND|TIMEOUT|GOLDEN_MISMATCH|RUNTIME_ERROR",
+      "file": "<test_file_path>",
+      "message": "<error_message>"
+    }
+  ]
+}
+```
+
+Create `test-results/` directory if it doesn't exist. This JSON is consumed by downstream stage gates.
+
+```bash
+mkdir -p test-results
+python3 -c "
+import json, datetime
+result = {
+    'skill': 'flutter-e2e-test',
+    'result': '<PASSED_or_FAILED>',
+    'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'tests_run': '<N>',
+    'tests_failed': '<N>',
+    'failures': []
+}
+with open('test-results/flutter-e2e-test.json', 'w') as f:
+    json.dump(result, f, indent=2)
+"
+```
 
 ---
 

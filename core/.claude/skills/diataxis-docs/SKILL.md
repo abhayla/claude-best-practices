@@ -180,3 +180,12 @@ For projects with a single large README or monolithic doc:
 - MUST NOT mix tutorial content into reference pages — tutorials guide learning, reference serves lookup
 - MUST NOT force all four categories to be filled immediately — use the gap report to prioritize
 - MUST NOT rename files arbitrarily — use descriptive, lowercase, hyphenated names matching the content
+
+## See Also
+
+- `/api-docs-generator` — Generates OpenAPI reference docs that belong in the `docs/reference/` Diataxis category
+- `/changelog-contributing` — Generates CHANGELOG.md and CONTRIBUTING.md — classify these as reference docs in the Diataxis index
+- `/doc-structure-enforcer` — Enforce stage-based folder structure before or after Diataxis restructuring
+- `/doc-staleness` — Run after restructuring to verify no references were broken during the move
+- `/adr` — ADRs belong in the `docs/explanation/` Diataxis category
+- `docs-manager` agent — Orchestrates broader documentation updates, delegates structural reorganization to this skill

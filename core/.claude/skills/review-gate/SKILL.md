@@ -14,8 +14,8 @@ triggers:
   - quality gate pipeline
   - pre-merge review
 allowed-tools: "Bash Read Grep Glob Skill"
-argument-hint: "[--skip <skill1,skill2>] [--fix] [--pr] [--threshold <0-100>]"
-version: "2.0.0"
+argument-hint: "[--skip <skill1,skill2>] [--fix] [--pr] [--threshold <0-100>] [--include-test-health]"
+version: "2.3.0"
 type: workflow
 ---
 
@@ -37,6 +37,7 @@ Run the full Stage 9 review pipeline: quality checks, architecture fitness, secu
 | `--fix` | off | Automatically fix blocking findings via `fix-loop` + `auto-verify` |
 | `--pr` | off | Create a PR via `request-code-review` after a passing review |
 | `--threshold <0-100>` | 50 | Maximum acceptable risk score from `change-risk-scoring` |
+| `--include-test-health` | off | Run Batch D (test-maintenance audit) as a non-blocking health check |
 
 ### 0.2 Validate Preconditions
 
@@ -121,7 +122,7 @@ Agent(prompt="Run /architecture-fitness on all changed files between $BASE_BRANC
 
 ```
 BATCH A — Code Quality Gate:
-  Status: {PASS / WARN / BLOCK}
+  Status: {PASS / WARN / BLOCK / UNKNOWN}
   Complexity: {max CC and file}
   Duplication: {percentage}
   SOLID: {issues count}
@@ -131,7 +132,7 @@ BATCH A — Code Quality Gate:
   Blocking issues: {count}
 
 BATCH A — Architecture Fitness:
-  Status: {PASS / WARN / BLOCK}
+  Status: {PASS / WARN / BLOCK / UNKNOWN}
   Dependency direction: {violations count}
   Circular dependencies: {cycles count}
   Coupling: {high-risk modules}
@@ -158,7 +159,7 @@ Skill("change-risk-scoring", args="--format json")
 
 ```
 BATCH B — Security Audit:
-  Status: {PASS / WARN / BLOCK}
+  Status: {PASS / WARN / BLOCK / UNKNOWN}
   Critical findings: {count}
   High findings: {count}
   Medium findings: {count}
@@ -201,7 +202,7 @@ Record result:
 
 ```
 BATCH C — Adversarial Review:
-  Status: {PASSED / PASSED WITH CAVEATS / BLOCKED}
+  Status: {PASSED / PASSED WITH CAVEATS / BLOCKED / UNKNOWN}
   Rounds completed: {1-3}
   Issues found: {total}
     Critical: {count} ({resolved} resolved)
@@ -222,7 +223,7 @@ Record result:
 
 ```
 BATCH C — PR Standards:
-  Status: {PASS / FAIL / WARN}
+  Status: {PASS / FAIL / WARN / UNKNOWN}
   Critical violations: {count}
   Warning violations: {count}
   Info violations: {count}
@@ -278,15 +279,48 @@ Skill("auto-verify", args="--files <fixed_files>")
 Skill("fix-loop", args="retest_command: <TEST_CMD> max_iterations: 3")
 ```
 
-### 4.3 Re-Run Failed Checks
+### 4.3 Scope-Aware Re-Run Policy
 
-After fixing, re-run ONLY the sub-skills that produced BLOCK status. Do NOT re-run passing checks — this avoids wasting time.
+After fix-loop applies fixes, determine the re-run scope based on whether the fix touched files outside the original finding's scope:
+
+1. **Identify fix scope**: Compare the files modified by the fix against the files referenced in the original finding
+2. **Classify fix reach**:
+
+| Fix Reach | Condition | Re-Run Scope |
+|-----------|-----------|-------------|
+| Scoped | Fix modified ONLY files listed in the original finding (same directory/module) | Re-run ONLY the sub-skill that produced the BLOCK status |
+| Cross-cutting | Fix modified files in DIFFERENT directories or modules than the original finding | Re-run ALL sub-skills (quality, architecture, security, adversarial, risk, PR standards) |
+
+3. **Detect cross-cutting fixes**:
+
+```bash
+# Get directories touched by the fix
+FIX_DIRS=$(git diff --name-only HEAD~1 HEAD | xargs -I{} dirname {} | sort -u)
+
+# Get directories from the original finding
+FINDING_DIRS=$(echo "<original_finding_files>" | xargs -I{} dirname {} | sort -u)
+
+# If fix introduced new directories not in the finding, it's cross-cutting
+NEW_DIRS=$(comm -23 <(echo "$FIX_DIRS") <(echo "$FINDING_DIRS"))
+if [ -n "$NEW_DIRS" ]; then
+  echo "Cross-cutting fix detected — re-running ALL checks"
+else
+  echo "Scoped fix — re-running only failed checks"
+fi
+```
+
+4. **Execute re-runs**:
 
 ```
-Re-running failed checks after fixes:
-  Code Quality Gate: RE-RUN → {new status}
-  Security Audit: RE-RUN → {new status}
-  PR Standards: RE-RUN → {new status}
+Re-running checks after fixes:
+  Fix reach: {SCOPED|CROSS-CUTTING}
+  Re-run scope: {FAILED_ONLY|ALL}
+  Code Quality Gate: {RE-RUN|SKIP} → {new status}
+  Architecture Fitness: {RE-RUN|SKIP} → {new status}
+  Security Audit: {RE-RUN|SKIP} → {new status}
+  Adversarial Review: {RE-RUN|SKIP} → {new status}
+  Change Risk Scoring: {RE-RUN|SKIP} → {new status}
+  PR Standards: {RE-RUN|SKIP} → {new status}
 ```
 
 Update the recorded results with the re-run outcomes.
@@ -313,12 +347,12 @@ Aggregate all sub-skill results into a single report. This is the artifact consu
 
 | # | Check | Status | Blocking | Details |
 |---|-------|--------|----------|---------|
-| 1 | Code Quality Gate | {PASS/WARN/BLOCK} | {count} | CC max: {N}, duplication: {%}, coverage diff: {%} |
-| 2 | Architecture Fitness | {PASS/WARN/BLOCK} | {count} | Dep violations: {N}, cycles: {N}, ADR drift: {N} |
-| 3 | Security Audit | {PASS/WARN/BLOCK} | {count} | Critical: {N}, High: {N}, Medium: {N} |
-| 4 | Adversarial Review | {PASS/WARN/BLOCK} | {count} | Issues: {N} ({resolved} resolved, {deferred} deferred) |
-| 5 | Change Risk Scoring | {PASS/WARN/BLOCK} | — | Score: {N}/100, hotspots: {list} |
-| 6 | PR Standards | {PASS/WARN/BLOCK} | {count} | Critical: {N}, Warning: {N}, Info: {N} |
+| 1 | Code Quality Gate | {PASS/WARN/BLOCK/UNKNOWN} | {count} | CC max: {N}, duplication: {%}, coverage diff: {%} |
+| 2 | Architecture Fitness | {PASS/WARN/BLOCK/UNKNOWN} | {count} | Dep violations: {N}, cycles: {N}, ADR drift: {N} |
+| 3 | Security Audit | {PASS/WARN/BLOCK/UNKNOWN} | {count} | Critical: {N}, High: {N}, Medium: {N} |
+| 4 | Adversarial Review | {PASS/WARN/BLOCK/UNKNOWN} | {count} | Issues: {N} ({resolved} resolved, {deferred} deferred) |
+| 5 | Change Risk Scoring | {PASS/WARN/BLOCK/UNKNOWN} | — | Score: {N}/100, hotspots: {list} |
+| 6 | PR Standards | {PASS/WARN/BLOCK/UNKNOWN} | {count} | Critical: {N}, Warning: {N}, Info: {N} |
 
 ## Blocking Issues (if any)
 
@@ -327,6 +361,20 @@ Aggregate all sub-skill results into a single report. This is the artifact consu
 ## Deferred Items
 
 {List each deferred issue with its tracking reference (GitHub Issue URL or TODO)}
+
+### Deferred Item Validation
+
+For each deferred item in the report:
+
+1. **Verify tracking reference exists** — check that the GitHub Issue URL resolves:
+   ```bash
+   gh issue view <issue_number> --json state,title 2>/dev/null
+   ```
+   If the issue does not exist or is already closed, promote the deferred item to BLOCK.
+
+2. **TTL enforcement** — each deferred item carries a `deferred_date` (ISO-8601). If the item is older than 14 days, auto-promote it to BLOCK on this review-gate run. Stale deferrals are unresolved problems, not accepted risk.
+
+3. **Deferred count threshold** — if >5 deferred items exist across all prior review-gate runs (check `test-results/review-gate.json` history or PR comments), emit a WARN: "Deferred item accumulation detected ({count} items). Review and resolve outstanding deferrals before adding more."
 
 ## Fix Loop Summary (if --fix was used)
 
@@ -363,9 +411,10 @@ Write the consolidated results to `test-results/review-gate.json` for programmat
     "change_risk_scoring": {"status": "PASSED", "score": 42, "classification": "MEDIUM"},
     "pr_standards": {"status": "PASSED", "blocking": 0, "violations": {"critical": 0, "warning": 2, "info": 3}}
   },
+  "_status_values": "checks.*.status accepts: PASSED | WARNED | BLOCKED | UNKNOWN",
   "blocking_issues": [],
   "deferred_items": [
-    {"source": "adversarial-review", "id": "R3", "tracking": "#456", "description": "..."}
+    {"source": "adversarial-review", "id": "R3", "tracking": "#456", "description": "...", "deferred_date": "2026-03-01T00:00:00Z", "ttl_remaining_days": 14, "auto_promoted": false}
   ],
   "fix_loop_ran": false,
   "verdict": "APPROVED",
@@ -376,7 +425,9 @@ Write the consolidated results to `test-results/review-gate.json` for programmat
 ### 5.3 Verdict Logic
 
 ```
-IF any check has unresolved BLOCK status:
+IF any check has status UNKNOWN:
+  verdict = "REJECTED"   # UNKNOWN is treated as BLOCK — unknowns are unsafe
+ELIF any check has unresolved BLOCK status:
   verdict = "REJECTED"
 ELIF risk_score > threshold + 15:
   verdict = "REJECTED"
@@ -478,6 +529,9 @@ Then re-run only the sub-skills affected by the changes made during feedback res
  │  STEP 4: /fix-loop + /auto-verify (if --fix and blocks exist)  │
  │     │                                                           │
  │     ▼                                                           │
+ │  BATCH D: /test-maintenance audit (if --include-test-health)    │
+ │     │                                                           │
+ │     ▼                                                           │
  │  STEP 5: Consolidated report → test-results/review-gate.json   │
  │     │                                                           │
  │     ▼                                                           │
@@ -502,6 +556,54 @@ The 6 analysis checks are grouped into 3 batches for optimal throughput:
 | Batch C | adversarial-review → pr-standards | Sequential after A+B | Adversarial review benefits from A+B findings as context |
 | Fix loop | fix-loop + auto-verify | Conditional after A+B+C | Only if --fix flag and blocking findings exist |
 | Final | report → PR → feedback | Sequential | Depends on all prior results |
+| Batch D | test-maintenance audit | Conditional after A+B+C | Only if `--include-test-health` flag is passed |
+
+---
+
+## Batch D: Test Health Audit (Optional)
+
+This batch runs ONLY if `--include-test-health` is passed. It invokes the first step (audit) of `/test-maintenance` as a non-blocking diagnostic check. Results appear as warnings in the consolidated report — they never produce BLOCK status.
+
+### D.1 Run Test Maintenance Audit
+
+```
+Skill("test-maintenance", args="--step audit-only")
+```
+
+### D.2 Record Results
+
+Extract the following metrics from the test-maintenance audit output and include them in the consolidated report's Recommendations section as warnings:
+
+```
+BATCH D — Test Health (non-blocking):
+  Skip rate: {percentage of tests marked skip/ignore/disabled}
+  Dead tests: {count of tests that never run in CI}
+  Slow tests: {count of tests exceeding category timeout thresholds}
+  Status: WARN (advisory only — does not affect verdict)
+```
+
+### D.3 Thresholds for Warnings
+
+| Metric | Healthy | Warning Threshold |
+|--------|---------|-------------------|
+| Skip rate | < 5% | >= 5% of total test suite |
+| Dead tests | 0 | >= 1 test never executed in CI |
+| Slow tests | 0 | >= 3 tests exceeding their category timeout |
+
+If any threshold is exceeded, add a warning entry to the consolidated report's `warnings` array in `test-results/review-gate.json`:
+
+```json
+{
+  "source": "test-maintenance",
+  "level": "WARN",
+  "metrics": {
+    "skip_rate_pct": 8.2,
+    "dead_test_count": 3,
+    "slow_test_count": 5
+  },
+  "message": "Test suite health degraded — 8.2% skip rate, 3 dead tests, 5 slow tests. Run /test-maintenance for remediation."
+}
+```
 
 ---
 
@@ -514,7 +616,8 @@ The 6 analysis checks are grouped into 3 batches for optimal throughput:
 - Always aggregate blocking issues from ALL sub-skills before deciding the verdict
 - Always apply override rules from `change-risk-scoring` (security files, migrations → minimum MEDIUM)
 - Always include deferred items with tracking references in the consolidated report
-- Always re-run only failed checks after fix-loop — do not re-run passing checks
+- Always check fix scope after fix-loop — if fix touched files outside the original finding's directory/module, re-run ALL checks; if fix is scoped to the same files, re-run only failed checks
+- If a sub-skill crashes, times out, or returns unparseable output, record its status as UNKNOWN and treat it as BLOCK — never silently ignore a sub-skill that failed to produce a result
 
 ## MUST NOT DO
 
@@ -525,5 +628,5 @@ The 6 analysis checks are grouped into 3 batches for optimal throughput:
 - MUST NOT report a passing verdict when any critical security finding is unresolved
 - MUST NOT silently swallow sub-skill failures — if a sub-skill crashes or times out, report it as UNKNOWN status in the consolidated report
 - MUST NOT create the PR without including the review gate summary in the PR description
-- MUST NOT re-run the entire pipeline when only specific checks failed — re-run only the failed checks after fixes
+- MUST NOT re-run only failed checks when the fix touched files outside the original finding's scope — cross-cutting fixes require a full re-run of ALL checks to catch regressions in previously-passing areas
 - MUST NOT block on warnings from `change-risk-scoring` alone — risk score is advisory, not a hard gate (unless score exceeds threshold + 15)

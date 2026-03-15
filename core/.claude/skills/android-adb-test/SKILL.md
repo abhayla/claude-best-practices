@@ -4,7 +4,7 @@ description: >
   Android E2E testing via ADB (uiautomator dump, screencap, input tap).
   Use for testing app screens without Compose test framework, debugging emulator UI,
   or validating user flows manually.
-allowed-tools: "Bash Read Grep Glob Skill"
+allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[screen-name|flow-name|all]"
 version: "1.0.0"
 type: reference
