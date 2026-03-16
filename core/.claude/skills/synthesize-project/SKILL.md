@@ -7,7 +7,7 @@ description: >
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis]"
-version: "2.0.0"
+version: "2.1.0"
 type: workflow
 ---
 
@@ -132,25 +132,57 @@ Gather project structure and configuration to understand what this project is an
 
 Based on what you learned in Step 2, identify 10-20 candidate conventions worth encoding as patterns.
 
-A convention is **WORTH** encoding when:
+### Rules — conventions worth encoding as always-on constraints
+
+A convention is worth a **rule** when:
 - It's a consistent pattern followed across multiple files
 - Breaking it would cause bugs, inconsistency, or confusion
 - A new developer (or AI) working on the project might not know about it
 - It's specific to THIS project, not a generic best practice
 
-A convention is **NOT** worth encoding when:
-- It's already enforced by a linter, formatter, or type checker
-- It's a language/framework default documented in official docs
-- It's a one-off implementation detail in a single file
-- It's a generic best practice (e.g., "write tests", "use descriptive names")
+### Skills — workflows worth encoding as on-demand procedures
 
-For each candidate convention, note:
+A convention is worth a **skill** when:
+- It's a multi-step procedure that developers repeat (e.g., "add a new DB model", "create a new feature module", "run and debug E2E tests")
+- The steps are project-specific — not just "run tests" but "run tests in this specific order with these specific fixtures and this specific setup"
+- Getting the steps wrong causes subtle bugs (e.g., forgetting one of 5 locations when adding a model)
+- It involves coordination across multiple files or modules
+
+### Agents — tasks worth delegating to a specialized subagent
+
+A convention is worth an **agent** when:
+- It's a review or analysis task that benefits from a dedicated persona (e.g., "review this meal generation output for dietary constraint violations")
+- It requires reading many files and producing a structured assessment
+- It's a recurring quality gate specific to this project's domain
+
+### NOT worth encoding (any type)
+
+- Already enforced by a linter, formatter, or type checker
+- A language/framework default documented in official docs
+- A one-off implementation detail in a single file
+- A generic best practice (e.g., "write tests", "use descriptive names")
+
+### Identification checklist
+
+For each candidate, note:
 1. **Name** — short descriptive name
 2. **Hypothesis** — what you believe the convention is
 3. **Evidence needed** — which specific source files to read to confirm (max 5 per convention)
 4. **Category** — `correctness` | `safety` | `consistency` | `testing` | `deployment`
-5. **Pattern type** — `rule` (always-on constraint) | `skill` (on-demand workflow) | `agent` (delegated task)
+5. **Pattern type** — choose using this decision table:
+
+   | Signal | Type |
+   |--------|------|
+   | "Always do X when working on Y files" | **rule** |
+   | "When you need to do X, follow these N steps" | **skill** |
+   | "Review/analyze X and produce a structured report" | **agent** |
+   | Multi-step procedure across 3+ files | **skill** |
+   | A constraint that applies to every edit in scope | **rule** |
+   | A task that benefits from a dedicated persona/focus | **agent** |
+
 6. **Confidence** — `high` (seen in 5+ files) | `medium` (seen in 2-4 files) | `low` (seen in 1 file)
+
+**Aim for a mix of types.** A project with only rules is missing workflow automation. A project with only skills is missing guardrails. Target roughly: 40-60% rules, 30-50% skills, 0-20% agents.
 
 Drop any candidate with `low` confidence immediately. A missing pattern is better than a wrong one.
 
@@ -240,7 +272,7 @@ private: false
 # [Skill Title]
 
 ## STEP 1: [Verb Phrase]
-[numbered instructions]
+[numbered instructions with concrete file paths and commands from THIS project]
 
 ## STEP 2: [Verb Phrase]
 [numbered instructions]
@@ -249,6 +281,38 @@ private: false
 - [constraint 1]
 - [constraint 2]
 ```
+
+Skills MUST encode project-specific multi-step procedures. Each step should reference actual file paths, commands, or patterns from the codebase. Generic workflow skills (e.g., "run tests") add no value — the skill must capture the project-specific gotchas, ordering, and coordination.
+
+### For agents (delegated review/analysis tasks):
+
+```yaml
+---
+name: [agent-name]
+description: >
+  When and why to use this agent. [1-3 sentences]
+model: inherit
+synthesized: true
+private: false
+---
+
+# [Agent Title]
+
+## Core Responsibilities
+- [what this agent analyzes or reviews]
+- [what domain knowledge it applies]
+
+## Input
+[what to pass to this agent]
+
+## Output Format
+[structured output: checklist, report, verdict]
+
+## Decision Criteria
+[project-specific rules this agent applies]
+```
+
+Agents MUST have a clear domain focus specific to this project. A generic "code reviewer" agent adds no value — an agent that reviews meal generation output for dietary constraint violations does.
 
 ### Quality checks for each generated pattern:
 
