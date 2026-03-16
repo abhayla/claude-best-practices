@@ -2304,24 +2304,61 @@ def main():
 
     # Step 6b: Provision if requested
     if args.provision:
-        print(f"\nProvisioning {args.tier} tier resources + config files...")
+        must_count = len(gaps.get("must-have", []))
+        improved_count = len(gaps.get("improved", []))
+        nice_count = len(gaps.get("nice-to-have", []))
+        skip_count = len(gaps.get("skip", []))
+
         if args.local:
             summary = provision_to_local(hub_root, Path(args.local), gaps, stacks, args.tier)
-            print(f"Copied {len(summary['copied_files'])} files to {args.local}/.claude/")
+            print()
+            print("=" * 60)
+            print("PROVISION SUMMARY")
+            print("=" * 60)
+            print()
+            print("Hub patterns:")
+            print(f"  Must-have:     {must_count} new patterns")
+            print(f"  Improved:      {improved_count} hub upgrades to existing patterns")
+            print(f"  Nice-to-have:  {nice_count} optional")
+            print(f"  Skipped:       {skip_count}")
+            print(f"  CLAUDE.md:     {summary['claude_md']}")
+            print(f"  settings.json: {summary['settings_json']}")
+            print()
+            print(f"Files copied: {len(summary['copied_files'])}")
             for f in summary["copied_files"]:
                 print(f"  + {f}")
-            print(f"CLAUDE.md: {summary['claude_md']}")
-            print(f"CLAUDE.local.md: {summary['claude_local_md']}")
-            print(f"settings.json: {summary['settings_json']}")
+            print()
+            print("=" * 60)
         elif getattr(args, "multi_pr", True):
             # Multi-PR mode: create separate PRs per tier
             pr_urls = provision_to_repo_multi_pr(
                 hub_root, args.repo, gaps, stacks,
                 hub_resources, project_names,
             )
+            print()
+            print("=" * 60)
+            print("PROVISION SUMMARY")
+            print("=" * 60)
+            print()
+            print("Hub patterns:")
+            print(f"  Must-have:     {must_count} new patterns")
+            print(f"  Improved:      {improved_count} hub upgrades to existing patterns")
+            print(f"  Nice-to-have:  {nice_count} optional (checkbox PR)")
+            print(f"  Skipped:       {skip_count}")
+            print()
+            print("PRs created:")
             for tier_name, url in pr_urls.items():
                 if url:
-                    print(f"  {tier_name} PR: {url}")
+                    label = {
+                        "must-have": "merge confidently",
+                        "improved": "review diffs",
+                        "nice-to-have": "check boxes and comment /apply",
+                    }.get(tier_name, "")
+                    print(f"  {tier_name:14s} {url} ({label})")
+                else:
+                    print(f"  {tier_name:14s} (skipped — empty or PR already exists)")
+            print()
+            print("=" * 60)
             if not any(pr_urls.values()):
                 print("No PRs created — project is already up to date.")
         else:
