@@ -153,39 +153,55 @@ This is where the reasoning happens. For each group:
 
 6. **Flag contradictions explicitly** in the output so the hub maintainer can review them.
 
-## STEP 6: Draft Generalized Patterns
+## STEP 6: Draft Generalized Patterns via Hub Creator Pipeline
 
-For each GENERALIZABLE sub-cluster with 3+ contributing projects, draft a hub-ready pattern.
+For each GENERALIZABLE sub-cluster with 3+ contributing projects, draft a hub-ready pattern **using the hub's own creator tools**. Do NOT draft patterns ad-hoc — the hub has strict standards that must be enforced.
 
-1. Read the pattern structure standards:
-   - `core/.claude/rules/pattern-structure.md`
-   - `core/.claude/rules/pattern-portability.md`
-   - `core/.claude/rules/pattern-self-containment.md`
+### 6a. Pre-draft: Curation gate
 
-2. Draft the generalized pattern, adapting the approach by type:
+Before drafting anything, verify each candidate against the hub's curation policy (`.claude/rules/rule-curation.md`):
 
-   **For rules:** Strip project-specific details, preserve the universal constraint. Replace file paths, class names, env vars with generic placeholders.
+1. **Source** — The synthesized patterns from 3+ downstream projects are the evidence
+2. **Problem it solves** — What goes wrong without this pattern (derived from the cluster analysis)
+3. **Not already covered** — Check purpose overlap with ALL existing patterns in `core/.claude/`. If a hub pattern already covers this convention generically, do NOT create a duplicate. Instead, consider whether the existing pattern should be enhanced.
 
-   **For skills:** Generalize the workflow steps while preserving the procedure structure. Replace project-specific commands with parameterized alternatives (e.g., "run your migration tool" instead of "run `alembic upgrade head`"). Keep the step ordering and gotchas — those are the value.
+Drop any candidate that fails the curation gate.
 
-   **For agents:** Generalize the domain focus while preserving the review structure. Replace project-specific decision criteria with parameterized ones (e.g., "check against configured dietary constraints" instead of "check for Jain/Sattvic violations").
+### 6b. Draft by type — delegate to the hub's creator tools
 
-   All types:
-   - Use RFC 2119 language (MUST, MUST NOT, SHOULD)
-   - Include `version: "1.0.0"` in frontmatter
-   - Do NOT include `synthesized: true` — this is now a hub pattern, not a project-specific one
-   - Include a provenance comment: `<!-- Generalized from N projects via /synthesize-hub -->`
+**For rules:** Use `/claude-guardian` to draft and validate the rule:
+1. Prepare the generalized constraint (strip all project-specific details → generic placeholders)
+2. Run `/claude-guardian` in "enhance-and-place" mode to determine correct scope (`globs:` or `# Scope: global`), validate against `rule-writing-meta.md` standards, and place in the right location
+3. The rule MUST follow `pattern-structure.md` (frontmatter with `description`, `globs`, `version`)
 
-3. Validate the draft follows all portability standards:
-   - No hardcoded paths
-   - No project-specific references
-   - Proper `globs:` scope
-   - Least-privilege `allowed-tools` (for skills)
+**For skills:** Use `/writing-skills` to draft the skill:
+1. Prepare the generalized workflow (replace project-specific commands with parameterized alternatives, preserve step ordering and gotchas)
+2. Run `/writing-skills` to generate the SKILL.md with proper frontmatter (`name`, `description`, `type`, `allowed-tools`, `version`), numbered `## STEP N:` sections, and `## CRITICAL RULES` section
+3. The skill MUST follow least-privilege `allowed-tools` per `pattern-portability.md`
 
-4. Run `validate_patterns.py` on the draft:
-   ```bash
-   python scripts/validate_patterns.py [draft-file]
-   ```
+**For agents:** Draft following `pattern-structure.md` agent requirements:
+1. Prepare the generalized agent (replace project-specific decision criteria with parameterized ones)
+2. The agent MUST have frontmatter with `name`, `description`, `model: inherit`
+3. The agent MUST have `## Core Responsibilities` and `## Output Format` sections
+4. The agent MUST declare `tools` in frontmatter following least-privilege
+
+### 6c. All types — mandatory standards
+
+Every drafted pattern MUST:
+- Pass `pattern-portability.md`: no hardcoded paths, no project-specific references, no environment assumptions
+- Pass `pattern-self-containment.md`: no placeholders, no stubs (<30 lines), self-contained execution
+- Pass `pattern-structure.md`: correct frontmatter, type classification, SemVer version
+- NOT include `synthesized: true` — this is now a hub pattern, not a project-specific one
+- Include a provenance comment: `<!-- Generalized from N projects via /synthesize-hub -->`
+- Use RFC 2119 language (MUST, MUST NOT, SHOULD)
+
+### 6d. Validate
+
+Run `validate_patterns.py` on every draft:
+```bash
+PYTHONPATH=. python scripts/validate_patterns.py [draft-file]
+```
+Drop any pattern that fails validation. Do NOT bypass the validator.
 
 ## STEP 7: Create PRs
 
@@ -305,5 +321,7 @@ rm -rf .synthesize-hub/collected/
 - NEVER generalize STYLE or DIVERGENT clusters. Even with a strong majority (15 agree, 2 disagree), classify as DIVERGENT. The hub does not impose preferences.
 - NEVER include project-specific details in generalized patterns. All file paths, class names, env vars, and internal references MUST be replaced with generic placeholders.
 - NEVER skip the validation step. Every generalized pattern MUST pass `validate_patterns.py`.
+- NEVER draft patterns ad-hoc. Use `/writing-skills` for skills, `/claude-guardian` for rules, and `pattern-structure.md` agent standards for agents. The hub's creator tools enforce standards that ad-hoc drafting misses.
+- NEVER add a pattern to the hub that doesn't pass the curation gate (`.claude/rules/rule-curation.md`): source evidence, problem statement, and dedup check against existing hub patterns are all mandatory.
 - The PR is a proposal — it MUST be reviewed and merged by the hub maintainer. This skill creates the PR but does not merge it.
 - Clean up `.synthesize-hub/collected/` after every run. Do not leave project patterns on disk.
