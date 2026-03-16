@@ -57,6 +57,9 @@ PYTHONPATH=. python scripts/recommend.py --repo owner/name --use-config
 # Compare content of overlapping resources (detect divergence)
 PYTHONPATH=. python scripts/recommend.py --repo owner/name --diff
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --diff
+
+# Validate patterns before submitting a PR
+PYTHONPATH=. python scripts/validate_patterns.py
 ```
 
 ## Architecture
@@ -127,6 +130,7 @@ Eight workflows: `test.yml` (CI on script changes), `scan-projects.yml` / `scan-
 
 - Test fixtures live in `scripts/tests/fixtures/` — shared fixtures are defined in `scripts/tests/conftest.py`.
 - Tests use `tmp_path` (pytest built-in) for temporary file operations and `sample_registry` fixture for registry-dependent tests.
+- Smoke/integration tests use a sample FastAPI project at `scripts/tests/smoke-test/todo-api/` for end-to-end workflow validation.
 - Dependencies: `pyyaml`, `requests`, `beautifulsoup4`, `anthropic`, `pytest`, `jinja2` (see `scripts/requirements.txt`).
 
 ## Bug Fixing Strategy
