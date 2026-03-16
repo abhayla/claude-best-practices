@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-16 02:12 UTC (auto-generated)
+> Last updated: 2026-03-16 10:59 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 182 |
-| Core (universal) | 177 |
+| Total Patterns | 183 |
+| Core (universal) | 178 |
 | Stack-specific | 5 |
 | Agents | 21 |
 | Hooks | 6 |
 | Rules | 19 |
-| Skills | 136 |
+| Skills | 137 |
 
 ## Pattern Inventory
 
@@ -34,6 +34,7 @@
 | android-test-patterns | skill | 1.0.0 | hub:pipeline-audit | android-run-tests, android-run-e2e |
 | anthropic-agent-orchestration-guide | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | api-docs-generator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| apply-selections | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-verify | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
