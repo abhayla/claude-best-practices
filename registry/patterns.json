@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-15",
-    "total_patterns": 183
+    "total_patterns": 179
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -1778,57 +1778,6 @@
     ],
     "changelog": "v1.0.0: Initial registration"
   },
-  "pattern-portability": {
-    "hash": "409bc30090635e149d1f7628d656c0aa7e53a2d0b810490e57a567fdc54c405d",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Portability standards for distributed patterns",
-    "tags": [
-      "quality",
-      "validation"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "pattern-self-containment": {
-    "hash": "b0928f3b33a5eb338c0b0534d88d55258067aa530be09d37ddc5706aef03e8e1",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Self-containment and completeness standards for patterns",
-    "tags": [
-      "quality",
-      "validation"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
-  "pattern-structure": {
-    "hash": "a2fe28ad6e651dc54228e4321ad639d0651734ddec8b8a0986526c49ad7f80dd",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Structural requirements for skills, agents, and rules",
-    "tags": [
-      "quality",
-      "validation"
-    ],
-    "changelog": "v1.0.0: Initial creation"
-  },
   "perf-test": {
     "hash": "dfc961b34652f639a428280a47c24f09d9e929eabee300c060fcee0a4429b7e7",
     "type": "skill",
@@ -2286,20 +2235,6 @@
       "quality-gate"
     ],
     "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps"
-  },
-  "rule-writing-meta": {
-    "hash": "1565654a0ac1bb069c30ec375d08e87fec0f53e8b928938b7d1c00da709f6a95",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v1.0.0: Initial registration"
   },
   "scan-discovery-report": {
     "hash": "d10d9bfb51a796cb174e20c68fe7ffd882e8458d813e585dffe2d70e0da85b0e",

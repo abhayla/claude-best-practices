@@ -419,7 +419,7 @@ NICE_TO_HAVE_UNIVERSAL_SKILLS = {
 }
 
 # Universal rules that are high-value
-MUST_HAVE_RULES = {"context-management", "rule-writing-meta"}
+MUST_HAVE_RULES = {"context-management"}
 
 # Universal agents that are high-value
 MUST_HAVE_AGENTS = {"security-auditor"}

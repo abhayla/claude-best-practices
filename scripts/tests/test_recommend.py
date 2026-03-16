@@ -64,7 +64,7 @@ def hub_root(tmp_path):
     # Rules
     rules = core / "rules"
     rules.mkdir(parents=True)
-    for name in ["workflow", "context-management", "rule-writing-meta", "fastapi-backend"]:
+    for name in ["workflow", "context-management", "fastapi-backend"]:
         (rules / f"{name}.md").write_text(f"---\nname: {name}\n---\n# {name}")
 
     # Hooks
@@ -179,7 +179,7 @@ class TestGetHubResources:
         resources = get_hub_resources(hub_root)
         assert len(resources["skill"]) == 8
         assert len(resources["agent"]) == 4
-        assert len(resources["rule"]) == 4
+        assert len(resources["rule"]) == 3
         assert len(resources["hook"]) == 3
 
     def test_skill_names_correct(self, hub_root):
@@ -292,7 +292,23 @@ class TestTierResource:
 
     def test_must_have_rule(self):
         assert tier_resource("context-management", "rule", []) == "must-have"
-        assert tier_resource("rule-writing-meta", "rule", []) == "must-have"
+
+    def test_hub_meta_rules_not_distributed(self):
+        """Hub-internal quality rules were removed from core/.claude/rules/ and registry.
+        They exist only at hub root .claude/rules/ for hub-internal use."""
+        from scripts.recommend import get_hub_resources
+        import tempfile, pathlib
+        # Verify none of the hub-meta rules would be discovered in a real hub scan
+        hub = pathlib.Path(tempfile.mkdtemp())
+        core_rules = hub / "core" / ".claude" / "rules"
+        core_rules.mkdir(parents=True)
+        for name in ["workflow", "context-management"]:
+            (core_rules / f"{name}.md").write_text(f"# {name}")
+        resources = get_hub_resources(hub)
+        found = {r["name"] for r in resources["rule"]}
+        for meta in ["pattern-structure", "pattern-portability",
+                      "pattern-self-containment", "rule-writing-meta"]:
+            assert meta not in found, f"{meta} should not be in distributable rules"
 
     def test_must_have_agent(self):
         assert tier_resource("security-auditor", "agent", []) == "must-have"

@@ -7,7 +7,7 @@ description: >
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis] [--only skills|rules|agents] [--tier must-have|improved|nice-to-have|all]"
-version: "3.0.0"
+version: "3.2.0"
 type: workflow
 ---
 
@@ -27,8 +27,8 @@ Provision hub patterns and generate project-specific `.claude/` patterns by read
 | `--repo owner/name` | Remote mode — fetch via GitHub API, create PR |
 | `--update` | Delta only — skip hub provision, synthesize only new/stale conventions |
 | `--dry-run` | Preview only, no writes |
-| `--skip-hub` | Skip Step 1 (no hub patterns, synthesis only — old behavior) |
-| `--skip-synthesis` | Skip Steps 2-8 (hub patterns only — equivalent to `recommend.py --provision`) |
+| `--skip-hub` | Skip Steps 1-2 (no hub patterns or CLAUDE.md audit, synthesis only — old behavior) |
+| `--skip-synthesis` | Skip Steps 3-8 (hub patterns + CLAUDE.md audit only — equivalent to `recommend.py --provision` plus section audit) |
 
 `--repo` can be combined with `--update`, `--dry-run`, `--skip-hub`, or `--skip-synthesis`.
 
@@ -114,7 +114,7 @@ PYTHONPATH=. python scripts/recommend.py --repo owner/name --provision --json
 - **must-have**: New patterns to add (merge confidently)
 - **improved**: Hub has newer versions of existing patterns (review diffs)
 - **nice-to-have**: Optional patterns (checkbox PR in remote mode)
-- **synthesized**: Placeholder for Step 7 (filled by this skill)
+- **synthesized**: Placeholder for Step 8 (filled by this skill)
 - **skip**: Patterns not relevant to this project
 
 Also capture:
@@ -124,15 +124,99 @@ Also capture:
 - settings.json status (created / merged / already existed)
 - Number of patterns skipped (already existed in project)
 
-Store these counts for the summary in Step 9.
+Store these counts for the summary in Step 10.
 
 **If recommend.py is not available** (e.g., this skill is running in a project that doesn't have the hub repo locally), skip this step gracefully and proceed to Step 2. Print a note: "Hub repo not found — skipping hub provisioning. Use --skip-hub to suppress this message."
 
-**If `--skip-synthesis` is set:** After this step, jump directly to Step 8 (generate synthesis-config.yml) and then Step 9 (summary). Skip Steps 2-7.
+**If `--skip-synthesis` is set:** After this step, proceed to Step 2 (Audit CLAUDE.md Sections), then jump directly to Step 9 (generate synthesis-config.yml) and Step 10 (summary). Skip Steps 3-8.
 
 ---
 
-## STEP 2: Map the Project
+## STEP 2: Audit CLAUDE.md Sections
+
+**Skip this step if:** `--skip-hub` is set (no hub template available), OR the project has no CLAUDE.md yet (Step 1 just created it from the template — it already has all sections).
+
+**Purpose:** When the hub template (`core/.claude/CLAUDE.md.template`) evolves with new sections (e.g., "Troubleshooting", "Patterns We DON'T Use"), existing projects that were provisioned earlier never learn about them. This step compares the template's section structure against the project's existing CLAUDE.md and reports gaps.
+
+### 2a. Read both files
+
+1. Read the hub template:
+   - **Local mode:** `Read core/.claude/CLAUDE.md.template`
+   - **Remote mode (running from hub repo):** The template is already local at `core/.claude/CLAUDE.md.template`
+
+2. Read the project's existing CLAUDE.md:
+   - **Local mode:** `Read $PROJECT_DIR/CLAUDE.md`
+   - **Remote mode:** `gh api repos/owner/name/contents/CLAUDE.md --jq '.content' | base64 -d`
+
+If either file doesn't exist, skip this step.
+
+### 2b. Extract and compare section headings
+
+Extract all `##` headings from both files. Ignore:
+- Content inside `<!-- hub:best-practices:start -->` ... `<!-- hub:best-practices:end -->` markers (hub-managed section is handled by `recommend.py`, not this audit)
+- Template variable lines (`{{...}}`) — these are placeholders, not real content
+- HTML comments (`<!-- TODO: ... -->`) — these are guidance for the user
+
+Compare the template's `##` headings against the project's `##` headings. Match by normalized heading text (lowercase, strip punctuation).
+
+### 2c. Report missing sections
+
+Print a section audit report:
+
+```
+CLAUDE.md Section Audit:
+
+Template sections present in project CLAUDE.md:
+  [check] Project Overview
+  [check] Architecture
+  [check] Development Commands
+  [check] Testing
+
+Template sections MISSING from project CLAUDE.md:
+  [missing] Troubleshooting — common issues & solutions table
+  [missing] Patterns We DON'T Use — explicitly list avoided patterns with alternatives
+  [missing] Environment Setup — local dev setup steps
+
+No action needed for [N] sections already present.
+```
+
+### 2d. Offer to append missing sections
+
+For each missing section, extract the corresponding section content from the template (including its TODO comments — these serve as guidance for the user to fill in).
+
+**If `--dry-run`:** Print what would be appended and stop.
+
+**If missing sections exist:** Ask the user:
+
+```
+[N] template sections are missing from your CLAUDE.md.
+Would you like to append them as TODO stubs? (y/n/select)
+  - y: append all missing sections before the hub-managed section
+  - n: skip (no changes to CLAUDE.md)
+  - select: choose which sections to add
+```
+
+**If user approves (y or select):**
+
+1. Read the project's CLAUDE.md
+2. Find the `<!-- hub:best-practices:start -->` marker (if present)
+3. Insert the missing sections BEFORE the marker (so they appear in the user-editable area, not inside the hub-managed section)
+4. If no marker exists, append the sections at the end of the file
+5. Write the updated CLAUDE.md
+
+**In remote mode (`--repo`):** Add the CLAUDE.md changes to the PR branch created in Step 7 (or the provision branch from Step 1). Do not create a separate PR for CLAUDE.md section updates.
+
+### 2e. Store audit results for summary
+
+Record for Step 10:
+- Number of template sections checked
+- Number already present
+- Number missing
+- Number appended (if user approved)
+
+---
+
+## STEP 3: Map the Project
 
 Gather project structure and configuration to understand what this project is and how it's built.
 
@@ -150,67 +234,37 @@ Gather project structure and configuration to understand what this project is an
 
 4. Find the test directory, then read one representative test file (pick the largest test file — it likely demonstrates the most conventions)
 
-**If `--update` mode:** Also read all existing `.claude/rules/*.md`, `.claude/skills/*/SKILL.md`, and `.claude/agents/*.md` to understand what patterns already exist.
+5. **Check for monolithic rules file** — look for `.claude/rules.md` (a single flat file containing all rules, as opposed to individual `.claude/rules/*.md` files). If found:
+
+   ```
+   ⚠ SSOT Warning: Found monolithic .claude/rules.md ([N] lines).
+
+   This project has a single rules.md file instead of (or in addition to)
+   individual rules/*.md files. Generating individual rule files will create
+   duplication and drift risk.
+
+   Options:
+     1. Split — decompose rules.md into individual rules/*.md files first, then synthesize
+     2. Skip rules — only synthesize skills and agents, leave rules.md as-is
+     3. Proceed anyway — generate individual files (will duplicate some content)
+   ```
+
+   **Wait for user choice** before proceeding. If the user chooses "split", help decompose the monolithic file into individual rule files before continuing. If "skip rules", set `--only skills,agents` for the remaining steps.
+
+**If `--update` mode:** Also read all existing `.claude/rules/*.md`, `.claude/skills/*/SKILL.md`, `.claude/agents/*.md`, and `CLAUDE.md` to understand what patterns and sections already exist.
 
 **Output of this step:** A mental model of the project's stack, structure, dependencies, and testing approach.
 
-## STEP 3: Identify Conventions (with Dedup Against Hub)
+## STEP 4: Identify Conventions (with Dedup Against Hub)
 
-Based on what you learned in Step 2, identify 10-20 candidate conventions worth encoding as patterns.
+Based on what you learned in Step 3, identify 10-20 candidate conventions worth encoding as patterns.
 
-### Rules — conventions worth encoding as always-on constraints
-
-A convention is worth a **rule** when:
-- It's a consistent pattern followed across multiple files
-- Breaking it would cause bugs, inconsistency, or confusion
-- A new developer (or AI) working on the project might not know about it
-- It's specific to THIS project, not a generic best practice
-
-### Skills — workflows worth encoding as on-demand procedures
-
-A convention is worth a **skill** when:
-- It's a multi-step procedure that developers repeat (e.g., "add a new DB model", "create a new feature module", "run and debug E2E tests")
-- The steps are project-specific — not just "run tests" but "run tests in this specific order with these specific fixtures and this specific setup"
-- Getting the steps wrong causes subtle bugs (e.g., forgetting one of 5 locations when adding a model)
-- It involves coordination across multiple files or modules
-
-### Agents — tasks worth delegating to a specialized subagent
-
-A convention is worth an **agent** when:
-- It's a review or analysis task that benefits from a dedicated persona (e.g., "review this meal generation output for dietary constraint violations")
-- It requires reading many files and producing a structured assessment
-- It's a recurring quality gate specific to this project's domain
-
-### NOT worth encoding (any type)
-
-- Already enforced by a linter, formatter, or type checker
-- A language/framework default documented in official docs
-- A one-off implementation detail in a single file
-- A generic best practice (e.g., "write tests", "use descriptive names")
-
-### Identification checklist
-
-For each candidate, note:
-1. **Name** — short descriptive name
-2. **Hypothesis** — what you believe the convention is
-3. **Evidence needed** — which specific source files to read to confirm (max 5 per convention)
-4. **Category** — `correctness` | `safety` | `consistency` | `testing` | `deployment`
-5. **Pattern type** — choose using this decision table:
-
-   | Signal | Type |
-   |--------|------|
-   | "Always do X when working on Y files" | **rule** |
-   | "When you need to do X, follow these N steps" | **skill** |
-   | "Review/analyze X and produce a structured report" | **agent** |
-   | Multi-step procedure across 3+ files | **skill** |
-   | A constraint that applies to every edit in scope | **rule** |
-   | A task that benefits from a dedicated persona/focus | **agent** |
-
-6. **Confidence** — `high` (seen in 5+ files) | `medium` (seen in 2-4 files) | `low` (seen in 1 file)
-
-**Aim for a mix of types.** A project with only rules is missing workflow automation. A project with only skills is missing guardrails. Target roughly: 40-60% rules, 30-50% skills, 0-20% agents.
-
-Drop any candidate with `low` confidence immediately. A missing pattern is better than a wrong one.
+**Read `references/convention-criteria.md`** for the full decision framework (rules vs skills vs agents, identification checklist, confidence thresholds). Key points:
+- **Rules** = consistent patterns across multiple files that new developers might miss
+- **Skills** = multi-step project-specific procedures across 3+ files
+- **Agents** = recurring review/analysis tasks with a domain focus
+- Drop `low` confidence candidates immediately
+- Target mix: 40-60% rules, 30-50% skills, 0-20% agents
 
 ### Present findings to user
 
@@ -237,19 +291,11 @@ Dropped ([N]):
 - [name]: generic best practice, not project-specific
 ```
 
-**Wait for user acknowledgment** before proceeding to Step 4. The user may want to add, remove, or reprioritize conventions.
+**Wait for user acknowledgment** before proceeding to Step 5. The user may want to add, remove, or reprioritize conventions.
 
 ### Dedup against hub patterns
 
-Before proceeding, compare each candidate convention against the hub patterns copied in Step 1 (if Step 1 ran). If a hub pattern already covers the convention (even generically), check whether the project-specific version adds genuine value beyond what the hub provides. Drop conventions where the hub pattern is sufficient.
-
-**Examples of "hub covers it":**
-- Hub has `android-arch` skill covering clean architecture → don't generate `module-dependency-direction` rule unless project has non-standard dependency rules
-- Hub has `testing.md` rule → don't generate test fixture rule unless project has unique fixture conventions
-
-**Examples of "project-specific adds value":**
-- Hub has generic `db-migrate` skill → project has 5-location model import rule (completely unique)
-- Hub has generic `tdd` skill → project has specific `BaseViewModel<T : BaseUiState>` pattern
+Compare each candidate against hub patterns from Step 1 and CLAUDE.md sections from Step 2. Drop conventions where the hub pattern is sufficient. Keep project-specific conventions that add genuine value. See `references/convention-criteria.md` for dedup examples.
 
 Print the dedup results:
 
@@ -265,7 +311,7 @@ Remaining after dedup: [N] conventions to investigate
 - New conventions not covered by existing patterns
 - Existing patterns that are now stale (code changed, pattern didn't)
 
-## STEP 4: Read Evidence and Confirm
+## STEP 5: Read Evidence and Confirm
 
 For each remaining candidate convention, read the source files listed in "evidence needed."
 
@@ -308,9 +354,9 @@ SENSITIVE ([N] — will ask before marking private):
 Proceeding to generate [N] patterns ([N] rules, [N] skills, [N] agents).
 ```
 
-**Wait for user acknowledgment** before proceeding to Step 5. This is the last checkpoint before pattern generation begins.
+**Wait for user acknowledgment** before proceeding to Step 6. This is the last checkpoint before pattern generation begins.
 
-## STEP 5: Load Reference Material
+## STEP 6: Load Reference Material
 
 Before generating patterns, load the format standards and examples that guide generation quality.
 
@@ -323,121 +369,22 @@ Before generating patterns, load the format standards and examples that guide ge
 
    If hub patterns were copied in Step 1, you can read examples from the project's own `.claude/` directory — they're now local.
 
-If the hub patterns are not available locally (project was not bootstrapped from the hub), skip this step and use the format requirements embedded in Step 6 below.
+If the hub patterns are not available locally (project was not bootstrapped from the hub), skip this step and use the format requirements embedded in Step 7 below.
 
-## STEP 6: Generate Patterns
+## STEP 7: Generate Patterns
 
 For each confirmed convention, generate a complete pattern file.
 
-### For rules (always-on constraints):
+**Read `references/pattern-templates.md`** for the full YAML templates (rule, skill, agent), quality checklists (structure, portability, self-containment, language), and sensitivity flagging keywords.
 
-```yaml
----
-description: >
-  [1-2 sentence description of what this rule enforces and why]
-globs: ["**/*.py", "**/*.ts"]  # Scope to relevant file types
-synthesized: true
-private: false  # Set to true if sensitive (auth, billing, secrets)
----
+Key requirements per type:
+- **Rules**: `globs:` in frontmatter, `synthesized: true`, MUST/MUST NOT language, provide alternatives
+- **Skills**: full frontmatter (`name`, `description`, `type`, `allowed-tools`, `argument-hint`, `version`), numbered steps, `## CRITICAL RULES` section
+- **Agents**: `tools` as JSON array, `model: inherit`, `## Core Responsibilities` and `## Output Format` sections
 
-# [Convention Name]
+All patterns MUST: have 30+ lines of content, be under 500 lines, use project-specific examples (not generic advice), and pass sensitivity scan for auth/secret/token keywords.
 
-[Body: what the convention is, why it matters, what to do and not do.
-Include concrete examples from the project's actual code patterns.
-Use MUST/MUST NOT for critical constraints.]
-```
-
-### For skills (on-demand workflows):
-
-```yaml
----
-name: [kebab-case-name]
-description: >
-  [1-3 sentences starting with a verb]
-type: workflow
-allowed-tools: "[minimal tool set]"
-argument-hint: "[required-arg] [--optional-flag]"
-version: "1.0.0"
-synthesized: true
-private: false
----
-
-# [Skill Title]
-
-## STEP 1: [Verb Phrase]
-[numbered instructions with concrete file paths and commands from THIS project]
-
-## STEP 2: [Verb Phrase]
-[numbered instructions]
-
-## CRITICAL RULES
-- [constraint 1]
-- [constraint 2]
-```
-
-Skills MUST encode project-specific multi-step procedures. Each step should reference actual file paths, commands, or patterns from the codebase. Generic workflow skills (e.g., "run tests") add no value — the skill must capture the project-specific gotchas, ordering, and coordination.
-
-### For agents (delegated review/analysis tasks):
-
-```yaml
----
-name: [agent-name]
-description: >
-  When and why to use this agent. [1-3 sentences]
-tools: ["Read", "Grep", "Glob"]  # JSON array, least-privilege
-model: inherit
-synthesized: true
-private: false
----
-
-# [Agent Title]
-
-## Core Responsibilities
-- [what this agent analyzes or reviews]
-- [what domain knowledge it applies]
-
-## Input
-[what to pass to this agent]
-
-## Output Format
-[structured output: checklist, report, verdict]
-
-## Decision Criteria
-[project-specific rules this agent applies]
-```
-
-Agents MUST have a clear domain focus specific to this project. A generic "code reviewer" agent adds no value — an agent that reviews meal generation output for dietary constraint violations does.
-
-### Quality checks for each generated pattern:
-
-**Structure (pattern-structure.md):**
-- Does `version` field exist and follow SemVer format (e.g., `"1.0.0"`)?
-- For skills: does it have `name`, `description`, `type`, `allowed-tools`, `argument-hint`, `version`?
-- For skills: does it have a `## CRITICAL RULES` section at the end?
-- For agents: does frontmatter include `tools` as a JSON array (e.g., `["Read", "Grep", "Glob"]`)?
-- For agents: does body include `## Core Responsibilities` and `## Output Format` sections?
-- For rules: does it have `globs:` in frontmatter OR `# Scope: global` in first 5 lines?
-
-**Portability (pattern-portability.md):**
-- Is it specific to THIS project (not generic advice)?
-- Are `allowed-tools` least-privilege (read-only skills don't include Write/Edit/Bash)?
-- Are project-specific file paths used as concrete examples (good) not as hardcoded assumptions (bad)?
-
-**Self-containment (pattern-self-containment.md):**
-- Does it contain at least 30 lines of actual content (not a stub)?
-- Is it under 500 lines? If 500-1000, consider splitting. Over 1000 = must split.
-- No placeholder markers (`<!-- TODO -->`, `<!-- FIXME -->`)?
-- If it references another skill by name, does that skill exist in the project's `.claude/`?
-
-**Language (rule-writing-meta.md):**
-- Does it use RFC 2119 language (MUST, MUST NOT, NEVER) for critical constraints?
-- For rules: does it provide alternatives, not just prohibitions?
-
-### Sensitivity flagging:
-
-Scan each generated pattern for keywords: `auth`, `secret`, `token`, `credential`, `billing`, `payment`, `session`, `encryption`, `API key`, `password`, `private key`. If found, **flag the pattern and ask the user** whether to mark it `private: true`. Do not auto-flag silently — the user may intend for auth-related patterns to be shareable.
-
-## STEP 7: Validate and Write
+## STEP 8: Validate and Write
 
 1. **If `--dry-run` mode:** Print each generated pattern with its target path and stop. Do not write any files.
 
@@ -508,7 +455,7 @@ Scan each generated pattern for keywords: `auth`, `secret`, `token`, `credential
    )"
    ```
 
-## STEP 8: Generate synthesis-config.yml
+## STEP 9: Generate synthesis-config.yml
 
 **Generate `synthesis-config.yml`** if it doesn't exist — create with sharing OFF:
 
@@ -541,93 +488,11 @@ scan_log: false
 
 **If `synthesis-config.yml` already exists:** Do not overwrite it. Respect existing consent settings.
 
-## STEP 9: Summary
+## STEP 10: Summary
 
-Print a summary showing both hub provisioning and synthesis results.
+**Read `references/summary-format.md`** for the full output format templates (sharing ON/OFF variants, conditional sections for `--skip-hub`, `--skip-synthesis`, `--update`, `--repo`).
 
-**Read `synthesis-config.yml`** to determine sharing status.
-
-**If sharing is OFF (default):**
-
-```
-Provision complete:
-
-Hub patterns:
-  Must-have:     [N] new patterns
-  Improved:      [N] hub upgrades to existing patterns
-  Nice-to-have:  [N] optional (checkbox PR created in remote mode)
-  Skipped:       [N]
-  CLAUDE.md:     created|updated|appended|skipped
-  settings.json: created|merged|skipped
-
-Synthesized patterns:
-  Rules generated:    [N]
-  Skills generated:   [N]
-  Agents generated:   [N]
-  Skipped (overlap):  [N] (covered by hub patterns)
-  Skipped (low conf): [N]
-
-All patterns are local — nothing has been shared.
-
-╭─ Synthesize Flywheel ──────────────────────────────────────────╮
-│                                                                 │
-│  Your patterns can improve over time via the hub, but it's a    │
-│  two-way exchange:                                              │
-│                                                                 │
-│  • Share ON  → hub can learn from your patterns, AND you        │
-│                receive new/improved patterns from the hub        │
-│  • Share OFF → fully standalone, no data leaves, no updates     │
-│                arrive (this is the default)                      │
-│                                                                 │
-│  To opt in:                                                     │
-│    Set allow_hub_sharing: true in .claude/synthesis-config.yml  │
-│                                                                 │
-╰─────────────────────────────────────────────────────────────────╯
-```
-
-**If sharing is ON:**
-
-```
-Provision complete:
-
-Hub patterns:
-  Must-have:     [N] new patterns
-  Improved:      [N] hub upgrades to existing patterns
-  Nice-to-have:  [N] optional (checkbox PR created in remote mode)
-  Skipped:       [N]
-  CLAUDE.md:     created|updated|appended|skipped
-  settings.json: created|merged|skipped
-
-Synthesized patterns:
-  Rules generated:    [N]
-  Skills generated:   [N]
-  Agents generated:   [N]
-  Skipped (overlap):  [N] (covered by hub patterns)
-  Skipped (low conf): [N]
-
-Hub sharing is ON — your patterns contribute to the hub, and you receive updates.
-```
-
-**If `--skip-hub` was set,** omit the "Hub patterns" section entirely.
-
-**If `--skip-synthesis` was set,** omit the "Synthesized patterns" section entirely.
-
-**If `--update` mode, also show:**
-
-```
-  Updated: [N] (stale patterns refreshed)
-  New:     [N] (new conventions detected)
-  Removed: [N] (conventions no longer present in codebase — files left for manual review)
-```
-
-**If `--repo` mode, also show:**
-
-```
-  PR created: https://github.com/owner/name/pull/[N]
-  Branch:     synthesize-project/[date]
-
-  The project owner should review the PR and merge patterns they agree with.
-```
+Print a summary showing hub provisioning, CLAUDE.md section audit, and synthesis results. Read `synthesis-config.yml` to determine sharing status and select the appropriate format variant.
 
 ---
 
@@ -642,3 +507,5 @@ Hub sharing is ON — your patterns contribute to the hub, and you receive updat
 - Mark patterns as `private: true` if they mention auth, secrets, tokens, credentials, billing, payment, or similar sensitive topics. When in doubt, mark private.
 - Each generated pattern MUST have at least 30 lines of actual content. No stubs.
 - When deduping against hub patterns in Step 3, err on the side of KEEPING the project-specific convention. Only drop it if the hub pattern genuinely covers the same ground. A project-specific pattern that adds even small value over the hub pattern is worth keeping.
+- STEP 2 (CLAUDE.md Section Audit) MUST insert missing sections BEFORE the `<!-- hub:best-practices:start -->` marker, never inside or after the hub-managed section. Never remove or reorganize the hub-managed markers — they are the boundary between user-editable and hub-managed content.
+- STEP 3 MUST check for a monolithic `.claude/rules.md` before generating individual `rules/*.md` files. Generating both creates SSOT violations and content drift. Always ask the user how to proceed.
