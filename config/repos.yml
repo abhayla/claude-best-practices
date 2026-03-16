@@ -13,3 +13,7 @@ repos:
     stacks: [android-compose, fastapi-python, ai-gemini, firebase-auth]
     auto_sync: true
     share_synthesized: true
+  - repo: abhayla/AlgoChanakya
+    stacks: [fastapi-python, ai-gemini, vue-nuxt]
+    auto_sync: true
+    share_synthesized: true
