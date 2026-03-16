@@ -7,7 +7,7 @@ description: >
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis]"
-version: "2.2.0"
+version: "2.3.0"
 type: workflow
 ---
 
@@ -186,6 +186,33 @@ For each candidate, note:
 
 Drop any candidate with `low` confidence immediately. A missing pattern is better than a wrong one.
 
+### Present findings to user
+
+Before proceeding, print the full candidate list as a table for the user to review:
+
+```
+Candidate Conventions ([N] identified):
+
+| # | Name | Type | Category | Confidence | Hypothesis |
+|---|------|------|----------|------------|------------|
+| 1 | ... | rule | correctness | high | ... |
+| 2 | ... | skill | consistency | medium | ... |
+| 3 | ... | agent | testing | medium | ... |
+
+Type mix: [N] rules, [N] skills, [N] agents
+```
+
+Then list which conventions were dropped and why:
+
+```
+Dropped ([N]):
+- [name]: low confidence (seen in 1 file only)
+- [name]: already enforced by [linter/formatter]
+- [name]: generic best practice, not project-specific
+```
+
+**Wait for user acknowledgment** before proceeding to Step 4. The user may want to add, remove, or reprioritize conventions.
+
 ### Dedup against hub patterns
 
 Before proceeding, compare each candidate convention against the hub patterns copied in Step 1 (if Step 1 ran). If a hub pattern already covers the convention (even generically), check whether the project-specific version adds genuine value beyond what the hub provides. Drop conventions where the hub pattern is sufficient.
@@ -198,7 +225,15 @@ Before proceeding, compare each candidate convention against the hub patterns co
 - Hub has generic `db-migrate` skill → project has 5-location model import rule (completely unique)
 - Hub has generic `tdd` skill → project has specific `BaseViewModel<T : BaseUiState>` pattern
 
-Track how many conventions were dropped due to hub overlap — report this in the summary.
+Print the dedup results:
+
+```
+Hub dedup: [N] conventions dropped (already covered by hub patterns):
+- [name]: covered by hub's [pattern-name] ([reason])
+- [name]: covered by hub's [pattern-name] ([reason])
+
+Remaining after dedup: [N] conventions to investigate
+```
 
 **If `--update` mode:** Compare candidates against existing patterns. Only keep:
 - New conventions not covered by existing patterns
@@ -217,6 +252,37 @@ For each remaining candidate convention, read the source files listed in "eviden
 4. Assess **sensitivity** — does the pattern reveal auth flows, secrets handling, billing logic, or internal architecture that the team might want private?
 
 Drop rejected conventions. Refine any that need it.
+
+### Present evidence results
+
+Print the confirmation report:
+
+```
+Evidence Review ([N] conventions investigated):
+
+CONFIRMED ([N]):
+| # | Name | Type | Evidence files read | Key finding |
+|---|------|------|--------------------:|-------------|
+| 1 | ... | rule | 5 | [1-line summary of what was confirmed] |
+| 2 | ... | skill | 3 | [1-line summary] |
+
+REFINED ([N]):
+| # | Name | Original hypothesis → Refined to |
+|---|------|-----------------------------------|
+| 1 | ... | [was X] → [now Y because Z] |
+
+REJECTED ([N]):
+| # | Name | Reason |
+|---|------|--------|
+| 1 | ... | [counter-evidence in N/M files] |
+
+SENSITIVE ([N] — will ask before marking private):
+- [name]: mentions [keyword], may contain [concern]
+
+Proceeding to generate [N] patterns ([N] rules, [N] skills, [N] agents).
+```
+
+**Wait for user acknowledgment** before proceeding to Step 5. This is the last checkpoint before pattern generation begins.
 
 ## STEP 5: Load Reference Material
 
