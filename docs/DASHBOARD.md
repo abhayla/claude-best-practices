@@ -1,15 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-16 11:52 UTC (auto-generated)
+> Last updated: 2026-03-16 19:07 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 183 |
-| Core (universal) | 178 |
+| Total Patterns | 179 |
+| Core (universal) | 174 |
 | Stack-specific | 5 |
 | Agents | 21 |
 | Hooks | 6 |
-| Rules | 19 |
+| Rules | 15 |
 | Skills | 137 |
 
 ## Pattern Inventory
@@ -122,9 +122,6 @@
 | nuxt-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | obsidian | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | parallel-worktree-orchestrator | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| pattern-portability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| pattern-self-containment | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| pattern-structure | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | perf-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | web-quality |
 | pg-query | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pipeline-orchestrator | skill | 2.0.0 | hub:abhayla/claude-best-practices | pipeline-orchestrator-agent |
@@ -151,7 +148,6 @@
 | remotion-video | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | request-code-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | review-gate | skill | 2.0.0 | hub:abhayla/claude-best-practices | code-quality-gate, architecture-fitness, security-audit, adversarial-review, change-risk-scoring, pr-standards |
-| rule-writing-meta | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | scan-discovery-report | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | scan-repo | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | scan-url | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
