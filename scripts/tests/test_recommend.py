@@ -11,7 +11,10 @@ from scripts.recommend import (
     apply_to_local,
     classify_divergence,
     deep_merge_settings,
+    detect_dependencies_from_dir,
+    detect_improved_patterns,
     detect_stacks_from_dir,
+    DEP_PATTERN_MAP,
     format_diff_report,
     format_divergence_table,
     format_report,
@@ -26,7 +29,10 @@ from scripts.recommend import (
     provision_claude_md,
     provision_settings_json,
     provision_to_local,
+    resolve_dep_patterns,
     tier_resource,
+    _copy_resources_for_tier,
+    _format_nice_to_have_pr_body,
     PROVISION_START_MARKER,
     PROVISION_END_MARKER,
     _compute_line_overlap,
@@ -278,8 +284,8 @@ class TestTierResource:
         assert tier_resource("branching", "skill", []) == "nice-to-have"
 
     def test_skip_always_skip_list(self):
-        assert tier_resource("d3-viz", "skill", []) == "skip"
         assert tier_resource("twitter-x", "skill", []) == "skip"
+        assert tier_resource("obsidian", "skill", []) == "skip"
 
     def test_skip_wrong_stack(self):
         assert tier_resource("fastapi-db-migrate", "skill", ["android-compose"]) == "skip"
@@ -295,11 +301,15 @@ class TestTierResource:
         """firebase-data-connect is stack-specific but overridden to nice-to-have."""
         assert tier_resource("firebase-data-connect", "skill", ["firebase-auth"]) == "nice-to-have"
 
-    def test_must_have_pg_query(self):
-        assert tier_resource("pg-query", "skill", []) == "must-have"
+    def test_pg_query_dep_promoted(self):
+        """pg-query is must-have when promoted by psycopg2 dep detection."""
+        assert tier_resource("pg-query", "skill", [], dep_promoted={"pg-query"}) == "must-have"
+        assert tier_resource("pg-query", "skill", []) == "nice-to-have"
 
-    def test_must_have_compose_ui(self):
-        assert tier_resource("compose-ui", "skill", []) == "must-have"
+    def test_compose_ui_dep_promoted(self):
+        """compose-ui is must-have when promoted by compose dep detection."""
+        assert tier_resource("compose-ui", "skill", [], dep_promoted={"compose-ui"}) == "must-have"
+        assert tier_resource("compose-ui", "skill", []) == "nice-to-have"
 
 
 # --- Gap Analysis ---
@@ -354,15 +364,28 @@ class TestAnalyzeGaps:
         # Project has 'api-tester', hub has 'fastapi-api-tester' — should match
         assert "fastapi-api-tester" not in all_names
 
-    def test_skips_d3_viz(self, hub_root, project_dir):
+    def test_d3_viz_nice_to_have_without_deps(self, hub_root, project_dir):
+        """d3-viz is nice-to-have without deps, must-have with d3 dep."""
         hub_resources = get_hub_resources(hub_root)
         project_names = get_project_resource_names(project_dir / ".claude")
         stacks = ["fastapi-python"]
 
         gaps = analyze_gaps(hub_resources, project_names, stacks)
 
-        skip_names = {g["name"] for g in gaps["skip"]}
-        assert "d3-viz" in skip_names
+        nice_names = {g["name"] for g in gaps["nice-to-have"]}
+        assert "d3-viz" in nice_names
+
+    def test_d3_viz_promoted_with_deps(self, hub_root, project_dir):
+        """d3-viz is promoted to must-have when d3 dep is detected."""
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project_dir / ".claude")
+        stacks = ["fastapi-python"]
+        deps = {"npm": ["d3"]}
+
+        gaps = analyze_gaps(hub_resources, project_names, stacks, deps=deps)
+
+        must_names = {g["name"] for g in gaps["must-have"]}
+        assert "d3-viz" in must_names
 
 
 # --- Report ---
@@ -1005,3 +1028,441 @@ class TestMainProvisionFlag:
         action_group.add_argument("--provision", action="store_true")
         with pytest.raises(SystemExit):
             parser.parse_args(["--local", "/tmp/test", "--apply", "--provision"])
+
+
+# --- Dependency Detection ---
+
+
+class TestDetectDependencies:
+    def test_parse_package_json(self, tmp_path):
+        (tmp_path / "package.json").write_text(json.dumps({
+            "dependencies": {"vue": "^3.4.0", "pinia": "^2.1.0"},
+            "devDependencies": {"vitest": "^1.0.0", "@playwright/test": "^1.40.0"},
+        }))
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "npm" in deps
+        assert "vue" in deps["npm"]
+        assert "pinia" in deps["npm"]
+        assert "vitest" in deps["npm"]
+        assert "@playwright/test" in deps["npm"]
+
+    def test_parse_requirements_txt(self, tmp_path):
+        (tmp_path / "requirements.txt").write_text(
+            "fastapi>=0.109.0\nuvicorn>=0.27.0\nsqlalchemy[asyncio]>=2.0\n# comment\n"
+        )
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "pip" in deps
+        assert "fastapi" in deps["pip"]
+        assert "uvicorn" in deps["pip"]
+        assert "sqlalchemy" in deps["pip"]
+
+    def test_parse_pyproject_toml(self, tmp_path):
+        (tmp_path / "pyproject.toml").write_text(
+            '[project]\ndependencies = [\n  "fastapi>=0.109",\n  "anthropic>=0.18",\n]\n'
+        )
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "pip" in deps
+        assert "fastapi" in deps["pip"]
+        assert "anthropic" in deps["pip"]
+
+    def test_nested_subdirectory(self, tmp_path):
+        frontend = tmp_path / "frontend"
+        frontend.mkdir()
+        (frontend / "package.json").write_text(json.dumps({
+            "dependencies": {"next": "14.0.0"},
+        }))
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "npm" in deps
+        assert "next" in deps["npm"]
+
+    def test_empty_project(self, tmp_path):
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert deps == {}
+
+    def test_parse_build_gradle(self, tmp_path):
+        (tmp_path / "build.gradle.kts").write_text(
+            'dependencies {\n'
+            '    implementation("androidx.compose:compose-runtime:1.5.0")\n'
+            '    testImplementation("junit:junit:4.13")\n'
+            '}\n'
+        )
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "gradle" in deps
+        assert "compose-runtime" in deps["gradle"]
+
+    def test_parse_pubspec_yaml(self, tmp_path):
+        (tmp_path / "pubspec.yaml").write_text(
+            "dependencies:\n  flutter:\n    sdk: flutter\n  dio: ^5.0.0\n"
+        )
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "pub" in deps
+        assert "flutter" in deps["pub"]
+        assert "dio" in deps["pub"]
+
+    def test_parse_go_mod(self, tmp_path):
+        (tmp_path / "go.mod").write_text(
+            "module example.com/myapp\n\ngo 1.21\n\n"
+            "require (\n\tgithub.com/gin-gonic/gin v1.9.1\n"
+            "\tgithub.com/go-redis/redis v6.15.9\n)\n"
+        )
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "go" in deps
+        assert "gin" in deps["go"]
+        assert "redis" in deps["go"]
+
+    def test_parse_gemfile(self, tmp_path):
+        (tmp_path / "Gemfile").write_text(
+            "source 'https://rubygems.org'\ngem 'rails'\ngem 'redis'\n"
+        )
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "gem" in deps
+        assert "rails" in deps["gem"]
+        assert "redis" in deps["gem"]
+
+    def test_parse_cargo_toml(self, tmp_path):
+        (tmp_path / "Cargo.toml").write_text(
+            "[dependencies]\ntokio = \"1.0\"\nserde = { version = \"1.0\", features = [\"derive\"] }\n"
+        )
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "cargo" in deps
+        assert "tokio" in deps["cargo"]
+        assert "serde" in deps["cargo"]
+
+    def test_multiple_ecosystems(self, tmp_path):
+        (tmp_path / "package.json").write_text(json.dumps({
+            "dependencies": {"vue": "^3.0.0"},
+        }))
+        (tmp_path / "requirements.txt").write_text("fastapi>=0.109.0\n")
+        deps = detect_dependencies_from_dir(tmp_path)
+        assert "npm" in deps
+        assert "pip" in deps
+        assert "vue" in deps["npm"]
+        assert "fastapi" in deps["pip"]
+
+
+class TestResolveDepPatterns:
+    def test_known_dep_resolves(self):
+        deps = {"npm": ["vue", "vitest"]}
+        promoted = resolve_dep_patterns(deps)
+        assert "vue-dev" in promoted
+        assert "vue-test" in promoted
+        assert "vitest-dev" in promoted
+
+    def test_unknown_dep_ignored(self):
+        deps = {"npm": ["unknown-package-xyz"]}
+        promoted = resolve_dep_patterns(deps)
+        assert len(promoted) == 0
+
+    def test_multiple_ecosystems(self):
+        deps = {"npm": ["vue"], "pip": ["fastapi"]}
+        promoted = resolve_dep_patterns(deps)
+        assert "vue-dev" in promoted
+        assert "fastapi-run-backend-tests" in promoted
+
+    def test_empty_deps(self):
+        assert resolve_dep_patterns({}) == set()
+
+    def test_redis_from_ioredis(self):
+        deps = {"npm": ["ioredis"]}
+        promoted = resolve_dep_patterns(deps)
+        assert "redis-patterns" in promoted
+
+
+class TestTierResourceWithDeps:
+    def test_dep_promotes_from_nice_to_have(self):
+        """vue-dev without deps is nice-to-have (universal), with deps is must-have."""
+        assert tier_resource("vue-dev", "skill", []) == "nice-to-have"
+        assert tier_resource("vue-dev", "skill", [], dep_promoted={"vue-dev"}) == "must-have"
+
+    def test_dep_promotes_from_skip(self):
+        """d3-viz is nice-to-have without deps, must-have when dep-promoted."""
+        assert tier_resource("d3-viz", "skill", []) == "nice-to-have"
+        assert tier_resource("d3-viz", "skill", [], dep_promoted={"d3-viz"}) == "must-have"
+
+    def test_no_deps_backward_compat(self):
+        """Without dep_promoted, behavior is same as before."""
+        assert tier_resource("tdd", "skill", []) == "must-have"
+        assert tier_resource("brainstorm", "skill", []) == "nice-to-have"
+        assert tier_resource("twitter-x", "skill", []) == "skip"
+
+    def test_dep_overrides_wrong_stack(self):
+        """Dep-promoted patterns bypass wrong-stack check."""
+        # fastapi-db-migrate without android-compose stack would normally skip
+        assert tier_resource("fastapi-db-migrate", "skill", ["android-compose"]) == "skip"
+        # But with dep promotion, it's must-have
+        assert tier_resource(
+            "fastapi-db-migrate", "skill", ["android-compose"],
+            dep_promoted={"fastapi-db-migrate"},
+        ) == "must-have"
+
+
+class TestAnalyzeGapsWithDeps:
+    def test_deps_override_always_skip(self, hub_root, project_dir):
+        """d3-viz is no longer skipped when d3 dep is detected."""
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project_dir / ".claude")
+        stacks = ["fastapi-python"]
+        deps = {"npm": ["d3"]}
+
+        gaps = analyze_gaps(hub_resources, project_names, stacks, deps=deps)
+
+        must_names = {g["name"] for g in gaps["must-have"]}
+        skip_names = {g["name"] for g in gaps["skip"]}
+        assert "d3-viz" in must_names
+        assert "d3-viz" not in skip_names
+
+    def test_backward_compat_without_deps(self, hub_root, project_dir):
+        """Without deps, behavior is same as before."""
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project_dir / ".claude")
+        stacks = ["fastapi-python"]
+
+        gaps = analyze_gaps(hub_resources, project_names, stacks)
+
+        must_names = {g["name"] for g in gaps["must-have"]}
+        assert "tdd" in must_names
+        assert "skill-master" in must_names
+
+    def test_gaps_has_improved_key(self, hub_root, project_dir):
+        """analyze_gaps returns 'improved' key in output."""
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project_dir / ".claude")
+        stacks = ["fastapi-python"]
+
+        gaps = analyze_gaps(hub_resources, project_names, stacks)
+        assert "improved" in gaps
+        assert isinstance(gaps["improved"], list)
+
+
+class TestDetectImprovedPatterns:
+    def test_identical_hash_skipped(self, tmp_path):
+        """Patterns with identical content are not flagged as improved."""
+        hub_root = tmp_path / "hub"
+        core = hub_root / "core" / ".claude"
+        skill_dir = core / "skills" / "fix-loop"
+        skill_dir.mkdir(parents=True)
+        content = "---\nname: fix-loop\nversion: '2.0.0'\n---\n# Fix Loop\n\nContent here.\n"
+        (skill_dir / "SKILL.md").write_text(content)
+
+        import hashlib
+        content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+        project_claude = tmp_path / "project" / ".claude"
+        proj_skill = project_claude / "skills" / "fix-loop"
+        proj_skill.mkdir(parents=True)
+        (proj_skill / "SKILL.md").write_text(content)
+
+        hub_resources = {"skill": [{"name": "fix-loop", "path": skill_dir / "SKILL.md"}]}
+        project_names = {"skill": {"fix-loop"}}
+        registry = {"fix-loop": {"hash": content_hash, "version": "2.0.0"}}
+
+        improved = detect_improved_patterns(
+            hub_root, project_claude, hub_resources, project_names, registry,
+        )
+        assert len(improved) == 0
+
+    def test_hub_newer_detected(self, tmp_path):
+        """Hub with newer version is flagged as improved."""
+        hub_root = tmp_path / "hub"
+        core = hub_root / "core" / ".claude"
+        skill_dir = core / "skills" / "fix-loop"
+        skill_dir.mkdir(parents=True)
+        hub_content = "---\nname: fix-loop\nversion: '3.0.0'\n---\n# Fix Loop v3\n\nNew content.\n"
+        (skill_dir / "SKILL.md").write_text(hub_content)
+
+        import hashlib
+        hub_hash = hashlib.sha256(hub_content.encode("utf-8")).hexdigest()
+
+        project_claude = tmp_path / "project" / ".claude"
+        proj_skill = project_claude / "skills" / "fix-loop"
+        proj_skill.mkdir(parents=True)
+        proj_content = "---\nname: fix-loop\nversion: '2.0.0'\n---\n# Fix Loop v2\n\nOld content.\n"
+        (proj_skill / "SKILL.md").write_text(proj_content)
+
+        hub_resources = {"skill": [{"name": "fix-loop", "path": skill_dir / "SKILL.md"}]}
+        project_names = {"skill": {"fix-loop"}}
+        registry = {"fix-loop": {"hash": hub_hash, "version": "3.0.0"}}
+
+        improved = detect_improved_patterns(
+            hub_root, project_claude, hub_resources, project_names, registry,
+        )
+        assert len(improved) == 1
+        assert improved[0]["name"] == "fix-loop"
+        assert "3.0.0" in improved[0]["reason"]
+
+    def test_project_customized_skipped(self, tmp_path):
+        """Project with >= hub version is not flagged."""
+        hub_root = tmp_path / "hub"
+        core = hub_root / "core" / ".claude"
+        skill_dir = core / "skills" / "fix-loop"
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "SKILL.md").write_text("---\nname: fix-loop\nversion: '2.0.0'\n---\n# v2\n")
+
+        project_claude = tmp_path / "project" / ".claude"
+        proj_skill = project_claude / "skills" / "fix-loop"
+        proj_skill.mkdir(parents=True)
+        proj_content = "---\nname: fix-loop\nversion: '3.0.0'\n---\n# v3 custom\n"
+        (proj_skill / "SKILL.md").write_text(proj_content)
+
+        hub_resources = {"skill": [{"name": "fix-loop", "path": skill_dir / "SKILL.md"}]}
+        project_names = {"skill": {"fix-loop"}}
+        registry = {"fix-loop": {"hash": "different", "version": "2.0.0"}}
+
+        improved = detect_improved_patterns(
+            hub_root, project_claude, hub_resources, project_names, registry,
+        )
+        assert len(improved) == 0
+
+    def test_no_version_flagged(self, tmp_path):
+        """Project pattern with no version is flagged when hub has a version."""
+        hub_root = tmp_path / "hub"
+        core = hub_root / "core" / ".claude"
+        skill_dir = core / "skills" / "fix-loop"
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "SKILL.md").write_text("---\nname: fix-loop\nversion: '2.0.0'\n---\n# v2\n")
+
+        project_claude = tmp_path / "project" / ".claude"
+        proj_skill = project_claude / "skills" / "fix-loop"
+        proj_skill.mkdir(parents=True)
+        (proj_skill / "SKILL.md").write_text("---\nname: fix-loop\n---\n# No version\n")
+
+        hub_resources = {"skill": [{"name": "fix-loop", "path": skill_dir / "SKILL.md"}]}
+        project_names = {"skill": {"fix-loop"}}
+        registry = {"fix-loop": {"hash": "different", "version": "2.0.0"}}
+
+        improved = detect_improved_patterns(
+            hub_root, project_claude, hub_resources, project_names, registry,
+        )
+        assert len(improved) == 1
+        assert "no version" in improved[0]["reason"]
+
+    def test_same_version_different_hash(self, tmp_path):
+        """Same version but different content is flagged for review."""
+        hub_root = tmp_path / "hub"
+        core = hub_root / "core" / ".claude"
+        skill_dir = core / "skills" / "fix-loop"
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "SKILL.md").write_text("---\nname: fix-loop\nversion: '2.0.0'\n---\n# Hub v2\n")
+
+        project_claude = tmp_path / "project" / ".claude"
+        proj_skill = project_claude / "skills" / "fix-loop"
+        proj_skill.mkdir(parents=True)
+        (proj_skill / "SKILL.md").write_text("---\nname: fix-loop\nversion: '2.0.0'\n---\n# Proj v2 customized\n")
+
+        hub_resources = {"skill": [{"name": "fix-loop", "path": skill_dir / "SKILL.md"}]}
+        project_names = {"skill": {"fix-loop"}}
+        registry = {"fix-loop": {"hash": "hub-hash-different", "version": "2.0.0"}}
+
+        improved = detect_improved_patterns(
+            hub_root, project_claude, hub_resources, project_names, registry,
+        )
+        assert len(improved) == 1
+        assert "same version" in improved[0]["reason"]
+
+
+# --- Multi-PR Helpers ---
+
+
+class TestCopyResourcesForTier:
+    def test_copies_skills(self, hub_root, tmp_path):
+        target = tmp_path / "target"
+        target.mkdir()
+        items = [{"name": "tdd", "type": "skill", "tier": "must-have"}]
+        copied = _copy_resources_for_tier(hub_root, target, items)
+        assert len(copied) == 1
+        assert "tdd" in copied[0]
+        assert (target / ".claude" / "skills" / "tdd" / "SKILL.md").exists()
+
+    def test_copies_agents(self, hub_root, tmp_path):
+        target = tmp_path / "target"
+        target.mkdir()
+        items = [{"name": "security-auditor", "type": "agent", "tier": "must-have"}]
+        copied = _copy_resources_for_tier(hub_root, target, items)
+        assert len(copied) == 1
+        assert "security-auditor" in copied[0]
+        assert (target / ".claude" / "agents" / "security-auditor.md").exists()
+
+    def test_copies_rules(self, hub_root, tmp_path):
+        target = tmp_path / "target"
+        target.mkdir()
+        items = [{"name": "workflow", "type": "rule", "tier": "nice-to-have"}]
+        copied = _copy_resources_for_tier(hub_root, target, items)
+        assert len(copied) == 1
+        assert (target / ".claude" / "rules" / "workflow.md").exists()
+
+    def test_copies_hooks(self, hub_root, tmp_path):
+        target = tmp_path / "target"
+        target.mkdir()
+        items = [{"name": "secret-scanner", "type": "hook", "tier": "must-have"}]
+        copied = _copy_resources_for_tier(hub_root, target, items)
+        assert len(copied) == 1
+        assert (target / ".claude" / "hooks" / "secret-scanner.sh").exists()
+
+    def test_empty_items_returns_empty(self, hub_root, tmp_path):
+        target = tmp_path / "target"
+        target.mkdir()
+        copied = _copy_resources_for_tier(hub_root, target, [])
+        assert copied == []
+
+    def test_multiple_types(self, hub_root, tmp_path):
+        target = tmp_path / "target"
+        target.mkdir()
+        items = [
+            {"name": "tdd", "type": "skill", "tier": "must-have"},
+            {"name": "workflow", "type": "rule", "tier": "must-have"},
+            {"name": "secret-scanner", "type": "hook", "tier": "must-have"},
+        ]
+        copied = _copy_resources_for_tier(hub_root, target, items)
+        assert len(copied) == 3
+
+    def test_nonexistent_resource_skipped(self, hub_root, tmp_path):
+        target = tmp_path / "target"
+        target.mkdir()
+        items = [{"name": "nonexistent-xyz", "type": "skill", "tier": "must-have"}]
+        copied = _copy_resources_for_tier(hub_root, target, items)
+        assert copied == []
+
+
+class TestFormatNiceToHavePrBody:
+    def test_contains_checkboxes(self):
+        items = [
+            {"name": "brainstorm", "type": "skill", "tier": "nice-to-have"},
+            {"name": "testing", "type": "rule", "tier": "nice-to-have"},
+        ]
+        body = _format_nice_to_have_pr_body(items)
+        assert "- [ ] `brainstorm`" in body
+        assert "- [ ] `testing`" in body
+
+    def test_groups_by_type(self):
+        items = [
+            {"name": "brainstorm", "type": "skill", "tier": "nice-to-have"},
+            {"name": "testing", "type": "rule", "tier": "nice-to-have"},
+            {"name": "docs-manager", "type": "agent", "tier": "nice-to-have"},
+        ]
+        body = _format_nice_to_have_pr_body(items)
+        assert "### Skills" in body
+        assert "### Rules" in body
+        assert "### Agents" in body
+
+    def test_empty_type_section_omitted(self):
+        items = [{"name": "brainstorm", "type": "skill", "tier": "nice-to-have"}]
+        body = _format_nice_to_have_pr_body(items)
+        assert "### Skills" in body
+        assert "### Rules" not in body
+        assert "### Agents" not in body
+
+    def test_has_instructions(self):
+        items = [{"name": "brainstorm", "type": "skill", "tier": "nice-to-have"}]
+        body = _format_nice_to_have_pr_body(items)
+        assert "/apply" in body
+        assert "Unchecked" in body
+
+    def test_sorted_within_type(self):
+        items = [
+            {"name": "z-skill", "type": "skill", "tier": "nice-to-have"},
+            {"name": "a-skill", "type": "skill", "tier": "nice-to-have"},
+        ]
+        body = _format_nice_to_have_pr_body(items)
+        a_pos = body.index("`a-skill`")
+        z_pos = body.index("`z-skill`")
+        assert a_pos < z_pos

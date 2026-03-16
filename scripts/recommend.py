@@ -26,7 +26,9 @@ Usage:
 """
 
 import argparse
+import base64
 import copy
+import hashlib
 import json
 import re
 import shutil
@@ -66,20 +68,342 @@ STACK_DETECTORS = [
     ("**/package.json", '"next"', "react-nextjs"),
 ]
 
+# --- Dependency Detection ---
+
+# Maps dependency names to hub pattern names that should be promoted to must-have
+DEP_PATTERN_MAP = {
+    # JS/TS
+    "tailwindcss": {"tailwind-dev"},
+    "@tailwindcss/postcss": {"tailwind-dev"},
+    "vitest": {"vitest-dev"},
+    "jest": {"jest-dev"},
+    "@playwright/test": {"playwright"},
+    "prisma": {"prisma-orm"},
+    "drizzle-orm": {"drizzle-orm"},
+    "next": {"nextjs-dev"},
+    "vue": {"vue-dev", "vue-test"},
+    "nuxt": {"nuxt-dev"},
+    "pinia": {"vue-dev"},
+    "react-native": {"react-native-dev", "react-native-e2e"},
+    "expo": {"expo-dev"},
+    "hono": {"hono-backend"},
+    "elysia": {"bun-elysia-test"},
+    "socket.io": {"websocket-patterns"},
+    "ws": {"websocket-patterns"},
+    "redis": {"redis-patterns"},
+    "ioredis": {"redis-patterns"},
+    "d3": {"d3-viz"},
+    "remotion": {"remotion-video"},
+    # Python
+    "fastapi": {"fastapi-run-backend-tests", "fastapi-deploy", "fastapi-db-migrate"},
+    "pytest": {"pytest-dev"},
+    "alembic": {"db-migrate", "db-migrate-verify"},
+    "sqlalchemy": {"schema-designer"},
+    "psycopg2-binary": {"pg-query"},
+    "psycopg2": {"pg-query"},
+    "asyncpg": {"pg-query"},
+    "anthropic": {"ai-gemini-api"},
+    "google-genai": {"ai-gemini-api"},
+    "websockets": {"websocket-patterns"},
+    # Android/Gradle
+    "compose": {"compose-ui"},
+    # Flutter
+    "flutter": {"flutter-dev", "flutter-e2e-test"},
+}
+
+# Subdirectory patterns to scan for dependency files (1-level deep)
+_DEP_SUBDIRS = [
+    "frontend", "backend", "server", "client", "app", "android", "ios", "web",
+]
+
+# Dependency file parsers: (filename, parser_function)
+# Each parser returns a list of dependency names.
+
+
+def _parse_package_json(content: str) -> list[str]:
+    """Extract dependency names from package.json."""
+    try:
+        data = json.loads(content)
+    except (json.JSONDecodeError, ValueError):
+        return []
+    deps = []
+    for key in ("dependencies", "devDependencies"):
+        section = data.get(key, {})
+        if isinstance(section, dict):
+            deps.extend(section.keys())
+    return deps
+
+
+def _parse_requirements_txt(content: str) -> list[str]:
+    """Extract dependency names from requirements.txt."""
+    deps = []
+    for line in content.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith("-"):
+            continue
+        # Strip version specifiers and extras
+        name = re.split(r"[>=<!~\[;@\s]", line)[0].strip()
+        if name:
+            deps.append(name.lower())
+    return deps
+
+
+def _parse_pyproject_toml(content: str) -> list[str]:
+    """Extract dependency names from pyproject.toml [project].dependencies."""
+    deps = []
+    # Try tomllib (Python 3.11+) first
+    try:
+        import tomllib
+        data = tomllib.loads(content)
+        for dep in data.get("project", {}).get("dependencies", []):
+            name = re.split(r"[>=<!~\[;@\s]", dep)[0].strip()
+            if name:
+                deps.append(name.lower())
+        return deps
+    except (ImportError, Exception):
+        pass
+    # Fallback: regex extraction
+    in_deps = False
+    for line in content.splitlines():
+        stripped = line.strip()
+        if stripped == "dependencies = [" or stripped.startswith("dependencies = ["):
+            in_deps = True
+            # Check inline list
+            if "]" in stripped:
+                # Single line list
+                items = re.findall(r'"([^"]+)"', stripped)
+                for item in items:
+                    name = re.split(r"[>=<!~\[;@\s]", item)[0].strip()
+                    if name:
+                        deps.append(name.lower())
+                in_deps = False
+            continue
+        if in_deps:
+            if stripped.startswith("]"):
+                in_deps = False
+                continue
+            items = re.findall(r'"([^"]+)"', stripped)
+            for item in items:
+                name = re.split(r"[>=<!~\[;@\s]", item)[0].strip()
+                if name:
+                    deps.append(name.lower())
+    return deps
+
+
+def _parse_build_gradle(content: str) -> list[str]:
+    """Extract dependency names from build.gradle or build.gradle.kts."""
+    deps = []
+    # Match: implementation("group:artifact:version") or implementation 'group:artifact:version'
+    # Also handles implementation("group:artifact:version") with parentheses
+    for match in re.finditer(r'(?:implementation|api|compileOnly|testImplementation)\s*\(\s*["\']([^"\']+)["\']', content):
+        parts = match.group(1).split(":")
+        if len(parts) >= 2:
+            deps.append(parts[1].lower())  # artifact name
+    return deps
+
+
+def _parse_pubspec_yaml(content: str) -> list[str]:
+    """Extract dependency names from pubspec.yaml."""
+    try:
+        data = yaml.safe_load(content)
+    except yaml.YAMLError:
+        return []
+    deps = []
+    for key in ("dependencies", "dev_dependencies"):
+        section = data.get(key, {}) if isinstance(data, dict) else {}
+        if isinstance(section, dict):
+            deps.extend(section.keys())
+    return deps
+
+
+def _parse_cargo_toml(content: str) -> list[str]:
+    """Extract dependency names from Cargo.toml."""
+    deps = []
+    in_deps = False
+    for line in content.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("[") and "dependencies" in stripped.lower():
+            in_deps = True
+            continue
+        if stripped.startswith("[") and "dependencies" not in stripped.lower():
+            in_deps = False
+            continue
+        if in_deps:
+            match = re.match(r'^(\S+)\s*=', stripped)
+            if match:
+                deps.append(match.group(1).lower())
+    return deps
+
+
+def _parse_go_mod(content: str) -> list[str]:
+    """Extract dependency names from go.mod."""
+    deps = []
+    in_require = False
+    for line in content.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("require ("):
+            in_require = True
+            continue
+        if in_require and stripped == ")":
+            in_require = False
+            continue
+        if in_require:
+            parts = stripped.split()
+            if parts:
+                # Extract last segment of module path as dep name
+                mod = parts[0]
+                deps.append(mod.split("/")[-1].lower())
+        elif stripped.startswith("require "):
+            parts = stripped.split()
+            if len(parts) >= 2:
+                deps.append(parts[1].split("/")[-1].lower())
+    return deps
+
+
+def _parse_gemfile(content: str) -> list[str]:
+    """Extract gem names from Gemfile."""
+    deps = []
+    for match in re.finditer(r"""gem\s+['"]([^'"]+)['"]""", content):
+        deps.append(match.group(1).lower())
+    return deps
+
+
+# Maps filename to parser function
+_DEP_FILE_PARSERS = {
+    "package.json": _parse_package_json,
+    "requirements.txt": _parse_requirements_txt,
+    "pyproject.toml": _parse_pyproject_toml,
+    "build.gradle.kts": _parse_build_gradle,
+    "build.gradle": _parse_build_gradle,
+    "pubspec.yaml": _parse_pubspec_yaml,
+    "Cargo.toml": _parse_cargo_toml,
+    "go.mod": _parse_go_mod,
+    "Gemfile": _parse_gemfile,
+}
+
+
+def detect_dependencies_from_dir(project_dir: Path) -> dict[str, list[str]]:
+    """Scan project root + 1-level-deep subdirectories for dependency files.
+
+    Returns dependency names grouped by ecosystem (e.g., {"npm": [...], "pip": [...]}).
+    """
+    ecosystem_map = {
+        "package.json": "npm",
+        "requirements.txt": "pip",
+        "pyproject.toml": "pip",
+        "build.gradle.kts": "gradle",
+        "build.gradle": "gradle",
+        "pubspec.yaml": "pub",
+        "Cargo.toml": "cargo",
+        "go.mod": "go",
+        "Gemfile": "gem",
+    }
+
+    deps: dict[str, list[str]] = {}
+    dirs_to_scan = [project_dir]
+    for subdir in _DEP_SUBDIRS:
+        subpath = project_dir / subdir
+        if subpath.is_dir():
+            dirs_to_scan.append(subpath)
+
+    for scan_dir in dirs_to_scan:
+        for filename, parser in _DEP_FILE_PARSERS.items():
+            filepath = scan_dir / filename
+            if not filepath.exists():
+                continue
+            try:
+                content = filepath.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            parsed = parser(content)
+            ecosystem = ecosystem_map.get(filename, "unknown")
+            deps.setdefault(ecosystem, [])
+            deps[ecosystem].extend(parsed)
+
+    # Deduplicate within each ecosystem
+    for eco in deps:
+        deps[eco] = sorted(set(deps[eco]))
+
+    return deps
+
+
+def detect_dependencies_from_repo(repo: str) -> dict[str, list[str]]:
+    """Detect dependencies from a remote GitHub repo via gh API.
+
+    Same logic as detect_dependencies_from_dir but fetches files via GitHub API.
+    """
+    ecosystem_map = {
+        "package.json": "npm",
+        "requirements.txt": "pip",
+        "pyproject.toml": "pip",
+        "build.gradle.kts": "gradle",
+        "build.gradle": "gradle",
+        "pubspec.yaml": "pub",
+        "Cargo.toml": "cargo",
+        "go.mod": "go",
+        "Gemfile": "gem",
+    }
+
+    deps: dict[str, list[str]] = {}
+    # Build list of paths to check: root + subdirs
+    paths_to_check = []
+    for filename in _DEP_FILE_PARSERS:
+        paths_to_check.append(filename)
+        for subdir in _DEP_SUBDIRS:
+            paths_to_check.append(f"{subdir}/{filename}")
+
+    for file_path in paths_to_check:
+        filename = file_path.split("/")[-1]
+        parser = _DEP_FILE_PARSERS.get(filename)
+        if not parser:
+            continue
+        try:
+            result = subprocess.run(
+                ["gh", "api", f"repos/{repo}/contents/{file_path}",
+                 "--jq", ".content"],
+                capture_output=True, text=True, timeout=15,
+            )
+            if result.returncode != 0:
+                continue
+            content = base64.b64decode(result.stdout.strip()).decode("utf-8", errors="ignore")
+        except Exception:
+            continue
+        parsed = parser(content)
+        ecosystem = ecosystem_map.get(filename, "unknown")
+        deps.setdefault(ecosystem, [])
+        deps[ecosystem].extend(parsed)
+
+    # Deduplicate within each ecosystem
+    for eco in deps:
+        deps[eco] = sorted(set(deps[eco]))
+
+    return deps
+
+
+def resolve_dep_patterns(deps: dict[str, list[str]]) -> set[str]:
+    """Flatten all dependency names across ecosystems and resolve to hub pattern names."""
+    all_dep_names = set()
+    for dep_list in deps.values():
+        all_dep_names.update(dep_list)
+
+    promoted = set()
+    for dep_name in all_dep_names:
+        patterns = DEP_PATTERN_MAP.get(dep_name, set())
+        promoted.update(patterns)
+    return promoted
+
+
 # Safety hooks that every project should have
 MUST_HAVE_HOOKS = {"dangerous-command-blocker", "secret-scanner"}
 
-# Universal skills that are high-value for any non-trivial project
-MUST_HAVE_UNIVERSAL_SKILLS = {
-    "skill-master",         # Routing — critical when skill count > 15
-    "systematic-debugging",  # Root cause analysis
-    "tdd",                  # Test-driven development
-    "pr-standards",         # PR quality gate
-    "request-code-review",  # Review-optimized PRs
-    "receive-code-review",  # Act on review feedback
-    "pg-query",             # PostgreSQL query assistant — must-have for any project using PostgreSQL
-    "compose-ui",           # Jetpack Compose UI — must-have for Compose projects
+# Core workflow skills that are high-value for any non-trivial project
+CORE_WORKFLOW_SKILLS = {
+    "implement", "fix-loop", "fix-issue", "tdd", "auto-verify",
+    "systematic-debugging", "continue", "handover", "skill-master",
+    "pr-standards", "request-code-review", "receive-code-review",
+    "code-quality-gate", "writing-plans", "executing-plans",
 }
+MUST_HAVE_UNIVERSAL_SKILLS = CORE_WORKFLOW_SKILLS  # backward compat alias
 
 # Universal skills that are nice-to-have
 NICE_TO_HAVE_UNIVERSAL_SKILLS = {
@@ -88,11 +412,8 @@ NICE_TO_HAVE_UNIVERSAL_SKILLS = {
     "branching",
     "git-worktrees",
     "brainstorm",
-    "writing-plans",
-    "executing-plans",
     "subagent-driven-dev",
     "batch",
-    "handover",
     "supply-chain-audit",
     "learn-n-improve",
 }
@@ -104,14 +425,12 @@ MUST_HAVE_RULES = {"context-management", "rule-writing-meta"}
 MUST_HAVE_AGENTS = {"security-auditor"}
 
 # Skills/resources to always skip (meta hub skills, wrong-domain)
+# NOTE: Framework skills like vue-dev, flutter-dev, etc. are NOT in this list —
+# they are "skip unless dep detected" via DEP_PATTERN_MAP.
 ALWAYS_SKIP = {
     "update-practices", "contribute-practice", "writing-skills",
-    "d3-viz", "obsidian", "solidity-audit", "playwright",
-    "remotion-video", "web-quality", "mcp-server-builder",
+    "obsidian", "solidity-audit", "mcp-server-builder",
     "twitter-x", "reddit", "github",
-    # Cross-platform frameworks — skip unless project actually uses them
-    "vue-dev", "nuxt-dev", "expo-dev", "flutter-dev", "flutter-e2e-test",
-    "react-native-dev",
 }
 
 # Stack-specific skills that should be downgraded to nice-to-have
@@ -359,11 +678,19 @@ def name_matches_existing(hub_name: str, project_names: set[str]) -> bool:
     return False
 
 
-def tier_resource(name: str, resource_type: str, stacks: list[str]) -> str:
+def tier_resource(name: str, resource_type: str, stacks: list[str], dep_promoted: set[str] | None = None) -> str:
     """Assign a tier to a missing resource: must-have, nice-to-have, or skip.
+
+    Args:
+        dep_promoted: Set of pattern names promoted by dependency detection.
+            If a pattern is in this set, it overrides ALWAYS_SKIP and wrong-stack.
 
     Returns one of: 'must-have', 'nice-to-have', 'skip'.
     """
+    # Dependency promotion overrides ALWAYS_SKIP and wrong-stack
+    if dep_promoted and name in dep_promoted:
+        return "must-have"
+
     # Always-skip list
     if name in ALWAYS_SKIP:
         return "skip"
@@ -416,13 +743,19 @@ def analyze_gaps(
     hub_resources: dict[str, list[dict]],
     project_names: dict[str, set[str]],
     stacks: list[str],
+    deps: dict[str, list[str]] | None = None,
 ) -> dict[str, list[dict]]:
     """Compare hub resources against project resources and tier the gaps.
 
-    Returns dict with keys 'must-have', 'nice-to-have', 'skip', each containing
-    a list of {'name': str, 'type': str, 'tier': str}.
+    Args:
+        deps: Dependency info from detect_dependencies_from_dir/repo.
+            Used to auto-promote patterns matching detected dependencies.
+
+    Returns dict with keys 'must-have', 'improved', 'nice-to-have', 'skip',
+    each containing a list of {'name': str, 'type': str, 'tier': str}.
     """
-    gaps = {"must-have": [], "nice-to-have": [], "skip": []}
+    dep_promoted = resolve_dep_patterns(deps) if deps else set()
+    gaps = {"must-have": [], "improved": [], "nice-to-have": [], "skip": []}
 
     for resource_type, resources in hub_resources.items():
         for resource in resources:
@@ -432,20 +765,130 @@ def analyze_gaps(
             if name_matches_existing(name, project_names.get(resource_type, set())):
                 continue
 
-            # Skip if it doesn't match the project's stacks
-            if not matches_stacks(name, stacks):
+            # Wrong-stack check — but dep-promoted patterns override this
+            if not matches_stacks(name, stacks) and not (dep_promoted and name in dep_promoted):
                 gaps["skip"].append({
                     "name": name, "type": resource_type, "tier": "skip",
                     "reason": "wrong stack",
                 })
                 continue
 
-            tier = tier_resource(name, resource_type, stacks)
+            tier = tier_resource(name, resource_type, stacks, dep_promoted)
             gaps[tier].append({
                 "name": name, "type": resource_type, "tier": tier,
             })
 
     return gaps
+
+
+# --- Improved Pattern Detection ---
+
+
+def _parse_frontmatter_version(content: str) -> str | None:
+    """Extract version from YAML frontmatter of a pattern file."""
+    if not content.startswith("---"):
+        return None
+    end = content.find("---", 3)
+    if end == -1:
+        return None
+    try:
+        meta = yaml.safe_load(content[3:end])
+        if isinstance(meta, dict):
+            return meta.get("version")
+    except yaml.YAMLError:
+        pass
+    return None
+
+
+def _version_gt(a: str | None, b: str | None) -> bool:
+    """Return True if version a > version b (simple semver comparison)."""
+    if not a or not b:
+        return False
+    try:
+        a_parts = [int(x) for x in a.split(".")]
+        b_parts = [int(x) for x in b.split(".")]
+        return a_parts > b_parts
+    except (ValueError, AttributeError):
+        return False
+
+
+def detect_improved_patterns(
+    hub_root: Path,
+    project_claude_dir: Path,
+    hub_resources: dict[str, list[dict]],
+    project_names: dict[str, set[str]],
+    registry: dict,
+) -> list[dict]:
+    """Detect patterns that exist in both hub and project but hub has a newer version.
+
+    For each overlapping pattern:
+    1. Compute project file hash (SHA256)
+    2. Get hub hash from registry
+    3. Compare versions to determine if hub has improvements
+
+    Returns list of {"name", "type", "hub_version", "project_version", "reason"}.
+    """
+    improved = []
+
+    for resource_type, resources in hub_resources.items():
+        for resource in resources:
+            hub_name = resource["name"]
+            proj_name = _find_matching_project_name(
+                hub_name, project_names.get(resource_type, set())
+            )
+            if proj_name is None:
+                continue
+
+            # Resolve project file path
+            proj_path = _resolve_project_path(project_claude_dir, proj_name, resource_type)
+            if not proj_path:
+                continue
+
+            # Compute project file hash
+            try:
+                proj_content = proj_path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            proj_hash = hashlib.sha256(proj_content.encode("utf-8")).hexdigest()
+
+            # Get hub hash from registry
+            reg_entry = registry.get(hub_name, {})
+            hub_hash = reg_entry.get("hash")
+
+            if hub_hash and proj_hash == hub_hash:
+                continue  # Identical — skip
+
+            # Parse versions
+            proj_version = _parse_frontmatter_version(proj_content)
+            hub_version = reg_entry.get("version")
+
+            if _version_gt(hub_version, proj_version):
+                improved.append({
+                    "name": hub_name,
+                    "type": resource_type,
+                    "hub_version": hub_version,
+                    "project_version": proj_version,
+                    "reason": f"hub v{hub_version} > project v{proj_version}",
+                })
+            elif proj_version is None and hub_version:
+                improved.append({
+                    "name": hub_name,
+                    "type": resource_type,
+                    "hub_version": hub_version,
+                    "project_version": None,
+                    "reason": "project has no version, hub has v" + hub_version,
+                })
+            elif hub_hash and proj_hash != hub_hash and proj_version == hub_version:
+                improved.append({
+                    "name": hub_name,
+                    "type": resource_type,
+                    "hub_version": hub_version,
+                    "project_version": proj_version,
+                    "reason": f"same version ({hub_version}) but different content",
+                })
+            # else: project version >= hub version — project customized intentionally
+
+    return improved
 
 
 # --- Report ---
@@ -480,6 +923,16 @@ def format_report(
             lines.append(f"  [{item['type']:6s}] {item['name']}")
         lines.append("")
 
+    # Improved
+    improved = gaps.get("improved", [])
+    if improved:
+        lines.append(f"--- IMPROVED ({len(improved)}) ---")
+        for item in sorted(improved, key=lambda x: (x["type"], x["name"])):
+            reason = item.get("reason", "")
+            suffix = f" ({reason})" if reason else ""
+            lines.append(f"  [{item['type']:6s}] {item['name']}{suffix}")
+        lines.append("")
+
     # Nice-to-have
     nice = gaps["nice-to-have"]
     if nice:
@@ -500,7 +953,10 @@ def format_report(
 
     # Totals
     lines.append("=" * 60)
-    lines.append(f"TOTAL: {len(must)} must-have, {len(nice)} nice-to-have, {len(skip)} skip")
+    lines.append(
+        f"TOTAL: {len(must)} must-have, {len(improved)} improved, "
+        f"{len(nice)} nice-to-have, {len(skip)} skip"
+    )
     lines.append("=" * 60)
 
     return "\n".join(lines)
@@ -1295,6 +1751,310 @@ def provision_to_local(
     }
 
 
+def _copy_resources_for_tier(
+    hub_root: Path,
+    target_dir: Path,
+    items: list[dict],
+) -> list[str]:
+    """Copy specific hub resources to a target directory. Returns list of copied file paths."""
+    copied = []
+    claude_src = hub_root / "core" / ".claude"
+
+    for item in items:
+        name = item["name"]
+        rtype = item["type"]
+
+        if rtype == "skill":
+            src = claude_src / "skills" / name
+            dst = target_dir / ".claude" / "skills" / name
+            if src.is_dir():
+                dst.mkdir(parents=True, exist_ok=True)
+                for f in src.rglob("*"):
+                    if f.is_file():
+                        rel = f.relative_to(src)
+                        dest_file = dst / rel
+                        dest_file.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(f, dest_file)
+                        copied.append(str(Path(".claude/skills") / name / rel))
+        elif rtype == "agent":
+            src = claude_src / "agents" / f"{name}.md"
+            dst = target_dir / ".claude" / "agents" / f"{name}.md"
+            if src.exists():
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+                copied.append(f".claude/agents/{name}.md")
+        elif rtype == "rule":
+            src = claude_src / "rules" / f"{name}.md"
+            dst = target_dir / ".claude" / "rules" / f"{name}.md"
+            if src.exists():
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+                copied.append(f".claude/rules/{name}.md")
+        elif rtype == "hook":
+            src = claude_src / "hooks" / f"{name}.sh"
+            dst = target_dir / ".claude" / "hooks" / f"{name}.sh"
+            if src.exists():
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+                copied.append(f".claude/hooks/{name}.sh")
+
+    return copied
+
+
+def _format_nice_to_have_pr_body(items: list[dict]) -> str:
+    """Format a PR body with checkboxes for nice-to-have patterns."""
+    lines = [
+        "## Optional Patterns\n",
+        "Check the patterns you want, then comment `/apply` to finalize.",
+        "Unchecked patterns will be removed from this PR.\n",
+    ]
+
+    # Group by type
+    by_type: dict[str, list[dict]] = {}
+    for item in items:
+        by_type.setdefault(item["type"], []).append(item)
+
+    type_headers = {"skill": "Skills", "rule": "Rules", "agent": "Agents", "hook": "Hooks"}
+    for rtype in ("skill", "rule", "agent", "hook"):
+        type_items = by_type.get(rtype, [])
+        if not type_items:
+            continue
+        lines.append(f"### {type_headers.get(rtype, rtype.title())}")
+        for item in sorted(type_items, key=lambda x: x["name"]):
+            lines.append(f"- [ ] `{item['name']}`")
+        lines.append("")
+
+    lines.append("---")
+    lines.append(
+        "Generated by [claude-best-practices]"
+        "(https://github.com/abhayla/claude-best-practices) hub."
+    )
+    return "\n".join(lines)
+
+
+def _create_tier_branch_and_pr(
+    tmpdir: str,
+    repo: str,
+    branch: str,
+    default_branch: str,
+    hub_root: Path,
+    items: list[dict],
+    title: str,
+    body: str,
+) -> Optional[str]:
+    """Create a branch, copy resources, commit, push, and create PR.
+
+    Returns PR URL if successful, None otherwise.
+    """
+    # Create branch from default
+    subprocess.run(
+        ["git", "-C", tmpdir, "checkout", default_branch],
+        capture_output=True, text=True, check=True,
+    )
+    subprocess.run(
+        ["git", "-C", tmpdir, "checkout", "-b", branch],
+        capture_output=True, text=True, check=True,
+    )
+
+    # Copy resources
+    copied = _copy_resources_for_tier(hub_root, Path(tmpdir), items)
+    if not copied:
+        return None
+
+    # Stage
+    subprocess.run(
+        ["git", "-C", tmpdir, "add", ".claude/"],
+        capture_output=True, text=True,
+    )
+
+    # Check if anything staged
+    status = subprocess.run(
+        ["git", "-C", tmpdir, "diff", "--cached", "--quiet"],
+        capture_output=True, text=True,
+    )
+    if status.returncode == 0:
+        return None  # Nothing to commit
+
+    # Commit
+    commit_msg = f"feat: {title}\n\nFiles:\n" + "\n".join(f"  - {f}" for f in copied[:20])
+    if len(copied) > 20:
+        commit_msg += f"\n  ... and {len(copied) - 20} more"
+    subprocess.run(
+        ["git", "-C", tmpdir, "commit", "-m", commit_msg],
+        capture_output=True, text=True, check=True,
+    )
+
+    # Push
+    push_result = subprocess.run(
+        ["git", "-C", tmpdir, "push", "-u", "origin", branch],
+        capture_output=True, text=True,
+    )
+    if push_result.returncode != 0:
+        print(f"Push failed for {branch}: {push_result.stderr}")
+        return None
+
+    # Create PR
+    pr_result = subprocess.run(
+        ["gh", "pr", "create",
+         "--repo", repo,
+         "--head", branch,
+         "--title", title,
+         "--body", body],
+        capture_output=True, text=True, timeout=30,
+    )
+    if pr_result.returncode == 0:
+        return pr_result.stdout.strip()
+    else:
+        print(f"PR creation failed for {branch}: {pr_result.stderr}")
+        return None
+
+
+def provision_to_repo_multi_pr(
+    hub_root: Path,
+    repo: str,
+    gaps: dict[str, list[dict]],
+    stacks: list[str],
+    hub_resources: dict[str, list[dict]],
+    project_names: dict[str, set[str]],
+) -> dict[str, Optional[str]]:
+    """Clone a repo and create up to 3 PRs for different tiers.
+
+    Creates:
+    - claude-provision/must-have: New must-have patterns (merge confidently)
+    - claude-provision/improved: Hub upgrades to existing patterns (review diffs)
+    - claude-provision/nice-to-have: Optional patterns with checkboxes
+
+    Returns dict mapping tier name to PR URL (or None if tier was empty/skipped).
+    """
+    from scripts.sync_to_projects import check_existing_pr
+
+    result = {"must-have": None, "improved": None, "nice-to-have": None}
+
+    # Check for existing PRs on any of the branches
+    branches = {
+        "must-have": "claude-provision/must-have",
+        "improved": "claude-provision/improved",
+        "nice-to-have": "claude-provision/nice-to-have",
+    }
+    for tier_name, branch in branches.items():
+        if check_existing_pr(repo, branch):
+            print(f"PR already exists for '{branch}' on {repo}. Skipping {tier_name}.")
+            # Still allow other tiers to proceed
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Clone once
+        try:
+            subprocess.run(
+                ["git", "clone", f"https://github.com/{repo}.git", tmpdir],
+                capture_output=True, text=True, check=True, timeout=120,
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            print(f"Failed to clone {repo}: {e}")
+            return result
+
+        # Detect default branch
+        db_result = subprocess.run(
+            ["git", "-C", tmpdir, "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True, text=True,
+        )
+        default_branch = db_result.stdout.strip() or "main"
+
+        # Also provision CLAUDE.md + settings.json on the must-have branch
+        must_have_items = gaps.get("must-have", [])
+        improved_items = gaps.get("improved", [])
+        nice_items = gaps.get("nice-to-have", [])
+
+        # --- Must-have PR ---
+        if must_have_items and not check_existing_pr(repo, branches["must-have"]):
+            must_count = len(must_have_items)
+            must_body = (
+                "## Must-Have Patterns\n\n"
+                f"**{must_count}** essential patterns for this project.\n"
+                "These are safe to merge — they add new files only.\n\n"
+                "Auto-provisioned from [claude-best-practices]"
+                "(https://github.com/abhayla/claude-best-practices) hub.\n\n"
+                "## Patterns\n\n"
+                + "\n".join(
+                    f"- `{i['name']}` ({i['type']})"
+                    for i in sorted(must_have_items, key=lambda x: x["name"])
+                )
+            )
+            pr_url = _create_tier_branch_and_pr(
+                tmpdir, repo, branches["must-have"], default_branch,
+                hub_root, must_have_items,
+                f"feat: add {must_count} must-have Claude patterns",
+                must_body,
+            )
+            result["must-have"] = pr_url
+            if pr_url:
+                # Also provision CLAUDE.md and settings.json on this branch
+                project_names_updated = get_project_resource_names(Path(tmpdir) / ".claude")
+                rules_present = sorted(project_names_updated.get("rule", set()))
+                provision_claude_md(hub_root, Path(tmpdir), stacks, rules_present)
+                provision_settings_json(hub_root, Path(tmpdir))
+                # Amend to include config files
+                add_paths = []
+                if (Path(tmpdir) / "CLAUDE.md").exists():
+                    add_paths.append("CLAUDE.md")
+                if (Path(tmpdir) / ".claude" / "settings.json").exists():
+                    add_paths.append(".claude/settings.json")
+                if add_paths:
+                    subprocess.run(
+                        ["git", "-C", tmpdir, "add"] + add_paths,
+                        capture_output=True, text=True,
+                    )
+                    status = subprocess.run(
+                        ["git", "-C", tmpdir, "diff", "--cached", "--quiet"],
+                        capture_output=True, text=True,
+                    )
+                    if status.returncode != 0:
+                        subprocess.run(
+                            ["git", "-C", tmpdir, "commit", "-m",
+                             "feat: provision CLAUDE.md and settings.json"],
+                            capture_output=True, text=True,
+                        )
+                        subprocess.run(
+                            ["git", "-C", tmpdir, "push"],
+                            capture_output=True, text=True,
+                        )
+
+        # --- Improved PR ---
+        if improved_items and not check_existing_pr(repo, branches["improved"]):
+            imp_count = len(improved_items)
+            imp_body = (
+                "## Improved Patterns\n\n"
+                f"**{imp_count}** patterns where the hub has newer versions.\n"
+                "Review the diffs carefully — these overwrite existing files.\n\n"
+                "Auto-provisioned from [claude-best-practices]"
+                "(https://github.com/abhayla/claude-best-practices) hub.\n\n"
+                "## Patterns\n\n"
+                + "\n".join(
+                    f"- `{i['name']}` ({i['type']}) — {i.get('reason', '')}"
+                    for i in sorted(improved_items, key=lambda x: x["name"])
+                )
+            )
+            pr_url = _create_tier_branch_and_pr(
+                tmpdir, repo, branches["improved"], default_branch,
+                hub_root, improved_items,
+                f"feat: upgrade {imp_count} Claude patterns to latest hub versions",
+                imp_body,
+            )
+            result["improved"] = pr_url
+
+        # --- Nice-to-have PR ---
+        if nice_items and not check_existing_pr(repo, branches["nice-to-have"]):
+            nice_body = _format_nice_to_have_pr_body(nice_items)
+            pr_url = _create_tier_branch_and_pr(
+                tmpdir, repo, branches["nice-to-have"], default_branch,
+                hub_root, nice_items,
+                f"feat: {len(nice_items)} optional Claude patterns (check to keep)",
+                nice_body,
+            )
+            result["nice-to-have"] = pr_url
+
+    return result
+
+
 def provision_to_repo(
     hub_root: Path,
     repo: str,
@@ -1453,6 +2213,11 @@ def main():
                         help="Compare content of overlapping resources to detect divergence")
     parser.add_argument("--json", action="store_true", dest="json_output",
                         help="Output results as JSON")
+    parser.add_argument("--multi-pr", action="store_true", dest="multi_pr",
+                        default=True,
+                        help="Create separate PRs per tier (default for --provision)")
+    parser.add_argument("--single-pr", action="store_false", dest="multi_pr",
+                        help="Create a single PR for all tiers (legacy behavior)")
 
     args = parser.parse_args()
     hub_root = Path(__file__).parent.parent
@@ -1474,6 +2239,15 @@ def main():
             stacks = detect_stacks_from_repo(args.repo)
         print(f"Auto-detected stacks: {', '.join(stacks) if stacks else 'none'}")
 
+    # Step 1b: Detect dependencies
+    if args.local:
+        deps = detect_dependencies_from_dir(Path(args.local))
+    else:
+        deps = detect_dependencies_from_repo(args.repo)
+    dep_promoted = resolve_dep_patterns(deps)
+    if dep_promoted:
+        print(f"Dependency-promoted patterns: {', '.join(sorted(dep_promoted))}")
+
     # Step 2: Get project resources
     if args.local:
         project_names = get_project_resource_names(Path(args.local) / ".claude")
@@ -1486,8 +2260,26 @@ def main():
     # Step 3: Get hub resources
     hub_resources = get_hub_resources(hub_root)
 
-    # Step 4: Analyze gaps
-    gaps = analyze_gaps(hub_resources, project_names, stacks)
+    # Step 4: Analyze gaps (with dependency-aware tiering)
+    gaps = analyze_gaps(hub_resources, project_names, stacks, deps)
+
+    # Step 4b: Detect improved patterns (hub has newer versions of existing patterns)
+    registry_path = hub_root / "registry" / "patterns.json"
+    if registry_path.exists():
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        project_claude_dir = (
+            Path(args.local) / ".claude" if args.local
+            else None  # Remote mode handled separately
+        )
+        if project_claude_dir and project_claude_dir.exists():
+            improved = detect_improved_patterns(
+                hub_root, project_claude_dir, hub_resources, project_names, registry,
+            )
+            gaps["improved"] = [
+                {"name": i["name"], "type": i["type"], "tier": "improved",
+                 "reason": i["reason"]}
+                for i in improved
+            ]
 
     # Step 5: Output
     if args.json_output:
@@ -1521,6 +2313,17 @@ def main():
             print(f"CLAUDE.md: {summary['claude_md']}")
             print(f"CLAUDE.local.md: {summary['claude_local_md']}")
             print(f"settings.json: {summary['settings_json']}")
+        elif getattr(args, "multi_pr", True):
+            # Multi-PR mode: create separate PRs per tier
+            pr_urls = provision_to_repo_multi_pr(
+                hub_root, args.repo, gaps, stacks,
+                hub_resources, project_names,
+            )
+            for tier_name, url in pr_urls.items():
+                if url:
+                    print(f"  {tier_name} PR: {url}")
+            if not any(pr_urls.values()):
+                print("No PRs created — project is already up to date.")
         else:
             pr_url = provision_to_repo(
                 hub_root, args.repo, gaps, stacks,

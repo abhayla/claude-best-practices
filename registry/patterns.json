@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-15",
-    "total_patterns": 182
+    "total_patterns": 183
   },
   "a11y-audit": {
     "hash": "6b3a5bc0f276397c8a86837dd779a91454f8c0961a6b31f73fa1ff63dc7149ce",
@@ -358,6 +358,25 @@
       "documentation"
     ],
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-framework OpenAPI generation, validation, CI integration"
+  },
+  "apply-selections": {
+    "hash": "f3092ae30bb570de73ebaf512994fe0cf132d02222d4703de1a3178475ee352a",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-16",
+    "last_updated": "2026-03-16",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Apply user-selected patterns from a nice-to-have PR by parsing checkbox state and removing unchecked files from the branch",
+    "tags": [
+      "provisioning",
+      "PR",
+      "checkbox",
+      "pattern-selection"
+    ],
+    "changelog": "v1.0.0: Initial release \u2014 checkbox parsing, file removal via GitHub API"
   },
   "architecture-fitness": {
     "hash": "26ff3f9a6a693d5c8a4d0612156b5f8443e35c186422c210d13b75ff10ec40b4",

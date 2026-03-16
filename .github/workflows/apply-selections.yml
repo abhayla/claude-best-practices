@@ -1,0 +1,122 @@
+name: Apply PR Selections
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  apply:
+    # Only run on PR comments containing /apply
+    if: >
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/apply')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Get PR details
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.issue.number }}
+          PR_DATA=$(gh api repos/${{ github.repository }}/pulls/$PR_NUMBER)
+          BRANCH=$(echo "$PR_DATA" | jq -r '.head.ref')
+          BODY=$(echo "$PR_DATA" | jq -r '.body')
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+          # Only proceed if this is a nice-to-have PR (has checkboxes)
+          if ! echo "$BODY" | grep -q '^\- \['; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Not a checkbox PR — skipping."
+            exit 0
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Checkout PR branch
+        if: steps.pr.outputs.skip == 'false'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.branch }}
+          fetch-depth: 0
+
+      - name: Parse and apply selections
+        if: steps.pr.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ steps.pr.outputs.pr_number }}
+          BODY=$(gh api repos/${{ github.repository }}/pulls/$PR_NUMBER --jq '.body')
+
+          # Extract unchecked patterns (- [ ] `name`)
+          UNCHECKED=$(echo "$BODY" | grep '^\- \[ \] ' | sed 's/.*`\([^`]*\)`.*/\1/')
+
+          if [ -z "$UNCHECKED" ]; then
+            echo "All patterns are checked — nothing to remove."
+            exit 0
+          fi
+
+          # Track current section type for path resolution
+          SECTION=""
+          REMOVED=0
+
+          while IFS= read -r line; do
+            case "$line" in
+              "### Skills") SECTION="skill" ;;
+              "### Rules")  SECTION="rule" ;;
+              "### Agents") SECTION="agent" ;;
+              "### Hooks")  SECTION="hook" ;;
+            esac
+          done <<< "$BODY"
+
+          # Remove unchecked patterns
+          for NAME in $UNCHECKED; do
+            # Determine file path based on type
+            # Check each possible location
+            if [ -d ".claude/skills/$NAME" ]; then
+              echo "Removing skill: $NAME"
+              git rm -rf ".claude/skills/$NAME" 2>/dev/null || true
+              REMOVED=$((REMOVED + 1))
+            elif [ -f ".claude/rules/$NAME.md" ]; then
+              echo "Removing rule: $NAME"
+              git rm ".claude/rules/$NAME.md" 2>/dev/null || true
+              REMOVED=$((REMOVED + 1))
+            elif [ -f ".claude/agents/$NAME.md" ]; then
+              echo "Removing agent: $NAME"
+              git rm ".claude/agents/$NAME.md" 2>/dev/null || true
+              REMOVED=$((REMOVED + 1))
+            elif [ -f ".claude/hooks/$NAME.sh" ]; then
+              echo "Removing hook: $NAME"
+              git rm ".claude/hooks/$NAME.sh" 2>/dev/null || true
+              REMOVED=$((REMOVED + 1))
+            else
+              echo "Pattern not found on branch: $NAME (skipping)"
+            fi
+          done
+
+          if [ "$REMOVED" -eq 0 ]; then
+            echo "No files to remove."
+            exit 0
+          fi
+
+          # Count kept patterns
+          CHECKED=$(echo "$BODY" | grep '^\- \[x\] ' | wc -l)
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: remove $REMOVED unselected patterns (kept $CHECKED)"
+          git push
+
+          echo "Removed $REMOVED unchecked patterns, kept $CHECKED."
+
+      - name: Update PR body
+        if: steps.pr.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ steps.pr.outputs.pr_number }}
+          gh pr comment $PR_NUMBER --repo ${{ github.repository }} \
+            --body "Applied selections. Unchecked patterns have been removed from this branch. Ready to merge."

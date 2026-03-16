@@ -444,6 +444,19 @@ class TestTieringListsReferenceRealResources:
             f"NICE_TO_HAVE_STACK_OVERRIDES references non-existent skills: {missing}"
         )
 
+    def test_dep_pattern_map_values_exist_in_registry(self):
+        """Every pattern name in DEP_PATTERN_MAP must exist in the registry."""
+        from scripts.recommend import DEP_PATTERN_MAP
+        reg = _load_registry()
+        all_pattern_names = set()
+        for patterns in DEP_PATTERN_MAP.values():
+            all_pattern_names.update(patterns)
+        reg_names = {k for k in reg if k != "_meta"}
+        missing = all_pattern_names - reg_names
+        assert missing == set(), (
+            f"DEP_PATTERN_MAP references patterns not in registry: {missing}"
+        )
+
     def test_no_overlap_between_must_have_and_skip(self):
         from scripts.recommend import (
             MUST_HAVE_UNIVERSAL_SKILLS, ALWAYS_SKIP, MUST_HAVE_HOOKS,

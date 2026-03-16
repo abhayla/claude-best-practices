@@ -6,8 +6,8 @@ description: >
   NEVER writes to core/.claude/ — that is the hub template. If running from the hub repo, --repo or --local is REQUIRED.
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
 allowed-tools: "Bash Read Grep Glob Write Edit"
-argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis]"
-version: "2.4.0"
+argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis] [--only skills|rules|agents] [--tier must-have|improved|nice-to-have|all]"
+version: "3.0.0"
 type: workflow
 ---
 
@@ -93,13 +93,13 @@ If `--repo owner/name` is provided, set up remote file access. Otherwise, use lo
 
 If `--dry-run`: Print "Would run: recommend.py --provision for [project]" and skip to Step 2. Do NOT execute recommend.py.
 
-Run `recommend.py --provision` to copy matching hub patterns and generate CLAUDE.md/settings.json for the project.
+Run `recommend.py --provision --json` to copy matching hub patterns and generate CLAUDE.md/settings.json for the project. The `--json` flag outputs structured 5-category results (must-have, improved, nice-to-have, synthesized, skip) that this skill parses.
 
 **Local mode:**
 
 ```bash
 # Run from the hub repo root (where recommend.py lives)
-PYTHONPATH=. python scripts/recommend.py --local "$PROJECT_DIR" --provision
+PYTHONPATH=. python scripts/recommend.py --local "$PROJECT_DIR" --provision --json
 ```
 
 Where `$PROJECT_DIR` is the target project's absolute path. If the user is running this in the target project directory and the hub repo is at a known location, adjust the command accordingly.
@@ -107,10 +107,17 @@ Where `$PROJECT_DIR` is the target project's absolute path. If the user is runni
 **Remote mode:**
 
 ```bash
-PYTHONPATH=. python scripts/recommend.py --repo owner/name --provision
+PYTHONPATH=. python scripts/recommend.py --repo owner/name --provision --json
 ```
 
-**Parse the output** to capture:
+**Parse the JSON output** to capture the 5-category breakdown:
+- **must-have**: New patterns to add (merge confidently)
+- **improved**: Hub has newer versions of existing patterns (review diffs)
+- **nice-to-have**: Optional patterns (checkbox PR in remote mode)
+- **synthesized**: Placeholder for Step 7 (filled by this skill)
+- **skip**: Patterns not relevant to this project
+
+Also capture:
 - Number of files copied
 - Which patterns were added (rules, skills, agents)
 - CLAUDE.md status (created / updated / already existed)
@@ -546,10 +553,12 @@ Print a summary showing both hub provisioning and synthesis results.
 Provision complete:
 
 Hub patterns:
-  Copied from hub:    [N] (rules: X, skills: Y, agents: Z)
-  CLAUDE.md:          created|updated|appended|skipped
-  settings.json:      created|merged|skipped
-  Skipped (existing): [N]
+  Must-have:     [N] new patterns
+  Improved:      [N] hub upgrades to existing patterns
+  Nice-to-have:  [N] optional (checkbox PR created in remote mode)
+  Skipped:       [N]
+  CLAUDE.md:     created|updated|appended|skipped
+  settings.json: created|merged|skipped
 
 Synthesized patterns:
   Rules generated:    [N]
@@ -582,10 +591,12 @@ All patterns are local — nothing has been shared.
 Provision complete:
 
 Hub patterns:
-  Copied from hub:    [N] (rules: X, skills: Y, agents: Z)
-  CLAUDE.md:          created|updated|appended|skipped
-  settings.json:      created|merged|skipped
-  Skipped (existing): [N]
+  Must-have:     [N] new patterns
+  Improved:      [N] hub upgrades to existing patterns
+  Nice-to-have:  [N] optional (checkbox PR created in remote mode)
+  Skipped:       [N]
+  CLAUDE.md:     created|updated|appended|skipped
+  settings.json: created|merged|skipped
 
 Synthesized patterns:
   Rules generated:    [N]
