@@ -2,153 +2,71 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Critical: Two `.claude/` Directories
 
-A curated knowledge hub of Claude Code patterns (agents, skills, rules) organized by technology stack. It serves as both a template system for bootstrapping new projects and a continuously-updated registry of battle-tested patterns. Users copy the `core/.claude/` directory to their project with one command.
+- **`core/.claude/`** — Distributable template (what users copy to their projects). NEVER put hub-only config here.
+- **`.claude/`** (repo root) — Hub-only operational config (scan skills, hub settings). NEVER distribute this.
 
 ## Commands
 
 ```bash
-# Run all tests
-PYTHONPATH=. python -m pytest scripts/tests/ -v
+# Install dependencies
+pip install -r scripts/requirements.txt
 
-# Run a single test file
-PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py -v
+# Run all tests (PYTHONPATH=. required for cross-module imports)
+PYTHONPATH=. python -m pytest scripts/tests/ -v
 
 # Run a single test
 PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py::TestCopyClaudeDir::test_copies_core_files -v
 
-# Install dependencies
-pip install -r scripts/requirements.txt
+# Validate patterns before PR
+PYTHONPATH=. python scripts/validate_patterns.py
 
-# Bootstrap a project with specific stacks
-python scripts/bootstrap.py --stacks fastapi-python,android-compose --target /path/to/project
-
-# Generate documentation dashboard
-python scripts/generate_docs.py
-
-# Check pattern freshness
-python scripts/check_freshness.py
-
-# Run deduplication check
-PYTHONPATH=. python scripts/dedup_check.py
-
-# Scan registered projects for new patterns
-PYTHONPATH=. python scripts/collate.py --all
-
-# Scan internet sources
-PYTHONPATH=. python scripts/scan_web.py --all
-
-# Recommend resources for a project (report only)
-PYTHONPATH=. python scripts/recommend.py --repo owner/name
-PYTHONPATH=. python scripts/recommend.py --local /path/to/project
-
-# Recommend and apply resources (copy files or create PR)
-PYTHONPATH=. python scripts/recommend.py --repo owner/name --apply
-PYTHONPATH=. python scripts/recommend.py --local /path/to/project --apply
-
-# Provision project (apply + generate CLAUDE.md + settings.json)
-PYTHONPATH=. python scripts/recommend.py --repo owner/name --provision
+# Provision a project (auto-detect stacks, copy patterns, generate CLAUDE.md)
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 
-# Use stacks from repos.yml config instead of auto-detection
-PYTHONPATH=. python scripts/recommend.py --repo owner/name --use-config
-
-# Compare content of overlapping resources (detect divergence)
-PYTHONPATH=. python scripts/recommend.py --repo owner/name --diff
-PYTHONPATH=. python scripts/recommend.py --local /path/to/project --diff
-
-# Validate patterns before submitting a PR
-PYTHONPATH=. python scripts/validate_patterns.py
+# Regenerate docs after registry changes
+python scripts/generate_docs.py
 ```
 
 ## Architecture
 
-### Pattern Organization
+A curated hub of Claude Code patterns (agents, skills, rules) organized by stack. Users provision their project via `recommend.py --provision` or `/synthesize-project`.
 
-- **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
-  - `agents/` — Agent definitions (universal + stack-specific)
-  - `skills/` — Skill directories, each with a `SKILL.md`
-  - `rules/` — Rule files (universal + stack-specific)
-  - `hooks/` — Hook examples (README only, no executables)
-  - `README.md` — Self-documenting index of all patterns
-  - `settings.json` — Minimal defaults
-  - `CLAUDE.md.template` / `CLAUDE.local.md.template` — Pre-filled templates with TODOs
+### Key Directories
 
-- **`.claude/`** — Hub-only operational config (not distributed). Contains:
-  - `skills/scan-repo/` — Scan downstream repos for patterns
-  - `skills/scan-url/` — Scan internet for patterns
-  - `settings.json` — Hub settings
-
-- **`registry/patterns.json`** — Machine-readable index of all patterns with hashes, versions, categories, and dependency info. Source of truth for sync operations.
-
-- **`config/`** — Hub-level configuration: `settings.yml` (scan schedules, dedup thresholds), `repos.yml` (registered downstream projects), `urls.yml` and `topics.yml` (internet scanning sources).
+- **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, templates
+- **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit directly after adding/removing patterns, then re-run `generate_docs.py`
+- **`config/`** — `settings.yml` (dedup thresholds), `repos.yml` (downstream projects), `urls.yml`/`topics.yml` (scan sources)
+- **`scripts/`** — All Python: `bootstrap.py`, `recommend.py`, `collate.py`, `scan_web.py`, `validate_patterns.py`, `generate_docs.py`, `dedup_check.py`, `check_freshness.py`, `sync_to_local.py`, `sync_to_projects.py`
 
 ### Stack Prefix Convention
 
-Stack-specific patterns use filename prefixes instead of separate directories:
+Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `react-*`, `flutter-*`, `vue-*`, `firebase-*`, `ai-gemini-*`, `bun-elysia-*`). Universal patterns have no prefix. The bootstrap script filters by these prefixes.
 
-| Stack | Prefix | Examples |
-|-------|--------|---------|
-| FastAPI + Python | `fastapi-` | `fastapi-api-tester.md`, `fastapi-db-migrate/` |
-| Android + Compose | `android-` | `android-compose.md`, `android-run-tests/` |
-| AI / Gemini | `ai-gemini-` | `ai-gemini-api/` |
-| Firebase Auth | `firebase-` | `firebase-dev/`, `firebase-ai/` |
-| React + Next.js | `react-` | `react-native-dev/`, `react-native-e2e/` |
-| Flutter | `flutter-` | `flutter-dev/`, `flutter-e2e-test/` |
-| Vue + Nuxt | `vue-` / `nuxt-` | `vue-dev/`, `nuxt-dev/` |
-| Bun + Elysia | `bun-elysia-` | `bun-elysia.md` |
+### Sync Flows (details in `docs/SYNC-ARCHITECTURE.md`)
 
-The bootstrap script filters by these prefixes when copying patterns to a target project.
+1. **Project → Hub**: `collate.py` extracts + deduplicates from registered repos
+2. **Internet → Hub**: `scan_web.py` discovers patterns from URLs/topics
+3. **Hub → Local**: `/update-practices` skill pulls updates
+4. **Hub → Registered Projects**: `sync_to_projects.py` creates per-project PRs
+5. **Local → Hub**: `/contribute-practice` validates and submits as PR
+6. **Hub → Project (Advisory)**: `recommend.py` produces tiered gap report, optionally applies
 
-### Sync Flows (6 total, defined in `docs/SYNC-ARCHITECTURE.md`)
+### GitHub Actions
 
-1. **Project → Hub**: `scripts/collate.py` extracts patterns from registered repos, deduplicates, creates PRs.
-2. **Internet → Hub**: `scripts/scan_web.py` discovers patterns from URLs/topics with 3-level dedup.
-3. **Hub → Local**: `/update-practices` skill compares local `.claude/` against registry, copies updates.
-4. **Hub → Registered Projects**: `scripts/sync_to_projects.py` creates per-project PRs on hub changes.
-5. **Local → Hub**: `/contribute-practice` skill validates and submits local patterns as hub PRs.
-6. **Hub → Project (Advisory)**: `scripts/recommend.py` auto-detects stacks, compares project `.claude/` against hub, outputs tiered gap report, optionally applies via PR or local copy.
-
-### Scripts (`scripts/`)
-
-All Python. Key modules:
-- `bootstrap.py` — Copies `core/.claude/` patterns to target project, filtering by stack prefix.
-- `collate.py` — Extracts patterns from downstream project repos.
-- `dedup_check.py` — 3-level deduplication (SHA256 hash, structural similarity, semantic comparison).
-- `generate_docs.py` — Renders `docs/DASHBOARD.md`, `docs/STACK-CATALOG.md`, and `docs/dashboard.html` from registry data.
-- `sync_to_local.py` / `sync_to_projects.py` — Sync implementations for flows 3 and 4.
-- `check_freshness.py` — Flags patterns that haven't been updated within configured staleness thresholds.
-- `validate_patterns.py` — Lints patterns against structure/portability/self-containment rules before merge.
-- `recommend.py` — Auto-detects a project's tech stacks, diffs its `.claude/` against the hub, and produces a tiered recommendation (must-have / nice-to-have / skip). Supports `--apply` (copy/PR), `--provision` (apply + generate CLAUDE.md + settings.json), and `--diff` (compare overlapping content).
-
-### GitHub Actions (`.github/workflows/`)
-
-Eight workflows: `test.yml` (CI on script changes), `scan-projects.yml` / `scan-internet.yml` (weekly scans), `validate-pr.yml`, `update-docs.yml`, `sync-to-projects.yml`, `expire-sources.yml`, `recommend.yml`.
+Eight workflows: `test.yml`, `scan-projects.yml`, `scan-internet.yml`, `validate-pr.yml`, `update-docs.yml`, `sync-to-projects.yml`, `expire-sources.yml`, `recommend.yml`.
 
 ## Testing
 
-- Test fixtures live in `scripts/tests/fixtures/` — shared fixtures are defined in `scripts/tests/conftest.py`.
-- Tests use `tmp_path` (pytest built-in) for temporary file operations and `sample_registry` fixture for registry-dependent tests.
-- Smoke/integration tests use a sample FastAPI project at `scripts/tests/smoke-test/todo-api/` for end-to-end workflow validation.
-- Dependencies: `pyyaml`, `requests`, `beautifulsoup4`, `anthropic`, `pytest`, `jinja2` (see `scripts/requirements.txt`).
-
-## Bug Fixing Strategy
-
-When a bug is reported, don't start by trying to fix it. Instead, start by writing a test that reproduces the bug. Then have subagents try to fix the bug and prove it with a passing test.
-
-## Pattern Curation Policy
-
-Rules and skills added to `core/.claude/` must be **reactive, not speculative** — every addition must originate from a real correction, observed failure, or documented community pattern with evidence. Before adding, provide: (1) source, (2) problem it solves, (3) proof it's not already covered by existing patterns.
-
-For new skills: perform a gap analysis against ALL existing skills first. Each skill must be self-contained — never spread a concept across multiple skills.
+- Fixtures: `scripts/tests/fixtures/` + shared in `scripts/tests/conftest.py`
+- Uses `tmp_path` for temp files and `sample_registry` fixture for registry tests
+- Smoke tests: `scripts/tests/smoke-test/todo-api/`
+- Bug fixing: write a failing test first, then fix. Use subagents to attempt fixes.
 
 ## Key Conventions
 
-- **Two `.claude/` directories**: `core/.claude/` is the distributable template (what users copy). `.claude/` at repo root is hub-only operational config (scan skills, hub settings) — never distribute it.
-- Scripts use `PYTHONPATH=.` when run from the repo root (needed for cross-module imports).
-- Pattern dedup thresholds are configured in `config/settings.yml`: strong semantic ≥85, weak ≥70, structural ≥3 shared fields.
-- The `registry/patterns.json` must stay in sync with actual files — `generate_docs.py` reads it to produce dashboards. After adding/removing patterns in `core/.claude/`, update the registry and re-run `python scripts/generate_docs.py`.
-- Stack-specific patterns are identified by filename prefix (e.g., `fastapi-backend.md` belongs to the `fastapi-python` stack).
-- `registry/patterns.json` is maintained manually — after adding/removing patterns, edit the registry JSON directly, then re-run `python scripts/generate_docs.py` to regenerate dashboards.
-- The `/synthesize-project` skill (in `core/.claude/skills/synthesize-project/`) is the primary way users provision a project: it combines hub pattern copying (`recommend.py --provision`) with code-driven synthesis of project-specific patterns. The `/synthesize-hub` skill (in `.claude/skills/synthesize-hub/`) generalizes recurring patterns from downstream projects back into the hub.
+- `registry/patterns.json` MUST stay in sync with actual files in `core/.claude/`
+- Pattern curation is reactive, not speculative — see `.claude/rules/rule-curation.md`
+- Pattern quality rules (structure, portability, self-containment) are in `.claude/rules/pattern-*.md`
+- `/synthesize-project` (in `core/.claude/skills/`) provisions projects; `/synthesize-hub` (in `.claude/skills/`) generalizes patterns back into the hub

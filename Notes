@@ -116,6 +116,8 @@ What NOT to do:
 *********************
 Claude Code Prompt:What is the single smartest and most radically innovative and accretive and useful and compelling addition you could make to the project at this point?
 *********************
+For high-stakes work, verify key facts independently. Ask Claude to cite sources or indicate confidence level. Enable web search to ground responses in current information.
+*********************
 save my prompts in a file
 
 *********************
