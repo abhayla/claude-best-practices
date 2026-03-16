@@ -6,34 +6,125 @@ A curated knowledge hub of **182 battle-tested patterns** (agents, skills, rules
 
 ## Getting Started
 
-There are three ways to use this hub, from simplest to most powerful:
+### Prerequisites
 
-### Option 1: Copy everything
+- [Claude Code](https://claude.ai/code) CLI installed and working
+- Git installed
+- A project you want to add Claude Code patterns to
+
+### Step-by-step setup
+
+**Step 1: Clone this hub repo**
 
 ```bash
+git clone https://github.com/abhayla/claude-best-practices.git
+cd claude-best-practices
+```
+
+**Step 2: Install dependencies** (only needed for smart provisioning or synthesis)
+
+```bash
+pip install -r scripts/requirements.txt
+```
+
+**Step 3: Choose how to provision your project**
+
+You have three options. Pick the one that fits your needs:
+
+---
+
+#### Option A: Copy everything (simplest, no dependencies needed)
+
+```bash
+# Copy all patterns to your project
 cp -r core/.claude/ /path/to/your/project/.claude/
 ```
 
-Delete what you don't need (e.g., `rm .claude/rules/android-*` if not using Android).
+Then delete what you don't need:
+```bash
+# Example: remove Android patterns if you don't use Android
+cd /path/to/your/project
+rm -f .claude/rules/android-*
+rm -rf .claude/skills/android-*
+rm -f .claude/agents/android-*
+```
 
-### Option 2: Smart provisioning (recommended)
+---
+
+#### Option B: Smart provisioning (recommended for most users)
+
+This auto-detects your project's tech stacks and copies only matching patterns:
 
 ```bash
-# Auto-detects your stacks, copies only matching patterns, generates CLAUDE.md + settings.json
+# Run from the hub repo directory
+cd claude-best-practices
 PYTHONPATH=. python scripts/recommend.py --local /path/to/your/project --provision
 ```
 
-This detects your project's tech stacks (FastAPI, Android, React, etc.) and copies only the relevant patterns.
+This will:
+- Detect your stacks (e.g., FastAPI + Android + Firebase)
+- Copy matching hub patterns to your project's `.claude/`
+- Generate a `CLAUDE.md` and `settings.json` for your project
+- Show you what was copied
 
-### Option 3: Full synthesis (most powerful)
+---
 
-Run inside Claude Code in your project directory:
+#### Option C: Full synthesis (most powerful — hub patterns + project-specific patterns)
+
+This does everything Option B does, PLUS reads your actual source code and generates patterns unique to YOUR codebase.
+
+```bash
+# Step C1: First, provision your project with hub patterns (this also copies /synthesize-project skill)
+cd claude-best-practices
+PYTHONPATH=. python scripts/recommend.py --local /path/to/your/project --provision
+
+# Step C2: Now open Claude Code in YOUR project
+cd /path/to/your/project
+claude
+
+# Step C3: Inside Claude Code, run the synthesis skill
+/synthesize-project --skip-hub
+```
+
+`--skip-hub` skips the hub provisioning step (you already did it in C1) and goes straight to analyzing your code.
+
+**What happens during synthesis:**
+1. Claude Code reads your project's config files, entry points, and test files
+2. Identifies 10-20 conventions specific to your codebase
+3. **Shows you what it found** — you review and approve before anything is generated
+4. Generates rules (constraints), skills (workflows), and agents (review personas)
+5. Writes them to your `.claude/` directory
+
+**For remote repos** (you don't need the code locally):
+
+```bash
+# Run from the hub repo directory — creates a PR on the target repo
+cd claude-best-practices
+claude
+/synthesize-project --repo owner/repo-name
+```
+
+---
+
+### After setup
+
+Once your project has a `.claude/` directory, you can use all the skills directly:
 
 ```
-/synthesize-project
+/implement          Build a feature with TDD workflow
+/fix-issue 42       Fix GitHub issue #42
+/fix-loop           Iterative fix until tests pass
+/tdd                Strict red-green-refactor cycle
+/continue           Resume from previous session
+/skill-master       Find the right skill for any task
 ```
 
-This does everything Option 2 does, PLUS reads your actual source code and generates project-specific patterns that encode YOUR conventions. One command, fully provisioned `.claude/` directory.
+### Keeping updated
+
+```bash
+# Inside Claude Code in your project — pulls latest from hub
+/update-practices
+```
 
 ---
 
@@ -199,18 +290,6 @@ Your project code
 ```
 
 **Sharing is opt-in and bilateral.** By default, everything stays local. To participate in the flywheel, set `allow_hub_sharing: true` in `.claude/synthesis-config.yml`. See [docs/synthesize-flywheel.md](docs/synthesize-flywheel.md) for the full design.
-
----
-
-## Keeping Updated
-
-```bash
-# Inside Claude Code — compare your .claude/ against hub, apply updates
-/update-practices
-
-# Or via script
-PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
-```
 
 ---
 
