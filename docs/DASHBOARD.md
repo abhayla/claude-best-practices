@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-15 18:13 UTC (auto-generated)
+> Last updated: 2026-03-16 01:44 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -167,7 +167,7 @@
 | strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | subagent-driven-dev | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | supply-chain-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| synthesize-project | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| synthesize-project | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | systematic-debugging | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | tailwind-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | tdd | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
