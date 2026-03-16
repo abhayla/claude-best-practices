@@ -1,12 +1,13 @@
 ---
 name: synthesize-hub
 description: >
-  Collect synthesized patterns from bilateral-sync downstream projects, cluster them by similarity,
-  classify as generalizable vs style vs divergent, draft generalized patterns for the hub,
-  and create PRs. Run in the hub repo when you want to discover recurring conventions across projects.
+  Collect synthesized patterns from downstream projects, generalize recurring conventions, and write them
+  to core/.claude/ (the hub template) via PR. This is the INVERSE of /synthesize-project — it pulls
+  patterns FROM projects INTO the hub. MUST only run from the hub repo (where core/.claude/ exists).
+  NEVER writes to downstream project repos — that is /synthesize-project's job.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[owner/repo]"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -17,6 +18,20 @@ Collect synthesized patterns from downstream projects, find recurring convention
 **Arguments:** $ARGUMENTS
 
 If a specific `owner/repo` is provided, scan only that project. Otherwise, scan all bilateral-sync projects.
+
+---
+
+## STEP 0: Hub Repo Guard (CRITICAL)
+
+Before anything else, verify you are running inside the hub repo:
+
+```bash
+test -d core/.claude && test -f registry/patterns.json && test -f scripts/recommend.py
+```
+
+**If ANY of these are missing:** STOP. This skill MUST only run from the hub repo. Print: "This skill must be run from the claude-best-practices hub repo (where core/.claude/ exists)." and exit.
+
+**Direction reminder:** This skill pulls patterns FROM downstream projects INTO the hub's `core/.claude/`. It is the INVERSE of `/synthesize-project`, which pushes patterns FROM the hub INTO a target project. If you want to provision a project with patterns, use `/synthesize-project --repo owner/name` instead.
 
 ---
 
@@ -334,6 +349,8 @@ rm -rf .synthesize-hub/collected/
 
 ## CRITICAL RULES
 
+- This skill MUST only run from the hub repo. It writes generalized patterns to `core/.claude/` (the hub template) via PR. It is the INVERSE of `/synthesize-project`. If you want to push patterns INTO a downstream project, use `/synthesize-project --repo owner/name` instead.
+- NEVER write patterns directly to a downstream project's `.claude/` from this skill. This skill READS from downstream projects and WRITES to the hub's `core/.claude/`.
 - NEVER scan a project without bilateral consent. Both `share_synthesized: true` in `repos.yml` AND `allow_hub_sharing: true` in the project's `synthesis-config.yml` MUST be verified.
 - NEVER include patterns marked `private: true` or listed in `private_patterns`.
 - NEVER generalize STYLE or DIVERGENT clusters. Even with a strong majority (15 agree, 2 disagree), classify as DIVERGENT. The hub does not impose preferences.

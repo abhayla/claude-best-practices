@@ -32,6 +32,12 @@ STUB_MIN_LINES = 30
 # Known stack prefixes
 STACK_PREFIXES = ["fastapi-", "android-", "ai-gemini-", "firebase-", "react-", "flutter-", "vue-", "nuxt-", "expo-"]
 
+# Hub-only patterns that MUST NOT appear in core/.claude/ (distributable template).
+# These are operational skills/rules for managing the hub itself, not for downstream projects.
+HUB_ONLY_SKILLS = {"synthesize-hub", "scan-repo", "scan-url"}
+HUB_ONLY_RULES = {"rule-curation"}
+HUB_ONLY_AGENTS = set()
+
 # Portability: patterns that indicate hardcoded paths (not in code blocks)
 HARDCODED_PATH_PATTERNS = [
     r"(?<![`\w])[A-Z]:\\[\w\\]+",           # Windows absolute paths like C:\Users\...
@@ -311,6 +317,12 @@ def validate_all() -> list[str]:
         for skill_dir in sorted(SKILLS_DIR.iterdir()):
             if not skill_dir.is_dir():
                 continue
+            if skill_dir.name in HUB_ONLY_SKILLS:
+                all_errors.append(
+                    f"{skill_dir.name}: Hub-only skill found in core/.claude/skills/ — "
+                    f"this belongs in .claude/skills/ (hub-only, not distributed)"
+                )
+                continue
             all_errors.extend(validate_skill(skill_dir))
             skill_md = skill_dir / "SKILL.md"
             if skill_md.exists():
@@ -321,6 +333,12 @@ def validate_all() -> list[str]:
         for agent_path in sorted(AGENTS_DIR.glob("*.md")):
             if agent_path.name == "README.md":
                 continue
+            if agent_path.stem in HUB_ONLY_AGENTS:
+                all_errors.append(
+                    f"{agent_path.stem}: Hub-only agent found in core/.claude/agents/ — "
+                    f"this belongs in .claude/agents/ (hub-only, not distributed)"
+                )
+                continue
             all_errors.extend(validate_agent(agent_path))
             all_errors.extend(check_portability(agent_path))
 
@@ -328,6 +346,12 @@ def validate_all() -> list[str]:
     if RULES_DIR.exists():
         for rule_path in sorted(RULES_DIR.glob("*.md")):
             if rule_path.name == "README.md":
+                continue
+            if rule_path.stem in HUB_ONLY_RULES:
+                all_errors.append(
+                    f"{rule_path.stem}: Hub-only rule found in core/.claude/rules/ — "
+                    f"this belongs in .claude/rules/ (hub-only, not distributed)"
+                )
                 continue
             all_errors.extend(validate_rule(rule_path))
             all_errors.extend(check_portability(rule_path))

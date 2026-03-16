@@ -67,9 +67,9 @@ PYTHONPATH=. python scripts/validate_patterns.py
 ### Pattern Organization
 
 - **`core/.claude/`** — All distributable patterns. Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`). Contains:
-  - `agents/` — 21 agent definitions (15 universal + 6 stack-specific)
-  - `skills/` — 133 skill directories, each with a `SKILL.md`
-  - `rules/` — 20 rule files (9 universal + 11 stack-specific)
+  - `agents/` — Agent definitions (universal + stack-specific)
+  - `skills/` — Skill directories, each with a `SKILL.md`
+  - `rules/` — Rule files (universal + stack-specific)
   - `hooks/` — Hook examples (README only, no executables)
   - `README.md` — Self-documenting index of all patterns
   - `settings.json` — Minimal defaults
@@ -150,3 +150,5 @@ For new skills: perform a gap analysis against ALL existing skills first. Each s
 - Pattern dedup thresholds are configured in `config/settings.yml`: strong semantic ≥85, weak ≥70, structural ≥3 shared fields.
 - The `registry/patterns.json` must stay in sync with actual files — `generate_docs.py` reads it to produce dashboards. After adding/removing patterns in `core/.claude/`, update the registry and re-run `python scripts/generate_docs.py`.
 - Stack-specific patterns are identified by filename prefix (e.g., `fastapi-backend.md` belongs to the `fastapi-python` stack).
+- `registry/patterns.json` is maintained manually — after adding/removing patterns, edit the registry JSON directly, then re-run `python scripts/generate_docs.py` to regenerate dashboards.
+- The `/synthesize-project` skill (in `core/.claude/skills/synthesize-project/`) is the primary way users provision a project: it combines hub pattern copying (`recommend.py --provision`) with code-driven synthesis of project-specific patterns. The `/synthesize-hub` skill (in `.claude/skills/synthesize-hub/`) generalizes recurring patterns from downstream projects back into the hub.
