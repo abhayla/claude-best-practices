@@ -687,53 +687,64 @@ def tier_resource(name: str, resource_type: str, stacks: list[str], dep_promoted
 
     Returns one of: 'must-have', 'nice-to-have', 'skip'.
     """
+    tier, _ = tier_resource_with_reason(name, resource_type, stacks, dep_promoted)
+    return tier
+
+
+def tier_resource_with_reason(
+    name: str, resource_type: str, stacks: list[str], dep_promoted: set[str] | None = None,
+) -> tuple[str, str]:
+    """Assign a tier and reason to a missing resource.
+
+    Returns (tier, reason) where tier is 'must-have', 'nice-to-have', or 'skip'.
+    """
     # Dependency promotion overrides ALWAYS_SKIP and wrong-stack
     if dep_promoted and name in dep_promoted:
-        return "must-have"
+        return "must-have", "dependency detected in project"
 
     # Always-skip list
     if name in ALWAYS_SKIP:
-        return "skip"
+        return "skip", "always-skip list"
 
     # Wrong-stack resources
     if is_stack_specific(name) and not matches_stacks(name, stacks):
-        return "skip"
+        return "skip", "wrong stack"
 
     # Type-specific tiering
     if resource_type == "hook":
         if name in MUST_HAVE_HOOKS:
-            return "must-have"
-        return "nice-to-have"
+            return "must-have", "essential safety hook"
+        return "nice-to-have", "optional hook"
 
     if resource_type == "agent":
         if name in MUST_HAVE_AGENTS:
-            return "must-have"
-        return "nice-to-have"
+            return "must-have", "core agent"
+        return "nice-to-have", "optional agent"
 
     if resource_type == "rule":
         if name in MUST_HAVE_RULES:
-            return "must-have"
-        return "nice-to-have"
+            return "must-have", "core rule"
+        return "nice-to-have", "optional rule"
 
     if resource_type == "skill":
         # Stack-specific overrides — some stack skills are nice-to-have, not must-have
         if name in NICE_TO_HAVE_STACK_OVERRIDES:
-            return "nice-to-have"
+            return "nice-to-have", "stack override (not essential for most projects)"
 
         # Stack-specific skills matching the project's stacks are must-haves
         if is_stack_specific(name) and matches_stacks(name, stacks):
-            return "must-have"
+            return "must-have", "matches detected stack"
 
         if name in MUST_HAVE_UNIVERSAL_SKILLS:
-            return "must-have"
+            return "must-have", "core workflow skill"
 
         if name in NICE_TO_HAVE_UNIVERSAL_SKILLS:
-            return "nice-to-have"
+            return "nice-to-have", "useful but optional"
 
         # Remaining universal skills not in any list — nice-to-have
-        return "nice-to-have"
+        return "nice-to-have", "optional skill"
 
-    return "nice-to-have"
+    return "nice-to-have", "optional"
 
 
 # --- Gap Analysis ---
@@ -773,9 +784,10 @@ def analyze_gaps(
                 })
                 continue
 
-            tier = tier_resource(name, resource_type, stacks, dep_promoted)
+            tier, reason = tier_resource_with_reason(name, resource_type, stacks, dep_promoted)
             gaps[tier].append({
                 "name": name, "type": resource_type, "tier": tier,
+                "reason": reason,
             })
 
     return gaps
@@ -2304,70 +2316,79 @@ def main():
 
     # Step 6b: Provision if requested
     if args.provision:
-        must_count = len(gaps.get("must-have", []))
-        improved_count = len(gaps.get("improved", []))
-        nice_count = len(gaps.get("nice-to-have", []))
-        skip_count = len(gaps.get("skip", []))
+        action_labels = {
+            "must-have": "add (new)",
+            "improved": "upgrade (hub newer)",
+            "nice-to-have": "optional",
+            "skip": "skip",
+        }
+        pr_urls = {}
 
         if args.local:
             summary = provision_to_local(hub_root, Path(args.local), gaps, stacks, args.tier)
-            print()
-            print("=" * 60)
-            print("PROVISION SUMMARY")
-            print("=" * 60)
-            print()
-            print("Hub patterns:")
-            print(f"  Must-have:     {must_count} new patterns")
-            print(f"  Improved:      {improved_count} hub upgrades to existing patterns")
-            print(f"  Nice-to-have:  {nice_count} optional")
-            print(f"  Skipped:       {skip_count}")
-            print(f"  CLAUDE.md:     {summary['claude_md']}")
-            print(f"  settings.json: {summary['settings_json']}")
-            print()
-            print(f"Files copied: {len(summary['copied_files'])}")
-            for f in summary["copied_files"]:
-                print(f"  + {f}")
-            print()
-            print("=" * 60)
         elif getattr(args, "multi_pr", True):
-            # Multi-PR mode: create separate PRs per tier
             pr_urls = provision_to_repo_multi_pr(
                 hub_root, args.repo, gaps, stacks,
                 hub_resources, project_names,
             )
-            print()
-            print("=" * 60)
-            print("PROVISION SUMMARY")
-            print("=" * 60)
-            print()
-            print("Hub patterns:")
-            print(f"  Must-have:     {must_count} new patterns")
-            print(f"  Improved:      {improved_count} hub upgrades to existing patterns")
-            print(f"  Nice-to-have:  {nice_count} optional (checkbox PR)")
-            print(f"  Skipped:       {skip_count}")
-            print()
-            print("PRs created:")
-            for tier_name, url in pr_urls.items():
-                if url:
-                    label = {
-                        "must-have": "merge confidently",
-                        "improved": "review diffs",
-                        "nice-to-have": "check boxes and comment /apply",
-                    }.get(tier_name, "")
-                    print(f"  {tier_name:14s} {url} ({label})")
-                else:
-                    print(f"  {tier_name:14s} (skipped — empty or PR already exists)")
-            print()
-            print("=" * 60)
-            if not any(pr_urls.values()):
-                print("No PRs created — project is already up to date.")
         else:
             pr_url = provision_to_repo(
                 hub_root, args.repo, gaps, stacks,
                 hub_resources, project_names, args.tier,
             )
             if pr_url:
-                print(f"PR created: {pr_url}")
+                pr_urls = {"all": pr_url}
+
+        # --- Print detailed summary ---
+        print()
+        print("=" * 100)
+        print("PROVISION SUMMARY")
+        print("=" * 100)
+
+        for tier_name in ("must-have", "improved", "nice-to-have", "skip"):
+            items = gaps.get(tier_name, [])
+            if not items:
+                continue
+            action = action_labels.get(tier_name, tier_name)
+            print(f"\n--- {tier_name.upper()} ({len(items)}) ---")
+            print(f"  {'Type':<8s} {'Name':<40s} {'Action':<22s} {'Reason'}")
+            print(f"  {'----':<8s} {'----':<40s} {'------':<22s} {'------'}")
+            for item in sorted(items, key=lambda x: (x["type"], x["name"])):
+                reason = item.get("reason", "")
+                print(f"  {item['type']:<8s} {item['name']:<40s} {action:<22s} {reason}")
+
+        # Config files (local mode)
+        if args.local:
+            print(f"\n--- CONFIG ---")
+            print(f"  CLAUDE.md:     {summary['claude_md']}")
+            print(f"  settings.json: {summary['settings_json']}")
+            print(f"\n  Files copied: {len(summary['copied_files'])}")
+
+        # PRs (remote mode)
+        if pr_urls:
+            print(f"\n--- PRs CREATED ---")
+            pr_action_hints = {
+                "must-have": "merge confidently",
+                "improved": "review diffs",
+                "nice-to-have": "check boxes, comment /apply",
+                "all": "review and merge",
+            }
+            for tier_name, url in pr_urls.items():
+                if url:
+                    hint = pr_action_hints.get(tier_name, "")
+                    print(f"  {tier_name:<14s} {url} ({hint})")
+                else:
+                    print(f"  {tier_name:<14s} (skipped)")
+
+        # Totals
+        print()
+        total_must = len(gaps.get("must-have", []))
+        total_imp = len(gaps.get("improved", []))
+        total_nice = len(gaps.get("nice-to-have", []))
+        total_skip = len(gaps.get("skip", []))
+        print(f"TOTAL: {total_must} must-have, {total_imp} improved, "
+              f"{total_nice} nice-to-have, {total_skip} skip")
+        print("=" * 100)
 
     # Step 7: Diff overlapping resources if requested
     if args.diff:
