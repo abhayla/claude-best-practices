@@ -1,21 +1,31 @@
 ---
 name: provision-report
 description: >
-  Generate or validate a provision summary report after running recommend.py --provision
-  or /synthesize-project. Enforces the canonical 4-section tabular format with Type, Name,
-  Action, and Reason columns. Use after any provisioning operation to produce a consistent,
-  reviewable summary.
+  Reference guide for the canonical provision summary format used by recommend.py
+  and /synthesize-project. Defines the 4-section tabular layout with Type, Name,
+  Action, and Reason columns. Consult when building or modifying any provisioning
+  output to ensure format consistency.
 type: reference
 allowed-tools: "Read Grep Glob"
-argument-hint: "[--from-json <path>] [--validate]"
 version: "1.0.0"
 ---
 
 # Provision Report Format Standard
 
-This skill defines the canonical output format for all provisioning operations
-(`recommend.py --provision`, `/synthesize-project`, `/synthesize-hub`).
-Any code that produces a provision summary MUST follow this format.
+Reference specification for the provision summary output format. All provisioning
+operations (`recommend.py --provision`, `/synthesize-project`, `/synthesize-hub`)
+MUST produce output conforming to this format.
+
+## Origin
+
+This format was created after the 3-layer tiering upgrade (2026-03-16) when
+`recommend.py --provision` against AlgoChanakya produced output that lacked
+visibility into WHY each pattern was selected or skipped. The user requested
+Type, Name, Action, and Reason columns to make provisioning decisions reviewable
+and auditable. The format is now enforced by `tier_resource_with_reason()` in
+`scripts/recommend.py`.
+
+---
 
 ## Report Structure
 
@@ -59,7 +69,7 @@ Each tier section uses a fixed-width tabular layout:
 
 ### Reason Values
 
-Reasons explain WHY a pattern was placed in its tier:
+Reasons explain WHY a pattern was placed in its tier. Every item MUST have a non-empty reason.
 
 | Reason | Meaning |
 |--------|---------|
@@ -140,3 +150,21 @@ When reviewing provision output, verify:
 - [ ] Remote mode shows PR URLs; local mode shows config status
 - [ ] Dep-promoted patterns show "dependency detected in project" as reason
 - [ ] Improved patterns show version comparison as reason
+
+## MUST DO
+
+- MUST include all 4 columns (Type, Name, Action, Reason) in every tier table
+- MUST provide a non-empty Reason for every pattern — never leave it blank
+- MUST sort by type then name alphabetically within each tier
+- MUST show the totals line matching actual counts
+- MUST use the exact Action values from the table above (not freeform text)
+- MUST show PR URLs in remote mode with action hints in parentheses
+
+## MUST NOT DO
+
+- MUST NOT omit the Reason column or use generic reasons like "recommended"
+- MUST NOT mix patterns from different tiers in the same table section
+- MUST NOT show config status (CLAUDE.md, settings.json) in remote mode output
+- MUST NOT show PR links in local mode output
+- MUST NOT change column widths without updating this spec (breaks alignment for scripts parsing the output)
+- MUST NOT add new Action values without updating both `recommend.py` and this reference
