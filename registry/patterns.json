@@ -2526,10 +2526,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
   "synthesize-project": {
-    "hash": "0d455af8b191e725ddc2a4582aa0f653716cbb36e9fc1081a3d2c6415f9aaeff",
+    "hash": "5a541267b77750aea7bcd5fdba0c231ef118c96d0761c3ee4b58b89c881732a4",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
     "last_updated": "2026-03-15",
@@ -2541,7 +2541,7 @@
       "provisioning",
       "unified-flow"
     ],
-    "changelog": "v2.1.0: Add skill/agent identification criteria and agent template to fix rules-only bias"
+    "changelog": "v2.2.0: Comprehensive quality checks aligned with all hub standards, dedup_check.py, user-confirmed sensitivity flagging"
   },
   "systematic-debugging": {
     "hash": "5e1801f0ab6999d877e91473f485240736d263827a157d52b7ec9535e7ab938d",

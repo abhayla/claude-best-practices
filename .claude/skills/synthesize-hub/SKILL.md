@@ -6,7 +6,7 @@ description: >
   and create PRs. Run in the hub repo when you want to discover recurring conventions across projects.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[owner/repo]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -161,47 +161,65 @@ For each GENERALIZABLE sub-cluster with 3+ contributing projects, draft a hub-re
 
 Before drafting anything, verify each candidate against the hub's curation policy (`.claude/rules/rule-curation.md`):
 
-1. **Source** — The synthesized patterns from 3+ downstream projects are the evidence
-2. **Problem it solves** — What goes wrong without this pattern (derived from the cluster analysis)
-3. **Not already covered** — Check purpose overlap with ALL existing patterns in `core/.claude/`. If a hub pattern already covers this convention generically, do NOT create a duplicate. Instead, consider whether the existing pattern should be enhanced.
+1. **Source** — The synthesized patterns from 3+ downstream projects are the evidence. But ask: did those projects actually experience the problem this pattern solves, or is it a speculative convention? If the source evidence is "3 projects all auto-synthesized this", verify at least one project has a concrete failure case.
+2. **Problem it solves** — What goes wrong without this pattern (derived from the cluster analysis). Be specific: "tests fail silently" is evidence, "code is less clean" is speculation.
+3. **Not already covered** — Read the FULL TEXT of existing hub patterns in `core/.claude/` that might overlap. Check purpose, not just name similarity. If a hub pattern covers 80%+ of this convention, enhance the existing pattern instead of creating a new one.
+4. **Gap analysis (skills only)** — Compare the candidate skill's unique workflow steps against ALL existing skills. Document which steps are genuinely new. If the new skill overlaps >50% with an existing skill, do NOT create it.
 
 Drop any candidate that fails the curation gate.
 
-### 6b. Draft by type — delegate to the hub's creator tools
+### 6b. Sanitize project-specific content
 
-**For rules:** Use `/claude-guardian` to draft and validate the rule:
-1. Prepare the generalized constraint (strip all project-specific details → generic placeholders)
-2. Run `/claude-guardian` in "enhance-and-place" mode to determine correct scope (`globs:` or `# Scope: global`), validate against `rule-writing-meta.md` standards, and place in the right location
-3. The rule MUST follow `pattern-structure.md` (frontmatter with `description`, `globs`, `version`)
+Before drafting, explicitly strip project-specific content from ALL source patterns:
 
-**For skills:** Use `/writing-skills` to draft the skill:
-1. Prepare the generalized workflow (replace project-specific commands with parameterized alternatives, preserve step ordering and gotchas)
-2. Run `/writing-skills` to generate the SKILL.md with proper frontmatter (`name`, `description`, `type`, `allowed-tools`, `version`), numbered `## STEP N:` sections, and `## CRITICAL RULES` section
-3. The skill MUST follow least-privilege `allowed-tools` per `pattern-portability.md`
+1. Scan for hardcoded file paths (e.g., `src/services/UserService.ts`) → replace with `<module_path>` or generic patterns (`src/services/<YourService>.ts`)
+2. Scan for specific class/function names → replace with `<ClassName>`, `<functionName>`
+3. Scan for environment variables → replace with `$VARIABLE_NAME`
+4. Scan for project names, domain names, internal URLs → replace with generic placeholders
+5. Scan for references to private patterns from source projects → replace with `<private-pattern>`
 
-**For agents:** Draft following `pattern-structure.md` agent requirements:
-1. Prepare the generalized agent (replace project-specific decision criteria with parameterized ones)
-2. The agent MUST have frontmatter with `name`, `description`, `model: inherit`
-3. The agent MUST have `## Core Responsibilities` and `## Output Format` sections
-4. The agent MUST declare `tools` in frontmatter following least-privilege
+Record all replacements made — include them in the PR body for reviewer transparency.
 
-### 6c. All types — mandatory standards
+### 6c. Draft by type — delegate to the hub's creator tools
 
-Every drafted pattern MUST:
-- Pass `pattern-portability.md`: no hardcoded paths, no project-specific references, no environment assumptions
-- Pass `pattern-self-containment.md`: no placeholders, no stubs (<30 lines), self-contained execution
-- Pass `pattern-structure.md`: correct frontmatter, type classification, SemVer version
-- NOT include `synthesized: true` — this is now a hub pattern, not a project-specific one
-- Include a provenance comment: `<!-- Generalized from N projects via /synthesize-hub -->`
-- Use RFC 2119 language (MUST, MUST NOT, SHOULD)
+**For rules:** Use `/claude-guardian` in "enhance-and-place" mode:
+1. Pass the sanitized, generalized constraint text as input
+2. `/claude-guardian` determines correct scope (`globs:` or `# Scope: global`) and places in the right location
+3. After `/claude-guardian` produces the rule, MANUALLY verify it has: `description`, `globs` or scope declaration, `version: "1.0.0"`, RFC 2119 language (MUST/MUST NOT), and alternatives for every prohibition. `/claude-guardian` does NOT enforce all of these — you must check.
 
-### 6d. Validate
+**For skills:** Use `/writing-skills` with explicit parameters:
+1. Pass the sanitized, generalized workflow as input
+2. Specify the template type: "Template A: Workflow Skill" for multi-step procedures, or "Template G: Reference Skill" for knowledge bases
+3. `/writing-skills` generates the SKILL.md — verify it has: `name`, `description`, `type`, `allowed-tools` (least-privilege per `pattern-portability.md`), `argument-hint`, `version: "1.0.0"`, numbered `## STEP N:` sections, and `## CRITICAL RULES` section
+4. Verify `allowed-tools` only includes tools the skill's steps actually use
 
-Run `validate_patterns.py` on every draft:
+**For agents:** Use `pattern-structure.md` agent requirements directly (no dedicated creator skill exists yet):
+1. Draft the agent from the sanitized, generalized review/analysis task
+2. Required frontmatter: `name`, `description`, `tools` (JSON array, least-privilege), `model: inherit`
+3. Required body sections: `## Core Responsibilities`, `## Output Format`
+4. Verify the agent description explains WHEN to use it, not just WHAT it does
+
+### 6d. All types — mandatory standards
+
+Every drafted pattern MUST pass ALL of these before validation:
+- **Portability** (`pattern-portability.md`): zero hardcoded paths, zero project-specific references, no environment assumptions, least-privilege tools
+- **Self-containment** (`pattern-self-containment.md`): no `<!-- TODO -->` / `<!-- FIXME -->` placeholders, >=30 lines of content, <=500 lines (split if 500-1000, reject if >1000), all cross-referenced skills exist in hub
+- **Structure** (`pattern-structure.md`): correct frontmatter for type, SemVer version, scope declaration for rules
+- **Language** (`rule-writing-meta.md`): RFC 2119 language (MUST, MUST NOT, SHOULD), alternatives for prohibitions
+- NOT include `synthesized: true` — this is now a hub pattern
+- Include provenance: `<!-- Generalized from N projects via /synthesize-hub -->`
+
+### 6e. Validate and iterate
+
+Run BOTH validators on every draft:
 ```bash
 PYTHONPATH=. python scripts/validate_patterns.py [draft-file]
+PYTHONPATH=. python scripts/dedup_check.py --check [draft-file]
 ```
-Drop any pattern that fails validation. Do NOT bypass the validator.
+
+**If validation fails:** Do NOT just drop the pattern. Read the error, fix the specific issue (wrong frontmatter, missing field, too short, etc.), and re-validate. Only drop after 2 failed fix attempts — the pattern may be valuable but poorly formatted.
+
+**If dedup detects overlap:** Check if the overlapping hub pattern should be ENHANCED instead of creating a new one. If the generalized pattern adds genuinely new content, proceed. If it's ≥85% similar, enhance the existing pattern.
 
 ## STEP 7: Create PRs
 

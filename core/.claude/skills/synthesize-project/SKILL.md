@@ -7,7 +7,7 @@ description: >
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis]"
-version: "2.1.0"
+version: "2.2.0"
 type: workflow
 ---
 
@@ -264,6 +264,7 @@ description: >
   [1-3 sentences starting with a verb]
 type: workflow
 allowed-tools: "[minimal tool set]"
+argument-hint: "[required-arg] [--optional-flag]"
 version: "1.0.0"
 synthesized: true
 private: false
@@ -291,6 +292,7 @@ Skills MUST encode project-specific multi-step procedures. Each step should refe
 name: [agent-name]
 description: >
   When and why to use this agent. [1-3 sentences]
+tools: ["Read", "Grep", "Glob"]  # JSON array, least-privilege
 model: inherit
 synthesized: true
 private: false
@@ -316,25 +318,46 @@ Agents MUST have a clear domain focus specific to this project. A generic "code 
 
 ### Quality checks for each generated pattern:
 
-- Does it follow the frontmatter format exactly?
+**Structure (pattern-structure.md):**
+- Does `version` field exist and follow SemVer format (e.g., `"1.0.0"`)?
+- For skills: does it have `name`, `description`, `type`, `allowed-tools`, `argument-hint`, `version`?
+- For skills: does it have a `## CRITICAL RULES` section at the end?
+- For agents: does frontmatter include `tools` as a JSON array (e.g., `["Read", "Grep", "Glob"]`)?
+- For agents: does body include `## Core Responsibilities` and `## Output Format` sections?
+- For rules: does it have `globs:` in frontmatter OR `# Scope: global` in first 5 lines?
+
+**Portability (pattern-portability.md):**
 - Is it specific to THIS project (not generic advice)?
+- Are `allowed-tools` least-privilege (read-only skills don't include Write/Edit/Bash)?
+- Are project-specific file paths used as concrete examples (good) not as hardcoded assumptions (bad)?
+
+**Self-containment (pattern-self-containment.md):**
 - Does it contain at least 30 lines of actual content (not a stub)?
-- Does the `globs` scope match the relevant file types?
-- Are sensitive patterns marked `private: true`?
+- Is it under 500 lines? If 500-1000, consider splitting. Over 1000 = must split.
+- No placeholder markers (`<!-- TODO -->`, `<!-- FIXME -->`)?
+- If it references another skill by name, does that skill exist in the project's `.claude/`?
 
-### Sensitivity auto-flagging:
+**Language (rule-writing-meta.md):**
+- Does it use RFC 2119 language (MUST, MUST NOT, NEVER) for critical constraints?
+- For rules: does it provide alternatives, not just prohibitions?
 
-Scan each generated pattern's content for these keywords: `auth`, `secret`, `token`, `credential`, `billing`, `payment`, `session`, `encryption`, `API key`, `password`, `private key`. If any are found, set `private: true` in frontmatter.
+### Sensitivity flagging:
+
+Scan each generated pattern for keywords: `auth`, `secret`, `token`, `credential`, `billing`, `payment`, `session`, `encryption`, `API key`, `password`, `private key`. If found, **flag the pattern and ask the user** whether to mark it `private: true`. Do not auto-flag silently — the user may intend for auth-related patterns to be shareable.
 
 ## STEP 7: Validate and Write
 
 1. **If `--dry-run` mode:** Print each generated pattern with its target path and stop. Do not write any files.
 
-2. **Validate** — For each generated pattern, write it to a temp file and run `validate_patterns.py` via Bash (if the script exists):
+2. **Validate** — For each generated pattern, write it to a temp file and run validators:
    ```bash
-   python scripts/validate_patterns.py [temp-pattern-file]
+   # Structural validation (required)
+   PYTHONPATH=. python scripts/validate_patterns.py [temp-pattern-file]
+
+   # Dedup check against existing patterns (required)
+   PYTHONPATH=. python scripts/dedup_check.py --check [temp-pattern-file]
    ```
-   Drop any pattern that fails validation.
+   If `validate_patterns.py` or `dedup_check.py` are not available (running outside the hub repo), perform manual validation against the quality checks above. Drop any pattern that fails.
 
 ### Local mode: write directly
 
