@@ -128,7 +128,7 @@ orchestrator which handles:
 
 Stage subagents should invoke it via:
 ```
-Skill("/test-pipeline", args="<failure_output_or_flags>")
+Skill("test-pipeline", args="<failure_output_or_flags>")
 ```
 
 ## Constraints

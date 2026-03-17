@@ -230,7 +230,7 @@ Quality gate thresholds (for reference — enforced by `/code-quality-gate`):
 Run the full test verification pipeline with screenshot proof and strict gates:
 
 ```
-Skill("/test-pipeline", args="--skip-fix")
+Skill("test-pipeline", args="--skip-fix")
 ```
 
 This invokes the `test-pipeline-agent` orchestrator which:
@@ -243,7 +243,7 @@ This invokes the `test-pipeline-agent` orchestrator which:
 If the pipeline reports FAILED, use `/fix-loop` on the specific failures, then re-run:
 
 ```
-Skill("/test-pipeline", args="<failure_output>")
+Skill("test-pipeline", args="<failure_output>")
 ```
 
 Also run linting and type checking (not covered by test-pipeline):

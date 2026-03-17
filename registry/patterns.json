@@ -2700,17 +2700,18 @@
     "changelog": "v1.0.0: Initial release"
   },
   "test-pipeline": {
-    "hash": "32150c71447954bb54930001eb7a22e266ed61c9b06eb36eddbbca26355eeb81",
+    "hash": "fe2dc2ed539bd41e85858295587e731f51c0f488b0cd98066640f3bf188e0d07",
     "type": "skill",
-    "path": "core/.claude/skills/test-pipeline/SKILL.md",
-    "description": "Run the full test verification pipeline: fix failures, verify changes, review visual proof, and commit.",
+    "category": "core",
     "version": "1.0.0",
-    "stacks": [
-      "universal"
-    ]
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-17",
+    "last_updated": "2026-03-17",
+    "dependencies": [],
+    "visibility": "public"
   },
   "test-pipeline-agent": {
-    "hash": "fc10bd0c100463ccf5c4f8f6240a7c9322b4ff8d7dfab358b8f7488bbcb8b6f9",
+    "hash": "6c13272ce36655bb49c45b324793f6f19eb93e5be10a34a4f6dbcf37dc4dcd4e",
     "type": "agent",
     "category": "core",
     "version": "1.0.0",
@@ -2718,14 +2719,7 @@
     "discovered": "2026-03-17",
     "last_updated": "2026-03-17",
     "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrates the full test verification pipeline: cleanup, stage dispatch, gate enforcement, and result aggregation.",
-    "tags": [
-      "testing",
-      "orchestration",
-      "pipeline"
-    ],
-    "changelog": "v1.0.0: Initial release"
+    "visibility": "public"
   },
   "tester-agent": {
     "hash": "2cf52b2eb6f4f13394edeaa4453df4a15c6a71e9f2ed15a3ff3f9bb455c7e6fd",
