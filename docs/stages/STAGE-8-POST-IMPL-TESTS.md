@@ -205,6 +205,17 @@ Scan the project root to determine which test types apply. Set skip flags for in
 | Multiple platform dirs (e.g., `android/` + `web/`) | Multi-platform | Enable cross-platform-visual |
 | PRD has GDPR/SOC2/HIPAA references | Regulated | Enable compliance testing in security-audit |
 
+### E2E Framework Selection (Android)
+
+When the project is an Android app, auto-detect the E2E framework:
+
+| Indicator | Framework | Skill |
+|-----------|-----------|-------|
+| `e2e/maestro/` directory OR `*.yaml` flows | Maestro | `android-run-e2e` (Maestro mode) |
+| `src/androidTest/` with Espresso/Compose tests | Gradle (Espresso/Compose) | `android-run-e2e` (Gradle mode) |
+| Both present | Both | Run Gradle first (framework-specific assertions), then Maestro (user journey flows) |
+| Neither present | None | Skip mobile E2E, log warning |
+
 Document detected type and skip decisions in the structured report (Step 14).
 
 ### STEP 3: Run Full Test Suite (Regression Baseline)

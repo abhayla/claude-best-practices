@@ -257,6 +257,10 @@ Write to `test-results/{skill-name}.json` after each verification run:
 
 ### Result Values
 
+**CRITICAL:** The field name `result` is the canonical gate signal. All skills
+MUST use `result` (not `status`, `verdict`, or `outcome`). Downstream gate
+checks parse this exact field name. Changing it breaks the entire pipeline.
+
 | Field | Values | Meaning |
 |-------|--------|---------|
 | `result` | `PASSED`, `FAILED`, `FIXED` | Overall verification outcome |

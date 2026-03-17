@@ -57,6 +57,7 @@ Argument modes: `staged` (cached only), branch name (diff HEAD against it), `abc
 | Build/CI | `Dockerfile`, `*.gradle`, `pom.xml`, `package.json` | Flag for full suite |
 | Documentation | `*.md`, `*.rst`, `*.txt` | Skip — no tests needed |
 | Migrations | `migrations/**`, `alembic/**` | Flag as high risk |
+| Test fixtures/factories | `tests/factories/**`, `tests/fixtures/**`, `tests/conftest.py`, `**/conftest.py`, `tests/helpers/**` | Re-run ALL tests that import the changed fixture — shared fixtures affect many tests |
 
 Record `CHANGED_SOURCE_FILES`, `CHANGED_TEST_FILES`, `CHANGED_CONFIG_FILES`, and `TOTAL_CHANGED`.
 
