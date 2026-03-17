@@ -63,11 +63,18 @@ For each stage in `pipeline.stages` (in order):
 
 ### AGGREGATE
 
-After all stages complete (or on pipeline failure):
+After all stages complete (or on pipeline failure), run the aggregation
+script from `testing.md` — this is mandatory, not optional:
 
 1. Read ALL `test-results/*.json` files
-2. Compute union of failures across all stages
-3. Detect contradictions (e.g., auto-verify PASSED but contract-test FAILED)
+2. Compute union of failures across all stages — if ANY skill reports
+   `result: "FAILED"`, the pipeline verdict is FAILED
+3. Detect contradictions and report them explicitly:
+   - auto-verify PASSED but contract-test FAILED → API compatibility issue
+   - auto-verify PASSED but perf-test FAILED → performance regression
+   - fix-loop PASSED but auto-verify FAILED → fix introduced new failures
+4. A contradiction does NOT auto-block but MUST be surfaced in the report
+   with a WARN flag so the user can investigate
 4. Write `test-results/pipeline-verdict.json`:
    ```json
    {

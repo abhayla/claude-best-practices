@@ -71,6 +71,11 @@ Delegate change identification and test mapping to `/regression-test`, which
 provides 2-level import graph tracing, coverage-based mapping, and risk
 classification. This is the single canonical mapper for the pipeline.
 
+**IMPORTANT:** `/regression-test` is invoked for MAPPING ONLY — it identifies
+which tests to run and classifies risk, but does NOT execute the tests itself.
+Test execution happens in STEP 2 via `tester-agent`. This avoids double
+execution where tests run once for mapping and again for verification.
+
 ```
 Skill("/regression-test", args="$FILES_ARG --framework auto")
 ```
@@ -78,8 +83,12 @@ Skill("/regression-test", args="$FILES_ARG --framework auto")
 After `/regression-test` completes, read `test-results/regression-test.json`:
 
 1. Extract the affected test list and overall risk level
-2. If `regression-test` reports `BLOCKED` (test infra broken) → exit with BLOCKED
-3. Use the mapped test files and risk classification for STEP 2
+2. If `regression-test` result is `FAILED` with `confidence: BLOCKED`
+   (test infra broken — cannot map tests) → exit with BLOCKED
+3. If `regression-test` result is `FAILED` with `confidence: LOW`
+   (some tests failed during mapping) → note failures but proceed to STEP 2
+   (tester-agent will re-run them with full verdict rules)
+4. Use the mapped test files and risk classification for STEP 2
 
 Coverage gaps flagged by `/regression-test` (source files with no mapped tests)
 are reported in the final auto-verify output as warnings.

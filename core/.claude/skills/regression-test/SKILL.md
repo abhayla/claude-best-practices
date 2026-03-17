@@ -263,11 +263,17 @@ Write to `test-results/regression-test.json`:
   "summary": { "total": 47, "passed": 46, "failed": 1, "skipped": 0, "flaky": 0 },
   "change_scope": { "source_files": 8, "test_files": 3, "config_files": 1, "overall_risk": "HIGH" },
   "coverage_gaps": ["<files with no mapped tests>"],
-  "confidence": "MEDIUM",
+  "confidence": "HIGH|MEDIUM|LOW|BLOCKED",
   "failures": [{ "test": "<name>", "file": "<path>", "message": "<error>" }],
   "duration_ms": 12300
 }
 ```
+
+**Result vs Confidence clarification:**
+- `result` is always `PASSED` or `FAILED` (binary gate signal for downstream consumers)
+- `confidence` is the nuanced assessment: `HIGH`, `MEDIUM`, `LOW`, or `BLOCKED`
+- `BLOCKED` means test infrastructure is broken (cannot run tests at all) — this maps to `result: "FAILED"` with `confidence: "BLOCKED"`
+- Downstream consumer `/auto-verify` checks: if `confidence == "BLOCKED"` → halt pipeline; if `result == "FAILED"` with `confidence != "BLOCKED"` → proceed with caution (tester-agent will re-run)
 
 ---
 
