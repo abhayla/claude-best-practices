@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-15",
-    "total_patterns": 183
+    "total_patterns": 184
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -24,7 +24,7 @@
       "axe-core",
       "Lighthouse"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 axe-core, Lighthouse a11y, WCAG checklist"
+    "changelog": "v1.0.0: Initial release — axe-core, Lighthouse a11y, WCAG checklist"
   },
   "adr": {
     "hash": "1900013d1bcfd25bf035fb99a0ddc40ed5238a198ec71e8f019ba2c9d1995eb1",
@@ -43,7 +43,7 @@
       "ADR",
       "decisions"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 Michael Nygard template, lifecycle management, index generation"
+    "changelog": "v1.0.0: Initial release — Michael Nygard template, lifecycle management, index generation"
   },
   "adversarial-review": {
     "hash": "24ddcf8502d2e1157f892397d16b21e7f74af43d9b0216e719d62c34761c272c",
@@ -75,7 +75,7 @@
       "agents",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation \u2014 Anthropic-aligned orchestration constraints"
+    "changelog": "v1.0.0: Initial creation — Anthropic-aligned orchestration constraints"
   },
   "ai-gemini-api": {
     "hash": "6e280c025a59b69519ec07d963702893f7e90f71a3d3a438fb94fcf52978eab8",
@@ -152,7 +152,7 @@
     "last_updated": "2026-03-13",
     "dependencies": [],
     "visibility": "public",
-    "description": "Android Gradle build failure diagnostics \u2014 10 common issue categories with solutions",
+    "description": "Android Gradle build failure diagnostics — 10 common issue categories with solutions",
     "tags": [
       "android",
       "gradle",
@@ -162,7 +162,7 @@
       "hilt",
       "room"
     ],
-    "changelog": "v1.0.0: Initial \u2014 adapted from TaeseongYun build-fixer agent"
+    "changelog": "v1.0.0: Initial — adapted from TaeseongYun build-fixer agent"
   },
   "android-compose-agent": {
     "hash": "e0809c924a1f163fbdca452455a029dcace8ce2593ecdc413de3edc4eeaa7a29",
@@ -224,7 +224,7 @@
       "coding-style",
       "testing"
     ],
-    "changelog": "v1.0.0: Initial \u2014 consolidated from 4 kotlin rule files in everything-claude-code"
+    "changelog": "v1.0.0: Initial — consolidated from 4 kotlin rule files in everything-claude-code"
   },
   "android-kotlin-reviewer-agent": {
     "hash": "6f54c0a1c173f0f12aa66fc4b0500d87cbb229fb92a5548dc5d06740d898c041",
@@ -245,7 +245,7 @@
       "coroutines",
       "kmp"
     ],
-    "changelog": "v1.0.0: Initial \u2014 adapted from everything-claude-code kotlin-reviewer"
+    "changelog": "v1.0.0: Initial — adapted from everything-claude-code kotlin-reviewer"
   },
   "android-mvi-scaffold": {
     "hash": "2606994217ecc7f5bd4c90d69944c9a7171150d5dbf2fe9d4019f4b2b2c6cf84",
@@ -257,7 +257,7 @@
     "last_updated": "2026-03-13",
     "dependencies": [],
     "visibility": "public",
-    "description": "MVI feature scaffolder \u2014 generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
+    "description": "MVI feature scaffolder — generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
     "tags": [
       "android",
       "kotlin",
@@ -266,7 +266,7 @@
       "compose",
       "architecture"
     ],
-    "changelog": "v1.0.0: Initial \u2014 consolidated from ChrisWW + TaeseongYun repos"
+    "changelog": "v1.0.0: Initial — consolidated from ChrisWW + TaeseongYun repos"
   },
   "android-run-e2e": {
     "hash": "210ad2d7dfe68b399c6eb521e6a721629078df6a7d27fc237d8b07b0e225b25c",
@@ -319,7 +319,7 @@
       "turbine",
       "mockk"
     ],
-    "changelog": "v1.0.0: Initial \u2014 JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns"
+    "changelog": "v1.0.0: Initial — JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns"
   },
   "anthropic-agent-orchestration-guide": {
     "hash": "44939f9bcd3e0044064e5a917f91876dda92663c773010f1f1a5e21b6c216bdf",
@@ -338,7 +338,7 @@
       "patterns",
       "agents"
     ],
-    "changelog": "v1.0.0: Initial creation \u2014 comprehensive orchestration reference"
+    "changelog": "v1.0.0: Initial creation — comprehensive orchestration reference"
   },
   "api-docs-generator": {
     "hash": "7a9fab9fc54dc8a082b2dbf1efb564cf5b5c20ab842083aebac7eca9121b0945",
@@ -357,7 +357,7 @@
       "Swagger",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 multi-framework OpenAPI generation, validation, CI integration"
+    "changelog": "v1.0.0: Initial release — multi-framework OpenAPI generation, validation, CI integration"
   },
   "apply-selections": {
     "hash": "f3092ae30bb570de73ebaf512994fe0cf132d02222d4703de1a3178475ee352a",
@@ -376,7 +376,7 @@
       "checkbox",
       "pattern-selection"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 checkbox parsing, file removal via GitHub API"
+    "changelog": "v1.0.0: Initial release — checkbox parsing, file removal via GitHub API"
   },
   "architecture-fitness": {
     "hash": "739bc721f36bb96dc9e787daedd04ca2ddc41c3e00e512ac9d4c7f44f1a97c5a",
@@ -395,7 +395,7 @@
       "coupling",
       "dependencies"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 dependency direction, circular deps, coupling, ADR review"
+    "changelog": "v1.0.0: Initial release — dependency direction, circular deps, coupling, ADR review"
   },
   "auto-format": {
     "hash": "5524c30bb72cef2828e16252af36e2301204a4b28be2e5147b2f608eec8df37c",
@@ -513,14 +513,14 @@
     "last_updated": "2026-03-13",
     "dependencies": [],
     "visibility": "public",
-    "description": "Quantified change risk score (files \u00c3\u2014 complexity \u00c3\u2014 inverse coverage) for deploy go/no-go decisions with hotspot analysis",
+    "description": "Quantified change risk score (files Ã— complexity Ã— inverse coverage) for deploy go/no-go decisions with hotspot analysis",
     "tags": [
       "risk",
       "change-management",
       "deploy",
       "metrics"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 composite risk scoring, hotspot analysis"
+    "changelog": "v1.0.0: Initial release — composite risk scoring, hotspot analysis"
   },
   "changelog-contributing": {
     "hash": "df799475ed1153f1273a41676d26cd369cd5612b7e0a4a87ab4335bf1b79dc4b",
@@ -539,7 +539,7 @@
       "conventional-commits",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 CHANGELOG + CONTRIBUTING generation"
+    "changelog": "v1.0.0: Initial release — CHANGELOG + CONTRIBUTING generation"
   },
   "chaos-resilience": {
     "hash": "3c029e8ea7dac24e075847f8ef2903edc9c9222f5954dfd2bc696646429dcec6",
@@ -558,7 +558,7 @@
       "failure-injection",
       "circuit-breaker"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 failure injection, degradation verification, gameday"
+    "changelog": "v1.0.0: Initial release — failure injection, degradation verification, gameday"
   },
   "ci-cd-setup": {
     "hash": "0bbedaab3c41d4dd94d31ed383fe3af766e6226cdac7ce91a8fba0d9272fe44d",
@@ -620,7 +620,7 @@
       "refactoring",
       "logging"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 complexity, duplication, SOLID, logging, refactor, layer checks"
+    "changelog": "v1.0.0: Initial release — complexity, duplication, SOLID, logging, refactor, layer checks"
   },
   "code-reviewer-agent": {
     "hash": "268bb192a5d01fe9106d450fd778957fac518fd7d392d754fb81c0d4a13c291a",
@@ -752,7 +752,7 @@
       "API",
       "consumer-driven"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 Pact consumer/provider, broker, CI integration"
+    "changelog": "v1.0.0: Initial release — Pact consumer/provider, broker, CI integration"
   },
   "contribute-practice": {
     "hash": "2cbcbd52aed457c3df3f619faf733a2ee9bd538987649b9636eac6bf4a579e18",
@@ -849,7 +849,7 @@
       "nuclei",
       "fuzzing"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 ZAP, Nuclei, headers, sessions, fuzzing, CI"
+    "changelog": "v1.0.0: Initial release — ZAP, Nuclei, headers, sessions, fuzzing, CI"
   },
   "db-migrate": {
     "hash": "37d620b0a7bb86c9d3d2e98941d7e1085d2306cf13ba850763e8b0c233206e79",
@@ -872,7 +872,7 @@
       "Django",
       "TypeORM"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 multi-ORM migration with safety rules"
+    "changelog": "v1.0.0: Initial release — multi-ORM migration with safety rules"
   },
   "db-migrate-verify": {
     "hash": "73587ed97c823b1a1aef42bc77d7902ae766d5006ea3cdab401383721666b92e",
@@ -924,7 +924,7 @@
       "zero-downtime",
       "PRR"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 GitOps, canary, blue-green, DB migration ordering, PRR"
+    "changelog": "v1.0.0: Initial release — GitOps, canary, blue-green, DB migration ordering, PRR"
   },
   "diataxis-docs": {
     "hash": "5287d419170173c2d6c35690e8c9e9d1a4c47b9615812d40a9f1488b027e8ff0",
@@ -936,14 +936,14 @@
     "last_updated": "2026-03-13",
     "dependencies": [],
     "visibility": "public",
-    "description": "Organize documentation using the Di\u00c3\u00a1taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
+    "description": "Organize documentation using the DiÃ¡taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
     "tags": [
       "documentation",
       "Diataxis",
       "tutorials",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 Di\u00c3\u00a1taxis categorization, templates, migration"
+    "changelog": "v1.0.0: Initial release — DiÃ¡taxis categorization, templates, migration"
   },
   "disaster-recovery": {
     "hash": "6dc9b26604683de6f7ebaaae5c9c0ddee645007d443f7bb04dc9d146018ce72e",
@@ -967,7 +967,7 @@
       "RTO",
       "RPO"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 RTO/RPO, backup, restore, failover, DR drills"
+    "changelog": "v1.0.0: Initial release — RTO/RPO, backup, restore, failover, DR drills"
   },
   "doc-staleness": {
     "hash": "8495d0fcd3db3ddfbb4b5a4516719e8ef85d9c2c86c195acee9cf5416991cd80",
@@ -979,14 +979,14 @@
     "last_updated": "2026-03-15",
     "dependencies": [],
     "visibility": "public",
-    "description": "Detect documentation that has drifted from the codebase \u2014 stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
+    "description": "Detect documentation that has drifted from the codebase — stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
     "tags": [
       "documentation",
       "staleness",
       "drift-detection",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 file/symbol/command/link staleness detection, severity-prioritized report"
+    "changelog": "v1.0.0: Initial release — file/symbol/command/link staleness detection, severity-prioritized report"
   },
   "doc-structure-enforcer": {
     "hash": "ed21cb6e8213bca75f599461d5f5157e8c9317c097652054cfc70be2a09bda4b",
@@ -1006,7 +1006,7 @@
       "pipeline-stages",
       "folder-management"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 stage-based folder structure, pattern + content classification, git mv + ref updates"
+    "changelog": "v1.0.0: Initial release — stage-based folder structure, pattern + content classification, git mv + ref updates"
   },
   "docker-optimize": {
     "hash": "eec1b3f0177b7ed19b1001442c3c6979b630c8aedcdf0bde1b38b69a1b3617f6",
@@ -1196,7 +1196,7 @@
       "toggles",
       "gradual-rollout"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 flag types, implementation patterns, cleanup"
+    "changelog": "v1.0.0: Initial release — flag types, implementation patterns, cleanup"
   },
   "firebase": {
     "hash": "7d173bc7ec83fbadf36727425a02753bb5ed984179927970722d749d1e8c39ae",
@@ -1214,7 +1214,7 @@
       "auth",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 grounded in KKB + cric patterns"
+    "changelog": "v1.0.0: Initial release — grounded in KKB + cric patterns"
   },
   "firebase-ai": {
     "hash": "1e9c9b33be88f0baf245b4d9e279d74550582ea7242b539a16e61349edf5da3a",
@@ -1321,7 +1321,7 @@
       "dart",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 grounded in cric repo patterns"
+    "changelog": "v1.0.0: Initial release — grounded in cric repo patterns"
   },
   "flutter-dart-agent": {
     "hash": "f7924430ccab1d770896e1779e90316acb08b662946c46be7c02f924c44136df",
@@ -1339,7 +1339,7 @@
       "dart",
       "mobile"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 grounded in cric repo patterns"
+    "changelog": "v1.0.0: Initial release — grounded in cric repo patterns"
   },
   "flutter-dev": {
     "hash": "d7d209911545999c608b70c24c6d341f44917727002351d42372647c736f082a",
@@ -1413,7 +1413,7 @@
       "search",
       "discovery"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 repo search, code search, deep inspect modes"
+    "changelog": "v1.0.0: Initial release — repo search, code search, deep inspect modes"
   },
   "handover": {
     "hash": "7b2480eda367305cefad80c8da51c96b41687b5ee385cf52a40e94fbf2c1c567",
@@ -1465,7 +1465,7 @@
       "demo",
       "Nielsen"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 single-file prototypes with heuristic validation"
+    "changelog": "v1.0.0: Initial release — single-file prototypes with heuristic validation"
   },
   "iac-deploy": {
     "hash": "f92b50d281662dac82ca227a4489dc745d8f9710559f06ae85062e5002d1c150",
@@ -1607,7 +1607,7 @@
       "branching",
       "post-merge"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 strategy matrix, pre/post-merge checklists"
+    "changelog": "v1.0.0: Initial release — strategy matrix, pre/post-merge checklists"
   },
   "middleware-test": {
     "hash": "02793a47a9f5a5a8ebe2b4b69373fa81e3e454f69f68614e9ff8c684b5e67421",
@@ -1710,7 +1710,7 @@
       "react",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 grounded in BestDematAccount + IPODhan patterns"
+    "changelog": "v1.0.0: Initial release — grounded in BestDematAccount + IPODhan patterns"
   },
   "node-backend-dev": {
     "hash": "c18c72de006cf77a915cc143f2b807a4a3b950cf8503457504440458380e83c7",
@@ -1722,7 +1722,7 @@
     "last_updated": "2026-03-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Node.js backends: Express, Hono, ElysiaJS \u2014 routing, middleware, DB, auth, WebSocket",
+    "description": "Node.js backends: Express, Hono, ElysiaJS — routing, middleware, DB, auth, WebSocket",
     "tags": [
       "nodejs",
       "backend",
@@ -1730,7 +1730,7 @@
       "hono",
       "elysia"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 grounded in FIREKaro + BestDematAccount + cric patterns"
+    "changelog": "v1.0.0: Initial release — grounded in FIREKaro + BestDematAccount + cric patterns"
   },
   "nuxt-dev": {
     "hash": "7d9f01d024c2b33e394f27b4c74652213539f22eb0323743b9836a7fa9ef1f20",
@@ -1798,7 +1798,7 @@
       "Lighthouse",
       "bundle"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 k6, Lighthouse, bundle analysis, baseline comparison"
+    "changelog": "v1.0.0: Initial release — k6, Lighthouse, bundle analysis, baseline comparison"
   },
   "pg-query": {
     "hash": "4521da934944d454672b33964780cd2cb7659356ae99f785ec018c6455446ae9",
@@ -1833,49 +1833,6 @@
       "DAG"
     ],
     "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent"
-  },
-  "project-manager-agent": {
-    "hash": "ee4649ce489dc96ce7dc1aa9b7a3c0541754202cf1ede8702cb672b9665cb7f2",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
-    "dependencies": [
-      "agent-orchestration"
-    ],
-    "visibility": "public",
-    "description": "DAG-based multi-stage pipeline orchestrator agent for PRD-to-Production delivery with typed artifact contracts and state persistence",
-    "tags": [
-      "pipeline",
-      "orchestration",
-      "DAG",
-      "agent"
-    ],
-    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u2014 orchestration logic now lives in the agent"
-  },
-  "skill-author-agent": {
-    "hash": "00a611d46cb5c301cc4241e00c2a2a2276f1266269fc692c999148179d30b33d",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-17",
-    "last_updated": "2026-03-17",
-    "dependencies": [
-      "writing-skills",
-      "pattern-structure"
-    ],
-    "visibility": "public",
-    "description": "Pattern author agent that creates, updates, and manages Claude Code skills, rules, and agents by delegating to /writing-skills and /claude-guardian",
-    "tags": [
-      "authoring",
-      "skills",
-      "agent",
-      "patterns"
-    ],
-    "changelog": "v1.0.0: Initial release \u2014 routes pattern creation to appropriate authoring workflows with quality validation"
   },
   "plan-executor-agent": {
     "hash": "16056a4b8212e93e7534b960601e025badf2386ee0c3d81d3adeb860e725d4d5",
@@ -1998,7 +1955,7 @@
       "IEEE-830",
       "parser"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 multi-format PRD parsing and normalization"
+    "changelog": "v1.0.0: Initial release — multi-format PRD parsing and normalization"
   },
   "prisma-orm": {
     "hash": "297d2c27b6e475a8da10086c534f4f8032b5064a59ae90b9b5eeee5565858579",
@@ -2018,6 +1975,48 @@
       "database"
     ],
     "changelog": "v1.0.0: Initial creation"
+  },
+  "project-manager-agent": {
+    "hash": "ee4649ce489dc96ce7dc1aa9b7a3c0541754202cf1ede8702cb672b9665cb7f2",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-03-14",
+    "dependencies": [
+      "agent-orchestration"
+    ],
+    "visibility": "public",
+    "description": "DAG-based multi-stage pipeline orchestrator agent for PRD-to-Production delivery with typed artifact contracts and state persistence",
+    "tags": [
+      "pipeline",
+      "orchestration",
+      "DAG",
+      "agent"
+    ],
+    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill — orchestration logic now lives in the agent"
+  },
+  "project-scaffold": {
+    "hash": "ab9dc66fbf798cd5908c70f8c5fa42e43b46adf0e0b2f97fbfbe10f21aaa9721",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-03-13",
+    "dependencies": [
+      "ci-cd-setup"
+    ],
+    "visibility": "public",
+    "description": "Multi-stack project initialization with 12-factor compliance, security baseline (dependency audit, SAST, Dependabot), conventional commits, .editorconfig, health endpoint, and Docker dev environment",
+    "tags": [
+      "scaffold",
+      "initialization",
+      "12-factor",
+      "security-baseline"
+    ],
+    "changelog": "v1.0.0: Initial release — covers Python, Node/TS, Android, Go, Rust"
   },
   "prompt-auto-enhance": {
     "hash": "3fd847a324f0f2d9182fd6525a600ce80fd0d6a1dfef275378162faa6b5be32f",
@@ -2041,7 +2040,7 @@
       "automation",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 tiered context gathering, web search decision tree, batch CRUD approval flow"
+    "changelog": "v1.0.0: Initial release — tiered context gathering, web search decision tree, batch CRUD approval flow"
   },
   "prompt-auto-enhance-rule": {
     "hash": "0588116e093fe3077e9ae50d944149652d97733e71131c758f06c8b5d4b1447f",
@@ -2062,28 +2061,7 @@
       "context-gathering",
       "automation"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 Tier 1/2 context gathering, silent/visible modes, web search triggers"
-  },
-  "project-scaffold": {
-    "hash": "ab9dc66fbf798cd5908c70f8c5fa42e43b46adf0e0b2f97fbfbe10f21aaa9721",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
-    "dependencies": [
-      "ci-cd-setup"
-    ],
-    "visibility": "public",
-    "description": "Multi-stack project initialization with 12-factor compliance, security baseline (dependency audit, SAST, Dependabot), conventional commits, .editorconfig, health endpoint, and Docker dev environment",
-    "tags": [
-      "scaffold",
-      "initialization",
-      "12-factor",
-      "security-baseline"
-    ],
-    "changelog": "v1.0.0: Initial release \u2014 covers Python, Node/TS, Android, Go, Rust"
+    "changelog": "v1.0.0: Initial release — Tier 1/2 context gathering, silent/visible modes, web search triggers"
   },
   "pytest-dev": {
     "hash": "8079e93f106c59cd93f232c8a17e13b13da03360b21454bf0ad8421dea5c2c3d",
@@ -2166,7 +2144,7 @@
       "react",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 replaces placeholder"
+    "changelog": "v1.0.0: Initial release — replaces placeholder"
   },
   "react-test-patterns": {
     "hash": "4c4da888ca4f3818d18856dc4cbb9f52129beb10d64b0a12bfd95464e4ff0889",
@@ -2372,7 +2350,7 @@
       "migration",
       "data-modeling"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 ER design, PII, evolution, API alignment"
+    "changelog": "v1.0.0: Initial release — ER design, PII, evolution, API alignment"
   },
   "secret-scanner": {
     "hash": "bd304630f63846915a580b1f8995b1608d77f47e2d54e08f103de4e02bc3ed23",
@@ -2443,6 +2421,28 @@
     "description": "",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "skill-author-agent": {
+    "hash": "00a611d46cb5c301cc4241e00c2a2a2276f1266269fc692c999148179d30b33d",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-17",
+    "last_updated": "2026-03-17",
+    "dependencies": [
+      "writing-skills",
+      "pattern-structure"
+    ],
+    "visibility": "public",
+    "description": "Pattern author agent that creates, updates, and manages Claude Code skills, rules, and agents by delegating to /writing-skills and /claude-guardian",
+    "tags": [
+      "authoring",
+      "skills",
+      "agent",
+      "patterns"
+    ],
+    "changelog": "v1.0.0: Initial release — routes pattern creation to appropriate authoring workflows with quality validation"
   },
   "skill-factory": {
     "hash": "7aa98beb094b1b737bf623acf2612abfd63df345864a537e0e00d54f9a8fa82c",
@@ -2594,7 +2594,7 @@
       "css",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 grounded in AlgoChanakya + IPODhan patterns"
+    "changelog": "v1.0.0: Initial release — grounded in AlgoChanakya + IPODhan patterns"
   },
   "tdd": {
     "hash": "93e0217f92886f7a70c932185e61707a758a7e19f5e10efb8a3056f4b9c4420f",
@@ -2664,7 +2664,7 @@
       "coverage",
       "mutation-testing"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 unit, API, BDD, property, mutation, a11y test generation"
+    "changelog": "v1.0.0: Initial release — unit, API, BDD, property, mutation, a11y test generation"
   },
   "test-knowledge": {
     "hash": "f380f6e842e631190c03f53dc6ca2869486b23fe849f3bda2ae46805138f1906",
@@ -2698,6 +2698,16 @@
       "optimization"
     ],
     "changelog": "v1.0.0: Initial release"
+  },
+  "test-pipeline": {
+    "hash": "32150c71447954bb54930001eb7a22e266ed61c9b06eb36eddbbca26355eeb81",
+    "type": "skill",
+    "path": "core/.claude/skills/test-pipeline/SKILL.md",
+    "description": "Run the full test verification pipeline: fix failures, verify changes, review visual proof, and commit.",
+    "version": "1.0.0",
+    "stacks": [
+      "universal"
+    ]
   },
   "test-pipeline-agent": {
     "hash": "fc10bd0c100463ccf5c4f8f6240a7c9322b4ff8d7dfab358b8f7488bbcb8b6f9",
@@ -2834,7 +2844,7 @@
       "testing",
       "vite"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 grounded in FIREKaro + AlgoChanakya + IPODhan patterns"
+    "changelog": "v1.0.0: Initial release — grounded in FIREKaro + AlgoChanakya + IPODhan patterns"
   },
   "vue": {
     "hash": "5009cb248f5765545f29fa9a2df68502cea34772d0d24e12a885f2b006c51647",
@@ -2852,7 +2862,7 @@
       "frontend",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 grounded in FIREKaro + AlgoChanakya patterns"
+    "changelog": "v1.0.0: Initial release — grounded in FIREKaro + AlgoChanakya patterns"
   },
   "vue-dev": {
     "hash": "bcc7d55a2bc05636a7aef07ad115635684905fc7a0b04cf952d4619b433bcc67",
