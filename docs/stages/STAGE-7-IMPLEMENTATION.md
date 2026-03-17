@@ -208,9 +208,12 @@ Invoke the selected skill with the plan. The skill handles:
 
 ### STEP 4: Post-Implementation Quality Gate
 
-After ALL tests pass, run `/code-quality-gate all changed files`:
+> **Note:** Skip this step if Step 5 will run `/test-pipeline`, which includes
+> `/code-quality-gate` as a sub-gate inside `/auto-verify`. Running both
+> duplicates the quality check. Only run Step 4 standalone if you need a quick
+> quality check without the full test pipeline.
 
-The quality gate checks (with blocking thresholds):
+Quality gate thresholds (for reference — enforced by `/code-quality-gate`):
 
 | Check | PASS | WARN (non-blocking) | BLOCK (must fix) |
 |-------|------|---------------------|-------------------|
@@ -221,10 +224,6 @@ The quality gate checks (with blocking thresholds):
 | Structured logging | All structured, no PII | Missing correlation ID | PII in logs |
 | Error handling | Typed errors, timeouts set | Missing circuit breaker | Empty catch, swallowed exceptions |
 | Diff coverage | ≥80% on new code | 60-79% | <60% or new file with 0% |
-
-**If BLOCK:** Fix the issues, re-run tests, re-run quality gate. Use `/fix-loop` if needed.
-**If WARN:** Note in the quality report, proceed. Stage 9 (Review) will address.
-**If PASS:** Proceed to Step 5.
 
 ### STEP 5: Final Verification
 

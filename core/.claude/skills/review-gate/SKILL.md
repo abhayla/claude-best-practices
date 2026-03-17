@@ -617,6 +617,7 @@ If any threshold is exceeded, add a warning entry to the consolidated report's `
 - Always apply override rules from `change-risk-scoring` (security files, migrations → minimum MEDIUM)
 - Always include deferred items with tracking references in the consolidated report
 - Always check fix scope after fix-loop — if fix touched files outside the original finding's directory/module, re-run ALL checks; if fix is scoped to the same files, re-run only failed checks
+- When invoking fix-loop + auto-verify for post-review fixes, pass `--capture-proof` to ensure screenshot evidence is captured for the review fix cycle (consistent with Stages 7-8 proof capture)
 - If a sub-skill crashes, times out, or returns unparseable output, record its status as UNKNOWN and treat it as BLOCK — never silently ignore a sub-skill that failed to produce a result
 
 ## MUST NOT DO
