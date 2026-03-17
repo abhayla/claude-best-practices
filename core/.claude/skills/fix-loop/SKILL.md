@@ -36,31 +36,35 @@ Analyze failures, apply minimal fixes, and optionally retest until resolved.
 
 ---
 
-## STEP 1: Analyze Failure
+## STEP 1: Analyze Failure (via test-failure-analyzer-agent)
 
-1. Parse the error output and classify into one of these categories:
-   - `COMPILE_ERROR` — Code doesn't compile/parse
-   - `ASSERTION_FAILURE` — Expected vs actual mismatch
-   - `TIMEOUT` — Test exceeds time limit
-   - `FIXTURE_MISMATCH` — Test setup/teardown issues
-   - `MISSING_IMPORT` — Import or dependency not found
-   - `RUNTIME_EXCEPTION` — Unexpected exception during execution
-   - `FLAKY_TEST` — Intermittent failure (passes on retry)
-   - `INFRASTRUCTURE` — Environment, network, or service issues
-   - `CONTRACT_MISMATCH` — API response doesn't match consumer contract
-   - `MIGRATION_FAILURE` — Database schema/migration error
-   - `AUTH_ERROR` — Authentication or authorization failure
-   - `VISUAL_REGRESSION` — Screenshot differs from baseline
-   - `SCHEMA_VALIDATION` — Response/request doesn't match schema
+Delegate failure classification to `test-failure-analyzer-agent` for structured
+diagnosis. The agent is read-only — it classifies failures and suggests fixes
+but does not modify files.
 
-2. Extract details from the error output:
-   - Failing file and line number
-   - Expected vs actual values
-   - Stack trace information
+```
+Agent("test-failure-analyzer-agent", prompt="Analyze these test failures and
+classify each into exactly one category. Group by root cause. Output: category,
+root file:line, fix suggestion, confidence level.
 
-3. Read the failing source code and test code
+Test output:
+$FAILURE_OUTPUT")
+```
 
-4. Identify root cause with confidence level (High/Medium/Low)
+The agent returns a structured analysis with:
+- **Category** per failure (one of: COMPILE_ERROR, ASSERTION_FAILURE, TIMEOUT,
+  FIXTURE_MISMATCH, MISSING_IMPORT, RUNTIME_EXCEPTION, FLAKY_TEST,
+  INFRASTRUCTURE, CONTRACT_MISMATCH, MIGRATION_FAILURE, AUTH_ERROR,
+  VISUAL_REGRESSION, SCHEMA_VALIDATION, PERFORMANCE_REGRESSION,
+  RESOURCE_LEAK, CONCURRENCY_ERROR, TEST_POLLUTION, EMPTY_ASSERTION)
+- **Root file and line** for each failure
+- **Grouped root causes** (multiple tests may fail from one issue)
+- **Fix priority order** (which fix unblocks the most tests)
+- **Confidence level** (High/Medium/Low)
+
+Use the agent's output to drive STEP 1A (flaky detection) and STEP 2 (apply fix).
+If the agent returns Low confidence on all failures, escalate to user immediately
+rather than attempting fixes.
 
 ## STEP 1A: Flaky Test Detection
 

@@ -5,17 +5,29 @@ description: >
   runs tests with smart priority, analyzes failures, applies fixes with approval,
   then runs quality gate, contract verification, and performance baseline checks.
   Use after making code changes to verify correctness.
-allowed-tools: "Bash Read Grep Glob Write Edit Skill"
-argument-hint: "[--files <paths>] [--full-suite]"
-version: "1.2.0"
+allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
+argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof]"
+version: "2.0.0"
 type: workflow
 ---
 
 # Auto-Verify — Post-Change Verification
 
-Automatically verify code changes by running targeted tests and analyzing results.
+Verify code changes by running targeted tests, reviewing visual proof, and
+enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 
 **Arguments:** $ARGUMENTS
+
+---
+
+## Parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--files` | git diff | Specific files to verify |
+| `--full-suite` | false | Run full test suite regardless of risk |
+| `--strict-gates` | false | Missing upstream JSON = BLOCK (set by orchestrator) |
+| `--capture-proof` | false | Capture screenshots on every test, pass or fail |
 
 ---
 
