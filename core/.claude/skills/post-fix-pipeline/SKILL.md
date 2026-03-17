@@ -5,7 +5,7 @@ description: >
   documentation, commits, and captures learnings. Use after auto-verify
   succeeds to finalize changes. Does NOT re-run tests — trusts upstream.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
-argument-hint: "[fixes_applied] [commit_format] [--strict-gates] [--capture-proof]"
+argument-hint: "[fixes_applied] [commit_format] [--strict-gates] [--capture-proof | --no-capture-proof]"
 version: "2.0.0"
 type: workflow
 ---
@@ -27,6 +27,7 @@ Finalize verified changes: documentation, commit, and learning capture.
 | `push` | false | Whether to push after commit |
 | `--strict-gates` | false | Missing upstream JSON = BLOCK |
 | `--capture-proof` | true (from config) | Include evidence summary in commit body |
+| `--no-capture-proof` | — | Disable screenshot capture even if config says true |
 
 ---
 

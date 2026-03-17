@@ -6,7 +6,7 @@ description: >
   then runs quality gate, contract verification, and performance baseline checks.
   Use after making code changes to verify correctness.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
-argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof]"
+argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof | --no-capture-proof]"
 version: "2.0.0"
 type: workflow
 ---
@@ -28,6 +28,7 @@ enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 | `--full-suite` | false | Run full test suite regardless of risk |
 | `--strict-gates` | false | Missing upstream JSON = BLOCK (set by orchestrator) |
 | `--capture-proof` | true (from config) | Capture screenshots on every test, pass or fail |
+| `--no-capture-proof` | — | Disable screenshot capture even if config says true |
 
 ---
 

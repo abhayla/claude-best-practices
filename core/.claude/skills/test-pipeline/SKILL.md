@@ -7,7 +7,7 @@ description: >
   fix→verify→commit chain with enforced gates and artifact cleanup.
 type: workflow
 allowed-tools: "Agent Read Grep Glob"
-argument-hint: "[--capture-proof] [--skip-fix] [failure_output]"
+argument-hint: "[--capture-proof | --no-capture-proof] [--skip-fix] [failure_output]"
 triggers:
   - test pipeline
   - run tests
@@ -31,7 +31,8 @@ cleanup, and optional screenshot-as-proof capture.
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `--capture-proof` | from config | Capture screenshots on every test (pass and fail) for visual review |
+| `--capture-proof` | true (from config) | Capture screenshots on every test (pass and fail) for visual review |
+| `--no-capture-proof` | — | Disable screenshot capture even if config says true |
 | `--skip-fix` | false | Skip the fix-loop stage (start at auto-verify) |
 | `failure_output` | — | Test failure output to feed into fix-loop |
 

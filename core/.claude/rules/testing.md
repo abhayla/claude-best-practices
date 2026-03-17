@@ -352,56 +352,113 @@ Add `test-results/` to `.gitignore` — these are ephemeral per-run artifacts.
 
 ### Screenshot Proof Archive
 
-When `--capture-proof` is enabled, E2E/UI tests capture screenshots on every
-test (pass and fail) as visual evidence. The archive is run-scoped and ephemeral.
+When `--capture-proof` is enabled (default: true), E2E/UI tests capture
+screenshots on every test (pass and fail) as visual evidence. Use
+`--no-capture-proof` to disable. The archive is run-scoped and ephemeral.
+
+If the project has no E2E/UI tests, `--capture-proof` is a no-op — the manifest
+will have an empty `screenshots` array and visual review will SKIP (not block).
+
+#### run_id Format
+
+Format: `{ISO-8601-timestamp}_{7-char-git-sha}`
+
+Examples:
+- `2026-03-17T14:30:12Z_abc1234`
+- `2026-03-17T09:15:00Z_f7e2a91`
+- `2026-01-05T22:00:45Z_0d3c8b2`
+
+The short SHA is always 7 characters (git's default `--short` length). The
+timestamp uses UTC with seconds precision. No colons in the timestamp when
+used as a directory name — replace `:` with `-` for filesystem safety:
+`2026-03-17T14-30-12Z_abc1234`.
 
 #### Directory Convention
 
 ```
 test-evidence/                  # gitignored — generated per pipeline run
-  {run_id}/                     # ISO-8601 timestamp + short git SHA
-    screenshots/                # All captured screenshots
+  {run_id}/                     # e.g., 2026-03-17T14-30-12Z_abc1234
+    screenshots/                # All captured screenshots (PNG, max 1440x900)
       {test_name}.pass.png
       {test_name}.fail.png
-      {test_name}.iter2.fail.png  # Fix-loop iteration screenshots
+      {test_name}.{platform}.pass.png  # Multi-platform runs
+      {test_name}.iter{N}.fail.png     # Fix-loop iteration screenshots
     manifest.json               # Index of all screenshots
     visual-review.json          # AI multimodal review verdicts
 ```
 
-Add `test-evidence/` to `.gitignore` alongside `test-results/`.
+Add `test-evidence/` and `test-results/` to `.gitignore`.
+
+**Screenshot format:** PNG, max resolution 1440x900 (for optimal multimodal
+token cost ~1,728 tokens/image). Downscale larger screenshots before archiving.
+
+**Retention:** `test-pipeline-agent` cleans `test-evidence/` at pipeline start.
+For manual runs, only the most recent 3 `{run_id}` directories are kept —
+older runs are deleted automatically when a new run starts.
 
 #### Manifest Schema
 
-Written by `tester-agent` after test execution:
+Written by `tester-agent` after test execution. Field types annotated.
 
 ```json
 {
-  "run_id": "{timestamp}_{git_sha_short}",
+  "run_id": "2026-03-17T14-30-12Z_abc1234",
   "capture_proof": true,
-  "platform": "playwright-chromium",
+  "platforms": ["playwright-chromium", "maestro-android"],
+  "screenshot_count": 50,
   "screenshots": [
     {
       "test": "test_login_success",
       "file": "tests/e2e/test_auth.py::test_login_success",
       "result": "PASSED",
       "screenshot": "screenshots/test_login_success.pass.png",
-      "timestamp": "2026-03-17T14:30:12Z"
+      "platform": "playwright-chromium",
+      "timestamp": "2026-03-17T14:30:12Z",
+      "iteration": null
+    },
+    {
+      "test": "test_checkout_flow",
+      "file": "tests/e2e/test_checkout.py::test_checkout_flow",
+      "result": "FAILED",
+      "screenshot": "screenshots/test_checkout_flow.iter2.fail.png",
+      "platform": "playwright-chromium",
+      "timestamp": "2026-03-17T14:30:45Z",
+      "iteration": 2
     }
   ]
 }
 ```
 
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `run_id` | string | yes | Pipeline run identifier |
+| `capture_proof` | boolean | yes | Always `true` when manifest exists |
+| `platforms` | string[] | yes | List of test platforms used |
+| `screenshot_count` | number | yes | Total screenshots captured |
+| `screenshots[].test` | string | yes | Test function name |
+| `screenshots[].file` | string | yes | Test file path with function |
+| `screenshots[].result` | enum | yes | `"PASSED"` or `"FAILED"` |
+| `screenshots[].screenshot` | string | yes | Relative path to PNG file |
+| `screenshots[].platform` | string | yes | Platform that captured this |
+| `screenshots[].timestamp` | string | yes | ISO-8601 capture time |
+| `screenshots[].iteration` | number\|null | yes | Fix-loop iteration (null if not from fix-loop) |
+
 #### Visual Review Schema
 
-Written by `/auto-verify` Step 2.5 after multimodal review:
+Written by `/auto-verify` Step 2.5. This is the **single source of truth** for
+visual review results — stored at `test-evidence/{run_id}/visual-review.json`.
+A summary is also embedded in `test-results/auto-verify.json` via the
+`visual_review` field, but the file is authoritative.
 
 ```json
 {
   "skill": "visual-proof-review",
-  "run_id": "{run_id}",
-  "timestamp": "{ISO-8601}",
+  "run_id": "2026-03-17T14-30-12Z_abc1234",
+  "timestamp": "2026-03-17T14:31:00Z",
   "screenshots_reviewed": 50,
   "screenshots_total": 50,
+  "confirmed_passes": 43,
+  "confirmed_failures": 5,
   "overrides": [
     {
       "test": "test_dashboard_loads",
@@ -411,17 +468,33 @@ Written by `/auto-verify` Step 2.5 after multimodal review:
       "screenshot": "screenshots/test_dashboard_loads.pass.png"
     }
   ],
-  "flags": [],
+  "flags": [
+    {
+      "test": "test_login_timeout",
+      "original_result": "FAILED",
+      "visual_observation": "Screenshot shows successful login — possible flaky",
+      "screenshot": "screenshots/test_login_timeout.fail.png"
+    }
+  ],
   "result": "PASSED|FAILED"
 }
 ```
 
-A visual review `result` of FAILED (any overrides exist) is a blocking signal —
-`/post-fix-pipeline` reads this file and blocks commit if overrides are present.
+| Field | Type | Description |
+|-------|------|-------------|
+| `result` | enum | `"PASSED"` (zero overrides) or `"FAILED"` (any override exists) |
+| `overrides` | array | Tests that passed by exit code but failed visually |
+| `flags` | array | Tests that failed by exit code but looked correct visually |
+| `screenshots_reviewed` | number | How many screenshots were analyzed |
+
+`/post-fix-pipeline` reads `test-evidence/{run_id}/visual-review.json` directly
+and blocks commit if any overrides exist.
 
 #### Integration with Stage Gate Aggregator
 
 The aggregator reads `test-results/*.json` for pipeline verdicts. It does NOT
-read `test-evidence/` directly. Instead, the visual review result is embedded
-in `test-results/auto-verify.json` via the `visual_review` field. This keeps
-the aggregation contract unchanged — one directory, one glob pattern.
+read `test-evidence/` directly. The visual review summary is embedded in
+`test-results/auto-verify.json` via the `visual_review` field — this keeps
+the aggregation contract unchanged (one directory, one glob pattern). The
+full visual-review.json in `test-evidence/` is the detailed source of truth
+for debugging and audit.

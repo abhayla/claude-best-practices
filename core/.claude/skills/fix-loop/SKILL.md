@@ -5,7 +5,7 @@ description: >
   Full Loop mode (with retest command) iterates until resolved. Single Fix mode
   (no retest) does one pass. Use when tests fail, build breaks, or runtime errors.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
-argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N] [--strict-gates] [--capture-proof]"
+argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N] [--strict-gates] [--capture-proof | --no-capture-proof]"
 version: "1.2.0"
 type: workflow
 ---
@@ -35,6 +35,7 @@ Analyze failures, apply minimal fixes, and optionally retest until resolved.
 | `files_of_interest` | — | Specific files to focus on |
 | `--strict-gates` | false | Passed by orchestrator for consistency; no upstream gate for fix-loop |
 | `--capture-proof` | true (from config) | Forward to retest command — capture screenshots on every test |
+| `--no-capture-proof` | — | Disable screenshot capture even if config says true |
 
 ---
 
