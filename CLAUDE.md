@@ -55,8 +55,8 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 
 ### Key Scripts
 
-- **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping and `copy_claude_dir()` which filters patterns by stack prefix. Imported by `recommend.py`.
-- **`recommend.py`** — Main entry point for provisioning. Modes: `--local`/`--repo` (report only), `--apply` (copy files), `--provision` (apply + generate CLAUDE.md + settings.json), `--diff` (compare overlapping content). Uses `bootstrap.py` for copying and `collate.py` for extraction.
+- **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping and `copy_claude_dir()` which filters patterns by stack prefix. Also `render_template()` for CLAUDE.md generation. Imported by `recommend.py`.
+- **`recommend.py`** — Main entry point for provisioning. Defines `STACK_DETECTORS` (file-based auto-detection) and `DEP_PATTERN_MAP` (dependency→pattern promotion). Modes: `--local`/`--repo` (report only), `--apply` (copy files), `--provision` (apply + generate CLAUDE.md + settings.json), `--diff` (compare overlapping content), `--use-config` (use stacks from `repos.yml`).
 - **`validate_patterns.py`** — CI validator. Checks frontmatter, cross-references, file/registry sync. Run before every PR.
 - **`generate_docs.py`** — Rebuilds `docs/` dashboard and `core/.claude/README.md` from `registry/patterns.json`.
 - **`collate.py`** — Extracts patterns from downstream project repos for hub ingestion.
@@ -79,4 +79,4 @@ Nine workflows: `test.yml`, `scan-projects.yml`, `scan-internet.yml`, `validate-
 - Pattern curation is reactive, not speculative — see `.claude/rules/rule-curation.md`
 - Pattern quality rules (structure, portability, self-containment) are in `.claude/rules/pattern-*.md`
 - `/synthesize-project` (in `core/.claude/skills/`) provisions projects; `/synthesize-hub` (in `.claude/skills/`) generalizes patterns back into the hub
-- Stack prefix filtering depends on `STACK_PREFIXES` in `scripts/bootstrap.py`. To add a new stack, add the prefix mapping there AND update stack detection in `scripts/recommend.py`.
+- Adding a new stack requires changes in three places: `STACK_PREFIXES` in `scripts/bootstrap.py` (prefix→stack mapping), `STACK_DETECTORS` in `scripts/recommend.py` (auto-detection rules), and optionally `DEP_PATTERN_MAP` in `recommend.py` (dependency→pattern promotion).

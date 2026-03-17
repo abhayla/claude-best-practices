@@ -341,6 +341,12 @@ def validate_file(file_path: Path) -> list[str]:
 # ── Main ────────────────────────────────────────────────────────────────────
 
 
+def validate_third_party_registry() -> list[str]:
+    """Validate config/third-party-skills.yml if it exists."""
+    from scripts.third_party_skills import validate_registry
+    return validate_registry(ROOT)
+
+
 def validate_all() -> list[str]:
     """Run all validators. Returns list of all errors."""
     all_errors = []
@@ -392,6 +398,9 @@ def validate_all() -> list[str]:
     # Cross-reference check
     if SKILLS_DIR.exists():
         all_errors.extend(check_cross_references(SKILLS_DIR))
+
+    # Third-party skills registry validation
+    all_errors.extend(validate_third_party_registry())
 
     return all_errors
 

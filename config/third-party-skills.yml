@@ -1,0 +1,34 @@
+# Third-party agent skills recommended during provisioning.
+#
+# The hub does NOT own these skills. It detects matching dependencies
+# and recommends installation. The project owner manages updates/removal.
+#
+# Fields:
+#   repo:           GitHub owner/repo (required)
+#   skill:          Specific skill name within the repo (optional)
+#   description:    What the skill provides (required)
+#   dependencies:   Dependency names that trigger this recommendation (OR logic)
+#   ecosystems:     Restrict to specific ecosystems: npm, pip, gradle, pub, cargo, gem, go
+#                   (optional, matches all ecosystems if omitted)
+#   file_signals:   File glob patterns that trigger this recommendation (optional)
+#   url:            Link to docs/README for the user (optional)
+#   prerequisites:  What the user needs to install this (optional, shown in report)
+#   tags:           Searchable tags (optional)
+
+skills:
+  - repo: redis/agent-skills
+    skill: redis-development
+    description: >
+      Redis best practices: data structures, query engine,
+      vector search, caching, and performance.
+    dependencies:
+      - redis
+      - ioredis
+      - redis-py
+      - aioredis
+      - bull
+      - bullmq
+      - "@redis/client"
+    url: https://github.com/redis/agent-skills
+    prerequisites: "Node.js (npx)"
+    tags: [database, cache, redis]

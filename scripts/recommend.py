@@ -42,6 +42,12 @@ import yaml
 
 from scripts.bootstrap import STACK_PREFIXES, copy_claude_dir, render_template
 from scripts.collate import extract_patterns_from_dir
+from scripts.third_party_skills import (
+    format_install_results,
+    format_recommendations,
+    resolve_skills as resolve_third_party_skills,
+    try_install as try_install_third_party,
+)
 
 
 # --- Stack Detection ---
@@ -2276,6 +2282,8 @@ def main():
                         help="Create separate PRs per tier (default for --provision)")
     parser.add_argument("--single-pr", action="store_false", dest="multi_pr",
                         help="Create a single PR for all tiers (legacy behavior)")
+    parser.add_argument("--skip-third-party", action="store_true",
+                        help="Skip third-party skill recommendations and installation")
 
     args = parser.parse_args()
     hub_root = Path(__file__).parent.parent
@@ -2305,6 +2313,15 @@ def main():
     dep_promoted = resolve_dep_patterns(deps)
     if dep_promoted:
         print(f"Dependency-promoted patterns: {', '.join(sorted(dep_promoted))}")
+
+    # Step 1c: Resolve third-party skills
+    third_party_matched = []
+    if not args.skip_third_party:
+        project_dir = Path(args.local) if args.local else None
+        third_party_matched = resolve_third_party_skills(deps, project_dir, hub_root)
+        if third_party_matched:
+            names = [e.get("skill", e.get("repo", "").split("/")[-1]) for e in third_party_matched]
+            print(f"Third-party skills matched: {', '.join(names)}")
 
     # Step 2: Get project resources
     if args.local:
@@ -2341,11 +2358,22 @@ def main():
 
     # Step 5: Output (defer JSON when --provision is also set)
     if args.json_output and not args.provision:
-        print(json.dumps(gaps, indent=2))
+        output = gaps
+        if third_party_matched:
+            output = dict(gaps)
+            output["third_party_skills"] = [
+                {"repo": e.get("repo"), "skill": e.get("skill", ""),
+                 "match_reason": e.get("match_reason", "")}
+                for e in third_party_matched
+            ]
+        print(json.dumps(output, indent=2))
     elif not args.json_output:
         report = format_report(gaps, stacks, project_names, hub_resources)
         print()
         print(report)
+        # Append third-party recommendations
+        if third_party_matched:
+            print(format_recommendations(third_party_matched))
 
     # Step 6: Apply if requested
     if args.apply:
@@ -2373,6 +2401,10 @@ def main():
 
         if args.local:
             summary = provision_to_local(hub_root, Path(args.local), gaps, stacks, args.tier)
+            # Install third-party skills after hub patterns are copied
+            if third_party_matched:
+                tp_results = try_install_third_party(Path(args.local), third_party_matched)
+                summary["third_party_skills"] = tp_results
             provision_summary = summary
         elif getattr(args, "multi_pr", True):
             pr_urls = provision_to_repo_multi_pr(
@@ -2409,6 +2441,12 @@ def main():
                 for item in sorted(items, key=lambda x: (x["type"], x["name"])):
                     reason = item.get("reason", "")
                     print(f"  {item['type']:<8s} {item['name']:<40s} {action:<22s} {reason}")
+
+            # Third-party skills
+            if third_party_matched:
+                print(format_recommendations(third_party_matched))
+                if args.local and summary.get("third_party_skills"):
+                    print(format_install_results(summary["third_party_skills"]))
 
             # Config files (local mode)
             if args.local:
