@@ -349,3 +349,79 @@ test-results/           # gitignored — generated per run
 ```
 
 Add `test-results/` to `.gitignore` — these are ephemeral per-run artifacts.
+
+### Screenshot Proof Archive
+
+When `--capture-proof` is enabled, E2E/UI tests capture screenshots on every
+test (pass and fail) as visual evidence. The archive is run-scoped and ephemeral.
+
+#### Directory Convention
+
+```
+test-evidence/                  # gitignored — generated per pipeline run
+  {run_id}/                     # ISO-8601 timestamp + short git SHA
+    screenshots/                # All captured screenshots
+      {test_name}.pass.png
+      {test_name}.fail.png
+      {test_name}.iter2.fail.png  # Fix-loop iteration screenshots
+    manifest.json               # Index of all screenshots
+    visual-review.json          # AI multimodal review verdicts
+```
+
+Add `test-evidence/` to `.gitignore` alongside `test-results/`.
+
+#### Manifest Schema
+
+Written by `tester-agent` after test execution:
+
+```json
+{
+  "run_id": "{timestamp}_{git_sha_short}",
+  "capture_proof": true,
+  "platform": "playwright-chromium",
+  "screenshots": [
+    {
+      "test": "test_login_success",
+      "file": "tests/e2e/test_auth.py::test_login_success",
+      "result": "PASSED",
+      "screenshot": "screenshots/test_login_success.pass.png",
+      "timestamp": "2026-03-17T14:30:12Z"
+    }
+  ]
+}
+```
+
+#### Visual Review Schema
+
+Written by `/auto-verify` Step 2.5 after multimodal review:
+
+```json
+{
+  "skill": "visual-proof-review",
+  "run_id": "{run_id}",
+  "timestamp": "{ISO-8601}",
+  "screenshots_reviewed": 50,
+  "screenshots_total": 50,
+  "overrides": [
+    {
+      "test": "test_dashboard_loads",
+      "original_result": "PASSED",
+      "visual_verdict": "FAILED",
+      "reason": "Empty table — no data rows visible",
+      "screenshot": "screenshots/test_dashboard_loads.pass.png"
+    }
+  ],
+  "flags": [],
+  "result": "PASSED|FAILED"
+}
+```
+
+A visual review `result` of FAILED (any overrides exist) is a blocking signal —
+`/post-fix-pipeline` reads this file and blocks commit if overrides are present.
+
+#### Integration with Stage Gate Aggregator
+
+The aggregator reads `test-results/*.json` for pipeline verdicts. It does NOT
+read `test-evidence/` directly. Instead, the visual review result is embedded
+in `test-results/auto-verify.json` via the `visual_review` field. This keeps
+the aggregation contract unchanged — one directory, one glob pattern.
