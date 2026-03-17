@@ -6,8 +6,8 @@ description: >
   integrates with CI for automated visual diff reporting. Use for one-off verification
   or full visual regression pipelines.
 allowed-tools: "Bash Read Grep Glob"
-argument-hint: "<screenshot-path or directory> [--update-baselines] [--strict] [--threshold=N]"
-version: "1.0.0"
+argument-hint: "<screenshot-path or directory> [--update-baselines] [--strict] [--threshold=N] [--proof-mode --run-id=<id>]"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -18,6 +18,27 @@ Validate screenshot files, compare against baselines, and manage visual regressi
 **Target:** $ARGUMENTS
 
 ---
+
+## STEP 0.5: Proof Mode (if --proof-mode)
+
+When invoked with `--proof-mode`, read screenshots from the evidence archive
+instead of from manually specified paths:
+
+1. Read `test-evidence/{run_id}/manifest.json`
+2. For each entry in `screenshots[]`:
+   - Set the target path to `test-evidence/{run_id}/{entry.screenshot}`
+   - Tag with the test result (`entry.result`) for review context
+3. Proceed to STEP 1 (File Validation) with the manifest-derived paths
+
+If `--run-id` is not provided, find the most recent `test-evidence/*/manifest.json`
+by timestamp.
+
+This mode is used by `/auto-verify` Step 2.5 for pipeline-integrated visual review,
+but can also be invoked standalone to review evidence from a previous run:
+
+```bash
+/verify-screenshots --proof-mode --run-id=2026-03-17T14:30:00Z_abc1234
+```
 
 ## STEP 1: File Validation
 
