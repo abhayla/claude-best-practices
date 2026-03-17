@@ -228,26 +228,35 @@ The quality gate checks (with blocking thresholds):
 
 ### STEP 5: Final Verification
 
-Run the complete verification suite:
+Run the full test verification pipeline with screenshot proof and strict gates:
+
+```
+Skill("/test-pipeline", args="--skip-fix")
+```
+
+This invokes the `test-pipeline-agent` orchestrator which:
+1. Cleans `test-results/` and `test-evidence/`
+2. Runs `/auto-verify` with strict gates and screenshot capture
+3. Runs quality gate, contract tests, and perf tests as sub-gates
+4. Produces `test-results/pipeline-verdict.json` with aggregated results
+5. Captures visual proof in `test-evidence/{run_id}/`
+
+If the pipeline reports FAILED, use `/fix-loop` on the specific failures, then re-run:
+
+```
+Skill("/test-pipeline", args="<failure_output>")
+```
+
+Also run linting and type checking (not covered by test-pipeline):
 
 ```bash
-# 1. Full test suite
-pytest tests/ -v --tb=short
-
-# 2. Linting
 ruff check src/ --fix     # Python
 # OR: npx eslint src/     # TypeScript
 # OR: golangci-lint run    # Go
 
-# 3. Type checking
 mypy src/                  # Python
 # OR: npx tsc --noEmit    # TypeScript
-
-# 4. Build verification
-# (project-specific build command)
 ```
-
-All four checks MUST pass. If any fail, use `/fix-loop` to resolve.
 
 ### STEP 6: Generate API Documentation (if applicable)
 

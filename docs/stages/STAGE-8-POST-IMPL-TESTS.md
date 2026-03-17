@@ -220,16 +220,16 @@ Run all existing unit + API tests to confirm Stage 7's work is intact:
 ```
 
 - **If ALL PASS** → Proceed to Step 4 (Wave A)
-- **If FAILURES** → Invoke `/test-pipeline` to run the full fix→verify→commit chain with strict gates and screenshot proof:
+- **If FAILURES** → Invoke the test pipeline for full fix→verify chain with strict gates and screenshot proof:
 
 ```
-/test-pipeline <failure_output>
+Skill("/test-pipeline", args="<failure_output>")
 ```
 
-Or invoke `/fix-loop` directly for a lighter-weight fix cycle:
+Or invoke `/fix-loop` directly for a lighter-weight fix cycle (no gates, no proof):
 
 ```
-/fix-loop <failure_output> retest_command: "<test command>" max_iterations: 3
+Skill("/fix-loop", args="<failure_output> retest_command: '<test command>' max_iterations: 3")
 ```
 
 If `fix-loop` reports UNRESOLVED after 3 iterations, set `regression_baseline` to `FAILED` and **halt** — do not proceed to extended tests with a broken baseline. Report the failure in Step 14.

@@ -114,6 +114,23 @@ On completion (success or failure), generate `docs/stages/PIPELINE-SUMMARY.md` w
 - Test results summary
 - Deployment URL and health status
 
+## Test Verification Integration
+
+For Stages 7 (Implementation) and 8 (Post-Impl Tests), use `/test-pipeline`
+as the preferred test invocation rather than calling `/fix-loop` and
+`/auto-verify` separately. `/test-pipeline` dispatches the `test-pipeline-agent`
+orchestrator which handles:
+
+- Artifact cleanup (`test-results/`, `test-evidence/`) before each run
+- Strict gate enforcement between fix→verify→commit stages
+- Screenshot-as-proof capture (enabled by default) with multimodal visual review
+- Result aggregation into `test-results/pipeline-verdict.json`
+
+Stage subagents should invoke it via:
+```
+Skill("/test-pipeline", args="<failure_output_or_flags>")
+```
+
 ## Constraints
 
 - MUST read DAG from `config/pipeline-stages.yaml` — never hardcode stage definitions
@@ -124,3 +141,4 @@ On completion (success or failure), generate `docs/stages/PIPELINE-SUMMARY.md` w
 - MUST NOT retry more than 3 times per stage or 15 times globally
 - MUST NOT let dispatched stage agents spawn their own subagents
 - MUST tag git before each stage for clean rollback
+- MUST use `/test-pipeline` for test verification in Stages 7-8 (not raw `/fix-loop` + `/auto-verify`)
