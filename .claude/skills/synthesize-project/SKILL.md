@@ -7,7 +7,7 @@ description: >
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis] [--only skills|rules|agents] [--tier must-have|improved|nice-to-have|all]"
-version: "3.2.0"
+version: "3.3.0"
 type: workflow
 ---
 
@@ -23,7 +23,7 @@ Provision hub patterns and generate project-specific `.claude/` patterns by read
 
 | Flag | Effect |
 |------|--------|
-| (none) | Full flow: hub provision + code synthesis |
+| (none) | Full flow: hub provision + code synthesis. **Default: `--repo` mode** — creates a PR. Use `--local` only when explicitly requested. |
 | `--repo owner/name` | Remote mode — fetch via GitHub API, create PR |
 | `--update` | Delta only — skip hub provision, synthesize only new/stale conventions |
 | `--dry-run` | Preview only, no writes |
@@ -53,6 +53,8 @@ test -d core/.claude && test -f registry/patterns.json && test -f scripts/recomm
 
 **If you are NOT in the hub repo:** Proceed normally — local mode targets the current directory.
 
+**Default mode is `--repo`:** When the user provides a project name or path without explicitly saying `--local`, infer the GitHub `owner/repo` from the project's git remote and use `--repo` mode. Use `--local` ONLY when the user explicitly requests it (e.g., `--local /path/to/project`).
+
 ### Hub freshness check
 
 If running from the hub repo (local mode), check for uncommitted changes that could affect provision accuracy:
@@ -68,6 +70,23 @@ If there are uncommitted changes in these paths, warn:
   Provisioned patterns may not reflect the latest state.
   Continue anyway? (y/n)
 ```
+
+### Target project git check (--local mode only)
+
+If running in `--local` mode, check the target project's git status before writing anything:
+
+```bash
+cd "$PROJECT_DIR" && git status --short
+```
+
+If there are uncommitted changes, warn and ask:
+```
+⚠ Target project has uncommitted changes.
+  Synthesized patterns may conflict with in-progress work.
+  Commit or stash first? (y/n)
+```
+
+If the user says yes, wait for them to commit/stash. If no, proceed with caution.
 
 ---
 
@@ -433,12 +452,15 @@ If the hub patterns are not available locally (project was not bootstrapped from
 
 For each confirmed convention, generate a complete pattern file.
 
-**Read `references/pattern-templates.md`** for the full YAML templates (rule, skill, agent), quality checklists (structure, portability, self-containment, language), and sensitivity flagging keywords.
+**Use the `skill-author` agent for each pattern.** Do NOT generate patterns manually or via raw subagents without authoring guidance.
 
-Key requirements per type:
-- **Rules**: `globs:` in frontmatter, `synthesized: true`, MUST/MUST NOT language, provide alternatives
-- **Skills**: full frontmatter (`name`, `description`, `type`, `allowed-tools`, `argument-hint`, `version`), numbered steps, `## CRITICAL RULES` section
-- **Agents**: `tools` as JSON array, `model: inherit`, `## Core Responsibilities` and `## Output Format` sections
+**Parallel generation:** Launch separate `skill-author` subagents — one per pattern. Each subagent receives the pattern type, name, convention hypothesis, and evidence file list. The `skill-author` agent handles routing to the correct authoring workflow:
+
+- **Skills** → delegates to `/writing-skills` (templates, quality checklist, trigger overlap scan)
+- **Rules** → delegates to `/claude-guardian` (structure, placement, scope declaration)
+- **Agents** → applies `pattern-structure.md` + `references/pattern-templates.md` Agent Template directly
+
+See `core/.claude/agents/skill-author.md` for the full routing logic and quality gate.
 
 All patterns MUST: have 30+ lines of content, be under 500 lines, use project-specific examples (not generic advice), and pass sensitivity scan for auth/secret/token keywords.
 
@@ -583,3 +605,8 @@ Print a summary showing hub provisioning, CLAUDE.md section audit, and synthesis
 - STEP 2 (CLAUDE.md Section Audit) MUST insert missing sections BEFORE the `<!-- hub:best-practices:start -->` marker, never inside or after the hub-managed section. Never remove or reorganize the hub-managed markers — they are the boundary between user-editable and hub-managed content.
 - STEP 2 MUST validate that every file path in the CLAUDE.md rules table exists on disk. Dangling references mislead developers and agents. Remove stale entries, add missing ones.
 - STEP 3 MUST check for a monolithic `.claude/rules.md` before generating individual `rules/*.md` files. Generating both creates SSOT violations and content drift. Always ask the user how to proceed.
+- ALWAYS run full synthesis (Steps 1-10) unless the user explicitly passes `--skip-synthesis` or `--skip-hub`. NEVER offer a menu asking whether to run full synthesis, stop after provision, or skip synthesis. The default is full flow.
+- NEVER generate skills without using `/writing-skills`. Raw generation bypasses quality checks, template validation, and the trigger overlap scan.
+- NEVER generate rules without using `/claude-guardian`. Raw rule creation risks wrong placement, missing scope declaration, and format violations.
+- For agents, ALWAYS read `pattern-structure.md` and `references/pattern-templates.md` (Agent Template) before generating — agents require `model` and `tools` in frontmatter, plus `## Core Responsibilities` and `## Output Format` sections.
+- Default to `--repo` mode (create PR) unless the user explicitly requests `--local`. Writing directly to a project's working directory without review is risky — PRs provide a review gate.
