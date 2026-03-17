@@ -53,9 +53,18 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 5. **Local → Hub**: `/contribute-practice` validates and submits as PR
 6. **Hub → Project (Advisory)**: `recommend.py` produces tiered gap report, optionally applies
 
+### Key Scripts
+
+- **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping and `copy_claude_dir()` which filters patterns by stack prefix. Imported by `recommend.py`.
+- **`recommend.py`** — Main entry point for provisioning. Modes: `--local`/`--repo` (report only), `--apply` (copy files), `--provision` (apply + generate CLAUDE.md + settings.json), `--diff` (compare overlapping content). Uses `bootstrap.py` for copying and `collate.py` for extraction.
+- **`validate_patterns.py`** — CI validator. Checks frontmatter, cross-references, file/registry sync. Run before every PR.
+- **`generate_docs.py`** — Rebuilds `docs/` dashboard and `core/.claude/README.md` from `registry/patterns.json`.
+- **`collate.py`** — Extracts patterns from downstream project repos for hub ingestion.
+- **`scan_web.py`** — Discovers patterns from URLs/topics configured in `config/urls.yml` and `config/topics.yml`.
+
 ### GitHub Actions
 
-Eight workflows: `test.yml`, `scan-projects.yml`, `scan-internet.yml`, `validate-pr.yml`, `update-docs.yml`, `sync-to-projects.yml`, `expire-sources.yml`, `recommend.yml`.
+Nine workflows: `test.yml`, `scan-projects.yml`, `scan-internet.yml`, `validate-pr.yml`, `update-docs.yml`, `sync-to-projects.yml`, `expire-sources.yml`, `recommend.yml`, `apply-selections.yml`.
 
 ## Testing
 
@@ -66,7 +75,8 @@ Eight workflows: `test.yml`, `scan-projects.yml`, `scan-internet.yml`, `validate
 
 ## Key Conventions
 
-- `registry/patterns.json` MUST stay in sync with actual files in `core/.claude/`
+- `registry/patterns.json` MUST stay in sync with actual files in `core/.claude/`. After adding/removing patterns: edit the registry, then run `python scripts/generate_docs.py` to regenerate docs. CI (`validate-pr.yml`) will catch drift.
 - Pattern curation is reactive, not speculative — see `.claude/rules/rule-curation.md`
 - Pattern quality rules (structure, portability, self-containment) are in `.claude/rules/pattern-*.md`
 - `/synthesize-project` (in `core/.claude/skills/`) provisions projects; `/synthesize-hub` (in `.claude/skills/`) generalizes patterns back into the hub
+- Stack prefix filtering depends on `STACK_PREFIXES` in `scripts/bootstrap.py`. To add a new stack, add the prefix mapping there AND update stack detection in `scripts/recommend.py`.
