@@ -64,44 +64,24 @@ fi
 
 ---
 
-## STEP 1: Identify Changes
+## STEP 1: Map Changes to Tests (via /regression-test)
 
-```bash
-git diff --name-only HEAD
-git diff --name-only --cached
+Delegate change identification and test mapping to `/regression-test`, which
+provides 2-level import graph tracing, coverage-based mapping, and risk
+classification. This is the single canonical mapper for the pipeline.
+
+```
+Skill("/regression-test", args="$FILES_ARG --framework auto")
 ```
 
-If `--files` provided, use those instead.
+After `/regression-test` completes, read `test-results/regression-test.json`:
 
-## STEP 2: Map Changes to Tests
+1. Extract the affected test list and overall risk level
+2. If `regression-test` reports `BLOCKED` (test infra broken) → exit with BLOCKED
+3. Use the mapped test files and risk classification for STEP 2
 
-For each changed file, find related test files using these strategies in order:
-
-### 2.1 Path-Based Mapping (try first)
-
-| Source Pattern | Test Pattern(s) to Check |
-|---------------|-------------------------|
-| `src/<path>/<name>.py` | `tests/<path>/test_<name>.py`, `tests/test_<name>.py` |
-| `src/<path>/<name>.ts` | `tests/<path>/<name>.test.ts`, `src/<path>/<name>.test.ts`, `__tests__/<path>/<name>.test.ts` |
-| `app/<path>/<name>.py` | `tests/<path>/test_<name>.py` |
-| `src/<path>/<name>.kt` | `src/test/<path>/<name>Test.kt` |
-
-### 2.2 Import-Based Mapping (fallback if path-based finds nothing)
-
-```bash
-# Find test files that import the changed module
-grep -rl "from.*<module_name>" tests/ --include="*.py" --include="*.ts"
-grep -rl "import.*<module_name>" tests/ --include="*.py" --include="*.ts"
-```
-
-### 2.3 Convention Detection
-
-Check the project for test layout conventions:
-- Look at existing test files to detect naming patterns
-- Check `CLAUDE.md`, `pyproject.toml`, or `jest.config.*` for test path config
-- If the project uses a non-standard layout, adapt mapping rules accordingly
-
-If no test files are found for a changed file, flag it: "No tests found for `<file>` — consider adding tests."
+Coverage gaps flagged by `/regression-test` (source files with no mapped tests)
+are reported in the final auto-verify output as warnings.
 
 ## STEP 3: Run Targeted Tests
 

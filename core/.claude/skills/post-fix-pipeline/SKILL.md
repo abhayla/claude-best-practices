@@ -1,18 +1,18 @@
 ---
 name: post-fix-pipeline
 description: >
-  Post-fix verification pipeline: regression tests, full test suite with auto-fix,
-  documentation updates, and git commit. Use after fix-loop succeeds to verify
-  no regressions before committing.
+  Post-fix completion pipeline: reads upstream auto-verify gate, updates
+  documentation, commits, and captures learnings. Use after auto-verify
+  succeeds to finalize changes. Does NOT re-run tests — trusts upstream.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
-argument-hint: "[fixes_applied] [test_suite_commands] [commit_format]"
-version: "1.1.0"
+argument-hint: "[fixes_applied] [commit_format] [--strict-gates] [--capture-proof]"
+version: "2.0.0"
 type: workflow
 ---
 
 # Post-Fix Pipeline
 
-Verify fixes don't cause regressions, update docs, and commit.
+Finalize verified changes: documentation, commit, and learning capture.
 
 **Input:** $ARGUMENTS
 
@@ -23,22 +23,26 @@ Verify fixes don't cause regressions, update docs, and commit.
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `fixes_applied` | — | Summary of fixes that were applied |
-| `test_suite_commands` | — | Commands to run for full test suite verification |
 | `commit_format` | `fix(scope): description` | Commit message format |
 | `push` | false | Whether to push after commit |
+| `--strict-gates` | false | Missing upstream JSON = BLOCK |
+| `--capture-proof` | false | Include evidence summary in commit body |
 
 ---
 
 ## STEP 0: Gate Check — Read Upstream Results
 
-Before running the pipeline, check if the upstream `auto-verify` stage passed:
+1. If `test-results/auto-verify.json` exists, read it:
+   - If `result` is `FAILED` → BLOCK. Exit immediately.
+   - If `result` is `PASSED` or `FIXED` → proceed.
 
-1. If `test-results/auto-verify.json` exists, read it
-2. Parse the `result` field
-3. If `result` is `FAILED`:
-   - Report: "BLOCKED: auto-verify reported FAILED — resolve upstream failures before running post-fix-pipeline."
-   - Exit immediately — do not proceed to regression testing
-4. If `result` is `PASSED`, `FIXED`, or the file does not exist → proceed to STEP 1
+2. If `test-results/auto-verify.json` does NOT exist:
+   - **With `--strict-gates`:** BLOCK. Report: "BLOCKED: auto-verify output missing."
+   - **Without `--strict-gates`:** WARN + proceed.
+
+3. If `test-evidence/*/visual-review.json` exists (most recent run_id), read it:
+   - If any `overrides` exist (passed tests overridden to FAILED) → BLOCK.
+   - Report which tests were visually overridden.
 
 ```bash
 if [ -f test-results/auto-verify.json ]; then
@@ -49,53 +53,51 @@ if [ -f test-results/auto-verify.json ]; then
   fi
   echo "auto-verify result: $UPSTREAM_RESULT — proceeding"
 else
-  echo "No auto-verify results found — proceeding without gate check"
+  if [ "$STRICT_GATES" = "true" ]; then
+    echo "BLOCKED: auto-verify output missing (--strict-gates enforced)"
+    exit 1
+  else
+    echo "WARN: No auto-verify results found — proceeding without gate check"
+  fi
+fi
+
+# Check visual review overrides
+VISUAL_REVIEW=$(find test-evidence -name "visual-review.json" 2>/dev/null | sort | tail -1)
+if [ -n "$VISUAL_REVIEW" ]; then
+  OVERRIDES=$(python3 -c "import json; d=json.load(open('$VISUAL_REVIEW')); print(len(d.get('overrides', [])))")
+  if [ "$OVERRIDES" -gt 0 ]; then
+    echo "BLOCKED: visual review found $OVERRIDES override(s) — passed tests visually broken"
+    exit 1
+  fi
 fi
 ```
 
 ---
 
-## STEP 1: Regression Testing
-
-Run targeted tests on the areas where fixes were applied:
-
-1. Identify test files related to changed files
-2. Run targeted tests first
-3. Report any regressions introduced by the fix
-
-## STEP 2: Full Test Suite Verification
-
-If test suite commands are provided, run them:
-
-1. Execute each test suite command
-2. If failures found:
-   - Attempt auto-fix (max 2 attempts via `/fix-loop`)
-   - If still failing, report and block commit
-3. Gate: PASSED / PASSED_AFTER_FIX / FAILED
-
-## STEP 3: Documentation Updates
+## STEP 1: Documentation Updates
 
 Delegate to docs-manager-agent if documentation needs updating:
 - Update continuation/handoff documents
-- Record test results
+- Record test results and evidence location
 
-## STEP 4: Git Commit
+## STEP 2: Git Commit
 
 If all gates pass:
 
 1. Delegate to git-manager-agent for secure commit
 2. Use conventional commit format
 3. Include summary of fixes in commit body
+4. If `--capture-proof`, include evidence directory path in commit body
 
 If gates fail:
 - Report blocking issues
 - Do NOT commit
 
-## STEP 5: Learning Capture
+## STEP 3: Learning Capture
 
 Invoke `/learn-n-improve session` to record the fix for future reference.
 
-## STEP 5.5: Structured JSON Output
+## STEP 4: Structured JSON Output
 
 Write machine-readable results to `test-results/post-fix-pipeline.json`:
 
@@ -105,12 +107,11 @@ Write machine-readable results to `test-results/post-fix-pipeline.json`:
   "result": "PASSED|FAILED",
   "timestamp": "<ISO-8601>",
   "details": {
-    "regression_tests": "PASSED|FAILED",
-    "test_suite": "PASSED|PASSED_AFTER_FIX|FAILED",
     "documentation": "UPDATED|SKIPPED",
     "commit": "<hash>|BLOCKED",
     "learning_capture": "RECORDED|SKIPPED",
-    "upstream_gate": "PASSED|SKIPPED"
+    "upstream_gate": "PASSED|SKIPPED",
+    "visual_review_gate": "PASSED|BLOCKED|SKIPPED"
   }
 }
 ```
@@ -126,12 +127,11 @@ result = {
     'result': '<PASSED_or_FAILED>',
     'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     'details': {
-        'regression_tests': '<status>',
-        'test_suite': '<status>',
         'documentation': '<status>',
         'commit': '<hash_or_BLOCKED>',
         'learning_capture': '<status>',
-        'upstream_gate': '<status>'
+        'upstream_gate': '<status>',
+        'visual_review_gate': '<status>'
     }
 }
 with open('test-results/post-fix-pipeline.json', 'w') as f:
@@ -145,8 +145,8 @@ with open('test-results/post-fix-pipeline.json', 'w') as f:
 
 ```
 Post-Fix Pipeline:
-  Regression tests: PASSED/FAILED
-  Test suite: PASSED/PASSED_AFTER_FIX/FAILED
+  Upstream gate: PASSED/BLOCKED
+  Visual review gate: PASSED/BLOCKED/SKIPPED
   Documentation: UPDATED/SKIPPED
   Commit: [hash] — [message] / BLOCKED
 ```
