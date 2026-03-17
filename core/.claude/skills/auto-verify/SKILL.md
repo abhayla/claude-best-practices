@@ -33,14 +33,16 @@ enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 
 ## STEP 0: Gate Check — Read Upstream Results
 
-Before running verification, check if the upstream `fix-loop` stage passed:
+Check if the upstream `fix-loop` stage passed:
 
-1. If `test-results/fix-loop.json` exists, read it
-2. Parse the `result` field
-3. If `result` is `FAILED` or `FLAKY`:
-   - Report: "BLOCKED: fix-loop reported {result} — resolve upstream failures before running auto-verify."
-   - Exit immediately — do not proceed to change identification
-4. If `result` is `PASSED`, `FIXED`, or the file does not exist → proceed to STEP 1
+1. If `test-results/fix-loop.json` exists, read it:
+   - If `result` is `FAILED` or `FLAKY` → BLOCK. Exit immediately.
+   - If `result` is `PASSED` or `FIXED` → proceed to STEP 1.
+
+2. If `test-results/fix-loop.json` does NOT exist:
+   - **With `--strict-gates`:** BLOCK. Report: "BLOCKED: fix-loop output missing — run fix-loop first or use orchestrator."
+   - **Without `--strict-gates`:** WARN: "No fix-loop results found — proceeding without gate check. Run via test-pipeline-agent for enforced gates."
+   - Proceed to STEP 1.
 
 ```bash
 if [ -f test-results/fix-loop.json ]; then
@@ -51,7 +53,12 @@ if [ -f test-results/fix-loop.json ]; then
   fi
   echo "fix-loop result: $UPSTREAM_RESULT — proceeding"
 else
-  echo "No fix-loop results found — proceeding without gate check"
+  if [ "$STRICT_GATES" = "true" ]; then
+    echo "BLOCKED: fix-loop output missing (--strict-gates enforced)"
+    exit 1
+  else
+    echo "WARN: No fix-loop results found — proceeding without gate check"
+  fi
 fi
 ```
 

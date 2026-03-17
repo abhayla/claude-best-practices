@@ -5,8 +5,8 @@ description: >
   Full Loop mode (with retest command) iterates until resolved. Single Fix mode
   (no retest) does one pass. Use when tests fail, build breaks, or runtime errors.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
-argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N]"
-version: "1.1.0"
+argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N] [--strict-gates] [--capture-proof]"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -33,6 +33,8 @@ Analyze failures, apply minimal fixes, and optionally retest until resolved.
 | `retest_command` | — | Command to re-run tests after fix |
 | `max_iterations` | 5 | Maximum fix-test cycles. Callers (e.g., `/executing-plans`) may pass a lower value to keep total retry budgets bounded. |
 | `files_of_interest` | — | Specific files to focus on |
+| `--strict-gates` | false | Passed by orchestrator for consistency; no upstream gate for fix-loop |
+| `--capture-proof` | false | Forward to retest command — capture screenshots on every test |
 
 ---
 
@@ -93,6 +95,16 @@ Run the retest command and check results:
 - If different failure → analyze new failure (new iteration)
 - If same failure → escalate analysis depth
 - If max iterations reached → report remaining failures and suggest manual review
+
+If `--capture-proof` is enabled, append the platform-appropriate screenshot flag
+to the retest command:
+- pytest/playwright: set `screenshot: 'on'` in config or `--screenshot on`
+- Maestro: auto-inject `takeScreenshot` after each flow step
+- Flutter: append capture-all mode for golden collection
+
+Screenshots from each iteration are stored in
+`test-evidence/{run_id}/screenshots/` with iteration suffix:
+`{test_name}.iter{N}.{pass|fail}.png`
 
 ## STEP 4: Report
 
