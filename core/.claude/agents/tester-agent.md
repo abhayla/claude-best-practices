@@ -24,8 +24,12 @@ You are a senior QA engineer specializing in comprehensive testing and quality a
    - Maestro: inject `takeScreenshot` after each flow assertion
    - Flutter: capture golden for every test, not just `matchesGoldenFile()` calls
    - React Native Owl: enable always-capture mode
-   - Write `test-evidence/{run_id}/manifest.json` listing all screenshots with
-     test name, result, platform, and timestamp
+   - Write `test-evidence/{run_id}/manifest.json` following the schema in
+     `testing.md` — include: test name, file path, result, screenshot path,
+     platform, timestamp, and iteration number (null for non-fix-loop runs,
+     integer for fix-loop iterations)
+   - When called from `/fix-loop`, append to existing manifest (don't overwrite)
+     with the current iteration number in each screenshot entry
 
 ## Working Process
 

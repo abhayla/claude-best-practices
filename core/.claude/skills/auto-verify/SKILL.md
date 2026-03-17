@@ -331,6 +331,12 @@ Write machine-readable results to `test-results/auto-verify.json`:
     "skipped": "<skipped_count>",
     "flaky": "<flaky_count>"
   },
+  "change_scope": {
+    "source_files": "<count from regression-test>",
+    "test_files": "<count>",
+    "overall_risk": "<CRITICAL|HIGH|MEDIUM|LOW>",
+    "coverage_gaps": ["<files with no mapped tests>"]
+  },
   "quality_gate": "PASSED|WARNED|FAILED|SKIPPED",
   "contract_check": "PASSED|FAILED|SKIPPED",
   "perf_baseline": "PASSED|REGRESSED|SKIPPED",
