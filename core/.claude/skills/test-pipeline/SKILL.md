@@ -57,9 +57,27 @@ If no failure output and no `--skip-fix`:
 
 ## STEP 2: Check Configuration
 
-Read `test-evidence-config.json` if it exists in the project root:
-- If `capture_proof: true` → enable capture-proof for the pipeline
-- CLI `--capture-proof` flag overrides the config file
+### Configuration Precedence (highest wins)
+
+1. **CLI flags** — `--capture-proof` or `--no-capture-proof` (always wins)
+2. **`test-evidence-config.json`** — Project-level config in project root
+3. **`config/test-pipeline.yml`** — Pipeline-level config (capture_proof.enabled)
+4. **Built-in default** — `true` (capture proof is on by default)
+
+Read configs in order and apply the highest-precedence value found:
+
+```bash
+# Check for project-level config
+if [ -f test-evidence-config.json ]; then
+  CAPTURE_PROOF=$(python3 -c "import json; print(json.load(open('test-evidence-config.json')).get('capture_proof', True))")
+elif [ -f config/test-pipeline.yml ]; then
+  CAPTURE_PROOF=$(python3 -c "import yaml; print(yaml.safe_load(open('config/test-pipeline.yml')).get('capture_proof', {}).get('enabled', True))")
+else
+  CAPTURE_PROOF=true
+fi
+# CLI flags override everything
+# --capture-proof → true, --no-capture-proof → false
+```
 
 Read `config/test-pipeline.yml` for stage definitions (the agent reads this
 internally, but verify it exists):

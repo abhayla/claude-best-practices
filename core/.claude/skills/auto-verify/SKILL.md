@@ -129,8 +129,8 @@ After `tester-agent` returns:
 
 ## STEP 2.5: Visual Proof Review (if --capture-proof enabled)
 
-Skip this step entirely if `--capture-proof` is not enabled or if no
-`test-evidence/{run_id}/manifest.json` exists.
+Skip this step entirely if `--capture-proof` is not enabled or `--no-capture-proof`
+was passed.
 
 ### 2.5.1 Read Manifest
 
@@ -138,6 +138,20 @@ Skip this step entirely if `--capture-proof` is not enabled or if no
 MANIFEST="test-evidence/${RUN_ID}/manifest.json"
 if [ ! -f "$MANIFEST" ]; then
   echo "No screenshot manifest found — skipping visual review"
+  # Set visual_review.enabled = false in structured output, proceed to STEP 3
+fi
+```
+
+If the manifest exists but has zero screenshots (`screenshot_count: 0` or
+empty `screenshots` array), this is normal for non-UI projects (API servers,
+CLI tools, libraries). Handle gracefully:
+
+```bash
+SCREENSHOT_COUNT=$(python3 -c "import json; print(json.load(open('$MANIFEST')).get('screenshot_count', 0))")
+if [ "$SCREENSHOT_COUNT" = "0" ]; then
+  echo "Manifest found but 0 screenshots (non-UI project) — skipping visual review"
+  # Write visual-review.json with result: PASSED, screenshots_reviewed: 0
+  # Proceed to STEP 3
 fi
 ```
 
