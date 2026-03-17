@@ -498,4 +498,4 @@ jobs:
 - `/changelog-contributing` — Generate a CHANGELOG.md alongside API docs to document endpoint changes over time
 - `/doc-staleness` — Detect when API documentation has drifted from the actual implementation
 - `/adr` — Record the decision to adopt a specific API documentation strategy
-- `docs-manager` agent — Orchestrates documentation updates across the project, delegates API doc generation to this skill
+- `docs-manager-agent` — Orchestrates documentation updates across the project, delegates API doc generation to this skill

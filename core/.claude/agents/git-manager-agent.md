@@ -1,5 +1,5 @@
 ---
-name: git-manager
+name: git-manager-agent
 description: Git Operations Specialist. Securely stages, commits, and pushes code changes with professional commit standards. Scans for secrets before committing.
 tools: ["Bash", "Read", "Grep", "Glob"]
 model: haiku

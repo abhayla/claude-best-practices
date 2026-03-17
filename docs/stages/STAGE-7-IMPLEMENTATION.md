@@ -390,11 +390,11 @@ On failure, report: what passed, what failed, suggested manual interventions, an
 **What to add (enhance Stage 7 gate check):**
 - Cyclomatic complexity check (max 10 per function)
 - Duplication detection (jscpd or framework-specific)
-- SOLID principles review checklist (can be done by `code-reviewer` agent)
+- SOLID principles review checklist (can be done by `code-reviewer-agent`)
 - Explicit TDD refactor phase after all tests pass
 - Structured logging pattern enforcement
 
-**Existing coverage:** Linting and type checking exist. `code-reviewer` agent exists but not invoked during implementation.
+**Existing coverage:** Linting and type checking exist. `code-reviewer-agent` exists but not invoked during implementation.
 
 ### Gap 7.2: `api-docs-generator` skill (Priority: P2)
 

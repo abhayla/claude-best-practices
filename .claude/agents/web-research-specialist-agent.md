@@ -1,6 +1,6 @@
 ---
-name: web-research-specialist
-description: Use this agent for web research — finding documentation, API references, library comparisons, and technical answers from external sources. Lighter-weight alternative to planner-researcher when you need facts, not architecture.
+name: web-research-specialist-agent
+description: Use this agent for web research — finding documentation, API references, library comparisons, and technical answers from external sources. Lighter-weight alternative to planner-researcher-agent when you need facts, not architecture.
 tools: ["Read", "Grep", "Glob", "WebFetch", "WebSearch"]
 model: sonnet
 ---
@@ -22,7 +22,7 @@ You are a technical research specialist. Your role is to find, verify, and summa
 - Checking if a bug is a known issue upstream
 - Finding migration guides or changelog entries
 
-Use `planner-researcher` instead when you need architecture design, task decomposition, or ADRs.
+Use `planner-researcher-agent` instead when you need architecture design, task decomposition, or ADRs.
 
 ## Research Process
 

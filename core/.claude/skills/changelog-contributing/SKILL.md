@@ -202,4 +202,4 @@ Changelog & Contributing: GENERATED
 - `/doc-structure-enforcer` — CHANGELOG.md and CONTRIBUTING.md are root docs (allowed at project root, not enforced into `docs/`)
 - `/doc-staleness` — Detect when changelog or contributing docs have drifted from actual project conventions
 - `/adr` — Major architectural decisions often correspond to changelog entries
-- `docs-manager` agent — Orchestrates project-wide documentation updates, delegates changelog generation to this skill
+- `docs-manager-agent` — Orchestrates project-wide documentation updates, delegates changelog generation to this skill

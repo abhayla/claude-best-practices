@@ -1,5 +1,5 @@
 ---
-name: docs-manager
+name: docs-manager-agent
 description: Use this agent for documentation updates — continuation prompts, requirement traceability, testing docs, and generated documentation. Referenced by post-fix-pipeline skill.
 tools: ["Read", "Grep", "Glob", "Edit", "Write"]
 model: sonnet

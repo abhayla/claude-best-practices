@@ -1,5 +1,5 @@
 ---
-name: android-build-fixer
+name: android-build-fixer-agent
 description: Diagnose and fix Android Gradle build failures. Covers version catalog issues, Kotlin/KSP mismatches, Compose compiler conflicts, dependency duplicates, Hilt/Room configuration, ProGuard, multi-module problems, and NDK.
 tools: ["Read", "Grep", "Glob", "Bash", "Edit"]
 model: sonnet

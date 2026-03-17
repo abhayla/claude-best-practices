@@ -79,7 +79,7 @@ Environment variables: `CONTEXT_WARN_THRESHOLD` (default 50), `CONTEXT_CRIT_THRE
 
 Environment variables: `CONTEXT_WARN_PCT` (default 35), `CONTEXT_CRIT_PCT` (default 25), `CONTEXT_DEBOUNCE` (default 10).
 
-Both options integrate with your existing `context-management` rules and `context-reducer` agent — the warnings reference `/handover`, context-reducer, and subagent delegation.
+Both options integrate with your existing `context-management` rules and `context-reducer-agent` — the warnings reference `/handover`, context-reducer-agent, and subagent delegation.
 
 ### Auto-Format on File Write (`auto-format.sh`)
 

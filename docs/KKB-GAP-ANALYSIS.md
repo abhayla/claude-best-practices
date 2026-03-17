@@ -8,7 +8,7 @@
 
 | Resource | KKB has | Hub has (eligible) | Gap |
 |----------|---------|-------------------|-----|
-| **Agents** | 14 | 14 (11 universal + 3 stack) | 1 missing (`security-auditor`) |
+| **Agents** | 14 | 14 (11 universal + 3 stack) | 1 missing (`security-auditor-agent`) |
 | **Skills** | 25 | ~55 (45 universal + 10 stack) | ~18 recommended |
 | **Rules** | 6 | 10 (5 universal + 5 stack) | 2 missing |
 | **Hooks** | 8 | 7 | 2 missing safety hooks |
@@ -26,7 +26,7 @@ KKB uses shorter names for some resources that correspond to hub stack-prefixed 
 | `db-migrate` | `fastapi-db-migrate` | Same skill |
 | `deploy` | `fastapi-deploy` | Same skill |
 | `gemini-api` | `ai-gemini-api` | Same skill |
-| `api-tester` (agent) | `fastapi-api-tester` (agent) | Same agent |
+| `api-tester` (agent) | `fastapi-api-tester-agent` (agent) | Same agent |
 | `database-admin` (agent) | `fastapi-database-admin` (agent) | Same agent |
 
 ---
@@ -61,7 +61,7 @@ KKB uses shorter names for some resources that correspond to hub stack-prefixed 
 
 | # | Hub Agent | Why |
 |---|-----------|-----|
-| 1 | **`security-auditor`** | KKB handles auth (Firebase Phone OTP), JWT token rotation, encrypted storage (AES256-GCM), rate limiting, and GDPR compliance. A dedicated security auditor agent pairs with the `security-audit` skill for periodic vulnerability assessment. |
+| 1 | **`security-auditor-agent`** | KKB handles auth (Firebase Phone OTP), JWT token rotation, encrypted storage (AES256-GCM), rate limiting, and GDPR compliance. A dedicated security auditor agent pairs with the `security-audit` skill for periodic vulnerability assessment. |
 
 ### Rules (2)
 
@@ -80,14 +80,14 @@ KKB uses shorter names for some resources that correspond to hub stack-prefixed 
 |---|-----------|---------------------|
 | 1 | **`security-audit`** | Full security audit workflow (CodeQL, Semgrep, SARIF triage). KKB handles auth, JWT, encryption. Valuable but periodic, not daily. |
 | 2 | **`adversarial-review`** | Structured adversarial review of security-sensitive code. Useful pre-release for auth/token rotation code. |
-| 3 | **`branching`** | Full branch lifecycle management. KKB has `git-manager` agent covering basics; this adds structured creation/cleanup. |
+| 3 | **`branching`** | Full branch lifecycle management. KKB has `git-manager-agent` covering basics; this adds structured creation/cleanup. |
 | 4 | **`git-worktrees`** | Isolated parallel development — useful for working on Android + backend simultaneously. Nice workflow improvement. |
-| 5 | **`brainstorm`** | Socratic questioning before planning. KKB already has `strategic-architect` and `planner-researcher` agent. Additive. |
-| 6 | **`writing-plans`** | Structured plan generation. KKB has `plan-executor` agent and `docs/plans/`. This adds the generation side. |
-| 7 | **`executing-plans`** | Execute pre-written plans step by step. Complements `plan-executor` agent; some overlap. |
+| 5 | **`brainstorm`** | Socratic questioning before planning. KKB already has `strategic-architect` and `planner-researcher-agent`. Additive. |
+| 6 | **`writing-plans`** | Structured plan generation. KKB has `plan-executor-agent` and `docs/plans/`. This adds the generation side. |
+| 7 | **`executing-plans`** | Execute pre-written plans step by step. Complements `plan-executor-agent`; some overlap. |
 | 8 | **`subagent-driven-dev`** | Orchestrate tasks across subagents. KKB's CLAUDE.md already uses subagent patterns; this formalizes orchestration. |
 | 9 | **`batch`** | Bulk operations across KKB's 416 Kotlin + 98 Python files (e.g., rename, migrate patterns). |
-| 10 | **`handover`** | Structured handover documents. KKB has `session-summarizer` agent and `docs/CONTINUE_PROMPT.md`; this is a more structured version. |
+| 10 | **`handover`** | Structured handover documents. KKB has `session-summarizer-agent` and `docs/CONTINUE_PROMPT.md`; this is a more structured version. |
 | 11 | **`supply-chain-audit`** | KKB has many dependencies (gradle version catalog, requirements.txt). Periodic supply chain security checks. |
 | 12 | **`learn-n-improve`** | Formalized learning system. KKB has a `reflect` skill; this adds analysis and self-modification. |
 | 13 | **`firebase-data-connect`** | Firebase Data Connect (PostgreSQL + GraphQL). KKB uses PostgreSQL but not GraphQL — partially relevant if KKB ever adds a GraphQL layer. |
@@ -137,4 +137,4 @@ KKB uses shorter names for some resources that correspond to hub stack-prefixed 
 2. **Routing**: Add `skill-master` so all 35+ skills become discoverable
 3. **Stack-specific**: Add `android-arch`, `android-gradle`, `compose-ui`, `firebase-dev`, `firebase-ai`, `pg-query`
 4. **Workflow**: Add `systematic-debugging`, `tdd`, `pr-standards`, `request-code-review`, `receive-code-review`
-5. **Rules + agent**: Add `context-management.md`, `rule-writing-meta.md`, `security-auditor` agent
+5. **Rules + agent**: Add `context-management.md`, `rule-writing-meta.md`, `security-auditor-agent`

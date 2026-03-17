@@ -1,5 +1,5 @@
 ---
-name: context-reducer
+name: context-reducer-agent
 description: Use this agent to summarize completed work mid-session and produce a compressed context block. Reduces context window usage while preserving critical information (modified files, test results, current task state). Use when approaching context limits or before switching tasks.
 tools: ["Read", "Grep", "Glob"]
 model: haiku

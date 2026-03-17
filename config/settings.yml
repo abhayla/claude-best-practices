@@ -34,7 +34,7 @@ synthesis:
       - tdd                      # Workflow type — shows numbered steps, critical rules section
       - test-knowledge           # Reference type — shows organized sections without step numbering
     agents:
-      - code-reviewer            # Shows agent structure: model, core responsibilities, output format
+      - code-reviewer-agent       # Shows agent structure: model, core responsibilities, output format
 
 clustering:
   min_cluster_size: 3

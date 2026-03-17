@@ -188,4 +188,4 @@ For projects with a single large README or monolithic doc:
 - `/doc-structure-enforcer` — Enforce stage-based folder structure before or after Diataxis restructuring
 - `/doc-staleness` — Run after restructuring to verify no references were broken during the move
 - `/adr` — ADRs belong in the `docs/explanation/` Diataxis category
-- `docs-manager` agent — Orchestrates broader documentation updates, delegates structural reorganization to this skill
+- `docs-manager-agent` — Orchestrates broader documentation updates, delegates structural reorganization to this skill

@@ -1,5 +1,5 @@
 ---
-name: planner-researcher
+name: planner-researcher-agent
 description: Senior technical lead specializing in software architecture, system design, and technical research. Use for planning implementations, researching solutions, analyzing codebases, and creating detailed technical plans.
 tools: ["Read", "Grep", "Glob", "Bash", "WebFetch", "WebSearch"]
 model: opus

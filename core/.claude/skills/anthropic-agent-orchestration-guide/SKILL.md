@@ -153,10 +153,10 @@ Agents and skills serve different purposes. Choosing wrong creates unnecessary c
 | Signal | Example |
 |--------|---------|
 | Dispatches 2+ subagents or sequences 3+ skills | `pipeline-orchestrator` — dispatches stage agents |
-| Needs its own context window (bulk reading) | `planner-researcher` — reads many files for analysis |
-| Runs as a worker dispatched by an orchestrator | `security-auditor` — dispatched by review-gate |
-| Requires tool scoping different from the caller | `code-reviewer` — needs only read tools |
-| Long-running with progress tracking | `plan-executor` — executes across many tasks |
+| Needs its own context window (bulk reading) | `planner-researcher-agent` — reads many files for analysis |
+| Runs as a worker dispatched by an orchestrator | `security-auditor-agent` — dispatched by review-gate |
+| Requires tool scoping different from the caller | `code-reviewer-agent` — needs only read tools |
+| Long-running with progress tracking | `plan-executor-agent` — executes across many tasks |
 
 ### Hybrid: Agent + Thin Skill Wrapper
 

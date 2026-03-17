@@ -267,4 +267,4 @@ Report any issues found.
 - `/doc-staleness` — Detect stale ADR references after restructuring or when linked decisions change
 - `/changelog-contributing` — Major architectural decisions often correspond to changelog entries
 - `/api-docs-generator` — API design decisions captured as ADRs often reference API documentation
-- `docs-manager` agent — Orchestrates documentation updates, can delegate ADR creation to this skill
+- `docs-manager-agent` — Orchestrates documentation updates, can delegate ADR creation to this skill

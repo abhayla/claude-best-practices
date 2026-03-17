@@ -26,7 +26,7 @@
   ┌──────────────────────────────┐
   │  Architecture Research       │
   │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
-  │  planner-researcher agent    │
+  │  planner-researcher-agent     │
   │  • Codebase analysis         │
   │  • ADR generation            │
   │  • Tech stack decisions      │
@@ -106,7 +106,7 @@
           │   ███ STAGE 2: PLAN ███   │
           │                           │
           │  writing-plans            │
-          │  planner-researcher       │
+          │  planner-researcher-agent  │
           │  plan-to-issues           │
           │                           │
           └──────────┬────────────────┘
@@ -138,7 +138,7 @@
 | 1 | Task decomposition (5-element format) | `writing-plans` (Step 2) | ✅ Covered | — |
 | 2 | Dependency graph & critical path | `writing-plans` (Step 3) | ✅ Covered | — |
 | 3 | Atomic plan grouping (2-3 tasks) | `writing-plans` (Step 2, atomic plan constraint) | ✅ Covered | — |
-| 4 | Architecture Decision Records | `planner-researcher` agent + Stage 2 prompt (Step 2) | ✅ Covered | **Michael Nygard ADR format** |
+| 4 | Architecture Decision Records | `planner-researcher-agent` + Stage 2 prompt (Step 2) | ✅ Covered | **Michael Nygard ADR format** |
 | 5 | PRD → GitHub Issues with epics | `plan-to-issues` skill | ✅ Covered | — |
 | 6 | Verification commands per task | `writing-plans` (element 4) | ✅ Covered | — |
 | 7 | File path verification | `writing-plans` (Step 4 checklist) | ✅ Covered | — |

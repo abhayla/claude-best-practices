@@ -75,7 +75,7 @@ If test suite commands are provided, run them:
 
 ## STEP 3: Documentation Updates
 
-Delegate to docs-manager agent if documentation needs updating:
+Delegate to docs-manager-agent if documentation needs updating:
 - Update continuation/handoff documents
 - Record test results
 
@@ -83,7 +83,7 @@ Delegate to docs-manager agent if documentation needs updating:
 
 If all gates pass:
 
-1. Delegate to git-manager agent for secure commit
+1. Delegate to git-manager-agent for secure commit
 2. Use conventional commit format
 3. Include summary of fixes in commit body
 

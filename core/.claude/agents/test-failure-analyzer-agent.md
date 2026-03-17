@@ -1,5 +1,5 @@
 ---
-name: test-failure-analyzer
+name: test-failure-analyzer-agent
 description: Use this agent to diagnose test failures — reads test output, classifies by root cause, suggests targeted fixes. Read-only analysis only; does not modify files or run tests. Complements /fix-loop which applies fixes.
 tools: ["Read", "Grep", "Glob"]
 model: sonnet

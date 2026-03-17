@@ -10,25 +10,25 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 
 | Agent | Description |
 |-------|-------------|
-| `code-reviewer` | Code quality assessment (readability, security, performance) |
-| `context-reducer` | Compress context mid-session while preserving critical info |
-| `debugger` | Systematic debugging, log analysis, performance optimization |
-| `docs-manager` | Keep project documentation accurate and up-to-date |
-| `git-manager` | Secure git operations with secret scanning |
-| `parallel-worktree-orchestrator` | Coordinate parallel workstreams using git worktrees |
-| `plan-executor` | Parse and execute multi-step implementation plans |
-| `planner-researcher` | Technical research, architecture design, task decomposition |
-| `quality-gate-evaluator` | Evaluate code/content against quality criteria with pass/fail verdicts |
-| `security-auditor` | Security review, STRIDE threat modeling, OWASP checks |
-| `session-summarizer` | Auto-generate session summaries for handoff |
-| `tester` | Run tests, analyze coverage, validate builds |
-| `test-failure-analyzer` | Diagnose test failures and suggest targeted fixes |
-| `web-research-specialist` | Web research for docs, API references, and technical fact-finding |
-| `fastapi-api-tester` | FastAPI endpoint testing and validation |
-| `fastapi-database-admin` | Database tasks — queries, migrations, schema management |
-| `android-build-fixer` | Android build error diagnosis and fix |
-| `android-compose` | Jetpack Compose UI — screens, state, design system |
-| `android-kotlin-reviewer` | Kotlin code review with Android best practices |
+| `code-reviewer-agent` | Code quality assessment (readability, security, performance) |
+| `context-reducer-agent` | Compress context mid-session while preserving critical info |
+| `debugger-agent` | Systematic debugging, log analysis, performance optimization |
+| `docs-manager-agent` | Keep project documentation accurate and up-to-date |
+| `git-manager-agent` | Secure git operations with secret scanning |
+| `parallel-worktree-orchestrator-agent` | Coordinate parallel workstreams using git worktrees |
+| `plan-executor-agent` | Parse and execute multi-step implementation plans |
+| `planner-researcher-agent` | Technical research, architecture design, task decomposition |
+| `quality-gate-evaluator-agent` | Evaluate code/content against quality criteria with pass/fail verdicts |
+| `security-auditor-agent` | Security review, STRIDE threat modeling, OWASP checks |
+| `session-summarizer-agent` | Auto-generate session summaries for handoff |
+| `tester-agent` | Run tests, analyze coverage, validate builds |
+| `test-failure-analyzer-agent` | Diagnose test failures and suggest targeted fixes |
+| `web-research-specialist-agent` | Web research for docs, API references, and technical fact-finding |
+| `fastapi-api-tester-agent` | FastAPI endpoint testing and validation |
+| `fastapi-database-admin-agent` | Database tasks — queries, migrations, schema management |
+| `android-build-fixer-agent` | Android build error diagnosis and fix |
+| `android-compose-agent` | Jetpack Compose UI — screens, state, design system |
+| `android-kotlin-reviewer-agent` | Kotlin code review with Android best practices |
 
 ## Skills (105)
 

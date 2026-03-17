@@ -63,7 +63,7 @@ if [[ $PCT_REMAINING -le $CRIT_PCT ]]; then
   echo "Context window is nearly full. Output quality will degrade significantly."
   echo "Recommended actions (pick one):"
   echo "  1. Run /handover to save session state and start fresh"
-  echo "  2. Use the context-reducer agent to compress completed work"
+  echo "  2. Use the context-reducer-agent to compress completed work"
   echo "  3. Delegate remaining sub-tasks to subagents (separate context windows)"
   echo ""
   echo "See context-management rule #7: break work into atomic plans of 2-3 tasks in fresh subagent contexts."

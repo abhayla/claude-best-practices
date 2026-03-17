@@ -1,5 +1,5 @@
 ---
-name: quality-gate-evaluator
+name: quality-gate-evaluator-agent
 description: Use this agent to evaluate code or content against a set of quality criteria. Scores output, identifies gaps, and provides actionable feedback for refinement. Use as a quality gate before merging, deploying, or finalizing work.
 tools: ["Read", "Grep", "Glob", "Bash"]
 model: sonnet

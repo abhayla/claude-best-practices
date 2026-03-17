@@ -1,5 +1,5 @@
 ---
-name: skill-author
+name: skill-author-agent
 description: >
   Create, update, or manage Claude Code skills, rules, and agents using the dedicated authoring
   workflows. Dispatches to /writing-skills for skills, /claude-guardian for rules, and applies

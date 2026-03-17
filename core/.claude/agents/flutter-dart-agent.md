@@ -1,5 +1,5 @@
 ---
-name: flutter-dart
+name: flutter-dart-agent
 description: Use this agent for Flutter/Dart UI work — building screens, fixing widget bugs, implementing state management with Riverpod, GoRouter navigation, Drift offline-first patterns, or reviewing Dart code for performance and correctness. Scoped to the presentation and data layers.
 tools: ["Read", "Grep", "Glob", "Bash", "Edit", "Write"]
 model: sonnet

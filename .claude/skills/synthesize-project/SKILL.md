@@ -452,15 +452,15 @@ If the hub patterns are not available locally (project was not bootstrapped from
 
 For each confirmed convention, generate a complete pattern file.
 
-**Use the `skill-author` agent for each pattern.** Do NOT generate patterns manually or via raw subagents without authoring guidance.
+**Use the `skill-author-agent` for each pattern.** Do NOT generate patterns manually or via raw subagents without authoring guidance.
 
-**Parallel generation:** Launch separate `skill-author` subagents — one per pattern. Each subagent receives the pattern type, name, convention hypothesis, and evidence file list. The `skill-author` agent handles routing to the correct authoring workflow:
+**Parallel generation:** Launch separate `skill-author-agent` subagents — one per pattern. Each subagent receives the pattern type, name, convention hypothesis, and evidence file list. The `skill-author-agent` handles routing to the correct authoring workflow:
 
 - **Skills** → delegates to `/writing-skills` (templates, quality checklist, trigger overlap scan)
 - **Rules** → delegates to `/claude-guardian` (structure, placement, scope declaration)
 - **Agents** → applies `pattern-structure.md` + `references/pattern-templates.md` Agent Template directly
 
-See `core/.claude/agents/skill-author.md` for the full routing logic and quality gate.
+See `core/.claude/agents/skill-author-agent.md` for the full routing logic and quality gate.
 
 All patterns MUST: have 30+ lines of content, be under 500 lines, use project-specific examples (not generic advice), and pass sensitivity scan for auth/secret/token keywords.
 

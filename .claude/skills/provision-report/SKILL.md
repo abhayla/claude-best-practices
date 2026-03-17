@@ -77,7 +77,7 @@ Reasons explain WHY a pattern was placed in its tier. Every item MUST have a non
 | `matches detected stack` | Stack prefix matches auto-detected stack (e.g., fastapi-db-migrate for fastapi-python stack) |
 | `core workflow skill` | In `CORE_WORKFLOW_SKILLS` set (implement, fix-loop, tdd, etc.) |
 | `core rule` | In `MUST_HAVE_RULES` set (context-management, rule-writing-meta) |
-| `core agent` | In `MUST_HAVE_AGENTS` set (security-auditor) |
+| `core agent` | In `MUST_HAVE_AGENTS` set (security-auditor-agent) |
 | `essential safety hook` | In `MUST_HAVE_HOOKS` set (dangerous-command-blocker, secret-scanner) |
 | `useful but optional` | In `NICE_TO_HAVE_UNIVERSAL_SKILLS` set |
 | `optional skill/rule/agent/hook` | Universal pattern not in any priority list |

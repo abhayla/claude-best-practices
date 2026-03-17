@@ -159,7 +159,7 @@
 | # | Capability | Existing Skill/Agent | Status | SE Standard |
 |---|-----------|---------------------|--------|-------------|
 | 1 | TDD red-green-refactor (red phase) | `tdd` skill (6 TDD patterns) | ✅ Covered | **Kent Beck TDD** |
-| 2 | Unit test writing (AAA pattern) | `tdd` skill + `tester` agent | ✅ Covered | — |
+| 2 | Unit test writing (AAA pattern) | `tdd` skill + `tester-agent` | ✅ Covered | — |
 | 3 | API test stubs (CRUD + auth) | `test-generator` (Step 5) | ✅ Covered | — |
 | 4 | E2E test skeletons (Page Objects) | `test-generator` (Step 6) + `playwright` skill (POM pattern) | ✅ Covered | — |
 | 5 | Performance test stubs (k6) | Stage 6 prompt | ✅ Covered | — |
@@ -208,7 +208,7 @@
 
 **Problem:** Stage 6 listed `tests/security/checklist.md` as output, but Stage 8 produces `tests/security/threat-model.md` (STRIDE analysis). These are different documents with different purposes.
 
-**Resolution:** Clarified that Stage 6 produces security test stubs as part of API tests (auth, permissions, injection prevention in `tests/api/`). Stage 8 produces the threat-model.md via `security-auditor` agent. No separate checklist artifact needed from Stage 6.
+**Resolution:** Clarified that Stage 6 produces security test stubs as part of API tests (auth, permissions, injection prevention in `tests/api/`). Stage 8 produces the threat-model.md via `security-auditor-agent`. No separate checklist artifact needed from Stage 6.
 
 ### Gap 6.4: Mobile E2E status stale (Priority: P2) — ✅ RESOLVED
 

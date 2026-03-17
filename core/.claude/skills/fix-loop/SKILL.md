@@ -145,7 +145,7 @@ If the same error persists after 2 iterations:
 1. Widen the search — read more context around the failing code
 2. Check for deeper root causes (configuration, dependencies, environment)
 3. Delegate to specialist agents based on failure category:
-   - `COMPILE_ERROR` / `MISSING_IMPORT` → debugger agent
+   - `COMPILE_ERROR` / `MISSING_IMPORT` → debugger-agent
    - `INFRASTRUCTURE` → check environment setup (DB connection, Redis, service health)
    - `CONTRACT_MISMATCH` → delegate to /contract-test for contract analysis
    - `MIGRATION_FAILURE` → delegate to /db-migrate-verify for schema validation

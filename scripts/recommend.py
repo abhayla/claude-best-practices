@@ -424,7 +424,7 @@ NICE_TO_HAVE_UNIVERSAL_SKILLS = {
 MUST_HAVE_RULES = {"context-management", "workflow", "claude-behavior", "testing", "tdd"}
 
 # Universal agents that are high-value
-MUST_HAVE_AGENTS = {"security-auditor"}
+MUST_HAVE_AGENTS = {"security-auditor-agent"}
 
 # Skills/resources to always skip (meta hub skills, wrong-domain)
 # NOTE: Framework skills like vue-dev, flutter-dev, etc. are NOT in this list —
@@ -457,9 +457,9 @@ RESOURCE_STACK_REQUIREMENTS: dict[str, set[str]] = {
     "fastapi-backend": {"fastapi-python"},
     "fastapi-database": {"fastapi-python"},
     # Agents
-    "android-build-fixer": {"android-compose"},
-    "android-compose": {"android-compose"},
-    "android-kotlin-reviewer": {"android-compose"},
+    "android-build-fixer-agent": {"android-compose"},
+    "android-compose-agent": {"android-compose"},
+    "android-kotlin-reviewer-agent": {"android-compose"},
 }
 
 

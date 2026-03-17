@@ -243,4 +243,4 @@ If `--fix` flag is set, apply the critical and high fixes automatically using Ed
 - `/doc-structure-enforcer` — Enforce folder structure rules; run before staleness scan to ensure files are in expected locations
 - `/changelog-contributing` — Update CHANGELOG.md when staleness scan reveals undocumented changes
 - `/adr` — Architecture Decision Records may reference stale symbols or deleted files
-- `docs-manager` agent — Orchestrates documentation updates, can delegate staleness scanning to this skill
+- `docs-manager-agent` — Orchestrates documentation updates, can delegate staleness scanning to this skill

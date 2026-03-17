@@ -58,7 +58,7 @@ Parse the PR body to extract checked and unchecked patterns:
 - [ ] `workflow` — description
 
 ### Agents
-- [ ] `docs-manager` — description
+- [ ] `docs-manager-agent` — description
 ```
 
 Build two lists:

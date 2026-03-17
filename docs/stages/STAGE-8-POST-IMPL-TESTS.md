@@ -534,7 +534,7 @@ If any required artifact is missing, generate it before reporting completion. If
 | 5 | Web quality audit (Lighthouse, CWV) | `web-quality` skill (Step 11) | ✅ Covered | — |
 | 6 | SAST (CodeQL, Semgrep) | `security-audit` skill (Step 6.1) | ✅ Covered | **OWASP Top 10** |
 | 7 | Supply chain audit | `supply-chain-audit` skill (Step 6.2) | ✅ Covered | — |
-| 8 | STRIDE threat modeling | `security-auditor` agent (Step 6.1) | ✅ Covered | **STRIDE (Microsoft)** |
+| 8 | STRIDE threat modeling | `security-auditor-agent` (Step 6.1) | ✅ Covered | **STRIDE (Microsoft)** |
 | 9 | Security checklist execution | `security-audit` skill (Step 6.1) | ✅ Covered | — |
 | 10 | Test results report generation | Orchestration prompt (Step 14) | ✅ Covered | — |
 | 11 | DAST (Dynamic Application Security Testing) | `dast-scan` skill (Step 8) | ✅ Covered | **OWASP DAST** |

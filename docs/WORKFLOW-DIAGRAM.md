@@ -113,7 +113,7 @@
 | Resource | Type | What it does |
 |----------|------|-------------|
 | `/strategic-architect` | Skill | Project diagnostics, bottleneck identification, roadmap |
-| `planner-researcher` | Agent | Technical research, architecture design |
+| `planner-researcher-agent` | Agent | Technical research, architecture design |
 
 **What's missing:**
 | Gap | Description | Suggested Addition |
@@ -132,8 +132,8 @@
 | `/strategic-architect` | Skill | Strategic diagnostics and roadmap creation |
 | `/plan-to-issues` | Skill | Parse markdown plan into GitHub Issues |
 | `/implement` | Skill | Structured implementation workflow (requirements → tests → code) |
-| `planner-researcher` | Agent | Architecture design, task decomposition |
-| `plan-executor` | Agent | Parse plans into tracked steps with dependencies |
+| `planner-researcher-agent` | Agent | Architecture design, task decomposition |
+| `plan-executor-agent` | Agent | Parse plans into tracked steps with dependencies |
 | `workflow.md` | Rule | 7-step development workflow |
 
 **Minor gaps:**
@@ -150,7 +150,7 @@
 |----------|------|-------------|
 | `/ui-ux-pro-max` | Skill | 50+ styles, 97 palettes, 57 font pairings, 9 framework stacks |
 | `android-compose-ui.md` | Rule | Compose UI structure, ViewModel patterns, design system |
-| `android-compose` | Agent | Jetpack Compose screens, state, design system |
+| `android-compose-agent` | Agent | Jetpack Compose screens, state, design system |
 | `react-nextjs.md` | Rule | ⚠️ Placeholder — no actual content |
 
 **Minor gaps:**
@@ -171,7 +171,7 @@
 | `/fix-loop` | Skill | Iterative fix cycle until tests pass |
 | `/fastapi-db-migrate` | Skill | Alembic migration generation |
 | `/ai-gemini-api` | Skill | Gemini API integration reference |
-| `fastapi-database-admin` | Agent | DB queries, migrations, schema management |
+| `fastapi-database-admin-agent` | Agent | DB queries, migrations, schema management |
 | `fastapi-backend.md` | Rule | SQLAlchemy patterns, services architecture |
 | `fastapi-database.md` | Rule | PostgreSQL config, Alembic workflows |
 | `android.md` | Rule | Gradle, architecture, coroutines, testing |
@@ -199,9 +199,9 @@
 | `/test-knowledge` | Skill | Self-improving testing knowledge base |
 | `/fix-loop` | Skill | Iterative debug cycle |
 | `/post-fix-pipeline` | Skill | Regression tests + full suite + commit |
-| `tester` | Agent | Test execution, coverage analysis, build validation |
-| `test-failure-analyzer` | Agent | Diagnose failures, classify root causes |
-| `debugger` | Agent | Log analysis, performance investigation |
+| `tester-agent` | Agent | Test execution, coverage analysis, build validation |
+| `test-failure-analyzer-agent` | Agent | Diagnose failures, classify root causes |
+| `debugger-agent` | Agent | Log analysis, performance investigation |
 | `testing.md` | Rule | Testing principles, fixtures, failure handling |
 
 **Minor gaps:**
@@ -219,9 +219,9 @@
 **What exists:**
 | Resource | Type | What it does |
 |----------|------|-------------|
-| `code-reviewer` | Agent | Code quality, type safety, security, performance review |
+| `code-reviewer-agent` | Agent | Code quality, type safety, security, performance review |
 | `/claude-guardian` | Skill | Validate CLAUDE.md config files |
-| `git-manager` | Agent | Secret scanning during git operations |
+| `git-manager-agent` | Agent | Secret scanning during git operations |
 
 **Minor gaps:**
 | Gap | Description | Suggested Addition |
@@ -237,7 +237,7 @@
 | Resource | Type | What it does |
 |----------|------|-------------|
 | `/fastapi-deploy` | Skill | FastAPI deployment: migrations, seeds, restart, health check |
-| `git-manager` | Agent | Secure git push with secret scanning |
+| `git-manager-agent` | Agent | Secure git push with secret scanning |
 
 **What's missing:**
 | Gap | Description | Suggested Addition |
@@ -278,8 +278,8 @@
 | `/learn-n-improve` | Skill | Session analysis, memory updates, pattern detection |
 | `/test-knowledge` | Skill | Self-improving testing knowledge base |
 | `/skill-factory` | Skill | Detect repeated workflows, create new skills |
-| `session-summarizer` | Agent | Auto-generate session summaries for handoff |
-| `context-reducer` | Agent | Compress context mid-session |
+| `session-summarizer-agent` | Agent | Auto-generate session summaries for handoff |
+| `context-reducer-agent` | Agent | Compress context mid-session |
 
 ---
 
@@ -290,9 +290,9 @@
 |----------|------|-------------|
 | `/continue` | Skill | Resume from previous session with full context |
 | `/status` | Skill | Quick project health snapshot |
-| `session-summarizer` | Agent | Session summaries for handoff |
-| `context-reducer` | Agent | Context compression |
-| `docs-manager` | Agent | Keep docs accurate |
+| `session-summarizer-agent` | Agent | Session summaries for handoff |
+| `context-reducer-agent` | Agent | Context compression |
+| `docs-manager-agent` | Agent | Keep docs accurate |
 
 ---
 

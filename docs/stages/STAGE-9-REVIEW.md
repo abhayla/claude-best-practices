@@ -137,8 +137,8 @@
 | # | Capability | Existing Skill/Agent | Status | SE Standard |
 |---|-----------|---------------------|--------|-------------|
 | 1 | Adversarial code review (multi-reviewer) | `adversarial-review` skill | ✅ Covered | — |
-| 2 | Security review | `security-auditor` agent + `security-audit` skill | ✅ Covered | **OWASP Top 10** |
-| 3 | Automated quality checks (lint, type, build) | `code-reviewer` agent | ✅ Covered | — |
+| 2 | Security review | `security-auditor-agent` + `security-audit` skill | ✅ Covered | **OWASP Top 10** |
+| 3 | Automated quality checks (lint, type, build) | `code-reviewer-agent` | ✅ Covered | — |
 | 4 | PR standards enforcement | `pr-standards` skill | ✅ Covered | — |
 | 5 | PR creation with comprehensive description | `request-code-review` + `branching` skills | ✅ Covered | — |
 | 6 | Fix loop for review findings | `fix-loop` skill | ✅ Covered | — |
@@ -181,7 +181,7 @@
 - Coupling metrics (afferent/efferent coupling)
 - Can be implemented as custom Semgrep rules or import analysis
 
-**Existing coverage:** `code-reviewer` agent checks conventions. `adversarial-review` has maintainability reviewer. Neither enforces architectural constraints formally.
+**Existing coverage:** `code-reviewer-agent` checks conventions. `adversarial-review` has maintainability reviewer. Neither enforces architectural constraints formally.
 
 ### Gap 9.2: Change risk scoring (Priority: P2)
 
@@ -244,7 +244,7 @@
 
 ## Stack Coverage
 
-Universal — code review is stack-agnostic. The `adversarial-review` skill and `code-reviewer` agent work across all languages. Stack-specific review concerns (e.g., Android ProGuard rules, FastAPI dependency injection) are handled by the respective stack rules.
+Universal — code review is stack-agnostic. The `adversarial-review` skill and `code-reviewer-agent` work across all languages. Stack-specific review concerns (e.g., Android ProGuard rules, FastAPI dependency injection) are handled by the respective stack rules.
 
 ## Autonomy Verdict
 

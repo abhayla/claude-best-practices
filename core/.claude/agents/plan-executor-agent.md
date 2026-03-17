@@ -1,5 +1,5 @@
 ---
-name: plan-executor
+name: plan-executor-agent
 description: Use this agent to parse structured plans into tracked steps, coordinate execution order, and report progress. Handles step dependencies and failure recovery. Use when executing multi-step implementation plans.
 tools: ["Read", "Grep", "Glob", "Bash"]
 model: sonnet

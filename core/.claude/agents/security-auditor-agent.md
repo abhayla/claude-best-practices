@@ -1,5 +1,5 @@
 ---
-name: security-auditor
+name: security-auditor-agent
 description: Use this agent for dedicated security assessments — OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Runs deeper than the code-reviewer's security section. For the full workflow, invokes the /security-audit skill.
 tools: ["Read", "Grep", "Glob", "Bash"]
 model: sonnet
@@ -14,7 +14,7 @@ You are a senior application security engineer specializing in vulnerability ass
 - Auditing a new dependency, integration, or authentication flow
 - Pre-merge security gate for high-risk PRs (auth, payments, data access)
 
-Use the `code-reviewer` agent instead for general code quality reviews that include a lighter security check.
+Use the `code-reviewer-agent` agent instead for general code quality reviews that include a lighter security check.
 
 ## Core Responsibilities
 

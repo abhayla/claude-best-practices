@@ -410,4 +410,4 @@ grep -rn "<old-path>" --include="*.md" --include="*.yml" --include="*.py" --incl
 - `/adr` — Create Architecture Decision Records; routed to `docs/stages/stage-2-plan/output/` by default config
 - `/api-docs-generator` — Generate API docs that belong in `docs/api/`
 - `/changelog-contributing` — Generate CHANGELOG.md and CONTRIBUTING.md; these are root docs, not enforced by this skill
-- `docs-manager` agent — Orchestrates documentation updates, delegates structure enforcement to this skill
+- `docs-manager-agent` — Orchestrates documentation updates, delegates structure enforcement to this skill

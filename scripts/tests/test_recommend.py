@@ -60,7 +60,7 @@ def hub_root(tmp_path):
     # Agents
     agents = core / "agents"
     agents.mkdir(parents=True)
-    for name in ["debugger", "tester", "security-auditor", "fastapi-api-tester"]:
+    for name in ["debugger-agent", "tester-agent", "security-auditor-agent", "fastapi-api-tester-agent"]:
         (agents / f"{name}.md").write_text(f"---\nname: {name}\n---\n# {name}")
 
     # Rules
@@ -108,7 +108,7 @@ def project_dir(tmp_path):
     # Existing agents
     agents = claude / "agents"
     agents.mkdir(parents=True)
-    for name in ["debugger", "tester", "api-tester"]:
+    for name in ["debugger-agent", "tester-agent", "api-tester"]:
         (agents / f"{name}.md").write_text(f"---\nname: {name}\n---\n# {name}")
 
     # Existing rules
@@ -200,7 +200,7 @@ class TestGetProjectResourceNames:
         names = get_project_resource_names(project_dir / ".claude")
         assert "fix-loop" in names["skill"]
         assert "db-migrate" in names["skill"]
-        assert "debugger" in names["agent"]
+        assert "debugger-agent" in names["agent"]
         assert "workflow" in names["rule"]
         assert "auto-format" in names["hook"]
 
@@ -229,7 +229,7 @@ class TestNameMatchesExisting:
 
     def test_hub_agent_prefix_match(self):
         """Hub 'fastapi-api-tester' should match project 'api-tester'."""
-        assert name_matches_existing("fastapi-api-tester", {"api-tester", "debugger"})
+        assert name_matches_existing("fastapi-api-tester-agent", {"api-tester-agent", "debugger-agent"})
 
     def test_reversed_prefix_match(self):
         """Hub 'android-run-tests' should match project 'run-android-tests'."""
@@ -317,7 +317,7 @@ class TestTierResource:
             assert meta not in found, f"{meta} should not be in distributable rules"
 
     def test_must_have_agent(self):
-        assert tier_resource("security-auditor", "agent", []) == "must-have"
+        assert tier_resource("security-auditor-agent", "agent", []) == "must-have"
 
     def test_stack_override_nice_to_have(self):
         """firebase-data-connect is stack-specific but overridden to nice-to-have."""
@@ -403,7 +403,7 @@ class TestAnalyzeGaps:
 
         # Already exists in project
         assert "fix-loop" not in all_names
-        assert "debugger" not in all_names
+        assert "debugger-agent" not in all_names
         assert "workflow" not in all_names
         assert "auto-format" not in all_names
 
@@ -538,8 +538,8 @@ class TestApplyToLocal:
         gaps = analyze_gaps(hub_resources, project_names, stacks)
         copied = apply_to_local(hub_root, project_dir, gaps, tier="must-have")
 
-        assert any("security-auditor" in f for f in copied)
-        assert (project_dir / ".claude" / "agents" / "security-auditor.md").exists()
+        assert any("security-auditor-agent" in f for f in copied)
+        assert (project_dir / ".claude" / "agents" / "security-auditor-agent.md").exists()
 
     def test_copies_rules(self, hub_root, project_dir):
         hub_resources = get_hub_resources(hub_root)
@@ -700,7 +700,7 @@ class TestAnalyzeOverlapsLocal:
 
         overlaps = analyze_overlaps_local(hub_root, project_dir, hub_resources, project_names)
 
-        debugger = [o for o in overlaps if o["hub_name"] == "debugger"]
+        debugger = [o for o in overlaps if o["hub_name"] == "debugger-agent"]
         assert len(debugger) == 1
         assert debugger[0]["type"] == "agent"
 
@@ -1471,11 +1471,11 @@ class TestCopyResourcesForTier:
     def test_copies_agents(self, hub_root, tmp_path):
         target = tmp_path / "target"
         target.mkdir()
-        items = [{"name": "security-auditor", "type": "agent", "tier": "must-have"}]
+        items = [{"name": "security-auditor-agent", "type": "agent", "tier": "must-have"}]
         copied = _copy_resources_for_tier(hub_root, target, items)
         assert len(copied) == 1
-        assert "security-auditor" in copied[0]
-        assert (target / ".claude" / "agents" / "security-auditor.md").exists()
+        assert "security-auditor-agent" in copied[0]
+        assert (target / ".claude" / "agents" / "security-auditor-agent.md").exists()
 
     def test_copies_rules(self, hub_root, tmp_path):
         target = tmp_path / "target"
@@ -1532,7 +1532,7 @@ class TestFormatNiceToHavePrBody:
         items = [
             {"name": "brainstorm", "type": "skill", "tier": "nice-to-have"},
             {"name": "testing", "type": "rule", "tier": "nice-to-have"},
-            {"name": "docs-manager", "type": "agent", "tier": "nice-to-have"},
+            {"name": "docs-manager-agent", "type": "agent", "tier": "nice-to-have"},
         ]
         body = _format_nice_to_have_pr_body(items)
         assert "### Skills" in body
@@ -1570,7 +1570,7 @@ class TestGenerateHubSectionCounts:
     def test_with_counts(self, hub_root):
         project_names = {
             "skill": {"fix-loop", "tdd", "brainstorm"},
-            "agent": {"debugger", "tester"},
+            "agent": {"debugger-agent", "tester-agent"},
             "rule": {"workflow"},
         }
         section = generate_hub_practices_section(

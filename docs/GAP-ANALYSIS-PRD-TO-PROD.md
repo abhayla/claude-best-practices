@@ -76,7 +76,7 @@
 |-------|------|---------|------------|-------------------|-----|
 | 0 | Master Orchestrator | Spawn, gate-check, coordinate all stages | — | `pipeline-orchestrator`, `subagent-driven-dev` | `STAGE-0-MASTER-ORCHESTRATOR.md` |
 | 1 | PRD | Generate or parse requirements document | — | `brainstorm`, `prd-parser`, `/github`, `/reddit`, `/twitter-x` | `STAGE-1-PRD.md` |
-| 2 | Plan | Decompose PRD into tasks + ADRs | Stage 1 | `writing-plans`, `plan-to-issues`, `planner-researcher` | `STAGE-2-PLAN.md` |
+| 2 | Plan | Decompose PRD into tasks + ADRs | Stage 1 | `writing-plans`, `plan-to-issues`, `planner-researcher-agent` | `STAGE-2-PLAN.md` |
 | 3 | Scaffolding | Repo setup, CI skeleton, dev env, linters | Stage 1 | `project-scaffold`, `ci-cd-setup` | `STAGE-3-SCAFFOLDING.md` |
 | 4 | HTML Demo | Interactive prototype with sample data | Stages 1, 3 | `html-prototype`, `ui-ux-pro-max`, `a11y-audit`, `d3-viz` | `STAGE-4-HTML-DEMO.md` |
 | 5 | Schema & Data | DB design, migrations, seed data | Stages 2, 3 | `schema-designer`, `db-migrate`, `fastapi-db-migrate`, `pg-query` | `STAGE-5-SCHEMA.md` |
@@ -228,7 +228,7 @@ STAGE 1:  brainstorm ─→ prd-parser
 STAGE 2:          STAGE 3:
 writing-plans     project-scaffold
 plan-to-issues    ci-cd-setup (skeleton)
-planner-researcher
+planner-researcher-agent
          │         │
          │    ┌────┘
          │    ▼
@@ -273,7 +273,7 @@ STAGE 9:
 adversarial-review ─→ architecture-fitness
 change-risk-scoring ─→ merge-strategy
 request-code-review ─→ pr-standards
-code-reviewer agent + security-auditor agent
+code-reviewer-agent + security-auditor-agent
          │
          ▼
 STAGE 10:
