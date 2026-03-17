@@ -1,0 +1,29 @@
+{
+  "description": "Screenshot-as-proof configuration for the test verification pipeline",
+  "capture_proof": false,
+  "review_screenshots": {
+    "passed": true,
+    "failed": true
+  },
+  "platforms": {
+    "playwright": {
+      "screenshot_mode": "only-on-failure",
+      "capture_proof_override": "on"
+    },
+    "maestro": {
+      "auto_inject_screenshot": false,
+      "capture_proof_override": true
+    },
+    "flutter": {
+      "capture_all_goldens": false,
+      "capture_proof_override": true
+    },
+    "react_native_owl": {
+      "always_capture": false,
+      "capture_proof_override": true
+    }
+  },
+  "evidence_dir": "test-evidence",
+  "manifest_filename": "manifest.json",
+  "visual_review_filename": "visual-review.json"
+}

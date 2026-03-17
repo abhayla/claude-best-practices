@@ -1,0 +1,46 @@
+# Test pipeline stage definitions
+# Read by test-pipeline-agent at runtime
+
+pipeline:
+  name: test-verification
+  version: "1.0.0"
+
+  stages:
+    - name: fix-loop
+      skill: "/fix-loop"
+      writes: "test-results/fix-loop.json"
+      retry_limit: 3
+
+    - name: auto-verify
+      skill: "/auto-verify"
+      reads: "test-results/fix-loop.json"
+      writes: "test-results/auto-verify.json"
+      retry_limit: 2
+      sub_gates:
+        - skill: "/code-quality-gate"
+          condition: "always"
+          writes: "test-results/code-quality-gate.json"
+        - skill: "/contract-test"
+          condition: "api_changed"
+          writes: "test-results/contract-test.json"
+        - skill: "/perf-test"
+          condition: "perf_code_changed"
+          writes: "test-results/perf-test.json"
+
+    - name: post-fix-pipeline
+      skill: "/post-fix-pipeline"
+      reads: "test-results/auto-verify.json"
+      writes: "test-results/post-fix-pipeline.json"
+      retry_limit: 1
+
+global_retry_budget: 15
+
+capture_proof:
+  enabled: false
+  review_rate_passed: 1.0
+  review_rate_failed: 1.0
+  evidence_dir: "test-evidence"
+
+cleanup:
+  - "test-results/"
+  - "test-evidence/"
