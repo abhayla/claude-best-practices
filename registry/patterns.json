@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-15",
-    "total_patterns": 179
+    "total_patterns": 180
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -998,7 +998,7 @@
     "last_updated": "2026-03-15",
     "dependencies": [],
     "visibility": "public",
-    "description": "Enforce stage-based documentation folder structure via config-driven rules. Two modes: audit (report misplaced files) or enforce (git mv + update references). Aligns with pipeline-orchestrator-agent.",
+    "description": "Enforce stage-based documentation folder structure via config-driven rules. Two modes: audit (report misplaced files) or enforce (git mv + update references). Aligns with project-manager-agent.",
     "tags": [
       "documentation",
       "structure",
@@ -1823,10 +1823,10 @@
     "discovered": "2026-03-13",
     "last_updated": "2026-03-14",
     "dependencies": [
-      "pipeline-orchestrator-agent"
+      "project-manager-agent"
     ],
     "visibility": "public",
-    "description": "Thin skill wrapper that dispatches the pipeline-orchestrator agent for DAG-based multi-stage pipeline coordination",
+    "description": "Thin skill wrapper that dispatches the project-manager agent for DAG-based multi-stage pipeline coordination",
     "tags": [
       "pipeline",
       "orchestration",
@@ -1834,7 +1834,7 @@
     ],
     "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent"
   },
-  "pipeline-orchestrator-agent": {
+  "project-manager-agent": {
     "hash": "ee4649ce489dc96ce7dc1aa9b7a3c0541754202cf1ede8702cb672b9665cb7f2",
     "type": "agent",
     "category": "core",
@@ -1854,6 +1854,28 @@
       "agent"
     ],
     "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u2014 orchestration logic now lives in the agent"
+  },
+  "skill-author": {
+    "hash": "00a611d46cb5c301cc4241e00c2a2a2276f1266269fc692c999148179d30b33d",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-17",
+    "last_updated": "2026-03-17",
+    "dependencies": [
+      "writing-skills",
+      "pattern-structure"
+    ],
+    "visibility": "public",
+    "description": "Pattern author agent that creates, updates, and manages Claude Code skills, rules, and agents by delegating to /writing-skills and /claude-guardian",
+    "tags": [
+      "authoring",
+      "skills",
+      "agent",
+      "patterns"
+    ],
+    "changelog": "v1.0.0: Initial release \u2014 routes pattern creation to appropriate authoring workflows with quality validation"
   },
   "plan-executor": {
     "hash": "16056a4b8212e93e7534b960601e025badf2386ee0c3d81d3adeb860e725d4d5",

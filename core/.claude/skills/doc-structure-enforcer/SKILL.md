@@ -4,7 +4,7 @@ description: >
   Enforce a stage-based documentation folder structure via config-driven rules.
   Two modes: audit (report misplaced files) or enforce (git mv + update all path
   references). Auto-generates .doc-structure.yml on first run if missing. Aligns
-  with pipeline-orchestrator-agent's 11-stage artifact layout.
+  with project-manager-agent's 11-stage artifact layout.
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "--audit | --enforce [--config <path>]"

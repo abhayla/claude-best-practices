@@ -1,5 +1,5 @@
 ---
-name: pipeline-orchestrator-agent
+name: project-manager-agent
 description: >
   DAG-based multi-stage pipeline orchestrator for PRD-to-Production delivery.
   Use when coordinating 2+ sequential/parallel stages that produce artifacts

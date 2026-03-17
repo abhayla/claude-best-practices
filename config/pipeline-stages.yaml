@@ -1,5 +1,5 @@
 # Pipeline Stage Definitions — DAG Configuration
-# Read by pipeline-orchestrator agent at runtime.
+# Read by project-manager agent at runtime.
 # Edit this file to add/remove stages or change dependencies.
 
 pipeline:

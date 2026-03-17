@@ -336,7 +336,7 @@ For pipelines exceeding 30 minutes or 10+ stages:
 - [Anthropic: Building Effective Agents](https://docs.anthropic.com/en/docs/build-with-claude/agentic-patterns) — Canonical source for the 5 workflow patterns
 - [Anthropic: Prompt Engineering Guide](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering) — Foundations for agent prompt design
 - `config/pipeline-stages.yaml` — Pipeline DAG configuration
-- `.claude/agents/pipeline-orchestrator.md` — Production orchestrator implementation
+- `.claude/agents/project-manager-agent.md` — Production orchestrator implementation
 - `.claude/skills/subagent-driven-dev/SKILL.md` — Detailed subagent dispatch patterns
 - `.claude/rules/agent-orchestration.md` — Enforced constraints for orchestration
 

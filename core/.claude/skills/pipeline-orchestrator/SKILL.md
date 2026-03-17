@@ -20,7 +20,7 @@ type: workflow
 
 # Pipeline Orchestrator — Dispatch Wrapper
 
-Dispatch the `pipeline-orchestrator-agent` agent to coordinate a multi-stage pipeline from PRD to Production.
+Dispatch the `project-manager-agent` agent to coordinate a multi-stage pipeline from PRD to Production.
 
 **Input:** $ARGUMENTS
 
@@ -31,7 +31,7 @@ Dispatch the `pipeline-orchestrator-agent` agent to coordinate a multi-stage pip
 Launch the pipeline-orchestrator agent with the user's input. The agent handles DAG loading from `config/pipeline-stages.yaml`, wave computation, stage agent dispatch, gate validation, state management, retry logic, and pipeline completion.
 
 ```
-Agent(subagent_type="pipeline-orchestrator-agent", prompt="$ARGUMENTS")
+Agent(subagent_type="project-manager-agent", prompt="$ARGUMENTS")
 ```
 
 The agent will:
@@ -57,7 +57,7 @@ After the agent completes, relay the pipeline summary to the user:
 
 ## MUST DO
 
-- Always dispatch via the `pipeline-orchestrator-agent` agent — do not inline orchestration logic
+- Always dispatch via the `project-manager-agent` agent — do not inline orchestration logic
 - Always relay the full pipeline summary to the user after completion
 
 ## MUST NOT DO

@@ -26,7 +26,7 @@ DOCS_STAGES = ROOT / "docs" / "stages"
 REGISTRY_PATH = ROOT / "registry" / "patterns.json"
 
 PIPELINE_CONFIG = CONFIG_DIR / "pipeline-stages.yaml"
-ORCHESTRATOR_AGENT = CORE_CLAUDE / "agents" / "pipeline-orchestrator-agent.md"
+ORCHESTRATOR_AGENT = CORE_CLAUDE / "agents" / "project-manager-agent.md"
 ORCHESTRATOR_SKILL = CORE_CLAUDE / "skills" / "pipeline-orchestrator" / "SKILL.md"
 ORCHESTRATION_RULE = CORE_CLAUDE / "rules" / "agent-orchestration.md"
 ORCHESTRATION_GUIDE = CORE_CLAUDE / "skills" / "anthropic-agent-orchestration-guide" / "SKILL.md"
@@ -348,7 +348,7 @@ class TestStageDocSkillReferences:
 
 
 class TestOrchestratorAgent:
-    """The pipeline-orchestrator-agent must be properly configured."""
+    """The project-manager-agent must be properly configured."""
 
     def test_agent_file_exists(self):
         assert ORCHESTRATOR_AGENT.exists()
@@ -356,7 +356,7 @@ class TestOrchestratorAgent:
     def test_agent_has_required_frontmatter(self):
         content = _read_file(ORCHESTRATOR_AGENT)
         fm = _parse_frontmatter(content)
-        assert fm.get("name") == "pipeline-orchestrator-agent"
+        assert fm.get("name") == "project-manager-agent"
         assert "description" in fm
         assert "model" in fm
         assert "tools" in fm
@@ -403,8 +403,8 @@ class TestOrchestratorSkillWrapper:
 
     def test_skill_dispatches_agent(self):
         content = _read_file(ORCHESTRATOR_SKILL)
-        assert "pipeline-orchestrator-agent" in content, (
-            "Skill wrapper must dispatch pipeline-orchestrator-agent"
+        assert "project-manager-agent" in content, (
+            "Skill wrapper must dispatch project-manager-agent"
         )
 
     def test_skill_has_correct_version(self):
@@ -669,10 +669,10 @@ class TestNewPatternsInRegistry:
 
     def test_orchestrator_agent_in_registry(self):
         reg = _load_registry()
-        assert "pipeline-orchestrator-agent" in reg, (
-            "pipeline-orchestrator-agent not in registry"
+        assert "project-manager-agent" in reg, (
+            "project-manager-agent not in registry"
         )
-        assert reg["pipeline-orchestrator-agent"]["type"] == "agent"
+        assert reg["project-manager-agent"]["type"] == "agent"
 
     def test_orchestration_rule_in_registry(self):
         reg = _load_registry()
