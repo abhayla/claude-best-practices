@@ -333,6 +333,43 @@ class TestTierResource:
         assert tier_resource("compose-ui", "skill", [], dep_promoted={"compose-ui"}) == "must-have"
         assert tier_resource("compose-ui", "skill", []) == "nice-to-have"
 
+    def test_non_prefixed_stack_rules_skip_when_no_stack(self):
+        """Non-prefixed rules like 'android', 'vue', 'firebase' skip when their stack is absent."""
+        # No stacks detected at all
+        assert tier_resource("android", "rule", []) == "skip"
+        assert tier_resource("firebase", "rule", []) == "skip"
+        assert tier_resource("flutter", "rule", []) == "skip"
+        assert tier_resource("bun-elysia", "rule", []) == "skip"
+        # Wrong stack detected
+        assert tier_resource("android", "rule", ["fastapi-python"]) == "skip"
+        assert tier_resource("firebase", "rule", ["fastapi-python"]) == "skip"
+        assert tier_resource("flutter", "rule", ["fastapi-python"]) == "skip"
+
+    def test_non_prefixed_stack_rules_kept_when_stack_matches(self):
+        """Non-prefixed rules are kept (not skipped) when their required stack is detected."""
+        assert tier_resource("android", "rule", ["android-compose"]) != "skip"
+        assert tier_resource("firebase", "rule", ["firebase-auth"]) != "skip"
+        assert tier_resource("flutter", "rule", ["android-compose"]) != "skip"
+        assert tier_resource("fastapi-backend", "rule", ["fastapi-python"]) != "skip"
+        assert tier_resource("fastapi-database", "rule", ["fastapi-python"]) != "skip"
+
+    def test_non_prefixed_stack_rules_dep_promoted_overrides_skip(self):
+        """Dep promotion overrides the stack requirement skip."""
+        assert tier_resource("vue", "rule", [], dep_promoted={"vue"}) == "must-have"
+        assert tier_resource("bun-elysia", "rule", [], dep_promoted={"bun-elysia"}) == "must-have"
+        assert tier_resource("flutter", "rule", [], dep_promoted={"flutter"}) == "must-have"
+
+    def test_vue_rule_skipped_without_vue_dep_or_stack(self):
+        """Vue rule is skipped when no Vue-related stack or dep is detected."""
+        # react-nextjs stack doesn't match, but vue requires it (as proxy for frontend JS stack)
+        assert tier_resource("vue", "rule", ["fastapi-python"]) == "skip"
+        assert tier_resource("vue", "rule", []) == "skip"
+
+    def test_fastapi_rules_skipped_without_fastapi_stack(self):
+        """FastAPI rules skip when project is not FastAPI."""
+        assert tier_resource("fastapi-backend", "rule", ["android-compose"]) == "skip"
+        assert tier_resource("fastapi-database", "rule", []) == "skip"
+
 
 # --- Gap Analysis ---
 

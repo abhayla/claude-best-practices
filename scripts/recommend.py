@@ -81,13 +81,13 @@ DEP_PATTERN_MAP = {
     "prisma": {"prisma-orm"},
     "drizzle-orm": {"drizzle-orm"},
     "next": {"nextjs-dev"},
-    "vue": {"vue-dev", "vue-test"},
-    "nuxt": {"nuxt-dev"},
-    "pinia": {"vue-dev"},
+    "vue": {"vue-dev", "vue-test", "vue"},  # vue rule
+    "nuxt": {"nuxt-dev", "vue"},            # Nuxt implies Vue rule
+    "pinia": {"vue-dev", "vue"},            # Pinia implies Vue rule
     "react-native": {"react-native-dev", "react-native-e2e"},
     "expo": {"expo-dev"},
     "hono": {"hono-backend"},
-    "elysia": {"bun-elysia-test"},
+    "elysia": {"bun-elysia-test", "bun-elysia"},  # bun-elysia rule
     "socket.io": {"websocket-patterns"},
     "ws": {"websocket-patterns"},
     "redis": {"redis-patterns"},
@@ -95,20 +95,22 @@ DEP_PATTERN_MAP = {
     "d3": {"d3-viz"},
     "remotion": {"remotion-video"},
     # Python
-    "fastapi": {"fastapi-run-backend-tests", "fastapi-deploy", "fastapi-db-migrate"},
+    "fastapi": {"fastapi-run-backend-tests", "fastapi-deploy", "fastapi-db-migrate",
+                 "fastapi-backend", "fastapi-database"},  # fastapi rules
     "pytest": {"pytest-dev"},
     "alembic": {"db-migrate", "db-migrate-verify"},
     "sqlalchemy": {"schema-designer"},
     "psycopg2-binary": {"pg-query"},
     "psycopg2": {"pg-query"},
     "asyncpg": {"pg-query"},
+    "firebase-admin": {"firebase"},  # firebase rule
     "anthropic": {"ai-gemini-api"},
     "google-genai": {"ai-gemini-api"},
     "websockets": {"websocket-patterns"},
     # Android/Gradle
-    "compose": {"compose-ui"},
+    "compose": {"compose-ui", "android"},  # android rule
     # Flutter
-    "flutter": {"flutter-dev", "flutter-e2e-test"},
+    "flutter": {"flutter-dev", "flutter-e2e-test", "flutter"},  # flutter rule
 }
 
 # Subdirectory patterns to scan for dependency files (1-level deep)
@@ -440,6 +442,26 @@ NICE_TO_HAVE_STACK_OVERRIDES = {
     "xml-to-compose",         # Only needed for XML-to-Compose migration, not greenfield
 }
 
+# Non-prefixed resources that are nonetheless stack-specific.
+# Maps resource name → set of stack identifiers that must be detected for it to be relevant.
+# If NONE of the required stacks are detected, the resource is skipped as "wrong stack".
+# This catches rules/agents like "android", "vue", "flutter" that don't use the standard
+# stack prefix convention (e.g., "android-" prefix) but are still stack-bound.
+RESOURCE_STACK_REQUIREMENTS: dict[str, set[str]] = {
+    # Rules
+    "android": {"android-compose"},
+    "vue": {"react-nextjs"},        # Vue projects detected via deps, not STACK_DETECTORS
+    "flutter": {"android-compose"}, # Flutter projects detected via deps
+    "firebase": {"firebase-auth"},
+    "bun-elysia": set(),            # No stack detector — requires elysia dep
+    "fastapi-backend": {"fastapi-python"},
+    "fastapi-database": {"fastapi-python"},
+    # Agents
+    "android-build-fixer": {"android-compose"},
+    "android-compose": {"android-compose"},
+    "android-kotlin-reviewer": {"android-compose"},
+}
+
 
 def detect_stacks_from_dir(project_dir: Path) -> list[str]:
     """Auto-detect tech stacks from project config files."""
@@ -706,9 +728,18 @@ def tier_resource_with_reason(
     if name in ALWAYS_SKIP:
         return "skip", "always-skip list"
 
-    # Wrong-stack resources
+    # Wrong-stack resources (prefix-based detection)
     if is_stack_specific(name) and not matches_stacks(name, stacks):
         return "skip", "wrong stack"
+
+    # Wrong-stack resources (non-prefixed but stack-bound)
+    if name in RESOURCE_STACK_REQUIREMENTS:
+        required_stacks = RESOURCE_STACK_REQUIREMENTS[name]
+        if required_stacks and not required_stacks.intersection(stacks):
+            return "skip", "wrong stack"
+        if not required_stacks:
+            # Empty set means "requires dep detection only" — skip if not dep-promoted
+            return "skip", "wrong stack"
 
     # Type-specific tiering
     if resource_type == "hook":
