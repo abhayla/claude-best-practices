@@ -36,7 +36,7 @@ pipeline:
 global_retry_budget: 15
 
 capture_proof:
-  enabled: false
+  enabled: true
   review_rate_passed: 1.0
   review_rate_failed: 1.0
   evidence_dir: "test-evidence"

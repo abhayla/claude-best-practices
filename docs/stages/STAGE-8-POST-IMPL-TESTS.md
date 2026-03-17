@@ -220,7 +220,13 @@ Run all existing unit + API tests to confirm Stage 7's work is intact:
 ```
 
 - **If ALL PASS** → Proceed to Step 4 (Wave A)
-- **If FAILURES** → Invoke `/fix-loop` with the retest command:
+- **If FAILURES** → Invoke `/test-pipeline` to run the full fix→verify→commit chain with strict gates and screenshot proof:
+
+```
+/test-pipeline <failure_output>
+```
+
+Or invoke `/fix-loop` directly for a lighter-weight fix cycle:
 
 ```
 /fix-loop <failure_output> retest_command: "<test command>" max_iterations: 3

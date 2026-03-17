@@ -197,6 +197,7 @@ Invoke the selected skill with the plan. The skill handles:
 - Task-by-task implementation
 - Running verification commands per task
 - Fix loops on failures (max 3 attempts per task via `/fix-loop` with max 3 iterations each — total max 9 attempts per task before escalation)
+- **Preferred:** Use `/test-pipeline` instead of invoking `/fix-loop` and `/auto-verify` separately — it handles cleanup, strict gates, screenshot proof capture, and result aggregation automatically
 - Git commits per completed task
 - Progress tracking
 

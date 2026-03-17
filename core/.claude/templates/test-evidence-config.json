@@ -1,6 +1,6 @@
 {
   "description": "Screenshot-as-proof configuration for the test verification pipeline",
-  "capture_proof": false,
+  "capture_proof": true,
   "review_screenshots": {
     "passed": true,
     "failed": true
