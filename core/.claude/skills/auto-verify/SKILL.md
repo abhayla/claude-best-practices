@@ -27,7 +27,7 @@ enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 | `--files` | git diff | Specific files to verify |
 | `--full-suite` | false | Run full test suite regardless of risk |
 | `--strict-gates` | false | Missing upstream JSON = BLOCK (set by orchestrator) |
-| `--capture-proof` | false | Capture screenshots on every test, pass or fail |
+| `--capture-proof` | true (from config) | Capture screenshots on every test, pass or fail |
 
 ---
 

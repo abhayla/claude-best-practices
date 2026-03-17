@@ -34,7 +34,7 @@ Analyze failures, apply minimal fixes, and optionally retest until resolved.
 | `max_iterations` | 5 | Maximum fix-test cycles. Callers (e.g., `/executing-plans`) may pass a lower value to keep total retry budgets bounded. |
 | `files_of_interest` | — | Specific files to focus on |
 | `--strict-gates` | false | Passed by orchestrator for consistency; no upstream gate for fix-loop |
-| `--capture-proof` | false | Forward to retest command — capture screenshots on every test |
+| `--capture-proof` | true (from config) | Forward to retest command — capture screenshots on every test |
 
 ---
 

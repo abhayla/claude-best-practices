@@ -26,7 +26,7 @@ Finalize verified changes: documentation, commit, and learning capture.
 | `commit_format` | `fix(scope): description` | Commit message format |
 | `push` | false | Whether to push after commit |
 | `--strict-gates` | false | Missing upstream JSON = BLOCK |
-| `--capture-proof` | false | Include evidence summary in commit body |
+| `--capture-proof` | true (from config) | Include evidence summary in commit body |
 
 ---
 
