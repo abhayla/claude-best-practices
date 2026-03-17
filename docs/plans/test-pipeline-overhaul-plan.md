@@ -181,31 +181,31 @@
 
 ## Atomic Plan 5: Rules Update, Code-Quality-Gate Refs, Aggregation, Validation
 
-- [ ] **Task 21:** Update `testing.md` rule — Add proof archive format and visual review mandate
+- [x] **Task 21:** Update `testing.md` rule — Add proof archive format and visual review mandate
   - Files: `core/.claude/rules/testing.md` (modify — add section after line 345)
   - Verify: `python -c "c = open('core/.claude/rules/testing.md').read(); assert 'Screenshot Proof Archive' in c; assert 'manifest.json' in c; assert 'visual-review.json' in c; print('OK')"`
   - Time: ~5m
   - Depends on: None
 
-- [ ] **Task 22:** Add `references/` directory to `/code-quality-gate` — Non-breaking split
+- [x] **Task 22:** Add `references/` directory to `/code-quality-gate` — Non-breaking split
   - Files: `core/.claude/skills/code-quality-gate/references/error-handling-audit.md` (create), `core/.claude/skills/code-quality-gate/references/mutation-testing.md` (create), `core/.claude/skills/code-quality-gate/references/dead-code-detection.md` (create), `core/.claude/skills/code-quality-gate/SKILL.md` (modify)
   - Verify: `python -c "import os; assert os.path.exists('core/.claude/skills/code-quality-gate/references/error-handling-audit.md'); main = open('core/.claude/skills/code-quality-gate/SKILL.md').read(); lines = len(main.strip().split('\n')); assert lines < 550, f'Still {lines} lines'; assert 'STEP 12' in main; assert 'code-quality-gate.json' in main; print(f'OK — {lines} lines')"`
   - Time: ~8m
   - Depends on: None
 
-- [ ] **Task 23:** Update `verify-screenshots` — Add proof-mode integration
+- [x] **Task 23:** Update `verify-screenshots` — Add proof-mode integration
   - Files: `core/.claude/skills/verify-screenshots/SKILL.md` (modify — frontmatter + add Step 0.5)
   - Verify: `python -c "c = open('core/.claude/skills/verify-screenshots/SKILL.md').read(); assert '--proof-mode' in c; assert '--run-id' in c; assert 'STEP 0.5' in c; print('OK')"`
   - Time: ~3m
   - Depends on: None
 
-- [ ] **Task 24:** Run pattern validation
+- [x] **Task 24:** Run pattern validation
   - Files: None (validation only)
   - Verify: `PYTHONPATH=. python scripts/validate_patterns.py`
   - Time: ~5m
   - Depends on: Tasks 1-23
 
-- [ ] **Task 25:** Update `registry/patterns.json` and regenerate docs
+- [x] **Task 25:** Update `registry/patterns.json` and regenerate docs
   - Files: `registry/patterns.json` (modify), docs/ (regenerate)
   - Version bumps: `auto-verify` → 2.0.0, `fix-loop` → 1.2.0, `post-fix-pipeline` → 2.0.0, `tester-agent` → 1.2.0, `test-failure-analyzer-agent` → 1.1.1, `verify-screenshots` → 1.1.0
   - New entry: `test-pipeline-agent` v1.0.0
