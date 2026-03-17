@@ -83,90 +83,169 @@ After `/regression-test` completes, read `test-results/regression-test.json`:
 Coverage gaps flagged by `/regression-test` (source files with no mapped tests)
 are reported in the final auto-verify output as warnings.
 
-## STEP 3: Run Targeted Tests
+## STEP 2: Execute Tests (via tester-agent)
 
-### 3.0 Risk Classification and Auto-Escalation
-
-Before running tests, classify each changed file by risk level:
-
-| Risk Level | Module Patterns | Action |
-|------------|----------------|--------|
-| CRITICAL | `auth/*`, `payment/*`, `crypto/*`, `security/*`, `token/*`, `oauth/*`, `billing/*` | Auto-escalate to full suite |
-| HIGH | `models/*`, `migrations/*`, `database/*`, `db/*`, `schema/*`, `entities/*` | Auto-escalate to full suite |
-| MEDIUM | `routes/*`, `controllers/*`, `handlers/*`, `api/*`, `endpoints/*`, `views/*` | Run targeted tests + related integration tests |
-| LOW | `utils/*`, `helpers/*`, `configs/*`, `constants/*`, `types/*`, `interfaces/*` | Run targeted tests only |
-
-If ANY changed file is classified as HIGH or CRITICAL, auto-escalate to full test suite regardless of whether `--full-suite` was specified. Log the escalation reason:
+Delegate test execution to `tester-agent`, which provides:
+- Smart test ordering (CRITICAL risk first, then HIGH, MEDIUM, LOW)
+- Verdict rules: FAILED if ANY test fails, FAILED if skip rate >10%,
+  FAILED on ResourceWarning or unclosed connections
+- Isolated re-run of failures to detect test pollution
+- Structured output with pass/fail/skip/flaky breakdown
 
 ```
-Risk escalation: <file> classified as <CRITICAL|HIGH> — running full test suite
+Agent("tester-agent", prompt="Run these tests and provide a verdict.
+
+Test files (from /regression-test mapping):
+$AFFECTED_TESTS
+
+Risk classification:
+$OVERALL_RISK
+
+Options:
+- Full suite: $FULL_SUITE
+- Capture proof: $CAPTURE_PROOF
+
+If --capture-proof is enabled, configure the test runner to capture a
+screenshot after every test (pass and fail). Store screenshots in
+test-evidence/{run_id}/screenshots/ with naming:
+  {test_name}.{pass|fail}.png
+
+Use the project's test runner (detect from CLAUDE.md, pyproject.toml,
+package.json, or build.gradle). Run targeted tests first unless
+risk >= HIGH or --full-suite specified.
+
+Return: verdict (PASSED/FAILED), test counts, failure details,
+screenshot manifest (if capture-proof enabled).")
 ```
 
-### 3.1 Execute Tests
+After `tester-agent` returns:
 
-Run only the tests related to changed files first (unless escalated to full suite):
+1. If verdict is **FAILED** → proceed to STEP 3 (evaluate results, report)
+2. If verdict is **PASSED** → proceed to STEP 2.5 (visual review) or STEP 4 (quality gates)
+3. Record the agent's screenshot manifest in `test-evidence/{run_id}/manifest.json`
 
-1. Execute mapped test files (or full suite if risk >= HIGH)
-2. If all pass and `--full-suite` not specified and risk < HIGH → report success
-3. If any fail → analyze and attempt fix
+---
 
-## STEP 4: Analyze Failures
+## STEP 2.5: Visual Proof Review (if --capture-proof enabled)
 
-For each failure:
-1. Read the test and source code
-2. Determine if the failure is from our change or pre-existing using git-stash verification
-3. If from our change → suggest fix
-4. If pre-existing → note it but don't block
+Skip this step entirely if `--capture-proof` is not enabled or if no
+`test-evidence/{run_id}/manifest.json` exists.
 
-### 4.1 Git-Stash Verification for Pre-Existing Failures
-
-For every failing test, verify whether the failure is pre-existing or caused by our changes using a stash-based comparison:
+### 2.5.1 Read Manifest
 
 ```bash
-# 1. Stash our changes to restore clean state
-git stash
-
-# 2. Run the specific failing test against clean state
-<test_runner> <failing_test_file>::<failing_test_name>
-
-# 3. Restore our changes
-git stash pop
+MANIFEST="test-evidence/${RUN_ID}/manifest.json"
+if [ ! -f "$MANIFEST" ]; then
+  echo "No screenshot manifest found — skipping visual review"
+fi
 ```
 
-**Decision logic:**
+Parse the manifest to get the list of all screenshots with their test names,
+results, and file paths.
 
-| Test on clean state | Test with our changes | Verdict | Action |
-|--------------------|-----------------------|---------|--------|
-| FAILS | FAILS | Pre-existing failure | Note it, do not block |
-| PASSES | FAILS | Our change caused it | BLOCK — must fix before proceeding |
-| PASSES | PASSES | Not a real failure | Likely flaky — log and re-run |
-| FAILS | PASSES | Our change fixed it | Note as incidental fix |
+### 2.5.2 Review All Screenshots
 
-If `git stash` fails (e.g., no changes to stash, merge conflicts), fall back to heuristic analysis: check `git log` for recent changes to the failing test's source files and classify based on recency.
+For EVERY screenshot in the manifest (100% review rate):
 
-### Content Verification Note
+1. **Read the screenshot** using multimodal Read (the image file)
+2. **Evaluate** against these criteria (from `/verify-screenshots` Step 2):
+   - No error dialogs, crash screens, or unhandled exception modals
+   - Text is readable and not truncated
+   - Layout appears correct (no overlapping elements)
+   - Loading states are resolved (no spinners in final screenshots)
+   - Data containers are populated (tables have rows, lists have items)
+   - No empty-state placeholders when data is expected
+   - No placeholder text ("Lorem ipsum", "undefined", "null", "NaN")
+   - Timestamps/dates are within expected recency
 
-When verifying UI tests, distinguish between:
-- **Test passes because UI rendered correctly** — layout, styles, elements all present
-- **Test passes because UI rendered correctly BUT with no data** — empty tables, blank charts, stale content
+3. **Classify** each screenshot:
 
-If changed files include API endpoints, data fetching, or state management:
-1. Verify that UI tests assert data presence (not just element presence)
-2. Flag tests that only check `toBeVisible()` without checking content
-3. Recommend adding data count assertions for tables, lists, and charts
+| Test Result | Visual Assessment | Verdict | Action |
+|-------------|-------------------|---------|--------|
+| PASSED | Looks correct | CONFIRMED | No action |
+| PASSED | Shows problems | OVERRIDE → FAILED | Add to overrides list |
+| FAILED | Shows the failure | CONFIRMED | Enrich failure diagnosis |
+| FAILED | Looks correct | FLAG for review | Possible flaky/timing issue |
 
-## STEP 5: Apply Fixes (with approval)
+### 2.5.3 Write Visual Review Results
 
-For each identified fix:
-1. Describe the fix to the user
-2. Apply only if approved or if running autonomously
-3. Re-run affected tests after fix
+Write `test-evidence/{run_id}/visual-review.json`:
 
-## STEP 6: Regression Check
+```json
+{
+  "skill": "visual-proof-review",
+  "run_id": "{run_id}",
+  "timestamp": "{ISO-8601}",
+  "screenshots_reviewed": 50,
+  "screenshots_total": 50,
+  "confirmed_passes": 43,
+  "confirmed_failures": 5,
+  "overrides": [
+    {
+      "test": "test_dashboard_loads",
+      "original_result": "PASSED",
+      "visual_verdict": "FAILED",
+      "reason": "Dashboard shows empty table — no data rows visible despite test asserting element presence",
+      "screenshot": "screenshots/test_dashboard_loads.pass.png"
+    }
+  ],
+  "flags": [
+    {
+      "test": "test_login_timeout",
+      "original_result": "FAILED",
+      "visual_observation": "Screenshot shows successful login page — possible timing/flaky issue",
+      "screenshot": "screenshots/test_login_timeout.fail.png"
+    }
+  ],
+  "result": "PASSED|FAILED"
+}
+```
 
-If fixes were applied, run broader test suite to check for regressions.
+`result` is FAILED if ANY overrides exist (a passed test was visually broken).
+`result` is PASSED if zero overrides (all passes confirmed, all failures confirmed).
 
-## STEP 6A: Quality Gate (if tests pass)
+### 2.5.4 Gate Impact
+
+If visual review `result` is FAILED:
+- Report each override with the reason and screenshot path
+- The override failures are added to the main failure list in STEP 3
+- These count as real failures for the auto-verify verdict
+
+If visual review `result` is PASSED:
+- Log: "Visual proof review: {N} screenshots confirmed, 0 overrides"
+- Proceed normally
+
+---
+
+## STEP 3: Evaluate Results
+
+After test execution (and visual review if enabled):
+
+1. **All tests pass** (and no visual overrides) → proceed to STEP 4 (quality gates)
+2. **Any test fails:**
+   - Classify each failure using the test output (category, file, message)
+   - Check for pre-existing failures using git-stash verification (see below)
+   - Report FAILED with detailed failure list
+   - Do NOT attempt fixes — fixing belongs in `/fix-loop` upstream
+
+### Pre-Existing Failure Detection
+
+For each failing test, verify whether it's caused by our changes:
+
+```bash
+git stash && <test_runner> <failing_test> && git stash pop
+```
+
+| Clean state | Our changes | Verdict | Action |
+|-------------|-------------|---------|--------|
+| FAILS | FAILS | Pre-existing | Note it, do not block |
+| PASSES | FAILS | Our change caused it | BLOCK — report in failures |
+| PASSES | PASSES | Flaky | Log, re-run to confirm |
+| FAILS | PASSES | Incidental fix | Note as bonus |
+
+---
+
+## STEP 4: Quality Gate (if tests pass)
 
 After all tests pass, run quality checks on changed code:
 
@@ -177,7 +256,7 @@ After all tests pass, run quality checks on changed code:
 
 Reference: delegates to `/code-quality-gate` skill for detailed analysis.
 
-## STEP 6B: Contract Verification (if API changed)
+## STEP 4A: Contract Verification (if API changed)
 
 If changed files include API routes, endpoints, schemas, or Pydantic models:
 
@@ -187,7 +266,7 @@ If changed files include API routes, endpoints, schemas, or Pydantic models:
 
 Reference: delegates to `/contract-test` skill if Pact is configured.
 
-## STEP 6C: Performance Baseline (if perf-sensitive code changed)
+## STEP 4B: Performance Baseline (if perf-sensitive code changed)
 
 If changed files match perf-sensitive paths (request handlers, database queries, serialization):
 
@@ -197,21 +276,22 @@ If changed files match perf-sensitive paths (request handlers, database queries,
 
 Reference: delegates to `/perf-test` skill if k6/Lighthouse is configured.
 
-## STEP 7: Report
+---
+
+## STEP 5: Report
 
 ```
-Auto-Verify: [PASSED / FIXED / FAILED]
+Auto-Verify: [PASSED / FAILED]
   Changed files: N
   Tests run: M
   Passed: P | Failed: F
-  Fixes applied: X
-  Regressions: Y
+  Visual review: N screenshots, K overrides
   Quality gate: PASSED/WARNED/SKIPPED
   Contract check: PASSED/FAILED/SKIPPED
   Perf baseline: PASSED/REGRESSED/SKIPPED
 ```
 
-## STEP 8: Structured Output
+## STEP 6: Structured Output
 
 Write machine-readable results to `test-results/auto-verify.json`:
 
@@ -219,7 +299,7 @@ Write machine-readable results to `test-results/auto-verify.json`:
 {
   "skill": "auto-verify",
   "timestamp": "<ISO-8601>",
-  "result": "PASSED|FIXED|FAILED",
+  "result": "PASSED|FAILED",
   "summary": {
     "total": "<tests_run>",
     "passed": "<passed_count>",
@@ -230,9 +310,24 @@ Write machine-readable results to `test-results/auto-verify.json`:
   "quality_gate": "PASSED|WARNED|FAILED|SKIPPED",
   "contract_check": "PASSED|FAILED|SKIPPED",
   "perf_baseline": "PASSED|REGRESSED|SKIPPED",
+  "visual_review": {
+    "enabled": true,
+    "screenshots_reviewed": 50,
+    "overrides": 1,
+    "flags": 1,
+    "result": "PASSED|FAILED",
+    "evidence_dir": "test-evidence/{run_id}/"
+  },
   "failures": [],
   "warnings": [],
   "duration_ms": "<elapsed>"
+}
+```
+
+If `--capture-proof` was not enabled, the `visual_review` field is:
+```json
+"visual_review": {
+  "enabled": false
 }
 ```
 

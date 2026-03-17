@@ -22,6 +22,11 @@ Identify what changed, find the tests that cover those changes, run them in prio
 
 **Critical constraint:** This skill MUST NOT modify source code or test files. It is a diagnostic workflow.
 
+**Consumer note:** This skill is the canonical change-to-test mapper for the
+pipeline. `/auto-verify` delegates its Step 1 here rather than maintaining its
+own mapping logic. Changes to the mapping algorithm or output schema affect
+all downstream consumers.
+
 **Target:** $ARGUMENTS
 
 ---
