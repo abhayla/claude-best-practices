@@ -37,8 +37,8 @@ A curated hub of Claude Code patterns (agents, skills, rules) organized by stack
 
 - **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, templates
 - **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit directly after adding/removing patterns, then re-run `generate_docs.py`
-- **`config/`** — `settings.yml` (dedup thresholds), `repos.yml` (downstream projects), `urls.yml`/`topics.yml` (scan sources)
-- **`scripts/`** — All Python: `bootstrap.py`, `recommend.py`, `collate.py`, `scan_web.py`, `validate_patterns.py`, `generate_docs.py`, `dedup_check.py`, `check_freshness.py`, `sync_to_local.py`, `sync_to_projects.py`
+- **`config/`** — `settings.yml` (dedup thresholds), `repos.yml` (downstream projects), `urls.yml`/`topics.yml` (scan sources), `third-party-skills.yml` (external skill registry)
+- **`scripts/`** — All Python tooling (see Key Scripts below for the important ones)
 
 ### Stack Prefix Convention
 
@@ -61,6 +61,7 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 - **`generate_docs.py`** — Rebuilds `docs/` dashboard and `core/.claude/README.md` from `registry/patterns.json`.
 - **`collate.py`** — Extracts patterns from downstream project repos for hub ingestion.
 - **`scan_web.py`** — Discovers patterns from URLs/topics configured in `config/urls.yml` and `config/topics.yml`.
+- **`third_party_skills.py`** — Matches project dependencies against `config/third-party-skills.yml` to recommend external agent skills. Called by `recommend.py` during provisioning.
 
 ### GitHub Actions
 

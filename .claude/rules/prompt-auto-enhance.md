@@ -19,8 +19,14 @@ user never needs to invoke a command.
 
 ## Behavior Modes
 
-- **Silent mode** (default): Gather context internally, produce better results
-  without showing the user what was gathered.
+- **Silent mode** (default): Gather context internally, produce better results.
+  MUST include a brief italic indicator at the top of the response showing what
+  context was gathered. Keep it under 15 words. Format:
+  `*Enhanced: <what was checked>*`
+  Examples:
+  - *Enhanced: git state, 3 rules, scanned skills/*
+  - *Enhanced: git state, registry check, read 2 source files*
+  - *Enhanced: git state, CLAUDE.md, Tier 2 skipped*
 - **Visible mode** (resource CRUD only): When you detect a need to CREATE, UPDATE,
   or DELETE a Claude Code resource (skill, agent, rule, hook), switch to visible
   mode — show the enhancement summary, interpreted intent, and proposed changes
@@ -106,7 +112,7 @@ approval flow in `/prompt-auto-enhance`.
 
 - NEVER create, update, or delete any Claude Code resource without user approval
 - NEVER re-prompt for items the user rejected in the same session
-- NEVER show the enhancement summary for non-CRUD prompts — stay silent
+- NEVER show the full enhancement summary for non-CRUD prompts — only the brief indicator line
 - NEVER skip Tier 1 context gathering
 - NEVER web search when local context suffices
 - Resource creation MUST follow `pattern-structure.md`, `pattern-portability.md`,
