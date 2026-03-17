@@ -1,12 +1,12 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-17 16:36 UTC (auto-generated)
+> Last updated: 2026-03-17 17:05 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
 | Total Patterns | 184 |
-| Core (universal) | 178 |
-| Stack-specific | 6 |
+| Core (universal) | 179 |
+| Stack-specific | 5 |
 | Agents | 23 |
 | Hooks | 6 |
 | Rules | 16 |
@@ -176,6 +176,7 @@
 | test-generator | skill | 1.0.0 | hub:abhayla/claude-best-practices | tdd, playwright |
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| test-pipeline | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-pipeline-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.1.0 | hub:abhayla/claude-best-practices | — |
