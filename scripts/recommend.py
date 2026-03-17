@@ -419,7 +419,7 @@ NICE_TO_HAVE_UNIVERSAL_SKILLS = {
 }
 
 # Universal rules that are high-value
-MUST_HAVE_RULES = {"context-management"}
+MUST_HAVE_RULES = {"context-management", "workflow", "claude-behavior", "testing", "tdd"}
 
 # Universal agents that are high-value
 MUST_HAVE_AGENTS = {"security-auditor"}
@@ -1542,6 +1542,7 @@ def get_rule_descriptions(hub_root: Path, rule_names: list[str]) -> dict[str, st
 
 def generate_hub_practices_section(
     hub_root: Path, rules_present: list[str],
+    project_names: dict[str, set[str]] | None = None,
 ) -> str:
     """Build the hub best-practices section for CLAUDE.md.
 
@@ -1577,7 +1578,13 @@ def generate_hub_practices_section(
 
     lines.append("## Claude Code Configuration")
     lines.append("")
-    lines.append("The `.claude/` directory contains skills, agents, and rules for Claude Code.")
+    if project_names:
+        n_skills = len(project_names.get("skill", set()))
+        n_agents = len(project_names.get("agent", set()))
+        n_rules = len(project_names.get("rule", set()))
+        lines.append(f"The `.claude/` directory contains {n_skills} skills, {n_agents} agents, and {n_rules} rules for Claude Code.")
+    else:
+        lines.append("The `.claude/` directory contains skills, agents, and rules for Claude Code.")
     lines.append("")
     lines.append(PROVISION_END_MARKER)
     return "\n".join(lines)
@@ -1588,6 +1595,7 @@ def provision_claude_md(
     target_dir: Path,
     stacks: list[str],
     rules_present: list[str],
+    project_names: dict[str, set[str]] | None = None,
 ) -> str:
     """Provision CLAUDE.md in the target directory.
 
@@ -1597,7 +1605,7 @@ def provision_claude_md(
     3. CLAUDE.md exists without markers → append section with markers
     """
     claude_md = target_dir / "CLAUDE.md"
-    hub_section = generate_hub_practices_section(hub_root, rules_present)
+    hub_section = generate_hub_practices_section(hub_root, rules_present, project_names)
 
     if not claude_md.exists():
         # Case 1: Create from template
@@ -1615,6 +1623,13 @@ def provision_claude_md(
                 "SELECTED_STACKS": ", ".join(stacks) if stacks else "none",
                 "LAST_SYNC_TIMESTAMP": datetime.utcnow().isoformat(),
             })
+            # Replace hardcoded hub section with dynamic one
+            start_idx = rendered.find(PROVISION_START_MARKER)
+            end_idx = rendered.find(PROVISION_END_MARKER)
+            if start_idx != -1 and end_idx != -1:
+                before = rendered[:start_idx]
+                after = rendered[end_idx + len(PROVISION_END_MARKER):]
+                rendered = before + hub_section + after
             claude_md.write_text(rendered, encoding="utf-8")
             return "created"
         else:
@@ -1747,7 +1762,7 @@ def provision_to_local(
     rules_present = sorted(project_names.get("rule", set()))
 
     # Step 2: Provision CLAUDE.md
-    claude_md_status = provision_claude_md(hub_root, target_dir, stacks, rules_present)
+    claude_md_status = provision_claude_md(hub_root, target_dir, stacks, rules_present, project_names)
 
     # Step 3: Provision CLAUDE.local.md
     claude_local_status = provision_claude_local_md(hub_root, target_dir)
@@ -2293,10 +2308,10 @@ def main():
                 for i in improved
             ]
 
-    # Step 5: Output
-    if args.json_output:
+    # Step 5: Output (defer JSON when --provision is also set)
+    if args.json_output and not args.provision:
         print(json.dumps(gaps, indent=2))
-    else:
+    elif not args.json_output:
         report = format_report(gaps, stacks, project_names, hub_resources)
         print()
         print(report)
@@ -2323,9 +2338,11 @@ def main():
             "skip": "skip",
         }
         pr_urls = {}
+        provision_summary = None
 
         if args.local:
             summary = provision_to_local(hub_root, Path(args.local), gaps, stacks, args.tier)
+            provision_summary = summary
         elif getattr(args, "multi_pr", True):
             pr_urls = provision_to_repo_multi_pr(
                 hub_root, args.repo, gaps, stacks,
@@ -2339,56 +2356,61 @@ def main():
             if pr_url:
                 pr_urls = {"all": pr_url}
 
-        # --- Print detailed summary ---
-        print()
-        print("=" * 100)
-        print("PROVISION SUMMARY")
-        print("=" * 100)
+        # Combined JSON output when both --provision and --json are set
+        if args.json_output:
+            combined = {"gaps": gaps, "provision": provision_summary or {}}
+            print(json.dumps(combined, indent=2))
+        else:
+            # --- Print detailed summary ---
+            print()
+            print("=" * 100)
+            print("PROVISION SUMMARY")
+            print("=" * 100)
 
-        for tier_name in ("must-have", "improved", "nice-to-have", "skip"):
-            items = gaps.get(tier_name, [])
-            if not items:
-                continue
-            action = action_labels.get(tier_name, tier_name)
-            print(f"\n--- {tier_name.upper()} ({len(items)}) ---")
-            print(f"  {'Type':<8s} {'Name':<40s} {'Action':<22s} {'Reason'}")
-            print(f"  {'----':<8s} {'----':<40s} {'------':<22s} {'------'}")
-            for item in sorted(items, key=lambda x: (x["type"], x["name"])):
-                reason = item.get("reason", "")
-                print(f"  {item['type']:<8s} {item['name']:<40s} {action:<22s} {reason}")
+            for tier_name in ("must-have", "improved", "nice-to-have", "skip"):
+                items = gaps.get(tier_name, [])
+                if not items:
+                    continue
+                action = action_labels.get(tier_name, tier_name)
+                print(f"\n--- {tier_name.upper()} ({len(items)}) ---")
+                print(f"  {'Type':<8s} {'Name':<40s} {'Action':<22s} {'Reason'}")
+                print(f"  {'----':<8s} {'----':<40s} {'------':<22s} {'------'}")
+                for item in sorted(items, key=lambda x: (x["type"], x["name"])):
+                    reason = item.get("reason", "")
+                    print(f"  {item['type']:<8s} {item['name']:<40s} {action:<22s} {reason}")
 
-        # Config files (local mode)
-        if args.local:
-            print(f"\n--- CONFIG ---")
-            print(f"  CLAUDE.md:     {summary['claude_md']}")
-            print(f"  settings.json: {summary['settings_json']}")
-            print(f"\n  Files copied: {len(summary['copied_files'])}")
+            # Config files (local mode)
+            if args.local:
+                print(f"\n--- CONFIG ---")
+                print(f"  CLAUDE.md:     {summary['claude_md']}")
+                print(f"  settings.json: {summary['settings_json']}")
+                print(f"\n  Files copied: {len(summary['copied_files'])}")
 
-        # PRs (remote mode)
-        if pr_urls:
-            print(f"\n--- PRs CREATED ---")
-            pr_action_hints = {
-                "must-have": "merge confidently",
-                "improved": "review diffs",
-                "nice-to-have": "check boxes, comment /apply",
-                "all": "review and merge",
-            }
-            for tier_name, url in pr_urls.items():
-                if url:
-                    hint = pr_action_hints.get(tier_name, "")
-                    print(f"  {tier_name:<14s} {url} ({hint})")
-                else:
-                    print(f"  {tier_name:<14s} (skipped)")
+            # PRs (remote mode)
+            if pr_urls:
+                print(f"\n--- PRs CREATED ---")
+                pr_action_hints = {
+                    "must-have": "merge confidently",
+                    "improved": "review diffs",
+                    "nice-to-have": "check boxes, comment /apply",
+                    "all": "review and merge",
+                }
+                for tier_name, url in pr_urls.items():
+                    if url:
+                        hint = pr_action_hints.get(tier_name, "")
+                        print(f"  {tier_name:<14s} {url} ({hint})")
+                    else:
+                        print(f"  {tier_name:<14s} (skipped)")
 
-        # Totals
-        print()
-        total_must = len(gaps.get("must-have", []))
-        total_imp = len(gaps.get("improved", []))
-        total_nice = len(gaps.get("nice-to-have", []))
-        total_skip = len(gaps.get("skip", []))
-        print(f"TOTAL: {total_must} must-have, {total_imp} improved, "
-              f"{total_nice} nice-to-have, {total_skip} skip")
-        print("=" * 100)
+            # Totals
+            print()
+            total_must = len(gaps.get("must-have", []))
+            total_imp = len(gaps.get("improved", []))
+            total_nice = len(gaps.get("nice-to-have", []))
+            total_skip = len(gaps.get("skip", []))
+            print(f"TOTAL: {total_must} must-have, {total_imp} improved, "
+                  f"{total_nice} nice-to-have, {total_skip} skip")
+            print("=" * 100)
 
     # Step 7: Diff overlapping resources if requested
     if args.diff:

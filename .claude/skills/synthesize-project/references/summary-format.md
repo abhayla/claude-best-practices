@@ -28,6 +28,7 @@ Synthesized patterns:
   Rules generated:    [N]
   Skills generated:   [N]
   Agents generated:   [N]
+  Private:            [N] (marked private — never shared)
   Skipped (overlap):  [N] (covered by hub patterns)
   Skipped (low conf): [N]
 
@@ -71,6 +72,7 @@ Synthesized patterns:
   Rules generated:    [N]
   Skills generated:   [N]
   Agents generated:   [N]
+  Private:            [N] (marked private — never shared)
   Skipped (overlap):  [N] (covered by hub patterns)
   Skipped (low conf): [N]
 
@@ -90,6 +92,20 @@ Hub sharing is ON — your patterns contribute to the hub, and you receive updat
   New:     [N] (new conventions detected)
   Removed: [N] (conventions no longer present in codebase — files left for manual review)
 ```
+
+## Warnings Section
+
+If any integrity issues were found during Step 2f (rules table validation) or Step 8 (reconciliation), display before the main summary:
+
+```
+Warnings:
+  - Removed 2 dangling rules table entries (rule-writing-meta, pattern-structure)
+  - Added 3 synthesized rules to CLAUDE.md table
+  - Monolithic .claude/rules.md detected (user chose: skip rules)
+  - recommend.py: hub skill 'batch' not found at core/.claude/skills/batch
+```
+
+If no warnings, omit this section entirely.
 
 **If `--repo` mode, also show:**
 

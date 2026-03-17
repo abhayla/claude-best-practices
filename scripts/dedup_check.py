@@ -139,6 +139,32 @@ def scan_for_secrets(file_path: Path) -> list[str]:
     return findings
 
 
+def check_file(file_path: Path) -> list[str]:
+    """Validate a single pattern file for integrity, secrets, and duplicates.
+
+    Returns list of error/finding strings (empty = passed).
+    """
+    errors = validate_pattern_integrity(file_path)
+    errors.extend(scan_for_secrets(file_path))
+
+    root = Path(__file__).parent.parent
+    registry_path = root / "registry" / "patterns.json"
+    if registry_path.exists():
+        with open(registry_path) as f:
+            registry = json.load(f)
+        file_hash = hash_pattern(str(file_path))
+        dup = check_exact_duplicate(file_hash, registry)
+        if dup:
+            errors.append(f"Exact duplicate of existing pattern: {dup}")
+        fm = parse_frontmatter(file_path)
+        if fm:
+            structural = check_structural_duplicate(fm, registry)
+            for s in structural:
+                errors.append(f"Structural similarity with: {s}")
+
+    return errors
+
+
 if __name__ == "__main__":
     if "--validate-all" in sys.argv:
         root = Path(__file__).parent.parent
@@ -169,3 +195,17 @@ if __name__ == "__main__":
             sys.exit(1)
         else:
             print("No secrets found")
+    elif "--check" in sys.argv:
+        idx = sys.argv.index("--check")
+        if idx + 1 >= len(sys.argv):
+            print("Usage: dedup_check.py --check <file_path>")
+            sys.exit(2)
+        target = Path(sys.argv[idx + 1])
+        errors = check_file(target)
+        if errors:
+            print(f"Dedup check failed for {target}:")
+            for e in errors:
+                print(f"  - {e}")
+            sys.exit(1)
+        else:
+            print(f"Dedup check passed for {target}")

@@ -6,10 +6,12 @@ from pathlib import Path
 import pytest
 
 from scripts.dedup_check import (
+    check_file,
     hash_pattern,
     check_exact_duplicate,
     check_structural_duplicate,
     parse_frontmatter,
+    scan_for_secrets,
     validate_pattern_integrity,
 )
 
@@ -93,3 +95,27 @@ class TestValidateIntegrity:
     def test_missing_frontmatter_fails(self, invalid_skill_path):
         errors = validate_pattern_integrity(invalid_skill_path)
         assert any("frontmatter" in e.lower() for e in errors)
+
+
+class TestCheckFile:
+    def test_check_valid_pattern(self, sample_skill_path):
+        errors = check_file(sample_skill_path)
+        assert not any("frontmatter" in e.lower() for e in errors)
+
+    def test_check_detects_missing_fields(self, tmp_path):
+        f = tmp_path / "bad.md"
+        f.write_text("---\ndescription: test\n---\n# No name or version\n")
+        errors = check_file(f)
+        assert any("name" in e.lower() for e in errors)
+
+    def test_check_detects_secrets(self, tmp_path):
+        f = tmp_path / "secret.md"
+        f.write_text('---\nname: test\ndescription: x\nversion: "1.0.0"\n---\npassword = "hunter2"\n')
+        errors = check_file(f)
+        assert any("password" in e.lower() for e in errors)
+
+    def test_scan_for_secrets_clean_file(self, tmp_path):
+        f = tmp_path / "clean.md"
+        f.write_text("---\nname: clean\n---\n# No secrets here\n")
+        findings = scan_for_secrets(f)
+        assert findings == []

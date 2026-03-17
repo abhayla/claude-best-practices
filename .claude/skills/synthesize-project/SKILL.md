@@ -53,6 +53,22 @@ test -d core/.claude && test -f registry/patterns.json && test -f scripts/recomm
 
 **If you are NOT in the hub repo:** Proceed normally — local mode targets the current directory.
 
+### Hub freshness check
+
+If running from the hub repo (local mode), check for uncommitted changes that could affect provision accuracy:
+
+```bash
+# Check for uncommitted changes in core/.claude/ or registry/
+git status --porcelain core/.claude/ registry/ scripts/recommend.py
+```
+
+If there are uncommitted changes in these paths, warn:
+```
+⚠ Hub repo has uncommitted changes in core/.claude/ or registry/.
+  Provisioned patterns may not reflect the latest state.
+  Continue anyway? (y/n)
+```
+
 ---
 
 If `--repo owner/name` is provided, set up remote file access. Otherwise, use local tools.
@@ -89,11 +105,13 @@ If `--repo owner/name` is provided, set up remote file access. Otherwise, use lo
 
 ## STEP 1: Provision Hub Patterns
 
-**Skip this step if:** `--skip-hub` is set, OR `--update` is set (hub patterns were already provisioned on first run), OR `--dry-run` is set (preview mode — do not provision, just note that hub provisioning would run).
+**Skip this step if:** `--skip-hub` is set, OR `--update` is set (hub patterns were already provisioned on first run).
 
-If `--dry-run`: Print "Would run: recommend.py --provision for [project]" and skip to Step 2. Do NOT execute recommend.py.
+**If `--dry-run`:** Run recommend.py with `--json` only (WITHOUT `--provision`) to get gap analysis data without writing files. Print "DRY RUN: analysis only — no files will be written." Store the gaps output for use in Steps 3-8. In Step 8, print generated patterns with their target paths but do NOT write any files.
 
-Run `recommend.py --provision --json` to copy matching hub patterns and generate CLAUDE.md/settings.json for the project. The `--json` flag outputs structured 5-category results (must-have, improved, nice-to-have, synthesized, skip) that this skill parses.
+**If recommend.py exits non-zero:** Capture stderr output. Print: "recommend.py failed (exit code [N]): [stderr]". Proceed to Step 2 with an empty gaps dict — treat all subsequent hub-related steps as if `--skip-hub` was set.
+
+Run `recommend.py --provision --json` to copy matching hub patterns and generate CLAUDE.md/settings.json for the project. The `--json` flag outputs a combined JSON object with `gaps` (4-category: must-have, improved, nice-to-have, skip) and `provision` (copied_files, config statuses).
 
 **Local mode:**
 
@@ -110,12 +128,13 @@ Where `$PROJECT_DIR` is the target project's absolute path. If the user is runni
 PYTHONPATH=. python scripts/recommend.py --repo owner/name --provision --json
 ```
 
-**Parse the JSON output** to capture the 5-category breakdown:
+**Parse the JSON output** to capture the 4-category gap breakdown:
 - **must-have**: New patterns to add (merge confidently)
 - **improved**: Hub has newer versions of existing patterns (review diffs)
 - **nice-to-have**: Optional patterns (checkbox PR in remote mode)
-- **synthesized**: Placeholder for Step 8 (filled by this skill)
 - **skip**: Patterns not relevant to this project
+
+The synthesized pattern counts in the Step 10 summary come from Step 8, not from recommend.py.
 
 Also capture:
 - Number of files copied
@@ -125,6 +144,8 @@ Also capture:
 - Number of patterns skipped (already existed in project)
 
 Store these counts for the summary in Step 10.
+
+**Also capture warnings:** If recommend.py emits lines containing `WARNING:` (e.g., "WARNING: hub skill 'X' not found"), collect them and include in the Step 10 summary under the Warnings section. These indicate registry/disk mismatches in the hub itself.
 
 **If recommend.py is not available** (e.g., this skill is running in a project that doesn't have the hub repo locally), skip this step gracefully and proceed to Step 2. Print a note: "Hub repo not found — skipping hub provisioning. Use --skip-hub to suppress this message."
 
@@ -199,7 +220,7 @@ Would you like to append them as TODO stubs? (y/n/select)
 **If user approves (y or select):**
 
 1. Read the project's CLAUDE.md
-2. Find the `<!-- hub:best-practices:start -->` marker (if present)
+2. Find the `<!-- hub:best-practices:start -->` marker (if present). **If multiple markers found:** Warn "Found [N] hub-managed section markers — expected exactly 1. Using the FIRST occurrence. Remove duplicate markers manually." Do not insert between duplicate markers.
 3. Insert the missing sections BEFORE the marker (so they appear in the user-editable area, not inside the hub-managed section)
 4. If no marker exists, append the sections at the end of the file
 5. Write the updated CLAUDE.md
@@ -213,6 +234,33 @@ Record for Step 10:
 - Number already present
 - Number missing
 - Number appended (if user approved)
+
+### 2f. Validate rules table against filesystem
+
+Extract all file paths from the rules table in the hub-managed section (rows matching `` `rules/<name>.md` ``). For each path, check if the file exists in the project's `.claude/` directory.
+
+**Report:**
+```
+Rules table integrity:
+  [check] rules/workflow.md — exists
+  [check] rules/context-management.md — exists
+  [missing] rules/rule-writing-meta.md — referenced in table but NOT on disk
+
+  Action: Remove 1 dangling reference(s) from CLAUDE.md rules table? (y/n)
+```
+
+**If dangling references found and user approves:** Remove the stale rows from the rules table. If no rows remain, remove the entire "Rules Reference" section.
+
+**In `--update` mode:** Dangling references are automatically removed without prompting (the user expects a cleanup pass). Still report what was removed in the summary.
+
+**Also check the inverse:** scan `.claude/rules/*.md` for rule files NOT listed in the table. Report them as candidates to add.
+
+### 2g. Store validation results for summary
+
+Record for Step 10:
+- Number of rules table entries checked
+- Number of dangling references removed
+- Number of unlisted rule files found
 
 ---
 
@@ -230,11 +278,13 @@ Gather project structure and configuration to understand what this project is an
    - Linter/formatter configs: `.eslintrc*`, `ruff.toml`, `pyproject.toml [tool.ruff]`, `.prettierrc*`, `biome.json`
    - Project CLAUDE.md or README.md (if they exist — these reveal stated conventions)
 
+   **Reuse Step 1 data:** If Step 1 ran, the project's stacks and dependencies are already known from recommend.py's JSON output. Do NOT re-read package configs for stack detection. Only read files NOT covered by Step 1: entry points, test files, CI configs, linter configs, README.md.
+
 3. Read **entry points** — files matching: `main.*`, `app.*`, `index.*`, `server.*`, `manage.py`, `wsgi.py`
 
 4. Find the test directory, then read one representative test file (pick the largest test file — it likely demonstrates the most conventions)
 
-5. **Check for monolithic rules file** — look for `.claude/rules.md` (a single flat file containing all rules, as opposed to individual `.claude/rules/*.md` files). If found:
+5. **Check for monolithic rules file** — look for `.claude/rules.md` (a single flat file containing all rules, as opposed to individual `.claude/rules/*.md` files). **In `--update` mode:** Skip this warning if `.claude/rules/*.md` files already exist from a prior synthesis run. If found:
 
    ```
    ⚠ SSOT Warning: Found monolithic .claude/rules.md ([N] lines).
@@ -297,6 +347,10 @@ Dropped ([N]):
 
 Compare each candidate against hub patterns from Step 1 and CLAUDE.md sections from Step 2. Drop conventions where the hub pattern is sufficient. Keep project-specific conventions that add genuine value. See `references/convention-criteria.md` for dedup examples.
 
+**Important:** Only count a hub pattern as "covering" a candidate if it was actually copied to the project in Step 1. Check the `copied_files` list from the Step 1 JSON output (under `provision.copied_files`). If a hub pattern exists in the registry but was NOT copied (e.g., it was in the nice-to-have tier and the user chose must-have only), it does NOT suppress the candidate — the project needs its own version.
+
+**If `--skip-hub` was set:** Skip hub dedup entirely. All candidates proceed to Step 5 — there are no hub patterns to compare against.
+
 Print the dedup results:
 
 ```
@@ -315,7 +369,7 @@ Remaining after dedup: [N] conventions to investigate
 
 For each remaining candidate convention, read the source files listed in "evidence needed."
 
-1. Read the files using `Read` — deduplicate across conventions (if two conventions need the same file, you already have it in context)
+1. Read the files using `Read` — deduplicate across conventions (if two conventions need the same file, you already have it in context). **File budget:** Read a maximum of 15 evidence files directly. If total evidence files exceed 15, delegate to a subagent: pass the file list and convention hypothesis, and have the subagent return a confirmation/rejection summary.
 2. For each convention, confirm or reject:
    - **Confirmed** — the convention holds across the evidence files with no major counter-examples
    - **Rejected** — the evidence is inconsistent, or the convention is weaker than hypothesized
@@ -360,12 +414,16 @@ Proceeding to generate [N] patterns ([N] rules, [N] skills, [N] agents).
 
 Before generating patterns, load the format standards and examples that guide generation quality.
 
-1. Read the pattern structure standards (these define required format):
-   - `core/.claude/rules/pattern-structure.md` (or the project's local copy if it exists)
-   - `core/.claude/rules/pattern-portability.md`
-   - `core/.claude/rules/pattern-self-containment.md`
+1. Read the pattern structure standards (these define required format). Use the path appropriate to your context:
+   - **If running from the hub repo** (Step 0 detected hub): read from `core/.claude/rules/`
+   - **If running in a provisioned project**: read from `.claude/rules/` (copied by Step 1)
 
-2. Read 2-3 existing patterns from `core/.claude/` as format examples — pick patterns that match the project's detected stack. If no stack match, use any well-structured universal pattern. These show what good output looks like.
+   Files to read:
+   - `pattern-structure.md`
+   - `pattern-portability.md`
+   - `pattern-self-containment.md`
+
+2. Read 2-3 existing patterns from `core/.claude/` as format examples — pick patterns that match the project's detected stack. If no stack match, use universal patterns like `workflow.md`, `context-management.md`, or `claude-behavior.md`. These show what good output looks like.
 
    If hub patterns were copied in Step 1, you can read examples from the project's own `.claude/` directory — they're now local.
 
@@ -384,9 +442,17 @@ Key requirements per type:
 
 All patterns MUST: have 30+ lines of content, be under 500 lines, use project-specific examples (not generic advice), and pass sensitivity scan for auth/secret/token keywords.
 
+**Source hash:** For all generated patterns, include `source_hash` in frontmatter — a SHA256 hash of the concatenated evidence files used to derive the pattern. In `--update` mode, compare this hash against existing patterns' `source_hash` to detect staleness.
+
+**Soft cap:** Generate a maximum of 10 patterns per synthesis run. If more than 10 conventions are confirmed, prioritize by confidence (high before medium) and type mix (maintain 40-60% rules target). Defer remainder to a follow-up `--update` run.
+
+**Note:** Hooks (`.claude/hooks/`) are not synthesized by this skill. Hooks require shell scripting and CI integration. Hub hooks are provisioned in Step 1 if available. Project-specific hooks should be created manually.
+
 ## STEP 8: Validate and Write
 
 1. **If `--dry-run` mode:** Print each generated pattern with its target path and stop. Do not write any files.
+
+**Validate-then-write:** Validate ALL generated patterns before writing ANY of them. If any pattern fails validation, report all failures and ask the user whether to (a) write only the passing patterns, or (b) fix and retry. Do not partially write and leave the project in an inconsistent state.
 
 2. **Validate** — For each generated pattern, write it to a temp file and run validators:
    ```bash
@@ -405,6 +471,13 @@ All patterns MUST: have 30+ lines of content, be under 500 lines, use project-sp
    - Skills → `.claude/skills/[skill-name]/SKILL.md`
    - Agents → `.claude/agents/[agent-name].md`
 
+4. **Reconcile CLAUDE.md rules table** — After all patterns are written:
+   - Read the project's CLAUDE.md
+   - Find the rules table in the hub-managed section
+   - Add rows for any synthesized rules not already listed
+   - Remove rows for any rules no longer on disk
+   - Write the updated CLAUDE.md
+
 ### Remote mode (`--repo`): create a PR
 
 3. **Create a branch** on the remote repo:
@@ -413,7 +486,7 @@ All patterns MUST: have 30+ lines of content, be under 500 lines, use project-sp
    DEFAULT_SHA=$(gh api repos/owner/name/git/refs/heads/main --jq '.object.sha')
 
    # Create branch
-   gh api repos/owner/name/git/refs -f ref="refs/heads/synthesize-project/$(date +%Y-%m-%d)" -f sha="$DEFAULT_SHA"
+   gh api repos/owner/name/git/refs -f ref="refs/heads/synthesize-project/$(date +%Y-%m-%d-%H%M%S)" -f sha="$DEFAULT_SHA"
    ```
 
 4. **Push each pattern file** to the branch:
@@ -423,7 +496,7 @@ All patterns MUST: have 30+ lines of content, be under 500 lines, use project-sp
      -X PUT \
      -f message="feat: add synthesized pattern [name]" \
      -f content="$(echo 'PATTERN_CONTENT' | base64)" \
-     -f branch="synthesize-project/$(date +%Y-%m-%d)"
+     -f branch="synthesize-project/$(date +%Y-%m-%d-%H%M%S)"
    ```
 
 5. **Push `synthesis-config.yml`** if it doesn't exist in the repo (check first via `gh api`).
@@ -431,7 +504,7 @@ All patterns MUST: have 30+ lines of content, be under 500 lines, use project-sp
 6. **Create a PR:**
    ```bash
    gh pr create --repo owner/name \
-     --head "synthesize-project/$(date +%Y-%m-%d)" \
+     --head "synthesize-project/$(date +%Y-%m-%d-%H%M%S)" \
      --title "feat: synthesized .claude/ patterns for this project" \
      --body "$(cat <<'EOF'
    ## Summary
@@ -508,4 +581,5 @@ Print a summary showing hub provisioning, CLAUDE.md section audit, and synthesis
 - Each generated pattern MUST have at least 30 lines of actual content. No stubs.
 - When deduping against hub patterns in Step 3, err on the side of KEEPING the project-specific convention. Only drop it if the hub pattern genuinely covers the same ground. A project-specific pattern that adds even small value over the hub pattern is worth keeping.
 - STEP 2 (CLAUDE.md Section Audit) MUST insert missing sections BEFORE the `<!-- hub:best-practices:start -->` marker, never inside or after the hub-managed section. Never remove or reorganize the hub-managed markers — they are the boundary between user-editable and hub-managed content.
+- STEP 2 MUST validate that every file path in the CLAUDE.md rules table exists on disk. Dangling references mislead developers and agents. Remove stale entries, add missing ones.
 - STEP 3 MUST check for a monolithic `.claude/rules.md` before generating individual `rules/*.md` files. Generating both creates SSOT violations and content drift. Always ask the user how to proceed.

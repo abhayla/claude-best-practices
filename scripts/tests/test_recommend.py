@@ -24,6 +24,7 @@ from scripts.recommend import (
     get_rule_descriptions,
     is_stack_specific,
     matches_stacks,
+    MUST_HAVE_RULES,
     name_matches_existing,
     provision_claude_local_md,
     provision_claude_md,
@@ -31,6 +32,7 @@ from scripts.recommend import (
     provision_to_local,
     resolve_dep_patterns,
     tier_resource,
+    tier_resource_with_reason,
     _copy_resources_for_tier,
     _format_nice_to_have_pr_body,
     PROVISION_START_MARKER,
@@ -64,7 +66,8 @@ def hub_root(tmp_path):
     # Rules
     rules = core / "rules"
     rules.mkdir(parents=True)
-    for name in ["workflow", "context-management", "fastapi-backend"]:
+    for name in ["workflow", "context-management", "claude-behavior", "testing", "tdd",
+                  "fastapi-backend"]:
         (rules / f"{name}.md").write_text(f"---\nname: {name}\n---\n# {name}")
 
     # Hooks
@@ -76,7 +79,10 @@ def hub_root(tmp_path):
     # Templates and settings
     (core / "CLAUDE.md.template").write_text(
         "# CLAUDE.md\n\n**{{PROJECT_NAME}}** - {{PROJECT_DESCRIPTION}}\n\n"
-        "Platform: {{PLATFORM}}\n",
+        "Platform: {{PLATFORM}}\n\n"
+        "<!-- hub:best-practices:start -->\n\n"
+        "<!-- Placeholder replaced at provision time. -->\n\n"
+        "<!-- hub:best-practices:end -->\n",
         encoding="utf-8",
     )
     (core / "CLAUDE.local.md.template").write_text(
@@ -179,7 +185,7 @@ class TestGetHubResources:
         resources = get_hub_resources(hub_root)
         assert len(resources["skill"]) == 8
         assert len(resources["agent"]) == 4
-        assert len(resources["rule"]) == 3
+        assert len(resources["rule"]) == 6
         assert len(resources["hook"]) == 3
 
     def test_skill_names_correct(self, hub_root):
@@ -837,6 +843,42 @@ class TestProvisionClaudeMd:
         content = (target / "CLAUDE.md").read_text()
         assert content.count(PROVISION_START_MARKER) == 2  # old broken + new
 
+    def test_create_from_template_uses_dynamic_rules_table(self, hub_root, tmp_path):
+        """Case 1a: template-based creation uses dynamic hub_section, not hardcoded content."""
+        target = tmp_path / "myproject"
+        target.mkdir()
+        result = provision_claude_md(hub_root, target, ["fastapi-python"], ["workflow", "context-management"])
+        assert result == "created"
+        content = (target / "CLAUDE.md").read_text()
+        # Dynamic rules table should contain only the rules that were passed
+        assert "`rules/workflow.md`" in content
+        assert "`rules/context-management.md`" in content
+        # Should NOT contain the old placeholder text from the template
+        assert "Placeholder replaced at provision time" not in content
+
+    def test_create_from_template_excludes_removed_rules(self, hub_root, tmp_path):
+        """Case 1a: rules not in rules_present must not appear in generated CLAUDE.md."""
+        target = tmp_path / "myproject"
+        target.mkdir()
+        # Only pass "workflow" — rule-writing-meta should NOT appear
+        provision_claude_md(hub_root, target, [], ["workflow"])
+        content = (target / "CLAUDE.md").read_text()
+        assert "`rules/workflow.md`" in content
+        assert "rule-writing-meta" not in content
+
+    def test_create_from_template_preserves_user_sections(self, hub_root, tmp_path):
+        """Case 1a: user-editable sections from the template survive hub section replacement."""
+        target = tmp_path / "myproject"
+        target.mkdir()
+        provision_claude_md(hub_root, target, ["fastapi-python"], ["workflow"])
+        content = (target / "CLAUDE.md").read_text()
+        # Template's user-editable sections should be preserved
+        assert "**myproject**" in content
+        assert "Platform: fastapi-python" in content
+        # Hub markers should be present from the dynamic section
+        assert PROVISION_START_MARKER in content
+        assert PROVISION_END_MARKER in content
+
 
 # --- Provision: CLAUDE.local.md ---
 
@@ -1482,3 +1524,77 @@ class TestFormatNiceToHavePrBody:
         a_pos = body.index("`a-skill`")
         z_pos = body.index("`z-skill`")
         assert a_pos < z_pos
+
+
+# --- Hub Practices Section: Dynamic Counts ---
+
+
+class TestGenerateHubSectionCounts:
+    def test_with_counts(self, hub_root):
+        project_names = {
+            "skill": {"fix-loop", "tdd", "brainstorm"},
+            "agent": {"debugger", "tester"},
+            "rule": {"workflow"},
+        }
+        section = generate_hub_practices_section(
+            hub_root, ["workflow"], project_names=project_names,
+        )
+        assert "3 skills, 2 agents, and 1 rules" in section
+
+    def test_without_counts(self, hub_root):
+        section = generate_hub_practices_section(hub_root, ["workflow"])
+        assert "contains skills, agents, and rules for Claude Code" in section
+
+
+# --- MUST_HAVE_RULES Expansion ---
+
+
+class TestMustHaveRulesExpanded:
+    def test_expanded_rules_in_set(self):
+        for rule in ["workflow", "claude-behavior", "testing", "tdd", "context-management"]:
+            assert rule in MUST_HAVE_RULES, f"{rule} should be in MUST_HAVE_RULES"
+
+    def test_tier_workflow_is_must_have(self):
+        tier, reason = tier_resource_with_reason("workflow", "rule", [])
+        assert tier == "must-have"
+        assert reason == "core rule"
+
+    def test_tier_claude_behavior_is_must_have(self):
+        tier, _ = tier_resource_with_reason("claude-behavior", "rule", [])
+        assert tier == "must-have"
+
+    def test_tier_testing_is_must_have(self):
+        tier, _ = tier_resource_with_reason("testing", "rule", [])
+        assert tier == "must-have"
+
+    def test_tier_tdd_is_must_have(self):
+        tier, _ = tier_resource_with_reason("tdd", "rule", [])
+        assert tier == "must-have"
+
+
+# --- Provision JSON Combined Output ---
+
+
+class TestProvisionJsonCombined:
+    def test_provision_summary_has_copied_files(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        gaps = {"must-have": [
+            {"name": "fix-loop", "type": "skill", "tier": "must-have", "reason": "core"},
+        ], "improved": [], "nice-to-have": [], "skip": []}
+        summary = provision_to_local(hub_root, target, gaps, ["general"])
+        assert "copied_files" in summary
+        assert isinstance(summary["copied_files"], list)
+
+    def test_provision_combined_json_structure(self, hub_root, tmp_path):
+        target = tmp_path / "myproject"
+        target.mkdir()
+        gaps = {"must-have": [
+            {"name": "workflow", "type": "rule", "tier": "must-have", "reason": "core"},
+        ], "improved": [], "nice-to-have": [], "skip": []}
+        summary = provision_to_local(hub_root, target, gaps, ["general"])
+        combined = {"gaps": gaps, "provision": summary}
+        assert "gaps" in combined
+        assert "provision" in combined
+        assert "copied_files" in combined["provision"]
+        assert "claude_md" in combined["provision"]

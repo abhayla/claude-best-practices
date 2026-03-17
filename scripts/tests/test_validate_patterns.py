@@ -7,12 +7,14 @@ from pathlib import Path
 import pytest
 
 from scripts.validate_patterns import (
+    _looks_like_agent,
     check_cross_references,
     check_portability,
     count_content_lines,
     is_valid_semver,
     parse_frontmatter,
     validate_agent,
+    validate_file,
     validate_rule,
     validate_skill,
 )
@@ -642,3 +644,43 @@ class TestActualPatterns:
                     placeholder_rules.append(rule_path.stem)
                     break
         assert len(placeholder_rules) == 0, f"Rules with placeholders: {placeholder_rules}"
+
+
+# ── Single-File Validation ─────────────────────────────────────────────────
+
+
+class TestValidateFile:
+    def test_validate_file_skill(self, tmp_path):
+        skill_dir = _write_skill(tmp_path, "test-skill")
+        errors = validate_file(skill_dir / "SKILL.md")
+        assert errors == []
+
+    def test_validate_file_rule(self, tmp_path):
+        rule_path = _write_rule(tmp_path, "test-rule")
+        errors = validate_file(rule_path)
+        assert errors == []
+
+    def test_validate_file_agent(self, tmp_path):
+        agent_path = _write_agent(tmp_path, "test-agent")
+        errors = validate_file(agent_path)
+        assert errors == []
+
+    def test_validate_file_nonexistent(self, tmp_path):
+        errors = validate_file(tmp_path / "nonexistent.md")
+        assert len(errors) == 1
+        assert "File not found" in errors[0]
+
+    def test_validate_file_invalid_skill(self, tmp_path):
+        skill_dir = tmp_path / "skills" / "bad-skill"
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "SKILL.md").write_text("no frontmatter here", encoding="utf-8")
+        errors = validate_file(skill_dir / "SKILL.md")
+        assert any("frontmatter" in e.lower() for e in errors)
+
+    def test_looks_like_agent_true(self, tmp_path):
+        agent_path = _write_agent(tmp_path, "my-agent")
+        assert _looks_like_agent(agent_path) is True
+
+    def test_looks_like_agent_false_for_rule(self, tmp_path):
+        rule_path = _write_rule(tmp_path, "my-rule")
+        assert _looks_like_agent(rule_path) is False

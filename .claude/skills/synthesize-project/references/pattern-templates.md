@@ -11,6 +11,7 @@ description: >
 globs: ["**/*.py", "**/*.ts"]  # Scope to relevant file types
 synthesized: true
 private: false  # Set to true if sensitive (auth, billing, secrets)
+version: "1.0.0"
 ---
 
 # [Convention Name]

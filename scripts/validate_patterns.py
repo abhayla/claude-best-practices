@@ -7,8 +7,10 @@ from CI via validate-pr.yml.
 Usage:
     PYTHONPATH=. python scripts/validate_patterns.py
     PYTHONPATH=. python scripts/validate_patterns.py --fix-suggestions
+    PYTHONPATH=. python scripts/validate_patterns.py path/to/pattern.md
 """
 
+import argparse
 import json
 import re
 import sys
@@ -305,6 +307,37 @@ def check_cross_references(skills_dir: Path) -> list[str]:
     return errors
 
 
+# ── Single-File Validator ───────────────────────────────────────────────────
+
+
+def _looks_like_agent(file_path: Path) -> bool:
+    """Check if a markdown file looks like an agent (has 'model' in frontmatter)."""
+    fm = parse_frontmatter(file_path)
+    return fm is not None and "model" in fm
+
+
+def validate_file(file_path: Path) -> list[str]:
+    """Validate a single pattern file. Auto-detects type (skill/agent/rule).
+
+    Returns list of error strings (empty = valid).
+    """
+    path = Path(file_path)
+    if not path.exists():
+        return [f"File not found: {path}"]
+
+    errors = []
+
+    if path.name == "SKILL.md":
+        errors.extend(validate_skill(path.parent))
+    elif _looks_like_agent(path):
+        errors.extend(validate_agent(path))
+    else:
+        errors.extend(validate_rule(path))
+
+    errors.extend(check_portability(path))
+    return errors
+
+
 # ── Main ────────────────────────────────────────────────────────────────────
 
 
@@ -364,15 +397,39 @@ def validate_all() -> list[str]:
 
 
 def main():
-    show_suggestions = "--fix-suggestions" in sys.argv
+    parser = argparse.ArgumentParser(description="Pattern quality validator")
+    parser.add_argument("file", nargs="?", default=None,
+                        help="Single pattern file to validate (auto-detects type)")
+    parser.add_argument("--fix-suggestions", action="store_true",
+                        help="Show suggested fixes for errors")
+    args = parser.parse_args()
 
+    if args.file:
+        # Single-file validation mode
+        target = Path(args.file)
+        print(f"Validating: {target}")
+        errors = validate_file(target)
+        warnings = [e for e in errors if "WARNING" in e]
+        hard_errors = [e for e in errors if "WARNING" not in e]
+        if warnings:
+            for w in warnings:
+                print(f"  WARN: {w}")
+        if hard_errors:
+            for e in hard_errors:
+                print(f"  FAIL: {e}")
+            print(f"\nFAILED: {len(hard_errors)} error(s), {len(warnings)} warning(s)")
+            sys.exit(1)
+        else:
+            print(f"PASSED ({len(warnings)} warning(s))")
+            sys.exit(0)
+
+    # Full validation mode (existing behavior)
     print("=" * 60)
     print("Pattern Quality Validator")
     print("=" * 60)
 
     errors = validate_all()
 
-    # Separate warnings from errors
     warnings = [e for e in errors if "WARNING" in e]
     hard_errors = [e for e in errors if "WARNING" not in e]
 
@@ -386,7 +443,7 @@ def main():
         for e in sorted(hard_errors):
             print(f"  FAIL: {e}")
 
-        if show_suggestions:
+        if args.fix_suggestions:
             print("\nSuggested fixes:")
             for e in sorted(hard_errors):
                 if "Missing 'version'" in e:
