@@ -670,6 +670,31 @@ with open('test-results/flutter-e2e-test.json', 'w') as f:
 
 ---
 
+## CAPTURE PROOF MODE
+
+When invoked with `--capture-proof`, capture a screenshot after every test
+function, not just tests with explicit `matchesGoldenFile()` calls.
+
+### Integration Test Pattern
+
+```dart
+// The tester-agent wraps each test's tearDown to capture:
+tearDown(() async {
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  await binding.takeScreenshot('${testName}_${passed ? "pass" : "fail"}');
+});
+```
+
+### Evidence Output
+
+Screenshots stored in `test-evidence/{run_id}/screenshots/`:
+`{test_name}.{pass|fail}.png`
+
+Platform suffix added for multi-platform runs:
+`{test_name}.{android|ios|web}.{pass|fail}.png`
+
+---
+
 ## Anti-Patterns
 
 ### MUST NOT DO

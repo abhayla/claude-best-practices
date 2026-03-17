@@ -294,6 +294,38 @@ jobs:
 
 ---
 
+## CAPTURE PROOF MODE
+
+When invoked with `--capture-proof`, enable always-capture mode for both
+Detox (functional) and Owl (visual regression) tests.
+
+### Detox Always-Capture
+
+```javascript
+// In e2e/config.js or jest setup:
+afterEach(async () => {
+  const testName = expect.getState().currentTestName.replace(/\s/g, '_');
+  const passed = expect.getState().assertionCalls === expect.getState().numPassingAsserts;
+  await device.takeScreenshot(`${testName}.${passed ? 'pass' : 'fail'}`);
+});
+```
+
+### Owl Always-Capture
+
+```bash
+# Run Owl with --capture-all flag (captures every screen, not just visual tests)
+npx owl test --capture-all
+```
+
+### Evidence Output
+
+Screenshots stored in `test-evidence/{run_id}/screenshots/`:
+`{test_name}.{pass|fail}.png`
+
+Platform suffix for cross-platform: `{test_name}.{android|ios}.{pass|fail}.png`
+
+---
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |

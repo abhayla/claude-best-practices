@@ -1838,6 +1838,47 @@ only against the Chromium project in your Playwright config.
 
 ---
 
+## CAPTURE PROOF MODE
+
+When invoked with `--capture-proof` (from `/auto-verify` or `test-pipeline-agent`),
+override the default screenshot behavior to capture on every test:
+
+### Configuration Override
+
+```typescript
+// playwright.config.ts — capture-proof mode
+use: {
+  screenshot: 'on',  // Changed from 'only-on-failure'
+},
+```
+
+Or via CLI:
+```bash
+npx playwright test --screenshot on
+```
+
+### Evidence Output
+
+With capture-proof enabled, Playwright stores screenshots at:
+```
+test-results/          # Playwright's native output
+  test-name-chromium/
+    test-name-1.png    # Every test, pass or fail
+```
+
+The `tester-agent` copies these to the evidence archive:
+```
+test-evidence/{run_id}/screenshots/
+  test_login_success.pass.png
+  test_dashboard_loads.pass.png
+  test_checkout_flow.fail.png
+```
+
+Naming convention: `{test_name}.{pass|fail}.png`
+If multi-browser: `{test_name}.{browser}.{pass|fail}.png`
+
+---
+
 ## CRITICAL RULES
 
 - NEVER use `page.waitForTimeout()` — use auto-wait assertions or `waitForSelector`/`waitForResponse` instead

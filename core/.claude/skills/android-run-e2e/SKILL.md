@@ -460,6 +460,38 @@ When running normally (no `--update-baselines`):
 4. `NEW` screenshots (no baseline) are warnings, not failures
 5. Include visual regression details in the final report
 
+## CAPTURE PROOF MODE
+
+When invoked with `--capture-proof`, auto-inject `takeScreenshot` after every
+assertion step in Maestro flows.
+
+### Auto-Injection Pattern
+
+For each `.yaml` flow file, the tester-agent appends a screenshot capture after
+every assertion or navigation command:
+
+```yaml
+# Original flow step:
+- tapOn: "Submit"
+- assertVisible: "Success"
+
+# With capture-proof, becomes:
+- tapOn: "Submit"
+- takeScreenshot: "submit_tapped"
+- assertVisible: "Success"
+- takeScreenshot: "success_visible"
+```
+
+### Evidence Output
+
+Screenshots are stored in `test-evidence/{run_id}/screenshots/` with naming:
+`{flow_name}.{step_name}.{pass|fail}.png`
+
+The `tester-agent` handles injection and evidence collection — flow files
+are NOT permanently modified. Injection is runtime-only.
+
+---
+
 ## Notes
 
 - Gradle E2E requires running emulator and backend
