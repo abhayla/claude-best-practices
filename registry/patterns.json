@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-15",
-    "total_patterns": 182
+    "total_patterns": 183
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -1295,7 +1295,7 @@
     "hash": "192d78878d1728ace982319cc1f31f8656348172da2dc4a1c3bff5391654b417",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-03-10",
@@ -2633,7 +2633,7 @@
     "hash": "adb7f0303fd248932b4ad83cf21cc904b7ad92c68d8d6a93e9fb20c89c104626",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-03-10",
@@ -2699,11 +2699,29 @@
     ],
     "changelog": "v1.0.0: Initial release"
   },
+  "test-pipeline-agent": {
+    "hash": "fc10bd0c100463ccf5c4f8f6240a7c9322b4ff8d7dfab358b8f7488bbcb8b6f9",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-17",
+    "last_updated": "2026-03-17",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrates the full test verification pipeline: cleanup, stage dispatch, gate enforcement, and result aggregation.",
+    "tags": [
+      "testing",
+      "orchestration",
+      "pipeline"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
   "tester-agent": {
     "hash": "2cf52b2eb6f4f13394edeaa4453df4a15c6a71e9f2ed15a3ff3f9bb455c7e6fd",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-03-10",
@@ -2790,7 +2808,7 @@
     "hash": "24341fa2cf1266726047697a9ead24e4f9d256592f60e00503d6d3727e3a713a",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-03-12",
