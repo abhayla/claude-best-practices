@@ -2,10 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**Every response MUST start with `*Enhanced: <what context was checked>*`** — see `.claude/rules/prompt-auto-enhance.md` for tiers and details.
+
 ## Critical: Two `.claude/` Directories
 
 - **`core/.claude/`** — Distributable template (what users copy to their projects). NEVER put hub-only config here.
 - **`.claude/`** (repo root) — Hub-only operational config: scan skills (`scan-repo`, `scan-url`), `synthesize-hub`, hub rules. NEVER distribute this.
+
+## Environment
+
+- **Python 3.12** required (all CI workflows use 3.12)
+- Install: `pip install -r scripts/requirements.txt`
 
 ## Commands
 
@@ -24,6 +31,10 @@ PYTHONPATH=. python scripts/validate_patterns.py
 
 # Provision a project (auto-detect stacks, copy patterns, generate CLAUDE.md)
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
+
+# Pre-PR validation (CI runs these — catch issues locally first)
+PYTHONPATH=. python scripts/validate_patterns.py
+PYTHONPATH=. python -m pytest scripts/tests/ -v
 
 # Regenerate docs after registry changes
 python scripts/generate_docs.py
@@ -68,6 +79,7 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 - **`third_party_skills.py`** — Matches project dependencies against `config/third-party-skills.yml` to recommend external agent skills. Called by `recommend.py` during provisioning.
 - **`dedup_check.py`** — Three-level dedup (SHA256 hash → structural → semantic via Claude Haiku). Used by scan workflows.
 - **`check_freshness.py`** — Validates internet source expiration dates. Used by `expire-sources` workflow.
+- **`sync_to_projects.py`** — Hub-to-project sync: creates per-project PRs for registered repos in `config/repos.yml`.
 - **`sync_to_local.py`** — Project-side sync: compares hub patterns against local copies using hashes/semver, applies updates.
 
 ### GitHub Actions
@@ -83,7 +95,7 @@ Nine workflows: `test.yml`, `scan-projects.yml`, `scan-internet.yml`, `validate-
 
 ## Key Conventions
 
-- `registry/patterns.json` MUST stay in sync with actual files in `core/.claude/`. After adding/removing patterns: edit the registry, then run `python scripts/generate_docs.py` to regenerate docs. CI (`validate-pr.yml`) will catch drift.
+- **Registry maintenance workflow**: (1) add/remove files in `core/.claude/`, (2) update `registry/patterns.json`, (3) run `python scripts/generate_docs.py`, (4) run `PYTHONPATH=. python scripts/validate_patterns.py` to verify sync. CI (`validate-pr.yml`) will catch drift.
 - Pattern curation is reactive, not speculative — see `.claude/rules/rule-curation.md`
 - Pattern quality rules (structure, portability, self-containment) are in `.claude/rules/pattern-*.md`
 - `/synthesize-project` (in `core/.claude/skills/`) provisions projects; `/synthesize-hub` (in `.claude/skills/`) generalizes patterns back into the hub
