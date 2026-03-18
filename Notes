@@ -133,6 +133,7 @@ skills
   Pydantic
   FastAPI
   user_preferences
+  Enhance and save prompts
   ******
 Explain Step by step what synthesize-project workflow does to help me understand how it scans the whole target project from all Claude.md files, rules, skills, agents, hooks etc. After scanning how it categorizes the findings and then how it creates the PRs for the target project.
 
