@@ -7,7 +7,7 @@ description: >
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis] [--only skills|rules|agents] [--tier must-have|improved|nice-to-have|all]"
-version: "3.3.0"
+version: "4.0.0"
 type: workflow
 ---
 
@@ -388,7 +388,7 @@ Remaining after dedup: [N] conventions to investigate
 
 For each remaining candidate convention, read the source files listed in "evidence needed."
 
-1. Read the files using `Read` — deduplicate across conventions (if two conventions need the same file, you already have it in context). **File budget:** Read a maximum of 15 evidence files directly. If total evidence files exceed 15, delegate to a subagent: pass the file list and convention hypothesis, and have the subagent return a confirmation/rejection summary.
+1. Read the files using `Read` — deduplicate across conventions (if two conventions need the same file, you already have it in context). **Deep scan (default):** Read ALL evidence files needed to confirm conventions. Do NOT cap at an arbitrary number. If total evidence files exceed 15, delegate overflow to subagents to manage context — but NEVER skip evidence files entirely.
 2. For each convention, confirm or reject:
    - **Confirmed** — the convention holds across the evidence files with no major counter-examples
    - **Rejected** — the evidence is inconsistent, or the convention is weaker than hypothesized
@@ -466,7 +466,7 @@ All patterns MUST: have 30+ lines of content, be under 500 lines, use project-sp
 
 **Source hash:** For all generated patterns, include `source_hash` in frontmatter — a SHA256 hash of the concatenated evidence files used to derive the pattern. In `--update` mode, compare this hash against existing patterns' `source_hash` to detect staleness.
 
-**Soft cap:** Generate a maximum of 10 patterns per synthesis run. If more than 10 conventions are confirmed, prioritize by confidence (high before medium) and type mix (maintain 40-60% rules target). Defer remainder to a follow-up `--update` run.
+**No cap:** Generate ALL confirmed conventions. NEVER limit, cap, or prioritize a subset — every confirmed convention MUST be generated. Do NOT defer any to a follow-up run. Do NOT cherry-pick "top N" patterns. The user expects complete coverage of their project's conventions.
 
 **Note:** Hooks (`.claude/hooks/`) are not synthesized by this skill. Hooks require shell scripting and CI integration. Hub hooks are provisioned in Step 1 if available. Project-specific hooks should be created manually.
 
@@ -500,48 +500,63 @@ All patterns MUST: have 30+ lines of content, be under 500 lines, use project-sp
    - Remove rows for any rules no longer on disk
    - Write the updated CLAUDE.md
 
-### Remote mode (`--repo`): create a PR
+### Remote mode (`--repo`): create SEPARATE PRs per tier
 
-3. **Create a branch** on the remote repo:
+**CRITICAL:** ALWAYS create separate PRs for each tier. NEVER combine tiers into a single PR. NEVER skip a tier. NEVER make arbitrary decisions about which resources to include or exclude. Every confirmed pattern MUST appear in exactly one PR based on its tier.
+
+**Tier classification for synthesized patterns:**
+- **Must-have (high confidence):** Patterns with `confidence: high` — correctness/safety conventions that prevent bugs
+- **Nice-to-have (medium confidence):** Patterns with `confidence: medium` — consistency/style conventions
+- **Enhanced (hub-improved):** Patterns where a hub pattern exists but the project-specific version adds value (refinements, not replacements)
+
+3. **For EACH tier with patterns**, create a separate branch and PR:
+
    ```bash
+   # Branches — one per tier
+   # synthesize-project/must-have     — high-confidence patterns
+   # synthesize-project/nice-to-have  — medium-confidence patterns
+   # synthesize-project/enhanced      — project refinements of hub patterns
+
    # Get default branch SHA
    DEFAULT_SHA=$(gh api repos/owner/name/git/refs/heads/main --jq '.object.sha')
 
-   # Create branch
-   gh api repos/owner/name/git/refs -f ref="refs/heads/synthesize-project/$(date +%Y-%m-%d-%H%M%S)" -f sha="$DEFAULT_SHA"
+   # Create branch for this tier
+   gh api repos/owner/name/git/refs \
+     -f ref="refs/heads/synthesize-project/TIER_NAME" \
+     -f sha="$DEFAULT_SHA"
    ```
 
-4. **Push each pattern file** to the branch:
+4. **Push pattern files** to the appropriate tier branch:
    ```bash
-   # For each generated pattern, create/update the file on the branch
-   echo "PATTERN_CONTENT" | base64 | gh api repos/owner/name/contents/.claude/rules/[name].md \
+   echo 'PATTERN_CONTENT' | base64 | gh api repos/owner/name/contents/.claude/rules/[name].md \
      -X PUT \
      -f message="feat: add synthesized pattern [name]" \
      -f content="$(echo 'PATTERN_CONTENT' | base64)" \
-     -f branch="synthesize-project/$(date +%Y-%m-%d-%H%M%S)"
+     -f branch="synthesize-project/TIER_NAME"
    ```
 
-5. **Push `synthesis-config.yml`** if it doesn't exist in the repo (check first via `gh api`).
+5. **Push `synthesis-config.yml`** to the must-have branch if it doesn't exist in the repo.
 
-6. **Create a PR:**
+6. **Create a PR for EACH tier:**
+
+   **Must-have PR:**
    ```bash
    gh pr create --repo owner/name \
-     --head "synthesize-project/$(date +%Y-%m-%d-%H%M%S)" \
-     --title "feat: synthesized .claude/ patterns for this project" \
+     --head "synthesize-project/must-have" \
+     --title "feat: add [N] must-have synthesized patterns" \
      --body "$(cat <<'EOF'
-   ## Summary
+   ## Must-Have Synthesized Patterns
 
-   Auto-generated `.claude/` patterns by analyzing this project's codebase.
-   These patterns encode conventions specific to this project.
+   **[N]** high-confidence patterns derived from this project's codebase.
+   These encode correctness and safety conventions — safe to merge.
 
-   ## Generated Patterns
+   ## Patterns
 
-   [List each pattern with name, type, and one-line description]
+   [List each pattern: - `name` (type) — description]
 
    ## Review Checklist
-
    - [ ] Patterns accurately reflect project conventions
-   - [ ] No sensitive information exposed (check `private: true` patterns)
+   - [ ] No sensitive information exposed
    - [ ] No generic advice — each pattern is project-specific
 
    ---
@@ -549,6 +564,49 @@ All patterns MUST: have 30+ lines of content, be under 500 lines, use project-sp
    EOF
    )"
    ```
+
+   **Nice-to-have PR:**
+   ```bash
+   gh pr create --repo owner/name \
+     --head "synthesize-project/nice-to-have" \
+     --title "feat: [N] optional synthesized patterns (review individually)" \
+     --body "$(cat <<'EOF'
+   ## Nice-to-Have Synthesized Patterns
+
+   **[N]** medium-confidence patterns. Review each individually.
+
+   ## Patterns
+
+   [List each with checkbox: - [ ] `name` (type) — description]
+
+   ---
+   Generated by `/synthesize-project`.
+   EOF
+   )"
+   ```
+
+   **Enhanced PR (if applicable):**
+   ```bash
+   gh pr create --repo owner/name \
+     --head "synthesize-project/enhanced" \
+     --title "feat: [N] enhanced patterns (project refinements)" \
+     --body "$(cat <<'EOF'
+   ## Enhanced Patterns
+
+   **[N]** patterns that refine hub patterns with project-specific conventions.
+   Review diffs carefully — these complement existing hub patterns.
+
+   ## Patterns
+
+   [List each: - `name` (type) — what it adds beyond the hub pattern]
+
+   ---
+   Generated by `/synthesize-project`.
+   EOF
+   )"
+   ```
+
+   **If a tier has zero patterns, skip that PR entirely (do NOT create an empty PR).**
 
 ## STEP 9: Generate synthesis-config.yml
 
@@ -601,6 +659,9 @@ Print a summary showing hub provisioning, CLAUDE.md section audit, and synthesis
 - If `--update` mode finds stale patterns, do NOT delete them automatically. Write them to the summary as "candidates for removal" and let the developer decide.
 - Mark patterns as `private: true` if they mention auth, secrets, tokens, credentials, billing, payment, or similar sensitive topics. When in doubt, mark private.
 - Each generated pattern MUST have at least 30 lines of actual content. No stubs.
+- NEVER cap, limit, or prioritize a subset of confirmed conventions. Generate ALL of them. Do NOT pick "top 10" or defer to a follow-up run. The user expects complete, exhaustive coverage.
+- ALWAYS create SEPARATE PRs for each tier (must-have, nice-to-have, enhanced) in remote mode. NEVER combine tiers into a single PR. NEVER skip a tier that has patterns. NEVER make arbitrary decisions about which resources to include or exclude from a PR.
+- ALWAYS perform deep scan — read ALL evidence files needed to confirm conventions. Do NOT limit evidence reads to an arbitrary budget. If more than 15 files are needed, delegate to subagents, but NEVER skip evidence.
 - When deduping against hub patterns in Step 3, err on the side of KEEPING the project-specific convention. Only drop it if the hub pattern genuinely covers the same ground. A project-specific pattern that adds even small value over the hub pattern is worth keeping.
 - STEP 2 (CLAUDE.md Section Audit) MUST insert missing sections BEFORE the `<!-- hub:best-practices:start -->` marker, never inside or after the hub-managed section. Never remove or reorganize the hub-managed markers — they are the boundary between user-editable and hub-managed content.
 - STEP 2 MUST validate that every file path in the CLAUDE.md rules table exists on disk. Dangling references mislead developers and agents. Remove stale entries, add missing ones.

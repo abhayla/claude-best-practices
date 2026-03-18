@@ -145,3 +145,6 @@ run synthesize-project for full synthesis
   1. Continue with full synthesis (Steps 3-8) — scan codebase, identify conventions, generate new patterns
   2. Stop here — the hub provision + CLAUDE.md audit is done, skip synthesis
   3. Run with --skip-synthesis — just generate the summary
+
+
+  Ask question when you are enhancing the prompt

@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Critical: Two `.claude/` Directories
 
 - **`core/.claude/`** — Distributable template (what users copy to their projects). NEVER put hub-only config here.
-- **`.claude/`** (repo root) — Hub-only operational config (scan skills, hub settings). NEVER distribute this.
+- **`.claude/`** (repo root) — Hub-only operational config: scan skills (`scan-repo`, `scan-url`), `synthesize-hub`, hub rules. NEVER distribute this.
 
 ## Commands
 
@@ -27,6 +27,9 @@ PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 
 # Regenerate docs after registry changes
 python scripts/generate_docs.py
+
+# Quick bootstrap for new projects (alternative to recommend.py)
+curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bootstrap.sh | bash -s -- --stacks android-compose,fastapi-python
 ```
 
 ## Architecture
@@ -37,7 +40,8 @@ A curated hub of Claude Code patterns (agents, skills, rules) organized by stack
 
 - **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, templates
 - **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit directly after adding/removing patterns, then re-run `generate_docs.py`
-- **`config/`** — `settings.yml` (dedup thresholds), `repos.yml` (downstream projects), `urls.yml`/`topics.yml` (scan sources), `third-party-skills.yml` (external skill registry)
+- **`config/`** — `settings.yml` (dedup thresholds: semantic 85/70, structural 3; scan limits), `repos.yml` (downstream projects, `auto_sync`/`share_synthesized` flags), `urls.yml`/`topics.yml` (scan sources with freshness tracking), `third-party-skills.yml` (external skill registry), `test-pipeline.yml` (externalized pipeline DAG)
+- **`docs/stages/`** — Pipeline stage definitions (STAGE-0 through STAGE-11) with executable `Skill()`/`Agent()` dispatch examples
 - **`scripts/`** — All Python tooling (see Key Scripts below for the important ones)
 
 ### Stack Prefix Convention
@@ -62,6 +66,9 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 - **`collate.py`** — Extracts patterns from downstream project repos for hub ingestion.
 - **`scan_web.py`** — Discovers patterns from URLs/topics configured in `config/urls.yml` and `config/topics.yml`.
 - **`third_party_skills.py`** — Matches project dependencies against `config/third-party-skills.yml` to recommend external agent skills. Called by `recommend.py` during provisioning.
+- **`dedup_check.py`** — Three-level dedup (SHA256 hash → structural → semantic via Claude Haiku). Used by scan workflows.
+- **`check_freshness.py`** — Validates internet source expiration dates. Used by `expire-sources` workflow.
+- **`sync_to_local.py`** — Project-side sync: compares hub patterns against local copies using hashes/semver, applies updates.
 
 ### GitHub Actions
 
