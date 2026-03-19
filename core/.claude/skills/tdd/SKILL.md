@@ -11,8 +11,8 @@ triggers:
   - red-green-refactor
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<feature-or-behavior-description>"
-version: "1.0.0"
-type: reference
+version: "1.0.1"
+type: workflow
 ---
 
 # Test-Driven Development (Red-Green-Refactor)
@@ -63,7 +63,7 @@ Ask the user whether to fix existing failures first or proceed with a known-brok
 
 ---
 
-## PHASE 1: RED — Write a Failing Test
+## STEP 1: RED — Write a Failing Test
 
 ### 1.1 Choose the Next Behavior
 
@@ -169,7 +169,7 @@ during testing?" If deployed — stop. That belongs in the GREEN phase.
 
 ---
 
-## PHASE 2: GREEN — Minimal Implementation
+## STEP 2: GREEN — Minimal Implementation
 
 ### 2.1 Write the Minimum Code to Pass
 
@@ -274,7 +274,7 @@ Violation check: "Is this change required to make the test pass, or am I making 
 
 ---
 
-## PHASE 3: REFACTOR — Clean Up
+## STEP 3: REFACTOR — Clean Up
 
 ### 3.1 Pre-Refactor Safety Check
 

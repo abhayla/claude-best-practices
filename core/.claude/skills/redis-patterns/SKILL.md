@@ -4,9 +4,9 @@ description: >
   Redis 7+ development patterns and best practices: data structure selection, caching strategies,
   connection management, Redis Query Engine, vector search, JSON documents, streams, pub/sub,
   security, and observability. Use when designing or optimizing Redis-backed features.
-allowed-tools: "Bash Read Grep Glob Write Edit"
+allowed-tools: "Read Grep Glob"
 argument-hint: "<redis-task-or-question>"
-version: "1.0.0"
+version: "1.0.1"
 type: reference
 ---
 

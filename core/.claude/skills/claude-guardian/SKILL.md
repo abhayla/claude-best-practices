@@ -6,8 +6,8 @@ description: >
   Two modes: enhance-and-place a rough rule idea, or audit all config files.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<rough rule text> | audit"
-version: "1.0.0"
-type: reference
+version: "1.0.1"
+type: workflow
 ---
 
 # Claude Guardian — Config Rule Placement & Audit
@@ -38,7 +38,7 @@ Audit all config files to catch accidental deletions, misplacements, and protect
 
 ---
 
-## MODE 1: Enhance & Place
+## STEP 1: Enhance & Place
 
 ### Step 1: Analyze the Rule
 - Parse the rough rule text
@@ -59,7 +59,7 @@ Transform rough text into structured format:
 
 ---
 
-## MODE 2: Audit
+## STEP 2: Audit
 
 ### Step 1: Read All Config Files
 Read all CLAUDE.md, CLAUDE.local.md, and .claude/rules/*.md files.

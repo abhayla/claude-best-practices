@@ -5,8 +5,8 @@ description: >
   auto-updates model import locations. Use when adding or modifying SQLAlchemy models.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<model-name or 'run' or 'status' or 'check'>"
-version: "1.0.0"
-type: reference
+version: "1.0.1"
+type: workflow
 ---
 
 # Database Migration Helper (FastAPI + Alembic)
@@ -28,7 +28,7 @@ Automates Alembic migration creation and model import location updates.
 
 ---
 
-## For "new-model" Mode
+## STEP 1: New Model Mode
 
 ### 1. Create the Model File
 
@@ -77,11 +77,11 @@ cd backend && PYTHONPATH=. python -c "from app.models import *; print('All impor
 
 ---
 
-## For "check" Mode
+## STEP 2: Check Mode
 
 Compare model imports across all required locations and report mismatches.
 
-## For "status" Mode
+## STEP 3: Status Mode
 
 ```bash
 cd backend && alembic current && alembic history --verbose | head -20

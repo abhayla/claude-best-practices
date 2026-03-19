@@ -7,8 +7,8 @@ description: >
   "project health check", or "create a roadmap".
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: diagnose|check-in|reassess> [context]"
-version: "1.0.0"
-type: reference
+version: "1.0.1"
+type: workflow
 ---
 
 # Strategic Architect — Project Diagnostics & Planning
@@ -29,7 +29,7 @@ Structured project assessment with constraint identification and action planning
 
 ---
 
-## DIAGNOSE MODE
+## STEP 1: Diagnose Mode
 
 ### Round 1: Project Context (4 questions)
 1. What is the project's primary goal and who are its users?
@@ -63,7 +63,7 @@ Structured project assessment with constraint identification and action planning
 
 ---
 
-## CONSTRAINT IDENTIFICATION
+## STEP 2: Constraint Identification
 
 After gathering answers, identify the primary constraint(s):
 
@@ -78,7 +78,7 @@ After gathering answers, identify the primary constraint(s):
 
 ---
 
-## STRATEGIC REPORT
+## STEP 3: Strategic Report
 
 Deliver a structured report with:
 
@@ -96,7 +96,7 @@ Save the report to `plans/strategic-assessment-{date}.md`.
 
 ---
 
-## CHECK-IN MODE
+## STEP 4: Check-In Mode
 
 1. Read previous assessment from `plans/`
 2. Compare current state against 30-day plan
@@ -104,6 +104,6 @@ Save the report to `plans/strategic-assessment-{date}.md`.
 4. Adjust priorities if needed
 5. Identify new blockers or risks
 
-## REASSESS MODE
+## STEP 5: Reassess Mode
 
 Run a fresh diagnostic with emphasis on what changed since last assessment.

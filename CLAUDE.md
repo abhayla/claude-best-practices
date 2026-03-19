@@ -26,7 +26,7 @@ PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py::TestCopyClaudeDir
 # Provision a project
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 
-# Pre-PR validation (CI runs these)
+# Pre-PR validation (CI runs these — see .github/workflows/validate-pr.yml)
 PYTHONPATH=. python scripts/validate_patterns.py
 
 # Regenerate docs after registry changes
@@ -65,6 +65,8 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 - **`validate_patterns.py`** — CI validator. Checks frontmatter, cross-references, file/registry sync. Run before every PR.
 - **`generate_docs.py`** — Rebuilds `docs/` dashboard and `core/.claude/README.md` from `registry/patterns.json`.
 - **`collate.py`** — Extracts patterns from downstream project repos for hub ingestion.
+- **`scan_web.py`** — Discovers patterns from URLs/topics configured in `config/urls.yml` and `config/topics.yml`.
+- **`sync_to_projects.py`** — Pushes hub updates to registered downstream projects as PRs (uses `config/repos.yml`).
 
 ## Testing
 

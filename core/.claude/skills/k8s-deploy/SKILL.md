@@ -4,9 +4,9 @@ description: >
   Kubernetes deployment skill covering manifests, services, ingress, secrets,
   probes, autoscaling, RBAC, namespaces, Helm charts, and debugging.
   Use when deploying, configuring, or troubleshooting Kubernetes workloads.
-allowed-tools: "Bash Read Grep Glob Write Edit"
+allowed-tools: "Read Grep Glob"
 argument-hint: "<deployment-task-or-question>"
-version: "1.0.0"
+version: "1.0.1"
 type: reference
 triggers:
   - kubernetes deploy

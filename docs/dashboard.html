@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-19 15:48 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-19 15:17 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">189</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">184</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">194</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">189</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">5</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">23</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">7</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">17</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">142</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">23</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">7</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">22</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">142</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -1057,6 +1057,33 @@ tr:hover { background: var(--primary-light); }
                 <td>—</td>
                 <td>orchestration, parallel, worktree</td>
             </tr>
+            <tr data-type="rule" data-category="core">
+                <td>pattern-portability</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>quality-gate, portability, pattern-governance</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>pattern-self-containment</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>quality-gate, self-containment, pattern-governance</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>pattern-structure</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>quality-gate, structure, pattern-governance</td>
+            </tr>
             <tr data-type="skill" data-category="core">
                 <td>perf-test</td>
                 <td><span class="badge badge-skill">skill</span></td>
@@ -1317,6 +1344,24 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>code-quality-gate, architecture-fitness, security-audit, adversarial-review, change-risk-scoring, pr-standards</td>
                 <td>review, orchestration, quality-gate</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>rule-curation</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>pattern-portability, pattern-structure, pattern-self-containment</td>
+                <td>curation, quality-gate, pattern-governance</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>rule-writing-meta</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>meta, rule-authoring, pattern-governance</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>save-session</td>

@@ -4,9 +4,9 @@ description: >
   Reference for Google Gemini API usage: client setup with google-genai SDK,
   structured output, prompt patterns, and troubleshooting. Use when working
   with Gemini-powered features.
-allowed-tools: "Bash Read Grep Glob Write Edit"
+allowed-tools: "Read Grep Glob"
 argument-hint: ""
-version: "1.0.0"
+version: "1.0.1"
 type: reference
 ---
 

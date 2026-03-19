@@ -5,7 +5,7 @@ description: >
   in a single report. Use when starting a session or checking project health.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: ""
-version: "1.0.0"
+version: "1.0.1"
 type: reference
 ---
 
@@ -41,7 +41,16 @@ gh issue list --assignee @me --state open --limit 3 2>/dev/null || echo ""
 ### 4. Recent Test Results
 Check for recent test output files or run a quick test count:
 - Look for test result artifacts in common locations
-- Optionally run `--collect-only` to count available tests
+- Optionally run `--collect-only` to count available tests without executing them
+- Check CI status via `gh run list --limit 1` if GitHub CLI is available
+
+## Health Criteria
+
+Assess overall project health based on these signals:
+- **GOOD**: Clean git state, tests passing, no stale PRs
+- **NEEDS_ATTENTION**: Uncommitted changes, open PRs older than 3 days, or test warnings
+- **BLOCKED**: Failing tests, merge conflicts, or CI failures on the current branch
+- Check CI status via `gh run list --limit 1` if GitHub CLI is available## Health CriteriaAssess overall project health based on these signals:- **GOOD**: Clean git state, tests passing, no stale PRs- **NEEDS_ATTENTION**: Uncommitted changes, open PRs older than 3 days, or test warnings- **BLOCKED**: Failing tests, merge conflicts, or CI failures on the current branch
 
 ## Report
 

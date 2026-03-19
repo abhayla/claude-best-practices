@@ -4,14 +4,14 @@ description: >
   Test middleware layers: auth (multi-layer), rate limiting, caching, request validation.
   Covers pass-through, rejection, and edge cases for each middleware type.
   Use when modifying or adding middleware to backend services.
-allowed-tools: "Bash Read Grep Glob Write Edit"
+allowed-tools: "Read Grep Glob"
 triggers:
   - middleware test
   - auth middleware
   - rate limit test
   - cache test
 argument-hint: "<middleware-type: auth|rate-limit|cache|validation|all>"
-version: "1.0.0"
+version: "1.0.1"
 type: reference
 ---
 

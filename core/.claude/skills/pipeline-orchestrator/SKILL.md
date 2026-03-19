@@ -14,7 +14,7 @@ triggers:
   - run pipeline
 allowed-tools: "Agent Read Grep Glob"
 argument-hint: "<feature description, PRD file path, or GitHub Issue URL>"
-version: "2.0.0"
+version: "2.0.1"
 type: workflow
 ---
 
@@ -42,6 +42,18 @@ The agent will:
 5. Validate gates and manage retries (max 3/stage, 15 global)
 6. Persist state to `.pipeline/state.json` after every mutation
 7. Generate pipeline summary on completion
+
+### Agent Dispatch Details
+
+The orchestrator manages the full lifecycle of a pipeline run:
+
+- **DAG Loading**: Reads `config/pipeline-stages.yaml` to build a directed acyclic graph of stages
+- **Wave Computation**: Groups stages with no unmet dependencies into parallel execution waves
+- **Agent Dispatch**: Launches each stage via `Agent()` with a structured prompt containing objective, input artifact paths, expected output paths, and verification commands
+- **Gate Validation**: After each worker completes, validates its gate result and output artifacts before advancing
+- **Retry Management**: Retries failed stages up to 3 times per stage, with a global budget of 15 retries across the entire pipeline run
+- **State Persistence**: Writes pipeline state to `.pipeline/state.json` after every mutation so runs can be resumed if interrupted
+### Agent Dispatch DetailsThe orchestrator reads `config/pipeline-stages.yaml` to build a directed acyclic graph of stages. Stages with no unmet dependencies are grouped into waves and dispatched in parallel via `Agent()` calls. Each worker agent receives a structured prompt containing its objective, input artifact paths, expected output paths, and verification commands. When a worker completes, the orchestrator validates its gate result and artifacts before advancing to the next wave. If a stage fails, the orchestrator retries up to 3 times per stage while respecting the global budget of 15 retries across the entire pipeline run.
 
 ## STEP 2: Report Results
 

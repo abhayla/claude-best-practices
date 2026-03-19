@@ -145,7 +145,7 @@ Agents and skills serve different purposes. Choosing wrong creates unnecessary c
 | Single-purpose workflow with defined steps | `/code-quality-gate` — 9 analysis steps |
 | No subagent dispatch needed | `/writing-plans` — works entirely in main context |
 | Invoked by the user as a slash command | `/brainstorm`, `/implement` |
-| Read-only analysis or reference lookup | `/agent-orchestration-guide` (this skill) |
+| Read-only analysis or reference lookup | `/anthropic-agent-orchestration-guide` (this skill) |
 | Produces a single output artifact | `/prd-parser` → normalized PRD |
 
 ### Use an Agent When

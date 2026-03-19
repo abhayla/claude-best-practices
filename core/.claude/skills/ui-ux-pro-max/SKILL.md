@@ -4,8 +4,8 @@ description: "UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairing
 
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<query> [--design-system] [--domain <domain>] [--stack <stack>]"
-version: "1.0.0"
-type: reference
+version: "1.0.1"
+type: workflow
 ---
 
 # UI/UX Pro Max - Design Intelligence
@@ -127,7 +127,7 @@ winget install Python.Python.3.12
 
 When user requests UI/UX work (design, build, create, implement, review, fix, improve), follow this workflow:
 
-### Step 1: Analyze User Requirements
+## STEP 1: Analyze User Requirements
 
 Extract key information from user request:
 - **Product type**: SaaS, e-commerce, portfolio, dashboard, landing page, etc.
@@ -135,7 +135,7 @@ Extract key information from user request:
 - **Industry**: healthcare, fintech, gaming, education, etc.
 - **Stack**: React, Vue, Next.js, or default to `html-tailwind`
 
-### Step 2: Generate Design System (REQUIRED)
+## STEP 2: Generate Design System (REQUIRED)
 
 **Always start with `--design-system`** to get comprehensive recommendations with reasoning:
 
@@ -154,7 +154,7 @@ This command:
 python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
 ```
 
-### Step 2b: Persist Design System (Master + Overrides Pattern)
+## STEP 2b: Persist Design System (Master + Overrides Pattern)
 
 To save the design system for **hierarchical retrieval across sessions**, add `--persist`:
 
@@ -188,7 +188,7 @@ If not, use the Master rules exclusively.
 Now, generate the code...
 ```
 
-### Step 3: Supplement with Detailed Searches (as needed)
+## STEP 3: Supplement with Detailed Searches (as needed)
 
 After getting the design system, use domain searches to get additional details:
 
@@ -206,7 +206,7 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n
 | Alternative fonts | `typography` | `--domain typography "elegant luxury"` |
 | Landing structure | `landing` | `--domain landing "hero social-proof"` |
 
-### Step 4: Stack Guidelines (Default: html-tailwind)
+## STEP 4: Stack Guidelines (Default: html-tailwind)
 
 Get implementation-specific best practices. If user doesn't specify a stack, **default to `html-tailwind`**.
 

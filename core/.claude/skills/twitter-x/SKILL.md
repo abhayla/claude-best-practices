@@ -23,8 +23,8 @@ triggers:
   - twitter monitor
 allowed-tools: "Bash Read Write Edit Grep Glob WebFetch WebSearch Agent"
 argument-hint: "<action> [options] — e.g., 'read https://x.com/user/status/123', 'compose tweet about AI', 'score my tweet', 'search AI agents', 'post Hello world'"
-version: "1.0.0"
-type: reference
+version: "1.0.1"
+type: workflow
 ---
 
 # Twitter/X Comprehensive Skill
@@ -37,7 +37,7 @@ Determine which mode to use based on the user's request, then follow that sectio
 
 ---
 
-## MODE 1: READ POST
+## STEP 1: Read Post
 
 Fetch any X/Twitter post as structured data for analysis.
 
@@ -80,7 +80,7 @@ After fetching, do whatever the user asked: summarize, analyze, extract key poin
 
 ---
 
-## MODE 2: COMPOSE TWEET
+## STEP 2: Compose Tweet
 
 Craft an optimized tweet or thread. Apply these rules:
 
@@ -146,7 +146,7 @@ STANDALONE HOOK: [Tweet 1 rephrased as standalone tweet]
 
 ---
 
-## MODE 3: VIRAL POTENTIAL SCORING
+## STEP 3: Viral Potential Scoring
 
 Score a tweet's viral potential using the 19-element system based on X's open-source recommendation algorithm.
 
@@ -219,7 +219,7 @@ Score a tweet's viral potential using the 19-element system based on X's open-so
 
 ---
 
-## MODE 4: SEARCH & DISCOVER
+## STEP 4: Search & Discover
 
 Search tweets, users, and trends. Requires API credentials.
 
@@ -271,7 +271,7 @@ python rnet_twitter.py search "keyword" --mode latest --min_faves 50
 
 ---
 
-## MODE 5: POST & ENGAGE
+## STEP 5: Post & Engage
 
 Post tweets, reply, like, retweet, and manage engagement. Requires API credentials.
 
@@ -341,7 +341,7 @@ curl -s -X POST "https://api.x.com/2/tweets" \
 
 ---
 
-## MODE 6: FOLLOWER & SOCIAL MANAGEMENT
+## STEP 6: Follower & Social Management
 
 ### Follower Analysis
 ```bash
@@ -385,7 +385,7 @@ Flag accounts to unfollow based on:
 
 ---
 
-## MODE 7: ACCOUNT HEALTH & GROWTH
+## STEP 7: Account Health & Growth
 
 ### TweepCred Health Score
 Evaluate account health on a 0-100 scale:
@@ -427,7 +427,7 @@ Check for potential shadowban indicators:
 
 ---
 
-## MODE 8: KEYWORD MONITORING
+## STEP 8: Keyword Monitoring
 
 Set up ongoing monitoring for keywords, competitors, or brand mentions.
 
@@ -460,7 +460,7 @@ Sentiment: Positive X% / Neutral X% / Negative X%
 
 ---
 
-## MODE 9: CONTENT STRATEGY & PLANNING
+## STEP 9: Content Strategy & Planning
 
 Generate a content calendar or strategy plan.
 
