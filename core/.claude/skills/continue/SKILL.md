@@ -6,7 +6,7 @@ description: >
   Use when starting a new conversation or returning after a break.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: ""
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -25,6 +25,7 @@ Read the following (skip any that don't exist):
 3. **Recent changes** — `git diff --stat HEAD~3..HEAD`
 4. **Open issues** — `gh issue list --assignee @me --state open --limit 5` (if gh is available)
 5. **Task/TODO files** — Check for TODO.md, tasks.md, or similar
+6. **Saved sessions** — Check if `.claude/sessions/` exists with `.md` files. If found, note the most recent session and suggest: "Saved session found: `{name}` ({date}). Use `/start-session` to restore full context, or continue with this general briefing."
 
 ## STEP 2: Assess Priority
 

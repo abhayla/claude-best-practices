@@ -81,6 +81,25 @@ Environment variables: `CONTEXT_WARN_PCT` (default 35), `CONTEXT_CRIT_PCT` (defa
 
 Both options integrate with your existing `context-management` rules and `context-reducer-agent` — the warnings reference `/handover`, context-reducer-agent, and subagent delegation.
 
+### Session Reminder (`session-reminder.sh`)
+
+PostToolUse hook on `*` (all tools) that reminds Claude to checkpoint progress via `/save-session` at configurable intervals. Uses a counter-based approach: counts tool invocations per session and emits a non-blocking reminder at the threshold. Complements `context-window-monitor.sh` — session-reminder fires first (default: 40 tool uses) as a save prompt, then context-monitor fires later (default: 50) for handover/compaction. Always exits 0 (non-blocking, advisory only).
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "command": ".claude/hooks/session-reminder.sh"
+      }
+    ]
+  }
+}
+```
+
+Environment variables: `SESSION_REMIND_THRESHOLD` (default 40), `SESSION_REMIND_DEBOUNCE` (default 20).
+
 ### Auto-Format on File Write (`auto-format.sh`)
 
 PostToolUse hook on `Write|Edit` that auto-formats files after Claude writes them. Supports Python (black/ruff), JS/TS/JSON/YAML/CSS/HTML (prettier), Kotlin (ktfmt), Go (gofmt), Rust (rustfmt), Swift (swift-format), and Shell (shfmt). Only runs formatters that are installed — missing ones are silently skipped. Always non-blocking (exit 0). Customize the formatters to match your project tooling.

@@ -10,3 +10,4 @@ venv/
 test-results/
 test-evidence/
 .pipeline/
+.claude/sessions/

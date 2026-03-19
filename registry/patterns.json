@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.0.0",
-    "last_updated": "2026-03-15",
-    "total_patterns": 186
+    "last_updated": "2026-03-19",
+    "total_patterns": 189
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -744,15 +744,19 @@
     "hash": "2f4c63bcafbd024362c154065f5a29c723c0c44ed0c5bc99022dafa8fe92fe87",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "description": "Resume work from a previous session with git state briefing and saved session detection",
+    "tags": [
+      "session",
+      "context",
+      "continuity"
+    ],
+    "changelog": "v2.1.0: Added saved session detection — suggests /start-session when .claude/sessions/ exists"
   },
   "contract-test": {
     "hash": "410d3acea02d8f55f09f0b118b5853938c5e8987e39ac814e7c46e568928b25f",
@@ -2350,6 +2354,24 @@
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
   },
+  "save-session": {
+    "hash": "bbdce60247319d9070516b316ad5f1d4e011589036d922e293e635bef031725d",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Save a structured session checkpoint capturing working files, git state, key decisions, and task progress for later resumption via /start-session",
+    "tags": [
+      "session",
+      "context",
+      "continuity"
+    ],
+    "changelog": "v1.0.0: Initial release — structured session checkpointing with portable template"
+  },
   "schema-designer": {
     "hash": "efc65d55d3078a3f2516341ab68dcc0ef92208bf7ccf49d95b79a86db2e67444",
     "type": "skill",
@@ -2385,6 +2407,24 @@
     "description": "",
     "tags": [],
     "changelog": "v1.0.0: Initial registration"
+  },
+  "session-reminder": {
+    "hash": "3d79cd069b740ee686986fb8234af816685a92a9d28aaa8a519c576770ffbd9d",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "PostToolUse hook that reminds Claude to checkpoint progress via /save-session at configurable tool-use count thresholds",
+    "tags": [
+      "session",
+      "hooks",
+      "reminder"
+    ],
+    "changelog": "v1.0.0: Initial release — counter-based session save reminder"
   },
   "security-audit": {
     "hash": "c29e395f90853183f0f36292c7ca549a3f6b5f0703886fe8fc4b5a361364fc07",
@@ -2463,6 +2503,26 @@
       "patterns"
     ],
     "changelog": "v1.0.0: Initial release — routes pattern creation to appropriate authoring workflows with quality validation"
+  },
+  "start-session": {
+    "hash": "8827e854164f71bc8a454409e13bc5a7213f9606f418add68c8fa5499e723fac",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [
+      "save-session"
+    ],
+    "visibility": "public",
+    "description": "Restore a previously saved session checkpoint, loading working files into context and presenting a structured briefing for seamless resumption",
+    "tags": [
+      "session",
+      "context",
+      "continuity"
+    ],
+    "changelog": "v1.0.0: Initial release — session restoration with priority-ordered file loading"
   },
   "skill-factory": {
     "hash": "7aa98beb094b1b737bf623acf2612abfd63df345864a537e0e00d54f9a8fa82c",

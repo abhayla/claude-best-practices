@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-19 11:35 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-19 14:23 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">186</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">181</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">189</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">184</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">5</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">23</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">6</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">17</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">140</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">23</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">7</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">17</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">142</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -476,10 +476,10 @@ tr:hover { background: var(--primary-light); }
                 <td>continue</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>2.0.0</td>
+                <td>2.1.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
-                <td>—</td>
+                <td>session, context, continuity</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>contract-test</td>
@@ -1319,6 +1319,15 @@ tr:hover { background: var(--primary-light); }
                 <td>review, orchestration, quality-gate</td>
             </tr>
             <tr data-type="skill" data-category="core">
+                <td>save-session</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>session, context, continuity</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
                 <td>scan-discovery-report</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
@@ -1390,6 +1399,15 @@ tr:hover { background: var(--primary-light); }
                 <td>—</td>
                 <td>—</td>
             </tr>
+            <tr data-type="hook" data-category="core">
+                <td>session-reminder</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>session, hooks, reminder</td>
+            </tr>
             <tr data-type="agent" data-category="core">
                 <td>session-summarizer-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
@@ -1443,6 +1461,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>configuration-ssot</td>
                 <td>SSOT, audit, configuration, duplication, quality</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>start-session</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>save-session</td>
+                <td>session, context, continuity</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>status</td>
