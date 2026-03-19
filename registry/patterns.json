@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-19",
-    "total_patterns": 194
+    "total_patterns": 195
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -426,13 +426,13 @@
     "changelog": "v2.0.0: Genericized and restructured"
   },
   "batch": {
-    "hash": "1a041549b6caaa9cc9fbdaeb53ec032c94a0c77299558e0e26bd1b442c6284ed",
+    "hash": "02c7f6b384fcd0b9c26804020a4a537d2aa165928792241f8ab4bbdfea0e9cb1",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Parallel codebase-wide changes, renames, API migrations",
@@ -454,13 +454,13 @@
     "changelog": "v1.0.0: Initial registration"
   },
   "branching": {
-    "hash": "277f9bf351776d5dbd1088003d8515166fc07a7180e7e08ebd7a14e106ee7d9f",
+    "hash": "1bb53fc01fcfc429c92c4857d29a1c456e4c8185f7c1ea83e15a65d62f49c09a",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Full branch lifecycle: create with naming conventions + finish with merge",
@@ -1492,13 +1492,13 @@
     "changelog": "v1.0.0: Initial release — single-file prototypes with heuristic validation"
   },
   "iac-deploy": {
-    "hash": "f92b50d281662dac82ca227a4489dc745d8f9710559f06ae85062e5002d1c150",
+    "hash": "7b0e0bfa93b93b1259bed278ef6bf022615e2c1d3c657fc059f6b6e921948bd2",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Infrastructure as Code: Terraform, Pulumi, state management",
@@ -1571,13 +1571,13 @@
     "changelog": "v1.0.0: Initial release"
   },
   "k8s-deploy": {
-    "hash": "21154c2cc73d4f08c1411e93d77ef0c50427cc7e1e93f1b4c092d1f64bfb42dd",
+    "hash": "62417ac3a03650b6e297cdb6caca9d3c3ef6fe3d0de348adf6ffc1d11a18c245",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Kubernetes manifests, probes, HPA, RBAC, Helm charts",
@@ -1687,13 +1687,13 @@
     "changelog": "v1.0.0: Initial release"
   },
   "monitoring-setup": {
-    "hash": "6742c95a84e31bd1d42e221179a97488f1b3832ed7c05dda2bbdc79192e857ff",
+    "hash": "9bd7bae448976d4c6fb6bc00b76caf99501d9b0952f6d6197579008677f9c907",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Prometheus, Grafana, alerting, SLO/SLI dashboards",
@@ -1955,13 +1955,13 @@
     "changelog": "v2.0.0: Genericized and restructured"
   },
   "playwright": {
-    "hash": "32318efa81e05b73d7512481a9297b1645f33d87e046599dc06a217ec10aba15",
+    "hash": "64d1bac9cdbea249dfc38048bf7b8372e3bdc2527a01fdb4829e42754781a08c",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Browser automation, E2E test generation, Page Object Model",
@@ -2141,6 +2141,24 @@
     ],
     "changelog": "v1.0.0: Initial release — Tier 1/2 context gathering, silent/visible modes, web search triggers"
   },
+  "prompt-enhance-reminder": {
+    "hash": "1b8fce4f183bd43911eb55f0fab3ef935a6c57bb70549b13704fc689f2dec817",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "UserPromptSubmit hook that injects a deterministic reminder for the Enhanced indicator on every user prompt",
+    "tags": [
+      "hook",
+      "prompt-enhance",
+      "deterministic"
+    ],
+    "changelog": "v1.0.0: Initial release — deterministic Enhanced indicator reminder"
+  },
   "pytest-dev": {
     "hash": "8079e93f106c59cd93f232c8a17e13b13da03360b21454bf0ad8421dea5c2c3d",
     "type": "skill",
@@ -2179,13 +2197,13 @@
     "changelog": "v1.0.0: Initial registration"
   },
   "react-native-dev": {
-    "hash": "2891a7f03534177279317a5100ee60ca7b1d7e5ebca4fb87970e112f3ae0db4b",
+    "hash": "1956aeeef5daead8b2c03f8fa977c1346092c8b7367887e8ac747eb2c05448fb",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
     "description": "React Native development, profiling, CI/CD, migration",
@@ -2399,6 +2417,24 @@
     ],
     "changelog": "v1.0.0: Initial release — distributed from hub-only to core"
   },
+  "save-session": {
+    "hash": "bbdce60247319d9070516b316ad5f1d4e011589036d922e293e635bef031725d",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Save a structured session checkpoint capturing working files, git state, key decisions, and task progress for later resumption via /start-session",
+    "tags": [
+      "session",
+      "context",
+      "continuity"
+    ],
+    "changelog": "v1.0.0: Initial release — structured session checkpointing with portable template"
+  },
   "scan-discovery-report": {
     "hash": "d10d9bfb51a796cb174e20c68fe7ffd882e8458d813e585dffe2d70e0da85b0e",
     "type": "skill",
@@ -2448,24 +2484,6 @@
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
   },
-  "save-session": {
-    "hash": "bbdce60247319d9070516b316ad5f1d4e011589036d922e293e635bef031725d",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-19",
-    "last_updated": "2026-03-19",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Save a structured session checkpoint capturing working files, git state, key decisions, and task progress for later resumption via /start-session",
-    "tags": [
-      "session",
-      "context",
-      "continuity"
-    ],
-    "changelog": "v1.0.0: Initial release — structured session checkpointing with portable template"
-  },
   "schema-designer": {
     "hash": "efc65d55d3078a3f2516341ab68dcc0ef92208bf7ccf49d95b79a86db2e67444",
     "type": "skill",
@@ -2501,24 +2519,6 @@
     "description": "",
     "tags": [],
     "changelog": "v1.0.0: Initial registration"
-  },
-  "session-reminder": {
-    "hash": "3d79cd069b740ee686986fb8234af816685a92a9d28aaa8a519c576770ffbd9d",
-    "type": "hook",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-19",
-    "last_updated": "2026-03-19",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "PostToolUse hook that reminds Claude to checkpoint progress via /save-session at configurable tool-use count thresholds",
-    "tags": [
-      "session",
-      "hooks",
-      "reminder"
-    ],
-    "changelog": "v1.0.0: Initial release — counter-based session save reminder"
   },
   "security-audit": {
     "hash": "c29e395f90853183f0f36292c7ca549a3f6b5f0703886fe8fc4b5a361364fc07",
@@ -2562,6 +2562,24 @@
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
+  "session-reminder": {
+    "hash": "3d79cd069b740ee686986fb8234af816685a92a9d28aaa8a519c576770ffbd9d",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "PostToolUse hook that reminds Claude to checkpoint progress via /save-session at configurable tool-use count thresholds",
+    "tags": [
+      "session",
+      "hooks",
+      "reminder"
+    ],
+    "changelog": "v1.0.0: Initial release — counter-based session save reminder"
+  },
   "session-summarizer-agent": {
     "hash": "7920a48dc28cad35c34147e6e8a3b58d55d347563889f7645e8704984b2fe637",
     "type": "agent",
@@ -2597,26 +2615,6 @@
       "patterns"
     ],
     "changelog": "v1.0.0: Initial release — routes pattern creation to appropriate authoring workflows with quality validation"
-  },
-  "start-session": {
-    "hash": "8827e854164f71bc8a454409e13bc5a7213f9606f418add68c8fa5499e723fac",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-19",
-    "last_updated": "2026-03-19",
-    "dependencies": [
-      "save-session"
-    ],
-    "visibility": "public",
-    "description": "Restore a previously saved session checkpoint, loading working files into context and presenting a structured briefing for seamless resumption",
-    "tags": [
-      "session",
-      "context",
-      "continuity"
-    ],
-    "changelog": "v1.0.0: Initial release — session restoration with priority-ordered file loading"
   },
   "skill-factory": {
     "hash": "7aa98beb094b1b737bf623acf2612abfd63df345864a537e0e00d54f9a8fa82c",
@@ -2681,6 +2679,26 @@
       "quality"
     ],
     "changelog": "v1.0.0: Initial release — 6-step audit workflow, cross-layer duplication detection, health scoring"
+  },
+  "start-session": {
+    "hash": "8827e854164f71bc8a454409e13bc5a7213f9606f418add68c8fa5499e723fac",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [
+      "save-session"
+    ],
+    "visibility": "public",
+    "description": "Restore a previously saved session checkpoint, loading working files into context and presenting a structured briefing for seamless resumption",
+    "tags": [
+      "session",
+      "context",
+      "continuity"
+    ],
+    "changelog": "v1.0.0: Initial release — session restoration with priority-ordered file loading"
   },
   "status": {
     "hash": "336e6e52b149f01683a895ec47fdc5a7e3cc2add49c6bd82e738d5e462e4555a",
@@ -3183,13 +3201,13 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
   "writing-skills": {
-    "hash": "46b16382b6492e0bfbd795efcdf1d8b8fbdb657e020151b2930d37fbdedb38b9",
+    "hash": "f6e238a17e13a82ff8ba19f6ce92b780a2b4644465b57a274bfb9fb2b829b108",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Skill authoring guide with 6 templates and quality checklist",
