@@ -26,9 +26,6 @@ PYTHONPATH=. python -m pytest scripts/tests/ -v
 # Run a single test
 PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py::TestCopyClaudeDir::test_copies_core_files -v
 
-# Validate patterns before PR
-PYTHONPATH=. python scripts/validate_patterns.py
-
 # Provision a project (auto-detect stacks, copy patterns, generate CLAUDE.md)
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 

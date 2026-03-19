@@ -13,7 +13,7 @@ triggers:
 allowed-tools: "Read Grep Glob WebFetch WebSearch Skill Agent"
 argument-hint: "[prompt text to enhance manually]"
 type: reference
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Prompt Auto-Enhance — Resource CRUD Procedures
