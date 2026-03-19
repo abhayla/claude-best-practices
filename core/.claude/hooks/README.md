@@ -100,6 +100,28 @@ PostToolUse hook on `*` (all tools) that reminds Claude to checkpoint progress v
 
 Environment variables: `SESSION_REMIND_THRESHOLD` (default 40), `SESSION_REMIND_DEBOUNCE` (default 20).
 
+### Prompt Enhance Reminder (`prompt-enhance-reminder.sh`)
+
+UserPromptSubmit hook that injects a deterministic reminder so Claude never skips the `*Enhanced: ...*` indicator from the `prompt-auto-enhance` rule. The rule is advisory — Claude can skip it under context pressure. This hook makes it deterministic by injecting the reminder on every user prompt. Always exits 0 (non-blocking).
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/prompt-enhance-reminder.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ### Auto-Format on File Write (`auto-format.sh`)
 
 PostToolUse hook on `Write|Edit` that auto-formats files after Claude writes them. Supports Python (black/ruff), JS/TS/JSON/YAML/CSS/HTML (prettier), Kotlin (ktfmt), Go (gofmt), Rust (rustfmt), Swift (swift-format), and Shell (shfmt). Only runs formatters that are installed — missing ones are silently skipped. Always non-blocking (exit 0). Customize the formatters to match your project tooling.
@@ -182,6 +204,7 @@ echo "$TIMESTAMP | skill: $SKILL" >> .claude/logs/workflow.log
 |-------|--------------|
 | `PreToolUse` | Before a tool executes |
 | `PostToolUse` | After a tool executes |
+| `UserPromptSubmit` | When the user sends a message (before Claude responds) |
 | `Notification` | When Claude sends a notification |
 
 ### Available Matchers
