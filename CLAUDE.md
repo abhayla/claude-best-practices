@@ -17,27 +17,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Install dependencies
-pip install -r scripts/requirements.txt
-
 # Run all tests (PYTHONPATH=. required for cross-module imports)
 PYTHONPATH=. python -m pytest scripts/tests/ -v
 
 # Run a single test
 PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py::TestCopyClaudeDir::test_copies_core_files -v
 
-# Provision a project (auto-detect stacks, copy patterns, generate CLAUDE.md)
+# Provision a project
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 
-# Pre-PR validation (CI runs these — catch issues locally first)
+# Pre-PR validation (CI runs these)
 PYTHONPATH=. python scripts/validate_patterns.py
-PYTHONPATH=. python -m pytest scripts/tests/ -v
 
 # Regenerate docs after registry changes
 python scripts/generate_docs.py
-
-# Quick bootstrap for new projects (alternative to recommend.py)
-curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bootstrap.sh | bash -s -- --stacks android-compose,fastapi-python
 ```
 
 ## Architecture
@@ -67,28 +60,18 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 
 ### Key Scripts
 
-- **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping and `copy_claude_dir()` which filters patterns by stack prefix. Also `render_template()` for CLAUDE.md generation. Imported by `recommend.py`.
 - **`recommend.py`** — Main entry point for provisioning. Defines `STACK_DETECTORS` (file-based auto-detection) and `DEP_PATTERN_MAP` (dependency→pattern promotion). Modes: `--local`/`--repo` (report only), `--apply` (copy files), `--provision` (apply + generate CLAUDE.md + settings.json), `--diff` (compare overlapping content), `--use-config` (use stacks from `repos.yml`).
+- **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping and `copy_claude_dir()` which filters patterns by stack prefix. Imported by `recommend.py`.
 - **`validate_patterns.py`** — CI validator. Checks frontmatter, cross-references, file/registry sync. Run before every PR.
 - **`generate_docs.py`** — Rebuilds `docs/` dashboard and `core/.claude/README.md` from `registry/patterns.json`.
 - **`collate.py`** — Extracts patterns from downstream project repos for hub ingestion.
-- **`scan_web.py`** — Discovers patterns from URLs/topics configured in `config/urls.yml` and `config/topics.yml`.
-- **`third_party_skills.py`** — Matches project dependencies against `config/third-party-skills.yml` to recommend external agent skills. Called by `recommend.py` during provisioning.
-- **`dedup_check.py`** — Three-level dedup (SHA256 hash → structural → semantic via Claude Haiku). Used by scan workflows.
-- **`check_freshness.py`** — Validates internet source expiration dates. Used by `expire-sources` workflow.
-- **`sync_to_projects.py`** — Hub-to-project sync: creates per-project PRs for registered repos in `config/repos.yml`.
-- **`sync_to_local.py`** — Project-side sync: compares hub patterns against local copies using hashes/semver, applies updates.
-
-### GitHub Actions
-
-Nine workflows: `test.yml`, `scan-projects.yml`, `scan-internet.yml`, `validate-pr.yml`, `update-docs.yml`, `sync-to-projects.yml`, `expire-sources.yml`, `recommend.yml`, `apply-selections.yml`.
 
 ## Testing
 
 - Fixtures: `scripts/tests/fixtures/` + shared in `scripts/tests/conftest.py`
 - Uses `tmp_path` for temp files and `sample_registry` fixture for registry tests
 - Smoke tests: `scripts/tests/smoke-test/todo-api/`
-- Bug fixing: write a failing test first, then fix. Use subagents to attempt fixes.
+- Bug fixing: write a failing test first, then fix — see `.claude/rules/workflow.md`
 
 ## Key Conventions
 

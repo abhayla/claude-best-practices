@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-15",
-    "total_patterns": 184
+    "total_patterns": 186
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -649,6 +649,26 @@
     "description": "Jetpack Compose UI patterns, theming, accessibility",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "configuration-ssot": {
+    "hash": "51a52709bb5da53f1323012316f7294d3166e984a5141faf4ac25bc9418c82bc",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Single Source of Truth principle for Claude Code configuration. Defines four non-overlapping layers (CLAUDE.md, rules, skills, settings), anti-duplication rules, and migration guide.",
+    "tags": [
+      "SSOT",
+      "configuration",
+      "duplication",
+      "CLAUDE.md",
+      "architecture"
+    ],
+    "changelog": "v1.0.0: Initial release — four-layer model, anti-duplication rules, pointer pattern, migration guide"
   },
   "context-management": {
     "hash": "4d9b088a1885a53f857ebd693547f0e5c2842faf4cadb100679ea3b637baa65b",
@@ -2485,6 +2505,28 @@
     "description": "Solidity smart contract security: CEI, Foundry, UUPS, gas optimization",
     "tags": [],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+  },
+  "ssot-audit": {
+    "hash": "de811c38020342ac2ed216d85cd4a153dd378de137dace640274db88a46550ef",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-03-19",
+    "dependencies": [
+      "configuration-ssot"
+    ],
+    "visibility": "public",
+    "description": "Audit project's Claude Code configuration for SSOT violations. Detects duplicated constraints, misplaced config, bloated CLAUDE.md, unscoped rules, and layer misuse.",
+    "tags": [
+      "SSOT",
+      "audit",
+      "configuration",
+      "duplication",
+      "quality"
+    ],
+    "changelog": "v1.0.0: Initial release — 6-step audit workflow, cross-layer duplication detection, health scoring"
   },
   "status": {
     "hash": "336e6e52b149f01683a895ec47fdc5a7e3cc2add49c6bd82e738d5e462e4555a",
