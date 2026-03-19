@@ -151,6 +151,15 @@ Training data may be outdated for fast-evolving libraries.
 | Nearby files | Prompt mentions a specific file/feature/module | Imports, dependencies, tests, related modules |
 | `registry/patterns.json` | Prompt involves pattern creation or comparison | Check if pattern already exists, verify sync |
 
+### Clarification Gate (after Tier 1/2)
+
+After context gathering, if the prompt is ambiguous or multi-file, enter a
+clarification loop before acting. See the `prompt-auto-enhance` rule for full
+trigger/skip conditions. Key principles:
+- Read relevant code before each question — MUST NOT ask what you can answer yourself
+- One question at a time, with a recommendation and reasoning
+- 3-5 questions max, then present the plan section by section for approval
+
 ---
 
 ## CRUD Detection Signals
@@ -186,6 +195,8 @@ the signals are clear.
 ## MUST DO
 
 - ALWAYS gather Tier 1 context before responding to any prompt
+- ALWAYS run the Clarification Gate for ambiguous or multi-file prompts before acting
+- ALWAYS read relevant code before asking a clarification question — never ask what you can answer yourself
 - ALWAYS present the batch table when resource CRUD is detected
 - ALWAYS wait for explicit user approval before creating/updating/deleting
 - ALWAYS delegate to existing authoring tools — never generate patterns ad-hoc

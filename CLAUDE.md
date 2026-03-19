@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Every response MUST start with `*Enhanced: <what context was checked>*`** — see `.claude/rules/prompt-auto-enhance.md` for tiers and details.
+**Every response MUST start with `*Enhanced: <what context was checked>*`** — see `.claude/rules/prompt-auto-enhance.md` for tiers, clarification gate, and details.
 
 ## Critical: Two `.claude/` Directories
 
