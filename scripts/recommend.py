@@ -706,6 +706,17 @@ def name_matches_existing(hub_name: str, project_names: set[str]) -> bool:
     return False
 
 
+def _load_tier_registry(hub_root: Path | None = None) -> dict[str, dict]:
+    """Load registry/patterns.json for tier lookups. Cached after first load."""
+    if not hasattr(_load_tier_registry, "_cache"):
+        _load_tier_registry._cache = {}
+    if hub_root and not _load_tier_registry._cache:
+        path = hub_root / "registry" / "patterns.json"
+        if path.exists():
+            _load_tier_registry._cache = json.loads(path.read_text(encoding="utf-8"))
+    return _load_tier_registry._cache
+
+
 def tier_resource(name: str, resource_type: str, stacks: list[str], dep_promoted: set[str] | None = None) -> str:
     """Assign a tier to a missing resource: must-have, nice-to-have, or skip.
 
@@ -723,6 +734,13 @@ def tier_resource_with_reason(
     name: str, resource_type: str, stacks: list[str], dep_promoted: set[str] | None = None,
 ) -> tuple[str, str]:
     """Assign a tier and reason to a missing resource.
+
+    Tiering priority:
+    1. Dependency promotion (overrides everything)
+    2. Always-skip list
+    3. Wrong-stack detection
+    4. Registry `tier` field (data-driven, from patterns.json)
+    5. Hardcoded fallback sets (legacy, for entries without `tier` field)
 
     Returns (tier, reason) where tier is 'must-have', 'nice-to-have', or 'skip'.
     """
@@ -747,7 +765,14 @@ def tier_resource_with_reason(
             # Empty set means "requires dep detection only" — skip if not dep-promoted
             return "skip", "wrong stack"
 
-    # Type-specific tiering
+    # Registry-driven tiering — check patterns.json `tier` field first
+    registry = _load_tier_registry()
+    if name in registry and isinstance(registry[name], dict):
+        reg_tier = registry[name].get("tier")
+        if reg_tier in ("must-have", "nice-to-have", "skip"):
+            return reg_tier, f"registry tier ({reg_tier})"
+
+    # Fallback: hardcoded sets (legacy, for entries without `tier` field)
     if resource_type == "hook":
         if name in MUST_HAVE_HOOKS:
             return "must-have", "essential safety hook"
@@ -2379,7 +2404,8 @@ def main():
     # Step 3: Get hub resources
     hub_resources = get_hub_resources(hub_root)
 
-    # Step 4: Analyze gaps (with dependency-aware tiering)
+    # Step 4: Analyze gaps (with registry-driven tiering)
+    _load_tier_registry(hub_root)  # Prime the cache before gap analysis
     gaps = analyze_gaps(hub_resources, project_names, stacks, deps)
 
     # Step 4b: Detect improved patterns (hub has newer versions of existing patterns)
