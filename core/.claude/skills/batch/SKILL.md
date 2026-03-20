@@ -98,475 +98,61 @@ conflicts.
 
 Dispatch one subagent per batch, each in its own worktree for full isolation.
 
-### 3.1 Pre-Work
+1. Complete foundational changes (file renames, class renames) that all batches depend on and commit pre-work
+2. Dispatch one `Agent()` per batch with `isolation="worktree"` — each gets: objective, change pattern, owned files, read-only files, verification commands
+3. Monitor progress as results come in; retry failed batches with enriched failure context (max 3 retries)
 
-Complete foundational changes that all batches depend on:
+**Read:** `references/parallel-execution.md` for pre-work examples, subagent dispatch templates, multi-batch dispatch, and retry patterns.
 
-```bash
-# Rename the source file first — all batches import from the new location
-git mv src/services/UserService.ts src/services/AccountService.ts
-
-# Update the barrel export
-# In src/services/index.ts: change "export { UserService } from './UserService'"
-#                          to "export { AccountService } from './AccountService'"
-
-# Rename the class inside the file
-# In src/services/AccountService.ts: class UserService → class AccountService
-
-# Commit pre-work so subagents branch from a clean state
-git add src/services/AccountService.ts src/services/index.ts
-git commit -m "refactor: rename UserService file and class to AccountService
-
-Pre-work for codebase-wide rename. All import paths will be updated in parallel batches."
-```
-
-### 3.2 Dispatch Subagents
-
-Each subagent gets a precise prompt with the change pattern, affected files, and
-expected before/after:
-
-```
-Agent("
-## Objective
-Update all UserService references to AccountService in the controller layer.
-
-## Change Pattern
-- Import: `import { UserService } from '../services/UserService'`
-  → `import { AccountService } from '../services/AccountService'`
-- Usage: `new UserService(` → `new AccountService(`
-- Usage: `userService.` → `accountService.` (variable names)
-- Type: `UserService` → `AccountService` (type annotations)
-
-## Files You Own (modify these)
-- src/api/controllers/UserController.ts
-- src/api/controllers/AdminController.ts
-- tests/api/UserController.test.ts
-
-## Files You May Read (do NOT modify)
-- src/services/AccountService.ts (read for the new interface)
-- src/services/index.ts (read to verify export name)
-
-## Verification
-Run: `npx tsc --noEmit src/api/controllers/*.ts`
-Run: `npx jest tests/api/UserController.test.ts --no-coverage`
-Expected: No type errors, all tests pass.
-
-## Completion Report
-Report: status, files modified, lines changed, test results.
-", isolation="worktree")
-```
-
-Dispatch all batch agents simultaneously:
-
-```
-# Batch A — Controllers
-Agent("[Batch A prompt as above]", isolation="worktree")
-
-# Batch B — Middleware
-Agent("
-## Objective
-Update UserService references in authentication middleware.
-
-## Change Pattern
-[same pattern as above]
-
-## Files You Own
-- src/middleware/auth.ts
-- tests/e2e/auth.test.ts
-
-## Verification
-Run: `npx tsc --noEmit src/middleware/auth.ts`
-Run: `npx jest tests/e2e/auth.test.ts --no-coverage`
-", isolation="worktree")
-
-# Batch C — Unit Tests
-Agent("
-## Objective
-Rename and update UserService unit tests and fixtures.
-
-## Files You Own
-- tests/services/UserService.test.ts (rename to AccountService.test.ts)
-- tests/fixtures/userFixtures.ts
-
-## Special Instructions
-- Use `git mv` to rename test file (preserves history)
-- Update all mock/stub references from UserService to AccountService
-
-## Verification
-Run: `npx jest tests/services/AccountService.test.ts --no-coverage`
-", isolation="worktree")
-
-# Batch D — Documentation
-Agent("
-## Objective
-Update all UserService references in documentation.
-
-## Files You Own
-- docs/architecture.md
-- docs/api-reference.md
-- README.md
-
-## Special Instructions
-- Preserve document structure and formatting
-- Update code examples, not just prose
-- Do NOT change historical references in ADR documents
-
-## Verification
-No automated verification — report changes for manual review.
-", isolation="worktree")
-```
-
-
-**Read:** `references/verification.md` for detailed verification reference material.
-
-## Objective
-RETRY: Update UserService references in authentication middleware.
-
-## Previous Failure
-The prior attempt failed with:
-  TypeError: Property 'validateToken' does not exist on type 'AccountService'
-
-The prior agent renamed the import but missed that auth.ts uses a method
-'validateToken' that was renamed to 'verifyToken' in the AccountService refactor.
-
-## Updated Change Pattern
-- Import: UserService → AccountService
-- Method: validateToken → verifyToken (method was renamed in pre-work)
-- Variable: userService → accountService
-
-## Files You Own
-- src/middleware/auth.ts
-- tests/e2e/auth.test.ts
-
-## Verification
-Run: `npx tsc --noEmit src/middleware/auth.ts`
-Run: `npx jest tests/e2e/auth.test.ts --no-coverage`
-", isolation="worktree")
-```
+**Read:** `references/verification.md` for progress monitoring and batch status tracking.
 
 ---
 
 ## STEP 4: Consistency Verification
 
-After all batches complete and their branches are merged, verify the entire codebase is
-consistent. Individual batch verification is necessary but not sufficient.
+After all batches complete and their branches are merged, verify the entire codebase is consistent. Individual batch verification is necessary but not sufficient.
 
-### 4.1 Type Checker / Compiler
+1. Run the type checker / compiler (tsc, mypy, go build, cargo check) — every type error indicates a missed reference
+2. Run the linter (eslint, ruff, golangci-lint) — errors after renames indicate unused imports or undefined references
+3. Run the full test suite (not just changed files) — the strongest signal of correctness
+4. Re-run the impact analysis from Step 1 to verify zero old references remain
+5. Compare symbol counts (old name count before vs new name count after should match)
+6. Validate the import graph for broken chains
 
-```bash
-# TypeScript
-npx tsc --noEmit
-
-# Python (mypy)
-mypy src/ --ignore-missing-imports
-
-# Go
-go build ./...
-
-# Rust
-cargo check
-
-# Java/Kotlin
-./gradlew compileJava compileKotlin
-```
-
-Every type error after a batch change indicates a missed reference.
-
-### 4.2 Linter
-
-```bash
-# ESLint
-npx eslint src/ tests/ --max-warnings=0
-
-# Ruff (Python)
-ruff check src/ tests/
-
-# golangci-lint
-golangci-lint run ./...
-```
-
-Linter errors after renames often indicate unused imports or undefined references.
-
-### 4.3 Full Test Suite
-
-```bash
-# Run the complete test suite — not just the files that were changed
-npm test
-pytest tests/ -v
-go test ./...
-./gradlew test
-```
-
-A passing full suite is the strongest signal that the batch change is correct.
-
-### 4.4 Re-Run Impact Analysis
-
-Repeat the search from Step 1 to verify no references were missed:
-
-```bash
-# The OLD name should appear ZERO times (excluding git history, changelogs, ADRs)
-grep -rn "UserService" src/ tests/ --include="*.ts" --include="*.tsx" --include="*.js"
-
-# Expected output: (empty)
-# If any results remain, those files were missed — fix them before proceeding
-```
-
-### 4.5 Symbol Count Comparison
-
-For renames, verify the counts balance:
-
-```bash
-# Before the change (check from git history)
-git stash
-grep -rn "UserService" src/ tests/ --include="*.ts" | wc -l
-# Result: 47
-
-git stash pop
-grep -rn "AccountService" src/ tests/ --include="*.ts" | wc -l
-# Result: should be 47 (same count, new name)
-```
-
-If counts do not match, investigate: either references were missed, or some were
-intentionally not renamed (ambiguous matches from Step 1.4).
-
-### 4.6 Import Graph Validation
-
-Verify no broken import chains exist:
-
-```bash
-# TypeScript: check for unresolved imports
-npx tsc --noEmit 2>&1 | grep "Cannot find module"
-
-# Python: check for import errors
-python -c "import src.services.AccountService" 2>&1
-
-# Node.js: attempt to require the entry point
-node -e "require('./src/index')" 2>&1
-```
+**Read:** `references/consistency-verification.md` for detailed verification commands by language/stack.
 
 ---
 
 ## STEP 5: Auto-Simplify
 
-After a codebase-wide change, leftover artifacts accumulate. Run a cleanup pass to
-remove dead code, unused imports, and redundant patterns.
+After a codebase-wide change, run a cleanup pass to remove dead code, unused imports, and redundant patterns.
 
-### 5.1 Remove Unused Imports
+1. Remove unused imports (eslint auto-fix, autoflake, goimports)
+2. Delete dead code (old adapters, compatibility shims with zero callers)
+3. Remove redundant type assertions from the old type
+4. Run the project formatter to normalize all changes
 
-Renames often leave behind imports of the old name that the search-and-replace missed:
-
-```bash
-# TypeScript/JavaScript: use eslint auto-fix
-npx eslint src/ tests/ --rule '{"no-unused-vars": "error", "import/no-unresolved": "error"}' --fix
-
-# Python: use autoflake
-autoflake --remove-all-unused-imports --in-place --recursive src/ tests/
-
-# Go: goimports handles this automatically
-goimports -w src/
-```
-
-### 5.2 Delete Dead Code
-
-After API migrations, old adapter code or compatibility shims may no longer be needed:
-
-```bash
-# Search for the old API surface that should no longer have callers
-grep -rn "oldApiCall\|legacyEndpoint\|deprecatedMethod" src/
-
-# If zero results, the old code is dead — remove it
-rm src/compat/legacy-api-adapter.ts
-rm src/utils/deprecated-helpers.ts
-```
-
-### 5.3 Remove Redundant Type Assertions
-
-After a type rename, explicit type assertions that cast to the old type become errors
-or unnecessary casts to the new type:
-
-```bash
-# Find casts that reference the change
-grep -rn "as AccountService\|<AccountService>" src/ --include="*.ts"
-
-# Review each: is the cast still needed, or was it only there because of the old type?
-```
-
-### 5.4 Run Formatter
-
-Ensure all changes conform to the project's formatting standards:
-
-```bash
-# Prettier
-npx prettier --write src/ tests/
-
-# Black (Python)
-black src/ tests/
-
-# gofmt
-gofmt -w src/
-
-# rustfmt
-cargo fmt
-```
+**Read:** `references/auto-simplify.md` for cleanup commands by language/stack.
 
 ## STEP 6: PR Strategy
 
-Choose the right PR structure based on the size and nature of the change.
+Choose the right PR structure based on the size and nature of the change: single PR for under 50 files, split by module for 50-200 files, or split by change type for API migrations. Every PR must include change pattern, scope, verification results, and rollback instructions.
 
-## Files Changed
-- **Source**: 5 files (service, controllers, middleware)
-- **Tests**: 5 files (unit, integration, e2e, fixtures)
-- **Config**: 3 files (jest, tsconfig, CI)
-- **Docs**: 3 files (architecture, API reference, README)
-
-## Verification
-- TypeScript: \`npx tsc --noEmit\` — clean
-- Tests: \`npm test\` — 142 passed, 0 failed
-- Lint: \`npx eslint\` — 0 warnings
-- Zero remaining references to old name in source/test files"
-```
-
-### 6.2 Split by Module (Large Changes — 50-200 Files)
-
-For changes spanning multiple modules or team boundaries:
-
-```bash
-# PR 1: Core service rename
-gh pr create --title "refactor: rename UserService core module" \
-  --body "Part 1/4 of UserService → AccountService rename. Core module only."
-
-# PR 2: Controller layer
-gh pr create --title "refactor: update controllers for AccountService rename" \
-  --body "Part 2/4. Updates all controller imports and usage. Depends on PR #1."
-
-# PR 3: Test updates
-gh pr create --title "test: update tests for AccountService rename" \
-  --body "Part 3/4. Renames test files and updates mocks/fixtures."
-
-# PR 4: Documentation and config
-gh pr create --title "docs: update docs for AccountService rename" \
-  --body "Part 4/4. Documentation and CI config updates."
-```
-
-### 6.4 PR Description Template for Batch Changes
-
-Every batch-change PR should include:
-
-```markdown
-## Summary
-<1-2 sentences: what changed and why>
-
-## Change Pattern
-<The mechanical transformation applied>
-- `OldName` → `NewName`
-- `oldImport` → `newImport`
-
-## Scope
-- Files changed: X
-- Lines added: Y
-- Lines removed: Z
-
-## Verification
-- [ ] Type checker: clean
-- [ ] Full test suite: passing
-- [ ] Linter: zero warnings
-- [ ] Zero remaining references to old pattern
-- [ ] Symbol count matches (before: N, after: N)
-
-## Rollback
-To revert this change:
-`git revert <commit-hash>` (single PR)
-`git revert <tag>..HEAD` (multi-PR, see rollback tags)
-```
+**Read:** `references/pr-strategy.md` for PR templates, split strategies, and description format.
 
 ---
 
 ## STEP 7: Rollback Safety
 
-Every batch change must be reversible. A failed migration that cannot be rolled back
-is worse than no migration at all.
+Every batch change must be reversible. Create a pre-change tag, commit each batch independently, and document rollback procedures.
 
-### 7.1 Pre-Change Tag
+1. Tag current state before starting (`git tag batch/pre-<description>`)
+2. One commit per batch for surgical rollback capability
+3. For partial rollback: `git revert <batch-commit>` for the problematic batch
+4. For full rollback: `git revert <tag>..HEAD` or reset to tag if not pushed
+5. After any rollback, verify zero new-name references remain and full test suite passes
 
-Before starting any batch work, create a tag:
-
-```bash
-# Tag the current state for easy rollback
-git tag batch/pre-rename-userservice
-
-# Verify the tag
-git log --oneline -1 batch/pre-rename-userservice
-```
-
-### 7.2 Per-Batch Commits
-
-Each batch gets its own commit. This enables surgical rollback of individual batches:
-
-```bash
-# Pre-work commit
-git commit -m "refactor(batch 0/4): rename UserService file and class"
-
-# Batch A commit (after merging agent worktree)
-git commit -m "refactor(batch 1/4): update controllers for AccountService"
-
-# Batch B commit
-git commit -m "refactor(batch 2/4): update middleware for AccountService"
-
-# Batch C commit
-git commit -m "refactor(batch 3/4): update tests for AccountService"
-
-# Batch D commit
-git commit -m "refactor(batch 4/4): update docs for AccountService"
-
-# Post-work commit
-git commit -m "refactor(batch post): update config and CI for AccountService"
-```
-
-### 7.3 Partial Rollback
-
-If Batch B introduced a bug but other batches are fine:
-
-```bash
-# Find the batch commit
-git log --oneline --grep="batch 2/4"
-
-# Revert only that batch
-git revert <batch-2-commit-hash> --no-edit
-
-# Re-run tests to verify the partial rollback is safe
-npm test
-```
-
-### 7.4 Full Rollback
-
-If the entire batch change needs to be undone:
-
-```bash
-# Option A: Revert to the pre-change tag
-git revert batch/pre-rename-userservice..HEAD --no-edit
-
-# Option B: Reset to the tag (destructive — only if not yet pushed)
-git reset --hard batch/pre-rename-userservice
-
-# Option C: Revert each batch commit individually (preserves history)
-git log --oneline batch/pre-rename-userservice..HEAD
-# Then revert each commit in reverse order
-```
-
-### 7.5 Rollback Verification
-
-After any rollback:
-
-```bash
-# Verify no references to the new name remain (should be zero)
-grep -rn "AccountService" src/ tests/ --include="*.ts" | wc -l
-
-# Verify all references to the old name are back
-grep -rn "UserService" src/ tests/ --include="*.ts" | wc -l
-
-# Run full test suite
-npm test
-```
+**Read:** `references/rollback-safety.md` for detailed rollback commands and verification.
 
 ---
 

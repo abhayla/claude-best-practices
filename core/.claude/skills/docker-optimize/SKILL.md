@@ -29,7 +29,7 @@ Analyze and optimize Docker configurations for the specified target.
 
 1. Locate all Dockerfiles, `docker-compose*.yml`, and `.dockerignore` files in the project
 2. Read each Dockerfile and note current base images, layer count, and build patterns
-3. Check for existing `.dockerignore` — if missing, flag immediately
+3. Check for existing `.dockerignore` -- if missing, flag immediately
 4. Identify the language/runtime stack to select appropriate optimizations
 5. Note the current image size if a built image exists (`docker images`)
 
@@ -37,749 +37,127 @@ Analyze and optimize Docker configurations for the specified target.
 
 ## STEP 2: Multi-Stage Builds
 
-Separate build-time dependencies from runtime. Every production Dockerfile MUST use multi-stage builds.
+Separate build-time dependencies from runtime. Every production Dockerfile MUST use multi-stage builds. Use Builder + Runtime (2-stage) or Build + Test + Runtime (3-stage) patterns.
 
-### Pattern: Builder + Runtime
+**Read:** `references/multi-stage-builds.md` for complete Dockerfile examples and key rules.
 
-```dockerfile
-# Stage 1: Build
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Stage 2: Runtime
-FROM node:20-alpine AS runtime
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-EXPOSE 3000
-CMD ["node", "dist/index.js"]
-```
-
-### Pattern: Build + Test + Runtime (3-Stage)
-
-```dockerfile
-# Stage 1: Dependencies
-FROM python:3.12-slim AS deps
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
-
-# Stage 2: Test
-FROM python:3.12-slim AS test
-WORKDIR /app
-COPY --from=deps /install /usr/local
-COPY . .
-RUN python -m pytest tests/ --tb=short
-
-# Stage 3: Runtime
-FROM python:3.12-slim AS runtime
-WORKDIR /app
-COPY --from=deps /install /usr/local
-COPY src/ ./src/
-USER nobody
-CMD ["python", "-m", "src.main"]
-```
-
-### Key Rules
-
-- NEVER install build tools (gcc, make, git) in the runtime stage
-- Use `AS <name>` aliases — never reference stages by index number
-- Copy only the artifacts needed: compiled binaries, dist folders, installed packages
-- If the final image contains compilers or package managers, the multi-stage build is wrong
+Core principle: copy only artifacts needed (compiled binaries, dist folders, installed packages). If the final image contains compilers or package managers, the multi-stage build is wrong.
 
 ---
 
 ## STEP 3: Layer Caching
 
-Docker caches layers top-down. A changed layer invalidates all subsequent layers.
+Docker caches layers top-down. A changed layer invalidates all subsequent layers. Order instructions from most stable (base image) to least stable (source code).
 
-### Instruction Ordering (Most Stable to Least Stable)
+**Read:** `references/layer-caching.md` for ordering examples, cache-busting mistakes table, and BuildKit cache mount patterns.
 
-```dockerfile
-# 1. Base image (rarely changes)
-FROM python:3.12-slim
-
-# 2. System packages (changes occasionally)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# 3. Dependency manifests (changes when deps change)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 4. Source code (changes frequently)
-COPY . .
-
-# 5. Build step (depends on source)
-RUN python -m compileall src/
-```
-
-### Cache-Busting Mistakes to Avoid
-
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| `COPY . .` before `pip install` | Source changes bust dep cache | Copy manifest first, install, then copy source |
-| `RUN apt-get update` alone | Stale package index gets cached | Combine with `apt-get install` in one RUN |
-| `ARG VERSION` before `COPY` | Changing arg busts all layers below | Place ARGs as late as possible |
-| Timestamps in build | Every build creates new layer | Use `SOURCE_DATE_EPOCH` for reproducibility |
-
-### BuildKit Cache Mounts
-
-```dockerfile
-# Cache pip downloads across builds
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements.txt
-
-# Cache apt packages across builds
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt \
-    apt-get update && apt-get install -y libpq-dev
-
-# Cache Go modules
-RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod download
-```
+Key rule: always copy dependency manifests and install before copying source code.
 
 ---
 
 ## STEP 4: Image Size Reduction
 
-### Alpine Caveats
+Minimize image size through base image selection, layer consolidation, and build context exclusion.
 
-- Uses musl libc instead of glibc — some Python packages with C extensions may fail
-- DNS resolution behaves differently (no `search` directive by default)
-- Use `*-slim` variants instead of alpine when encountering musl compatibility issues
+**Read:** `references/image-size-reduction.md` for Alpine caveats, layer bloat fixes, `.dockerignore` template, and size audit commands.
 
-### Reduce Layer Bloat
-
-```dockerfile
-# WRONG: Leaves apt cache in layer
-RUN apt-get update
-RUN apt-get install -y curl
-RUN apt-get clean
-
-# RIGHT: Single layer, clean in same RUN
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
-    rm -rf /var/lib/apt/lists/*
-```
-
-### .dockerignore Patterns
-
-Create a `.dockerignore` in the same directory as the Dockerfile:
-
-```
-# Version control
-.git
-.gitignore
-
-# Dependencies (rebuilt in container)
-node_modules
-__pycache__
-*.pyc
-.venv
-vendor
-
-# Build artifacts
-dist
-build
-*.o
-*.a
-
-# IDE and editor files
-.vscode
-.idea
-*.swp
-*.swo
-
-# CI/CD
-.github
-.gitlab-ci.yml
-Jenkinsfile
-
-# Documentation
-*.md
-docs/
-LICENSE
-
-# Docker files (prevent recursive inclusion)
-Dockerfile*
-docker-compose*
-.dockerignore
-
-# Environment and secrets
-.env
-.env.*
-*.pem
-*.key
-credentials.json
-
-# Test files
-tests/
-test/
-*_test.go
-*.test.js
-*.spec.ts
-coverage/
-.nyc_output
-```
-
-### Size Audit
-
-After building, audit the image:
-
-```bash
-# Show image size
-docker images <image-name>
-
-# Inspect layer sizes
-docker history <image-name>
-
-# Deep analysis with dive
-dive <image-name>
-```
+Key decisions:
+- Use `*-slim` variants instead of alpine when musl compatibility is an issue
+- Combine `apt-get update` and `apt-get install` in a single RUN with cleanup
+- Always create a `.dockerignore` to exclude `.git`, `node_modules`, `.env`, test files
 
 ---
 
 ## STEP 5: Security Hardening
 
-### Non-Root User (Mandatory)
+Every production container MUST run as non-root, never embed secrets in layers, and use security scanning.
 
-```dockerfile
-# Create a dedicated user
-RUN groupadd -r appuser && useradd -r -g appuser -s /bin/false appuser
+**Read:** `references/security-hardening.md` for non-root user setup, read-only filesystem, build secrets, Trivy/Snyk scanning, and capability dropping.
 
-# For alpine
-RUN addgroup -S appuser && adduser -S -G appuser appuser
-
-# Switch to non-root BEFORE CMD
-USER appuser
-CMD ["./app"]
-```
-
-### Read-Only Filesystem
-
-```dockerfile
-# In docker-compose.yml
-services:
-  app:
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /var/run
-```
-
-### No Secrets in Layers
-
-```dockerfile
-# NEVER do this — secret persists in layer history
-COPY .env /app/.env
-RUN echo "API_KEY=secret" > /app/config
-
-# Use build secrets (BuildKit)
-RUN --mount=type=secret,id=api_key \
-    cat /run/secrets/api_key > /tmp/key && \
-    ./configure --key=$(cat /tmp/key) && \
-    rm /tmp/key
-
-# Or pass at runtime
-docker run -e API_KEY=secret app
-docker run --env-file .env app
-```
-
-### Security Scanning with Trivy
-
-```bash
-# Scan a built image
-trivy image <image-name>
-
-# Scan and fail on HIGH/CRITICAL
-trivy image --severity HIGH,CRITICAL --exit-code 1 <image-name>
-
-# Scan Dockerfile for misconfigurations
-trivy config Dockerfile
-
-# Scan as part of CI
-trivy image --format json --output results.json <image-name>
-```
-
-### Security Scanning with Snyk
-
-```bash
-# Authenticate
-snyk auth
-
-# Test a Docker image
-snyk container test <image-name>
-
-# Monitor continuously
-snyk container monitor <image-name>
-```
-
-### Additional Hardening
-
-```dockerfile
-# Drop all capabilities, add only what's needed
-# (in docker-compose.yml or docker run)
-cap_drop:
-  - ALL
-cap_add:
-  - NET_BIND_SERVICE
-
-# No new privileges
-security_opt:
-  - no-new-privileges:true
-
-# Pin base image by digest for reproducibility
-FROM python:3.12-slim@sha256:abc123...
-```
+Key checklist:
+- Add `USER` instruction before `CMD`
+- Use `--mount=type=secret` for build-time secrets (BuildKit)
+- Pin base images by digest for reproducibility
+- Run `trivy image --severity HIGH,CRITICAL --exit-code 1` in CI
 
 ---
 
 ## STEP 6: Health Checks
 
-### Dockerfile HEALTHCHECK
+Every service MUST have a health check. Use HTTP, TCP, or file-based checks depending on the service type.
 
-```dockerfile
-# HTTP health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+**Read:** `references/health-checks.md` for HEALTHCHECK examples, parameter recommendations, graceful shutdown patterns, and application-level signal handling.
 
-# TCP health check (no curl needed)
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD ["sh", "-c", "echo > /dev/tcp/localhost/8080 || exit 1"]
-
-# File-based health check
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD ["test", "-f", "/tmp/healthy"]
-
-# Custom script
-COPY healthcheck.sh /usr/local/bin/
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD ["healthcheck.sh"]
-```
-
-### Health Check Parameters
-
-| Parameter | Default | Recommendation |
-|-----------|---------|---------------|
-| `--interval` | 30s | 10-30s for critical services |
-| `--timeout` | 30s | 3-5s (fail fast) |
-| `--start-period` | 0s | Set to app startup time + buffer |
-| `--retries` | 3 | 2-3 for most services |
-
-### Graceful Shutdown
-
-```dockerfile
-# Use exec form so signals reach the process
-CMD ["python", "app.py"]  # Correct: PID 1 receives SIGTERM
-
-# WRONG: shell form wraps in /bin/sh, signals don't propagate
-CMD python app.py
-
-# For apps that need cleanup time
-STOPSIGNAL SIGTERM
-# In docker-compose.yml:
-# stop_grace_period: 30s
-```
-
-### Application-Level Shutdown
-
-```python
-# Python example: handle SIGTERM
-import signal, sys
-
-def shutdown_handler(signum, frame):
-    print("Shutting down gracefully...")
-    # Close DB connections, flush buffers, etc.
-    sys.exit(0)
-
-signal.signal(signal.SIGTERM, shutdown_handler)
-```
-
-```javascript
-// Node.js example: handle SIGTERM
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down...');
-  server.close(() => {
-    process.exit(0);
-  });
-});
-```
+Key rules:
+- Use exec form (`["cmd", "arg"]`) for CMD -- shell form breaks signal handling
+- Set `--start-period` to app startup time + buffer
+- Set `--timeout` to 3-5s (fail fast)
 
 ---
 
 ## STEP 7: Docker Compose
 
-### Service Structure
+Structure compose files with base config, dev overrides, and prod overrides. Use `depends_on` with `condition: service_healthy` for startup ordering.
 
-```yaml
-# docker-compose.yml (base — shared config)
-version: "3.9"
+**Read:** `references/docker-compose.md` for full service structure examples, dev/prod override patterns, and environment management.
 
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runtime
-    ports:
-      - "${APP_PORT:-3000}:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://user:pass@db:5432/mydb
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - backend
+Key pattern:
+- `docker-compose.yml` -- base shared config
+- `docker-compose.override.yml` -- auto-loaded dev overrides
+- `docker-compose.prod.yml` -- explicit prod config with resource limits
 
-  db:
-    image: postgres:16-alpine
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: mydb
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d mydb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - backend
-
-volumes:
-  pgdata:
-
-networks:
-  backend:
-    driver: bridge
-```
-
-### Dev vs Prod Overrides
-
-```yaml
-# docker-compose.override.yml (auto-loaded, dev-only)
-services:
-  app:
-    build:
-      target: builder  # Use builder stage with dev tools
-    volumes:
-      - .:/app          # Bind mount for hot reload
-      - /app/node_modules  # Preserve container's node_modules
-    environment:
-      - NODE_ENV=development
-      - DEBUG=true
-    command: ["npm", "run", "dev"]
-
-  db:
-    ports:
-      - "5432:5432"  # Expose DB port for local tools
-```
-
-```yaml
-# docker-compose.prod.yml
-services:
-  app:
-    build:
-      target: runtime
-    deploy:
-      replicas: 2
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.5"
-          memory: 256M
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-```
-
-```bash
-# Run dev (auto-loads override)
-docker compose up
-
-# Run prod
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-```
-
-### Environment Management
-
-```yaml
-# Use .env file for variable substitution
-# .env
-APP_PORT=3000
-POSTGRES_PASSWORD=changeme
-
-# Reference in compose
-services:
-  app:
-    ports:
-      - "${APP_PORT}:3000"
-```
+---
 
 ## STEP 8: Build Arguments and Multi-Platform
 
-### ARG/ENV Patterns
+Use `ARG` for build-time configuration and `ENV` for runtime. Use BuildKit buildx for multi-platform images.
 
-```dockerfile
-# Build-time arguments (not in final image unless converted to ENV)
-ARG PYTHON_VERSION=3.12
-FROM python:${PYTHON_VERSION}-slim
-
-# Convert to runtime env var if needed
-ARG APP_VERSION
-ENV APP_VERSION=${APP_VERSION}
-
-# Use ARGs for conditional logic
-ARG INSTALL_DEV_DEPS=false
-RUN if [ "$INSTALL_DEV_DEPS" = "true" ]; then \
-        pip install -r requirements-dev.txt; \
-    fi
-```
-
-```bash
-# Pass build args
-docker build --build-arg PYTHON_VERSION=3.11 --build-arg APP_VERSION=1.2.3 .
-```
-
-### Multi-Platform Builds with Buildx
-
-```bash
-# Create a builder instance
-docker buildx create --name multiarch --use
-
-# Build for multiple platforms
-docker buildx build \
-    --platform linux/amd64,linux/arm64 \
-    --tag myapp:latest \
-    --push .
-
-# Build and load locally (single platform only)
-docker buildx build --platform linux/amd64 --load -t myapp:latest .
-```
-
-```dockerfile
-# Platform-aware Dockerfile
-FROM --platform=$BUILDPLATFORM golang:1.22-alpine AS builder
-ARG TARGETPLATFORM
-ARG TARGETOS
-ARG TARGETARCH
-
-WORKDIR /app
-COPY . .
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-    go build -o /app/server .
-
-FROM --platform=$TARGETPLATFORM gcr.io/distroless/static-debian12
-COPY --from=builder /app/server /server
-CMD ["/server"]
-```
+**Read:** `references/build-args-multiplatform.md` for ARG/ENV patterns, conditional logic, and platform-aware Dockerfile examples.
 
 ---
 
 ## STEP 9: Performance Tuning
 
+Enable BuildKit (`DOCKER_BUILDKIT=1`) for faster builds and better caching. Use `.dockerignore` to reduce build context size.
 
-**Read:** `references/performance-tuning.md` for detailed step 9: performance tuning reference material.
+**Read:** `references/performance-tuning.md` for detailed performance tuning reference material.
 
-# Enable BuildKit (faster builds, better caching)
-export DOCKER_BUILDKIT=1
-
-# Parallel multi-stage builds (BuildKit default)
-# Stages that don't depend on each other build concurrently
-
-# Use .dockerignore to reduce build context size
-# Large build contexts slow down every build
-
+```bash
 # Check build context size
 docker build --no-cache . 2>&1 | grep "Sending build context"
 ```
 
+---
+
 ## STEP 10: Common Anti-Patterns
 
+Lint Dockerfiles with hadolint to catch common mistakes before they reach production.
 
-**Read:** `references/common-anti-patterns.md` for detailed step 10: common anti-patterns reference material.
+**Read:** `references/common-anti-patterns.md` for detailed anti-patterns reference material.
 
+```bash
 # Use hadolint for Dockerfile linting
 hadolint Dockerfile
 
 # Run via Docker (no local install)
 docker run --rm -i hadolint/hadolint < Dockerfile
-
-# Ignore specific rules
-# hadolint ignore=DL3008
-RUN apt-get update && apt-get install -y curl
 ```
 
 ---
 
 ## STEP 11: Language-Specific Patterns
 
-### Python
+Select the appropriate pattern for your runtime stack. Each language has specific optimizations for dependency caching, binary compilation, and minimal base images.
 
-```dockerfile
-FROM python:3.12-slim AS builder
-WORKDIR /app
+**Read:** `references/language-patterns.md` for complete Dockerfiles and key points for Python, Node.js, Go, Java, and Rust.
 
-# Install build dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc libpq-dev && \
-    rm -rf /var/lib/apt/lists/*
-
-# Build wheels (portable, no compile needed at runtime)
-COPY requirements.txt .
-RUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
-
-FROM python:3.12-slim AS runtime
-WORKDIR /app
-
-# Install pre-built wheels (no gcc needed)
-COPY --from=builder /wheels /wheels
-RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
-
-COPY src/ ./src/
-USER nobody
-CMD ["python", "-m", "src.main"]
-```
-
-Key points:
-- Use `pip wheel` in builder to pre-compile C extensions
-- Use `--no-cache-dir` with pip to avoid caching downloaded packages
-- Use `python:*-slim` instead of alpine to avoid musl issues with numpy, pandas, etc.
-- Set `PYTHONDONTWRITEBYTECODE=1` and `PYTHONUNBUFFERED=1` in production
-
-### Node.js
-
-```dockerfile
-FROM node:20-alpine AS builder
-WORKDIR /app
-
-# Install deps with clean install (respects lockfile exactly)
-COPY package.json package-lock.json ./
-RUN npm ci
-
-# Build
-COPY . .
-RUN npm run build
-
-FROM node:20-alpine AS runtime
-WORKDIR /app
-ENV NODE_ENV=production
-
-# Production deps only
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev && npm cache clean --force
-
-COPY --from=builder /app/dist ./dist
-USER node
-EXPOSE 3000
-CMD ["node", "dist/index.js"]
-```
-
-Key points:
-- Use `npm ci` instead of `npm install` for deterministic builds
-- Use `--omit=dev` in runtime to exclude devDependencies
-- The `node` user is built into the official Node image
-- Set `NODE_ENV=production` before `npm ci` to affect package behavior
-
-### Go
-
-```dockerfile
-FROM golang:1.22-alpine AS builder
-WORKDIR /app
-
-# Cache module downloads
-COPY go.mod go.sum ./
-RUN go mod download
-
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build \
-    -ldflags="-s -w" \
-    -o /server ./cmd/server
-
-# Distroless: ~2MB final image
-FROM gcr.io/distroless/static-debian12
-COPY --from=builder /server /server
-USER nonroot:nonroot
-ENTRYPOINT ["/server"]
-```
-
-Key points:
-- `CGO_ENABLED=0` produces a static binary — no libc dependency
-- `-ldflags="-s -w"` strips debug info, reducing binary size ~30%
-- Distroless has no shell — use `ENTRYPOINT` with exec form only
-- Cache `go mod download` separately from source copy
-
-# Use jlink to create minimal JRE
-FROM eclipse-temurin:21-jdk-alpine AS jre-builder
-RUN jlink \
-    --add-modules java.base,java.logging,java.sql,java.naming,java.management,java.instrument,java.desktop \
-    --strip-debug \
-    --no-man-pages \
-    --no-header-files \
-    --compress=zip-6 \
-    --output /custom-jre
-
-FROM alpine:3.19 AS runtime
-COPY --from=jre-builder /custom-jre /opt/java
-ENV PATH="/opt/java/bin:$PATH"
-
-WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar app.jar
-
-RUN addgroup -S appuser && adduser -S -G appuser appuser
-USER appuser
-
-EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD ["sh", "-c", "echo > /dev/tcp/localhost/8080 || exit 1"]
-CMD ["java", "-jar", "app.jar"]
-```
-
-Key points:
-- Use `jlink` to create a custom minimal JRE — reduces image by 200+ MB
-- Cache Gradle/Maven dependency download before source copy
-- Use `--no-daemon` in containers to avoid zombie processes
-- Spring Boot layered JARs can further optimize caching
-
-### Rust
-
-```dockerfile
-FROM rust:1.77-alpine AS builder
-RUN apk add --no-cache musl-dev
-WORKDIR /app
-
-# Cache dependencies via dummy build
-COPY Cargo.toml Cargo.lock ./
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-RUN cargo build --release && rm -rf src target/release/deps/myapp*
-
-COPY src/ src/
-RUN cargo build --release
-
-FROM gcr.io/distroless/static-debian12
-COPY --from=builder /app/target/release/myapp /myapp
-USER nonroot:nonroot
-ENTRYPOINT ["/myapp"]
-```
-
-Key points:
-- Use the dummy-build trick to cache dependency compilation
-- Alpine + musl gives static binaries by default
-- Final image with distroless is typically 5-15 MB
+| Language | Base Image | Key Optimization |
+|----------|-----------|-----------------|
+| Python | `python:*-slim` | `pip wheel` in builder, `--no-cache-dir` |
+| Node.js | `node:*-alpine` | `npm ci --omit=dev`, built-in `node` user |
+| Go | `golang:*-alpine` | `CGO_ENABLED=0`, distroless final (~2MB) |
+| Java | `eclipse-temurin:*-jdk-alpine` | `jlink` custom JRE (-200MB) |
+| Rust | `rust:*-alpine` | Dummy-build trick for dep caching, distroless final |
 
 ---
 
@@ -796,11 +174,11 @@ Key points:
 
 ## CRITICAL RULES
 
-- NEVER leave containers running as root in production — always add a USER instruction
+- NEVER leave containers running as root in production -- always add a USER instruction
 - NEVER embed secrets (API keys, passwords, tokens) in Dockerfile instructions or layers
-- NEVER use `latest` tag for base images — pin specific versions for reproducibility
+- NEVER use `latest` tag for base images -- pin specific versions for reproducibility
 - ALWAYS create a `.dockerignore` to exclude `.git`, `node_modules`, `.env`, and test files
-- ALWAYS use exec form (`["cmd", "arg"]`) for CMD and ENTRYPOINT — shell form breaks signal handling
+- ALWAYS use exec form (`["cmd", "arg"]`) for CMD and ENTRYPOINT -- shell form breaks signal handling
 - ALWAYS combine `apt-get update` and `apt-get install` in a single RUN with cleanup
 - ALWAYS copy dependency manifests and install before copying source code for proper layer caching
 - Prefer `COPY` over `ADD` unless extracting archives or fetching URLs
