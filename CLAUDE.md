@@ -2,8 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Every response MUST start with `*Enhanced: <what context was checked>*`** — see `.claude/rules/prompt-auto-enhance.md` for tiers, clarification gate, and details.
-
 ## Critical: Two `.claude/` Directories
 
 - **`core/.claude/`** — Distributable template (what users copy to their projects). NEVER put hub-only config here.
@@ -26,8 +24,11 @@ PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py::TestCopyClaudeDir
 # Provision a project
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 
-# Pre-PR validation (CI runs these — see .github/workflows/validate-pr.yml)
+# Full local CI replication (validate-pr.yml runs all 4 — run before opening a PR)
+PYTHONPATH=. python scripts/dedup_check.py --validate-all
+PYTHONPATH=. python scripts/dedup_check.py --secret-scan
 PYTHONPATH=. python scripts/validate_patterns.py
+PYTHONPATH=. python -m pytest scripts/tests/ -v
 
 # Regenerate docs after registry changes
 python scripts/generate_docs.py

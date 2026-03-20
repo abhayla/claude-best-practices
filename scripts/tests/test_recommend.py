@@ -67,7 +67,7 @@ def hub_root(tmp_path):
     # Rules
     rules = core / "rules"
     rules.mkdir(parents=True)
-    for name in ["workflow", "context-management", "claude-behavior", "testing", "tdd",
+    for name in ["workflow", "context-management", "claude-behavior", "testing", "tdd-rule",
                   "fastapi-backend"]:
         (rules / f"{name}.md").write_text(f"---\nname: {name}\n---\n# {name}")
 
@@ -1670,7 +1670,7 @@ class TestGenerateHubSectionCounts:
 
 class TestMustHaveRulesExpanded:
     def test_expanded_rules_in_set(self):
-        for rule in ["workflow", "claude-behavior", "testing", "tdd", "context-management"]:
+        for rule in ["workflow", "claude-behavior", "testing", "tdd-rule", "context-management"]:
             assert rule in MUST_HAVE_RULES, f"{rule} should be in MUST_HAVE_RULES"
 
     def test_tier_workflow_is_must_have(self):
@@ -1686,8 +1686,8 @@ class TestMustHaveRulesExpanded:
         tier, _ = tier_resource_with_reason("testing", "rule", [])
         assert tier == "must-have"
 
-    def test_tier_tdd_is_must_have(self):
-        tier, _ = tier_resource_with_reason("tdd", "rule", [])
+    def test_tier_tdd_rule_is_must_have(self):
+        tier, _ = tier_resource_with_reason("tdd-rule", "rule", [])
         assert tier == "must-have"
 
 

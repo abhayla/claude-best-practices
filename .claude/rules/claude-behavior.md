@@ -15,7 +15,7 @@ globs: ["**/*"]
 
 ## Self-Improvement
 
-5. **Self-Improving Rules**: Every time I correct you, propose a new rule to add to this CLAUDE.md file so the mistake never happens again. Also update `tasks/lessons.md` with the pattern so lessons persist across sessions. Periodically review existing rules and propose removing any that Claude already follows without being told, or that have become outdated. All rule additions and removals MUST be explicitly approved by the user before applying. Review lessons at session start for the relevant project. Ruthlessly iterate on lessons until mistake rate drops.
+5. **Self-Improving Rules**: Every time I correct you, propose a new rule to add to this CLAUDE.md file so the mistake never happens again. Also update `.claude/tasks/lessons.md` with the pattern so lessons persist across sessions. Periodically review existing rules and propose removing any that Claude already follows without being told, or that have become outdated. All rule additions and removals MUST be explicitly approved by the user before applying. Review lessons at session start for the relevant project. Ruthlessly iterate on lessons until mistake rate drops.
 
 ## Git Hygiene
 
@@ -42,7 +42,7 @@ globs: ["**/*"]
 
 ## Task Management
 
-14. **Task Tracking**: (1) Write plan to `tasks/todo.md` with checkable items before starting. (2) Check in with user before starting implementation. (3) Mark items complete as you go. (4) Provide high-level summary at each step. (5) Add review section to `tasks/todo.md` when done. (6) Update `tasks/lessons.md` after corrections.
+14. **Task Tracking**: (1) Write plan to `.claude/tasks/todo.md` with checkable items before starting. (2) Check in with user before starting implementation. (3) Mark items complete as you go. (4) Provide high-level summary at each step. (5) Add review section to `.claude/tasks/todo.md` when done. (6) Update `.claude/tasks/lessons.md` after corrections.
 
 ## Core Principles
 

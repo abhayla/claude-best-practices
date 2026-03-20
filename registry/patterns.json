@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-19",
-    "total_patterns": 195
+    "total_patterns": 196
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -2764,7 +2764,7 @@
     "hash": "80b918479285ed49bc6635dba3da2a9a2825cdc4462f399c60399b9300806657",
     "type": "skill",
     "category": "core",
-    "version": "3.0.0",
+    "version": "4.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
     "last_updated": "2026-03-16",
@@ -2962,6 +2962,20 @@
     "description": "",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured"
+  },
+  "tdd-rule": {
+    "hash": "e9c3e93e0f42508c857e9d65605e87c62dafa1f12ec056f8fa4966a984c35200",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-21",
+    "last_updated": "2026-03-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "TDD red-green-refactor cycle rules scoped to test and source files.",
+    "tags": ["tdd", "testing"],
+    "changelog": "v1.0.0: Initial registration of existing tdd.md rule"
   },
   "trace-test": {
     "hash": "c4f98ed3fe0ad036dacc1773721ffb1bd32d959e1c52e8c8d9e8c333f632a63c",

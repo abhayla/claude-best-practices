@@ -427,7 +427,7 @@ NICE_TO_HAVE_UNIVERSAL_SKILLS = {
 }
 
 # Universal rules that are high-value
-MUST_HAVE_RULES = {"context-management", "workflow", "claude-behavior", "testing", "tdd"}
+MUST_HAVE_RULES = {"context-management", "workflow", "claude-behavior", "testing", "tdd-rule"}
 
 # Universal agents that are high-value
 MUST_HAVE_AGENTS = {"security-auditor-agent"}
