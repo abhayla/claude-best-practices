@@ -82,3 +82,4 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 - Pattern quality rules (structure, portability, self-containment) are in `.claude/rules/pattern-*.md`
 - `/synthesize-project` (in `core/.claude/skills/`) provisions projects; `/synthesize-hub` (in `.claude/skills/`) generalizes patterns back into the hub
 - Adding a new stack requires changes in three places: `STACK_PREFIXES` in `scripts/bootstrap.py` (prefix→stack mapping), `STACK_DETECTORS` in `scripts/recommend.py` (auto-detection rules), and optionally `DEP_PATTERN_MAP` in `recommend.py` (dependency→pattern promotion).
+
