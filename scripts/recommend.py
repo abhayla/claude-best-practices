@@ -1627,6 +1627,44 @@ def generate_hub_practices_section(
     return "\n".join(lines)
 
 
+def reconcile_claude_md_rules(target_dir: Path) -> list[str]:
+    """Verify CLAUDE.md rules table matches actual files on disk.
+
+    Returns a list of warning strings. Empty list means everything is consistent.
+    """
+    warnings = []
+    claude_md = target_dir / "CLAUDE.md"
+    rules_dir = target_dir / ".claude" / "rules"
+
+    if not claude_md.exists():
+        return warnings
+
+    content = claude_md.read_text(encoding="utf-8")
+
+    # Extract rule names referenced in the Rules Reference table
+    # Pattern matches: | `rules/something.md` | ... |
+    referenced_rules = set()
+    for match in re.findall(r"\|\s*`rules/([^`]+)\.md`\s*\|", content):
+        referenced_rules.add(match)
+
+    # Get actual rule files on disk
+    rules_on_disk = set()
+    if rules_dir.exists():
+        for f in rules_dir.glob("*.md"):
+            if f.name != "README.md":
+                rules_on_disk.add(f.stem)
+
+    # Check for dangling references (in CLAUDE.md but not on disk)
+    for name in sorted(referenced_rules - rules_on_disk):
+        warnings.append(f"CLAUDE.md references rules/{name}.md but file does not exist")
+
+    # Check for unreferenced rules (on disk but not in CLAUDE.md)
+    for name in sorted(rules_on_disk - referenced_rules):
+        warnings.append(f"rules/{name}.md exists on disk but is not listed in CLAUDE.md")
+
+    return warnings
+
+
 def provision_claude_md(
     hub_root: Path,
     target_dir: Path,
@@ -1648,7 +1686,7 @@ def provision_claude_md(
         # Case 1: Create from template
         template_path = hub_root / "core" / ".claude" / "CLAUDE.md.template"
         if template_path.exists():
-            from datetime import datetime
+            from datetime import datetime, timezone
             template = template_path.read_text(encoding="utf-8")
             rendered = render_template(template, {
                 "PROJECT_NAME": target_dir.name,
@@ -1658,7 +1696,7 @@ def provision_claude_md(
                 "DEVELOPMENT_COMMANDS": "# Add your commands here",
                 "HUB_REPO": "abhayla/claude-best-practices",
                 "SELECTED_STACKS": ", ".join(stacks) if stacks else "none",
-                "LAST_SYNC_TIMESTAMP": datetime.utcnow().isoformat(),
+                "LAST_SYNC_TIMESTAMP": datetime.now(timezone.utc).isoformat(),
             })
             # Replace hardcoded hub section with dynamic one
             start_idx = rendered.find(PROVISION_START_MARKER)
@@ -1801,10 +1839,15 @@ def provision_to_local(
     # Step 2: Provision CLAUDE.md
     claude_md_status = provision_claude_md(hub_root, target_dir, stacks, rules_present, project_names)
 
-    # Step 3: Provision CLAUDE.local.md
+    # Step 3: Reconcile CLAUDE.md rules references against disk
+    reconciliation_warnings = reconcile_claude_md_rules(target_dir)
+    for w in reconciliation_warnings:
+        print(f"  WARNING: {w}")
+
+    # Step 4: Provision CLAUDE.local.md
     claude_local_status = provision_claude_local_md(hub_root, target_dir)
 
-    # Step 4: Provision settings.json
+    # Step 5: Provision settings.json
     settings_status = provision_settings_json(hub_root, target_dir)
 
     return {
@@ -1812,6 +1855,7 @@ def provision_to_local(
         "claude_md": claude_md_status,
         "claude_local_md": claude_local_status,
         "settings_json": settings_status,
+        "reconciliation_warnings": reconciliation_warnings,
     }
 
 

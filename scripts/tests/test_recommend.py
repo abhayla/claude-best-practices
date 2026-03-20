@@ -39,6 +39,7 @@ from scripts.recommend import (
     PROVISION_END_MARKER,
     _compute_line_overlap,
     _find_matching_project_name,
+    reconcile_claude_md_rules,
 )
 
 
@@ -1086,6 +1087,87 @@ class TestProvisionToLocal:
         assert len(summary2["copied_files"]) == 0
         # CLAUDE.md already exists — should replace or append
         assert summary2["claude_md"] in ("replaced", "appended")
+
+
+# --- Reconciliation ---
+
+
+class TestReconcileClaudeMdRules:
+    def test_consistent_state_no_warnings(self, tmp_path):
+        target = tmp_path / "project"
+        target.mkdir()
+        rules_dir = target / ".claude" / "rules"
+        rules_dir.mkdir(parents=True)
+        (rules_dir / "workflow.md").write_text("# Workflow")
+        (rules_dir / "testing.md").write_text("# Testing")
+        claude_md = (
+            "# Project\n\n"
+            "| Rule File | What It Covers |\n"
+            "|-----------|---------------|\n"
+            "| `rules/workflow.md` | Workflow |\n"
+            "| `rules/testing.md` | Testing |\n"
+        )
+        (target / "CLAUDE.md").write_text(claude_md)
+        warnings = reconcile_claude_md_rules(target)
+        assert warnings == []
+
+    def test_dangling_reference(self, tmp_path):
+        target = tmp_path / "project"
+        target.mkdir()
+        rules_dir = target / ".claude" / "rules"
+        rules_dir.mkdir(parents=True)
+        claude_md = (
+            "# Project\n\n"
+            "| `rules/workflow.md` | Workflow |\n"
+            "| `rules/nonexistent.md` | Ghost |\n"
+        )
+        (target / "CLAUDE.md").write_text(claude_md)
+        (rules_dir / "workflow.md").write_text("# Workflow")
+        warnings = reconcile_claude_md_rules(target)
+        assert any("nonexistent" in w and "does not exist" in w for w in warnings)
+
+    def test_unreferenced_rule_on_disk(self, tmp_path):
+        target = tmp_path / "project"
+        target.mkdir()
+        rules_dir = target / ".claude" / "rules"
+        rules_dir.mkdir(parents=True)
+        (rules_dir / "workflow.md").write_text("# Workflow")
+        (rules_dir / "orphan.md").write_text("# Orphan")
+        claude_md = "| `rules/workflow.md` | Workflow |\n"
+        (target / "CLAUDE.md").write_text(claude_md)
+        warnings = reconcile_claude_md_rules(target)
+        assert any("orphan" in w and "not listed" in w for w in warnings)
+
+    def test_no_claude_md_no_warnings(self, tmp_path):
+        target = tmp_path / "project"
+        target.mkdir()
+        warnings = reconcile_claude_md_rules(target)
+        assert warnings == []
+
+    def test_no_rules_dir_no_warnings(self, tmp_path):
+        target = tmp_path / "project"
+        target.mkdir()
+        (target / "CLAUDE.md").write_text("# Project\nNo rules table here.\n")
+        warnings = reconcile_claude_md_rules(target)
+        assert warnings == []
+
+    def test_readme_excluded(self, tmp_path):
+        target = tmp_path / "project"
+        target.mkdir()
+        rules_dir = target / ".claude" / "rules"
+        rules_dir.mkdir(parents=True)
+        (rules_dir / "README.md").write_text("# Rules README")
+        (target / "CLAUDE.md").write_text("# Project\n")
+        warnings = reconcile_claude_md_rules(target)
+        assert warnings == []
+
+    def test_provision_to_local_returns_reconciliation(self, hub_root, project_dir):
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project_dir / ".claude")
+        gaps = analyze_gaps(hub_resources, project_names, ["fastapi-python"])
+        summary = provision_to_local(hub_root, project_dir, gaps, ["fastapi-python"])
+        assert "reconciliation_warnings" in summary
+        assert isinstance(summary["reconciliation_warnings"], list)
 
 
 # --- Main: --provision flag ---

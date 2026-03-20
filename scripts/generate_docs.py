@@ -2,7 +2,7 @@
 
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -58,7 +58,7 @@ def scan_claude_dir(claude_dir: Path) -> dict:
 def generate_dashboard_md(registry: dict, scan_history: list, sync_status: dict) -> str:
     """Generate DASHBOARD.md content."""
     counts = count_patterns(registry)
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     lines = [
         "# Claude Best Practices Hub — Dashboard",
@@ -221,7 +221,7 @@ def generate_getting_started(hub_repo: str, available_stacks: list[str]) -> str:
 def generate_dashboard_html(registry: dict, claude_dir: Path) -> str:
     """Generate an interactive HTML dashboard."""
     counts = count_patterns(registry)
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     # Build pattern rows
     pattern_rows = []

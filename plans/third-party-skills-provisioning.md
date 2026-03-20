@@ -1,6 +1,6 @@
 # Third-Party Skills Auto-Provisioning
 
-## Status: Proposed
+## Status: Completed (2026-03-17, commit cf4f507)
 ## Date: 2026-03-17
 
 ---

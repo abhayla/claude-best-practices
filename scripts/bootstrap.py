@@ -4,7 +4,7 @@ import argparse
 import re
 import shutil
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -103,7 +103,7 @@ def generate_sync_config(hub_repo: str, stacks: list[str], sync_target: str = "p
         "sync_target": sync_target,
         "selected_stacks": stacks,
         "last_sync_version": "v1.0",
-        "last_sync_timestamp": datetime.utcnow().isoformat() + "Z",
+        "last_sync_timestamp": datetime.now(timezone.utc).isoformat(),
         "auto_check_on_session_start": True,
     }
     return yaml.dump(config, default_flow_style=False, sort_keys=False)
@@ -148,7 +148,7 @@ def bootstrap(hub_root: Path, target_dir: Path, stacks: list[str], hub_repo: str
             "DEVELOPMENT_COMMANDS": "# Add your commands here",
             "HUB_REPO": hub_repo,
             "SELECTED_STACKS": ", ".join(stacks),
-            "LAST_SYNC_TIMESTAMP": datetime.utcnow().isoformat(),
+            "LAST_SYNC_TIMESTAMP": datetime.now(timezone.utc).isoformat(),
         })
         claude_md = target_dir / "CLAUDE.md"
         if not claude_md.exists():
