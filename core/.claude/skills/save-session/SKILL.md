@@ -8,7 +8,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "[session-name]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Save Session — Checkpoint Your Progress
@@ -117,7 +117,31 @@ Only include docs that are directly relevant to the work in this session.
 
 ---
 
-## STEP 4: Post-Save Summary
+## STEP 4: Purge Expired Sessions
+
+Automatically delete session files older than 5 days. This runs silently with no user interaction.
+
+```bash
+find .claude/sessions -name "*.md" -mtime +5 -delete 2>/dev/null
+```
+
+On Windows (Git Bash / MSYS2 may not support `-mtime`), use this fallback:
+
+```bash
+python3 -c "
+import os, time, glob
+cutoff = time.time() - 5 * 86400
+for f in glob.glob('.claude/sessions/*.md'):
+    if os.path.getmtime(f) < cutoff:
+        os.remove(f)
+" 2>/dev/null || true
+```
+
+MUST NOT prompt the user or log individual deletions. If no expired sessions exist, this step is a silent no-op.
+
+---
+
+## STEP 5: Post-Save Summary
 
 After saving, present:
 
@@ -142,3 +166,5 @@ After saving, present:
 - MUST sanitize session names to filesystem-safe kebab-case
 - MUST NOT delegate context gathering to subagents — gather inline in this skill
 - MUST read the session template from `references/session-template.md` when available
+- MUST automatically purge session files older than 5 days — no user confirmation required
+- MUST NOT log or display individual file deletions during purge — silent cleanup only
