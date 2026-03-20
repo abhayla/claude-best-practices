@@ -57,108 +57,8 @@ If no vault found, ask the user for the vault path. Store it for the session.
 
 ## STEP 3: Execute Action
 
-### 3.1 Create / Edit Markdown (.md)
 
-#### Obsidian-Specific Syntax Reference
-
-Always use Obsidian syntax, NOT standard Markdown, for these features:
-
-**Wikilinks** (NEVER convert to standard `[text](url)` format):
-```markdown
-[[Note Name]]                    # Link to note
-[[Note Name|Display Text]]      # Aliased link
-[[Note Name#Heading]]            # Link to heading
-[[Note Name#^block-id]]          # Link to block
-```
-
-**Embeds** (transclusion — pulls content inline):
-```markdown
-![[Note Name]]                   # Embed entire note
-![[Note Name#Heading]]           # Embed specific section
-![[image.png]]                   # Embed image
-![[image.png|300]]               # Embed image with width
-![[image.png|300x200]]           # Embed image with dimensions
-![[document.pdf#page=3]]         # Embed PDF page
-```
-
-**Callouts** (styled admonitions):
-```markdown
-> [!note] Title
-> Content here
-
-> [!warning] Important
-> Critical information
-
-> [!tip]+ Collapsible (open by default)
-> Expandable content
-
-> [!danger]- Collapsed by default
-> Hidden until clicked
-```
-
-Callout types: `note`, `abstract`, `info`, `tip`, `success`, `question`, `warning`, `failure`, `danger`, `bug`, `example`, `quote`
-
-**Properties / Frontmatter** (YAML at top of file):
-```yaml
----
-title: Note Title
-tags:
-  - project/active
-  - type/decision
-date: 2026-03-12
-aliases:
-  - Alternative Name
-cssclasses:
-  - custom-class
----
-```
-
-**Block IDs** (for precise linking):
-```markdown
-This is a paragraph. ^unique-id
-
-| Column 1 | Column 2 |
-|----------|----------|
-| Data     | Data     |
-
-^table-id
-```
-
-**Other Obsidian syntax:**
-```markdown
-%%This is a comment — hidden in reading view%%
-
-==Highlighted text==
-
-- [ ] Task item
-- [x] Completed task
-- [/] In progress
-- [-] Cancelled
-
-$$LaTeX math equation$$
-
-```mermaid
-graph TD
-    A --> B
-```​
-```
-
-**Footnotes:**
-```markdown
-Here is a statement[^1] with a footnote.
-
-[^1]: This is the footnote content.
-```
-
-#### File Creation Template
-
-```markdown
----
-title: {{title}}
-tags: {{tags}}
-date: {{YYYY-MM-DD}}
-type: {{note|decision|bug|snippet|meeting|daily}}
----
+**Read:** `references/execute-action.md` for detailed step 3: execute action reference material.
 
 # {{title}}
 
@@ -204,73 +104,6 @@ tags:
 # Append a log entry to today's daily note
 echo "- $(date +%H:%M) — $ENTRY" >> "$DAILY_FILE"
 ```
-
-### 3.3 Canvas Files (.canvas)
-
-Canvas files use the [JSON Canvas Spec 1.0](https://jsoncanvas.org/):
-
-```json
-{
-  "nodes": [
-    {
-      "id": "a1b2c3d4e5f67890",
-      "type": "text",
-      "x": 0,
-      "y": 0,
-      "width": 400,
-      "height": 200,
-      "text": "# Node Title\n\nMarkdown content here"
-    },
-    {
-      "id": "b2c3d4e5f6789012",
-      "type": "file",
-      "x": 500,
-      "y": 0,
-      "width": 400,
-      "height": 200,
-      "file": "path/to/note.md"
-    },
-    {
-      "id": "c3d4e5f678901234",
-      "type": "link",
-      "x": 0,
-      "y": 300,
-      "width": 400,
-      "height": 200,
-      "url": "https://example.com"
-    },
-    {
-      "id": "d4e5f67890123456",
-      "type": "group",
-      "x": -50,
-      "y": -50,
-      "width": 1000,
-      "height": 600,
-      "label": "Group Label"
-    }
-  ],
-  "edges": [
-    {
-      "id": "e5f6789012345678",
-      "fromNode": "a1b2c3d4e5f67890",
-      "toNode": "b2c3d4e5f6789012",
-      "fromSide": "right",
-      "toSide": "left",
-      "label": "relates to"
-    }
-  ]
-}
-```
-
-**Canvas rules:**
-- Node IDs: 16-character hexadecimal strings (unique)
-- Every node requires: `id`, `type`, `x`, `y`, `width`, `height`
-- Text nodes: `text` field with Markdown content
-- File nodes: `file` field with vault-relative path
-- Link nodes: `url` field
-- Group nodes: optional `label`, optional `background` (CSS color)
-- Edge sides: `top`, `right`, `bottom`, `left`
-- Edges can have: `color` (CSS), `label` (text)
 
 ### 3.4 Base Files (.base)
 
@@ -489,45 +322,9 @@ tags:
 
 If Obsidian v1.12+ is installed with CLI enabled, use these commands:
 
-### File Operations
-```bash
-obsidian read "$VAULT" "path/to/note.md"
-obsidian create "$VAULT" "path/to/note.md" --content "# Title"
-obsidian append "$VAULT" "path/to/note.md" --content "New line"
-obsidian prepend "$VAULT" "path/to/note.md" --content "Top line"
-obsidian move "$VAULT" "old/path.md" "new/path.md"
-obsidian rename "$VAULT" "path/to/note.md" "New Name"
-obsidian delete "$VAULT" "path/to/note.md" --trash  # Move to .trash
-```
 
-### Daily Notes
-```bash
-obsidian daily-note append "$VAULT" --content "- $(date +%H:%M) Log entry"
-obsidian daily-note read "$VAULT"
-obsidian daily-note prepend "$VAULT" --content "## Priority Tasks"
-```
+**Read:** `references/obsidian-cli-integration.md` for detailed step 4: obsidian cli integration reference material.
 
-### Search & Metadata
-```bash
-obsidian search "$VAULT" --query "search term" --format json
-obsidian properties get "$VAULT" "path/to/note.md"
-obsidian properties set "$VAULT" "path/to/note.md" --key status --value done
-obsidian tags list "$VAULT"
-obsidian tasks list "$VAULT" --incomplete
-```
-
-### Graph & Links
-```bash
-obsidian backlinks "$VAULT" "path/to/note.md"
-obsidian unresolved-links "$VAULT"       # Find broken wikilinks
-obsidian orphans "$VAULT"                 # Find unlinked notes
-```
-
-### Fallback (No CLI)
-
-When Obsidian CLI is not available, fall back to direct file manipulation:
-
-```bash
 # Check if CLI is available
 if command -v obsidian &>/dev/null; then
   echo "CLI available"
@@ -571,40 +368,7 @@ mkdir -p "$DECISION_DIR"
 
 ## STEP 6: Verify & Report
 
-After any vault operation:
-
-1. **Verify file exists** and is valid:
-   ```bash
-   # Check .md file
-   test -f "$FILE_PATH" && echo "Created: $FILE_PATH"
-
-   # Check .canvas file (must be valid JSON)
-   python3 -c "import json; json.load(open('$FILE_PATH'))" 2>/dev/null && echo "Valid canvas"
-
-   # Check .base file (must be valid YAML)
-   python3 -c "import yaml; yaml.safe_load(open('$FILE_PATH'))" 2>/dev/null && echo "Valid base"
-   ```
-
-2. **Check wikilinks** resolve:
-   ```bash
-   # Extract wikilinks and verify targets exist
-   grep -oP '\[\[([^\]|]+)' "$FILE_PATH" | sed 's/\[\[//' | while read link; do
-     find "$VAULT_ROOT" -name "$link.md" -o -name "$link" | head -1 | \
-       grep -q . || echo "Unresolved: [[$link]]"
-   done
-   ```
-
-3. **Report:**
-   ```
-   Vault operation complete:
-     Action: {{action}}
-     File: {{path relative to vault root}}
-     Type: {{.md | .canvas | .base}}
-     Wikilinks: {{N total, M unresolved}}
-     Size: {{line count or node count}}
-   ```
-
----
+**Read:** `references/verify-report.md` for detailed step 6: verify & report reference material.
 
 ## RULES
 

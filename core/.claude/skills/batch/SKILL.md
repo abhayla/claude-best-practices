@@ -69,48 +69,6 @@ grep -rn "UserService" docs/ *.md README*
 grep -rn "UserService" webpack.config.* tsconfig.* jest.config.* vite.config.*
 ```
 
-### 1.2 Categorize Affected Files
-
-Sort every match into categories — each category may need different handling:
-
-```
-Impact Analysis: Rename UserService → AccountService
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-DIRECT REFERENCES (class/function usage):
-  src/services/UserService.ts          — class definition (rename class + file)
-  src/services/index.ts                — re-export
-  src/api/controllers/UserController.ts — imports and instantiates UserService
-  src/api/controllers/AdminController.ts — imports UserService for admin ops
-  src/middleware/auth.ts                — imports UserService for token validation
-
-TRANSITIVE DEPENDENCIES (import chains):
-  src/api/routes/userRoutes.ts         — imports UserController (which uses UserService)
-  src/app.ts                           — registers userRoutes
-
-TEST FILES:
-  tests/services/UserService.test.ts   — unit tests (rename file + all references)
-  tests/api/UserController.test.ts     — integration tests with UserService mock
-  tests/e2e/auth.test.ts              — e2e test that references UserService in setup
-  tests/fixtures/userFixtures.ts       — test fixtures with UserService factory
-
-CONFIG FILES:
-  jest.config.ts                       — moduleNameMapper for UserService path
-  tsconfig.json                        — path alias for @services/UserService
-  docker-compose.yml                   — environment variable USER_SERVICE_URL
-
-DOCUMENTATION:
-  docs/architecture.md                 — references UserService in architecture diagram
-  docs/api-reference.md               — documents UserService endpoints
-  README.md                           — mentions UserService in quickstart
-
-GENERATED / CI:
-  .github/workflows/test.yml          — references UserService in test job name
-  openapi.yaml                        — schema references
-
-TOTAL: 18 files affected
-```
-
 ### 1.3 Verify Completeness
 
 After the initial search, validate that nothing was missed:
@@ -128,116 +86,13 @@ grep -rn "user-service\|UserService\|user_service" . | grep -v node_modules | gr
 grep -rn "User.*Service\|user.*service" --include="*.ts" src/ | grep -v "UserService"
 ```
 
-### 1.4 Flag Ambiguous Matches
-
-Some matches need human judgment:
-
-```
-AMBIGUOUS — Requires manual review:
-  src/utils/naming.ts:42    — "UserServiceFactory" — rename to AccountServiceFactory?
-  src/types/global.d.ts:18  — "UserServiceConfig" — rename to AccountServiceConfig?
-  docs/adr/003-auth.md:15   — historical reference — update or leave as-is?
-  migrations/002_add_user_service_table.sql — migration file — NEVER rename
-```
-
-Present ambiguous matches to the user for a decision before proceeding.
-
----
-
 ## STEP 2: Change Decomposition
 
 Group affected files into independent batches that can be processed in parallel without
 conflicts.
 
-### 2.1 Dependency Graph
 
-Map which files import from which:
-
-```
-Dependency Graph:
-  UserService.ts ← UserController.ts ← userRoutes.ts ← app.ts
-  UserService.ts ← AdminController.ts
-  UserService.ts ← auth.ts
-  UserService.test.ts (standalone — mocks UserService)
-  UserController.test.ts (standalone — mocks UserService)
-```
-
-### 2.2 Batch Grouping Rules
-
-| Rule | Rationale |
-|------|-----------|
-| Files in different modules with no shared imports can be parallel | No merge conflicts possible |
-| Files with shared imports must be in the same batch OR sequential | Prevents broken import chains |
-| Test files grouped with their source files | Tests must stay in sync with source |
-| Config files in a dedicated batch (or main context) | Config changes affect everything |
-| Documentation in its own batch | No code dependencies |
-| Generated files handled last | May need regeneration after source changes |
-
-### 2.3 Batch Assignment
-
-```
-Batch Plan: Rename UserService → AccountService
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-PRE-WORK (main context — before any parallel dispatch):
-  - Rename src/services/UserService.ts → src/services/AccountService.ts
-  - Update src/services/index.ts re-export
-  - Commit: "refactor: rename UserService file to AccountService"
-
-BATCH A — Controllers + Tests:
-  src/api/controllers/UserController.ts
-  src/api/controllers/AdminController.ts
-  tests/api/UserController.test.ts
-
-BATCH B — Middleware + Auth Tests:
-  src/middleware/auth.ts
-  tests/e2e/auth.test.ts
-
-BATCH C — Unit Tests + Fixtures:
-  tests/services/UserService.test.ts → AccountService.test.ts
-  tests/fixtures/userFixtures.ts
-
-BATCH D — Documentation:
-  docs/architecture.md
-  docs/api-reference.md
-  README.md
-
-POST-WORK (main context — after all batches merge):
-  - Update jest.config.ts path aliases
-  - Update tsconfig.json path aliases
-  - Update .github/workflows/test.yml
-  - Regenerate openapi.yaml if applicable
-  - Run full test suite
-```
-
-### 2.4 Present Plan for Approval
-
-Before executing, show the user the full batch plan:
-
-```
-Batch Execution Plan
-━━━━━━━━━━━━━━━━━━━━
-Change: Rename UserService → AccountService
-Files affected: 18
-Batches: 4 parallel + pre-work + post-work
-
-Pre-work:  2 files (main context, sequential)
-Batch A:   3 files (controllers + controller tests)
-Batch B:   2 files (middleware + auth tests)
-Batch C:   2 files (unit tests + fixtures)
-Batch D:   3 files (documentation)
-Post-work: 4 files (config + CI + verification)
-
-Estimated time: ~3 minutes
-Parallel agents: 4
-
-Proceed? [Waiting for user confirmation]
-```
-
-MUST NOT execute without user confirmation. The plan may reveal files the user does not
-want changed, or batches that need different ordering.
-
----
+**Read:** `references/change-decomposition.md` for detailed step 2: change decomposition reference material.
 
 ## STEP 3: Parallel Execution
 
@@ -361,32 +216,9 @@ No automated verification — report changes for manual review.
 ", isolation="worktree")
 ```
 
-### 3.3 Monitor Progress
 
-Track each agent's status as results come in:
+**Read:** `references/verification.md` for detailed verification reference material.
 
-```
-Batch Execution Status
-━━━━━━━━━━━━━━━━━━━━━━
-[DONE]    Pre-work: File rename + class rename (committed)
-[DONE]    Batch A: Controllers — PASSED (3 files, 12 lines changed)
-[RUNNING] Batch B: Middleware — dispatched 45s ago
-[DONE]    Batch C: Unit tests — PASSED (2 files renamed, 28 lines changed)
-[DONE]    Batch D: Documentation — PASSED (3 files, 8 lines changed)
-[PENDING] Post-work: Config + verification (waiting on Batch B)
-```
-
-### 3.4 Handle Partial Failures
-
-If some batches succeed and others fail:
-
-1. **Commit successful batches** — Do not risk losing passing work
-2. **Analyze the failure** — Read the agent's error report
-3. **Retry with failure context** — Pass what was tried and why it failed
-4. **Continue unblocked work** — Do not wait for retries if other batches are independent
-
-```
-Agent("
 ## Objective
 RETRY: Update UserService references in authentication middleware.
 
@@ -577,35 +409,9 @@ gofmt -w src/
 cargo fmt
 ```
 
-### 5.5 Final Lint Pass
-
-After all cleanup:
-
-```bash
-npx eslint src/ tests/ --max-warnings=0
-npx tsc --noEmit
-npm test
-```
-
-All three must pass before proceeding to PR creation.
-
----
-
 ## STEP 6: PR Strategy
 
 Choose the right PR structure based on the size and nature of the change.
-
-### 6.1 Single PR (Small Changes — Under 50 Files)
-
-For straightforward renames or pattern updates affecting fewer than 50 files:
-
-```bash
-gh pr create \
-  --title "refactor: rename UserService to AccountService" \
-  --body "## Summary
-- Renamed UserService class, file, and all references to AccountService
-- Updated 18 files across controllers, middleware, tests, and documentation
-- All tests passing, type checker clean
 
 ## Files Changed
 - **Source**: 5 files (service, controllers, middleware)
@@ -640,17 +446,6 @@ gh pr create --title "test: update tests for AccountService rename" \
 # PR 4: Documentation and config
 gh pr create --title "docs: update docs for AccountService rename" \
   --body "Part 4/4. Documentation and CI config updates."
-```
-
-### 6.3 Split by Change Type (API Migrations)
-
-For API migrations where source, tests, and docs need different review:
-
-```
-PR 1: Source code changes (needs careful code review)
-PR 2: Test updates (can be reviewed by test owners)
-PR 3: Documentation updates (can be reviewed by docs team)
-PR 4: Config/CI changes (needs DevOps review)
 ```
 
 ### 6.4 PR Description Template for Batch Changes

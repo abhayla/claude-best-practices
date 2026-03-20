@@ -40,23 +40,6 @@ Read and extract testable requirements from available sources:
 Build the test matrix:
 
 ```markdown
-## Test Matrix
-
-| Requirement | Test Type | Test ID | Description | Status |
-|-------------|-----------|---------|-------------|--------|
-| AC-001 | Unit | UT-001 | Validate email format | RED |
-| AC-002 | API | AT-001 | POST /users returns 201 | RED |
-| AC-003 | E2E | ET-001 | User can sign up | STUB |
-| NFR-002 | Perf | PT-001 | p95 < 200ms under 100rps | STUB |
-| NFR-006 | Security | ST-001 | Auth required on /users/me | RED |
-```
-
-Every AC and NFR MUST map to at least one test. If a requirement has no corresponding test, flag it.
-
-Wait for confirmation of the test matrix before generating test files.
-
----
-
 ## STEP 2: Detect Test Framework
 
 Auto-detect the project's test framework by scanning for config files:
@@ -304,16 +287,6 @@ class RegistrationPage:
         await self.submit_button.click()
 ```
 
-### 6.3 Rules
-
-- Test functions use `@pytest.mark.skip` (Python) or `test.skip()` (JS) — NOT empty bodies without skip markers
-- Each skip includes `reason="E2E stub — fill in at Stage 8"`
-- Page Object classes are fully defined with locators and actions
-- One test file per user flow, one Page Object per page/screen
-- Test IDs in the test matrix use status `STUB` (not `RED`) for E2E tests
-
----
-
 ## STEP 7: Generate BDD Scenarios
 
 For stakeholder-readable specs, generate Gherkin-style scenarios:
@@ -381,30 +354,6 @@ def verify_message(browser, message):
     assert browser.text_content("body").find(message) != -1
 ```
 
-### 7.3 Framework Setup
-
-| Language | BDD Framework | Install |
-|----------|-------------|---------|
-| Python | pytest-bdd | `pip install pytest-bdd` |
-| JavaScript | Cucumber.js | `npm install @cucumber/cucumber` |
-| Kotlin | Cucumber-JVM | `testImplementation("io.cucumber:cucumber-java")` |
-
----
-
-### 7.4 When BDD Is Required
-
-Generate BDD/Gherkin scenarios for:
-- **User-facing features** — Any AC that describes end-user behavior (registration, checkout, search)
-- **Multi-step workflows** — Features involving state transitions (order lifecycle, approval flows)
-- **Stakeholder-visible behavior** — Features that non-technical stakeholders need to verify
-
-Skip BDD for:
-- Internal infrastructure (DB migrations, caching, logging)
-- Pure computation (math functions, data transformations)
-- Developer-facing APIs with no UI (unless consumer contracts apply)
-
----
-
 ## STEP 8: Property-Based Tests
 
 For domain logic with complex input spaces, generate property-based tests:
@@ -436,97 +385,10 @@ def test_order_total_is_non_negative(amount):
     assert order.total >= 0
 ```
 
-### 8.2 JavaScript/TypeScript (fast-check)
-
-```typescript
-// tests/property/user.property.test.ts
-
-import fc from "fast-check";
-
-test("email normalization is idempotent", () => {
-  fc.assert(
-    fc.property(fc.emailAddress(), (email) => {
-      const normalized = normalizeEmail(email);
-      expect(normalizeEmail(normalized)).toBe(normalized);
-    })
-  );
-});
-```
-
-### 8.3 When Property-Based Tests Are Required
-
-Property-based tests are **mandatory** for domain logic with these patterns:
-- **Serialization roundtrips** — `deserialize(serialize(x)) == x`
-- **Idempotent operations** — `f(f(x)) == f(x)`
-- **Invariants** — "balance is never negative", "list is always sorted after sort"
-- **Commutativity** — `merge(a, b) == merge(b, a)`
-- **Domain constraints** — "age is between 0 and 150", "price is non-negative"
-
-Skip property-based tests for:
-- Simple CRUD with no domain logic (pass-through to DB)
-- UI rendering (use visual snapshot tests instead)
-- External API wrappers (use contract tests instead)
-
----
-
 ## STEP 9: Coverage Configuration
 
-### 9.1 Coverage Thresholds
 
-Read coverage thresholds from these sources (in priority order):
-1. **Plan file** — If Stage 2 plan specifies coverage targets, use those
-2. **Project config** — `pyproject.toml` / `vitest.config.ts` existing thresholds
-3. **Defaults** — Fall back to the targets below
-
-Configure minimum coverage enforcement:
-
-**Python (pyproject.toml):**
-```toml
-[tool.pytest.ini_options]
-addopts = "--cov=src --cov-report=term-missing --cov-fail-under=80"
-
-[tool.coverage.run]
-branch = true
-
-[tool.coverage.report]
-fail_under = 80
-exclude_lines = [
-    "pragma: no cover",
-    "if TYPE_CHECKING:",
-    "if __name__ == .__main__.",
-]
-```
-
-**JavaScript (vitest.config.ts):**
-```typescript
-export default defineConfig({
-  test: {
-    coverage: {
-      provider: "v8",
-      thresholds: {
-        lines: 80,
-        branches: 70,
-        functions: 80,
-        statements: 80,
-      },
-    },
-  },
-});
-```
-
-### 9.2 Coverage Targets
-
-| Metric | Minimum | Stretch Goal |
-|--------|---------|-------------|
-| Line coverage | 80% | 90% |
-| Branch coverage | 70% | 85% |
-| Function coverage | 80% | 90% |
-| Domain layer | 90% | 95% |
-| Infrastructure layer | 60% | 75% |
-
-Domain logic (entities, use cases) MUST have higher coverage than infrastructure (DB adapters, external API clients).
-
----
+**Read:** `references/coverage-configuration.md` for detailed step 9: coverage configuration reference material.
 
 ## STEP 10: Mutation Testing Setup
 
@@ -549,64 +411,13 @@ mutmut results
 # Target: >70% mutation score (killed / total mutants)
 ```
 
-### 10.2 JavaScript/TypeScript (Stryker)
-
-```json
-// stryker.conf.json
-{
-  "mutate": ["src/**/*.ts", "!src/**/*.test.ts"],
-  "testRunner": "vitest",
-  "reporters": ["html", "clear-text", "progress"],
-  "thresholds": {
-    "high": 80,
-    "low": 60,
-    "break": 50
-  }
-}
-```
-
-### 10.3 Interpreting Results
-
-| Mutation Score | Quality |
-|---------------|---------|
-| >80% | Excellent — tests catch most bugs |
-| 60-80% | Good — review surviving mutants |
-| <60% | Weak — tests exist but don't catch bugs |
-
-For surviving mutants, either:
-- Add a test that catches the mutant
-- Document why the mutation is equivalent (doesn't change behavior)
-
----
-
 ## STEP 11: Snapshot Test Stubs
 
 For projects with UI, generate data and visual snapshot test stubs:
 
-### 11.1 Data Snapshots (Jest/Vitest)
 
-```typescript
-// tests/snapshots/api-responses.test.ts
+**Read:** `references/snapshot-test-stubs.md` for detailed step 11: snapshot test stubs reference material.
 
-import { describe, test, expect } from "vitest";
-
-describe("API Response Snapshots", () => {
-  test("GET /users/:id response shape", async () => {
-    const response = await client.get("/users/1");
-    // Snapshot locks down the response shape — breaks if fields change
-    expect(response.json()).toMatchSnapshot();
-  });
-
-  test("error response shape", async () => {
-    const response = await client.get("/users/nonexistent");
-    expect(response.json()).toMatchSnapshot();
-  });
-});
-```
-
-### 11.2 Data Snapshots (pytest)
-
-```python
 # tests/snapshots/test_api_responses.py
 
 def test_user_response_shape(client, snapshot):
@@ -617,41 +428,9 @@ def test_user_response_shape(client, snapshot):
 
 Requires `pytest-snapshot` or `syrupy`. Generate one snapshot test per API endpoint response shape and per serialized domain entity.
 
-### 11.3 When to Use Snapshot Tests
-
-- **API response shapes** — Lock down JSON structure to catch unintended changes
-- **Serialized domain entities** — Ensure serialization format doesn't drift
-- **Configuration output** — Generated config files, migration SQL
-- **Visual regression** — Delegate to `verify-screenshots` skill (already covered)
-
-Skip snapshot tests for:
-- Frequently changing output (timestamps, IDs) — use selective snapshots
-- Large binary output — use hash comparison instead
-
----
-
 ## STEP 12: Accessibility Test Stubs
 
-For projects with UI, generate a11y test stubs:
-
-```typescript
-// tests/a11y/test_<page>.ts
-
-import { test, expect } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
-
-test("home page passes WCAG 2.1 AA", async ({ page }) => {
-  await page.goto("/");
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa"])
-    .analyze();
-  expect(results.violations).toEqual([]);
-});
-```
-
-Generate one a11y test per page/screen identified in the PRD.
-
----
+**Read:** `references/accessibility-test-stubs.md` for detailed step 12: accessibility test stubs reference material.
 
 ## STEP 13: Red Phase Gate Verification
 
@@ -678,17 +457,6 @@ Count results by status:
 - **ERROR** — Acceptable if caused by missing imports (module doesn't exist yet). Fix if caused by syntax errors in test files.
 - **PASSED** — NOT acceptable. A passing test means either the implementation already exists or the test asserts nothing. Investigate and fix.
 
-### 13.3 Gate Decision
-
-| Condition | Result |
-|-----------|--------|
-| All non-skipped tests FAIL or ERROR (missing import) | ✅ PASS — proceed to Step 14 |
-| Any test PASSES | ❌ FAIL — investigate and fix the passing test |
-| Test files have syntax errors | ❌ FAIL — fix syntax errors |
-| Test collection fails entirely | ❌ FAIL — fix framework configuration |
-
----
-
 ## STEP 14: Output Summary & Structured Results
 
 ### 14.1 Human-Readable Summary
@@ -696,126 +464,6 @@ Count results by status:
 After generating all test files, present:
 
 ```markdown
-## Test Generation Summary
-
-**Source:** <PRD / Plan / Schema file>
-**Framework:** <detected framework>
-
-| Category | Files | Tests | Coverage Target |
-|----------|-------|-------|----------------|
-| Unit | 5 | 23 | 80% line |
-| API | 3 | 15 | 80% line |
-| BDD | 2 features | 8 scenarios | — |
-| Property | 2 | 6 | — |
-| E2E | 1 | 3 stubs (skipped) | — |
-| Snapshot | 2 | 4 | — |
-| A11y | 1 | 2 | WCAG 2.1 AA |
-| **Total** | **15** | **61** | — |
-
-**Mutation testing:** Configured (mutmut / Stryker)
-**Coverage enforcement:** 80% line, 70% branch
-**Red phase gate:** ✅ All tests FAIL or SKIPPED (no passing tests)
-
-### Requirement Traceability
-| Requirement | Tests | Coverage |
-|-------------|-------|----------|
-| AC-001 | UT-001, UT-002, AT-001 | ✅ |
-| AC-002 | UT-003, AT-002, ET-001 | ✅ |
-| NFR-002 | PT-001 | ✅ (stub) |
-| NFR-006 | ST-001, ST-002 | ✅ |
-
-### Next Steps
-- **`/tdd`** — Start the red-green-refactor cycle with these failing tests
-- **Run tests** — `<test command>` (all should FAIL — red phase)
-```
-
-### 14.2 Structured JSON Output
-
-Write machine-readable results to `test-results/test-generator.json` for stage gate validation:
-
-```json
-{
-  "skill": "test-generator",
-  "timestamp": "2026-03-14T10:30:00Z",
-  "result": "PASSED",
-  "summary": {
-    "total": 61,
-    "passed": 0,
-    "failed": 54,
-    "skipped": 3,
-    "error": 4,
-    "flaky": 0
-  },
-  "quality_gate": "PASSED",
-  "contract_check": "SKIPPED",
-  "perf_baseline": "SKIPPED",
-  "red_phase_gate": {
-    "status": "PASSED",
-    "passing_tests": [],
-    "failing_tests": 54,
-    "skipped_stubs": 3,
-    "import_errors": 4
-  },
-  "test_matrix": {
-    "requirements_covered": 12,
-    "requirements_total": 12,
-    "unmapped_requirements": []
-  },
-  "artifacts": [
-    "tests/unit/",
-    "tests/api/",
-    "tests/e2e/",
-    "tests/bdd/",
-    "tests/property/",
-    "tests/snapshots/",
-    "tests/a11y/",
-    "tests/conftest.py",
-    "tests/factories.py"
-  ],
-  "failures": [],
-  "warnings": [],
-  "duration_ms": 8500
-}
-```
-
-The `result` field is `PASSED` when:
-- All non-skipped tests FAIL or ERROR (no passing tests)
-- Every requirement in the PRD maps to at least one test
-- Test files have no syntax errors
-
-The `result` field is `FAILED` when:
-- Any test passes (red phase violation)
-- Requirements exist with no mapped tests
-- Test files cannot be collected
-
----
-
-## Contract Test Decision Criteria
-
-Use the `contract-test` skill (Pact) when:
-- **Multi-service architecture** — 2+ services communicating via HTTP/gRPC/messaging
-- **Separate deploy cycles** — Consumer and provider deploy independently
-- **Cross-team API boundaries** — Different teams own consumer vs provider
-
-Skip contract tests for:
-- **Monoliths** — Single deployable unit with no service boundaries
-- **Internal modules** — Modules within the same service (use unit tests instead)
-- **Third-party APIs** — You don't control the provider (use integration tests with recorded responses)
-
----
-
-## Test File Naming Convention
-
-Follow the project's existing convention. If no convention exists, use:
-
-| Language | Test Files | Test Classes/Functions |
-|----------|-----------|----------------------|
-| Python | `test_<entity>.py` | `class Test<Entity>:` / `def test_<behavior>():` |
-| JavaScript | `<entity>.test.ts` | `describe("<Entity>")` / `test("<behavior>")` |
-| Kotlin | `<Entity>Test.kt` | `class <Entity>Test` / `fun \`should <behavior>\`()` |
-
----
-
 ## MUST DO
 
 - Always build a test matrix mapping every requirement to tests (Step 1)

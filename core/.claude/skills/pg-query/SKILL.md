@@ -266,130 +266,13 @@ psql "$DATABASE_URL" -c "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) SELECT * FROM u
 
 ## Common Query Patterns
 
-### Aggregations
 
-```sql
--- Count with grouping
-SELECT status, count(*) FROM orders GROUP BY status ORDER BY count DESC;
-
--- Date-based aggregation
-SELECT date_trunc('day', created_at) AS day, count(*)
-FROM events
-GROUP BY day ORDER BY day DESC LIMIT 30;
-
--- Multiple aggregates
-SELECT
-    count(*) AS total,
-    count(*) FILTER (WHERE status = 'active') AS active,
-    avg(amount) AS avg_amount,
-    percentile_cont(0.95) WITHIN GROUP (ORDER BY response_time) AS p95
-FROM requests
-WHERE created_at > now() - interval '1 hour';
-```
-
-### Joins
-
-```sql
--- INNER JOIN with aggregation
-SELECT u.email, count(o.id) AS order_count, sum(o.total) AS total_spent
-FROM users u
-JOIN orders o ON o.user_id = u.id
-WHERE o.created_at > now() - interval '30 days'
-GROUP BY u.email
-ORDER BY total_spent DESC LIMIT 20;
-
--- LEFT JOIN to find orphans
-SELECT u.id, u.email
-FROM users u
-LEFT JOIN profiles p ON p.user_id = u.id
-WHERE p.id IS NULL;
-```
-
-### Window Functions
-
-```sql
--- Running total
-SELECT date, revenue,
-       sum(revenue) OVER (ORDER BY date) AS running_total
-FROM daily_revenue;
-
--- Rank within groups
-SELECT department, employee, salary,
-       rank() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank
-FROM employees;
-
--- Lag/Lead comparison
-SELECT date, metric_value,
-       metric_value - lag(metric_value) OVER (ORDER BY date) AS change
-FROM daily_metrics;
-```
-
-### Common Table Expressions (CTEs)
-
-```sql
--- Readable multi-step queries
-WITH active_users AS (
-    SELECT user_id, count(*) AS action_count
-    FROM user_actions
-    WHERE created_at > now() - interval '7 days'
-    GROUP BY user_id
-    HAVING count(*) > 10
-),
-user_details AS (
-    SELECT u.id, u.email, u.created_at, au.action_count
-    FROM users u
-    JOIN active_users au ON au.user_id = u.id
-)
-SELECT * FROM user_details ORDER BY action_count DESC LIMIT 50;
-```
-
----
+**Read:** `references/common-query-patterns.md` for detailed common query patterns reference material.
 
 ## Index Analysis
 
-### Index Usage Statistics
 
-```bash
-psql "$DATABASE_URL" <<'SQL'
--- Index usage: which indexes are being used
-SELECT schemaname, relname AS table_name, indexrelname AS index_name,
-       idx_scan AS times_used, idx_tup_read, idx_tup_fetch
-FROM pg_stat_user_indexes
-ORDER BY idx_scan DESC;
-SQL
-```
-
-### Unused Indexes
-
-```bash
-psql "$DATABASE_URL" <<'SQL'
--- Indexes with zero scans (candidates for removal)
-SELECT schemaname, relname AS table_name, indexrelname AS index_name,
-       pg_size_pretty(pg_relation_size(indexrelid)) AS index_size
-FROM pg_stat_user_indexes
-WHERE idx_scan = 0
-  AND indexrelname NOT LIKE '%_pkey'
-ORDER BY pg_relation_size(indexrelid) DESC;
-SQL
-```
-
-### Missing Index Detection
-
-```bash
-psql "$DATABASE_URL" <<'SQL'
--- Tables with high sequential scan counts (may need indexes)
-SELECT schemaname, relname AS table_name,
-       seq_scan, seq_tup_read,
-       idx_scan, n_live_tup,
-       round(seq_tup_read::numeric / GREATEST(seq_scan, 1), 0) AS avg_rows_per_seq_scan
-FROM pg_stat_user_tables
-WHERE seq_scan > 100
-  AND n_live_tup > 10000
-ORDER BY seq_tup_read DESC;
-SQL
-```
-
----
+**Read:** `references/index-analysis.md` for detailed index analysis reference material.
 
 ## Table Statistics
 
@@ -427,72 +310,8 @@ SQL
 
 ## Connection Management
 
-### Active Connections
 
-```bash
-psql "$DATABASE_URL" <<'SQL'
--- Current connections by state
-SELECT state, count(*), max(now() - state_change) AS max_duration
-FROM pg_stat_activity
-WHERE datname = current_database()
-GROUP BY state
-ORDER BY count DESC;
-SQL
-```
-
-### Long-Running Queries
-
-```bash
-psql "$DATABASE_URL" <<'SQL'
--- Queries running longer than 30 seconds
-SELECT pid, now() - pg_stat_activity.query_start AS duration,
-       state, left(query, 100) AS query_preview
-FROM pg_stat_activity
-WHERE state != 'idle'
-  AND now() - pg_stat_activity.query_start > interval '30 seconds'
-ORDER BY duration DESC;
-SQL
-```
-
-### Connection Limits
-
-```bash
-psql "$DATABASE_URL" <<'SQL'
-SELECT
-    (SELECT count(*) FROM pg_stat_activity) AS current_connections,
-    (SELECT setting::int FROM pg_settings WHERE name = 'max_connections') AS max_connections,
-    (SELECT count(*) FROM pg_stat_activity WHERE state = 'active') AS active_queries;
-SQL
-```
-
-### Blocked Queries
-
-```bash
-psql "$DATABASE_URL" <<'SQL'
--- Queries blocked by locks
-SELECT blocked.pid AS blocked_pid,
-       blocked.query AS blocked_query,
-       blocking.pid AS blocking_pid,
-       blocking.query AS blocking_query
-FROM pg_stat_activity blocked
-JOIN pg_locks bl ON bl.pid = blocked.pid
-JOIN pg_locks kl ON kl.locktype = bl.locktype
-    AND kl.database IS NOT DISTINCT FROM bl.database
-    AND kl.relation IS NOT DISTINCT FROM bl.relation
-    AND kl.page IS NOT DISTINCT FROM bl.page
-    AND kl.tuple IS NOT DISTINCT FROM bl.tuple
-    AND kl.transactionid IS NOT DISTINCT FROM bl.transactionid
-    AND kl.classid IS NOT DISTINCT FROM bl.classid
-    AND kl.objid IS NOT DISTINCT FROM bl.objid
-    AND kl.objsubid IS NOT DISTINCT FROM bl.objsubid
-    AND kl.pid != bl.pid
-    AND kl.granted
-JOIN pg_stat_activity blocking ON blocking.pid = kl.pid
-WHERE NOT bl.granted;
-SQL
-```
-
----
+**Read:** `references/connection-management.md` for detailed connection management reference material.
 
 ## Query Optimization Tips
 

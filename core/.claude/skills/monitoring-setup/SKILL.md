@@ -43,17 +43,6 @@ grep -r "prometheus\|opentelemetry\|datadog\|newrelic\|statsd" package.json requ
 
 ## STEP 2: Prometheus Metrics
 
-### 2.1 Metric Types
-
-Choose the correct metric type for each measurement:
-
-| Type | Use Case | Example |
-|------|----------|---------|
-| **Counter** | Monotonically increasing values | `http_requests_total`, `errors_total`, `bytes_sent_total` |
-| **Gauge** | Values that go up and down | `active_connections`, `queue_depth`, `temperature_celsius` |
-| **Histogram** | Distribution of values (latency, size) | `http_request_duration_seconds`, `response_size_bytes` |
-| **Summary** | Pre-calculated quantiles (client-side) | `rpc_duration_seconds` (use histogram instead when possible) |
-
 ### 2.2 Naming Conventions
 
 Follow Prometheus naming conventions strictly:
@@ -276,65 +265,9 @@ myapp_thread_pool_active / myapp_thread_pool_max
 
 ## STEP 4: SLO/SLI Definition
 
-### 4.1 Service Level Indicators (SLIs)
 
-Define measurable indicators of service health:
+**Read:** `references/slosli-definition.md` for detailed step 4: slo/sli definition reference material.
 
-```yaml
-slis:
-  availability:
-    description: "Proportion of successful HTTP requests"
-    good_events: 'sum(rate(myapp_http_requests_total{status!~"5.."}[5m]))'
-    total_events: 'sum(rate(myapp_http_requests_total[5m]))'
-
-  latency:
-    description: "Proportion of requests faster than 500ms"
-    good_events: 'sum(rate(myapp_http_request_duration_seconds_bucket{le="0.5"}[5m]))'
-    total_events: 'sum(rate(myapp_http_requests_total[5m]))'
-
-  correctness:
-    description: "Proportion of requests returning correct data"
-    good_events: 'sum(rate(myapp_data_validation_success_total[5m]))'
-    total_events: 'sum(rate(myapp_data_validation_total[5m]))'
-```
-
-### 4.2 Service Level Objectives (SLOs)
-
-Set targets based on business requirements:
-
-```yaml
-slos:
-  - name: "API Availability"
-    sli: availability
-    target: 0.999          # 99.9% — 8.77 hours downtime/year
-    window: 30d            # rolling 30-day window
-
-  - name: "API Latency"
-    sli: latency
-    target: 0.99           # 99% of requests under 500ms
-    window: 30d
-
-  - name: "Data Correctness"
-    sli: correctness
-    target: 0.9999         # 99.99%
-    window: 30d
-```
-
-Common SLO targets and their implications:
-
-| Target | Monthly Downtime | Yearly Downtime | Suitable For |
-|--------|-----------------|-----------------|--------------|
-| 99% | 7.3 hours | 3.65 days | Internal tools, batch jobs |
-| 99.5% | 3.65 hours | 1.83 days | Non-critical services |
-| 99.9% | 43.8 minutes | 8.77 hours | Most production services |
-| 99.95% | 21.9 minutes | 4.38 hours | Important customer-facing |
-| 99.99% | 4.38 minutes | 52.6 minutes | Critical infrastructure |
-
-### 4.3 Error Budget
-
-Calculate and track error budget consumption:
-
-```promql
 # Error budget remaining (30-day window, 99.9% SLO)
 1 - (
   (1 - (sum(rate(myapp_http_requests_total{status!~"5.."}[30d])) / sum(rate(myapp_http_requests_total[30d]))))
@@ -397,82 +330,9 @@ Multi-window burn rate alerts catch both fast and slow burns:
 ---
 ## STEP 6: Grafana Dashboards
 
-### 6.1 Dashboard Structure
 
-Organize dashboards in a hierarchy:
+**Read:** `references/grafana-dashboards.md` for detailed step 6: grafana dashboards reference material.
 
-```
-dashboards/
-  overview/
-    service-map.json              # Top-level service health
-  services/
-    myapp-overview.json           # Per-service golden signals
-    myapp-detailed.json           # Deep-dive with all metrics
-  infrastructure/
-    nodes.json                    # Server/node metrics
-    kubernetes.json               # K8s cluster metrics
-  databases/
-    postgres.json                 # Database metrics
-    redis.json                    # Cache metrics
-  business/
-    revenue-impact.json           # Business KPIs correlated with tech metrics
-```
-
-### 6.2 Panel Types
-
-Use the right visualization for each metric:
-
-| Panel Type | Best For | Example |
-|------------|----------|---------|
-| **Time series** | Rates, latencies over time | Request rate, p99 latency |
-| **Stat** | Single current values | Uptime, error budget remaining |
-| **Gauge** | Values with known ranges | CPU %, disk %, SLO compliance |
-| **Bar gauge** | Comparing across instances | Per-node memory usage |
-| **Table** | Multi-dimension data | Top endpoints by latency |
-| **Heatmap** | Distribution over time | Latency distribution |
-| **Logs** | Correlated log lines | Errors from Loki/Elasticsearch |
-| **Alert list** | Active alerts | Firing alerts for this service |
-
-### 6.3 Template Variables
-
-Use Grafana variables for reusable, filterable dashboards:
-
-```json
-{
-  "templating": {
-    "list": [
-      {
-        "name": "namespace",
-        "type": "query",
-        "query": "label_values(myapp_http_requests_total, namespace)",
-        "refresh": 2
-      },
-      {
-        "name": "service",
-        "type": "query",
-        "query": "label_values(myapp_http_requests_total{namespace=\"$namespace\"}, service)",
-        "refresh": 2
-      },
-      {
-        "name": "interval",
-        "type": "interval",
-        "options": [
-          {"text": "1m", "value": "1m"},
-          {"text": "5m", "value": "5m"},
-          {"text": "15m", "value": "15m"}
-        ],
-        "current": {"text": "5m", "value": "5m"}
-      }
-    ]
-  }
-}
-```
-
-### 6.4 Dashboard as Code
-
-Provision dashboards automatically using JSON models or Grafonnet:
-
-```yaml
 # grafana/provisioning/dashboards/default.yml
 apiVersion: 1
 providers:
@@ -488,99 +348,10 @@ providers:
 
 Store dashboard JSON in version control. Use `grafana-dashboard-manager` or Terraform for syncing.
 
-### 6.5 Standard Service Dashboard Layout
-
-Every service dashboard MUST include these rows (top to bottom):
-
-```
-Row 1: SLO Status
-  - SLO compliance (stat panel, green/red)
-  - Error budget remaining (gauge)
-  - Error budget burn rate (time series)
-
-Row 2: Golden Signals
-  - Request rate (time series)
-  - Error rate (time series, percentage)
-  - p50/p95/p99 latency (time series, multiple queries)
-  - Saturation — active connections or CPU (time series)
-
-Row 3: Detailed Metrics
-  - Requests by handler (time series, stacked)
-  - Errors by handler (table, sorted by error count)
-  - Latency heatmap (heatmap)
-
-Row 4: Dependencies
-  - Database query latency (time series)
-  - Cache hit rate (stat + time series)
-  - External API call latency (time series)
-  - Queue depth (time series)
-
-Row 5: Infrastructure
-  - CPU usage (time series)
-  - Memory usage (time series)
-  - Disk I/O (time series)
-  - Network I/O (time series)
-
-Row 6: Alerts & Logs
-  - Active alerts (alert list panel)
-  - Recent error logs (logs panel from Loki)
-```
-
----
-
 ## STEP 7: Log Aggregation
 
-### 7.1 Structured Logging
 
-All logs MUST be structured JSON — never unstructured text:
-
-```json
-{
-  "timestamp": "2025-01-15T10:30:45.123Z",
-  "level": "error",
-  "message": "Failed to process payment",
-  "service": "payment-service",
-  "trace_id": "abc123def456",
-  "span_id": "789ghi",
-  "request_id": "req-001",
-  "user_id": "user-42",
-  "error": {
-    "type": "PaymentGatewayError",
-    "message": "Connection timeout",
-    "stack": "..."
-  },
-  "context": {
-    "payment_id": "pay-123",
-    "amount": 99.99,
-    "currency": "USD"
-  }
-}
-```
-
-### 7.2 Log Levels
-
-Use log levels consistently across all services:
-
-| Level | When to Use | Example |
-|-------|-------------|---------|
-| `error` | Something failed, requires investigation | Payment processing failed, database connection lost |
-| `warn` | Degraded but functional, or unexpected input | Retry succeeded, deprecated API called, rate limit approaching |
-| `info` | Normal significant events | Request completed, job finished, config loaded |
-| `debug` | Diagnostic detail for troubleshooting | SQL queries, cache lookups, request/response bodies |
-
-Rules:
-- Production MUST run at `info` level minimum
-- `debug` logs MUST NOT contain PII or secrets
-- Log at the boundary — entry and exit of significant operations, not every internal step
-- Include duration for all operations: `"duration_ms": 145`
-
-### 7.3 Correlation IDs
-
-Propagate trace context through every log entry:
-
-```python
-import uuid
-import contextvars
+**Read:** `references/log-aggregation.md` for detailed step 7: log aggregation reference material.
 
 # Request-scoped correlation
 request_id_var = contextvars.ContextVar('request_id', default='unknown')
@@ -670,51 +441,9 @@ sum(rate({app="myapp"} [5m]))
 ---
 ## STEP 10: Infrastructure Monitoring
 
-### 10.1 Node/Host Metrics
 
-Essential node-exporter metrics to monitor and alert on:
+**Read:** `references/infrastructure-monitoring.md` for detailed step 10: infrastructure monitoring reference material.
 
-```yaml
-alerts:
-  # CPU
-  - alert: HighCPUUsage
-    expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
-    for: 15m
-    labels:
-      severity: warning
-
-  # Memory
-  - alert: HighMemoryUsage
-    expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 0.9
-    for: 10m
-    labels:
-      severity: warning
-
-  # Disk space
-  - alert: DiskSpaceCritical
-    expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes) < 0.05
-    for: 5m
-    labels:
-      severity: critical
-
-  # Disk I/O saturation
-  - alert: HighDiskIOUtilization
-    expr: rate(node_disk_io_time_seconds_total[5m]) > 0.9
-    for: 15m
-    labels:
-      severity: warning
-
-  # Network errors
-  - alert: NetworkErrors
-    expr: rate(node_network_receive_errs_total[5m]) + rate(node_network_transmit_errs_total[5m]) > 10
-    for: 5m
-    labels:
-      severity: warning
-```
-
-### 10.2 Kubernetes Metrics
-
-```promql
 # Pod restart rate (indicates crash loops)
 increase(kube_pod_container_status_restarts_total[1h]) > 3
 
@@ -760,71 +489,8 @@ rate(container_network_transmit_bytes_total[5m])
 ---
 ## STEP 12: Anti-Patterns to Avoid
 
-### 12.1 Alerting Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| Alert on everything | Alert fatigue — team ignores all alerts | Alert only on customer-facing symptoms, not causes |
-| No runbooks | On-call scrambles to diagnose at 3 AM | Every alert links to a runbook with diagnosis steps |
-| No `for` duration | Transient spikes trigger pages | Require 2-15 minutes sustained condition |
-| Alerting on causes, not symptoms | Generates cascading alerts | Alert on "error rate > 1%" not "pod restarted" |
-| Same severity for everything | No prioritization | Use critical/warning/info consistently |
-| No alert ownership | "Someone else will handle it" | Every alert has a `team` label for routing |
-
-### 12.2 Metrics Anti-Patterns
-
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| High cardinality labels | Prometheus OOM, slow queries | Use bounded label values only; group into buckets |
-| Using Summary over Histogram | Cannot aggregate across instances | Use Histogram — aggregatable with `histogram_quantile` |
-| Metric names without units | Ambiguous: is it ms or seconds? | Always suffix with `_seconds`, `_bytes`, `_total` |
-| Metrics inside hot loops | Performance degradation | Increment counters at operation boundaries, not inner loops |
-| Missing `_total` suffix | Breaks Prometheus conventions | Counters MUST end with `_total` |
-| Logging metrics instead of exposing | Cannot query, alert, or graph | Expose via `/metrics` endpoint, not log lines |
-
-### 12.3 Logging Anti-Patterns
-
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| Unstructured logs | Cannot query or aggregate | Use structured JSON logging everywhere |
-| Missing correlation IDs | Cannot trace request across services | Propagate request_id and trace_id in every log |
-| Logging PII/secrets | Compliance violation, security risk | Scrub sensitive fields; never log passwords, tokens, SSNs |
-| Logging at wrong level | Too noisy or too silent | Follow level guidelines: error/warn/info/debug |
-| No log rotation | Disk fills up | Configure max size and retention policies |
-| printf debugging in production | Noise, performance impact | Remove debug logs before merge; use `debug` level |
-
-### 12.4 Tracing Anti-Patterns
-
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| No sampling strategy | Storage costs explode | Use head-based or tail-based sampling |
-| Missing context propagation | Broken traces across services | Inject/extract trace context at every boundary |
-| Too many spans | Trace viewer unusable, storage costs | Span per operation, not per function call |
-| No span attributes | Traces have no useful metadata | Add business-relevant attributes to spans |
-
----
-
-## Verification Checklist
-
-Before reporting monitoring setup complete, verify:
-
-| Check | Status |
-|-------|--------|
-| All four golden signals instrumented (latency, traffic, errors, saturation) | |
-| Metrics follow naming conventions (`_total`, `_seconds`, `_bytes`) | |
-| No high-cardinality labels (user IDs, request IDs in labels) | |
-| SLOs defined with error budget tracking | |
-| Burn rate alerts configured (fast + slow burn) | |
-| Every alert has a runbook URL | |
-| Alertmanager routing configured with severity levels | |
-| Structured JSON logging with correlation IDs | |
-| OpenTelemetry tracing with context propagation | |
-| Grafana dashboard with standard layout (SLOs, golden signals, dependencies) | |
-| Sampling strategy configured for traces | |
-| Infrastructure alerts for disk, CPU, memory | |
-| Dashboard committed as code (JSON in version control) | |
-
----
+**Read:** `references/anti-patterns-to-avoid.md` for detailed step 12: anti-patterns to avoid reference material.
 
 ## CRITICAL RULES
 

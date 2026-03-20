@@ -84,119 +84,16 @@ After fetching, do whatever the user asked: summarize, analyze, extract key poin
 
 Craft an optimized tweet or thread. Apply these rules:
 
-### Single Tweet Rules
-- **Hard limit:** 280 characters
-- **Target:** 200-260 chars (leaves room for engagement)
-- **Structure:** Hook (first line grabs attention) + Body + CTA or open question
-- **No hashtag spam** — max 2 relevant hashtags, placed at end
-- Always show character count: `X/280`
 
-### Hook Formulas (proven high-engagement openers)
-| Type | Formula | Example |
-|------|---------|---------|
-| Transformation | "I [did X]. Here's what happened:" | "I quit my job and built an AI agent. Here's what happened:" |
-| Contrarian | "Most people think [belief]. They're wrong." | "Most people think you need 10k followers to monetize. They're wrong." |
-| Authority | "I've [credential]. Here's [insight]:" | "I've reviewed 500 PRs this year. Here's the #1 pattern I see:" |
-| Curiosity Gap | "[Number] [things] that [surprising result]:" | "3 tweets that generated $50k in revenue:" |
-| Story | "In [time], I went from [A] to [B]. Here's how:" | "In 6 months, I went from 0 to 25k followers. Here's how:" |
-
-### Thread Rules
-- **Length:** 7-15 tweets ideal, 25 max
-- **Tweet 1:** Must standalone as a hook — this is 80% of the thread's success
-- **Each tweet:** Self-contained thought, ends with a reason to keep reading
-- **Last tweet:** CTA (follow, retweet, bookmark) + link back to tweet 1
-- **Numbering:** Use X/N format (e.g., "3/12")
-- Show character count per tweet
-
-### Thread Frameworks
-1. **How-To:** Step-by-step guide solving a specific problem
-2. **Story:** Personal narrative with lessons learned
-3. **Listicle:** Curated list of tools/tips/resources
-4. **Contrarian:** Challenge conventional wisdom with evidence
-5. **Case Study:** Deep-dive analysis of a real example
-6. **Breakdown:** Deconstruct how something works
-
-### Content Mix (weekly posting strategy)
-| Type | % | Description |
-|------|---|-------------|
-| Value | 40% | Tips, tutorials, insights, how-tos |
-| Engagement | 30% | Questions, polls, hot takes, debates |
-| Build in Public | 20% | Progress updates, lessons, behind-the-scenes |
-| Promotion | 10% | Product launches, announcements, CTAs |
-
-### Output Format
-```
-TWEET: [content]
-CHARS: X/280
----
-(or for threads)
-THREAD: [Topic]
-FRAMEWORK: [Which framework]
-LENGTH: X tweets
-
-1/X: [hook tweet]
-CHARS: X/280
-
-2/X: [next tweet]
-CHARS: X/280
-...
-
-STANDALONE HOOK: [Tweet 1 rephrased as standalone tweet]
-```
-
----
+**Read:** `references/compose-tweet.md` for detailed step 2: compose tweet reference material.
 
 ## STEP 3: Viral Potential Scoring
 
 Score a tweet's viral potential using the 19-element system based on X's open-source recommendation algorithm.
 
-### Tier 1: Core Engagement (60 points)
-| Factor | Max | 🟢 High | 🟡 Medium | 🔴 Low |
-|--------|-----|---------|-----------|--------|
-| Reply Potential | 22 | Direct question or debatable claim | Invites response | Statement only |
-| Retweet Potential | 16 | Actionable insight / surprising fact | Interesting but niche | No share value |
-| Favorite Potential | 12 | Emotionally resonant / personal story | Useful reference | Low appeal |
-| Quote Potential | 10 | Strong opinion inviting commentary | Thought-provoking | Self-contained |
 
-### Tier 2: Extended Engagement (25 points)
-| Factor | Max | Description |
-|--------|-----|-------------|
-| Dwell Time | 6 | Long-form / detailed content requiring reading time |
-| Continuous Dwell | 4 | Thread / story arc requiring sustained attention |
-| Click Potential | 5 | Compelling link with clear CTA |
-| Photo Expand | 4 | Visual storytelling with multiple images |
-| Video View | 3 | Video with strong hook (>5s watch time) |
-| Quoted Click | 3 | Bold claim inviting verification |
+**Read:** `references/viral-potential-scoring.md` for detailed step 3: viral potential scoring reference material.
 
-### Tier 3: Relationship Building (15 points)
-| Factor | Max | Description |
-|--------|-----|-------------|
-| Profile Click | 5 | Creates curiosity about the author |
-| Follow Potential | 4 | Demonstrates ongoing value worth following for |
-| Share Potential | 2 | General cross-platform sharing value |
-| Share via DM | 2 | "Send to a friend" relatability |
-| Share via Copy Link | 2 | Bookmark / reference worthy |
-
-### Penalties (subtract from total)
-| Risk | Range | Trigger |
-|------|-------|---------|
-| Not Interested | -5 to -15 | Clickbait, irrelevant content |
-| Mute Risk | -5 to -15 | Repetitive, annoying patterns |
-| Block Risk | -10 to -25 | Offensive, aggressive tone |
-| Report Risk | -15 to -30 | Policy violations, spam signals |
-
-### Grade Scale
-| Score | Grade | Verdict |
-|-------|-------|---------|
-| 90-100 | S | Exceptional — high viral probability |
-| 75-89 | A | Strong — likely to perform well |
-| 60-74 | B | Good — solid engagement expected |
-| 45-59 | C | Average — consider improvements |
-| 30-44 | D | Below average — needs rework |
-| 0-29 | F | Low potential — rewrite recommended |
-
-### Scoring Output Format
-```
 ## Score: XX/100 (Grade: X)
 
 ### Breakdown
@@ -387,45 +284,8 @@ Flag accounts to unfollow based on:
 
 ## STEP 7: Account Health & Growth
 
-### TweepCred Health Score
-Evaluate account health on a 0-100 scale:
 
-| Factor | Weight | How to check |
-|--------|--------|-------------|
-| Follower/Following ratio | 20% | Healthy: >1.0, Great: >5.0 |
-| Engagement rate | 25% | (likes+replies+RTs) / followers / tweets |
-| Content consistency | 15% | Regular posting cadence (4-7x/week ideal) |
-| Profile completeness | 10% | Bio, avatar, banner, pinned tweet, link |
-| Account age vs followers | 10% | Organic growth trajectory |
-| Reply ratio | 10% | Engaging with others (>30% of activity) |
-| Original content ratio | 10% | Original tweets vs retweets (>60% ideal) |
-
-### Shadowban Detection
-Check for potential shadowban indicators:
-1. Search for your recent tweets — if they don't appear, possible search ban
-2. Check if replies are hidden from conversations — reply deboosting
-3. Verify profile appears in search results — ghost ban
-4. Test: `https://x.com/search?q=from:USERNAME&f=live` — should show recent tweets
-
-### Algorithm Weight Reference (X's open-source scoring)
-| Signal | Weight | Implication |
-|--------|--------|-------------|
-| Reply from followed | +75 | Reply to people you follow — highest signal |
-| Reply general | +27 | All replies boost visibility |
-| Profile click | +12 | Curiosity-driving content wins |
-| Dwell time (>2min) | +10 | Long-form and threads rewarded |
-| Like | +0.5 | Likes are weak signal |
-| Image/Video | +2x | Media tweets get 2x distribution |
-| External link | -0.5x | Links reduce reach (put in reply instead) |
-
-### Growth Tactics
-- **Reply strategy:** Reply to 10-20 accounts in your niche daily (highest ROI)
-- **Posting cadence:** 1-3 tweets/day, 1-2 threads/week
-- **Best times:** 8-10am and 5-7pm in your audience's timezone
-- **Link placement:** Never in main tweet — put links in first reply
-- **Visual content:** Include image/video for 2x algorithm boost
-
----
+**Read:** `references/account-health-growth.md` for detailed step 7: account health & growth reference material.
 
 ## STEP 8: Keyword Monitoring
 

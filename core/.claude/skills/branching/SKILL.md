@@ -47,59 +47,12 @@ git checkout main 2>/dev/null || git checkout master
 git pull origin $(git branch --show-current)
 ```
 
-### 0.2 Determine Branch Name
-
-Apply naming conventions based on the task type:
-
-| Task Type | Prefix | Example |
-|-----------|--------|---------|
-| New feature | `feat/` | `feat/user-registration` |
-| Bug fix | `fix/` | `fix/login-crash-empty-email` |
-| Refactoring | `refactor/` | `refactor/extract-auth-service` |
-| Documentation | `docs/` | `docs/api-reference-update` |
-| Chore/maintenance | `chore/` | `chore/upgrade-dependencies` |
-| Hotfix (production) | `hotfix/` | `hotfix/payment-timeout` |
-
-Rules for branch names:
-- Lowercase, kebab-case
-- Include ticket/issue number if available: `feat/PROJ-123-user-registration`
-- Max 50 characters
-- Descriptive but concise
-
-### 0.3 Create the Branch
-
-```bash
-BRANCH_NAME="<prefix>/<descriptive-name>"
-BASE_BRANCH=$(git branch --show-current)
-
-git checkout -b "$BRANCH_NAME"
-echo "Created branch: $BRANCH_NAME (from $BASE_BRANCH)"
-```
-
 ### 0.4 Set Upstream
 
 ```bash
 git push -u origin "$BRANCH_NAME"
 echo "Upstream set: origin/$BRANCH_NAME"
 ```
-
-### 0.5 Branch Creation Summary
-
-```
-Branch Created:
-  Name:   <BRANCH_NAME>
-  Base:   <BASE_BRANCH>
-  Remote: origin/<BRANCH_NAME>
-
-Next steps:
-  - Start implementing with /implement or /executing-plans
-  - When ready for review, use /request-code-review
-  - When approved, use /branching finish <BRANCH_NAME>
-```
-
-If the command starts with `finish`, `merge`, or `finalize`, proceed to Step 1.
-
----
 
 ## STEP 1: Pre-Merge Checklist
 
@@ -234,24 +187,6 @@ gh api repos/:owner/:repo/pulls/$PR_NUMBER/comments --jq '
 # Expected: 0
 ```
 
-### 1.7 Checklist Summary
-
-After all checks pass, output:
-
-```
-Pre-Merge Checklist: PASSED
-- Review decision:    APPROVED
-- Change requests:    0 outstanding
-- CI checks:          all passing
-- Merge conflicts:    none
-- Branch freshness:   up to date with <base-branch>
-- Review threads:     all resolved
-
-Ready to merge PR #<number> (<branch> -> <base-branch>).
-```
-
----
-
 ## STEP 2: Commit History Cleanup
 
 Clean up the commit history before merging. The goal is a readable history: meaningful
@@ -273,26 +208,6 @@ a7c9d4e address review: rename variable per feedback
 b2d4e6f fix: handle edge case for empty email
 c8a3f1d address review: add test for boundary condition
 9d7e2a1 feat: add user registration endpoint
-```
-
-### 2.2 Categorize Commits
-
-Separate commits into two categories:
-
-| Category | Pattern | Action |
-|----------|---------|--------|
-| **Keep** | `feat:`, `fix:`, `refactor:`, `perf:`, `docs:` | Preserve as individual commits |
-| **Squash** | `address review`, `fix typo`, `fixup`, `wip`, `oops`, `nit` | Squash into the nearest preceding "keep" commit |
-
-From the example above:
-
-```
-KEEP:   9d7e2a1 feat: add user registration endpoint
-SQUASH: c8a3f1d address review: add test for boundary condition  -> into 9d7e2a1
-KEEP:   b2d4e6f fix: handle edge case for empty email
-KEEP:   1e5f8g9 feat: add input validation for user registration
-SQUASH: a7c9d4e address review: rename variable per feedback     -> into 1e5f8g9
-SQUASH: f3a1b2c fix typo in error message                        -> into 1e5f8g9
 ```
 
 ### 2.3 Perform the Squash
@@ -339,23 +254,6 @@ git commit --fixup=1e5f8g9 --allow-empty -m "fixup! feat: add input validation"
 GIT_SEQUENCE_EDITOR=true git rebase --autosquash "origin/$BASE_BRANCH"
 ```
 
-### 2.4 Generate Clean Commit Message
-
-For the squashed commit, generate a message that summarizes the full PR:
-
-```
-<type>: <concise summary of the change>
-
-<bullet points covering what was done>
-
-- <change 1>
-- <change 2>
-- <change 3>
-
-PR: #<PR-number>
-Co-authored-by: <reviewers who contributed suggestions>
-```
-
 ### 2.5 Force Push the Cleaned History
 
 ```bash
@@ -392,20 +290,6 @@ PR_URL=$(gh pr view "$PR_NUMBER" --json url --jq '.url')
 PR_AUTHOR=$(gh pr view "$PR_NUMBER" --json author --jq '.author.login')
 ```
 
-### 3.2 Categorize the Change
-
-Map the PR to a Keep a Changelog category based on the PR title prefix and labels:
-
-| PR Title Prefix / Label | Changelog Category |
-|--------------------------|-------------------|
-| `feat:`, `feature`, `enhancement` | Added |
-| `fix:`, `bug`, `bugfix` | Fixed |
-| `refactor:`, `perf:`, `improvement` | Changed |
-| `deprecate:` | Deprecated |
-| `remove:`, `breaking` | Removed |
-| `security:`, `vulnerability` | Security |
-
-```bash
 # Determine category from PR title
 if echo "$PR_TITLE" | grep -qi '^feat'; then
   CATEGORY="Added"
@@ -434,37 +318,6 @@ Example output:
 
 ```
 - Add user registration with input validation ([#142](https://github.com/org/repo/pull/142))
-```
-
-### 3.4 Insert into CHANGELOG.md
-
-If a `CHANGELOG.md` exists, insert the entry under the appropriate section. If the
-`[Unreleased]` section does not have the right category, create it.
-
-```bash
-if [ -f CHANGELOG.md ]; then
-  # Check if [Unreleased] section exists
-  if grep -q '## \[Unreleased\]' CHANGELOG.md; then
-    # Check if the category subsection exists under [Unreleased]
-    if grep -A 50 '## \[Unreleased\]' CHANGELOG.md | grep -q "### $CATEGORY"; then
-      # Insert after the category header
-      sed -i "/### $CATEGORY/a\\$CHANGELOG_ENTRY" CHANGELOG.md
-    else
-      # Add the category section under [Unreleased]
-      sed -i "/## \[Unreleased\]/a\\\n### $CATEGORY\n$CHANGELOG_ENTRY" CHANGELOG.md
-    fi
-  else
-    # Add [Unreleased] section at the top (after the title)
-    sed -i "1a\\\n## [Unreleased]\n\n### $CATEGORY\n$CHANGELOG_ENTRY" CHANGELOG.md
-  fi
-
-  echo "Changelog updated with entry under [$CATEGORY]"
-  git add CHANGELOG.md
-  git commit -m "docs: add changelog entry for PR #$PR_NUMBER"
-else
-  echo "No CHANGELOG.md found — skipping changelog generation."
-  echo "To start a changelog, create CHANGELOG.md following https://keepachangelog.com"
-fi
 ```
 
 ### 3.5 Changelog Entry Examples
@@ -509,59 +362,6 @@ fi
 git worktree list | grep "$BRANCH" && echo "Found worktree for branch $BRANCH"
 ```
 
-### 4.2 Ensure Work is Committed
-
-```bash
-if [ "$IS_WORKTREE" = true ]; then
-  # Check for uncommitted changes
-  if [ -n "$(git status --porcelain)" ]; then
-    echo "ERROR: Worktree has uncommitted changes. Commit or stash before cleanup."
-    git status --short
-    exit 1
-  fi
-fi
-```
-
-### 4.3 Clean Up Worktree-Specific Files
-
-```bash
-if [ "$IS_WORKTREE" = true ]; then
-  # Remove worktree-specific env files that should not persist
-  WORKTREE_ENV_FILES=(.env.local .env.development.local node_modules/.cache)
-  for f in "${WORKTREE_ENV_FILES[@]}"; do
-    if [ -e "$WORKTREE_PATH/$f" ]; then
-      echo "Removing worktree-specific file: $f"
-      rm -rf "$WORKTREE_PATH/$f"
-    fi
-  done
-fi
-```
-
-### 4.4 Navigate to Main Repo and Remove Worktree
-
-```bash
-if [ "$IS_WORKTREE" = true ]; then
-  # Switch to the main repository before removing the worktree
-  cd "$MAIN_REPO"
-
-  # Remove the worktree
-  git worktree remove "$WORKTREE_PATH"
-  echo "Worktree removed: $WORKTREE_PATH"
-
-  # Prune stale worktree references
-  git worktree prune
-  echo "Stale worktree references pruned."
-
-  # Verify the worktree directory is gone
-  if [ -d "$WORKTREE_PATH" ]; then
-    echo "WARNING: Worktree directory still exists at $WORKTREE_PATH"
-    echo "Manual cleanup may be needed."
-  else
-    echo "Worktree directory confirmed removed."
-  fi
-fi
-```
-
 ### 4.5 Verify Worktree State
 
 ```bash
@@ -599,18 +399,6 @@ git pull origin $BASE_BRANCH
 git revert -m 1 <merge-sha>
 git push origin $BASE_BRANCH
 \`\`\`
-
-### Additional rollback steps:
-- [ ] Database migrations to revert: _(list if applicable)_
-- [ ] Config changes to undo: _(list if applicable)_
-- [ ] Feature flags to disable: _(list if applicable)_
-- [ ] Cache invalidation needed: _(yes/no)_
-
----
-_Generated by /branching_
-EOF
-)"
-```
 
 ### 5.2 Execute the Merge
 
@@ -653,18 +441,6 @@ gh pr comment "$PR_NUMBER" --body "$(cat <<EOF
 ## Merge Complete
 
 **Merge commit:** \`$MERGE_SHA\`
-
-### Revert command (if needed):
-\`\`\`bash
-git checkout $BASE_BRANCH && git pull
-git revert -m 1 $MERGE_SHA
-git push origin $BASE_BRANCH
-\`\`\`
-EOF
-)"
-```
-
----
 
 ## STEP 6: Post-Merge Verification
 
@@ -718,28 +494,6 @@ else
 fi
 ```
 
-### 6.4 Handle Verification Failures
-
-If tests or build fail after the merge:
-
-```
-POST-MERGE FAILURE DETECTED
-
-Failed step: <tests|build>
-Error output:
-<error details>
-
-IMMEDIATE ACTIONS:
-1. Do NOT panic — this is why we documented the rollback plan.
-2. Investigate whether the failure is caused by the merge or pre-existing.
-3. If caused by the merge, revert immediately:
-
-   git revert -m 1 <MERGE_SHA>
-   git push origin <BASE_BRANCH>
-
-4. If pre-existing, file a separate issue and proceed.
-```
-
 ### 6.5 Compare Key Metrics (Optional)
 
 ```bash
@@ -755,19 +509,6 @@ elif [ -f pytest.ini ] || [ -f pyproject.toml ]; then
   python -m pytest --co -q 2>/dev/null | tail -1
 fi
 ```
-
-### 6.6 Verification Report
-
-```
-Post-Merge Verification: PASSED
-- Branch:     <base-branch> @ <short-sha>
-- Tests:      <X> passed, 0 failed
-- Build:      success
-- Merge SHA:  <merge-sha>
-- Regressions: none detected
-```
-
----
 
 ## STEP 7: Branch Cleanup
 

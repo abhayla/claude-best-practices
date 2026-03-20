@@ -108,41 +108,6 @@ provider "aws" {
 - MUST use `default_tags` (AWS) or equivalent to tag all resources consistently.
 - NEVER hardcode regions or account IDs — use variables.
 
-### 2.2 Resource Blocks
-
-```hcl
-resource "aws_s3_bucket" "data_lake" {
-  bucket = "${var.project_name}-${var.environment}-data-lake"
-
-  tags = {
-    Purpose = "Data lake storage"
-  }
-}
-
-resource "aws_s3_bucket_versioning" "data_lake" {
-  bucket = aws_s3_bucket.data_lake.id
-
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "data_lake" {
-  bucket = aws_s3_bucket.data_lake.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
-    }
-  }
-}
-```
-
-**Key rules:**
-- Use separate resource blocks for bucket sub-resources (versioning, encryption, lifecycle) — inline configuration is deprecated for many resources.
-- Reference other resources via `resource_type.name.attribute`, never by hardcoded IDs.
-- Use `${var.project}-${var.env}-<purpose>` naming convention for uniqueness.
-
 ### 2.3 Data Sources
 
 Data sources read existing infrastructure without managing it.
@@ -237,19 +202,6 @@ output "db_endpoint" {
 
 ## STEP 3: Pulumi Fundamentals
 
-### 3.1 Project Structure
-
-```
-my-infra/
-  Pulumi.yaml           # Project metadata
-  Pulumi.dev.yaml       # Dev stack config
-  Pulumi.staging.yaml   # Staging stack config
-  Pulumi.prod.yaml      # Prod stack config
-  __main__.py           # Python entry point (or index.ts for TypeScript)
-  requirements.txt      # Python deps (or package.json for TypeScript)
-```
-
-```yaml
 # Pulumi.yaml
 name: my-infra
 runtime: python  # or nodejs, go, dotnet
@@ -273,16 +225,6 @@ pulumi config set --secret dbPassword 'supersecret'
 pulumi stack select prod
 pulumi config set instanceType t3.large
 ```
-
-### 3.3 Resource Creation — Python
-
-```python
-import pulumi
-import pulumi_aws as aws
-
-config = pulumi.Config()
-environment = pulumi.get_stack()
-project_name = pulumi.get_project()
 
 # Common tags applied to all resources
 common_tags = {
@@ -309,82 +251,6 @@ data_bucket = aws.s3.Bucket(
 pulumi.export("bucket_name", data_bucket.bucket)
 pulumi.export("bucket_arn", data_bucket.arn)
 ```
-
-### 3.4 Resource Creation — TypeScript
-
-```typescript
-import * as pulumi from "@pulumi/pulumi";
-import * as aws from "@pulumi/aws";
-
-const config = new pulumi.Config();
-const environment = pulumi.getStack();
-const projectName = pulumi.getProject();
-
-const commonTags = {
-    Environment: environment,
-    ManagedBy: "pulumi",
-    Project: projectName,
-};
-
-const dataBucket = new aws.s3.Bucket("data-lake", {
-    bucket: `${projectName}-${environment}-data-lake`,
-    versioning: { enabled: true },
-    serverSideEncryptionConfiguration: {
-        rule: {
-            applyServerSideEncryptionByDefault: {
-                sseAlgorithm: "aws:kms",
-            },
-        },
-    },
-    tags: { ...commonTags, Purpose: "Data lake storage" },
-});
-
-export const bucketName = dataBucket.bucket;
-export const bucketArn = dataBucket.arn;
-```
-
-### 3.5 Resource Creation — Go
-
-```go
-package main
-
-import (
-    "fmt"
-    "github.com/pulumi/pulumi-aws/sdk/v6/go/aws/s3"
-    "github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-    "github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
-)
-
-func main() {
-    pulumi.Run(func(ctx *pulumi.Context) error {
-        env := ctx.Stack()
-        project := ctx.Project()
-        cfg := config.New(ctx, "")
-
-        bucket, err := s3.NewBucket(ctx, "data-lake", &s3.BucketArgs{
-            Bucket: pulumi.Sprintf("%s-%s-data-lake", project, env),
-            Tags: pulumi.StringMap{
-                "Environment": pulumi.String(env),
-                "ManagedBy":   pulumi.String("pulumi"),
-            },
-        })
-        if err != nil {
-            return err
-        }
-
-        ctx.Export("bucketName", bucket.Bucket)
-        return nil
-    })
-}
-```
-
-**Pulumi key rules:**
-- MUST use `pulumi.get_stack()` / `getStack()` for environment differentiation — never hardcode.
-- MUST use `pulumi config set --secret` for any sensitive values.
-- MUST export critical resource attributes (IDs, ARNs, endpoints) for cross-stack references.
-- Use component resources (classes extending `pulumi.ComponentResource`) for reusable abstractions.
-
----
 
 ## STEP 4: State Management
 
@@ -442,19 +308,6 @@ pulumi login s3://mycompany-pulumi-state
 pulumi login --local
 ```
 
-### 4.3 State Locking
-
-State locking prevents concurrent modifications that corrupt state.
-
-| Tool | Lock Mechanism | Setup |
-|------|----------------|-------|
-| Terraform + S3 | DynamoDB table | Create table with `LockID` partition key |
-| Terraform + GCS | Built-in | Automatic with GCS backend |
-| Terraform + Azure | Built-in | Automatic with blob lease |
-| Pulumi Cloud | Built-in | Automatic |
-| Pulumi + S3 | Not built-in | Use CI/CD pipeline locks instead |
-
-```hcl
 # DynamoDB lock table for Terraform S3 backend
 resource "aws_dynamodb_table" "terraform_lock" {
   name         = "terraform-state-lock"
@@ -513,26 +366,9 @@ pulumi import aws:s3/bucket:Bucket existing-bucket my-existing-bucket-name
 
 ## STEP 5: Module Composition
 
-### 5.1 Terraform Module Structure
 
-```
-modules/
-  vpc/
-    main.tf          # Resource definitions
-    variables.tf     # Input variables
-    outputs.tf       # Output values
-    versions.tf      # Provider requirements
-    README.md        # Usage documentation
-  database/
-    main.tf
-    variables.tf
-    outputs.tf
-    versions.tf
-```
+**Read:** `references/module-composition.md` for detailed step 5: module composition reference material.
 
-### 5.2 Module Input/Output Contract
-
-```hcl
 # modules/vpc/variables.tf — inputs
 variable "cidr_block" {
   description = "CIDR block for the VPC"
@@ -646,16 +482,6 @@ locals {
 
 **Workspace limitations:** Workspaces share the same backend config and code. For significantly different environments, use separate directories or Terragrunt instead.
 
-### 6.2 Variable Files Per Environment (Preferred Approach)
-
-```
-environments/
-  dev.tfvars
-  staging.tfvars
-  prod.tfvars
-```
-
-```hcl
 # environments/prod.tfvars
 environment    = "prod"
 instance_type  = "t3.large"
@@ -692,26 +518,6 @@ config = pulumi.Config()
 instance_type = config.get("instanceType") or ("t3.large" if stack == "prod" else "t3.micro")
 replicas = config.get_int("replicas") or (3 if stack == "prod" else 1)
 ```
-
-### 6.4 Dev/Staging/Prod Parity
-
-| Aspect | Dev | Staging | Prod |
-|--------|-----|---------|------|
-| Instance size | t3.micro | t3.small | t3.large |
-| Replicas | 1 | 2 | 3 |
-| Multi-AZ DB | No | No | Yes |
-| WAF/DDoS | No | No | Yes |
-| Monitoring | Basic | Standard | Full |
-| Backup retention | 1 day | 7 days | 30 days |
-| State locking | Optional | Required | Required |
-
-**Environment rules:**
-- MUST use the same Terraform/Pulumi code across all environments — only variable values differ.
-- MUST NOT use `count` or `for_each` to conditionally create entire environment topologies — use variables to control sizing and features.
-- MUST protect prod state with additional access controls (IAM policies, separate credentials).
-- Use tfvars files (Terraform) or stack configs (Pulumi) per environment — never inline environment checks in resource blocks.
-
----
 
 ## STEP 7: Drift Detection
 
@@ -809,21 +615,6 @@ provider "aws" {
     aws-region: us-east-1
 ```
 
-### 8.2 Sensitive Variables
-
-```hcl
-variable "db_password" {
-  type      = string
-  sensitive = true  # Suppresses value in plan output
-}
-
-output "db_connection_string" {
-  value     = "postgresql://${var.db_user}:${var.db_password}@${aws_db_instance.main.endpoint}/mydb"
-  sensitive = true
-}
-```
-
-```bash
 # Pass sensitive values via environment variables
 export TF_VAR_db_password="$(aws secretsmanager get-secret-value --secret-id db-password --query SecretString --output text)"
 terraform apply

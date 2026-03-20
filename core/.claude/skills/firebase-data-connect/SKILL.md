@@ -53,61 +53,9 @@ if (import.meta.env.DEV) {
 
 ## Schema Reference
 
-### Defining Types
 
-```graphql
-type Movie @table {
-  # id: UUID! is auto-added
-  title: String!
-  releaseYear: Int
-  genre: String
-}
-```
+**Read:** `references/schema-reference.md` for detailed schema reference reference material.
 
-### Customizing Tables
-
-```graphql
-type Movie @table(name: "movies", key: "id", singular: "movie", plural: "movies") {
-  id: UUID! @col(name: "movie_id") @default(expr: "uuidV4()")
-  title: String!
-  releaseYear: Int @col(name: "release_year")
-  genre: String @col(dataType: "varchar(20)")
-}
-```
-
-### User Table with Auth
-
-```graphql
-type User @table(key: "uid") {
-  uid: String! @default(expr: "auth.uid")
-  email: String! @unique
-  displayName: String @col(dataType: "varchar(100)")
-  createdAt: Timestamp! @default(expr: "request.time")
-}
-```
-
-### Core Directives
-
-| Directive | Purpose | Key Arguments |
-|-----------|---------|---------------|
-| `@table` | Define a database table | `name`, `key`, `singular`, `plural` |
-| `@col` | Customize column mapping | `name`, `dataType`, `size` (for Vector) |
-| `@default` | Set default value | `value` (literal), `expr` (CEL), `sql` (raw SQL) |
-| `@unique` | Unique constraint | On field or `@unique(fields: [...])` on type |
-| `@index` | Database index | `fields`, `order` (`ASC`/`DESC`), `type` (`BTREE`/`GIN`/`HNSW`) |
-| `@searchable` | Enable full-text search | `language` (default: `"english"`) |
-
-### Default Expressions
-
-| Expression | Description |
-|------------|-------------|
-| `uuidV4()` | Generate UUID |
-| `auth.uid` | Current user's Firebase Auth UID |
-| `request.time` | Server timestamp |
-
-### Relationships
-
-```graphql
 # One-to-many: Movie has many Reviews
 type Review @table {
   movie: Movie!    # Creates foreign key
@@ -304,56 +252,8 @@ mutation UpdateMovie($id: UUID!, $title: String!)
 
 Semantic search using Vertex AI embeddings and PostgreSQL `pgvector`.
 
-### Schema
 
-```graphql
-type Movie @table {
-  title: String!
-  description: String
-  descriptionEmbedding: Vector! @col(size: 768)
-}
-```
-
-### Generate Embeddings
-
-```graphql
-mutation CreateMovieWithEmbedding($title: String!, $description: String!)
-  @auth(level: USER) {
-  movie_insert(data: {
-    title: $title,
-    description: $description,
-    descriptionEmbedding_embed: {
-      model: "textembedding-gecko@003",
-      text: $description
-    }
-  })
-}
-```
-
-### Similarity Query
-
-```graphql
-query SearchMovies($query: String!) @auth(level: PUBLIC) {
-  movies_descriptionEmbedding_similarity(
-    compare_embed: { model: "textembedding-gecko@003", text: $query },
-    method: COSINE,
-    within: 2.0,
-    limit: 5
-  ) {
-    id title description
-    _metadata { distance }
-  }
-}
-```
-
-| Parameter | Description |
-|-----------|-------------|
-| `compare_embed` | Generate embedding from text via Vertex AI |
-| `compare` | Raw Vector for pre-computed embeddings |
-| `method` | `L2`, `COSINE`, or `INNER_PRODUCT` |
-| `within` | Max distance threshold |
-
----
+**Read:** `references/vector-similarity-search.md` for detailed vector similarity search reference material.
 
 ## Full-Text Search
 
@@ -389,44 +289,8 @@ query SearchMovies($query: String!) @auth(level: PUBLIC) {
 
 ## SDK Generation
 
-### Configuration (connector.yaml)
 
-```yaml
-connectorId: my-connector
-generate:
-  javascriptSdk:
-    outputDir: "../web-app/src/lib/dataconnect"
-    package: "@movie-app/dataconnect"
-  kotlinSdk:
-    outputDir: "../android-app/app/src/main/kotlin/com/example/dataconnect"
-    package: "com.example.dataconnect"
-  swiftSdk:
-    outputDir: "../ios-app/DataConnect"
-```
-
-Generate: `npx -y firebase-tools@latest dataconnect:sdk:generate`
-
-### Web SDK Usage
-
-```typescript
-import { listMovies, createMovie, getMovie } from '@movie-app/dataconnect';
-import { listMoviesRef, subscribe } from '@movie-app/dataconnect';
-
-// Query
-const result = await listMovies();
-console.log(result.data.movies);
-
-// Mutation
-const newMovie = await createMovie({ title: 'New Movie', genre: 'Action' });
-
-// Realtime subscription
-const unsubscribe = subscribe(listMoviesRef(), {
-  onNext: (result) => console.log(result.data),
-  onError: (error) => console.error(error),
-});
-```
-
----
+**Read:** `references/sdk-generation.md` for detailed sdk generation reference material.
 
 ## Firebase Hosting (Static Sites)
 
@@ -475,46 +339,9 @@ npx -y firebase-tools@latest hosting:clone SOURCE:preview-name TARGET:live
 
 For Next.js, Angular, and other frameworks with SSR/ISR. Requires Blaze plan.
 
-### When to Use Which
 
-| Use Case | Service |
-|----------|---------|
-| Static HTML/CSS/JS, SPA (React/Vue without SSR) | Firebase Hosting |
-| Next.js / Angular with SSR or ISR | App Hosting |
-| Automated git-push-to-deploy | App Hosting |
+**Read:** `references/firebase-app-hosting-ssr-frameworks.md` for detailed firebase app hosting (ssr frameworks) reference material.
 
-### Configuration (apphosting.yaml)
-
-```yaml
-runConfig:
-  minInstances: 0
-  maxInstances: 4
-  cpu: 1
-  memoryMiB: 512
-  concurrency: 80
-
-env:
-  - variable: NEXT_PUBLIC_API_URL
-    value: "https://api.example.com"
-  - variable: API_KEY
-    secret: my-api-key    # References Cloud Secret Manager
-```
-
-### firebase.json
-
-```json
-{
-  "apphosting": {
-    "backendId": "my-app-id",
-    "rootDir": "/",
-    "ignore": ["node_modules", ".git", "functions"]
-  }
-}
-```
-
-### CLI Commands
-
-```bash
 # List backends
 npx -y firebase-tools@latest apphosting:backends:list
 

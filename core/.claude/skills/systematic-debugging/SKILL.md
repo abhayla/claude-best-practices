@@ -68,29 +68,9 @@ Proceed to Step 1 (Reproduce the Failure). After resolving the issue, Step 8 wil
 
 Before touching any code, establish a reliable reproduction case.
 
-### 1.1 Understand the Report
 
-Gather essential information about the failure:
+**Read:** `references/reproduce-the-failure.md` for detailed step 1: reproduce the failure reference material.
 
-| Element | Source | Example |
-|---------|--------|---------|
-| **Symptom** | Error message, user report, failing test | `TypeError: Cannot read properties of undefined` |
-| **Context** | When/where it happens | "Happens on login when email contains a `+` sign" |
-| **Expected behavior** | What should happen instead | "User should be logged in successfully" |
-| **Frequency** | Always, intermittent, or one-time | "Every time with `+` in email, never without" |
-| **Environment** | OS, runtime version, config | "Python 3.11, production database, DEBUG=false" |
-
-If any of these are missing, ask the user before proceeding. Debugging without a clear symptom description wastes time.
-
-### 1.2 Create a Minimal Reproduction
-
-Build the simplest possible case that triggers the failure:
-
-1. **Start with the reported reproduction steps** — run them exactly as described
-2. **Verify the failure occurs** — you must see the actual error yourself
-3. **Record the exact command and output** — this becomes your baseline
-
-```bash
 # Record the exact reproduction command
 {reproduction_command}
 ```
@@ -229,53 +209,8 @@ If multiple tests fail, look for a common root cause rather than fixing each ind
 
 Based on the evidence gathered in Steps 1-2, generate a ranked list of possible causes.
 
-### 3.1 List Candidate Causes
 
-Generate at least 3 hypotheses, ranked by likelihood:
-
-```
-Hypotheses for: {symptom_description}
-
-1. [MOST LIKELY] {hypothesis_1}
-   Evidence for: {supporting_evidence}
-   Evidence against: {contradicting_evidence}
-   How to verify: {verification_step}
-
-2. [POSSIBLE] {hypothesis_2}
-   Evidence for: {supporting_evidence}
-   Evidence against: {contradicting_evidence}
-   How to verify: {verification_step}
-
-3. [UNLIKELY BUT CHECK] {hypothesis_3}
-   Evidence for: {supporting_evidence}
-   Evidence against: {contradicting_evidence}
-   How to verify: {verification_step}
-```
-
-### 3.2 Prioritization Heuristics
-
-Rank hypotheses using these principles:
-
-| Principle | Description |
-|-----------|-------------|
-| **Recent changes first** | Code changed in the last few commits is the most likely culprit |
-| **Simple before complex** | A typo is more likely than a compiler bug |
-| **Data before logic** | Wrong input is more likely than wrong algorithm |
-| **Boundary conditions** | Off-by-one, null, empty string, zero, max value |
-| **State before code** | Stale cache, wrong env var, missing config is more likely than code logic error |
-| **Common over exotic** | NullPointerException > cosmic ray flipping a bit |
-
-### 3.3 Avoid Premature Conclusions
-
-Do NOT jump to a fix after forming the first hypothesis. Common traps:
-
-- **Confirmation bias** — "I bet it's X" and then only looking for evidence that supports X
-- **Anchoring** — Fixating on the first thing that looks wrong, even if it's unrelated
-- **Correlation vs causation** — Two things changed at the same time, but only one caused the bug
-
-Always test at least your top hypothesis with concrete evidence before attempting a fix.
-
----
+**Read:** `references/form-hypotheses.md` for detailed step 3: form hypotheses reference material.
 
 ## STEP 4: Gather Evidence
 
@@ -378,114 +313,15 @@ If all hypotheses are refuted, return to Step 3 and generate new ones based on t
 
 Trace from the symptom to the actual underlying cause. The root cause is the earliest point in the causal chain where a fix would prevent the bug.
 
-### 5.1 Trace the Causal Chain
 
-Build the chain from symptom back to cause:
-
-```
-Causal Chain:
-  SYMPTOM: {what the user sees}
-    caused by: {proximate cause — the immediate trigger}
-      caused by: {intermediate cause}
-        caused by: {root cause — the fundamental issue}
-```
-
-Example:
-```
-Causal Chain:
-  SYMPTOM: "500 Internal Server Error on login"
-    caused by: NullPointerException in UserService.authenticate()
-      caused by: user.getProfile() returns null
-        caused by: Profile table migration was not run in production
-          ROOT CAUSE: Deployment script skips migrations when DB_MIGRATE=false
-```
-
-### 5.2 Distinguish Root Cause from Proximate Cause
-
-| Level | Example | Fix Quality |
-|-------|---------|-------------|
-| **Symptom** | "Page shows 500 error" | Useless — just hides the error |
-| **Proximate cause** | "Null pointer in line 42" | Fragile — adds a null check but doesn't prevent null |
-| **Root cause** | "Migration not run in prod" | Durable — fixes the deployment pipeline |
-| **Systemic cause** | "No migration check in deploy" | Best — adds a deployment safeguard |
-
-Always fix at the root cause level or deeper. Fixing the proximate cause creates a band-aid that will fail again in a different way.
-
-### 5.3 The "Five Whys" Technique
-
-When the root cause is not obvious, ask "why" iteratively:
-
-1. **Why** did the server return a 500 error? Because `authenticate()` threw a NullPointerException.
-2. **Why** did it throw NPE? Because `user.getProfile()` returned null.
-3. **Why** did it return null? Because the profile row does not exist in the database.
-4. **Why** does the row not exist? Because the migration that creates the profiles table was not run.
-5. **Why** was the migration not run? Because `DB_MIGRATE` is set to `false` in the production deploy config.
-
-The root cause is at level 4 or 5 — not level 1 or 2.
-
-### 5.4 Verify the Root Cause
-
-Before writing a fix, confirm the root cause by predicting behavior:
-
-1. **Predict** — "If my root cause analysis is correct, then {changing X} should {produce Y}"
-2. **Test the prediction** — Make the predicted change and verify the predicted outcome
-3. **Confirm** — If the prediction holds, you have found the root cause
-4. **Refute** — If the prediction fails, your root cause analysis is wrong — return to Step 3
-
-Example:
-- Prediction: "If the root cause is the missing migration, then running the migration should fix the login error"
-- Test: Run the migration in a test environment and attempt login
-- Result: Login succeeds — root cause confirmed
-
----
+**Read:** `references/root-cause-analysis.md` for detailed step 5: root cause analysis reference material.
 
 ## STEP 6: Apply a Targeted Fix
 
 Fix the root cause with a minimal, focused change.
 
-### 6.1 Design the Fix
 
-Before writing code, plan the fix:
-
-```
-Fix Plan:
-  Root cause: {root cause from Step 5}
-  Fix approach: {what to change}
-  Files to modify: {list of files}
-  Risk assessment: {what could go wrong with this fix}
-  Alternative approaches considered: {other ways to fix, and why this one is better}
-```
-
-### 6.2 Fix Principles
-
-| Principle | Description |
-|-----------|-------------|
-| **Minimal change** | Change only what is necessary to fix the root cause. Do NOT refactor nearby code. |
-| **Same abstraction level** | Fix at the same level as the root cause — don't add workarounds at a higher level |
-| **Preserve behavior** | The fix should change only the broken behavior, not any working behavior |
-| **Defensive coding** | Add validation/guards at the boundary where bad data enters, not deep inside the call chain |
-| **No TODO fixes** | Do not write `// TODO: fix this properly later` — fix it properly now or document the limitation |
-
-### 6.3 Implement the Fix
-
-Apply the fix using targeted edits:
-
-1. Make the minimum code change to address the root cause
-2. If the fix requires changes to multiple files, change them in logical order
-3. Do NOT fix unrelated issues you noticed during debugging — log them separately
-
-### 6.4 Remove Diagnostic Code
-
-After implementing the fix, remove all temporary debugging code added in Step 4:
-
-- Remove `[DEBUG]` / `[DIAG]` log statements
-- Remove temporary print statements
-- Remove debugging breakpoints
-- Revert any temporary configuration changes
-
-Leaving diagnostic code in production is a common source of log noise, performance issues, and security leaks.
-
----
+**Read:** `references/apply-a-targeted-fix.md` for detailed step 6: apply a targeted fix reference material.
 
 ## STEP 7: Verify the Fix
 
@@ -549,63 +385,9 @@ Common edge cases to check based on failure type:
 
 Make sure this class of bug cannot happen again.
 
-### 8.1 Add a Regression Test
 
-Write a test that specifically covers the bug scenario:
+**Read:** `references/prevent-recurrence.md` for detailed step 8: prevent recurrence reference material.
 
-```
-Regression test:
-  Name: test_{descriptive_name_of_bug_scenario}
-  Input: {the minimal reproduction input from Step 1}
-  Expected: {correct behavior}
-  Verifies: {root cause from Step 5 does not recur}
-```
-
-The test should:
-1. **Fail without the fix** — verify by temporarily reverting your fix and running the test
-2. **Pass with the fix** — confirms the test actually covers the bug
-3. **Be minimal** — test the specific scenario, not a broad integration
-4. **Have a descriptive name** — future developers should understand WHAT bug this prevents
-
-### 8.2 Add Defensive Guards
-
-Based on the root cause, add guards at system boundaries:
-
-| Guard Type | When to Add | Example |
-|------------|-------------|---------|
-| **Input validation** | Bad data caused the bug | Validate email format before processing |
-| **Assertion** | Invariant was violated | `assert profile is not None, "User must have a profile"` |
-| **Type check** | Wrong type passed silently | Add type annotation, runtime type check |
-| **Error message** | Failure was hard to diagnose | Add context to the exception: what was expected, what was received |
-| **Default value** | Missing value caused crash | Provide a sensible default instead of crashing |
-| **Boundary check** | Out-of-range value caused bug | Validate array index, check for overflow |
-
-### 8.3 Improve Error Messages
-
-If the original error message was unhelpful (e.g., "NullPointerException" with no context), improve it:
-
-Before:
-```
-NullPointerException at UserService.java:42
-```
-
-After:
-```
-User profile not found for user_id=12345. The profiles table may need migration.
-Run: python manage.py migrate --run-syncdb
-See: docs/deployment.md#database-setup
-```
-
-Good error messages include:
-1. **What happened** — the specific failure
-2. **Why it matters** — the operation that could not complete
-3. **What to do** — actionable next steps for the developer or operator
-
-### 8.4 Document the Bug
-
-For non-trivial bugs, leave a breadcrumb in the code:
-
-```python
 # Fix for: users with '+' in email could not log in
 # Root cause: email was used as URL parameter without encoding
 # See: https://github.com/org/repo/issues/123
@@ -618,173 +400,13 @@ This helps future developers understand WHY unusual-looking code exists.
 
 ## Common Debugging Patterns
 
-### Pattern 1: Binary Search with Git Bisect
 
-When you know "it used to work" but not which commit broke it:
-
-```bash
-git bisect start
-git bisect bad HEAD                          # Current version is broken
-git bisect good v1.2.0                       # This version worked
-git bisect run ./run_reproduction_test.sh    # Automate the search
-```
-
-Git bisect performs a binary search through commits, finding the exact commit that introduced the bug in O(log n) steps.
-
-**When to use:** Regressions where you have a known good version.
-**When NOT to use:** Bugs that have always existed, or when the reproduction requires external state (database, API).
-
-### Pattern 2: Delta Debugging
-
-When a large input causes the failure but you don't know which part:
-
-1. Split input in half
-2. Test each half separately
-3. The half that fails contains the trigger
-4. Recurse on the failing half
-5. Continue until you find the minimal failing input
-
-**When to use:** Large configuration files, complex data inputs, long sequences of operations.
-**Example:** A 500-line config file causes a crash. Delta debugging finds that line 347 (`timeout: -1`) is the trigger.
-
-### Pattern 3: Rubber Duck Debugging
-
-When you are stuck and cannot form new hypotheses:
-
-1. Explain the problem out loud (or in writing) as if teaching someone unfamiliar with the code
-2. Explain each step: what the code SHOULD do, what it ACTUALLY does, and what you have already checked
-3. The act of articulating forces you to identify assumptions you haven't examined
-
-**When to use:** After exhausting your initial hypotheses, when the bug seems "impossible."
-**Technique in practice:** Write a detailed description of the bug in a comment to the user. Often, the act of writing the description reveals the cause.
-
-### Pattern 4: State Inspection
-
-When the bug is about incorrect state rather than incorrect logic:
-
-1. Identify the key state variables involved
-2. Log their values at each state transition
-3. Compare actual state transitions against expected
-4. Find the first point where actual diverges from expected
-
-**When to use:** Stateful systems, UI bugs, data pipeline issues, caching problems.
-
-### Pattern 5: Differential Debugging
-
-When the same code works in one context but not another:
-
-1. Identify a working case and a broken case
-2. List ALL differences between them (input, environment, config, timing, data)
-3. Eliminate differences one by one until you find the one that matters
-4. The critical difference is your root cause
-
-**When to use:** "Works on my machine" bugs, environment-specific failures, user-specific bugs.
-
----
+**Read:** `references/common-debugging-patterns.md` for detailed common debugging patterns reference material.
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Random Code Changes
 
-**What it looks like:** Changing code without understanding why, hoping it fixes the problem.
-
-**Why it fails:**
-- Even if the bug disappears, you don't know if you fixed it or masked it
-- You may introduce new bugs
-- You learn nothing for next time
-
-**Instead:** Follow Steps 1-5 before touching any code. Understand the root cause FIRST.
-
-### Anti-Pattern 2: Fixing Symptoms Instead of Causes
-
-**What it looks like:** Adding a null check instead of preventing the null from occurring.
-
-**Why it fails:**
-- The null check fixes this one crash but the underlying data is still wrong
-- Other code paths will hit the same bad data
-- The bug report changes from "crash" to "silently wrong behavior" — harder to detect
-
-**Instead:** Trace the causal chain (Step 5) and fix at the root cause level.
-
-### Anti-Pattern 3: Untested Fixes
-
-**What it looks like:** Making a code change, eyeballing it, and declaring it fixed without running the reproduction.
-
-**Why it fails:**
-- You may have fixed a different code path than the one that is actually failing
-- The fix may only work in your dev environment
-- Without a regression test, the bug will return
-
-**Instead:** Always run the original reproduction (Step 7.1) and add a regression test (Step 8.1).
-
-### Anti-Pattern 4: Debugging by Rewriting
-
-**What it looks like:** "I don't understand this code, so I'll rewrite it from scratch."
-
-**Why it fails:**
-- The original code may handle edge cases you don't know about
-- Rewriting introduces new bugs while potentially fixing the old one
-- You still don't understand the root cause
-
-**Instead:** Understand the existing code first. Fix the specific issue. Only refactor after the bug is fixed and tests pass.
-
-### Anti-Pattern 5: Ignoring Intermittent Failures
-
-**What it looks like:** "It only fails sometimes, so it's probably a flaky test."
-
-**Why it fails:**
-- Intermittent failures are real bugs — usually race conditions, timing issues, or resource leaks
-- They become more frequent under load
-- They are the hardest bugs to fix later because the reproduction conditions are complex
-
-**Instead:** Take intermittent failures seriously. Add logging with timestamps, check for shared mutable state, look for race conditions.
-
-### Anti-Pattern 6: "It Works on My Machine"
-
-**What it looks like:** Dismissing a bug because it doesn't reproduce locally.
-
-**Why it fails:**
-- The bug is real for someone
-- Environment differences are a common root cause category
-- Dismissing it means it stays broken
-
-**Instead:** Use differential debugging (Pattern 5) to find environment differences.
-
----
-
-## Debugging Report Template
-
-After completing the debugging process, summarize your findings:
-
-```
-DEBUGGING REPORT
-================
-
-Symptom: {what was observed}
-Reproduction: {exact command or steps}
-
-Investigation:
-  Hypotheses tested: {count}
-  Root cause: {description}
-  Causal chain: {symptom} <- {proximate} <- {root cause}
-
-Fix:
-  Files changed: {list}
-  Approach: {description of the fix}
-  Risk: {what could go wrong}
-
-Verification:
-  Original reproduction: PASS
-  Regression tests: PASS
-  Edge cases tested: {count}
-
-Prevention:
-  Regression test added: {test name and location}
-  Guards added: {description}
-  Error messages improved: {yes/no}
-```
-
----
+**Read:** `references/anti-patterns-to-avoid.md` for detailed anti-patterns to avoid reference material.
 
 ## MUST DO
 

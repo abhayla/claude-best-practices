@@ -74,85 +74,13 @@ PR Size Assessment:
 
 Research shows reviewer effectiveness drops sharply after 200-400 lines. A 2,000-line PR will get rubber-stamped, not reviewed.
 
-### 1.3 Splitting Strategy (if PR is too large)
-
-When the PR exceeds 500 lines, suggest concrete splits:
-
-| Strategy | When to Use | Example |
-|----------|-------------|---------|
-| **By layer** | Changes span multiple layers | Split into "backend API" + "frontend UI" + "database migration" PRs |
-| **By feature** | Multiple features bundled | Split each feature into its own PR |
-| **By risk** | Mix of risky and mechanical changes | Split into "refactor (safe)" + "behavior change (needs review)" PRs |
-| **By dependency** | Some changes depend on others | Create a chain: PR1 (base) -> PR2 (depends on PR1) -> PR3 |
-| **Extract refactor** | Refactoring mixed with new logic | PR1: pure refactor (no behavior change), PR2: new logic on clean code |
-
-Recommend the split with specific file groupings:
-
-```
-Recommended split:
-  PR 1: "Refactor UserService to extract validation"
-    Files: src/services/UserService.ts, src/validators/UserValidator.ts
-    Lines: ~120
-    Risk: Low (pure refactor, no behavior change)
-
-  PR 2: "Add email verification flow"
-    Files: src/services/EmailService.ts, src/routes/auth.ts, tests/
-    Lines: ~200
-    Risk: Medium (new auth flow)
-    Depends on: PR 1
-```
-
----
-
 ## STEP 2: Classify Changes by Risk Level
 
 Categorize every changed file by the risk its changes introduce. Present high-risk changes first so reviewers allocate attention accordingly.
 
-### 2.1 Risk Classification Rules
 
-| Risk Level | Criteria | Examples |
-|------------|----------|----------|
-| **HIGH** | Authentication, authorization, payments, data migrations, security, cryptography, PII handling, rate limiting, session management | Changes to `auth/`, `payments/`, `migrations/`, `security/`, `middleware/auth*` |
-| **HIGH** | Breaking changes to public APIs, shared interfaces, database schemas | Removed exports, changed function signatures, altered column types |
-| **HIGH** | Concurrency, distributed state, cache invalidation | Mutex changes, distributed locks, cache TTL changes |
-| **MEDIUM** | Core business logic, data transformations, state management | Service layer changes, reducers, data pipelines |
-| **MEDIUM** | Error handling, retry logic, fallback behavior | Catch blocks, circuit breakers, timeout values |
-| **MEDIUM** | Third-party integrations, external API calls | New SDK usage, webhook handlers, API client changes |
-| **LOW** | Tests, documentation, comments | Test files, README, JSDoc/docstrings |
-| **LOW** | Configuration, build, CI/CD (non-security) | package.json deps, Dockerfile, workflow YAML |
-| **LOW** | Code style, formatting, renaming | Linter fixes, variable renames, import reordering |
+**Read:** `references/classify-changes-by-risk-level.md` for detailed step 2: classify changes by risk level reference material.
 
-### 2.2 Risk Report Format
-
-Produce a risk-categorized file list:
-
-```
-CHANGE RISK ASSESSMENT
-======================
-
-HIGH RISK (review carefully):
-  [M] src/auth/TokenService.ts        (+45, -12)  — Changed token refresh logic
-  [M] migrations/0042_add_roles.sql    (+28, -0)   — New database migration
-  [M] src/middleware/rateLimit.ts       (+15, -8)   — Modified rate limit thresholds
-
-MEDIUM RISK (review normally):
-  [M] src/services/OrderService.ts     (+62, -20)  — Added retry logic for payments
-  [A] src/services/NotificationSvc.ts  (+85, -0)   — New notification service
-
-LOW RISK (skim or skip):
-  [M] tests/auth/token.test.ts         (+120, -5)  — New tests for token refresh
-  [M] docs/api/authentication.md       (+25, -10)  — Updated API docs
-  [M] .eslintrc.json                   (+2, -1)    — Added new lint rule
-
-Summary: 3 high-risk, 2 medium-risk, 3 low-risk files
-Estimated review time: 25-35 minutes
-```
-
-### 2.3 Automatic High-Risk Detection Patterns
-
-Scan the diff for these high-risk patterns and flag them explicitly:
-
-```bash
 # Security-sensitive patterns in the diff
 git diff "$BASE_BRANCH"...HEAD | grep -n -E "(password|secret|token|api_key|private_key|credential)" || true
 
@@ -172,136 +100,22 @@ git diff "$BASE_BRANCH"...HEAD | grep -n -E "([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}
 
 Identify changes that affect consumers, downstream services, or require migration steps.
 
-### 3.1 Breaking Change Checklist
 
-Scan for these categories of breaking changes:
-
-| Category | What to Check | How to Detect |
-|----------|---------------|---------------|
-| **Removed exports** | Functions, classes, constants removed from public API | `git diff` shows removed `export` statements |
-| **Changed signatures** | Function parameters added, removed, or reordered | Compare function signatures in the diff |
-| **Schema changes** | Database columns added/removed/renamed, type changes | Check migration files, ORM model changes |
-| **Config format** | Changed config keys, removed options, new required fields | Diff config files, check config parsing code |
-| **API response shape** | Changed JSON structure, removed fields, renamed keys | Check serializers, response builders, API routes |
-| **Behavioral changes** | Same input produces different output | Check for changed conditionals, altered defaults |
-| **Dependency changes** | Major version bumps, removed dependencies | Check package.json, requirements.txt, go.mod |
-| **Environment variables** | New required env vars, renamed vars | Check for new `os.getenv()` / `process.env` references |
-
-### 3.2 Breaking Change Report
-
-```
-BREAKING CHANGES DETECTED
-==========================
-
-1. [API] POST /api/v1/users response shape changed
-   Before: { "user": { "id": 1, "name": "..." } }
-   After:  { "data": { "id": 1, "name": "...", "role": "..." } }
-   Impact: All API consumers must update response parsing
-   Migration: Update client code to read from `data` instead of `user`
-
-2. [Schema] Added NOT NULL column `role` to `users` table
-   Impact: Existing rows will fail migration without a default value
-   Migration: Set default value in migration, backfill existing rows
-
-3. [Config] Renamed ENV var `DB_URL` to `DATABASE_URL`
-   Impact: All deployment configs must be updated
-   Migration: Update .env files, CI/CD secrets, and deployment configs
-
-No breaking changes: [NONE DETECTED] (state this explicitly if clean)
-```
-
----
+**Read:** `references/detect-breaking-changes.md` for detailed step 3: detect breaking changes reference material.
 
 ## STEP 4: Annotate Diff with Intent
 
 For each significant change, explain WHY it was made, not just what changed. This saves reviewers from having to reverse-engineer your reasoning.
 
-### 4.1 Intent Annotation Format
 
-For each high-risk and medium-risk file, provide intent annotations:
-
-```
-FILE: src/auth/TokenService.ts
-
-Line 42-55: Changed token refresh window from 5min to 15min
-  WHY: Users on slow connections were getting logged out during page loads
-       because the 5min window wasn't enough time for the refresh request
-       to complete. 15min matches the P99 page load time from our metrics.
-  RISK: Tokens are valid longer before refresh — increases window for
-        stolen token use. Acceptable because we also added token binding
-        to IP in this PR.
-
-Line 78-92: Added IP-based token binding
-  WHY: Compensating control for the extended refresh window above.
-       If a token is used from a different IP than it was issued to,
-       force a full re-authentication.
-  RISK: Users on mobile networks with changing IPs may get logged out.
-        Mitigated by only checking on sensitive operations, not every request.
-```
-
-### 4.2 When to Annotate
-
-| Change Type | Annotate? | Reason |
-|-------------|-----------|--------|
-| New business logic | YES | Reviewer needs to understand the requirements |
-| Bug fix | YES | Explain what was broken and why this fix is correct |
-| Refactor | BRIEF | "Extracted to reduce duplication" is sufficient |
-| Performance optimization | YES | Explain the bottleneck and why this approach helps |
-| Security change | YES + RISK | Security changes always need threat model context |
-| Test changes | BRIEF | "Added coverage for edge case X" |
-| Config/build changes | ONLY IF NON-OBVIOUS | "Upgraded to Node 20 for native fetch support" |
-| Formatting/style | NO | Should be self-evident |
-
----
+**Read:** `references/annotate-diff-with-intent.md` for detailed step 4: annotate diff with intent reference material.
 
 ## STEP 5: Generate Review Questions
 
 Create specific, actionable questions about areas where you have the least confidence. Generic "please review" wastes reviewer time.
 
-### 5.1 Question Generation Rules
 
-Good review questions are:
-- **Specific** — Reference exact functions, lines, or decisions
-- **Bounded** — Ask about one thing, not "is this okay?"
-- **Contextual** — Explain what you considered and why you're unsure
-- **Actionable** — The reviewer can answer without extensive research
-
-### 5.2 Question Categories
-
-| Category | Template | Example |
-|----------|----------|---------|
-| **Correctness** | "Is {approach} correct for {scenario}?" | "Is the retry logic in `OrderService.retry()` safe for concurrent requests? I'm concerned about duplicate charges if two retries execute simultaneously." |
-| **Edge cases** | "What happens when {edge case}?" | "What happens when a user's session expires mid-payment? I added a check at line 85 but I'm not sure it covers the Stripe webhook race condition." |
-| **Architecture** | "Is {pattern} the right approach for {goal}?" | "I used an event-driven approach for notifications instead of direct calls. Does this align with how we handle cross-service communication elsewhere?" |
-| **Performance** | "Will {approach} scale for {load}?" | "The new query joins 3 tables. Is this acceptable for the /users endpoint which handles ~500 RPS, or should I denormalize?" |
-| **Security** | "Does {change} introduce {risk}?" | "I'm passing the user ID in the JWT payload instead of looking it up. Does this create a privilege escalation risk if someone modifies their token?" |
-| **Compatibility** | "Will {change} break {consumer}?" | "I renamed the `getData()` export to `fetchData()`. I found 3 internal consumers — are there external ones I'm missing?" |
-
-### 5.3 Review Questions Output Format
-
-```
-REVIEW QUESTIONS
-================
-
-For: @security-team (or whoever owns auth)
-  1. TokenService.ts#L78: The IP-binding check skips WebSocket connections
-     because they don't carry the origin IP reliably. Is this acceptable,
-     or should we enforce a different binding for WS connections?
-
-For: @backend-team
-  2. OrderService.ts#L142: The retry uses exponential backoff with jitter,
-     but I'm not sure if the max retry count (3) is appropriate for payment
-     operations. Our Stripe webhook has a 30s timeout — could 3 retries
-     with backoff exceed that?
-
-For: @dba / database owner
-  3. Migration 0042: I added a `role` column with DEFAULT 'user'. The users
-     table has ~2M rows. Will this lock the table during migration in
-     Postgres, or does Postgres handle ADD COLUMN with DEFAULT without a
-     full table rewrite?
-```
-
----
+**Read:** `references/generate-review-questions.md` for detailed step 5: generate review questions reference material.
 
 ## STEP 6: Pre-Review Self-Check
 
@@ -582,32 +396,6 @@ for file in $(git diff --name-only "$BASE_BRANCH"...HEAD); do
 done
 ```
 
-### 10.2 Impact Matrix
-
-```
-DEPENDENCY IMPACT ANALYSIS
-===========================
-
-Changed shared utilities:
-  src/utils/validation.ts (imported by 12 files)
-    Changed function: validateEmail()
-    Signature change: NO (safe)
-    Behavior change: YES — now rejects emails with consecutive dots
-    Affected consumers:
-      - src/services/UserService.ts (uses validateEmail in registration)
-      - src/services/InviteService.ts (uses validateEmail in invite flow)
-      - src/api/routes/auth.ts (uses validateEmail in login)
-    Risk: MEDIUM — some previously accepted emails will now be rejected
-
-  src/types/User.ts (imported by 8 files)
-    Changed: Added required `role` field to User interface
-    Impact: All files that construct User objects must provide `role`
-    Affected consumers: {list files that construct User objects}
-    Risk: HIGH — TypeScript will catch this at compile time, but runtime
-          code that constructs Users from raw data (API responses, DB rows)
-          may fail silently
-```
-
 ### 10.3 Cross-Service Impact
 
 For changes that might affect other services or deployments:
@@ -627,47 +415,6 @@ API contract changes:
     - Coordinate with mobile team for app update
     - Update API gateway response transformation
     - Notify partner integrations 2 weeks before deployment
-```
-
----
-
-## Review Readiness Summary
-
-After completing all steps, produce a final summary:
-
-```
-PR REVIEW READINESS REPORT
-============================
-
-PR: feat(auth): add role-based access control with token binding
-Branch: feature/rbac-token-binding -> main
-
-Size: 342 lines changed (Medium)
-Risk: HIGH (auth changes, schema migration)
-
-Files by risk:
-  HIGH:   3 files (src/auth/*, migrations/*)
-  MEDIUM: 2 files (src/services/*)
-  LOW:    4 files (tests/*, docs/*)
-
-Breaking changes: 2 detected (API response shape, new env var)
-Review questions: 3 targeted questions for specific reviewers
-Pre-review checks: ALL PASSED
-  [PASS] No debug code
-  [PASS] No untracked TODOs
-  [PASS] No commented-out code
-  [PASS] No merge conflicts
-  [PASS] No sensitive data
-  [PASS] Branch rebased on latest main
-
-Suggested reviewers:
-  Required: @alice (CODEOWNERS: src/auth/)
-  Recommended: @bob (recent context), @carol (original author)
-  Optional: @dave (DBA for migration review)
-
-Estimated review time: 25-35 minutes
-
-PR created: https://github.com/org/repo/pull/456
 ```
 
 ---

@@ -74,27 +74,6 @@ emulator -avd <avd_name> -no-audio -no-boot-anim &
 adb wait-for-device
 ```
 
-### Flow File Structure
-
-Organize flows by feature in `e2e/maestro/`:
-
-```
-e2e/maestro/
-├── auth/
-│   ├── login.yaml
-│   ├── signup.yaml
-│   └── forgot-password.yaml
-├── home/
-│   ├── home-feed.yaml
-│   └── search.yaml
-├── settings/
-│   ├── profile-edit.yaml
-│   └── preferences.yaml
-├── navigation/
-│   └── tab-navigation.yaml
-└── config.yaml
-```
-
 ### Writing Flows
 
 ```yaml
@@ -138,24 +117,6 @@ appId: com.example.app
     cropOn:
       id: "main_content"  # Ignore status bar clock/battery
 ```
-
-### Common Actions
-
-| Action | Syntax | Use For |
-|--------|--------|---------|
-| `tapOn` | `- tapOn: "Button Text"` | Tap buttons, links, elements |
-| `inputText` | `- inputText: "value"` | Type into focused field |
-| `assertVisible` | `- assertVisible: "Text"` | Verify element is displayed |
-| `assertNotVisible` | `- assertNotVisible: "Error"` | Verify element is NOT shown |
-| `scrollUntilVisible` | `- scrollUntilVisible: {element: "Text", direction: DOWN}` | Scroll to find element |
-| `back` | `- back` | Press back button |
-| `swipe` | `- swipe: {direction: LEFT, duration: 400}` | Swipe gesture |
-| `waitForAnimationToEnd` | `- waitForAnimationToEnd` | Wait for transitions |
-| `takeScreenshot` | `- takeScreenshot: "screenshot_name"` | Capture for visual regression |
-| `runFlow` | `- runFlow: auth/login.yaml` | Reuse another flow |
-| `repeat` | `- repeat: {times: 3, commands: [...]}` | Loop actions |
-| `evalScript` | `- evalScript: \${output.field}` | Access JavaScript expressions |
-| `assertScreenshot` | `- assertScreenshot: {path: "baseline.png", thresholdPercentage: 95}` | Visual regression assertion (autonomous pass/fail) |
 
 ### Selectors (priority order)
 
@@ -213,33 +174,9 @@ maestro-e2e:
 
 ## Execution
 
-### Gradle-based E2E (Espresso/Compose)
 
-For each feature group:
+**Read:** `references/execution.md` for detailed execution reference material.
 
-1. Run the group's test class(es)
-2. If failure → delegate to `/fix-loop` (max 3 retries per group)
-3. If still failing → mark as FAILED, continue to next group
-4. Track pass/fail per group
-
-```bash
-cd android && ./gradlew :app:connectedDebugAndroidTest \
-  -Pandroid.testInstrumentationRunnerArguments.class={test_class}
-```
-
-### Maestro-based E2E
-
-For each feature group:
-
-1. Run the group's flow directory with screenshot capture
-2. If failure → capture screenshots + debug output
-3. Compare captured screenshots against baselines (see Visual Regression Verification)
-4. If visual regression detected → mark as VISUAL_REGRESSION failure
-5. Retry once (Maestro flows are deterministic)
-6. If still failing → mark as FAILED, continue to next group
-7. If `--update-baselines` flag is set → copy current screenshots to baselines instead of comparing
-
-```bash
 # Run tests with screenshot output
 maestro test e2e/maestro/{group}/ --debug-output=e2e/output/{group}
 
@@ -310,33 +247,6 @@ cp e2e/output/auth/screenshots/*.png e2e/maestro/baselines/auth/
 maestro test e2e/maestro/auth/  # Passes if within threshold
 ```
 
-### Baseline Directory Structure
-
-```
-e2e/maestro/
-  baselines/        # Committed to version control
-    auth/
-      login-complete.png
-      signup-success.png
-    home/
-      home-feed.png
-      search-results.png
-  current/          # Generated during test run (gitignored)
-    auth/
-      login-complete.png
-    home/
-      home-feed.png
-  diffs/            # Side-by-side comparison images (gitignored)
-    home/
-      home-feed-diff.png
-```
-
-Add to `.gitignore`:
-```
-e2e/maestro/current/
-e2e/maestro/diffs/
-```
-
 ### Capturing Screenshots in Flows
 
 Add `takeScreenshot` commands at verification points in your Maestro flows:
@@ -358,23 +268,6 @@ appId: com.example.app
 
 The screenshot filename MUST match the corresponding baseline filename (without extension).
 
-### Verification Workflow
-
-After running each Maestro group, perform visual comparison:
-
-1. **Locate screenshots** — Find all `.png` files in `e2e/output/{group}/`
-2. **Copy to current/** — Move screenshots to `e2e/maestro/current/{group}/` for organized comparison
-3. **Compare against baselines** — For each screenshot in `current/{group}/`:
-   - Check if a baseline exists in `e2e/maestro/baselines/{group}/`
-   - If baseline exists → use Claude's multimodal `Read` tool to view both images
-   - Compare current vs baseline visually for layout shifts, missing elements, color changes, or content differences
-   - Determine pass/fail based on whether the screens look functionally identical
-4. **Report results** — Each screenshot gets one of three verdicts:
-   - `MATCH` — Current matches baseline, no visual regression
-   - `VISUAL_REGRESSION` — Current differs from baseline in a meaningful way
-   - `NEW` — No baseline exists yet (not a failure, but flagged for review)
-
-```bash
 # Step 1: Run the group
 maestro test e2e/maestro/{group}/ --debug-output=e2e/output/{group}
 

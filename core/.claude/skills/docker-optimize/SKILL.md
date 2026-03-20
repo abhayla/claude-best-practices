@@ -149,16 +149,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 ## STEP 4: Image Size Reduction
 
-### Base Image Selection
-
-| Use Case | Base Image | Approx Size |
-|----------|-----------|-------------|
-| Go, Rust (static binaries) | `gcr.io/distroless/static-debian12` | ~2 MB |
-| Python, Node (need libc) | `*-slim` variants | ~50-80 MB |
-| General minimal | `alpine:3.19` | ~7 MB |
-| Debug-friendly prod | `*-slim` + debug tools | ~100 MB |
-| Security-hardened | `cgr.dev/chainguard/*` | ~10-30 MB |
-
 ### Alpine Caveats
 
 - Uses musl libc instead of glibc — some Python packages with C extensions may fail
@@ -540,30 +530,6 @@ services:
       - "${APP_PORT}:3000"
 ```
 
-### Networking Best Practices
-
-- Use custom bridge networks — never rely on the default bridge
-- Service names are DNS hostnames within the same network
-- Isolate frontend and backend into separate networks
-- Only expose ports that external clients need
-
-```yaml
-networks:
-  frontend:
-  backend:
-    internal: true  # No external access
-
-services:
-  proxy:
-    networks: [frontend, backend]
-  api:
-    networks: [backend]
-  db:
-    networks: [backend]
-```
-
----
-
 ## STEP 8: Build Arguments and Multi-Platform
 
 ### ARG/ENV Patterns
@@ -626,36 +592,9 @@ CMD ["/server"]
 
 ## STEP 9: Performance Tuning
 
-### Volume Strategies
 
-| Type | Use Case | Syntax |
-|------|----------|--------|
-| Bind mount | Dev: live code reload | `./src:/app/src` |
-| Named volume | Data persistence (DB, uploads) | `pgdata:/var/lib/postgresql/data` |
-| tmpfs | Temporary/sensitive data, faster I/O | `tmpfs: /tmp` |
-| Anonymous volume | Preserve container-only dirs | `/app/node_modules` |
+**Read:** `references/performance-tuning.md` for detailed step 9: performance tuning reference material.
 
-### Resource Limits
-
-```yaml
-services:
-  app:
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 1G
-        reservations:
-          cpus: "0.5"
-          memory: 256M
-    # OOM settings
-    mem_swappiness: 0
-    oom_kill_disable: false
-```
-
-### Build Performance
-
-```bash
 # Enable BuildKit (faster builds, better caching)
 export DOCKER_BUILDKIT=1
 
@@ -669,43 +608,11 @@ export DOCKER_BUILDKIT=1
 docker build --no-cache . 2>&1 | grep "Sending build context"
 ```
 
-### Logging Configuration
-
-```yaml
-services:
-  app:
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"   # Rotate at 10MB
-        max-file: "3"     # Keep 3 rotated files
-        compress: "true"
-```
-
----
-
 ## STEP 10: Common Anti-Patterns
 
-### Detection Checklist
 
-| Anti-Pattern | Detection | Fix |
-|-------------|-----------|-----|
-| Running as root | No `USER` instruction | Add non-root user, switch before CMD |
-| apt-get without cleanup | `apt-get install` without `rm -rf /var/lib/apt/lists/*` | Combine install + cleanup in one RUN |
-| COPY . before deps | `COPY .` appears before dependency install | Copy manifest first, install, then copy source |
-| No .dockerignore | Missing `.dockerignore` file | Create with patterns from Step 4 |
-| Latest tag | `FROM python:latest` | Pin specific version: `FROM python:3.12-slim` |
-| Multiple CMD/ENTRYPOINT | More than one CMD instruction | Only last CMD takes effect — consolidate |
-| Secrets in build | `ENV API_KEY=...` or `COPY .env` | Use `--mount=type=secret` or runtime env vars |
-| Large base image | Using full `ubuntu` or `python` (non-slim) | Switch to `-slim` or `-alpine` variants |
-| Shell form CMD | `CMD python app.py` | Use exec form: `CMD ["python", "app.py"]` |
-| No health check | Missing HEALTHCHECK instruction | Add HEALTHCHECK (see Step 6) |
-| ADD for local files | `ADD . /app` for non-archive local files | Use COPY — ADD has implicit tar extraction and URL fetch |
-| Hardcoded ports/hosts | `ENV DB_HOST=192.168.1.50` | Use service names and environment variables |
+**Read:** `references/common-anti-patterns.md` for detailed step 10: common anti-patterns reference material.
 
-### Automated Lint Check
-
-```bash
 # Use hadolint for Dockerfile linting
 hadolint Dockerfile
 
@@ -816,19 +723,6 @@ Key points:
 - Distroless has no shell — use `ENTRYPOINT` with exec form only
 - Cache `go mod download` separately from source copy
 
-### Java (Spring Boot)
-
-```dockerfile
-FROM eclipse-temurin:21-jdk-alpine AS builder
-WORKDIR /app
-
-COPY gradle/ gradle/
-COPY gradlew build.gradle.kts settings.gradle.kts ./
-RUN ./gradlew dependencies --no-daemon
-
-COPY src/ src/
-RUN ./gradlew bootJar --no-daemon -x test
-
 # Use jlink to create minimal JRE
 FROM eclipse-temurin:21-jdk-alpine AS jre-builder
 RUN jlink \
@@ -897,23 +791,6 @@ Key points:
 4. Build the optimized image and compare size with the original
 5. Run security scan on the new image
 6. Verify health checks work correctly
-
----
-
-## Verification Checklist
-
-| Check | Command | Status |
-|-------|---------|--------|
-| Image builds successfully | `docker build -t app:optimized .` | |
-| Multi-stage used | `grep -c "^FROM" Dockerfile` (should be >= 2) | |
-| Non-root user | `docker run app:optimized whoami` (not root) | |
-| .dockerignore exists | `test -f .dockerignore` | |
-| No secrets in layers | `docker history app:optimized` | |
-| Health check defined | `docker inspect app:optimized \| jq '.[0].Config.Healthcheck'` | |
-| Image size reduced | Compare `docker images` before and after | |
-| Security scan clean | `trivy image --severity HIGH,CRITICAL app:optimized` | |
-| Compose services start | `docker compose up -d && docker compose ps` | |
-| Graceful shutdown works | `docker compose stop` (exits within grace period) | |
 
 ---
 

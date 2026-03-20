@@ -115,57 +115,6 @@ Extract the spec:
 curl -s http://localhost:8000/openapi.json | python -m json.tool > docs/openapi.json
 ```
 
-### 2.2 Express + swagger-jsdoc
-
-```javascript
-// swagger.js
-const swaggerJsdoc = require("swagger-jsdoc");
-
-const options = {
-  definition: {
-    openapi: "3.1.0",
-    info: {
-      title: "<Project Name> API",
-      version: "1.0.0",
-      description: "<description>",
-    },
-    servers: [
-      { url: "http://localhost:3000", description: "Development" },
-    ],
-  },
-  apis: ["./src/routes/*.js"],
-};
-
-module.exports = swaggerJsdoc(options);
-```
-
-Add JSDoc annotations to routes:
-```javascript
-/**
- * @openapi
- * /users:
- *   post:
- *     summary: Create a new user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserCreate'
- *     responses:
- *       201:
- *         description: User created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserResponse'
- *       409:
- *         description: Email already registered
- */
-router.post("/users", createUser);
-```
-
 ### 2.3 Go (swaggo)
 
 ```go
@@ -343,34 +292,8 @@ All endpoints require `Authorization: Bearer <token>` header unless noted.
 
 ## Endpoints
 
-### Users
 
-#### Create User
-`POST /users`
-
-**Request Body:**
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| email | string (email) | Yes | User's email |
-| name | string | Yes | Display name |
-
-**Responses:**
-| Status | Description |
-|--------|-------------|
-| 201 | User created |
-| 409 | Email already registered |
-| 422 | Validation error |
-
-**Example:**
-```bash
-curl -X POST http://localhost:8000/users \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "name": "Test User"}'
-```
-```
-
----
+**Read:** `references/endpoints.md` for detailed endpoints reference material.
 
 ## STEP 5: API Versioning Documentation
 
@@ -381,27 +304,8 @@ Document the API versioning strategy:
 
 **Strategy:** URL path versioning (`/api/v1/`, `/api/v2/`)
 
-### Version Lifecycle
-| Version | Status | End of Life |
-|---------|--------|-------------|
-| v1 | Current | — |
-| v2 | Planning | — |
 
-### Breaking Change Policy
-- Breaking changes require a new major version
-- Non-breaking additions (new fields, new endpoints) are backward-compatible
-- Deprecated endpoints are marked with `Sunset` header and 6-month notice
-- Migration guides published for each major version bump
-
-### Deprecation Headers
-```
-Sunset: Sat, 01 Jan 2027 00:00:00 GMT
-Deprecation: true
-Link: <https://docs.example.com/migration/v1-to-v2>; rel="sunset"
-```
-```
-
----
+**Read:** `references/api-versioning.md` for detailed api versioning reference material.
 
 ## STEP 6: CI Integration
 
@@ -451,27 +355,8 @@ jobs:
 **Spec format:** OpenAPI 3.1.0
 **Endpoints documented:** <N>
 
-### Generated Files
-| File | Purpose |
-|------|---------|
-| `docs/openapi.json` | Machine-readable spec |
-| `docs/api-reference.html` | Human-readable Redoc |
-| `docs/API.md` | Markdown reference |
 
-### Validation
-| Check | Status |
-|-------|--------|
-| Spec lint | ✅ 0 errors, 2 warnings |
-| Spec vs tests | ✅ All endpoints tested |
-| Spec vs schema | ⚠️ 1 enum mismatch |
-
-### Next Steps
-- Fix enum mismatch (`user.status`)
-- Add Swagger UI endpoint to dev server
-- Set up CI auto-generation
-```
-
----
+**Read:** `references/api-documentation-summary.md` for detailed api documentation summary reference material.
 
 ## MUST DO
 

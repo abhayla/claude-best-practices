@@ -31,92 +31,13 @@ overhead or file conflict risk.
 
 ## STEP 1: Understand Git Worktrees
 
-### 1.1 What Worktrees Are
 
-A git worktree is an additional working directory linked to the same repository. Each worktree
-checks out a different branch simultaneously, sharing the same `.git` object store. Unlike
-`git checkout` (which swaps files in place), worktrees give each branch its own directory on
-disk.
-
-```
-repo/                     ← main worktree (branch: main)
-  .git/
-  src/
-  tests/
-
-repo-worktrees/
-  feature-auth/           ← linked worktree (branch: feature/auth)
-    src/
-    tests/
-  hotfix-crash/           ← linked worktree (branch: hotfix/crash-on-login)
-    src/
-    tests/
-```
-
-All three directories share the same git history. Commits made in any worktree are visible
-to all others. Branches checked out in one worktree cannot be checked out in another.
-
-### 1.2 Why Worktrees Matter for Parallel Development
-
-| Problem with Single Working Directory | How Worktrees Solve It |
-|----------------------------------------|------------------------|
-| Branch switching discards uncommitted work | Each branch has its own directory — no switching needed |
-| Subagents editing the same directory collide on files | Each subagent operates in its own worktree directory |
-| Build caches invalidate on branch switch | Each worktree maintains its own build artifacts |
-| Context switching between tasks is expensive | Keep multiple tasks open simultaneously |
-| `index.lock` conflicts when parallel git ops run | Each worktree has its own index file |
-
-### 1.3 Worktrees vs. Clones
-
-| Aspect | Worktree | Separate Clone |
-|--------|----------|----------------|
-| Disk space | Shared object store — lightweight | Full copy — heavy |
-| Branch visibility | Instant — shared history | Requires fetch/push |
-| Setup time | Seconds | Minutes (network + disk) |
-| Independence | Shared refs can cause lock contention | Fully independent |
-| Best for | Same-repo parallel work | Cross-repo or fully isolated CI |
-
-Use worktrees for same-repo parallel development. Use separate clones only when you need
-complete isolation (e.g., testing different dependency versions simultaneously).
-
----
+**Read:** `references/understand-git-worktrees.md` for detailed step 1: understand git worktrees reference material.
 
 ## STEP 2: Decide When to Use Worktrees
 
-### 2.1 Use Worktrees When
 
-| Signal | Example |
-|--------|---------|
-| **Parallel agent tasks that touch overlapping files** | Two subagents both need to modify `src/config.ts` on different branches |
-| **Long-running feature + urgent hotfix** | Working on a multi-day feature but need to ship a hotfix from `main` |
-| **Comparative research** | Exploring two different approaches to the same problem side-by-side |
-| **Review while developing** | Checking out a PR branch for review without disrupting current work |
-| **Build/test isolation** | Running tests on `main` while developing on a feature branch |
-| **Multiple subagents with `isolation: "worktree"`** | Claude Code automatically creates worktrees for each agent |
-
-### 2.2 Do NOT Use Worktrees When
-
-| Signal | Use Instead |
-|--------|-------------|
-| **Subagents touch completely different files** | Regular parallel agents in the same working directory — no isolation needed |
-| **Single-file quick fix** | `git stash` → fix → `git stash pop` — faster than worktree setup |
-| **Exploratory read-only research** | Subagent with read-only scope — no writes means no conflicts |
-| **Sequential tasks** | Regular branch workflow — worktrees add unnecessary complexity |
-| **Submodules in the repo** | Worktrees and submodules interact poorly — use separate clones instead |
-
-### 2.3 Decision Checklist
-
-Before creating worktrees, answer these questions:
-
-1. **Do I need multiple branches checked out simultaneously?** If you can work sequentially, use regular branches.
-2. **Will parallel agents modify files in the same directory?** If yes, worktrees provide the isolation needed.
-3. **Does the task benefit from build-cache preservation?** If switching branches invalidates expensive build caches, worktrees help.
-4. **Is the repo free of submodules?** If the repo uses submodules, worktrees may cause issues — test carefully or use clones.
-5. **Am I willing to clean up worktrees after?** Worktrees left behind consume disk space and can cause confusion.
-
-If the answer to question 1 is "no," skip worktrees — the overhead is not justified.
-
----
+**Read:** `references/decide-when-to-use-worktrees.md` for detailed step 2: decide when to use worktrees reference material.
 
 ## STEP 3: Create Worktrees
 
@@ -152,17 +73,6 @@ Rules:
 - Prefix with purpose: `feature-`, `hotfix-`, `research-`, `agent-N-`
 - MUST NOT create worktrees inside the main repository directory — this causes path confusion and gitignore issues
 
-### 3.3 Branch Strategies
-
-| Pattern | Branch Naming | When to Use |
-|---------|--------------|-------------|
-| **Feature worktree** | `feature/<name>` based off `main` | New feature development |
-| **Hotfix worktree** | `hotfix/<name>` based off `main` or latest tag | Production fixes |
-| **Research worktree** | `research/<name>` based off `main` | Throwaway exploration |
-| **Agent worktree** | `agent/<task-id>-<description>` based off current branch | Parallel subagent dispatch |
-| **Review worktree** | No new branch — check out existing PR branch | Code review |
-
-```bash
 # Feature worktree: branch from main
 git worktree add ../project-wt/feature-auth -b feature/auth main
 
@@ -215,29 +125,6 @@ Implement user authentication middleware
 ## Files to Modify
 - src/middleware/auth.ts
 - tests/middleware/auth.test.ts
-
-## Verification
-Run: npm test -- --grep 'auth middleware'
-", isolation="worktree")
-```
-
-When `isolation: "worktree"` is set:
-
-1. Claude Code creates a new branch and worktree automatically
-2. The subagent operates entirely within that worktree directory
-3. File edits are isolated — no risk of conflicting with the main worktree or other agents
-4. On completion, the changes remain on the worktree's branch for the orchestrator to merge
-
-### 4.2 When to Use `isolation: "worktree"`
-
-| Scenario | Use `isolation: "worktree"` | Use Regular Agent |
-|----------|----------------------------|-------------------|
-| Agents modifying overlapping files | Yes — prevents conflicts | No — will collide |
-| Agents modifying completely different files | Optional but safe | Yes — simpler |
-| Agent needs to run build/test in isolation | Yes — own build cache | No — shared cache may interfere |
-| Agent task is read-only research | No — unnecessary overhead | Yes — no writes to conflict |
-| More than 3 parallel agents | Yes — isolation scales safely | Risky — file conflicts increase with parallelism |
-| Agent needs to install different dependencies | Yes — own node_modules/venv | No — would break other agents |
 
 ### 4.3 Dispatching Multiple Isolated Agents
 
@@ -347,18 +234,6 @@ git worktree prune --verbose
 
 ## STEP 6: Merge Strategies
 
-### 6.1 Choosing a Merge Strategy
-
-After work in a worktree is complete, merge the worktree's branch back into the target
-branch. Choose based on the situation:
-
-| Strategy | When to Use | Command |
-|----------|-------------|---------|
-| **Merge commit** | Feature branches with multiple commits — preserves history | `git merge feature/auth` |
-| **Squash merge** | Agent worktrees with messy intermediate commits | `git merge --squash agent/task42-validation` |
-| **Rebase** | Clean linear history preferred, few commits | `git rebase main` (from feature branch) |
-| **Cherry-pick** | Only some commits from the worktree are wanted | `git cherry-pick abc1234 def5678` |
-
 ### 6.2 Merging Agent Worktree Branches
 
 For parallel agent workflows, squash merge is usually best — each agent's work becomes
@@ -400,16 +275,6 @@ git add <resolved-files>
 git commit -m "feat: add order validation (resolved merge conflict with user validation)"
 ```
 
-### 6.4 Sequential Merge Order
-
-When merging multiple worktree branches, order matters:
-
-1. **Merge the branch with the most foundational changes first** — e.g., data models before
-   API endpoints
-2. **Run tests after each merge** — catch integration issues incrementally
-3. **Resolve conflicts immediately** — do not batch conflict resolution
-
-```bash
 # Merge in dependency order
 git merge --squash agent/models       && npm test
 git merge --squash agent/api-endpoints && npm test
@@ -423,16 +288,6 @@ git merge --squash agent/tests         && npm test
 This step ties together worktrees with the subagent-driven-dev skill for a complete
 parallel workflow.
 
-### 7.1 Planning Phase
-
-Before dispatching agents into worktrees:
-
-1. **Identify subtasks** — Use the decomposition from `/subagent-driven-dev` Step 2
-2. **Determine isolation need** — Apply the decision framework from Step 2 of this skill
-3. **Complete pre-work** — Shared interfaces, base classes, config changes
-4. **Commit pre-work to the base branch** — Agents will branch from this commit
-
-```bash
 # Ensure the base branch is clean and pre-work is committed
 git status  # Should be clean
 git log --oneline -1  # Should show pre-work commit
@@ -593,55 +448,9 @@ git branch --list 'research/*'
 
 ## STEP 9: Common Pitfalls
 
-### 9.1 Shared `index.lock`
 
-Each worktree has its own index, but certain git operations (e.g., `git gc`, `git prune`)
-acquire a repository-level lock. If two worktrees run these simultaneously:
+**Read:** `references/common-pitfalls.md` for detailed step 9: common pitfalls reference material.
 
-```
-fatal: Unable to create '/path/to/repo/.git/index.lock': File exists.
-```
-
-**Fix:** Avoid running `git gc`, `git prune`, or `git repack` while agents are active in
-worktrees. Schedule maintenance for idle periods.
-
-### 9.2 Submodules
-
-Git worktrees and submodules have known interaction issues:
-
-- Submodule state is shared across worktrees — checking out a different submodule commit
-  in one worktree affects all others
-- `.gitmodules` changes in one worktree can confuse other worktrees
-
-**Fix:** If the repo uses submodules, use separate clones instead of worktrees for isolation.
-
-### 9.3 Hooks
-
-Git hooks in `.git/hooks/` are shared across all worktrees. A hook that references
-`$GIT_DIR` may behave unexpectedly:
-
-- In the main worktree, `$GIT_DIR` is `.git/`
-- In linked worktrees, `$GIT_DIR` is `.git/worktrees/<name>/`
-
-**Fix:** Use `$GIT_COMMON_DIR` when hooks need to access shared repository data, and
-`$GIT_DIR` for worktree-specific data.
-
-### 9.4 Branch Already Checked Out
-
-A branch checked out in one worktree cannot be checked out in another:
-
-```
-fatal: 'feature/auth' is already checked out at '/path/to/worktree'
-```
-
-**Fix:** This is intentional — it prevents conflicting edits. Create a new branch for
-the second worktree, or remove the first worktree if it is no longer needed.
-
-### 9.5 Stale Worktree References
-
-If a worktree directory is deleted with `rm -rf` instead of `git worktree remove`:
-
-```bash
 # Git still thinks the worktree exists
 git worktree list  # Shows the deleted worktree
 
@@ -798,19 +607,6 @@ git worktree list | wc -l
 # If more than 5, merge and clean up before creating more
 ```
 
-### 11.2 Forgetting Cleanup
-
-**Problem:** Worktrees left behind after their branches are merged waste disk space and
-pollute `git worktree list` output, making it hard to find active worktrees.
-
-**Fix:** Always pair worktree creation with a cleanup step. After every merge:
-
-```bash
-git worktree remove <path>
-git branch -d <branch>
-git worktree prune
-```
-
 ### 11.3 Conflicting Edits Across Worktrees
 
 **Problem:** Two worktrees based off the same branch, both modifying `src/config.ts`.
@@ -841,24 +637,6 @@ git worktree add ./worktrees/feature -b feature/x
 # RIGHT — sibling directory
 git worktree add ../project-wt/feature -b feature/x
 ```
-
-### 11.6 Long-Lived Worktrees
-
-**Problem:** A worktree created weeks ago drifts far from `main`, making eventual merge
-painful.
-
-**Fix:** Periodically rebase long-lived worktree branches onto `main`:
-
-```bash
-cd ../project-wt/long-lived-feature
-git fetch origin main
-git rebase origin/main
-```
-
-If a worktree has been idle for more than a week, evaluate whether the work should be
-merged, discarded, or explicitly continued.
-
----
 
 ## MUST DO
 

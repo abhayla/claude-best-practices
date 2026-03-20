@@ -141,17 +141,6 @@ docker run --network host ghcr.io/zaproxy/zaproxy:stable \
   -w zap-baseline-report.md
 ```
 
-### 3.4 Interpret Results
-
-| ZAP Risk Level | Severity | Action |
-|---------------|----------|--------|
-| High | CRITICAL | ❌ BLOCK — must fix before merge |
-| Medium | HIGH | ❌ BLOCK — must fix or document accepted risk |
-| Low | MEDIUM | ⚠️ Review — fix if feasible |
-| Informational | LOW | 📝 Note — no action required |
-
----
-
 ## STEP 4: Nuclei Scan
 
 ### 4.1 Run Nuclei Templates
@@ -219,20 +208,6 @@ SESSION_AFTER=$(curl -s <target>/login -d 'email=test@example.com&password=test'
 [ "$SESSION_BEFORE" != "$SESSION_AFTER" ] && echo "✅ Session regenerated" || echo "❌ SESSION FIXATION VULNERABILITY"
 ```
 
-### 5.3 Token Security
-
-For JWT/API token authentication:
-
-| Check | Pass Criteria |
-|-------|--------------|
-| Token expiry | Expires within reasonable time (≤1h for access, ≤7d for refresh) |
-| Token revocation | Logout invalidates token server-side |
-| Token storage | Not in URL params, not in localStorage for sensitive apps |
-| CORS policy | `Access-Control-Allow-Origin` not `*` for auth endpoints |
-| Rate limiting | Login endpoint rate-limited (≤10 attempts/min) |
-
----
-
 ## STEP 6: Fuzz Testing (API + Property-Based + Mutation)
 
 ### 6.1 API Input Fuzzing
@@ -262,18 +237,6 @@ All injection attempts MUST return:
 - NEVER return 200 with injected content executed
 - NEVER return internal error messages or stack traces
 
-### 6.2 Property-Based Testing
-
-Use generative testing to find edge cases that hand-written tests miss. Property-based tests generate thousands of random inputs and verify invariants hold.
-
-| Stack | Library | Install |
-|-------|---------|---------|
-| Python | Hypothesis | `pip install hypothesis` |
-| TypeScript/JS | fast-check | `npm install fast-check` |
-| Kotlin/JVM | Kotest Property | `testImplementation("io.kotest:kotest-property")` |
-| Go | rapid | `go get pgregory.net/rapid` |
-| Rust | proptest | `cargo add proptest --dev` |
-
 #### Python (Hypothesis)
 
 ```python
@@ -302,82 +265,6 @@ def test_order_total_never_negative(prices):
     assert order.total >= 0
     assert order.total >= sum(prices) * 0.8  # minimum after max discount
 ```
-
-#### TypeScript (fast-check)
-
-```typescript
-import fc from 'fast-check';
-
-// Test: encode/decode roundtrip
-fc.assert(
-  fc.property(fc.string(), (input) => {
-    expect(decode(encode(input))).toEqual(input);
-  })
-);
-
-// Test: sorted output is always sorted
-fc.assert(
-  fc.property(fc.array(fc.integer()), (arr) => {
-    const sorted = sortFunction(arr);
-    for (let i = 1; i < sorted.length; i++) {
-      expect(sorted[i]).toBeGreaterThanOrEqual(sorted[i - 1]);
-    }
-  })
-);
-
-// Test: API validates all inputs (no 500s)
-fc.assert(
-  fc.property(fc.record({ name: fc.string(), email: fc.emailAddress() }), async (input) => {
-    const res = await fetch('/api/users', { method: 'POST', body: JSON.stringify(input) });
-    expect(res.status).not.toBe(500); // Must validate, not crash
-  }),
-  { numRuns: 1000 }
-);
-```
-
-#### Kotlin (Kotest Property)
-
-```kotlin
-class UserPropertyTest : FunSpec({
-    test("serialization roundtrip preserves data") {
-        checkAll(Arb.string(), Arb.int(), Arb.boolean()) { name, age, active ->
-            val user = User(name, age, active)
-            val restored = User.fromJson(user.toJson())
-            restored shouldBe user
-        }
-    }
-
-    test("repository never returns more items than limit") {
-        checkAll(Arb.int(1..100)) { limit ->
-            val results = repository.search("test", limit = limit)
-            results.size shouldBeLessThanOrEqual limit
-        }
-    }
-})
-```
-
-#### Common Properties to Test
-
-| Property | Description | Example |
-|----------|-------------|---------|
-| **Roundtrip** | encode(decode(x)) == x | Serialization, encryption, compression |
-| **Invariant** | f(x) satisfies condition for ALL x | Total >= 0, list length preserved |
-| **Idempotent** | f(f(x)) == f(x) | Formatting, normalization, dedup |
-| **Commutative** | f(a, b) == f(b, a) | Merge, union, max |
-| **No crash** | f(x) doesn't throw for any valid x | API validation, parser |
-| **Monotonic** | x <= y -> f(x) <= f(y) | Pricing, sorting |
-
-### 6.3 Mutation Testing
-
-Verify that tests actually catch bugs by injecting small mutations into source code and checking if tests fail.
-
-| Stack | Tool | Command |
-|-------|------|---------|
-| Python | mutmut | `mutmut run --paths-to-mutate=src/` |
-| TypeScript/JS | Stryker | `npx stryker run` |
-| Kotlin/JVM | PIT (pitest) | `./gradlew pitest` |
-| Go | go-mutesting | `go-mutesting ./...` |
-| Rust | cargo-mutants | `cargo mutants` |
 
 #### Interpreting Results
 
@@ -444,22 +331,6 @@ jobs:
           path: report_html.html
 ```
 
-### ZAP Rules File (zap-rules.tsv)
-
-```tsv
-10010	IGNORE	# Cookie without Secure flag (dev only)
-10011	IGNORE	# Cookie without HttpOnly flag (dev only)
-10015	FAIL	# Incomplete or no CSP
-10021	FAIL	# X-Content-Type-Options missing
-10038	FAIL	# Content-Security-Policy missing
-40012	FAIL	# XSS Reflected
-40014	FAIL	# XSS Persistent
-40018	FAIL	# SQL Injection
-90033	FAIL	# Loosely Scoped Cookie
-```
-
----
-
 ## STEP 8: DAST Report
 
 Present findings as a structured security report:
@@ -471,38 +342,8 @@ Present findings as a structured security report:
 **Date:** <date>
 **Tools:** ZAP + Nuclei + Manual
 
-### Summary
 
-| Severity | Count | Action |
-|----------|-------|--------|
-| CRITICAL | 0 | — |
-| HIGH | 1 | ❌ Must fix |
-| MEDIUM | 3 | ⚠️ Review |
-| LOW | 5 | 📝 Noted |
-
-### Findings
-
-#### [HIGH] Missing Content-Security-Policy
-- **URL:** All responses
-- **Risk:** XSS attacks not mitigated by CSP
-- **Fix:** Add CSP header in middleware:
-  ```python
-  response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'"
-  ```
-- **Ref:** OWASP A05:2021 Security Misconfiguration
-
-#### [MEDIUM] Session cookie without SameSite
-- **URL:** POST /login
-- **Risk:** CSRF attacks possible
-- **Fix:** Set `SameSite=Lax` on session cookie
-- **Ref:** OWASP A07:2021 Identification and Authentication Failures
-
-### Gate Decision
-- **PASS** — No CRITICAL/HIGH findings (or all accepted with documented risk)
-- **BLOCK** — N CRITICAL/HIGH findings must be resolved
-```
-
----
+**Read:** `references/dast-security-report.md` for detailed dast security report reference material.
 
 ## MUST DO
 
@@ -550,43 +391,3 @@ docker run --rm -v $(pwd):/zap/wrk owasp/zap2docker-stable zap-api-scan.py \
   -c zap-fuzz-config.conf
 ```
 
-### OWASP API Top 10 Mapping
-
-Map tests to OWASP API Security Top 10 categories:
-
-| OWASP Category | Test Approach | Automated |
-|---------------|---------------|-----------|
-| API1: Broken Object Level Auth | Request resource with different user's token | Yes |
-| API2: Broken Authentication | Token expiry, brute force, credential stuffing | Yes |
-| API3: Broken Object Property Level Auth | Modify read-only fields in PATCH/PUT | Yes |
-| API4: Unrestricted Resource Consumption | Exceed rate limits, large payloads | Yes |
-| API5: Broken Function Level Auth | Access admin endpoints with user token | Yes |
-| API6: Unrestricted Access to Sensitive Business Flows | Automate business-critical flows | Partial |
-| API7: Server Side Request Forgery | SSRF payloads in URL parameters | Yes |
-| API8: Security Misconfiguration | Check headers, CORS, error disclosure | Yes |
-| API9: Improper Inventory Management | Undocumented endpoints, old API versions | Yes |
-| API10: Unsafe Consumption of APIs | Third-party API response validation | Partial |
-
-### CI Integration
-
-```yaml
-security-scan:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Conformance test
-      run: specmatic test --contract openapi.yaml --host localhost --port 8000
-
-    - name: OWASP ZAP API scan
-      uses: zaproxy/action-api-scan@v0.7.0
-      with:
-        target: 'http://localhost:8000/openapi.json'
-        format: openapi
-        fail_action: true  # Fail CI on HIGH/CRITICAL findings
-
-    - name: Upload security report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: security-report
-        path: report_html.html
-```

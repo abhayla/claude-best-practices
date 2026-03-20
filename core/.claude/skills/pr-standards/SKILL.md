@@ -113,34 +113,6 @@ for file in $(git diff --name-only "$BASE_BRANCH"...HEAD); do
 done
 ```
 
-### 1.3 Build the Analysis Manifest
-
-Construct a manifest of what to analyze:
-
-```
-ANALYSIS MANIFEST
-=================
-
-New files (full scan):
-  src/services/UserService.py (245 lines)
-  src/models/Role.py (89 lines)
-
-Modified files (changed lines only):
-  src/routes/users.py (+45, -12) — 45 added lines to check
-  src/middleware/auth.py (+8, -3) — 8 added lines to check
-  tests/test_users.py (+120, -5) — 120 added lines to check
-
-Deleted files (reference check):
-  src/utils/old_validator.py — check for dangling imports
-
-Renamed files (import check):
-  src/helpers/format.py -> src/utils/format.py — verify imports updated
-
-Total lines to analyze: 507 (added/changed only)
-```
-
----
-
 ## STEP 2: Load Standards and Rules
 
 Load all applicable rules from project configuration and custom definitions.
@@ -245,79 +217,12 @@ rules:
     message: "External API call without error handling. Wrap in try/except."
 ```
 
-### 2.4 Rule Schema
-
-Each rule (custom or built-in) has these fields:
-
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `name` | Yes | string | Unique rule identifier (kebab-case) |
-| `description` | Yes | string | Human-readable explanation |
-| `severity` | Yes | `critical` / `warning` / `info` | Violation severity level |
-| `pattern` | Yes | regex string | Pattern to search for in changed lines |
-| `check` | No | string | Additional context-aware check to perform |
-| `auto-fix` | No | boolean | Whether this violation can be auto-fixed |
-| `fix-pattern` | No | string | Regex pattern to match for replacement (required if auto-fix) |
-| `fix-replacement` | No | string | Replacement text (required if auto-fix) |
-| `languages` | No | list | Limit rule to specific file extensions |
-| `exclude-paths` | No | list | Paths where this rule does not apply |
-| `message` | Yes | string | Message shown when violation is detected |
-
----
-
 ## STEP 3: Built-in Default Rules
 
 These rules apply when no `.pr-standards.yml` exists, or alongside custom rules unless explicitly excluded. They represent universally applicable code hygiene standards.
 
-### 3.1 Debug and Development Artifacts
 
-| Rule | Severity | Pattern | Auto-fix |
-|------|----------|---------|----------|
-| `no-console-log` | Warning | `console\.log\(` | Yes: remove line |
-| `no-print-debug` | Warning | `^\s*print\(` (in non-test Python files) | Yes: replace with `logger.debug(` |
-| `no-debugger` | Critical | `debugger;` or `debugger\b` | Yes: remove line |
-| `no-pdb` | Critical | `pdb\.set_trace\(\)` or `breakpoint\(\)` | Yes: remove line |
-| `no-binding-pry` | Critical | `binding\.pry` | Yes: remove line |
-| `no-var-dump` | Warning | `var_dump\(` or `dd\(` | Yes: remove line |
-
-### 3.2 Code Quality
-
-| Rule | Severity | Pattern | Auto-fix |
-|------|----------|---------|----------|
-| `no-todo-without-ticket` | Warning | `TODO\|FIXME\|HACK\|XXX` without `(#\d+)` or `([A-Z]+-\d+)` | No |
-| `no-commented-code` | Info | 3+ consecutive commented-out lines that look like code | No |
-| `no-magic-numbers` | Info | Numeric literals > 1 in logic (excluding 0, 1, common HTTP codes) | No |
-| `no-empty-catch` | Warning | `catch.*\{[\s]*\}` or `except.*:[\s]*pass` | No |
-| `no-swallowed-errors` | Warning | Catch/except blocks without logging or re-raising | No |
-
-### 3.3 Security
-
-| Rule | Severity | Pattern | Auto-fix |
-|------|----------|---------|----------|
-| `no-hardcoded-secrets` | Critical | `(api_key\|password\|secret\|token\|private_key)\s*=\s*["'][^"']+["']` | No |
-| `no-hardcoded-ip` | Warning | `\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}` (not in tests/config) | No |
-| `no-eval` | Critical | `eval\(` (in JS/Python) | No |
-| `no-inner-html` | Warning | `innerHTML\s*=` or `dangerouslySetInnerHTML` | No |
-| `no-sql-injection` | Critical | String concatenation/interpolation in SQL queries | No |
-| `no-disabled-security` | Critical | `verify=False`, `checkServerIdentity: null`, `rejectUnauthorized: false` | No |
-
-### 3.4 Test Coverage
-
-| Rule | Severity | Pattern | Auto-fix |
-|------|----------|---------|----------|
-| `new-function-needs-test` | Warning | New `def`/`function`/`func` declaration in non-test file without corresponding test | No |
-| `new-endpoint-needs-test` | Warning | New route/endpoint without corresponding test | No |
-| `no-skip-test` | Info | `@skip`, `@ignore`, `xit(`, `xdescribe(`, `test.skip(` without issue reference | No |
-
-### 3.5 Import and Dependency Hygiene
-
-| Rule | Severity | Pattern | Auto-fix |
-|------|----------|---------|----------|
-| `no-wildcard-import` | Warning | `from X import *` or `import * from` | No |
-| `no-relative-parent-import` | Info | `from ../../` deep relative imports (3+ levels) | No |
-| `no-unused-import` | Info | Import statement where the imported name does not appear in the file | No |
-
----
+**Read:** `references/built-in-default-rules.md` for detailed step 3: built-in default rules reference material.
 
 ## STEP 4: Run Standards Engine
 
@@ -373,119 +278,20 @@ Before recording a violation, check:
 2. **Same rule, adjacent lines (within 3 lines)** — group into a single violation with a range
 3. **Rule superseded by a stricter rule** — if `no-hardcoded-secrets` (critical) and `no-magic-numbers` (info) both match the same line, report only the critical violation
 
-### 4.5 Track Violations
-
-Maintain a structured list of all violations found:
-
-```
-violation:
-  id: V001
-  rule: no-debugger
-  severity: critical
-  file: src/routes/users.py
-  line: 45
-  column: 5
-  matched_text: "    debugger"
-  message: "Debugger statement found. Remove before merging."
-  auto_fixable: true
-  fix_description: "Remove the debugger line"
-  context:
-    before: "    user = get_user(user_id)"
-    matched: "    debugger"
-    after: "    return jsonify(user)"
-```
-
----
-
 ## STEP 5: Classify Violations by Severity
 
 Categorize every violation and determine the overall PR verdict.
 
-### 5.1 Severity Definitions
 
-| Severity | Icon | Action Required | Blocks PR | Examples |
-|----------|------|----------------|-----------|----------|
-| **Critical** | `[C]` | MUST fix before merge | Yes | Security vulnerability, debugger statement, hardcoded secret, broken API contract, disabled security check |
-| **Warning** | `[W]` | Should fix, flag to author | Only in `--strict` mode | Missing error handling, no test for new function, TODO without ticket, debug print statement |
-| **Info** | `[I]` | Optional improvement | No | Naming suggestion, missing docstring, magic number, deep relative import |
-
-### 5.2 PR Verdict Logic
-
-```
-IF critical_count > 0:
-  verdict = "FAIL"
-  message = "PR has {critical_count} critical violation(s) that must be fixed."
-ELIF strict_mode AND warning_count > 0:
-  verdict = "FAIL"
-  message = "Strict mode: PR has {warning_count} warning(s) that must be fixed."
-ELIF warning_count > 10:
-  verdict = "WARN"
-  message = "PR has many warnings ({warning_count}). Consider addressing before review."
-ELSE:
-  verdict = "PASS"
-  message = "PR meets team standards."
-```
-
-### 5.3 Violation Summary
-
-```
-VIOLATION SUMMARY
-=================
-
-Critical: {count} — MUST fix before merge
-Warning:  {count} — Should fix before review
-Info:     {count} — Optional improvements
-
-Auto-fixable: {count} of {total} violations
-```
-
----
+**Read:** `references/classify-violations-by-severity.md` for detailed step 5: classify violations by severity reference material.
 
 ## STEP 6: Generate Auto-Fixes
 
 For each violation marked as auto-fixable, generate a concrete code fix.
 
-### 6.1 Auto-Fix Generation
 
-For each auto-fixable violation:
+**Read:** `references/generate-auto-fixes.md` for detailed step 6: generate auto-fixes reference material.
 
-1. **Read the current file content** at the violation line
-2. **Apply the fix-pattern/fix-replacement** from the rule definition
-3. **Generate a before/after diff** showing exactly what will change
-4. **Validate the fix** — ensure it does not break syntax (for simple checks: matching brackets, valid indentation)
-
-### 6.2 Auto-Fix Report
-
-Present fixes for user confirmation:
-
-```
-AUTO-FIX PROPOSALS
-==================
-
-Fix 1 of 3: [W] no-print-debug (src/services/user_service.py:23)
-  Before: print(f"Creating user: {email}")
-  After:  logger.debug(f"Creating user: {email}")
-  Note:   Requires `import logging; logger = logging.getLogger(__name__)` at top of file
-
-Fix 2 of 3: [C] no-debugger (src/routes/users.py:45)
-  Before:     debugger
-  After:      (line removed)
-
-Fix 3 of 3: [W] no-console-log (src/components/UserForm.tsx:112)
-  Before: console.log('form submitted', data);
-  After:  (line removed)
-
-Apply all fixes? [y/N/select]
-  y — Apply all 3 fixes
-  N — Skip auto-fixes, report only
-  select — Choose which fixes to apply (e.g., "1,3" to apply fixes 1 and 3)
-```
-
-### 6.3 Fix Application
-
-When applying fixes:
-
-```bash
 # Apply each accepted fix using sed or direct file editing
 # Track which fixes were applied vs. skipped
 
@@ -517,136 +323,16 @@ Remaining violations after auto-fix: {count}
 
 Produce the full structured report for the user.
 
-### 7.1 Report Format
 
-```
-=========================================
-  PR STANDARDS CHECK: {PASS / FAIL / WARN}
-=========================================
-
-Branch: {current_branch} -> {base_branch}
-Files analyzed: {count}
-Lines analyzed: {count} (changed lines only)
-Rules applied: {count} ({built_in_count} built-in + {custom_count} custom)
-
------------------------------------------
-  CRITICAL (must fix before merge): {count}
------------------------------------------
-
-[C1] no-debugger — Debugger statement found
-     File: src/routes/users.py, line 45
-     Code: `    debugger`
-     Fix:  Remove the debugger line (auto-fixable)
-
-[C2] no-hardcoded-secrets — Hardcoded API key detected
-     File: src/services/payment.py, line 12
-     Code: `    api_key = "sk_live_abc123def456"`
-     Fix:  Move to environment variable. Use `os.getenv("STRIPE_API_KEY")`
-
-[C3] rate-limiting-required — API endpoint missing rate limiting
-     File: src/routes/users.py, line 30
-     Code: `@router.post("/api/users")`
-     Fix:  Add `@rate_limit(max=100, per=60)` decorator before route handler
-
------------------------------------------
-  WARNING (should fix): {count}
------------------------------------------
-
-[W1] new-function-needs-test — New function has no tests
-     File: src/services/user_service.py, line 23
-     Code: `def create_user(email: str, role: str) -> User:`
-     Fix:  Add test in tests/test_user_service.py for create_user()
-
-[W2] no-swallowed-errors — Error silently swallowed in catch block
-     File: src/routes/users.py, line 67
-     Code: `    except Exception: pass`
-     Fix:  Log the error or re-raise: `except Exception as e: logger.error(f"Failed: {e}"); raise`
-
-[W3] no-todo-without-ticket — TODO without issue reference
-     File: src/services/user_service.py, line 45
-     Code: `    # TODO: add email validation`
-     Fix:  Create an issue and reference it: `# TODO(#123): add email validation`
-
------------------------------------------
-  INFO (optional improvements): {count}
------------------------------------------
-
-[I1] no-magic-numbers — Magic number in logic
-     File: src/services/user_service.py, line 34
-     Code: `    if retry_count > 3:`
-     Fix:  Extract to named constant: `MAX_RETRIES = 3`
-
-[I2] docstring-required — Public function missing docstring
-     File: src/services/user_service.py, line 23
-     Code: `def create_user(email: str, role: str) -> User:`
-     Fix:  Add docstring describing parameters and return value
-
-=========================================
-  TOTALS
-=========================================
-
-| Severity | Count | Auto-fixable |
-|----------|-------|-------------|
-| Critical | 3     | 1           |
-| Warning  | 3     | 0           |
-| Info     | 2     | 0           |
-| **Total**| **8** | **1**       |
-
-Auto-fixable: 1 of 8 violations
-Run with --fix to apply auto-fixes.
-```
-
-### 7.2 Per-File Summary
-
-Additionally, provide a per-file violation count for quick scanning:
-
-```
-PER-FILE SUMMARY
-================
-
-| File | Critical | Warning | Info | Total |
-|------|----------|---------|------|-------|
-| src/routes/users.py | 2 | 1 | 0 | 3 |
-| src/services/user_service.py | 0 | 2 | 2 | 4 |
-| src/services/payment.py | 1 | 0 | 0 | 1 |
-| tests/test_users.py | 0 | 0 | 0 | 0 |
-| **Total** | **3** | **3** | **2** | **8** |
-```
-
----
+**Read:** `references/generate-standards-report.md` for detailed step 7: generate standards report reference material.
 
 ## STEP 8: Diff-Aware Analysis Patterns
 
 Apply smart detection strategies based on how files changed.
 
-### 8.1 New Files (Added)
 
-For files with status `A`:
+**Read:** `references/diff-aware-analysis-patterns.md` for detailed step 8: diff-aware analysis patterns reference material.
 
-1. **Full file scan** — apply all applicable rules to every line
-2. **Structure check** — verify the file follows project conventions:
-   - Has required file header/license if project uses one
-   - Follows naming convention (file name matches class/module name)
-   - Has appropriate imports organized per project convention
-3. **Boilerplate check** — if the file looks like it was copied from another file, flag unchanged placeholder text (e.g., "TODO: replace this")
-
-### 8.2 Modified Files (Changed Lines Only)
-
-For files with status `M`:
-
-1. **Changed lines only** — apply pattern rules to added/modified lines only
-2. **Context-aware rules** — for rules that need surrounding code (e.g., "must be in try/except"), read 10 lines of context around each changed line
-3. **Removed code check** — if a function/class was removed, verify no other changed files still reference it
-4. **Changed signature check** — if a function signature was modified, verify all callers in changed files use the new signature
-
-### 8.3 Deleted Files
-
-For files with status `D`:
-
-1. **Dangling reference check** — search all other changed files for imports or references to the deleted file
-2. **No content analysis** — do not apply code quality rules to deleted files
-
-```bash
 # Check for dangling references to a deleted file
 DELETED_MODULE=$(basename "$DELETED_FILE" | sed 's/\.[^.]*$//')
 for file in $(git diff --name-only --diff-filter=AM "$BASE_BRANCH"...HEAD); do
@@ -680,188 +366,20 @@ done
 
 Clear handoff points between /implement, /pr-standards, and /request-code-review.
 
-### 9.1 Input: From /implement or /executing-plans
 
-This skill expects a completed implementation — code is written, tests pass, branch is committed. The input is the branch diff against main.
-
-Prerequisites:
-- All implementation work is committed
-- Tests pass (verified by /implement Step 6)
-- Branch is ready for review
-
-### 9.2 Output: Standards Report + Next Step
-
-Based on the verdict, provide a clear next action:
-
-| Verdict | Critical | Warnings | Action |
-|---------|----------|----------|--------|
-| **FAIL** | > 0 | any | "Fix {N} critical violations before proceeding. Run `/pr-standards` again after fixing." |
-| **FAIL (strict)** | 0 | > 0 | "Strict mode: fix {N} warnings before proceeding. Run `/pr-standards` again after fixing." |
-| **WARN** | 0 | > 5 | "Consider addressing {N} warnings before review. Proceed with `/request-code-review`? Warnings will be included in the PR description." |
-| **PASS** | 0 | <= 5 | "Standards check passed. Proceed with `/request-code-review`." |
-
-### 9.3 Handoff to /request-code-review
-
-When the standards check passes (or the user chooses to proceed with warnings), include the standards report in the PR review workflow:
-
-```
-Standards Check: PASS (2 warnings, 1 info)
-Warnings:
-  [W1] New function create_user() has no tests
-  [W2] TODO without ticket reference on line 45
-
-These will be noted in the PR description for reviewer awareness.
-Proceed with /request-code-review.
-```
-
-### 9.4 Feedback Loop: Fix and Re-Check
-
-If the standards check fails:
-
-1. Fix all critical violations (manually or via auto-fix)
-2. Commit the fixes
-3. Re-run `/pr-standards` to verify
-4. Repeat until the check passes
-5. Then proceed to `/request-code-review`
-
-```
-Standards check FAILED. 3 critical violations found.
-
-After fixing, run:
-  /pr-standards
-
-Or apply auto-fixes and re-check:
-  /pr-standards --fix
-```
-
----
+**Read:** `references/pipeline-integration.md` for detailed step 9: pipeline integration reference material.
 
 ## STEP 10: Team Standards Evolution
 
 Track which rules catch real issues over time to refine the standards.
 
-### 10.1 Violation Logging
 
-After each standards check, log a summary to `.pr-standards-log.json` (gitignored):
-
-```json
-{
-  "timestamp": "2026-03-12T14:30:00Z",
-  "branch": "feature/user-roles",
-  "verdict": "FAIL",
-  "violations": {
-    "critical": 3,
-    "warning": 3,
-    "info": 2
-  },
-  "rules_triggered": [
-    {"rule": "no-debugger", "count": 1, "severity": "critical"},
-    {"rule": "no-hardcoded-secrets", "count": 1, "severity": "critical"},
-    {"rule": "rate-limiting-required", "count": 1, "severity": "critical"},
-    {"rule": "new-function-needs-test", "count": 1, "severity": "warning"},
-    {"rule": "no-swallowed-errors", "count": 1, "severity": "warning"},
-    {"rule": "no-todo-without-ticket", "count": 1, "severity": "warning"},
-    {"rule": "no-magic-numbers", "count": 1, "severity": "info"},
-    {"rule": "docstring-required", "count": 1, "severity": "info"}
-  ],
-  "auto_fixes_applied": 1,
-  "auto_fixes_skipped": 0
-}
-```
-
-### 10.2 Trend Analysis
-
-When the log file exists and contains 10+ entries, provide trend insights:
-
-```
-STANDARDS TREND ANALYSIS
-========================
-
-Most triggered rules (last 30 days):
-  1. no-todo-without-ticket — 23 violations across 8 PRs
-  2. new-function-needs-test — 18 violations across 12 PRs
-  3. no-print-debug — 15 violations across 6 PRs
-  4. no-swallowed-errors — 12 violations across 5 PRs
-  5. no-magic-numbers — 8 violations across 7 PRs
-
-Recommendations:
-  - PROMOTE: no-swallowed-errors (warning -> critical)
-    Reason: Triggered in 5 PRs, 3 led to production issues
-  - RETIRE: no-commented-code
-    Reason: 0 violations in last 30 days — rule may be unnecessary
-  - NEW RULE CANDIDATE: "require type hints on public functions"
-    Reason: Review feedback pattern — reviewers requested type hints in 4 PRs
-
-Never-triggered rules (candidates for removal):
-  - no-binding-pry (team does not use Ruby)
-  - no-var-dump (team does not use PHP)
-```
-
-### 10.3 Rule Lifecycle
-
-| Phase | Criteria | Action |
-|-------|----------|--------|
-| **Proposed** | Pattern observed in 2+ reviews | Add as `info` severity |
-| **Active** | Catches real issues regularly | Promote to `warning` |
-| **Critical** | Violations have caused production issues | Promote to `critical` |
-| **Retiring** | Zero triggers for 60+ days | Suggest removal |
-| **Retired** | Confirmed unused by team | Remove from rule set |
-
-### 10.4 Feeding Insights Back
-
-After trend analysis, suggest actionable improvements:
-
-1. **Frequent warnings -> critical**: If a warning-level rule triggers in 50%+ of PRs and the violations are always fixed, promote it
-2. **Frequent info -> warning**: If an info-level rule triggers often and reviewers also flag the same issue, promote it
-3. **Never-triggered rules**: Suggest removing rules for languages/frameworks the team does not use
-4. **New rule candidates**: When the same manual review comment appears across 3+ PRs, propose a new automated rule
-
----
+**Read:** `references/team-standards-evolution.md` for detailed step 10: team standards evolution reference material.
 
 ## Common Scenarios
 
-### Scenario 1: First Run (No Custom Rules)
 
-When `.pr-standards.yml` does not exist:
-
-1. Apply all built-in default rules (Step 3)
-2. Report results with a note: "Using built-in defaults. Create `.pr-standards.yml` to customize rules for your team."
-3. Offer to generate a starter `.pr-standards.yml` based on the project's tech stack
-
-### Scenario 2: Large Diff (500+ Changed Lines)
-
-When the diff is large:
-
-1. Note the size: "Large diff detected (X lines). Analysis may take longer."
-2. Prioritize critical rules first — report critical violations immediately
-3. Run warning and info rules after critical scan completes
-4. Consider suggesting PR splitting (reference `/request-code-review` Step 1.3)
-
-### Scenario 3: Only Test Files Changed
-
-When only test files are modified:
-
-1. Skip most code quality rules (debug statements in tests are sometimes acceptable)
-2. Apply test-specific rules: no `@skip` without ticket, test naming conventions
-3. Report with a note: "Only test files changed. Reduced rule set applied."
-
-### Scenario 4: Configuration/Build Files Only
-
-When only config files changed (`.yml`, `.json`, `.toml`, `Dockerfile`, etc.):
-
-1. Apply security rules (no hardcoded secrets, no disabled security)
-2. Skip code quality rules (no magic numbers, no empty catch, etc.)
-3. Report with a note: "Configuration changes only. Security rules applied."
-
-### Scenario 5: Migration Files
-
-When database migration files are changed:
-
-1. Apply security rules (no hardcoded secrets)
-2. Flag irreversible operations: `DROP TABLE`, `DROP COLUMN`, `ALTER COLUMN ... NOT NULL` without default
-3. Note: "Migration file detected. Verify rollback plan exists."
-
----
+**Read:** `references/common-scenarios.md` for detailed common scenarios reference material.
 
 ## CRITICAL RULES
 

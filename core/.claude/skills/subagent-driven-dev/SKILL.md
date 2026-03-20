@@ -32,96 +32,16 @@ Orchestrate work across multiple subagents for faster, parallelized development.
 
 Not every task benefits from subagent delegation. Evaluate the task against this decision framework before proceeding.
 
-### 1.1 Use Subagents When
 
-| Signal | Example |
-|--------|---------|
-| **3+ independent subtasks** | "Add logging to services A, B, and C" — each service is independent |
-| **Bulk file operations** | "Update all test files to use new fixture" — each file is independent |
-| **Research + implementation** | "Research API options while I scaffold the integration" — no dependency |
-| **Multi-module features** | "Add validation to API, CLI, and SDK" — separate codebases |
-| **Large-scale refactoring** | "Rename `UserService` across 15 files" — each file is independent |
-| **Parallel test creation** | "Write unit tests for 5 utility functions" — each test file is independent |
-
-### 1.2 Do NOT Use Subagents When
-
-| Signal | Why Not |
-|--------|---------|
-| **Single-file change** | Overhead of delegation exceeds the work itself |
-| **Tightly coupled logic** | Changes in one area depend on decisions in another — sequential is safer |
-| **Shared state mutation** | Multiple agents writing to the same config, schema, or state file causes conflicts |
-| **Under 5 minutes of total work** | Subagent setup overhead is not worth it |
-| **Exploratory/ambiguous tasks** | When you don't yet know what needs to be done, explore first in the main context |
-| **Database migrations** | Schema changes are inherently sequential and order-dependent |
-| **Single test failure fix** | One focused fix loop is faster than spinning up orchestration |
-
-### 1.3 Decision Checklist
-
-Before dispatching subagents, answer all five questions:
-
-1. **Can I identify 3+ subtasks?** If fewer than 3, do it directly.
-2. **Are the subtasks truly independent?** If any subtask needs the output of another, they are dependent — execute those sequentially.
-3. **Do the subtasks touch different files?** If they share files, do NOT parallelize.
-4. **Is each subtask well-defined enough to describe in a self-contained prompt?** If you cannot write a clear prompt without saying "and also check what the other agent did," the tasks are coupled.
-5. **Will the combined results merge cleanly?** If subagent outputs need complex reconciliation, sequential execution with manual integration is safer.
-
-If any answer is "no," fall back to sequential execution (use `/implement` or `/executing-plans` instead).
-
----
+**Read:** `references/decide-whether-to-use-subagents.md` for detailed step 1: decide whether to use subagents reference material.
 
 ## STEP 2: Decompose the Task
 
 Break the work into subtasks suitable for subagent delegation.
 
-### 2.1 Identify Units of Work
 
-Analyze the task and extract independent units:
+**Read:** `references/decompose-the-task.md` for detailed step 2: decompose the task reference material.
 
-1. **Read the task description** — Understand the full scope
-2. **Map affected files** — List every file that will be created, modified, or deleted
-3. **Cluster by independence** — Group files that can be changed without knowledge of changes to other files
-4. **Identify shared boundaries** — Find files, types, or interfaces that multiple subtasks depend on but none should modify
-
-```
-Task: "Add input validation to all API endpoints"
-
-File mapping:
-  src/api/users.py      → User validation (independent)
-  src/api/orders.py     → Order validation (independent)
-  src/api/products.py   → Product validation (independent)
-  src/api/validators.py → Shared validator base class (BOUNDARY — do not parallelize)
-  tests/test_users.py   → User validation tests (pairs with users.py)
-  tests/test_orders.py  → Order validation tests (pairs with orders.py)
-  tests/test_products.py → Product validation tests (pairs with products.py)
-
-Clusters:
-  Subtask A: users.py + test_users.py
-  Subtask B: orders.py + test_orders.py
-  Subtask C: products.py + test_products.py
-  Pre-work:  validators.py (do this FIRST in main context, before dispatching)
-```
-
-### 2.2 Classify Dependencies
-
-For each pair of subtasks, determine their relationship:
-
-| Relationship | Definition | Action |
-|-------------|------------|--------|
-| **Independent** | No shared files, no shared types, no ordering constraint | Parallelize freely |
-| **Shared-read** | Both read the same file but neither modifies it | Safe to parallelize |
-| **Sequential** | Subtask B needs the output of Subtask A | Execute A first, then B |
-| **Conflicting** | Both modify the same file | MUST NOT parallelize — execute sequentially or merge into one subtask |
-
-### 2.3 Establish Pre-Work
-
-Before dispatching any subagents, complete work that multiple subtasks depend on:
-
-1. **Create shared interfaces or base classes** that subtasks will implement
-2. **Set up directory structures** that subtasks will populate
-3. **Write configuration or schema changes** that subtasks depend on
-4. **Commit the pre-work** so subagents start from a clean, consistent state
-
-```bash
 # Commit pre-work before dispatching subagents
 git add src/api/validators.py
 git commit -m "feat: add validator base class for endpoint validation
@@ -245,77 +165,8 @@ Before dispatching, verify each prompt against:
 
 Choose the right dispatch pattern based on task structure.
 
-### 4.1 Full Parallel (Fan-Out)
 
-Use when all subtasks are independent and touch different files.
-
-```
-Dispatch pattern: Fan-out
-  Agent A: User validation     (users.py, test_users.py)
-  Agent B: Order validation    (orders.py, test_orders.py)
-  Agent C: Product validation  (products.py, test_products.py)
-  ↓ all complete ↓
-  Main: Aggregate results, run full test suite, commit
-```
-
-Dispatch all agents simultaneously:
-
-```
-Agent("Subtask A: User validation ... [full prompt]")
-Agent("Subtask B: Order validation ... [full prompt]")
-Agent("Subtask C: Product validation ... [full prompt]")
-```
-
-### 4.2 Sequential with Parallel Waves
-
-Use when some subtasks depend on others but independent groups exist within waves.
-
-```
-Wave 1 (sequential pre-work):
-  Main context: Create base validator class, commit
-
-Wave 2 (parallel):
-  Agent A: User validation
-  Agent B: Order validation
-  Agent C: Product validation
-
-Wave 3 (sequential post-work):
-  Main context: Integration test, update API docs, commit
-```
-
-### 4.3 Pipeline (Sequential Fan-Out)
-
-Use when later subtasks depend on earlier ones but each wave has parallelism.
-
-```
-Wave 1: Agent A (data models) + Agent B (config setup)
-  ↓ both complete ↓
-Wave 2: Agent C (API endpoints, depends on A) + Agent D (CLI commands, depends on A)
-  ↓ both complete ↓
-Wave 3: Agent E (integration tests, depends on C and D)
-```
-
-### 4.4 Research Fan-Out + Sequential Implementation
-
-Use when you need to gather information from multiple sources before implementing.
-
-```
-Research phase (parallel):
-  Agent A: "Read src/api/ and summarize all endpoint patterns"
-  Agent B: "Read tests/ and summarize test conventions"
-  Agent C: "Read docs/API.md and extract validation requirements"
-  ↓ all complete ↓
-
-Synthesis (main context):
-  Combine research findings, make design decisions
-
-Implementation (parallel or sequential based on findings):
-  Dispatch implementation subagents with full context from research
-```
-
-This pattern is especially useful when exploring unfamiliar codebases. The research subagents consume their own context windows, keeping the main conversation lean.
-
----
+**Read:** `references/dispatch-strategy.md` for detailed step 4: dispatch strategy reference material.
 
 ## STEP 5: Monitor Progress and Aggregate Results
 
@@ -431,46 +282,9 @@ Run: `pytest tests/test_orders.py -v`
 ")
 ```
 
-### 6.2 Multiple Subagent Failures
 
-When 2+ subagents fail in the same wave:
+**Read:** `references/verification.md` for detailed verification reference material.
 
-1. **Check for a common cause** — Same import error, shared dependency issue, or environment problem
-2. **Fix the root cause in main context** if it is shared (e.g., missing package, broken base class)
-3. **Commit the fix** before retrying
-4. **Re-dispatch all failed subtasks** with updated context
-
-### 6.3 Cascading Failures
-
-When a failed subtask blocks downstream waves:
-
-```
-Wave 1: Agent A (PASSED) + Agent B (FAILED)
-Wave 2: Agent C (depends on A — can proceed) + Agent D (depends on B — BLOCKED)
-```
-
-Action:
-1. Dispatch Agent C (its dependency is satisfied)
-2. Retry Agent B in parallel with Agent C
-3. Once Agent B passes, dispatch Agent D
-
-Do NOT wait for all retries to complete before making progress on unblocked work.
-
-### 6.4 Retry Limits
-
-| Attempt | Strategy |
-|---------|----------|
-| **1st retry** | Add failure context to prompt, suggest different approach |
-| **2nd retry** | Simplify the task scope — break the subtask into smaller pieces |
-| **3rd retry** | Escalate — do the work directly in the main context or ask the user |
-
-MUST NOT retry more than 3 times. After 3 failures, the subtask has a deeper issue that automated retry will not solve.
-
-### 6.5 Rollback a Failed Wave
-
-If a wave produces partial results that cannot be salvaged:
-
-```bash
 # Identify files changed by failed subagents
 git diff --name-only
 
@@ -541,77 +355,8 @@ Read: `references/orchestration-patterns.md`
 
 After all subtasks are complete (or execution is halted), produce a structured summary.
 
-### 9.1 Full Success
 
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SUBAGENT ORCHESTRATION COMPLETE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Task: {task_description}
-Subtasks: {total}/{total} completed
-Waves: {wave_count}
-Subagents dispatched: {agent_count} ({retry_count} retries)
-
-Results:
-  [PASSED] Agent A: User validation — 3 files, 3 tests added
-  [PASSED] Agent B: Order validation — 3 files, 4 tests added
-  [PASSED] Agent C: Product validation — 3 files, 3 tests added
-
-Integration verification: ALL TESTS PASSING
-Commits: {commit_count}
-
-Files modified:
-  src/api/users.py, src/api/orders.py, src/api/products.py
-  src/api/validators.py (pre-work)
-  tests/test_users.py, tests/test_orders.py, tests/test_products.py
-```
-
-### 9.2 Partial Success
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SUBAGENT ORCHESTRATION PAUSED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Task: {task_description}
-Subtasks: {completed}/{total} completed, {failed} failed
-
-Results:
-  [PASSED]  Agent A: User validation — committed
-  [FAILED]  Agent B: Order validation — 3 retries exhausted
-  [PASSED]  Agent C: Product validation — committed
-  [BLOCKED] Agent D: Integration tests — blocked on Agent B
-
-Failed subtask details:
-  Agent B: Order validation
-    Last error: {error_summary}
-    Files with uncommitted changes: {file_list}
-    Attempts: 3/3
-
-Options:
-  1. Fix Order validation manually, then resume
-  2. Skip Order validation and proceed with unblocked subtasks
-  3. Roll back all changes from this orchestration
-```
-
-### 9.3 Post-Completion
-
-After orchestration completes:
-
-1. **Run the full project test suite** — Subagent-level tests passing does not guarantee integration correctness
-2. **Review the diff** — `git diff {start_hash}..HEAD` to see all changes holistically
-3. **Invoke `/learn-n-improve`** to capture orchestration lessons:
-   - Which subtask prompts worked well
-   - Which needed retries and why
-   - File boundary violations encountered
-   - Patterns to reuse in future orchestrations
-
-```
-Skill("learn-n-improve", args="session")
-```
-
----
+**Read:** `references/completion-summary.md` for detailed step 9: completion summary reference material.
 
 ## MUST DO
 

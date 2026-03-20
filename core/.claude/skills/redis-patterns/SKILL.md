@@ -62,39 +62,9 @@ session:abc123
 
 ## Caching Patterns
 
-### Cache-Aside (Lazy Loading)
 
-```python
-import json
+**Read:** `references/caching-patterns.md` for detailed caching patterns reference material.
 
-def get_user(user_id: str) -> dict:
-    cached = r.get(f"cache:user:{user_id}")
-    if cached:
-        return json.loads(cached)
-
-    user = db.query_user(user_id)  # Fetch from primary store
-    r.setex(f"cache:user:{user_id}", 3600, json.dumps(user))  # Cache with TTL
-    return user
-```
-
-### Write-Through
-
-```python
-def update_user(user_id: str, data: dict):
-    db.update_user(user_id, data)  # Write to primary store
-    r.setex(f"cache:user:{user_id}", 3600, json.dumps(data))  # Update cache
-```
-
-### Client-Side Caching (Redis 7+ with RESP3)
-
-```python
-import redis
-
-client = redis.Redis(
-    host='localhost', port=6379,
-    protocol=3,  # RESP3 required
-    cache_config=redis.CacheConfig(max_size=1000)
-)
 # Subsequent reads for the same key avoid server round-trips
 value = client.get("frequently:read:key")
 ```
@@ -148,25 +118,7 @@ def is_rate_limited(user_id: str, limit: int = 100, window: int = 60) -> bool:
 
 ## Session Management
 
-```python
-import json, secrets
-
-def create_session(user_id: str, ttl: int = 1800) -> str:
-    session_id = secrets.token_urlsafe(32)
-    r.hset(f"session:{session_id}", mapping={
-        "user_id": user_id,
-        "created_at": str(time.time()),
-        "ip": request.remote_addr
-    })
-    r.expire(f"session:{session_id}", ttl)
-    return session_id
-
-def get_session(session_id: str) -> dict | None:
-    data = r.hgetall(f"session:{session_id}")
-    if data:
-        r.expire(f"session:{session_id}", 1800)  # Slide expiration
-    return data or None
-```
+**Read:** `references/session-management.md` for detailed session management reference material.
 
 ## Connection Management
 
@@ -271,40 +223,9 @@ r.json().arrappend("user:1001", "$.tags", "premium")
 
 ## Redis Query Engine (RQE)
 
-### Index Creation
 
-Index only the fields you query. Always specify a prefix:
+**Read:** `references/redis-query-engine-rqe.md` for detailed redis query engine (rqe) reference material.
 
-```python
-from redis.commands.search.field import TextField, TagField, NumericField, VectorField
-from redis.commands.search.indexDefinition import IndexDefinition, IndexType
-
-schema = [
-    TextField("name", weight=2.0),
-    TagField("category", sortable=True),
-    NumericField("price", sortable=True),
-]
-
-r.ft("idx:products").create_index(
-    schema,
-    definition=IndexDefinition(prefix=["product:"], index_type=IndexType.HASH)
-)
-```
-
-### Field Type Selection
-
-| Field Type | Use When | Notes |
-|------------|----------|-------|
-| TEXT | Full-text search needed | Tokenized, stemmed |
-| TAG | Exact match, filtering | 10x faster than TEXT for filtering |
-| NUMERIC | Range queries, sorting | Prices, counts, timestamps |
-| GEO | Point location queries | Lat/long coordinates |
-| GEOSHAPE | Area/region queries | Polygons, circles |
-| VECTOR | Similarity search | HNSW or FLAT algorithm |
-
-### Querying
-
-```python
 # Specific filters + limit results
 results = r.ft("idx:products").search(
     "@category:{electronics} @price:[100 500]",
@@ -332,34 +253,8 @@ r.ft("idx").create_index(schema, definition=definition, skip_initial_scan=True)
 
 ## Vector Search
 
-### Index Configuration
 
-```python
-from redis.commands.search.field import VectorField
-
-VectorField(
-    "embedding",
-    algorithm="HNSW",
-    attributes={
-        "TYPE": "FLOAT32",
-        "DIM": 1536,           # MUST match your embedding model
-        "DISTANCE_METRIC": "COSINE"
-    }
-)
-```
-
-| Algorithm | Speed | Accuracy | Best For |
-|-----------|-------|----------|----------|
-| HNSW | Fast (approximate) | ~95%+ tunable | Large datasets (>10k vectors) |
-| FLAT | Slower (exact) | 100% | Small datasets, accuracy-critical |
-
-**HNSW tuning:** `M` (16-64, connections/node), `EF_CONSTRUCTION` (100-500, build quality), `EF_RUNTIME` (query accuracy vs speed).
-
-### RAG Pattern with RedisVL
-
-```python
-from redisvl.index import SearchIndex
-from redisvl.query import VectorQuery
+**Read:** `references/vector-search.md` for detailed vector search reference material.
 
 # Store documents with embeddings
 for doc in documents:
@@ -402,26 +297,7 @@ Filters are applied before vector search, reducing computation. Use TAG for cate
 
 ## Semantic Caching (LangCache)
 
-> LangCache is currently in preview on Redis Cloud.
-
-```python
-from langcache import LangCache
-
-lang_cache = LangCache(
-    server_url=f"https://{os.getenv('HOST')}",
-    cache_id=os.getenv("CACHE_ID"),
-    api_key=os.getenv("API_KEY")
-)
-
-result = lang_cache.search(prompt="What is Redis?", similarity_threshold=0.9)
-if result:
-    response = result[0]["response"]
-else:
-    response = llm.generate("What is Redis?")
-    lang_cache.set(prompt="What is Redis?", response=response)
-```
-
-**Best practices:** Start threshold at 0.9. Use separate cache IDs for different LLM tasks. Use custom attributes for filtering within a cache.
+**Read:** `references/semantic-caching-langcache.md` for detailed semantic caching (langcache) reference material.
 
 ## Pub/Sub vs Streams
 
@@ -497,33 +373,8 @@ rename-command CONFIG ""
 
 ## Observability
 
-### Key Metrics to Monitor
 
-| Metric | Alert When |
-|--------|------------|
-| `used_memory` | > 80% of maxmemory |
-| `connected_clients` | Sudden spikes or drops |
-| `blocked_clients` | > 0 sustained |
-| `instantaneous_ops_per_sec` | Significant drops |
-| `keyspace_hits/misses` | Hit ratio < 80% |
-| `rejected_connections` | > 0 |
-
-```python
-info = r.info()
-hit_ratio = info['keyspace_hits'] / (info['keyspace_hits'] + info['keyspace_misses']) * 100
-print(f"Memory: {info['used_memory_human']}, Ops/sec: {info['instantaneous_ops_per_sec']}, Hit ratio: {hit_ratio:.1f}%")
-```
-
-### Debugging Commands
-
-```
-SLOWLOG GET 10          # Find slow commands
-MEMORY USAGE mykey      # Per-key memory
-MEMORY DOCTOR           # Memory diagnostics
-FT.INFO idx:products    # Index stats
-FT.PROFILE idx:products SEARCH QUERY "@name:laptop"  # Query profiling
-CLIENT LIST             # Active connections
-```
+**Read:** `references/observability.md` for detailed observability reference material.
 
 ## Anti-Pattern Guardrails
 

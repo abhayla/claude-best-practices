@@ -155,94 +155,15 @@ Agent(prompt="Run /security-audit on all changed files between $BASE_BRANCH and 
 Skill("change-risk-scoring", args="--format json")
 ```
 
-### 2.1 Record Results
 
-```
-BATCH B — Security Audit:
-  Status: {PASS / WARN / BLOCK / UNKNOWN}
-  Critical findings: {count}
-  High findings: {count}
-  Medium findings: {count}
-  Low findings: {count}
-  Blocking issues: {count}
-
-BATCH B — Change Risk Scoring:
-  Risk score: {0-100}
-  Classification: {LOW / MEDIUM / HIGH / CRITICAL}
-  Recommendation: {AUTO-DEPLOY / HUMAN REVIEW / EXTRA TESTING / HOLD}
-  Hotspots: {list or "none"}
-  Top risk files: {list}
-```
-
-If any Critical security findings exist, this step is automatically BLOCK regardless of other results.
-
-### 2.2 Threshold Check
-
-Compare the risk score against the threshold (default: 50):
-
-| Score vs Threshold | Action |
-|--------------------|--------|
-| Score ≤ threshold | PASS — risk is within acceptable bounds |
-| Score > threshold by ≤ 15 | WARN — flag for awareness but do not block |
-| Score > threshold by > 15 | BLOCK — risk exceeds acceptable bounds, recommend scope reduction |
-
----
+**Read:** `references/batch-b-security-risk-scoring-parallel.md` for detailed step 2: batch b — security + risk scoring (parallel) reference material.
 
 ## STEP 3: Batch C — Adversarial Review → PR Standards (Sequential)
 
 Run adversarial-review with findings from Batches A+B as context, then pr-standards. These are sequential because adversarial-review benefits from knowing what earlier checks found.
 
-### 3.1 Adversarial Review
 
-```
-Skill("adversarial-review", args="--mode code")
-```
-
-Record result:
-
-```
-BATCH C — Adversarial Review:
-  Status: {PASSED / PASSED WITH CAVEATS / BLOCKED / UNKNOWN}
-  Rounds completed: {1-3}
-  Issues found: {total}
-    Critical: {count} ({resolved} resolved)
-    Major: {count} ({resolved} resolved)
-    Minor: {count} ({resolved} resolved)
-  Unresolved critical: {count}
-  Deferred with tracking: {count}
-  Blocking issues: {count}
-```
-
-### 3.2 PR Standards
-
-```
-Skill("pr-standards", args="")
-```
-
-Record result:
-
-```
-BATCH C — PR Standards:
-  Status: {PASS / FAIL / WARN / UNKNOWN}
-  Critical violations: {count}
-  Warning violations: {count}
-  Info violations: {count}
-  Auto-fixable: {count}
-```
-
-If the result is FAIL and `--fix` is enabled:
-
-```
-Skill("pr-standards", args="--fix")
-```
-
-Then re-run to verify:
-
-```
-Skill("pr-standards", args="")
-```
-
----
+**Read:** `references/batch-c-adversarial-review-pr-standards-sequential.md` for detailed step 3: batch c — adversarial review → pr standards (sequential) reference material.
 
 ## STEP 4: Fix Loop (Conditional)
 
@@ -250,50 +171,9 @@ This step runs ONLY if:
 1. Any previous step produced BLOCK status, AND
 2. `--fix` flag is enabled
 
-### 4.1 Collect All Blocking Findings
 
-Gather all BLOCK/CRITICAL findings from Steps 1-6 into a single fix list:
+**Read:** `references/fix-loop-conditional.md` for detailed step 4: fix loop (conditional) reference material.
 
-```
-BLOCKING FINDINGS TO FIX:
-  [QG-1] Cyclomatic complexity 22 in src/services/order.py:process_order
-  [SEC-1] SQL injection in src/api/routes.py:42
-  [AR-1] Unresolved critical: missing null check in payment flow
-  [PS-1] Debugger statement in src/routes/users.py:45
-```
-
-### 4.2 Apply Fixes
-
-For each blocking finding:
-
-1. Apply the fix (using the suggested fix from the sub-skill's report)
-2. Verify the fix does not introduce regressions:
-
-```
-Skill("auto-verify", args="--files <fixed_files>")
-```
-
-3. If `auto-verify` fails:
-
-```
-Skill("fix-loop", args="retest_command: <TEST_CMD> max_iterations: 3")
-```
-
-### 4.3 Scope-Aware Re-Run Policy
-
-After fix-loop applies fixes, determine the re-run scope based on whether the fix touched files outside the original finding's scope:
-
-1. **Identify fix scope**: Compare the files modified by the fix against the files referenced in the original finding
-2. **Classify fix reach**:
-
-| Fix Reach | Condition | Re-Run Scope |
-|-----------|-----------|-------------|
-| Scoped | Fix modified ONLY files listed in the original finding (same directory/module) | Re-run ONLY the sub-skill that produced the BLOCK status |
-| Cross-cutting | Fix modified files in DIFFERENT directories or modules than the original finding | Re-run ALL sub-skills (quality, architecture, security, adversarial, risk, PR standards) |
-
-3. **Detect cross-cutting fixes**:
-
-```bash
 # Get directories touched by the fix
 FIX_DIRS=$(git diff --name-only HEAD~1 HEAD | xargs -I{} dirname {} | sort -u)
 
@@ -390,54 +270,8 @@ For each deferred item in the report:
 - {If REJECTED: "Address N blocking issues before re-running /review-gate."}
 ```
 
-### 5.2 Machine-Readable Output
 
-Write the consolidated results to `test-results/review-gate.json` for programmatic consumption by Stage 10:
-
-```json
-{
-  "skill": "review-gate",
-  "timestamp": "<ISO-8601>",
-  "result": "APPROVED",
-  "branch": "<branch>",
-  "base_branch": "<base_branch>",
-  "risk_score": 42,
-  "risk_classification": "MEDIUM",
-  "checks": {
-    "code_quality_gate": {"status": "PASSED", "blocking": 0},
-    "architecture_fitness": {"status": "PASSED", "blocking": 0},
-    "security_audit": {"status": "WARNED", "blocking": 0, "findings": {"critical": 0, "high": 1, "medium": 2, "low": 3}},
-    "adversarial_review": {"status": "PASSED", "blocking": 0, "issues": {"total": 5, "resolved": 4, "deferred": 1}},
-    "change_risk_scoring": {"status": "PASSED", "score": 42, "classification": "MEDIUM"},
-    "pr_standards": {"status": "PASSED", "blocking": 0, "violations": {"critical": 0, "warning": 2, "info": 3}}
-  },
-  "_status_values": "checks.*.status accepts: PASSED | WARNED | BLOCKED | UNKNOWN",
-  "blocking_issues": [],
-  "deferred_items": [
-    {"source": "adversarial-review", "id": "R3", "tracking": "#456", "description": "...", "deferred_date": "2026-03-01T00:00:00Z", "ttl_remaining_days": 14, "auto_promoted": false}
-  ],
-  "fix_loop_ran": false,
-  "verdict": "APPROVED",
-  "recommendation": "Proceed to PR creation and Stage 10."
-}
-```
-
-### 5.3 Verdict Logic
-
-```
-IF any check has status UNKNOWN:
-  verdict = "REJECTED"   # UNKNOWN is treated as BLOCK — unknowns are unsafe
-ELIF any check has unresolved BLOCK status:
-  verdict = "REJECTED"
-ELIF risk_score > threshold + 15:
-  verdict = "REJECTED"
-ELIF any check has WARN status OR deferred_items > 0 OR risk_score > threshold:
-  verdict = "APPROVED WITH CAVEATS"
-ELSE:
-  verdict = "APPROVED"
-```
-
----
+**Read:** `references/recommendations.md` for detailed recommendations reference material.
 
 ## STEP 6: PR Creation (Conditional)
 
@@ -504,46 +338,7 @@ Then re-run only the sub-skills affected by the changes made during feedback res
 
 ## Pipeline Flow Summary
 
-```
- ┌─────────────────────────────────────────────────────────────────┐
- │                    /review-gate                                 │
- │                                                                 │
- │  STEP 0: Validate preconditions (branch, commits, tests)       │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 1: BATCH A (parallel agents)                             │
- │     ├── /code-quality-gate (skip layer check)                  │
- │     └── /architecture-fitness (authoritative layer check)      │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 2: BATCH B (parallel)                                    │
- │     ├── /security-audit (via agent)                            │
- │     └── /change-risk-scoring                                   │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 3: BATCH C (sequential, uses A+B context)                │
- │     ├── /adversarial-review --mode code                        │
- │     └── /pr-standards                                          │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 4: /fix-loop + /auto-verify (if --fix and blocks exist)  │
- │     │                                                           │
- │     ▼                                                           │
- │  BATCH D: /test-maintenance audit (if --include-test-health)    │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 5: Consolidated report → test-results/review-gate.json   │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 6: /request-code-review (if --pr and verdict ≠ REJECTED) │
- │     │                                                           │
- │     ▼                                                           │
- │  STEP 7: /receive-code-review (when feedback arrives)          │
- │                                                                 │
- └─────────────────────────────────────────────────────────────────┘
-```
-
----
+**Read:** `references/pipeline-flow-summary.md` for detailed pipeline flow summary reference material.
 
 ## Parallelization Strategy
 
@@ -564,48 +359,8 @@ The 6 analysis checks are grouped into 3 batches for optimal throughput:
 
 This batch runs ONLY if `--include-test-health` is passed. It invokes the first step (audit) of `/test-maintenance` as a non-blocking diagnostic check. Results appear as warnings in the consolidated report — they never produce BLOCK status.
 
-### D.1 Run Test Maintenance Audit
 
-```
-Skill("test-maintenance", args="--step audit-only")
-```
-
-### D.2 Record Results
-
-Extract the following metrics from the test-maintenance audit output and include them in the consolidated report's Recommendations section as warnings:
-
-```
-BATCH D — Test Health (non-blocking):
-  Skip rate: {percentage of tests marked skip/ignore/disabled}
-  Dead tests: {count of tests that never run in CI}
-  Slow tests: {count of tests exceeding category timeout thresholds}
-  Status: WARN (advisory only — does not affect verdict)
-```
-
-### D.3 Thresholds for Warnings
-
-| Metric | Healthy | Warning Threshold |
-|--------|---------|-------------------|
-| Skip rate | < 5% | >= 5% of total test suite |
-| Dead tests | 0 | >= 1 test never executed in CI |
-| Slow tests | 0 | >= 3 tests exceeding their category timeout |
-
-If any threshold is exceeded, add a warning entry to the consolidated report's `warnings` array in `test-results/review-gate.json`:
-
-```json
-{
-  "source": "test-maintenance",
-  "level": "WARN",
-  "metrics": {
-    "skip_rate_pct": 8.2,
-    "dead_test_count": 3,
-    "slow_test_count": 5
-  },
-  "message": "Test suite health degraded — 8.2% skip rate, 3 dead tests, 5 slow tests. Run /test-maintenance for remediation."
-}
-```
-
----
+**Read:** `references/batch-d-test-health-audit-optional.md` for detailed batch d: test health audit (optional) reference material.
 
 ## MUST DO
 
