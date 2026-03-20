@@ -26,7 +26,7 @@ Skip Tier 2 if Tier 1 suffices. MUST NOT read more than necessary.
 
 ## Clarification Gate — Ask Before Acting
 
-After gathering Tier 1/2 context, assess whether the prompt is **unambiguous enough to act on**. If not, enter a structured clarification loop before implementing anything.
+Before starting any implementation, clarify requirements by asking questions one at a time.
 
 ### When to Trigger
 
@@ -40,17 +40,24 @@ After gathering Tier 1/2 context, assess whether the prompt is **unambiguous eno
 - The answer is fully resolvable from codebase context gathered in Tier 1/2
 - The prompt is a question (just answer it)
 
-### How to Clarify
+### How to Ask
 
-1. **Read first** — before each question, read relevant files/docs to ground your recommendation in what actually exists. MUST NOT ask things you can answer by reading code.
-2. **One question at a time** — state how many remain (e.g., "Question 2 of ~4")
-3. **Lead with a recommendation** — for each question, state your suggested answer with reasoning (cite codebase patterns, standards, or docs you read). Ask the user to confirm or override.
-4. **Don't ask obvious things** — if there's a clear best-practice answer, state it as your recommendation and move on unless the user disagrees.
-5. **Converge fast** — target 3-5 questions max. Stop as soon as you have enough confidence to act.
+- State how many questions remain (e.g., "Question 3 of ~6")
+- For each question, provide your recommendation with reasoning (cite codebase patterns, standards, or docs you read)
+- Before each question, read relevant files/docs to ground your recommendation in what actually exists — MUST NOT ask things you can answer by reading code
+- Target 3-5 questions max. Stop as soon as you have enough confidence to act.
 
-### After Clarification
+### After Clarification — Present Plan Section by Section
 
-Once all questions are resolved, present the plan **section by section** for review — not all at once. Wait for approval on each section before showing the next. Only begin implementation after all sections are approved.
+- Present the plan **section by section** for review (not all at once)
+- For each section, wait for approval or feedback before showing the next
+- Only begin implementation after all sections are approved
+
+### What NOT to Do
+
+- MUST NOT ask generic questions you could resolve by reading the codebase (e.g., "What tech stack do you use?" — read CLAUDE.md)
+- MUST NOT ask the user to confirm things that have obvious best-practice answers — state your recommendation and move on unless the user disagrees
+- MUST NOT present the entire plan in one shot expecting blanket approval
 
 ## Resource CRUD Detection
 
