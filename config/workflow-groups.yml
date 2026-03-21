@@ -66,6 +66,7 @@ workflows:
         - learn-n-improve
         - skill-factory
         - test-knowledge
+        - self-improve
       agents:
         - session-summarizer-agent
         - context-reducer-agent

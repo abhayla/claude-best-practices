@@ -22,7 +22,7 @@ from typing import Optional
 
 import yaml
 
-from scripts.validate_patterns import parse_frontmatter, get_body
+from scripts.workflow_quality_gate_validate_patterns import parse_frontmatter, get_body
 
 ROOT = Path(__file__).parent.parent
 CORE_CLAUDE = ROOT / "core" / ".claude"
