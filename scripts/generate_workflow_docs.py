@@ -125,11 +125,145 @@ def extract_references(name: str, body: str) -> dict:
     for m in re.finditer(r'(?:invokes?|runs?)\s+`?/([a-z0-9_-]+)`?', body, re.IGNORECASE):
         refs["skill_calls"].add(m.group(1))
 
+    # Prose agent references: "delegate to docs-manager-agent",
+    # "via tester-agent", "dispatches test-failure-analyzer-agent"
+    for m in re.finditer(r'[Dd]elegates?\s+to\s+([a-z][a-z0-9-]*-agent)', body):
+        refs["agent_calls"].add(m.group(1))
+    for m in re.finditer(r'[Dd]ispatche?s?\s+([a-z][a-z0-9-]*-agent)', body):
+        refs["agent_calls"].add(m.group(1))
+    for m in re.finditer(r'via\s+([a-z][a-z0-9-]*-agent)', body):
+        refs["agent_calls"].add(m.group(1))
+    # Backtick-quoted agent names
+    for m in re.finditer(r'`([a-z][a-z0-9-]*-agent)`', body):
+        refs["agent_calls"].add(m.group(1))
+
+    # Multi-reference delegation: catch all `/skill` refs on delegation lines
+    for line in body.splitlines():
+        if re.search(r'[Dd]elegates?\s+to', line):
+            for sm in re.finditer(r'`/([a-z0-9_-]+)`', line):
+                refs["skill_calls"].add(sm.group(1))
+
     # Remove self-references
     refs["skill_calls"].discard(name)
     refs["agent_calls"].discard(name)
 
     return {k: sorted(v) for k, v in refs.items()}
+
+
+def extract_steps(name: str, body: str) -> list[dict]:
+    """Extract numbered STEP sections from a skill body.
+
+    Returns a list of step dicts with title, delegations, gates, artifacts,
+    and decision points.
+    """
+    steps = []
+    # Match ## STEP N: Title or ## STEP N — Title
+    step_pattern = re.compile(
+        r'^##\s+STEP\s+(\d+\w*)\s*[:\-—]\s*(.+)', re.MULTILINE
+    )
+    matches = list(step_pattern.finditer(body))
+    if not matches:
+        return steps
+
+    for i, m in enumerate(matches):
+        step_num = m.group(1).strip()
+        step_title = m.group(2).strip()
+        start = m.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
+        section = body[start:end]
+
+        # Extract delegations within this step
+        skill_calls = set()
+        for sm in re.finditer(r'Skill\(["\']([a-z0-9_-]+)["\']\)', section):
+            skill_calls.add(sm.group(1))
+        for sm in re.finditer(r'`/([a-z0-9_-]+)`', section):
+            skill_calls.add(sm.group(1))
+        skill_calls.discard(name)
+
+        agent_calls = set()
+        for am in re.finditer(r'Agent\(["\']([a-z0-9_-]+)["\']\)', section):
+            agent_calls.add(am.group(1))
+
+        # Prose agent references: "delegate to docs-manager-agent",
+        # "via tester-agent", "dispatches test-failure-analyzer-agent"
+        prose_agent_patterns = [
+            r'[Dd]elegates?\s+to\s+([a-z][a-z0-9-]*-agent)',
+            r'via\s+([a-z][a-z0-9-]*-agent)',
+            r'[Dd]ispatche?s?\s+([a-z][a-z0-9-]*-agent)',
+            r'`([a-z][a-z0-9-]*-agent)`',
+        ]
+        for pat in prose_agent_patterns:
+            for pam in re.finditer(pat, section):
+                agent_calls.add(pam.group(1))
+
+        # Multi-reference delegation: "/skill-a or /skill-b"
+        # Catch backtick-quoted skill refs after "or"/"and" on delegation lines
+        for line in section.splitlines():
+            if re.search(r'[Dd]elegates?\s+to', line):
+                for sm in re.finditer(r'`/([a-z0-9_-]+)`', line):
+                    ref = sm.group(1)
+                    if ref != name:
+                        skill_calls.add(ref)
+
+        # Detect gate checks
+        has_gate = bool(re.search(
+            r'(?:gate|block|BLOCK|reads?\s+.*\.json|upstream)', section, re.IGNORECASE
+        ))
+
+        # Detect decision points
+        has_decision = bool(re.search(
+            r'(?:if\s+.*(?:fail|pass|exist|missing)|→.*mode|→.*BLOCK)',
+            section, re.IGNORECASE
+        ))
+
+        # Detect artifact production (deduplicated)
+        artifacts_set = set()
+        for am in re.finditer(r'(?:test-results|test-evidence)/[a-z0-9_\-{}/.*]+\.json', section):
+            artifacts_set.add(am.group(0))
+        artifacts = sorted(artifacts_set)
+
+        # Detect artifact consumption (reads/gates on upstream JSON)
+        artifacts_consumed = set()
+        consume_patterns = [
+            r'[Rr]ead[s]?\s+`?(test-(?:results|evidence)/[a-z0-9_\-{}/.*]+\.json)`?',
+            r'[Ii]f\s+`?(test-(?:results|evidence)/[a-z0-9_\-{}/.*]+\.json)`?\s+exists',
+            r'-f\s+(test-(?:results|evidence)/[a-z0-9_\-{}/.*]+\.json)',
+            r'from\s+`?(test-(?:results|evidence)/[a-z0-9_\-{}/.*]+\.json)`?',
+        ]
+        for pat in consume_patterns:
+            for cm in re.finditer(pat, section):
+                artifacts_consumed.add(cm.group(1))
+
+        # Extract branch targets from decision points
+        branches = []
+        branch_patterns = [
+            # → BLOCK or → BLOCK.
+            (r'→\s*(BLOCK)', "BLOCK"),
+            # → proceed to STEP N or → STEP N
+            (r'→\s*(?:proceed to\s+)?STEP\s+(\d+\w*)', None),
+            # if ... PASSED/FAILED → ...
+            (r'[Ii]f\s+.*?(PASSED|FIXED)\s*→', "PASS"),
+            (r'[Ii]f\s+.*?(FAILED|FLAKY)\s*→', "FAIL"),
+        ]
+        for pat, label_override in branch_patterns:
+            for bm in re.finditer(pat, section):
+                branch_label = label_override or f"STEP {bm.group(1)}"
+                if branch_label not in [b["label"] for b in branches]:
+                    branches.append({"label": branch_label})
+
+        steps.append({
+            "num": step_num,
+            "title": step_title,
+            "skill_calls": sorted(skill_calls),
+            "agent_calls": sorted(agent_calls),
+            "has_gate": has_gate,
+            "has_decision": has_decision,
+            "artifacts": artifacts,
+            "artifacts_consumed": sorted(artifacts_consumed),
+            "branches": branches,
+        })
+
+    return steps
 
 
 def build_reference_graph(
@@ -149,6 +283,7 @@ def build_reference_graph(
 
     # Initialize nodes
     for name, (ptype, data) in all_patterns.items():
+        steps = extract_steps(name, data["body"]) if ptype == "skill" else []
         nodes[name] = {
             "type": ptype,
             "path": data["path"],
@@ -157,6 +292,7 @@ def build_reference_graph(
             "label": data.get("label", ""),
             "refs_out": [],
             "refs_in": [],
+            "steps": steps,
         }
 
     # Extract references and build edges
@@ -302,6 +438,150 @@ def generate_mermaid_flow(workflow: dict) -> str:
     return "\n".join(lines)
 
 
+def generate_detailed_mermaid(workflow: dict, graph: dict) -> str:
+    """Generate a detailed Mermaid flowchart showing steps, gates, and artifacts.
+
+    For each skill that has extracted steps, shows the step-level flow with
+    decision diamonds for gates and artifact nodes for JSON outputs.
+    Only includes skills with 3+ steps to avoid noise.
+    """
+    lines = ["```mermaid", "graph TD"]
+    node_ids = set()
+
+    # Collect skills with meaningful step data
+    detailed_skills = []
+    for sname in workflow["skills"]:
+        node = graph["nodes"].get(sname, {})
+        steps = node.get("steps", [])
+        if len(steps) >= 3:
+            detailed_skills.append((sname, steps))
+
+    if not detailed_skills:
+        return ""
+
+    for sname, steps in detailed_skills:
+        safe_skill = sname.replace("-", "_")
+
+        # Subgraph per skill
+        display = sname.replace("-", " ").title()
+        lines.append(f"    subgraph {safe_skill}_sub[\"{display}\"]")
+
+        prev_id = None
+        for step in steps:
+            step_id = f"{safe_skill}_s{step['num']}"
+            label = f"Step {step['num']}: {step['title']}"
+            node_ids.add(step_id)
+
+            if step["has_gate"]:
+                # Diamond for gate/decision
+                lines.append(f"        {step_id}{{{{{label}}}}}")
+            else:
+                lines.append(f"        {step_id}[\"{label}\"]")
+
+            if prev_id:
+                # If previous step had branches, label the forward edge as PASS
+                prev_step = next(
+                    (s for s in steps if f"{safe_skill}_s{s['num']}" == prev_id),
+                    None
+                )
+                has_block_branch = prev_step and any(
+                    b["label"] == "BLOCK" for b in prev_step.get("branches", [])
+                )
+                if has_block_branch:
+                    lines.append(f"        {prev_id} -->|OK| {step_id}")
+                else:
+                    lines.append(f"        {prev_id} --> {step_id}")
+            prev_id = step_id
+
+            # Show delegations as edges to external nodes
+            for sc in step["skill_calls"]:
+                ext_id = sc.replace("-", "_") + "_ext"
+                if ext_id not in node_ids:
+                    lines.append(f"        {ext_id}([/{sc}/])")
+                    node_ids.add(ext_id)
+                lines.append(f"        {step_id} -.-> {ext_id}")
+
+            for ac in step["agent_calls"]:
+                ext_id = ac.replace("-", "_") + "_ext"
+                if ext_id not in node_ids:
+                    lines.append(f"        {ext_id}(({ac}))")
+                    node_ids.add(ext_id)
+                lines.append(f"        {step_id} -.-> {ext_id}")
+
+            # Show artifact consumption (dashed arrow FROM artifact TO step)
+            for art in step.get("artifacts_consumed", []):
+                art_id = (
+                    safe_skill + "_" +
+                    art.replace("/", "_").replace(".", "_").replace("-", "_")
+                    .replace("{", "").replace("}", "").replace("*", "")
+                )
+                if art_id not in node_ids:
+                    lines.append(f"        {art_id}[(\"{art}\")]")
+                    node_ids.add(art_id)
+                lines.append(f"        {art_id} -.->|reads| {step_id}")
+
+            # Show artifact production (solid arrow FROM step TO artifact)
+            for art in step["artifacts"]:
+                # Skip if already shown as consumed (avoid duplicate nodes)
+                if art in step.get("artifacts_consumed", []):
+                    continue
+                art_id = (
+                    safe_skill + "_" +
+                    art.replace("/", "_").replace(".", "_").replace("-", "_")
+                    .replace("{", "").replace("}", "").replace("*", "")
+                )
+                if art_id not in node_ids:
+                    lines.append(f"        {art_id}[(\"{art}\")]")
+                    node_ids.add(art_id)
+                lines.append(f"        {step_id} -->|writes| {art_id}")
+
+            # Show branch labels on decision steps
+            for branch in step.get("branches", []):
+                label = branch["label"]
+                if label == "BLOCK":
+                    block_id = f"{step_id}_block"
+                    if block_id not in node_ids:
+                        lines.append(f"        {block_id}[/BLOCK/]")
+                        node_ids.add(block_id)
+                    lines.append(
+                        f"        {step_id} -->|FAILED| {block_id}"
+                    )
+
+        lines.append("    end")
+        lines.append("")
+
+    # Add inter-skill edges for the detailed skills
+    detailed_names = {s[0] for s in detailed_skills}
+    for edge in workflow["edges"]:
+        if edge["from"] in detailed_names and edge["to"] in detailed_names:
+            src_sub = edge["from"].replace("-", "_") + "_sub"
+            tgt_sub = edge["to"].replace("-", "_") + "_sub"
+            # Don't duplicate — subgraph-to-subgraph edges
+            # Instead, find the step that makes the call and connect
+            src_node = graph["nodes"].get(edge["from"], {})
+            for step in src_node.get("steps", []):
+                target = edge["to"]
+                if target in step["skill_calls"] or target in step["agent_calls"]:
+                    src_id = f"{edge['from'].replace('-', '_')}_s{step['num']}"
+                    # Find first step of target
+                    tgt_node = graph["nodes"].get(edge["to"], {})
+                    tgt_steps = tgt_node.get("steps", [])
+                    if tgt_steps:
+                        tgt_id = f"{edge['to'].replace('-', '_')}_s{tgt_steps[0]['num']}"
+                        edge_key = f"{src_id}-->{tgt_id}"
+                        if edge_key not in node_ids:
+                            lines.append(f"    {src_id} ==> {tgt_id}")
+                            node_ids.add(edge_key)
+                    break
+
+    lines.append("```")
+
+    # Only return if we generated meaningful content
+    if len(lines) <= 3:
+        return ""
+    return "\n".join(lines)
+
+
 def generate_cross_workflow_mermaid(workflows: dict, graph: dict) -> str:
     """Generate a top-level cross-workflow connection diagram."""
     lines = ["```mermaid", "graph TD"]
@@ -341,12 +621,22 @@ def generate_cross_workflow_mermaid(workflows: dict, graph: dict) -> str:
 
 
 def preserve_manual_annotations(existing_content: str) -> str:
-    """Extract content below the MANUAL ANNOTATIONS marker."""
+    """Extract user-written content below the MANUAL ANNOTATIONS marker.
+
+    Strips the marker itself and the auto-generated comment line that follows it,
+    returning only genuine user annotations.
+    """
     if MANUAL_MARKER not in existing_content:
         return ""
     idx = existing_content.index(MANUAL_MARKER)
     after = existing_content[idx + len(MANUAL_MARKER):]
-    return after.strip()
+    # Remove auto-generated instruction comments
+    lines = after.splitlines()
+    filtered = [
+        line for line in lines
+        if not line.strip().startswith("<!-- Add custom notes")
+    ]
+    return "\n".join(filtered).strip()
 
 
 def render_workflow_doc(
@@ -368,10 +658,22 @@ def render_workflow_doc(
         "",
     ]
 
-    # Flow diagram
+    # Overview diagram (skill-to-skill edges)
     if workflow["edges"]:
-        lines.extend(["## Flow Diagram", ""])
+        lines.extend(["## Overview", ""])
         lines.append(generate_mermaid_flow(workflow))
+        lines.append("")
+
+    # Detailed diagram (step-level with gates, artifacts, decisions)
+    detailed = generate_detailed_mermaid(workflow, graph)
+    if detailed:
+        lines.extend(["## Detailed Flow", ""])
+        lines.append(
+            "Step-level flow showing gates (diamonds), delegations (dashed), "
+            "and artifacts (cylinders)."
+        )
+        lines.append("")
+        lines.append(detailed)
         lines.append("")
 
     # Skills table
