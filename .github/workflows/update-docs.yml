@@ -5,6 +5,7 @@ on:
     paths:
       - 'registry/patterns.json'
       - 'core/.claude/**'
+      - 'config/workflow-groups.yml'
   workflow_dispatch:
 
 permissions:
@@ -20,7 +21,9 @@ jobs:
           python-version: '3.12'
       - run: pip install -r scripts/requirements.txt
       - name: Generate docs
-        run: PYTHONPATH=. python scripts/generate_docs.py
+        run: |
+          PYTHONPATH=. python scripts/generate_docs.py
+          PYTHONPATH=. python scripts/generate_workflow_docs.py
       - name: Commit if changed
         run: |
           if [ -n "$(git status --porcelain docs/)" ]; then

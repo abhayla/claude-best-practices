@@ -1,0 +1,143 @@
+# Workflow group definitions for generate_workflow_docs.py
+#
+# Each group has seed patterns (anchors) and a description.
+# The script walks the reference graph from seeds to discover
+# connected patterns. Patterns can appear in multiple groups.
+#
+# To add a new workflow group: add an entry here, then run
+# /update-workflow-docs to regenerate docs/workflows/.
+
+workflows:
+  development-loop:
+    description: "The core build cycle: ideate, plan, implement, verify, commit."
+    seeds:
+      skills:
+        - brainstorm
+        - writing-plans
+        - executing-plans
+        - implement
+        - fix-issue
+        - subagent-driven-dev
+      agents:
+        - plan-executor-agent
+        - planner-researcher-agent
+      rules:
+        - workflow
+
+  testing-pipeline:
+    description: "Test execution, verification, quality enforcement, and the fix-verify-commit chain."
+    seeds:
+      skills:
+        - tdd
+        - auto-verify
+        - fix-loop
+        - post-fix-pipeline
+        - test-pipeline
+        - code-quality-gate
+        - coverage-analysis
+        - test-generator
+        - regression-test
+        - test-maintenance
+      agents:
+        - tester-agent
+        - test-failure-analyzer-agent
+        - test-pipeline-agent
+        - quality-gate-evaluator-agent
+      rules:
+        - tdd-rule
+        - testing
+
+  debugging-loop:
+    description: "Targeted bug diagnosis and structured resolution."
+    seeds:
+      skills:
+        - systematic-debugging
+        - fix-loop
+        - fix-issue
+      agents:
+        - debugger-agent
+        - test-failure-analyzer-agent
+      rules: []
+
+  learning-self-improvement:
+    description: "Session analysis, pattern detection, knowledge accumulation, and skill auto-generation."
+    seeds:
+      skills:
+        - learn-n-improve
+        - skill-factory
+        - test-knowledge
+      agents:
+        - session-summarizer-agent
+        - context-reducer-agent
+      rules:
+        - context-management
+
+  session-continuity:
+    description: "Start, save, resume, and hand over between sessions."
+    seeds:
+      skills:
+        - start-session
+        - save-session
+        - continue
+        - handover
+        - status
+      agents:
+        - session-summarizer-agent
+      rules:
+        - context-management
+
+  skill-authoring:
+    description: "Creating, validating, and maintaining skills, agents, and rules."
+    seeds:
+      skills:
+        - writing-skills
+        - skill-factory
+        - skill-master
+        - claude-guardian
+        - prompt-auto-enhance
+      agents:
+        - skill-author-agent
+      rules:
+        - pattern-structure
+        - pattern-portability
+        - pattern-self-containment
+        - rule-curation
+        - rule-writing-meta
+
+  code-review:
+    description: "Creating, requesting, and acting on code reviews."
+    seeds:
+      skills:
+        - request-code-review
+        - receive-code-review
+        - adversarial-review
+        - pr-standards
+        - review-gate
+      agents:
+        - code-reviewer-agent
+        - security-auditor-agent
+      rules: []
+
+  documentation:
+    description: "Documentation generation, structure enforcement, and maintenance."
+    seeds:
+      skills:
+        - adr
+        - diataxis-docs
+        - doc-staleness
+        - doc-structure-enforcer
+        - changelog-contributing
+        - api-docs-generator
+      agents:
+        - docs-manager-agent
+      rules: []
+
+  hub-sync:
+    description: "Hub-specific pattern management: provisioning, syncing, contributing."
+    seeds:
+      skills:
+        - update-practices
+        - contribute-practice
+        - synthesize-project
+      agents: []
+      rules: []
