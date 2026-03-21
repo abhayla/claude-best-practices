@@ -40,6 +40,13 @@ from scripts.recommend import (
     _compute_line_overlap,
     _find_matching_project_name,
     reconcile_claude_md_rules,
+    _compute_file_hash,
+    classify_sync_status,
+    load_sync_manifest,
+    save_sync_manifest,
+    build_sync_classification,
+    update_improved_to_local,
+    update_manifest_after_sync,
 )
 
 
@@ -1717,3 +1724,207 @@ class TestProvisionJsonCombined:
         assert "provision" in combined
         assert "copied_files" in combined["provision"]
         assert "claude_md" in combined["provision"]
+
+
+# --- Sync Manifest Tests ---
+
+
+class TestComputeFileHash:
+    def test_deterministic(self, tmp_path):
+        f = tmp_path / "test.md"
+        f.write_text("hello world", encoding="utf-8")
+        assert _compute_file_hash(f) == _compute_file_hash(f)
+
+    def test_crlf_lf_equivalent(self, tmp_path):
+        f1 = tmp_path / "lf.md"
+        f2 = tmp_path / "crlf.md"
+        f1.write_bytes(b"line1\nline2\n")
+        f2.write_bytes(b"line1\r\nline2\r\n")
+        assert _compute_file_hash(f1) == _compute_file_hash(f2)
+
+    def test_different_content(self, tmp_path):
+        f1 = tmp_path / "a.md"
+        f2 = tmp_path / "b.md"
+        f1.write_text("aaa", encoding="utf-8")
+        f2.write_text("bbb", encoding="utf-8")
+        assert _compute_file_hash(f1) != _compute_file_hash(f2)
+
+    def test_sha256_prefix(self, tmp_path):
+        f = tmp_path / "test.md"
+        f.write_text("test", encoding="utf-8")
+        assert _compute_file_hash(f).startswith("sha256:")
+
+
+class TestClassifySyncStatus:
+    def test_up_to_date(self):
+        assert classify_sync_status("A", "A", "A") == "up-to-date"
+
+    def test_up_to_date_no_manifest(self):
+        assert classify_sync_status("A", "A", None) == "up-to-date"
+
+    def test_hub_only_change(self):
+        assert classify_sync_status("B", "A", "A") == "hub-only"
+
+    def test_project_only_change(self):
+        assert classify_sync_status("A", "B", "A") == "project-only"
+
+    def test_conflict(self):
+        assert classify_sync_status("B", "C", "A") == "conflict"
+
+    def test_no_manifest_entry(self):
+        assert classify_sync_status("B", "A", None) == "no-manifest"
+
+    def test_hub_and_project_same_change(self):
+        # Both changed to the same thing — up-to-date
+        assert classify_sync_status("B", "B", "A") == "up-to-date"
+
+
+class TestSyncManifestIO:
+    def test_load_missing_returns_empty(self, tmp_path):
+        manifest = load_sync_manifest(tmp_path)
+        assert manifest["files"] == {}
+        assert manifest["_meta"]["version"] == "1.0.0"
+
+    def test_save_and_load_roundtrip(self, tmp_path):
+        (tmp_path / ".claude").mkdir()
+        manifest = load_sync_manifest(tmp_path)
+        manifest["files"]["rules/test.md"] = {
+            "hub_hash": "sha256:abc123",
+            "synced_at": "2026-03-21T00:00:00Z",
+        }
+        save_sync_manifest(tmp_path, manifest)
+        loaded = load_sync_manifest(tmp_path)
+        assert "rules/test.md" in loaded["files"]
+        assert loaded["_meta"]["last_sync"] is not None
+
+    def test_load_corrupt_returns_empty(self, tmp_path):
+        p = tmp_path / ".claude" / "sync-manifest.json"
+        p.parent.mkdir(parents=True)
+        p.write_text("{invalid json", encoding="utf-8")
+        manifest = load_sync_manifest(tmp_path)
+        assert manifest["files"] == {}
+
+    def test_load_missing_files_key_returns_empty(self, tmp_path):
+        p = tmp_path / ".claude" / "sync-manifest.json"
+        p.parent.mkdir(parents=True)
+        p.write_text('{"_meta": {}}', encoding="utf-8")
+        manifest = load_sync_manifest(tmp_path)
+        assert manifest["files"] == {}
+
+
+class TestBuildSyncClassification:
+    def test_hub_only_detected(self, hub_root, tmp_path):
+        """Rule exists in both but project has stale version -> hub-only."""
+        project = tmp_path / "project"
+        project.mkdir()
+        claude = project / ".claude" / "rules"
+        claude.mkdir(parents=True)
+        (claude / "workflow.md").write_text("old content", encoding="utf-8")
+
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project / ".claude")
+
+        # Manifest records old content hash as the hub hash at sync time
+        manifest = load_sync_manifest(project)
+        manifest["files"]["rules/workflow.md"] = {
+            "hub_hash": _compute_file_hash(claude / "workflow.md"),
+            "synced_at": "2026-03-01T00:00:00Z",
+        }
+
+        result = build_sync_classification(
+            hub_root, project, hub_resources, project_names, manifest,
+        )
+        workflow_items = [i for i in result["hub-only"] if i["name"] == "workflow"]
+        assert len(workflow_items) == 1
+
+    def test_project_only_detected(self, hub_root, tmp_path):
+        """Project modified a rule but hub hasn't changed -> project-only."""
+        project = tmp_path / "project"
+        project.mkdir()
+        claude = project / ".claude" / "rules"
+        claude.mkdir(parents=True)
+        (claude / "workflow.md").write_text("customized content", encoding="utf-8")
+
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project / ".claude")
+
+        # Manifest records current hub hash (hub hasn't changed since sync)
+        hub_hash = _compute_file_hash(hub_root / "core" / ".claude" / "rules" / "workflow.md")
+        manifest = load_sync_manifest(project)
+        manifest["files"]["rules/workflow.md"] = {
+            "hub_hash": hub_hash,
+            "synced_at": "2026-03-01T00:00:00Z",
+        }
+
+        result = build_sync_classification(
+            hub_root, project, hub_resources, project_names, manifest,
+        )
+        proj_only = [i for i in result["project-only"] if i["name"] == "workflow"]
+        assert len(proj_only) == 1
+
+    def test_no_manifest_all_classified(self, hub_root, tmp_path):
+        """No manifest -> all overlapping files classified as no-manifest."""
+        project = tmp_path / "project"
+        project.mkdir()
+        claude = project / ".claude" / "rules"
+        claude.mkdir(parents=True)
+        (claude / "workflow.md").write_text("old content", encoding="utf-8")
+
+        hub_resources = get_hub_resources(hub_root)
+        project_names = get_project_resource_names(project / ".claude")
+        manifest = load_sync_manifest(project)  # empty
+
+        result = build_sync_classification(
+            hub_root, project, hub_resources, project_names, manifest,
+        )
+        # workflow should be in no-manifest (project version differs from hub)
+        no_man = [i for i in result["no-manifest"] if i["name"] == "workflow"]
+        assert len(no_man) == 1
+
+
+class TestUpdateImprovedToLocal:
+    def test_overwrites_existing_rule(self, hub_root, tmp_path):
+        project = tmp_path / "project"
+        rules = project / ".claude" / "rules"
+        rules.mkdir(parents=True)
+        (rules / "workflow.md").write_text("old", encoding="utf-8")
+
+        items = [{"name": "workflow", "type": "rule", "rel_path": "rules/workflow.md"}]
+        updated = update_improved_to_local(hub_root, project, items)
+        assert len(updated) == 1
+        new_content = (rules / "workflow.md").read_text(encoding="utf-8")
+        assert new_content != "old"
+
+    def test_overwrites_existing_skill(self, hub_root, tmp_path):
+        project = tmp_path / "project"
+        skill = project / ".claude" / "skills" / "tdd"
+        skill.mkdir(parents=True)
+        (skill / "SKILL.md").write_text("old", encoding="utf-8")
+
+        items = [{"name": "tdd", "type": "skill", "rel_path": "skills/tdd/SKILL.md"}]
+        updated = update_improved_to_local(hub_root, project, items)
+        assert any("tdd" in f for f in updated)
+
+
+class TestProvisionWithManifest:
+    def test_first_run_creates_manifest(self, hub_root, tmp_path):
+        project = tmp_path / "project"
+        project.mkdir()
+        gaps = {"must-have": [
+            {"name": "tdd", "type": "skill", "tier": "must-have"},
+        ], "improved": [], "nice-to-have": [], "skip": []}
+        summary = provision_to_local(hub_root, project, gaps, ["general"])
+        manifest_path = project / ".claude" / "sync-manifest.json"
+        assert manifest_path.exists()
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        assert len(manifest["files"]) > 0
+        assert manifest["_meta"]["last_sync"] is not None
+
+    def test_summary_includes_sync_fields(self, hub_root, tmp_path):
+        project = tmp_path / "project"
+        project.mkdir()
+        gaps = {"must-have": [], "improved": [], "nice-to-have": [], "skip": []}
+        summary = provision_to_local(hub_root, project, gaps, ["general"])
+        assert "auto_updated" in summary
+        assert "sync_classification" in summary
+        assert "conflicts" in summary
