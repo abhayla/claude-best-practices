@@ -1,0 +1,9 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Accumulated pattern discoveries from external sources. Deduped across runs.",
+    "last_updated": "2026-03-22"
+  },
+  "discoveries": [],
+  "rejected": []
+}
