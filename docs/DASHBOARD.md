@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-21 12:02 UTC (auto-generated)
+> Last updated: 2026-03-21 14:02 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -126,7 +126,7 @@
 | pattern-portability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pattern-self-containment | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pattern-structure | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| perf-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | web-quality |
+| perf-test | skill | 1.2.0 | hub:abhayla/claude-best-practices | web-quality |
 | pg-query | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pipeline-orchestrator | skill | 2.0.0 | hub:abhayla/claude-best-practices | project-manager-agent |
 | plan-executor-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
