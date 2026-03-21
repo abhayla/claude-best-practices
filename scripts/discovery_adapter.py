@@ -23,6 +23,11 @@ ROOT = Path(__file__).parent.parent
 DISCOVERIES_PATH = ROOT / "config" / "discoveries.json"
 LEARNINGS_PATH = ROOT / ".claude" / "learnings.json"
 REGISTRY_PATH = ROOT / "registry" / "patterns.json"
+URLS_PATH = ROOT / "config" / "urls.yml"
+
+# Auto-queue threshold: discoveries above this from high-trust sources
+# are auto-queued for import without manual triage
+AUTO_QUEUE_CONFIDENCE = 85
 
 
 def load_discoveries() -> dict:
@@ -210,6 +215,113 @@ def convert_to_learning(discovery_id: str) -> dict:
     return {"status": "converted", "learning_id": next_id, "discovery_id": discovery_id}
 
 
+def get_auto_queue() -> list:
+    """Get discoveries eligible for auto-import (>=85 confidence, high trust)."""
+    data = load_discoveries()
+    return [
+        d for d in data["discoveries"]
+        if d.get("status") == "pending"
+        and d.get("confidence", 0) >= AUTO_QUEUE_CONFIDENCE
+        and d.get("source_trust") == "high"
+    ]
+
+
+def degrade_source_trust(source_url: str, reason: str) -> dict:
+    """Degrade a source's trust level in urls.yml after a bad import.
+
+    high -> medium -> low. Low stays at low.
+    """
+    if not URLS_PATH.exists():
+        return {"status": "urls_not_found"}
+
+    import yaml
+    with open(URLS_PATH, encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+
+    degradation = {"high": "medium", "medium": "low", "low": "low"}
+    updated = False
+
+    for entry in config.get("urls", []):
+        if source_url in entry.get("url", ""):
+            old_trust = entry.get("trust_level", "low")
+            new_trust = degradation.get(old_trust, "low")
+            if old_trust != new_trust:
+                entry["trust_level"] = new_trust
+                entry["trust_degraded"] = reason
+                entry["trust_degraded_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                updated = True
+                break
+
+    if updated:
+        with open(URLS_PATH, "w", encoding="utf-8") as f:
+            yaml.dump(config, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        return {"status": "degraded", "url": source_url, "new_trust": new_trust, "reason": reason}
+
+    return {"status": "source_not_found", "url": source_url}
+
+
+def upgrade_source_trust(source_url: str) -> dict:
+    """Upgrade a source's trust level after successful imports.
+
+    low -> medium -> high. High stays at high.
+    Requires 3+ successful imports from the source.
+    """
+    data = load_discoveries()
+    successful = [
+        d for d in data["discoveries"]
+        if d.get("status") == "imported"
+        and source_url in str(d.get("sources", []))
+    ]
+
+    if len(successful) < 3:
+        return {"status": "insufficient_evidence", "successful_imports": len(successful), "required": 3}
+
+    if not URLS_PATH.exists():
+        return {"status": "urls_not_found"}
+
+    import yaml
+    with open(URLS_PATH, encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+
+    upgrade = {"low": "medium", "medium": "high", "high": "high"}
+    for entry in config.get("urls", []):
+        if source_url in entry.get("url", ""):
+            old_trust = entry.get("trust_level", "low")
+            new_trust = upgrade.get(old_trust, old_trust)
+            if old_trust != new_trust:
+                entry["trust_level"] = new_trust
+                entry.pop("trust_degraded", None)
+                entry.pop("trust_degraded_date", None)
+                with open(URLS_PATH, "w", encoding="utf-8") as f:
+                    yaml.dump(config, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+                return {"status": "upgraded", "url": source_url, "new_trust": new_trust}
+            return {"status": "already_max", "url": source_url}
+
+    return {"status": "source_not_found", "url": source_url}
+
+
+def check_convergent_evolution() -> list:
+    """Detect patterns discovered from 3+ independent sources.
+
+    These are strong candidates for hub promotion — multiple projects
+    independently developed similar patterns.
+    """
+    data = load_discoveries()
+    convergent = []
+
+    for d in data["discoveries"]:
+        if d.get("status") == "pending" and len(d.get("sources", [])) >= 3:
+            convergent.append({
+                "id": d["id"],
+                "name": d["name"],
+                "sources": d["sources"],
+                "source_count": len(d["sources"]),
+                "confidence": d.get("confidence", 0),
+            })
+
+    return sorted(convergent, key=lambda x: -x["source_count"])
+
+
 def get_pending() -> list:
     """Get all pending discoveries sorted by confidence."""
     data = load_discoveries()
@@ -257,6 +369,10 @@ def main():
     parser.add_argument("--reason", type=str, default="", help="Rejection reason")
     parser.add_argument("--to-learning", type=str, help="Convert discovery to learning entry")
     parser.add_argument("--pending", action="store_true", help="Show pending discoveries")
+    parser.add_argument("--auto-queue", action="store_true", help="Show auto-queue eligible discoveries")
+    parser.add_argument("--convergent", action="store_true", help="Show convergent evolution patterns")
+    parser.add_argument("--degrade", type=str, help="Degrade source trust (URL)")
+    parser.add_argument("--upgrade", type=str, help="Upgrade source trust (URL)")
     parser.add_argument("--stats", action="store_true", help="Show pipeline statistics")
     args = parser.parse_args()
 
@@ -285,6 +401,34 @@ def main():
                   f"{d['type']:8s} | {d['name']}{auto}")
             if d.get("seen_count", 1) > 1:
                 print(f"         seen {d['seen_count']}x from {len(d.get('sources', []))} source(s)")
+
+    elif args.auto_queue:
+        queue = get_auto_queue()
+        if not queue:
+            print("No discoveries eligible for auto-queue (need >=85 confidence + high trust).")
+            return
+        print(f"Auto-queue eligible ({len(queue)}):\n")
+        for d in queue:
+            print(f"  {d['id']} | {d['confidence']:3d}% | {d['name']} | from {', '.join(d.get('sources', []))}")
+
+    elif args.convergent:
+        patterns = check_convergent_evolution()
+        if not patterns:
+            print("No convergent evolution detected (need 3+ independent sources).")
+            return
+        print(f"Convergent patterns ({len(patterns)}):\n")
+        for p in patterns:
+            print(f"  {p['id']} | {p['name']} | {p['source_count']} sources | {p['confidence']}% confidence")
+            for s in p["sources"]:
+                print(f"       - {s}")
+
+    elif args.degrade:
+        result = degrade_source_trust(args.degrade, args.reason or "imported pattern caused issues")
+        print(json.dumps(result, indent=2))
+
+    elif args.upgrade:
+        result = upgrade_source_trust(args.upgrade)
+        print(json.dumps(result, indent=2))
 
     elif args.stats:
         stats = get_stats()
