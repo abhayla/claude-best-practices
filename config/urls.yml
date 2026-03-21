@@ -37,3 +37,32 @@ urls:
     last_verified: "2026-03-13"
     expires_after: 90d
     trust_level: high
+
+  # Community discovery sources — Claude Code patterns in the wild
+  - url: https://www.reddit.com/r/ClaudeAI/search.json?q=claude+code+CLAUDE.md&sort=new&restrict_sr=1&limit=25
+    last_verified: "2026-03-22"
+    expires_after: 30d
+    trust_level: medium
+    notes: "r/ClaudeAI — focused subreddit, community tips and patterns"
+  - url: https://www.reddit.com/r/ClaudeAI/search.json?q=claude+code+skills+hooks&sort=new&restrict_sr=1&limit=25
+    last_verified: "2026-03-22"
+    expires_after: 30d
+    trust_level: medium
+    notes: "r/ClaudeAI — skills and hooks discussions"
+  - url: https://www.reddit.com/r/programming/search.json?q=claude+code+best+practices&sort=relevance&restrict_sr=1&limit=10
+    last_verified: "2026-03-22"
+    expires_after: 60d
+    trust_level: low
+    notes: "r/programming — general, needs extra scrutiny"
+
+  # GitHub community repos with Claude Code patterns
+  - url: https://github.com/anthropics/claude-code-example-configs
+    last_verified: "2026-03-22"
+    expires_after: 30d
+    trust_level: high
+    notes: "Official Anthropic example configs — authoritative source"
+  - url: https://github.com/topics/claude-code
+    last_verified: "2026-03-22"
+    expires_after: 30d
+    trust_level: medium
+    notes: "GitHub topic page — community repos tagged claude-code"

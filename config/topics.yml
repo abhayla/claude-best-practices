@@ -18,3 +18,20 @@ topics:
   - name: gemini-api
     keywords: ["Google Gemini API structured output", "Gemini 2.5 Flash best practices"]
     category: stack:ai-gemini
+
+  # Core Claude Code discovery topics
+  - name: claude-code-rules
+    keywords: ["Claude Code CLAUDE.md rules", "claude code configuration rules conventions"]
+    category: core
+  - name: claude-code-self-improvement
+    keywords: ["Claude Code learn from mistakes", "Claude Code self-improving rules", "AI coding agent self-improvement"]
+    category: core
+  - name: claude-code-errors-fixes
+    keywords: ["Claude Code common errors fixes", "claude code debugging tips workarounds"]
+    category: core
+  - name: claude-code-workflows
+    keywords: ["Claude Code TDD workflow", "Claude Code implementation workflow", "claude code fix loop debugging"]
+    category: core
+  - name: claude-code-mcp
+    keywords: ["Claude Code MCP server patterns", "Model Context Protocol tools best practices"]
+    category: core
