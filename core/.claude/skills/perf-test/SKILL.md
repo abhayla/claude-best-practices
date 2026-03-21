@@ -15,7 +15,7 @@ triggers:
   - nfr thresholds
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<project directory, PRD path, or baseline results path>"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -293,7 +293,36 @@ Budget config for Lighthouse CI:
 
 ---
 
-## STEP 8: Output Summary
+## STEP 8: Structured Output
+
+Write consolidated results to `test-results/perf-test.json` for the stage gate aggregator:
+
+```bash
+mkdir -p test-results
+```
+
+```json
+{
+  "skill": "perf-test",
+  "timestamp": "<ISO-8601>",
+  "result": "PASSED|FAILED",
+  "summary": {
+    "k6_smoke": "PASSED|FAILED|SKIPPED",
+    "k6_load": "PASSED|FAILED|SKIPPED",
+    "k6_stress": "PASSED|FAILED|SKIPPED",
+    "lighthouse": "PASSED|FAILED|SKIPPED",
+    "bundle_size": "PASSED|FAILED|SKIPPED"
+  },
+  "regressions": [],
+  "thresholds": {},
+  "quality_gate": "PASSED|WARNED|FAILED|SKIPPED",
+  "failures": [],
+  "warnings": [],
+  "duration_ms": 0
+}
+```
+
+Set `result` to `FAILED` if ANY regression exceeds thresholds (>10% latency, >0.5% error rate, >5% bundle size, Lighthouse below target). Detailed results remain in `perf/results/` — this file is the aggregator-compatible summary.
 
 ```markdown
 ## Performance Test Summary

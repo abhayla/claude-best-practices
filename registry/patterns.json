@@ -1887,10 +1887,10 @@
     "hash": "dfc961b34652f639a428280a47c24f09d9e929eabee300c060fcee0a4429b7e7",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "last_updated": "2026-03-21",
     "dependencies": [
       "web-quality"
     ],
@@ -1903,7 +1903,7 @@
       "Lighthouse",
       "bundle"
     ],
-    "changelog": "v1.0.0: Initial release — k6, Lighthouse, bundle analysis, baseline comparison"
+    "changelog": "v1.2.0: Add test-results/perf-test.json structured output for stage gate aggregator"
   },
   "pg-query": {
     "hash": "4521da934944d454672b33964780cd2cb7659356ae99f785ec018c6455446ae9",
