@@ -44,8 +44,16 @@ globs: ["**/*"]
 
 14. **Task Tracking**: (1) Write plan to `.claude/tasks/todo.md` with checkable items before starting. (2) Check in with user before starting implementation. (3) Mark items complete as you go. (4) Provide high-level summary at each step. (5) Add review section to `.claude/tasks/todo.md` when done. (6) Update `.claude/tasks/lessons.md` after corrections.
 
+## Failure Response
+
+15. **Test Failures → Use Skills**: When tests fail, invoke the appropriate skill instead of ad-hoc debugging:
+    - **Code test failure with known retest command** → `/fix-loop` (iterates: analyze → fix → retest until green)
+    - **Unclear root cause or 2+ failed attempts** → `/systematic-debugging` (structured: reproduce → isolate → hypothesize → evidence → root cause → fix → verify)
+    - **E2E/integration failure** → `/systematic-debugging` first (environment issues masquerade as code bugs), then `/fix-loop` once root cause is isolated
+    - **Never** manually retry the same approach 3+ times without switching to a structured skill
+
 ## Core Principles
 
-15. **Simplicity First**: Make every change as simple as possible. Impact minimal code.
-16. **No Laziness**: Find root causes. No temporary fixes. Never apply band-aid solutions when the underlying issue can be identified and fixed properly.
-17. **Senior Developer Standards**: Hold all output to the bar of a senior developer. Code, explanations, and decisions should reflect depth of understanding, not just surface-level correctness.
+16. **Simplicity First**: Make every change as simple as possible. Impact minimal code.
+17. **No Laziness**: Find root causes. No temporary fixes. Never apply band-aid solutions when the underlying issue can be identified and fixed properly.
+18. **Senior Developer Standards**: Hold all output to the bar of a senior developer. Code, explanations, and decisions should reflect depth of understanding, not just surface-level correctness.
