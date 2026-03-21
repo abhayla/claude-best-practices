@@ -94,7 +94,7 @@ After generation:
 Run validation:
 
 ```bash
-PYTHONPATH=. python scripts/validate_patterns.py
+PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
 ```
 
 ---

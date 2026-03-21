@@ -201,7 +201,7 @@
 
 - [x] **Task 24:** Run pattern validation
   - Files: None (validation only)
-  - Verify: `PYTHONPATH=. python scripts/validate_patterns.py`
+  - Verify: `PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py`
   - Time: ~5m
   - Depends on: Tasks 1-23
 
@@ -209,7 +209,7 @@
   - Files: `registry/patterns.json` (modify), docs/ (regenerate)
   - Version bumps: `auto-verify` → 2.0.0, `fix-loop` → 1.2.0, `post-fix-pipeline` → 2.0.0, `tester-agent` → 1.2.0, `test-failure-analyzer-agent` → 1.1.1, `verify-screenshots` → 1.1.0
   - New entry: `test-pipeline-agent` v1.0.0
-  - Verify: `PYTHONPATH=. python scripts/validate_patterns.py && python scripts/generate_docs.py && echo "OK"`
+  - Verify: `PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py && python scripts/generate_docs.py && echo "OK"`
   - Time: ~5m
   - Depends on: Task 24
 

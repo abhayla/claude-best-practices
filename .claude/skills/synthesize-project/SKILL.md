@@ -479,12 +479,12 @@ All patterns MUST: have 30+ lines of content, be under 500 lines, use project-sp
 2. **Validate** — For each generated pattern, write it to a temp file and run validators:
    ```bash
    # Structural validation (required)
-   PYTHONPATH=. python scripts/validate_patterns.py [temp-pattern-file]
+   PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py [temp-pattern-file]
 
    # Dedup check against existing patterns (required)
    PYTHONPATH=. python scripts/dedup_check.py --check [temp-pattern-file]
    ```
-   If `validate_patterns.py` or `dedup_check.py` are not available (running outside the hub repo), perform manual validation against the quality checks above. Drop any pattern that fails.
+   If `workflow_quality_gate_validate_patterns.py` or `dedup_check.py` are not available (running outside the hub repo), perform manual validation against the quality checks above. Drop any pattern that fails.
 
 ### Local mode: write directly
 

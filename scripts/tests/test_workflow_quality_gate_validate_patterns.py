@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.validate_patterns import (
+from scripts.workflow_quality_gate_validate_patterns import (
     _looks_like_agent,
     check_cross_references,
     check_portability,
@@ -82,7 +82,7 @@ def _write_skill(tmp_path, name, frontmatter_extra="", body=""):
         ---
         name: {name}
         description: >
-          Test skill for validation.
+          Validate test patterns when running quality checks.
         allowed-tools: "Bash Read Grep Glob Write Edit"
         argument-hint: "<input>"
         type: workflow

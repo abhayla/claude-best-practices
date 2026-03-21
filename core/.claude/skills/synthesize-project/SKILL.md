@@ -340,12 +340,12 @@ Scan each generated pattern for keywords: `auth`, `secret`, `token`, `credential
 2. **Validate** — For each generated pattern, write it to a temp file and run validators:
    ```bash
    # Structural validation (required)
-   PYTHONPATH=. python scripts/validate_patterns.py [temp-pattern-file]
+   PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py [temp-pattern-file]
 
    # Dedup check against existing patterns (required)
    PYTHONPATH=. python scripts/dedup_check.py --check [temp-pattern-file]
    ```
-   If `validate_patterns.py` or `dedup_check.py` are not available (running outside the hub repo), perform manual validation against the quality checks above. Drop any pattern that fails.
+   If `workflow_quality_gate_validate_patterns.py` or `dedup_check.py` are not available (running outside the hub repo), perform manual validation against the quality checks above. Drop any pattern that fails.
 
 
 **Read:** `references/validate-and-write.md` for detailed step 7: validate and write reference material.

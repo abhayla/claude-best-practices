@@ -24,7 +24,7 @@ The existing 133 skills, 21 agents, and 20 rules become few-shot examples and st
 
 1. **Changes the category of the project.** More skills, better dedup, telemetry, a web UI — all incremental. This makes the hub a compiler, not a catalog.
 2. **Zero cost to the developer.** Runs inside their existing Claude Code session. No API keys, no billing, no setup.
-3. **All infrastructure already exists.** Pattern format standards, validation pipeline (`validate_patterns.py`), structure/portability/self-containment rules, stack detection in `recommend.py`.
+3. **All infrastructure already exists.** Pattern format standards, validation pipeline (`workflow_quality_gate_validate_patterns.py`), structure/portability/self-containment rules, stack detection in `recommend.py`.
 4. **Doesn't violate curation policy.** The reactive-not-speculative rule applies to patterns added to the hub. Synthesized patterns are generated for a specific project from its actual code — they originate from observed reality.
 5. **Creates a self-improving flywheel** (detailed below).
 
@@ -94,7 +94,7 @@ The 133 existing manually-curated skills ARE the cold-start fuel. They provide t
 3. **Project mapping (Step 2):** Claude Code reads the project — source files, configs, CI, tests (using Read, Glob, Grep tools it already has)
 4. **Convention identification (Step 3):** Identifies 10-20 candidate conventions, deduplicates against hub patterns just copied — drops any already covered by hub
 5. **Evidence gathering (Step 4):** Reads source files to confirm/reject each convention
-6. **Pattern generation (Steps 5-7):** Loads reference material, generates patterns, validates each against `validate_patterns.py`, writes passing patterns
+6. **Pattern generation (Steps 5-7):** Loads reference material, generates patterns, validates each against `workflow_quality_gate_validate_patterns.py`, writes passing patterns
 7. Prints summary showing both hub patterns copied AND project-specific patterns synthesized, with flywheel onboarding box
 
 **Cost:** Zero beyond the developer's existing Claude Code session. No separate API calls.
@@ -242,7 +242,7 @@ Next time `/synthesize-project` runs on ANY project, it has this new battle-test
 
 **Defense layers:**
 
-1. `validate_patterns.py` catches structural issues (missing frontmatter, bad format) → **blocked automatically**
+1. `workflow_quality_gate_validate_patterns.py` catches structural issues (missing frontmatter, bad format) → **blocked automatically**
 2. If structurally valid but semantically wrong: PR reaches hub maintainer
 3. `/synthesize-hub` clustering shows this pattern has NO matches in other projects → low confidence → flagged
 4. Hub maintainer rejects the PR
@@ -641,7 +641,7 @@ The skill instructs Claude Code to:
 
 1. **Load references (Step 5):** Read pattern structure standards and 2-3 existing patterns as format examples — hub patterns are now local from Phase 1
 2. **Generate patterns (Step 6):** For each confirmed convention, generate a complete pattern file with `synthesized: true` in frontmatter. Auto-flag sensitive patterns as `private: true`
-3. **Validate and write (Step 7):** Run `validate_patterns.py` on each pattern, drop failures, write to `.claude/`
+3. **Validate and write (Step 7):** Run `workflow_quality_gate_validate_patterns.py` on each pattern, drop failures, write to `.claude/`
 4. **Generate config (Step 8):** Create `synthesis-config.yml` with sharing OFF if it doesn't exist
 5. **Summary (Step 9):** Print combined report showing both hub patterns copied AND project-specific patterns synthesized, with flywheel onboarding box
 
@@ -840,7 +840,7 @@ clustering:
 | Component | Location | Reuse |
 |---|---|---|
 | Stack detection | `recommend.py` | Reuse detection logic in Step 1 |
-| Pattern validation | `validate_patterns.py` | Validate all generated output in Step 3 |
+| Pattern validation | `workflow_quality_gate_validate_patterns.py` | Validate all generated output in Step 3 |
 | Structure standards | `.claude/rules/pattern-structure.md` | Loaded by skill as reference for pattern generation |
 | Portability standards | `.claude/rules/pattern-portability.md` | Loaded by skill as reference for pattern generation |
 | Self-containment standards | `.claude/rules/pattern-self-containment.md` | Loaded by skill as reference for pattern generation |

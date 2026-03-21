@@ -190,7 +190,7 @@ Minimal module with:
 
 **Complexity**: Medium | **Dependencies**: Task 2
 
-### Task 4: Add validation to `scripts/validate_patterns.py`
+### Task 4: Add validation to `scripts/workflow_quality_gate_validate_patterns.py`
 
 Validate `config/third-party-skills.yml`:
 - Required fields present (`repo`, `description`)
@@ -248,5 +248,5 @@ The hub is a **matchmaker**, not a **package manager**.
 1. `recommend.py --local /path/to/project` lists matching third-party skills with install commands
 2. `recommend.py --provision --local /path/to/project` attempts installation and reports results
 3. If npx is unavailable, provisioning succeeds with manual commands printed
-4. `validate_patterns.py` catches malformed registry entries
+4. `workflow_quality_gate_validate_patterns.py` catches malformed registry entries
 5. All new code has tests. Existing tests pass.

@@ -17,6 +17,6 @@ jobs:
       - name: Secret scan
         run: PYTHONPATH=. python scripts/dedup_check.py --secret-scan
       - name: Validate pattern quality
-        run: PYTHONPATH=. python scripts/validate_patterns.py
+        run: PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
       - name: Run tests
         run: PYTHONPATH=. python -m pytest scripts/tests/ -v

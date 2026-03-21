@@ -228,7 +228,7 @@ Every drafted pattern MUST pass ALL of these before validation:
 
 Run BOTH validators on every draft:
 ```bash
-PYTHONPATH=. python scripts/validate_patterns.py [draft-file]
+PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py [draft-file]
 PYTHONPATH=. python scripts/dedup_check.py --check [draft-file]
 ```
 
@@ -355,7 +355,7 @@ rm -rf .synthesize-hub/collected/
 - NEVER include patterns marked `private: true` or listed in `private_patterns`.
 - NEVER generalize STYLE or DIVERGENT clusters. Even with a strong majority (15 agree, 2 disagree), classify as DIVERGENT. The hub does not impose preferences.
 - NEVER include project-specific details in generalized patterns. All file paths, class names, env vars, and internal references MUST be replaced with generic placeholders.
-- NEVER skip the validation step. Every generalized pattern MUST pass `validate_patterns.py`.
+- NEVER skip the validation step. Every generalized pattern MUST pass `workflow_quality_gate_validate_patterns.py`.
 - NEVER draft patterns ad-hoc. Use `/writing-skills` for skills, `/claude-guardian` for rules, and `pattern-structure.md` agent standards for agents. The hub's creator tools enforce standards that ad-hoc drafting misses.
 - NEVER add a pattern to the hub that doesn't pass the curation gate (`.claude/rules/rule-curation.md`): source evidence, problem statement, and dedup check against existing hub patterns are all mandatory.
 - The PR is a proposal — it MUST be reviewed and merged by the hub maintainer. This skill creates the PR but does not merge it.

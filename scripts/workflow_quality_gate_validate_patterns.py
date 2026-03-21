@@ -7,6 +7,9 @@ from CI via validate-pr.yml.
 Usage:
     PYTHONPATH=. python scripts/validate_patterns.py
     PYTHONPATH=. python scripts/validate_patterns.py --fix-suggestions
+    PYTHONPATH=. python scripts/validate_patterns.py --score
+    PYTHONPATH=. python scripts/validate_patterns.py --baseline-save
+    PYTHONPATH=. python scripts/validate_patterns.py --baseline
     PYTHONPATH=. python scripts/validate_patterns.py path/to/pattern.md
 """
 
@@ -54,6 +57,28 @@ PLACEHOLDER_PATTERNS = [
     r"<!--\s*PLACEHOLDER",
 ]
 
+BASELINE_PATH = ROOT / ".pattern-baseline.json"
+
+# Description quality: vague words that indicate a generic summary, not a trigger condition
+VAGUE_DESCRIPTION_WORDS = {
+    "helper", "utility", "tool", "handler", "manager", "misc",
+    "various", "general", "stuff", "things",
+}
+
+# Description quality: action verbs that a good description should start with
+ACTION_VERBS = {
+    "run", "generate", "analyze", "validate", "create", "build", "check",
+    "scan", "deploy", "test", "audit", "review", "execute", "configure",
+    "detect", "enforce", "extract", "implement", "launch", "manage",
+    "monitor", "optimize", "parse", "provision", "scaffold", "search",
+    "set", "verify", "write", "compose", "compute", "consume", "craft",
+    "debug", "discover", "fix", "inspect", "iterate", "migrate", "plan",
+    "post", "read", "recommend", "resume", "route", "save", "score",
+    "organize", "fetch", "collect", "guide", "orchestrate", "convert",
+    "initialize", "restore", "resume", "trigger", "setup", "scaffold",
+    "auto", "apply", "push", "pull", "compare", "trace", "measure",
+}
+
 
 def parse_frontmatter(file_path: Path) -> Optional[dict]:
     """Extract YAML frontmatter from a markdown file."""
@@ -86,6 +111,303 @@ def is_valid_semver(version: str) -> bool:
     return bool(re.match(r"^\d+\.\d+\.\d+$", str(version)))
 
 
+# ── Description Quality ────────────────────────────────────────────────────
+
+
+def check_description_quality(name: str, description: str) -> list[str]:
+    """Check if a skill description is a trigger condition, not a generic summary."""
+    errors = []
+    if not description:
+        return errors
+
+    first_word = description.split()[0].lower().rstrip("s")
+    if first_word not in ACTION_VERBS and first_word + "s" not in ACTION_VERBS:
+        errors.append(
+            f"{name}: WARNING — description should start with an action verb "
+            f"(e.g., Run, Generate, Analyze), got '{description.split()[0]}'"
+        )
+
+    desc_lower = description.lower()
+    if "when" not in desc_lower and "use " not in desc_lower:
+        errors.append(
+            f"{name}: WARNING — description should include a 'when' or 'use when' "
+            f"clause to help Claude discover and trigger the skill"
+        )
+
+    for vague in VAGUE_DESCRIPTION_WORDS:
+        if re.search(rf"\b{vague}\b", desc_lower):
+            errors.append(
+                f"{name}: WARNING — description contains vague word '{vague}' "
+                f"— use specific language instead"
+            )
+
+    if len(description) > 1024:
+        errors.append(
+            f"{name}: Description is {len(description)} chars (max 1024)"
+        )
+
+    return errors
+
+
+# ── Quality Scoring ───────────────────────────────────────────────────────
+
+
+def score_skill(skill_dir: Path) -> tuple[int, list[str]]:
+    """Score a skill 0-100. Returns (score, breakdown)."""
+    breakdown = []
+    score = 100
+    skill_md = skill_dir / "SKILL.md"
+
+    if not skill_md.exists():
+        return 0, ["Missing SKILL.md (-100)"]
+
+    fm = parse_frontmatter(skill_md)
+    if fm is None:
+        return 0, ["Missing frontmatter (-100)"]
+
+    name = skill_dir.name
+
+    # Frontmatter fields (6 required, -8 each missing = max -48)
+    required = ["name", "description", "type", "allowed-tools", "argument-hint", "version"]
+    for field in required:
+        if field not in fm:
+            score -= 8
+            breakdown.append(f"Missing '{field}' (-8)")
+
+    # Name matches directory (-5)
+    if fm.get("name") and fm["name"] != name:
+        score -= 5
+        breakdown.append(f"Name mismatch (-5)")
+
+    # Valid semver (-5)
+    if fm.get("version") and not is_valid_semver(fm["version"]):
+        score -= 5
+        breakdown.append(f"Invalid semver (-5)")
+
+    # Type-specific structure (-10)
+    body = get_body(skill_md)
+    has_steps = bool(re.search(r"^##\s+STEP\s+\d+", body, re.MULTILINE))
+    if fm.get("type") == "workflow" and not has_steps:
+        score -= 10
+        breakdown.append(f"Workflow type without STEP sections (-10)")
+
+    # Critical rules section (-5)
+    has_critical = bool(re.search(
+        r"^##\s+(CRITICAL RULES|MUST DO|MUST NOT DO)", body, re.MULTILINE
+    ))
+    if not has_critical:
+        score -= 5
+        breakdown.append(f"Missing CRITICAL RULES section (-5)")
+
+    # Description quality (-3 each, max -9)
+    desc = str(fm.get("description", "")).strip()
+    if desc:
+        first_word = desc.split()[0].lower().rstrip("s")
+        if first_word not in ACTION_VERBS and first_word + "s" not in ACTION_VERBS:
+            score -= 3
+            breakdown.append(f"Description doesn't start with action verb (-3)")
+        if "when" not in desc.lower() and "use " not in desc.lower():
+            score -= 3
+            breakdown.append(f"Description missing 'when' clause (-3)")
+        for vague in VAGUE_DESCRIPTION_WORDS:
+            if re.search(rf"\b{vague}\b", desc.lower()):
+                score -= 3
+                breakdown.append(f"Description uses vague word '{vague}' (-3)")
+                break
+
+    # Size penalties
+    total_lines = len(skill_md.read_text(encoding="utf-8").splitlines())
+    if total_lines > SIZE_FAIL:
+        score -= 15
+        breakdown.append(f"Over {SIZE_FAIL} lines (-15)")
+    elif total_lines > SIZE_WARN:
+        score -= 5
+        breakdown.append(f"Over {SIZE_WARN} lines (-5)")
+
+    # Stub penalty
+    content_lines = count_content_lines(skill_md)
+    if content_lines < STUB_MIN_LINES:
+        score -= 15
+        breakdown.append(f"Stub: only {content_lines} content lines (-15)")
+
+    # Portability
+    port_errors = check_portability(skill_md)
+    if port_errors:
+        score -= 5
+        breakdown.append(f"Portability issues (-5)")
+
+    # Placeholder markers
+    content = skill_md.read_text(encoding="utf-8")
+    content_stripped = re.sub(r"```[\s\S]*?```", "", content)
+    content_stripped = re.sub(r"`[^`]+`", "", content_stripped)
+    for pattern in PLACEHOLDER_PATTERNS:
+        if re.search(pattern, content_stripped, re.IGNORECASE):
+            score -= 10
+            breakdown.append(f"Contains placeholder markers (-10)")
+            break
+
+    return max(0, score), breakdown
+
+
+def score_agent(agent_path: Path) -> tuple[int, list[str]]:
+    """Score an agent 0-100. Returns (score, breakdown)."""
+    breakdown = []
+    score = 100
+
+    fm = parse_frontmatter(agent_path)
+    if fm is None:
+        return 0, ["Missing frontmatter (-100)"]
+
+    required = ["name", "description", "model"]
+    for field in required:
+        if field not in fm:
+            score -= 15
+            breakdown.append(f"Missing '{field}' (-15)")
+
+    if fm.get("model") and fm["model"] not in ("inherit", "sonnet", "haiku", "opus"):
+        score -= 10
+        breakdown.append(f"Invalid model value (-10)")
+
+    body = get_body(agent_path)
+    if "## Core Responsibilities" not in body:
+        score -= 10
+        breakdown.append(f"Missing '## Core Responsibilities' section (-10)")
+    if "## Output Format" not in body:
+        score -= 10
+        breakdown.append(f"Missing '## Output Format' section (-10)")
+
+    desc = str(fm.get("description", "")).lower()
+    if "when" not in desc and "use " not in desc:
+        score -= 5
+        breakdown.append(f"Description missing 'when' clause (-5)")
+
+    port_errors = check_portability(agent_path)
+    if port_errors:
+        score -= 5
+        breakdown.append(f"Portability issues (-5)")
+
+    return max(0, score), breakdown
+
+
+def score_rule(rule_path: Path) -> tuple[int, list[str]]:
+    """Score a rule 0-100. Returns (score, breakdown)."""
+    breakdown = []
+    score = 100
+
+    content = rule_path.read_text(encoding="utf-8")
+    fm = parse_frontmatter(rule_path)
+
+    has_globs = fm and ("globs" in fm or "paths" in fm)
+    first_lines = "\n".join(content.splitlines()[:10])
+    has_scope_global = "# Scope: global" in first_lines
+
+    if not has_globs and not has_scope_global:
+        score -= 20
+        breakdown.append(f"Missing scope declaration (-20)")
+
+    body_lines = content.split("---", 2)[-1] if "---" in content else content
+    content_lines = sum(1 for line in body_lines.splitlines()
+                        if line.strip() and not line.strip().startswith("#"))
+    if content_lines < 5:
+        score -= 20
+        breakdown.append(f"Stub: only {content_lines} content lines (-20)")
+
+    content_stripped = re.sub(r"```[\s\S]*?```", "", content)
+    content_stripped = re.sub(r"`[^`]+`", "", content_stripped)
+    for pattern in PLACEHOLDER_PATTERNS:
+        if re.search(pattern, content_stripped, re.IGNORECASE):
+            score -= 15
+            breakdown.append(f"Contains placeholder markers (-15)")
+            break
+
+    port_errors = check_portability(rule_path)
+    if port_errors:
+        score -= 5
+        breakdown.append(f"Portability issues (-5)")
+
+    if not re.search(r"\bMUST\b|\bNEVER\b|\bMUST NOT\b", content):
+        score -= 5
+        breakdown.append(f"No directive language (MUST/NEVER) found (-5)")
+
+    return max(0, score), breakdown
+
+
+def grade(score: int) -> str:
+    """Convert a numeric score to a letter grade."""
+    if score >= 90:
+        return "A"
+    if score >= 75:
+        return "B"
+    if score >= 60:
+        return "C"
+    if score >= 40:
+        return "D"
+    return "F"
+
+
+def score_all() -> dict[str, dict]:
+    """Score all patterns. Returns {name: {score, grade, type, breakdown}}."""
+    results = {}
+
+    if SKILLS_DIR.exists():
+        for skill_dir in sorted(SKILLS_DIR.iterdir()):
+            if not skill_dir.is_dir() or skill_dir.name in HUB_ONLY_SKILLS:
+                continue
+            s, bd = score_skill(skill_dir)
+            results[skill_dir.name] = {
+                "score": s, "grade": grade(s), "type": "skill", "breakdown": bd
+            }
+
+    if AGENTS_DIR.exists():
+        for agent_path in sorted(AGENTS_DIR.glob("*.md")):
+            if agent_path.name == "README.md" or agent_path.stem in HUB_ONLY_AGENTS:
+                continue
+            s, bd = score_agent(agent_path)
+            results[agent_path.stem] = {
+                "score": s, "grade": grade(s), "type": "agent", "breakdown": bd
+            }
+
+    if RULES_DIR.exists():
+        for rule_path in sorted(RULES_DIR.glob("*.md")):
+            if rule_path.name == "README.md" or rule_path.stem in HUB_ONLY_RULES:
+                continue
+            s, bd = score_rule(rule_path)
+            results[rule_path.stem] = {
+                "score": s, "grade": grade(s), "type": "rule", "breakdown": bd
+            }
+
+    return results
+
+
+# ── Baseline Mode ─────────────────────────────────────────────────────────
+
+
+def save_baseline(errors: list[str]) -> Path:
+    """Save current violations as the baseline. Returns path to baseline file."""
+    baseline = sorted(set(errors))
+    BASELINE_PATH.write_text(
+        json.dumps({"violations": baseline}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return BASELINE_PATH
+
+
+def load_baseline() -> set[str]:
+    """Load baseline violations. Returns empty set if no baseline exists."""
+    if not BASELINE_PATH.exists():
+        return set()
+    try:
+        data = json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
+        return set(data.get("violations", []))
+    except (json.JSONDecodeError, KeyError):
+        return set()
+
+
+def filter_new_violations(errors: list[str], baseline: set[str]) -> list[str]:
+    """Return only violations not in the baseline."""
+    return [e for e in errors if e not in baseline]
+
+
 # ── Skill Validators ────────────────────────────────────────────────────────
 
 
@@ -111,6 +433,10 @@ def validate_skill(skill_dir: Path) -> list[str]:
 
     if "description" not in fm:
         errors.append(f"{name}: Missing 'description' in frontmatter")
+    else:
+        desc = str(fm["description"]).strip()
+        desc_errors = check_description_quality(name, desc)
+        errors.extend(desc_errors)
 
     if "allowed-tools" not in fm:
         errors.append(f"{name}: Missing 'allowed-tools' in frontmatter")
@@ -419,7 +745,49 @@ def main():
                         help="Single pattern file to validate (auto-detects type)")
     parser.add_argument("--fix-suggestions", action="store_true",
                         help="Show suggested fixes for errors")
+    parser.add_argument("--score", action="store_true",
+                        help="Show quality scores (0-100) for all patterns")
+    parser.add_argument("--baseline-save", action="store_true",
+                        help="Save current violations as baseline for incremental adoption")
+    parser.add_argument("--baseline", action="store_true",
+                        help="Only report new violations not in the baseline")
     args = parser.parse_args()
+
+    # Score mode
+    if args.score:
+        print("=" * 60)
+        print("Pattern Quality Scores")
+        print("=" * 60)
+
+        results = score_all()
+        by_grade = {"A": [], "B": [], "C": [], "D": [], "F": []}
+        for name, data in results.items():
+            by_grade[data["grade"]].append((name, data))
+
+        total = len(results)
+        for g in ["A", "B", "C", "D", "F"]:
+            count = len(by_grade[g])
+            if count == 0:
+                continue
+            print(f"\n{'-' * 40}")
+            print(f"Grade {g}: {count} pattern(s)")
+            print(f"{'-' * 40}")
+            for name, data in sorted(by_grade[g], key=lambda x: -x[1]["score"]):
+                print(f"  {data['score']:3d}/100 [{data['type']:6s}] {name}")
+                if data["breakdown"] and data["score"] < 90:
+                    for item in data["breakdown"]:
+                        print(f"           {item}")
+
+        avg = sum(d["score"] for d in results.values()) / total if total else 0
+        grade_dist = {g: len(v) for g, v in by_grade.items() if v}
+        print(f"\n{'=' * 60}")
+        print(f"Total: {total} patterns | Average: {avg:.0f}/100 ({grade(int(avg))})")
+        print(f"Distribution: {' | '.join(f'{g}:{c}' for g, c in grade_dist.items())}")
+        below_b = len(by_grade["C"]) + len(by_grade["D"]) + len(by_grade["F"])
+        if below_b:
+            print(f"Action needed: {below_b} pattern(s) below Grade B (75)")
+        print(f"{'=' * 60}")
+        sys.exit(0)
 
     if args.file:
         # Single-file validation mode
@@ -440,12 +808,35 @@ def main():
             print(f"PASSED ({len(warnings)} warning(s))")
             sys.exit(0)
 
-    # Full validation mode (existing behavior)
+    # Full validation mode
     print("=" * 60)
     print("Pattern Quality Validator")
     print("=" * 60)
 
     errors = validate_all()
+
+    # Baseline save mode
+    if args.baseline_save:
+        path = save_baseline(errors)
+        warnings = [e for e in errors if "WARNING" in e]
+        hard_errors = [e for e in errors if "WARNING" not in e]
+        print(f"\nBaseline saved to {path}")
+        print(f"  {len(hard_errors)} error(s) and {len(warnings)} warning(s) baselined")
+        print(f"  Future runs with --baseline will only report NEW violations")
+        sys.exit(0)
+
+    # Baseline filter mode
+    if args.baseline:
+        baseline = load_baseline()
+        if not baseline:
+            print("\nWARNING: No baseline found. Run --baseline-save first.")
+            print("Falling back to full validation.\n")
+        else:
+            original_count = len(errors)
+            errors = filter_new_violations(errors, baseline)
+            suppressed = original_count - len(errors)
+            if suppressed:
+                print(f"\n  ({suppressed} baselined violation(s) suppressed)")
 
     warnings = [e for e in errors if "WARNING" in e]
     hard_errors = [e for e in errors if "WARNING" not in e]

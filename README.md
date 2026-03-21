@@ -298,7 +298,7 @@ Your project code
 Found a pattern that works well in your project?
 
 1. Run `/contribute-practice <pattern-path>` inside Claude Code — validates, sanitizes project-specific content, and creates a PR
-2. Or add it directly to `core/.claude/` and open a PR. Run `PYTHONPATH=. python scripts/validate_patterns.py` first.
+2. Or add it directly to `core/.claude/` and open a PR. Run `PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py` first.
 
 All patterns must pass the [curation standards](docs/synthesize-flywheel.md): real source, real problem, not already covered.
 

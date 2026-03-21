@@ -27,11 +27,14 @@ PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 # Full local CI replication (validate-pr.yml runs all 4 — run before opening a PR)
 PYTHONPATH=. python scripts/dedup_check.py --validate-all
 PYTHONPATH=. python scripts/dedup_check.py --secret-scan
-PYTHONPATH=. python scripts/validate_patterns.py
+PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
 PYTHONPATH=. python -m pytest scripts/tests/ -v
 
 # Regenerate docs after registry changes
 python scripts/generate_docs.py
+
+# Regenerate workflow docs after pattern cross-reference changes
+PYTHONPATH=. python scripts/generate_workflow_docs.py
 ```
 
 ## Architecture
@@ -63,11 +66,13 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 
 - **`recommend.py`** — Main entry point for provisioning. Defines `STACK_DETECTORS` (file-based auto-detection) and `DEP_PATTERN_MAP` (dependency→pattern promotion). Modes: `--local`/`--repo` (report only), `--apply` (copy files), `--provision` (apply + generate CLAUDE.md + settings.json), `--diff` (compare overlapping content), `--use-config` (use stacks from `repos.yml`).
 - **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping and `copy_claude_dir()` which filters patterns by stack prefix. Imported by `recommend.py`.
-- **`validate_patterns.py`** — CI validator. Checks frontmatter, cross-references, file/registry sync. Run before every PR.
+- **`workflow_quality_gate_validate_patterns.py`** — CI validator. Checks frontmatter, cross-references, file/registry sync. Run before every PR.
 - **`generate_docs.py`** — Rebuilds `docs/` dashboard and `core/.claude/README.md` from `registry/patterns.json`.
 - **`collate.py`** — Extracts patterns from downstream project repos for hub ingestion.
 - **`scan_web.py`** — Discovers patterns from URLs/topics configured in `config/urls.yml` and `config/topics.yml`.
 - **`sync_to_projects.py`** — Pushes hub updates to registered downstream projects as PRs (uses `config/repos.yml`).
+- **`dedup_check.py`** — CI deduplication validator (`--validate-all`) and secret scanner (`--secret-scan`).
+- **`generate_workflow_docs.py`** — Rebuilds `docs/workflows/` from `config/workflow-groups.yml` and pattern cross-references.
 
 ## Testing
 
@@ -78,7 +83,7 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 
 ## Key Conventions
 
-- **Registry maintenance workflow**: (1) add/remove files in `core/.claude/`, (2) update `registry/patterns.json`, (3) run `python scripts/generate_docs.py`, (4) run `PYTHONPATH=. python scripts/validate_patterns.py` to verify sync. CI (`validate-pr.yml`) will catch drift.
+- **Registry maintenance workflow**: (1) add/remove files in `core/.claude/`, (2) update `registry/patterns.json`, (3) run `python scripts/generate_docs.py`, (4) run `PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py` to verify sync. CI (`validate-pr.yml`) will catch drift.
 - Pattern curation is reactive, not speculative — see `.claude/rules/rule-curation.md`
 - Pattern quality rules (structure, portability, self-containment) are in `.claude/rules/pattern-*.md`
 - `/synthesize-project` (in `core/.claude/skills/`) provisions projects; `/synthesize-hub` (in `.claude/skills/`) generalizes patterns back into the hub

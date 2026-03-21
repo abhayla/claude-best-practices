@@ -91,7 +91,7 @@ After any workflow-related change, run these commands before committing:
 
 ```bash
 # Pattern quality check (frontmatter, portability, cross-references)
-PYTHONPATH=. python scripts/validate_patterns.py
+PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
 
 # Regenerate workflow docs (picks up new connections, artifacts, steps)
 PYTHONPATH=. python scripts/generate_workflow_docs.py
@@ -100,5 +100,5 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 python scripts/generate_docs.py
 ```
 
-Do not commit if `validate_patterns.py` fails. The workflow doc and dashboard
+Do not commit if `workflow_quality_gate_validate_patterns.py` fails. The workflow doc and dashboard
 regeneration ensures documentation stays in sync with the changes.
