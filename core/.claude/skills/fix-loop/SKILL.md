@@ -169,9 +169,26 @@ If the same error persists after 2 iterations:
    - `VISUAL_REGRESSION` → delegate to /verify-screenshots for baseline comparison
 4. If confidence remains Low after specialist consultation, report UNRESOLVED and ask for user input
 
+## AUTO-RECORD LEARNING (MANDATORY)
+
+After a fix iteration succeeds (test goes from FAIL → PASS), ALWAYS record the learning before reporting success. This is NOT optional.
+
+1. **Classify** the fix: `TIMING`, `NETWORK`, `BUILD`, `STATE`, `CONFIG`, `API-COMPAT`, `AUTH`, `EMULATOR`
+2. **Route** to the right knowledge base:
+   - Test timing/flaky issues → `/test-knowledge add`
+   - Stack-specific issues (emulator, platform, env) → stack knowledge base if available
+   - Other → write symptom + fix to `.claude/learnings.json`
+3. **Log** the learning:
+   ```
+   LEARNING RECORDED: [category] [one-line summary]
+   ```
+
+This ensures the same failure is auto-resolved next time without re-diagnosing.
+
 ## CRITICAL RULES
 
 - Maximum {max_iterations} iterations — do NOT infinite loop
 - Each iteration must try a DIFFERENT fix approach
 - Never suppress errors or add broad exception handlers
 - If confidence is Low, explain reasoning and ask for user input
+- ALWAYS record learning after successful fix — no exceptions
