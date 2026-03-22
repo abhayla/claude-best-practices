@@ -116,6 +116,53 @@ If test-related learnings were captured, also feed them into `/test-knowledge`:
 Skill("test-knowledge", args="add <learning-summary>")
 ```
 
+### 3D: Analyze Session Checkpoints
+
+Read the most recent session file from `.claude/sessions/`:
+
+```bash
+ls -t .claude/sessions/*.md 2>/dev/null | head -1
+```
+
+If a session file exists, extract learning signals:
+
+1. **Blocked tasks** — scan for tasks marked `blocked` or `in-progress` that
+   were never completed. Each blocked task is a potential skill gap or
+   missing capability. Record as a learning with tag `session-blocked`.
+
+2. **Decision themes** — scan the "Key Decisions" section for recurring
+   patterns. If the same type of decision appears across multiple session
+   files (e.g., "chose X over Y for testing"), it may warrant a rule.
+   Compare against the 3 most recent session files if available:
+   ```bash
+   ls -t .claude/sessions/*.md 2>/dev/null | head -3
+   ```
+
+3. **File hotspots** — extract the "Working Files" section and count which
+   files appear most frequently across recent sessions. Files modified in
+   3+ sessions are change hotspots — flag for potential refactoring or
+   dedicated rule creation.
+
+4. **Session duration signal** — if a session has many completed tasks but
+   also many blocked tasks, the session was productive but hit walls.
+   Record the blocked-to-completed ratio as a learning metric.
+
+Feed findings into the learning database:
+```bash
+PYTHONPATH=. python scripts/discovery_adapter.py --add '{
+  "name": "session-pattern:<pattern-name>",
+  "type": "rule",
+  "source": "session:.claude/sessions/<filename>",
+  "source_trust": "high",
+  "content": "<finding summary>",
+  "has_frontmatter": false,
+  "community_signal": 0
+}'
+```
+
+Session-derived discoveries get `high` trust — they come from direct
+observation of real work, not external sources.
+
 ---
 
 ## STEP 4: Review Pending Improvements
