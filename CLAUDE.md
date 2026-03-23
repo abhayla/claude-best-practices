@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Environment
 
 - **Python 3.12** required (all CI workflows use 3.12)
-- Install: `pip install -r scripts/requirements.txt`
+- Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`
 
 ## Commands
 
@@ -65,15 +65,17 @@ Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `
 
 ### Key Scripts
 
-- **`recommend.py`** — Main entry point for provisioning. Defines `STACK_DETECTORS` (file-based auto-detection) and `DEP_PATTERN_MAP` (dependency→pattern promotion). Modes: `--local`/`--repo` (report only), `--apply` (copy files), `--provision` (apply + generate CLAUDE.md + settings.json), `--diff` (compare overlapping content), `--use-config` (use stacks from `repos.yml`).
-- **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping and `copy_claude_dir()` which filters patterns by stack prefix. Imported by `recommend.py`.
-- **`workflow_quality_gate_validate_patterns.py`** — CI validator. Checks frontmatter, cross-references, file/registry sync. Run before every PR.
-- **`generate_docs.py`** — Rebuilds `docs/` dashboard and `core/.claude/README.md` from `registry/patterns.json`.
-- **`collate.py`** — Extracts patterns from downstream project repos for hub ingestion.
-- **`scan_web.py`** — Discovers patterns from URLs/topics configured in `config/urls.yml` and `config/topics.yml`.
-- **`sync_to_projects.py`** — Pushes hub updates to registered downstream projects as PRs (uses `config/repos.yml`).
-- **`dedup_check.py`** — CI deduplication validator (`--validate-all`) and secret scanner (`--secret-scan`).
-- **`generate_workflow_docs.py`** — Rebuilds `docs/workflows/` from `config/workflow-groups.yml` and pattern cross-references.
+- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo` (report), `--apply` (copy), `--provision` (apply + generate CLAUDE.md + settings.json), `--diff`, `--use-config`. Defines `STACK_DETECTORS` and `DEP_PATTERN_MAP`.
+- **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping and `copy_claude_dir()`. Imported by `recommend.py`.
+- **`workflow_quality_gate_validate_patterns.py`** — CI validator for frontmatter, cross-references, file/registry sync.
+- **`generate_docs.py`** — Rebuilds `docs/` dashboard and `core/.claude/README.md` from registry.
+- **`collate.py`** — Extracts patterns from downstream repos for hub ingestion.
+- **`scan_web.py`** — Discovers patterns from `config/urls.yml` and `config/topics.yml`.
+- **`sync_to_projects.py`** — Pushes hub updates to registered projects as PRs (`config/repos.yml`).
+- **`dedup_check.py`** — CI dedup validator (`--validate-all`) and secret scanner (`--secret-scan`).
+- **`generate_workflow_docs.py`** — Rebuilds `docs/workflows/` from `config/workflow-groups.yml`.
+
+CI lives in `.github/workflows/validate-pr.yml` — runs all 4 validation commands listed above.
 
 ## Testing
 

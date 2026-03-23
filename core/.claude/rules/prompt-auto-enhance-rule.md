@@ -9,7 +9,7 @@ globs: ["**/*"]
 # Prompt Auto-Enhance
 
 Every response MUST start with `*Enhanced: <what was checked>*` (under 15 words).
-Examples: *Enhanced: git state, 3 rules, scanned skills/* | *Enhanced: git state, registry check, read 2 source files*
+Examples: *Enhanced: prompt strengthened (2 fixes), git state, 3 rules* | *Enhanced: git state, registry check, read 2 source files*
 
 ## Tier 1 — Always (every prompt)
 
@@ -23,6 +23,24 @@ Examples: *Enhanced: git state, 3 rules, scanned skills/* | *Enhanced: git state
 5. **`registry/patterns.json`** — Check before suggesting new patterns.
 
 Skip Tier 2 if Tier 1 suffices. MUST NOT read more than necessary.
+
+## Prompt Strengthening — Diagnose & Rewrite Before Executing
+
+For **non-trivial prompts** (same threshold as Clarification Gate: ambiguous,
+multi-file, or multi-step), diagnose weaknesses and rewrite before execution.
+Skip for direct unambiguous instructions, single-file changes, and questions.
+
+1. **Diagnose** — Classify prompt against 9 failure categories: VAGUE_INTENT,
+   MISSING_CONTEXT, CONFLICTING_CONSTRAINTS, OVER_SCOPED, UNDER_CONSTRAINED,
+   MISSING_OUTPUT_SPEC, AMBIGUOUS_SCOPE, IMPLICIT_ASSUMPTIONS, MISSING_STRUCTURE
+   (flat text where XML tags like `<task>`, `<context>`, `<constraints>` would
+   improve clarity — see `/prompt-auto-enhance` for the full XML Tag Reference)
+2. **Map** — Each weakness → one specific structural fix
+3. **Rewrite** — Targeted changes only, preserve original intent
+4. **Show before/after** — MUST display comparison table to user every time
+5. **Execute** — Proceed with the strengthened version
+
+If all 9 categories score clean, skip strengthening — do not force unnecessary rewrites.
 
 ## Clarification Gate — Ask Before Acting
 
@@ -69,6 +87,8 @@ approval flow in `/prompt-auto-enhance`. Otherwise stay silent (indicator only).
 
 - NEVER skip the `*Enhanced: ...*` indicator — it is MANDATORY on every response
 - NEVER skip Tier 1 context gathering
+- NEVER skip Prompt Strengthening for non-trivial prompts — diagnose before executing
+- NEVER hide the before/after comparison — it MUST be shown to the user every time strengthening activates
 - NEVER skip the Clarification Gate for ambiguous prompts — ask before acting
 - NEVER ask questions answerable by reading the codebase — read first, then ask
 - NEVER create, update, or delete any resource without user approval

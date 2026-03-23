@@ -1,28 +1,170 @@
 ---
 name: prompt-auto-enhance
 description: >
-  Apply auto-enhance procedures for resource CRUD: batch approval flow,
-  delegation routing to existing authoring tools, and web search decision tree.
-  Use when the prompt-auto-enhance rule detects resource changes or when manually
-  enhancing prompts via /prompt-auto-enhance.
+  Strengthen non-trivial prompts by diagnosing weak spots, mapping fixes, and
+  rewriting before execution — with visible before/after comparison. Also handles
+  resource CRUD batch approval flow, delegation routing, and web search decisions.
+  Use when the prompt-auto-enhance rule activates or manually via /prompt-auto-enhance.
 triggers:
   - prompt-auto-enhance
   - auto-enhance
   - enhance prompt
   - enrich prompt
+  - strengthen prompt
+  - fix my prompt
 allowed-tools: "Read Grep Glob WebFetch WebSearch Skill Agent"
 argument-hint: "[prompt text to enhance manually]"
 type: reference
-version: "1.1.0"
+version: "1.2.0"
 ---
 
-# Prompt Auto-Enhance — Resource CRUD Procedures
+# Prompt Auto-Enhance — Strengthening & Resource CRUD Procedures
 
-This skill contains the detailed procedures referenced by the `prompt-auto-enhance`
-global rule. The rule handles silent enhancement automatically. This skill handles
-the **visible mode** workflow when resource CRUD is detected.
+This skill strengthens non-trivial prompts before execution (diagnose → fix → rewrite
+→ show before/after) and handles the **visible mode** workflow when resource CRUD is
+detected. The `prompt-auto-enhance` global rule controls when this activates.
 
 **Arguments:** $ARGUMENTS
+
+---
+
+## Prompt Strengthening
+
+Activates automatically for **non-trivial prompts** — same threshold as the
+Clarification Gate (ambiguous, multi-file, or multi-step). Skipped for direct
+unambiguous instructions (e.g., "run tests", "rename X to Y", "fix the typo on line 42").
+
+Adapted from community pattern by @heyrimsha (source: x.com/heyrimsha/status/2035995286150234480).
+
+### Strengthening Step 1: Diagnose Prompt Weaknesses
+
+Analyze the user's prompt against the failure category table. Classify every
+weakness found — a prompt may have multiple.
+
+#### Failure Category Table
+
+| Category | Symptoms | Structural Fix |
+|----------|----------|---------------|
+| **VAGUE_INTENT** | Unclear what the user wants done; could be interpreted multiple ways | Rewrite as a specific action verb + object + success criteria |
+| **MISSING_CONTEXT** | Prompt assumes knowledge not provided (file paths, prior decisions, domain terms) | Add explicit context: which files, which module, what prior state |
+| **CONFLICTING_CONSTRAINTS** | Prompt asks for contradictory things ("make it fast and thorough", "simple but handles all edge cases") | Identify the conflict, prioritize one, note the tradeoff |
+| **OVER_SCOPED** | Prompt asks for too many things at once; would require 5+ files changed | Break into sequential focused prompts, suggest ordering |
+| **UNDER_CONSTRAINED** | Prompt gives freedom where specificity is needed (output format, target files, approach) | Add constraints: format, scope boundaries, acceptance criteria |
+| **MISSING_OUTPUT_SPEC** | No indication of what the result should look like | Add explicit output format (table, JSON, diff, file changes) |
+| **AMBIGUOUS_SCOPE** | Unclear which files, modules, or layers are in scope | Add explicit scope boundaries ("only in src/api/", "just the tests") |
+| **IMPLICIT_ASSUMPTIONS** | Prompt relies on assumptions that may not hold (env setup, dependencies, prior steps) | Make assumptions explicit or add verification steps |
+| **MISSING_STRUCTURE** | Complex multi-part prompt uses flat unstructured text where XML tags would improve clarity and adherence | Restructure with XML tags (see XML Tag Reference below) |
+
+#### XML Tag Reference
+
+Claude is trained on XML-structured prompts. Using XML tags for complex,
+multi-part prompts improves constraint adherence by ~12% and response quality
+by up to 30% for long-context inputs (per Anthropic's official documentation).
+
+**When to apply XML structuring:**
+- Prompt mixes instructions, context, data, and constraints
+- Prompt has 3+ distinct parts (task, rules, examples, output format)
+- Prompt includes long context or multiple documents
+
+**When NOT to apply:**
+- Simple single-intent queries ("run tests", "rename X to Y")
+- Prompts that are already 1-2 sentences
+- Over-tagging adds noise without benefit — use 3-7 tags, not more
+
+**Core tags (ordered by frequency of use):**
+
+| Tag | Purpose | Use When |
+|-----|---------|----------|
+| `<task>` | Define what must be done | Every complex prompt — the single most important tag |
+| `<context>` | Background information needed for the task | Prompt assumes knowledge not explicitly stated |
+| `<instructions>` | Step-by-step directives | Task has a specific procedure to follow |
+| `<constraints>` / `<rules>` | Explicit limitations and behavioral rules | Task has non-obvious boundaries or MUST/MUST NOT rules |
+| `<output_format>` | Desired response structure | Output must match a specific schema, table, or format |
+| `<examples>` | Few-shot demonstrations (3-5 examples) | Task benefits from showing input→output patterns |
+| `<input>` | Variable user data, separated from instructions | Prompt mixes static instructions with dynamic data |
+| `<documents>` | Container for long multi-document context | Multiple source documents need to be referenced |
+| `<thinking>` | Scratchpad for chain-of-thought reasoning | Task requires step-by-step reasoning before answering |
+| `<answer>` | Final output, separated from reasoning | Used with `<thinking>` to cleanly extract the result |
+
+**Behavioral tags (self-describing constraint blocks):**
+
+Anthropic uses tag names as the instruction itself in system prompts:
+```xml
+<default_to_action>Implement changes directly instead of suggesting them.</default_to_action>
+<investigate_before_answering>Read relevant files before making claims.</investigate_before_answering>
+```
+
+**Structuring rules:**
+- Tag names MUST be descriptive and consistent — `<patient_records>` not `<data1>`
+- Nest tags when content has natural hierarchy
+- Place long context ABOVE the query (improves quality by up to 30%)
+- Do not wrap single sentences in tags — tags are for content blocks
+
+If no weaknesses are found (prompt scores clean), skip to execution — do not
+force unnecessary rewrites.
+
+### Strengthening Step 2: Map Fixes
+
+For each diagnosed weakness, determine the minimal structural fix. Each fix
+MUST map to exactly one failure category — no fix without a diagnosis, no
+diagnosis without a fix.
+
+Format:
+```
+Diagnosis:
+  [1] CATEGORY_NAME → specific fix description
+  [2] CATEGORY_NAME → specific fix description
+```
+
+### Strengthening Step 3: Rewrite the Prompt
+
+Apply all fixes to produce a strengthened version. Rules:
+- Targeted changes only — do not rewrite parts that are already clear
+- Preserve the user's original intent and voice
+- Do not add complexity unless it directly eliminates a diagnosed weakness
+- Do not change terminology the user chose unless it causes ambiguity
+- When MISSING_STRUCTURE is diagnosed, wrap distinct prompt sections in XML tags
+  (e.g., `<task>`, `<context>`, `<constraints>`, `<output_format>`) — use the
+  XML Tag Reference above to select appropriate tags
+- Place long context above the query, constraints near the task definition
+
+### Strengthening Step 4: Show Before/After
+
+MUST show the comparison to the user every time strengthening activates.
+This is NOT optional — visibility builds trust and helps users learn.
+
+```
+Prompt Strengthened (N fixes):
+┌─────────────────┬──────────────────────────────────────────────┐
+│ Original        │ [user's original prompt text]                │
+├─────────────────┼──────────────────────────────────────────────┤
+│ Strengthened    │ [rewritten prompt text]                      │
+├─────────────────┼──────────────────────────────────────────────┤
+│ Changes Applied │                                              │
+│  [1]            │ CATEGORY → what was changed and why          │
+│  [2]            │ CATEGORY → what was changed and why          │
+└─────────────────┴──────────────────────────────────────────────┘
+Proceeding with strengthened prompt...
+```
+
+Update the `*Enhanced:*` indicator to include strengthening:
+`*Enhanced: prompt strengthened (N fixes), git state, 2 rules*`
+
+### Strengthening Step 5: Execute
+
+Proceed with the strengthened prompt as if the user had entered it directly.
+The rest of the auto-enhance pipeline (Tier 1/2 context, Clarification Gate,
+CRUD detection) applies to the strengthened version, not the original.
+
+### When NOT to Strengthen
+
+| Condition | Action |
+|-----------|--------|
+| Direct unambiguous instruction | Skip — execute as-is |
+| Single-file simple change | Skip — no diagnosis needed |
+| User says "do exactly this" or quotes a specific command | Skip — respect explicit intent |
+| Prompt is a question (not an action request) | Skip — just answer it |
+| All 8 categories score clean | Skip — prompt is already strong |
 
 ---
 
@@ -195,6 +337,9 @@ the signals are clear.
 ## MUST DO
 
 - ALWAYS gather Tier 1 context before responding to any prompt
+- ALWAYS run Prompt Strengthening for non-trivial prompts before execution
+- ALWAYS show the before/after comparison table when strengthening activates — never silent
+- ALWAYS include strengthening count in the `*Enhanced:*` indicator when fixes are applied
 - ALWAYS run the Clarification Gate for ambiguous or multi-file prompts before acting
 - ALWAYS read relevant code before asking a clarification question — never ask what you can answer yourself
 - ALWAYS present the batch table when resource CRUD is detected
@@ -202,14 +347,15 @@ the signals are clear.
 - ALWAYS delegate to existing authoring tools — never generate patterns ad-hoc
 - ALWAYS follow quality standards from `pattern-structure.md`,
   `pattern-portability.md`, `pattern-self-containment.md`
-- ALWAYS stay silent (no enhancement summary) when no CRUD is detected
 
 ## MUST NOT DO
 
+- MUST NOT strengthen direct unambiguous instructions — respect explicit user intent
+- MUST NOT add complexity during strengthening that doesn't map to a diagnosed weakness
+- MUST NOT change the user's original intent during strengthening — only clarify and constrain
 - MUST NOT create, update, or delete resources without batch approval
 - MUST NOT re-prompt for rejected items in the same session
 - MUST NOT web search when local context is sufficient
-- MUST NOT show enhancement details for non-CRUD prompts
 - MUST NOT generate patterns directly — use `/writing-skills`, `/claude-guardian`,
   or `skill-author` agent
 - MUST NOT suggest resource changes when signals are ambiguous — default to
