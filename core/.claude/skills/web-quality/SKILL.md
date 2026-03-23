@@ -1,9 +1,9 @@
 ---
 name: web-quality
 description: >
-  Run a comprehensive web quality audit covering Core Web Vitals, accessibility (WCAG 2.1 AA),
-  SEO, performance budgets, responsive design, and progressive enhancement. Produces actionable
-  findings with fix guidance. Inspired by Addy Osmani's web-quality-skills (Google Chrome team).
+  Run a web quality audit covering Core Web Vitals, accessibility (WCAG 2.1 AA),
+  SEO, performance budgets, responsive design, and progressive enhancement. Use when
+  assessing web application quality or preparing for performance and accessibility reviews.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<url-or-file-path> [--focus=vitals|a11y|seo|perf|responsive|all]"
 version: "1.0.0"

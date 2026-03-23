@@ -1,8 +1,8 @@
 ---
 name: fastapi-deploy
 description: >
-  Backend deployment orchestration for FastAPI projects. Runs migrations, seeds data,
-  restarts server, and performs health checks.
+  Orchestrate backend deployment for FastAPI projects by running migrations, seeding data,
+  restarting the server, and performing health checks. Use when deploying or updating a FastAPI service.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[--skip-seed] [--skip-migrate] [--port 8000]"
 version: "1.0.0"

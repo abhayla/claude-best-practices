@@ -1,13 +1,14 @@
 ---
 name: flutter-e2e-test
 description: >
-  Flutter E2E testing across Android, Web, and desktop platforms. MCP-based semantic
+  Run Flutter E2E tests across Android, Web, and desktop platforms with MCP-based semantic
   element recognition, integration_test package workflows, self-healing selectors,
-  visual regression, monkey testing, and CI/CD integration. Based on ai-dashboad/flutter-skill.
+  visual regression, monkey testing, and CI/CD integration. Use when writing, running,
+  or debugging end-to-end tests for Flutter apps.
 triggers: "flutter test, e2e, integration test, end-to-end, widget test, UI test"
-allowed-tools: "Bash Read Write Edit Grep Glob"
+allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<test-scope: 'all' | feature-name | 'setup' | 'visual' | 'monkey'>"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -388,6 +389,49 @@ Platform suffix added for multi-platform runs:
 
 ---
 
+## STEP 9: Auto-Fix and Learn (On Failure Only)
+
+If tests failed in STEP 6, automatically invoke the fix-and-learn pipeline. Do NOT just report failures — fix them.
+
+### 9a. Diagnose First (E2E-Specific)
+
+Per Rule 15, E2E failures go through `/systematic-debugging` first because environment issues masquerade as code bugs:
+
+```
+Skill("systematic-debugging", args="Flutter E2E test failed: <failure_output>")
+```
+
+### 9b. Invoke Fix-Loop
+
+Once root cause is isolated by systematic debugging:
+
+```
+Skill("fix-loop", args="<diagnosed_failure>\n\nretest_command: flutter test integration_test/{test_file}")
+```
+
+### 9c. Capture Learnings (On Fix Success)
+
+If `/fix-loop` reports `result: PASSED` or `result: FIXED`:
+
+```
+Skill("learn-n-improve", args="session")
+```
+
+### 9d. Escalation (On Fix Failure)
+
+If `/fix-loop` exhausts iterations without success:
+- Report the failure to the user
+- Do NOT silently continue
+
+### Skip Conditions
+
+Do NOT auto-invoke fix pipeline if:
+- No connected device (`flutter devices` shows none)
+- Build failed before tests ran (`flutter build` errors)
+- ChromeDriver not started (web tests)
+
+---
+
 ## Anti-Patterns
 
 ### MUST NOT DO
@@ -402,6 +446,7 @@ Platform suffix added for multi-platform runs:
 
 ### MUST DO
 
+- Invoke `/fix-loop` on test failure — do not just report failures
 - Annotate interactive widgets with `Semantics` labels and `Key` values at development time
 - Use the robot/page-object pattern to encapsulate screen interactions
 - Batch 5+ sequential actions into helper methods for token efficiency

@@ -1,9 +1,9 @@
 ---
 name: expo-dev
 description: >
-  Expo development workflow: project setup, Expo Router file-based navigation,
-  EAS Build/Submit/Update, SDK upgrades, push notifications, and common Expo packages.
-  Use for building, deploying, and maintaining React Native apps with Expo.
+  Build and deploy React Native apps with Expo including project setup, Expo Router
+  navigation, EAS Build/Submit/Update, SDK upgrades, and push notifications. Use when
+  building, deploying, or maintaining Expo-based mobile applications.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "expo, expo router, expo sdk, eas build, eas submit, app store deploy, expo upgrade"
 argument-hint: "<feature-description or 'setup' or 'deploy' or 'upgrade' or 'navigate'>"

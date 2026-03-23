@@ -1,7 +1,7 @@
 ---
 name: k8s-deploy
 description: >
-  Kubernetes deployment skill covering manifests, services, ingress, secrets,
+  Deploy and configure Kubernetes workloads including manifests, services, ingress, secrets,
   probes, autoscaling, RBAC, namespaces, Helm charts, and debugging.
   Use when deploying, configuring, or troubleshooting Kubernetes workloads.
 allowed-tools: "Read Grep Glob"

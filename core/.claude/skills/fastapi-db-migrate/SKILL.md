@@ -1,8 +1,9 @@
 ---
 name: fastapi-db-migrate
 description: >
-  Database migration helper for FastAPI + Alembic projects. Generates migrations and
-  auto-updates model import locations. Use when adding or modifying SQLAlchemy models.
+  Generate and manage database migrations for FastAPI + Alembic projects. Creates
+  migration scripts and auto-updates model import locations. Use when adding or
+  modifying SQLAlchemy models in a FastAPI application.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<model-name or 'run' or 'status' or 'check'>"
 version: "1.0.1"

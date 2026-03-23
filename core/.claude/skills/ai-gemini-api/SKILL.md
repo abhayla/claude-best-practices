@@ -1,9 +1,9 @@
 ---
 name: ai-gemini-api
 description: >
-  Reference for Google Gemini API usage: client setup with google-genai SDK,
-  structured output, prompt patterns, and troubleshooting. Use when working
-  with Gemini-powered features.
+  Apply Google Gemini API patterns including client setup with google-genai SDK,
+  structured output, prompt design, and troubleshooting. Use when integrating
+  or debugging Gemini-powered features.
 allowed-tools: "Read Grep Glob"
 argument-hint: ""
 version: "1.0.1"

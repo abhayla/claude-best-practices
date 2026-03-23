@@ -1,9 +1,9 @@
 ---
 name: brainstorm
 description: >
-  Socratic questioning phase before planning or implementation. Explores intent,
-  proposes approaches with trade-offs, and produces a spec document. Use before
-  building anything non-trivial.
+  Explore intent through Socratic questioning, propose approaches with trade-offs,
+  and produce a spec document. Use before building anything non-trivial to clarify
+  requirements and evaluate alternatives.
 triggers:
   - brainstorm
   - explore ideas

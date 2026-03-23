@@ -1,7 +1,7 @@
 ---
 name: firebase-dev
 description: >
-  Core Firebase development: project setup, CLI, Authentication (providers, tokens,
+  Build Firebase-backed apps with project setup, CLI, Authentication (providers, tokens,
   security rules, web SDK), and Firestore (provisioning, security rules, CRUD,
   transactions, realtime listeners, indexes). Use when building Firebase-backed apps.
 allowed-tools: "Read Grep Glob"

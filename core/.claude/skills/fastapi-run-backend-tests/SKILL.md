@@ -1,11 +1,12 @@
 ---
 name: fastapi-run-backend-tests
 description: >
-  Run backend pytest with smart defaults and short-name resolution.
-  Resolves short names like "auth" to test_auth.py. Suggests /fix-loop on failure.
-allowed-tools: "Bash Read Write Grep Glob"
+  Run backend pytest with smart defaults, short-name resolution, and auto-fix on failure.
+  Resolves short names like "auth" to test_auth.py. Invokes /fix-loop on failure and
+  /learn-n-improve on success. Use when running or re-running FastAPI backend tests.
+allowed-tools: "Bash Read Write Grep Glob Skill"
 argument-hint: "[test_path] [--coverage] [--collect-only] [-x] [--file <name>] [--func <name>]"
-version: "1.2.0"
+version: "2.1.0"
 type: workflow
 ---
 
@@ -123,8 +124,7 @@ Failed Tests:
   tests/test_auth.py::test_login_expired_token — AssertionError: 401 != 200
   tests/test_users.py::test_create_duplicate — IntegrityError
 
-Suggested: /fix-loop with retest_command:
-  cd {backend_dir} && PYTHONPATH=. pytest {failed_path} -v --tb=short -x
+Auto-invoking /fix-loop (STEP 7)...
 ```
 
 Categorize failures using these standard categories:
@@ -141,7 +141,7 @@ Categorize failures using these standard categories:
 | Result | Action |
 |--------|--------|
 | All passed | Report success, suggest broader suite if only subset was run |
-| Failures found | Suggest `/fix-loop` with the retest command |
+| Failures found | Auto-invoke `/fix-loop` (see STEP 7) |
 | Coverage below 80% | Highlight uncovered files, suggest `/test-generator` for gap filling |
 | Flaky tests detected | Suggest re-running with `--count=3` (pytest-repeat) to confirm |
 
@@ -190,13 +190,48 @@ with open('test-results/fastapi-run-backend-tests.json', 'w') as f:
 
 ---
 
+## STEP 7: Auto-Fix and Learn (On Failure Only)
+
+If tests failed in STEP 4, automatically invoke the fix-and-learn pipeline. Do NOT just suggest — invoke directly.
+
+### 7a. Invoke Fix-Loop
+
+```
+Skill("fix-loop", args="<failure_output>\n\nretest_command: cd {backend_dir} && PYTHONPATH=. pytest {resolved_path} -v --tb=short -x")
+```
+
+This iterates: analyze → fix → retest until green (max 5 iterations).
+
+### 7b. Capture Learnings (On Fix Success)
+
+If `/fix-loop` reports `result: PASSED` or `result: FIXED`:
+
+```
+Skill("learn-n-improve", args="session")
+```
+
+### 7c. Escalation (On Fix Failure)
+
+If `/fix-loop` exhausts 5 iterations without success:
+- Report the failure to the user
+- Suggest `/systematic-debugging` for deeper investigation
+- Do NOT silently continue
+
+### Skip Conditions
+
+Do NOT auto-invoke fix-loop if:
+- `--collect-only` was used (no actual test execution)
+- The failure is an environment error (venv not active, import error from missing PYTHONPATH)
+
+---
+
 ## MUST DO
 
 - Always detect the backend directory before running — never assume `backend/`
 - Always use `PYTHONPATH=.` to ensure cross-module imports work
 - Always use `--tb=short` for readable output (unless user requests `--tb=long`)
 - Always categorize failures in the report
-- Always suggest `/fix-loop` with the exact retest command on failure
+- Always invoke `/fix-loop` on failure — do not just suggest it
 
 ## MUST NOT DO
 

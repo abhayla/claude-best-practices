@@ -1,8 +1,8 @@
 ---
 name: android-adb-test
 description: >
-  Android E2E testing via ADB (uiautomator dump, screencap, input tap).
-  Use for testing app screens without Compose test framework, debugging emulator UI,
+  Run Android E2E tests via ADB using uiautomator dump, screencap, and input tap.
+  Use when testing app screens without the Compose test framework, debugging emulator UI,
   or validating user flows manually.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[screen-name|flow-name|all]"

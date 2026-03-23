@@ -1,9 +1,9 @@
 ---
 name: project-scaffold
 description: >
-  Initialize a fully configured project skeleton with build, lint, test, CI,
+  Scaffold a fully configured project skeleton with build, lint, test, CI,
   Docker, security baseline, 12-factor compliance, and conventional commits.
-  Multi-stack: Python, Node/TypeScript, Android, React/Next.js, Go, Rust.
+  Use when initializing a new project in Python, Node/TypeScript, Android, React/Next.js, Go, or Rust.
 triggers:
   - scaffold project
   - init project

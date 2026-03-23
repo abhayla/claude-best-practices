@@ -4,8 +4,7 @@ description: >
   Run mobile accessibility tests for Android (Compose/XML) and Flutter projects.
   Detects platform, runs automated checks, audits content labels, validates touch
   targets, checks color contrast, and produces a structured severity report.
-  CRITICAL: every interactive element MUST have an accessibility label and meet
-  48dp minimum touch target.
+  Use when auditing or validating mobile app accessibility compliance.
 triggers:
   - mobile accessibility
   - android a11y

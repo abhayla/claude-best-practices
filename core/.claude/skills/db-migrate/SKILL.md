@@ -1,10 +1,10 @@
 ---
 name: db-migrate
 description: >
-  Stack-neutral database migration helper supporting Prisma, Knex, Django,
-  TypeORM, Drizzle, SQLAlchemy/Alembic, and raw SQL. Detects the project's
-  migration tool, generates migrations with UP + DOWN, and verifies safety.
-  Use when creating, running, or troubleshooting database migrations.
+  Generate and verify database migrations across Prisma, Knex, Django, TypeORM,
+  Drizzle, SQLAlchemy/Alembic, and raw SQL. Auto-detects the project's migration
+  framework, creates migrations with UP + DOWN, and verifies safety. Use when
+  creating, running, or troubleshooting database migrations.
 triggers:
   - db migrate
   - database migration

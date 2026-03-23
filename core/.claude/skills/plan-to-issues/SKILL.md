@@ -2,7 +2,8 @@
 name: plan-to-issues
 description: >
   Parse a markdown plan into GitHub Issues with labels and duplicate detection.
-  Supports text input or file path. Max 20 issues per invocation.
+  Supports text input or file path. Use when converting a structured plan into
+  tracked GitHub Issues.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<plan-file-path or plan text>"
 version: "1.0.0"

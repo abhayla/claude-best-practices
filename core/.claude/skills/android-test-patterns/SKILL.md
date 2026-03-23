@@ -1,10 +1,10 @@
 ---
 name: android-test-patterns
 description: >
-  Android test writing patterns: JUnit 5 unit tests, Compose UI tests,
+  Apply Android test writing patterns including JUnit 5 unit tests, Compose UI tests,
   Espresso instrumented tests, Hilt test modules, coroutine test utilities,
   Room database testing, and test fixture factories. Use when writing new
-  Android tests or setting up test infrastructure for an Android project.
+  Android tests or setting up test infrastructure.
 triggers:
   - android test
   - write android tests

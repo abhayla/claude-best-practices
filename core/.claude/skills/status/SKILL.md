@@ -1,8 +1,8 @@
 ---
 name: status
 description: >
-  Quick project health snapshot. Shows git status, test status, and project state
-  in a single report. Use when starting a session or checking project health.
+  Generate a project health snapshot showing git status, test status, and project
+  state in a single report. Use when starting a session or checking project health.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: ""
 version: "1.0.1"

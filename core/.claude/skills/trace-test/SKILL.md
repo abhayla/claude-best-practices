@@ -1,9 +1,9 @@
 ---
 name: trace-test
 description: >
-  Trace-based testing with OpenTelemetry and Tracetest. Assert on distributed trace spans
+  Validate distributed traces with OpenTelemetry and Tracetest by asserting on spans
   instead of just HTTP responses — verify downstream calls, latency per span, error propagation,
-  and correlation ID flow. Use for microservice integration verification.
+  and correlation ID flow. Use when testing microservice integration and observability.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 triggers:
   - trace test

@@ -1,8 +1,9 @@
 ---
 name: contribute-practice
 description: >
-  Push a pattern from your project to the best practices hub.
-  Validates pattern structure, checks for duplicates, and creates a PR.
+  Push a pattern from your project to the best practices hub by validating
+  structure, checking for duplicates, and creating a PR. Use when you have a
+  battle-tested pattern worth sharing with other projects.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<pattern-path>"
 type: workflow

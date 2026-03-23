@@ -1,9 +1,9 @@
 ---
 name: claude-guardian
 description: >
-  Use when adding rules/conventions to CLAUDE.md files, when CLAUDE.md files have been
-  edited and need validation, or when unsure which config file a rule belongs in.
-  Two modes: enhance-and-place a rough rule idea, or audit all config files.
+  Validate and place rules into the correct CLAUDE.md or config file. Two modes:
+  enhance-and-place a rough rule idea, or audit all config files for misplaced rules.
+  Use when adding conventions, after editing CLAUDE.md, or when unsure where a rule belongs.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<rough rule text> | audit"
 version: "1.0.1"

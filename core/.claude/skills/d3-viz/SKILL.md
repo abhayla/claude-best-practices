@@ -1,9 +1,9 @@
 ---
 name: d3-viz
 description: >
-  D3.js data visualization — selections, data joins, scales, axes, transitions,
-  interactions. Chart types: bar, line, scatter, pie, heatmap, chord, force graph,
-  treemap, choropleth. Responsive SVG, tooltips, zoom/pan, drag.
+  Build D3.js data visualizations including bar, line, scatter, pie, heatmap, chord,
+  force graph, treemap, and choropleth charts with responsive SVG and interactions.
+  Use when creating or modifying data visualizations with D3.
 triggers:
   - d3
   - d3.js

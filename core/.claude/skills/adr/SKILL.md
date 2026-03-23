@@ -3,8 +3,8 @@ name: adr
 description: >
   Create and manage Architecture Decision Records (ADRs). Initialize an ADR directory,
   create new ADRs from the Michael Nygard template, list existing decisions, supersede
-  or deprecate old ADRs, and generate an ADR index. Supports both interactive and
-  argument-driven usage.
+  or deprecate old ADRs, and generate an ADR index. Use when making architectural
+  decisions that need formal documentation or when reviewing past decisions.
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<new \"Decision Title\" | list | index | supersede <ADR-number> | deprecate <ADR-number>>"

@@ -1,10 +1,10 @@
 ---
 name: solidity-audit
 description: >
-  Production Solidity development and security auditing. Foundry/Hardhat testing,
+  Audit and develop Solidity smart contracts covering Foundry/Hardhat testing,
   reentrancy protection, access control, gas optimization, upgrade patterns (UUPS,
-  Transparent), oracle security, ERC standards, Aderyn/Slither static analysis,
-  Cyfrin audit methodology. Private key safety guardrails.
+  Transparent), oracle security, ERC standards, and Aderyn/Slither static analysis.
+  Use when building, reviewing, or auditing smart contracts.
 triggers:
   - solidity
   - smart contract

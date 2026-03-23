@@ -1,10 +1,9 @@
 ---
 name: anthropic-agent-orchestration-guide
 description: >
-  Reference guide for designing multi-agent orchestration systems. Covers
-  Anthropic's 5 workflow patterns, agent vs skill decision framework,
-  orchestration architecture, anti-patterns, and context management.
-  Consult when designing new orchestrators or refactoring existing ones.
+  Design multi-agent orchestration systems using Anthropic's 5 workflow patterns,
+  agent vs skill decision framework, orchestration architecture, and context
+  management. Use when designing new orchestrators or refactoring existing ones.
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "[pattern name or question about orchestration]"

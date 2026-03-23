@@ -1,8 +1,8 @@
 ---
 name: prisma-orm
 description: >
-  Prisma ORM schema design, migrations, queries, and client usage for TypeScript projects.
-  Use when working with Prisma in any TypeScript backend (Next.js, Express, Hono, Fastify).
+  Design Prisma ORM schemas, run migrations, write queries, and configure client usage
+  for TypeScript projects. Use when working with Prisma in any TypeScript backend.
 allowed-tools: "Read Grep Glob"
 argument-hint: "[schema|migrate|query|seed]"
 version: "1.0.0"

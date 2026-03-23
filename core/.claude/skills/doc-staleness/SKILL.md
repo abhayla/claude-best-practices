@@ -1,9 +1,9 @@
 ---
 name: doc-staleness
 description: >
-  Detect documentation that has drifted from the codebase. Compares docs against
-  recent code changes to find stale references, outdated examples, missing modules,
-  and broken links. Produces a prioritized staleness report with fix suggestions.
+  Detect documentation that has drifted from the codebase by comparing docs against
+  recent code changes to find stale references, outdated examples, and broken links.
+  Use when docs may be outdated after significant code changes or before a release.
 type: workflow
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[docs-directory] [--since <commit-or-date>] [--fix]"

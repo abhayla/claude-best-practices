@@ -1,7 +1,7 @@
 ---
 name: monorepo
 description: >
-  Monorepo management patterns for npm/pnpm/yarn workspaces, Turborepo, and shared packages.
+  Manage monorepo configurations with npm/pnpm/yarn workspaces, Turborepo, and shared packages.
   Use when setting up, managing, or troubleshooting monorepo configurations.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[setup|workspace|shared|turborepo]"

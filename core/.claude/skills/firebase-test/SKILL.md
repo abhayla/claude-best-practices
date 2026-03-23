@@ -3,11 +3,12 @@ name: firebase-test
 description: >
   Run and validate Firebase application tests across security rules, Cloud Functions,
   Auth triggers, and Test Lab. Manages Firebase Emulator Suite lifecycle, seeds test
-  data, and produces structured JSON results.
+  data, and produces structured JSON results. Invokes /fix-loop on failure and
+  /learn-n-improve on success. Use when testing Firebase security rules, Cloud Functions, or Auth triggers.
 type: workflow
-allowed-tools: "Bash Read Write Edit Grep Glob"
+allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<test-scope> [--rules|--functions|--auth|--emulator]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Firebase Test Runner
@@ -465,11 +466,51 @@ Verify ports are released and report final status with passed/failed/skipped cou
 
 ---
 
+## STEP 11: Auto-Fix and Learn (On Failure Only)
+
+If tests failed in STEP 8, automatically invoke the fix-and-learn pipeline. Do NOT just report failures — fix them.
+
+### 11a. Invoke Fix-Loop
+
+```
+Skill("fix-loop", args="<failure_output>\n\nretest_command: npx jest {test_scope} --forceExit")
+```
+
+Or for mocha:
+```
+Skill("fix-loop", args="<failure_output>\n\nretest_command: npx mocha {test_scope} --exit")
+```
+
+### 11b. Capture Learnings (On Fix Success)
+
+If `/fix-loop` reports `result: PASSED` or `result: FIXED`:
+
+```
+Skill("learn-n-improve", args="session")
+```
+
+### 11c. Escalation (On Fix Failure)
+
+If `/fix-loop` exhausts 5 iterations without success:
+- Report the failure to the user
+- Suggest `/systematic-debugging` for deeper investigation
+- Do NOT silently continue
+
+### Skip Conditions
+
+Do NOT auto-invoke fix-loop if:
+- Emulators failed to start (environment error — fix emulator setup first)
+- `firebase.json` is missing or misconfigured
+- The failure is a security rules test that correctly rejects access (that's the test working as intended)
+
+---
+
 ## CRITICAL RULES
 
 ### MUST DO
 
 - MUST run all tests against the Firebase Emulator Suite, never against live projects
+- MUST invoke `/fix-loop` on test failure — do not just report failures
 - MUST set `FIRESTORE_EMULATOR_HOST` and `FIREBASE_AUTH_EMULATOR_HOST` before test execution
 - MUST clear Firestore data between test suites using `testEnv.clearFirestore()` or the REST endpoint
 - MUST tear down emulators after test completion (Step 10), even on failure

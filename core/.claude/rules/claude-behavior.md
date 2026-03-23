@@ -46,11 +46,14 @@ globs: ["**/*"]
 
 ## Failure Response
 
-15. **Test Failures → Use Skills**: When tests fail, invoke the appropriate skill instead of ad-hoc debugging:
+15. **Test Failures → Use Skills**: When tests fail, invoke the appropriate skill instead of ad-hoc debugging.
+    This is MANDATORY — do not document failures and wait for user direction. Fix autonomously:
     - **Code test failure with known retest command** → `/fix-loop` (iterates: analyze → fix → retest until green)
     - **Unclear root cause or 2+ failed attempts** → `/systematic-debugging` (structured: reproduce → isolate → hypothesize → evidence → root cause → fix → verify)
     - **E2E/integration failure** → `/systematic-debugging` first (environment issues masquerade as code bugs), then `/fix-loop` once root cause is isolated
+    - **After successful fix** → `/learn-n-improve session` to capture the error→fix→lesson pattern
     - **Never** manually retry the same approach 3+ times without switching to a structured skill
+    - **Never** just log failures in a session file and stop — the pipeline is: detect → diagnose → fix → learn
 
 ## Core Principles
 

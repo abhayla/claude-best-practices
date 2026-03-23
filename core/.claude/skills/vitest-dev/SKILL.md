@@ -1,9 +1,10 @@
 ---
 name: vitest-dev
 description: >
-  Vitest testing reference: configuration, mocking (vi.mock/vi.fn/vi.spyOn), snapshot
+  Apply Vitest patterns for configuration, mocking (vi.mock/vi.fn/vi.spyOn), snapshot
   testing, coverage with v8/istanbul, workspace mode for monorepos, and framework
-  integration (React Testing Library, Vue Test Utils). Use for writing and running Vitest tests.
+  integration (React Testing Library, Vue Test Utils). Use when writing or running
+  Vitest tests.
 allowed-tools: "Bash Read Grep Glob"
 triggers: "vitest, vi.mock, vi.fn, test runner, unit test vite, testing library vitest"
 argument-hint: "<pattern-to-look-up or 'config' or 'mock' or 'coverage' or 'workspace'>"

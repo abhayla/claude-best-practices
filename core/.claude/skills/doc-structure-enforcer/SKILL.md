@@ -2,9 +2,9 @@
 name: doc-structure-enforcer
 description: >
   Enforce a stage-based documentation folder structure via config-driven rules.
-  Two modes: audit (report misplaced files) or enforce (git mv + update all path
-  references). Auto-generates .doc-structure.yml on first run if missing. Aligns
-  with project-manager-agent's 11-stage artifact layout.
+  Two modes: audit (report misplaced files) or enforce (git mv + update path
+  references). Use when documentation files are disorganized or when onboarding
+  a project to a structured docs layout.
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "--audit | --enforce [--config <path>]"

@@ -1,8 +1,9 @@
 ---
 name: drizzle-orm
 description: >
-  Drizzle ORM schema design, migrations, queries, and relations for TypeScript projects.
-  Use when working with Drizzle ORM in any TypeScript backend (Next.js, Bun, Hono, Express).
+  Apply Drizzle ORM patterns for schema design, migrations, queries, and relations
+  in TypeScript projects. Use when working with Drizzle ORM in any TypeScript backend
+  (Next.js, Bun, Hono, Express).
 allowed-tools: "Read Grep Glob"
 argument-hint: "[schema|migrate|query|relations]"
 version: "1.0.0"

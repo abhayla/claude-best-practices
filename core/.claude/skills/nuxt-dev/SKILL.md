@@ -1,9 +1,9 @@
 ---
 name: nuxt-dev
 description: >
-  Nuxt 4.3+ full-stack development: project setup, server routes, SSR/SSG, Nuxt Modules,
-  NuxtHub (database/KV/blob/cache), Nuxt Content v3, Nuxt UI v4, nuxt-better-auth,
-  auto-imports, middleware, composables, and deployment. Use for building Nuxt applications.
+  Build Nuxt 4.3+ full-stack applications with project setup, server routes, SSR/SSG, Nuxt Modules,
+  NuxtHub, Nuxt Content v3, Nuxt UI v4, nuxt-better-auth,
+  auto-imports, middleware, composables, and deployment. Use when developing or extending Nuxt applications.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "nuxt, nuxt4, nuxt module, nuxthub, nuxt content, nuxt ui, nuxt auth, server routes, SSR"
 argument-hint: "<feature-description or 'setup' or 'api' or 'module' or 'deploy'>"

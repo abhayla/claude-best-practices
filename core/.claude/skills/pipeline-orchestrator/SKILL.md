@@ -1,8 +1,8 @@
 ---
 name: pipeline-orchestrator
 description: >
-  DAG-based multi-stage pipeline orchestrator for PRD-to-Production delivery.
-  Thin wrapper that dispatches the pipeline-orchestrator agent. Use when
+  Orchestrate multi-stage pipelines for PRD-to-Production delivery using a
+  DAG-based execution model. Use when
   coordinating 2+ sequential/parallel stages that produce artifacts consumed
   by downstream stages.
 triggers:

@@ -1,11 +1,9 @@
 ---
 name: deploy-strategy
 description: >
-  Advanced deployment strategies: GitOps (ArgoCD/Flux), progressive delivery
-  (canary/blue-green with Flagger/Argo Rollouts), zero-downtime DB migrations
-  (expand-contract), production readiness review, secret rotation strategy,
-  CDN/edge caching, and mobile app deployment (Play Store/App Store via Fastlane).
-  Use before first production deploy.
+  Design deployment strategies including GitOps (ArgoCD/Flux), progressive delivery
+  (canary/blue-green), zero-downtime DB migrations, and mobile app deployment via
+  Fastlane. Use when planning production deployments or setting up delivery pipelines.
 triggers:
   - deploy strategy
   - gitops

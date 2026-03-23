@@ -1,9 +1,9 @@
 ---
 name: pg-query
 description: >
-  PostgreSQL read-only query assistant: schema exploration, query execution with timeouts,
+  Execute read-only PostgreSQL queries with schema exploration,
   EXPLAIN ANALYZE performance analysis, index and table statistics, connection diagnostics,
-  and query optimization. Use for any PostgreSQL database investigation or troubleshooting.
+  and query optimization. Use when investigating or troubleshooting PostgreSQL databases.
 triggers: "postgresql postgres pg database query schema explain sql"
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<sql-query or question about database schema/performance>"

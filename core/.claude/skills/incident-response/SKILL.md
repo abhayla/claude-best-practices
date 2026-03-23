@@ -1,7 +1,7 @@
 ---
 name: incident-response
 description: >
-  Comprehensive incident response workflow: detection, triage, severity classification,
+  Manage incident response through detection, triage, severity classification,
   mitigation, communication, post-mortem, and on-call handoff. Use when responding to
   production incidents, generating runbooks, conducting post-mortems, or preparing
   on-call handoff documents.

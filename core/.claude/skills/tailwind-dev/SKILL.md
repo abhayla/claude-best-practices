@@ -1,9 +1,9 @@
 ---
 name: tailwind-dev
 description: >
-  Tailwind CSS v3/v4 reference: setup and configuration, utility patterns, component
-  styling with CVA, theming with CSS custom properties, dark mode, responsive design,
-  and performance optimization. Use for styling web applications with Tailwind.
+  Apply Tailwind CSS v3/v4 patterns for setup and configuration, component styling
+  with CVA, theming with CSS custom properties, dark mode, responsive design, and
+  performance optimization. Use when styling web applications with Tailwind.
 allowed-tools: "Read Grep Glob"
 triggers: "tailwind, tailwindcss, utility css, tailwind config, tailwind theme, cn utility"
 argument-hint: "<pattern-to-look-up or 'setup' or 'theme' or 'component' or 'migrate'>"

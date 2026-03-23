@@ -1,10 +1,9 @@
 ---
 name: changelog-contributing
 description: >
-  Auto-generate CHANGELOG.md from conventional commits and create a project-specific
-  CONTRIBUTING.md with development setup, commit format, branch naming, testing
-  requirements, and PR process. Parses git log, groups entries by type following
-  Keep a Changelog format, and optionally integrates with CI for automatic updates.
+  Generate CHANGELOG.md from conventional commits and create a project-specific
+  CONTRIBUTING.md with development setup, commit format, and PR process. Use when
+  preparing a release, onboarding contributors, or setting up changelog automation.
 triggers:
   - changelog
   - contributing

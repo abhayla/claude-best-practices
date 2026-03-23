@@ -1,14 +1,11 @@
 ---
 name: iac-deploy
 description: >
-  Infrastructure as Code deployment skill covering Terraform and Pulumi.
-  Handles provider configuration, resource management, state backends,
-  module composition, environment management, drift detection, security
-  hardening, CI/CD integration, common cloud resource patterns, FinOps
-  (cost estimation with Infracost, right-sizing, budget alerts), serverless
-  deployment (Lambda/Cloud Functions), and static site deployment
-  (Vercel/Netlify/Cloudflare Pages/Firebase Hosting).
-  Use for any IaC planning, writing, reviewing, or troubleshooting.
+  Deploy infrastructure with Terraform and Pulumi covering provider configuration,
+  resource management, state backends, module composition, environment management,
+  drift detection, security hardening, CI/CD integration, FinOps, serverless
+  deployment, and static site deployment.
+  Use when planning, writing, reviewing, or troubleshooting IaC configurations.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "iac, terraform, pulumi, infrastructure, infrastructure as code, tf plan, tf apply, cloud provisioning"
 argument-hint: "<'plan' or 'write <resource>' or 'review' or 'migrate-state' or 'modularize' or 'drift-check'>"

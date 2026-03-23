@@ -2,8 +2,8 @@
 name: coverage-analysis
 description: >
   Analyze test coverage across a project, identify gaps in critical code paths,
-  and prioritize which files and functions to test next. Supports Python (pytest-cov),
-  JavaScript/TypeScript (vitest, jest, istanbul), and Android (jacoco) projects.
+  and prioritize which files and functions to test next. Use when coverage is
+  below target or when determining where to add tests for maximum impact.
 type: workflow
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[target-directory] [--threshold LINE:BRANCH e.g. 80:70]"

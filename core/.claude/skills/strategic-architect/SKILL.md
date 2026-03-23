@@ -1,10 +1,9 @@
 ---
 name: strategic-architect
 description: >
-  Project strategic diagnostics and planning. Use when the team or project needs
-  a structured assessment, identifying bottlenecks, planning improvements, or
-  creating a roadmap. Triggered by "help me plan", "what's holding us back",
-  "project health check", or "create a roadmap".
+  Diagnose project health and create strategic plans by identifying bottlenecks,
+  assessing architecture fitness, and building improvement roadmaps. Use when the
+  team needs a structured assessment, project health check, or strategic planning.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: diagnose|check-in|reassess> [context]"
 version: "1.0.1"

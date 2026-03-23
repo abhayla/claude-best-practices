@@ -1,9 +1,9 @@
 ---
 name: pytest-dev
 description: >
-  Pytest testing reference: configuration, fixtures, parametrize, markers, async testing,
-  mocking (monkeypatch, pytest-mock), plugins, and conftest.py patterns. Use for writing
-  and running Python tests with pytest.
+  Apply pytest patterns for configuration, fixtures, parametrize, markers, async testing,
+  mocking (monkeypatch, pytest-mock), plugins, and conftest.py. Use when writing
+  or running Python tests with pytest.
 allowed-tools: "Read Grep Glob"
 triggers: "pytest, conftest, fixture, parametrize, monkeypatch, pytest-mock, python test"
 argument-hint: "<pattern-to-look-up or 'config' or 'fixtures' or 'mock' or 'markers' or 'async'>"

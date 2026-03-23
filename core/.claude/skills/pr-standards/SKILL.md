@@ -1,11 +1,9 @@
 ---
 name: pr-standards
 description: >
-  Proactively enforce team standards against PR diffs before requesting human review.
-  Extracts changed lines, checks them against project rules and custom standards,
-  categorizes violations by severity, generates auto-fixes where possible, and produces
-  a structured standards report. Sits between /implement and /request-code-review in
-  the development pipeline.
+  Enforce team standards against PR diffs by extracting changed lines, checking them
+  against project rules, categorizing violations by severity, and generating auto-fixes.
+  Use when preparing a PR for review or validating code changes against team standards.
 triggers:
   - pr-standards
   - standards-check

@@ -1,11 +1,11 @@
 ---
 name: review-gate
 description: >
-  Stage 9 orchestrator: sequences all review sub-skills (code-quality-gate,
-  architecture-fitness, security-audit, adversarial-review, change-risk-scoring,
-  pr-standards) into a single autonomous pipeline. Aggregates results into a
-  consolidated review report with a go/no-go verdict for Stage 10 (Deploy).
-  Handles fix loops for blocking findings and creates the PR when approved.
+  Orchestrate all review sub-skills (code-quality-gate, architecture-fitness,
+  security-audit, adversarial-review, change-risk-scoring, pr-standards) into a
+  single autonomous pipeline. Aggregates results into a consolidated review report
+  with a go/no-go verdict. Use when running the Stage 9 pre-merge review gate
+  before deployment.
 triggers:
   - review-gate
   - stage-9

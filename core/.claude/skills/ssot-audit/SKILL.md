@@ -3,7 +3,7 @@ name: ssot-audit
 description: >
   Audit project's Claude Code configuration for Single Source of Truth violations.
   Detects duplicated constraints, misplaced config, bloated CLAUDE.md, and layer misuse.
-  Run after editing CLAUDE.md or .claude/ files to catch configuration drift.
+  Use when editing CLAUDE.md or .claude/ files to catch configuration drift.
 type: workflow
 allowed-tools: "Read Grep Glob"
 argument-hint: "[--fix]"

@@ -77,6 +77,8 @@ ACTION_VERBS = {
     "organize", "fetch", "collect", "guide", "orchestrate", "convert",
     "initialize", "restore", "resume", "trigger", "setup", "scaffold",
     "auto", "apply", "push", "pull", "compare", "trace", "measure",
+    "design", "diagnose", "author", "finalize", "inject", "integrate",
+    "assess", "capture", "classify", "define", "explore", "identify",
 }
 
 
@@ -120,7 +122,7 @@ def check_description_quality(name: str, description: str) -> list[str]:
     if not description:
         return errors
 
-    first_word = description.split()[0].lower().rstrip("s")
+    first_word = description.split()[0].lower().rstrip("s").rstrip(",.:;")
     if first_word not in ACTION_VERBS and first_word + "s" not in ACTION_VERBS:
         errors.append(
             f"{name}: WARNING — description should start with an action verb "
@@ -202,7 +204,7 @@ def score_skill(skill_dir: Path) -> tuple[int, list[str]]:
     # Description quality (-3 each, max -9)
     desc = str(fm.get("description", "")).strip()
     if desc:
-        first_word = desc.split()[0].lower().rstrip("s")
+        first_word = desc.split()[0].lower().rstrip("s").rstrip(",.:;")
         if first_word not in ACTION_VERBS and first_word + "s" not in ACTION_VERBS:
             score -= 3
             breakdown.append(f"Description doesn't start with action verb (-3)")

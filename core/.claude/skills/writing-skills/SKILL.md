@@ -1,10 +1,10 @@
 ---
 name: writing-skills
 description: >
-  Guide for intentionally authoring new Claude Code skills from scratch or from
-  observed patterns. Covers YAML frontmatter, step structure, trigger design,
-  quality validation, testing, hub promotion, and a full template library for
-  common skill types. The "how to write skills" manual as a skill itself.
+  Author new Claude Code skills from scratch or from observed patterns. Covers YAML
+  frontmatter, step structure, trigger design, quality validation, testing, hub
+  promotion, and a full template library. Use when creating or refining skills
+  for the .claude/skills/ directory.
 triggers:
   - write-skill
   - create-skill

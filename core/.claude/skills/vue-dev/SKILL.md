@@ -1,9 +1,9 @@
 ---
 name: vue-dev
 description: >
-  Vue 3.5+ development workflow: Composition API patterns, TypeScript integration,
+  Build Vue 3.5+ applications using Composition API patterns, TypeScript integration,
   Reka UI headless components, Vue Router, composables, VueUse, testing with Vitest,
-  and project architecture. Use for building Vue 3 applications with modern patterns.
+  and project architecture. Use when developing Vue 3 applications with modern patterns.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "vue, vue3, composition api, composable, vue component, vue router, reka-ui"
 argument-hint: "<feature-description or 'setup' or 'test' or 'composable' or 'component'>"

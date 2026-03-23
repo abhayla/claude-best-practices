@@ -3,7 +3,8 @@ name: react-test-patterns
 description: >
   Execute advanced React testing workflows including RTL custom renders,
   Server Component testing, hook testing, form interaction simulation,
-  state management verification, and accessibility audits.
+  state management verification, and accessibility audits. Use when testing
+  React components, hooks, Server Components, or running accessibility checks.
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<test-scope> [--component|--hook|--rsc|--form|--state]"

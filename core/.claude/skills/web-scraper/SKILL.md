@@ -1,7 +1,7 @@
 ---
 name: web-scraper
 description: >
-  Web scraping patterns with Puppeteer, Cheerio, and data extraction pipelines.
+  Build web scrapers using Puppeteer, Cheerio, and data extraction pipelines.
   Use when building scrapers, crawlers, or data extraction workflows.
 allowed-tools: "Read Grep Glob"
 argument-hint: "[cheerio|puppeteer|pipeline|anti-detection]"

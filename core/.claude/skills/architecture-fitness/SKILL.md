@@ -1,9 +1,9 @@
 ---
 name: architecture-fitness
 description: >
-  Automated architecture conformance checks: dependency direction validation,
-  circular dependency detection, coupling/cohesion metrics, layer violation
-  scanning, and architecture decision review. Use as a review gate.
+  Validate architecture conformance including dependency direction, circular
+  dependency detection, coupling/cohesion metrics, and layer violation scanning.
+  Use when reviewing PRs for architectural drift or enforcing fitness functions.
 triggers:
   - architecture check
   - fitness functions

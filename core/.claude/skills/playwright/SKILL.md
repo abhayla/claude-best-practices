@@ -1,8 +1,8 @@
 ---
 name: playwright
 description: >
-  Self-contained Playwright E2E testing skill for web applications. Write, run, and
-  debug Playwright tests including browser automation, Page Object Model, visual
+  Write, run, and debug Playwright E2E tests for web applications including browser
+  automation, Page Object Model, visual
   regression, network interception, cross-browser testing, and CI integration.
   Use when building or maintaining end-to-end tests for web UIs.
 triggers:

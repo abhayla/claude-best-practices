@@ -1,7 +1,7 @@
 ---
 name: websocket-patterns
 description: >
-  WebSocket implementation patterns for real-time features across frameworks.
+  Implement WebSocket patterns for real-time features across frameworks.
   Use when building real-time data streaming, live updates, chat, or push notifications.
 allowed-tools: "Read Grep Glob"
 argument-hint: "[server|client|reconnect|scaling]"

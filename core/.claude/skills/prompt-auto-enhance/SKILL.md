@@ -1,10 +1,10 @@
 ---
 name: prompt-auto-enhance
 description: >
-  Detailed procedures for auto-enhance resource CRUD: batch approval flow,
+  Apply auto-enhance procedures for resource CRUD: batch approval flow,
   delegation routing to existing authoring tools, and web search decision tree.
-  Invoked by the prompt-auto-enhance rule when resource changes are detected,
-  or explicitly via /prompt-auto-enhance for manual enhancement.
+  Use when the prompt-auto-enhance rule detects resource changes or when manually
+  enhancing prompts via /prompt-auto-enhance.
 triggers:
   - prompt-auto-enhance
   - auto-enhance

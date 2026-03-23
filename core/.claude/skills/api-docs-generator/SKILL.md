@@ -1,9 +1,9 @@
 ---
 name: api-docs-generator
 description: >
-  Auto-generate OpenAPI/Swagger docs from code annotations. Supports FastAPI,
-  Express/NestJS, Go, and manual spec writing. Validates spec against API tests,
-  generates Redoc/Swagger UI, and produces API changelog.
+  Generate OpenAPI/Swagger documentation from code annotations for FastAPI,
+  Express/NestJS, Go, and manual specs. Validates spec against API tests and
+  produces Redoc/Swagger UI. Use when creating or updating API documentation.
 triggers:
   - api docs
   - openapi

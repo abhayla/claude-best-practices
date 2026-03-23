@@ -3,7 +3,7 @@ name: request-code-review
 description: >
   Create high-quality, review-optimized pull requests that surface risks, generate
   intelligent review questions, annotate diffs with intent, and help reviewers focus
-  on what matters. Goes beyond basic `gh pr create` to produce PRs that get reviewed
+  on what matters. Use when preparing a PR for review to ensure it gets reviewed
   faster and more thoroughly.
 triggers:
   - request-review

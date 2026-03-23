@@ -1,10 +1,10 @@
 ---
 name: scan-discovery-report
 description: >
-  Comprehensive report generator for scan results from GitHub, Reddit, X/Twitter,
-  or any combination. Compares discovered patterns against the hub registry,
-  classifies overlap vs new, scores replacement candidates, and outputs a
-  structured multi-section report.
+  Generate structured reports from scan results across GitHub, Reddit, and X/Twitter.
+  Compares discovered patterns against the hub registry, classifies overlap vs new,
+  and scores replacement candidates. Use when reviewing scan output to identify
+  actionable new patterns.
 triggers:
   - scan report
   - scan results

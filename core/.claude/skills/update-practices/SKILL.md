@@ -3,6 +3,7 @@ name: update-practices
 description: >
   Pull latest best practices from the hub into your project's .claude/ directory.
   Compares local files against hub registry, shows diffs, and copies updates.
+  Use when your local patterns are outdated or after hub registry changes.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--check-only] [--force]"
 version: "1.0.0"

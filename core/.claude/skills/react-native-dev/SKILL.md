@@ -1,11 +1,11 @@
 ---
 name: react-native-dev
 description: >
-  React Native development workflow: project setup, functional components, hooks,
+  Build React Native applications covering project setup, functional components, hooks,
   React Navigation, state management (Zustand/Redux Toolkit), performance profiling
   (Hermes, Reanimated 3, FPS), platform-specific code, testing, CI/CD, version
-  upgrades, brownfield migration, and debugging. Based on callstackincubator/agent-skills
-  and community best practices.
+  upgrades, brownfield migration, and debugging. Use when developing, optimizing,
+  or upgrading React Native apps.
 triggers: "react native, react-native, expo, metro, react navigation, hermes, flipper, brownfield"
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<feature-description or 'setup' or 'test' or 'optimize' or 'upgrade' or 'brownfield'>"

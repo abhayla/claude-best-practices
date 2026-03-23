@@ -2,9 +2,8 @@
 name: skill-factory
 description: >
   Detect repeated workflows in session logs and classify them into the right
-  automation type (skill, agent, hook, MCP server, or rule). Modes: scan
-  (detect patterns), propose (classify and suggest), create (build resource),
-  list (show existing).
+  automation type (skill, agent, hook, MCP server, or rule). Use when you notice
+  recurring manual steps that should be automated. Modes: scan, propose, create, list.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: scan|propose|create|list> [details]"
 type: workflow

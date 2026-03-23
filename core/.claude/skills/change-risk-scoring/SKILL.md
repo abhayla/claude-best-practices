@@ -3,8 +3,8 @@ name: change-risk-scoring
 description: >
   Compute a quantified risk score (0-100) for code changes based on files changed,
   complexity delta, inverse test coverage, churn frequency, and author familiarity.
-  Produces a classification (low/medium/high/critical) with per-factor breakdown
-  and a deploy recommendation (auto-deploy / human review / extra testing / hold).
+  Use when deciding whether a change can auto-deploy or needs human review, extra
+  testing, or a hold before release.
 triggers:
   - change risk
   - risk score

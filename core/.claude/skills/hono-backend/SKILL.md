@@ -1,7 +1,7 @@
 ---
 name: hono-backend
 description: >
-  Hono web framework patterns for TypeScript backends on Node.js, Bun, Deno, or Cloudflare Workers.
+  Build TypeScript backends with Hono web framework on Node.js, Bun, Deno, or Cloudflare Workers.
   Use when building APIs, middleware, or server-side logic with Hono.
 allowed-tools: "Read Grep Glob"
 argument-hint: "[route|middleware|auth|validation]"

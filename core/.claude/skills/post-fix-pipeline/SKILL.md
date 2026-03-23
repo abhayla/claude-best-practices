@@ -1,9 +1,9 @@
 ---
 name: post-fix-pipeline
 description: >
-  Post-fix completion pipeline: reads upstream auto-verify gate, updates
-  documentation, commits, and captures learnings. Use after auto-verify
-  succeeds to finalize changes. Does NOT re-run tests — trusts upstream.
+  Finalize verified changes by reading the upstream auto-verify gate, updating
+  documentation, committing, and capturing learnings. Use after auto-verify
+  succeeds to complete the post-fix workflow. Does NOT re-run tests.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[fixes_applied] [commit_format] [--strict-gates] [--capture-proof | --no-capture-proof]"
 version: "2.0.0"

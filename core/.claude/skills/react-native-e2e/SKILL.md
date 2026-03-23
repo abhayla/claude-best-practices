@@ -1,9 +1,9 @@
 ---
 name: react-native-e2e
 description: >
-  React Native E2E testing with Detox and visual regression with React Native Owl.
-  Covers setup, flow writing, screenshot comparison, and CI integration.
-  Use for end-to-end testing of React Native apps on Android and iOS.
+  Run end-to-end tests for React Native apps using Detox and visual regression
+  with React Native Owl. Covers setup, flow writing, screenshot comparison, and
+  CI integration. Use when testing React Native apps on Android and iOS.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 triggers:
   - react native e2e

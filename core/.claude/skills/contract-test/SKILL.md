@@ -2,9 +2,8 @@
 name: contract-test
 description: >
   Implement consumer-driven contract testing with Pact. Write consumer contract
-  tests, generate Pact files, run provider verification, integrate with a Pact
-  broker, and set up CI gates with can-i-deploy. Supports Pact-JS, Pact-Python,
-  and Pact-JVM.
+  tests, generate Pact files, run provider verification, and set up CI gates with
+  can-i-deploy. Use when adding or modifying cross-service API boundaries.
 triggers:
   - contract-test
   - pact

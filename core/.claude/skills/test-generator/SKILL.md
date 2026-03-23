@@ -1,11 +1,10 @@
 ---
 name: test-generator
 description: >
-  Auto-generate test suites from PRD requirements, schema, or API specs.
-  Produces shared test infrastructure (conftest.py/setupTests.ts), unit, API,
-  E2E stubs (skipped with Page Objects), BDD/Gherkin, property-based, snapshot tests,
-  coverage thresholds, mutation testing setup, red phase gate verification, and
-  structured JSON output for stage gate validation. Use before implementation (TDD red phase).
+  Generate test suites from PRD requirements, schema, or API specs. Produces shared
+  test infrastructure, unit, API, E2E stubs, BDD/Gherkin, property-based, snapshot
+  tests, coverage thresholds, and mutation testing setup. Use when starting TDD red
+  phase before implementation.
 triggers:
   - generate tests
   - test stubs

@@ -5,7 +5,8 @@ description: >
   persona. Supports both plan review (pre-implementation) and code review
   (post-implementation). The reviewer critically examines work for security issues,
   edge cases, performance problems, and design weaknesses through up to 3 rounds of
-  structured debate. Catches blind spots that single-model review misses.
+  structured debate. Use when finalizing a plan or code change that needs rigorous
+  challenge before committing.
 triggers:
   - adversarial-review
   - challenge

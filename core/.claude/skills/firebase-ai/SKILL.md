@@ -1,7 +1,7 @@
 ---
 name: firebase-ai
 description: >
-  Firebase AI Logic (Gemini API) integration: setup, text generation, multimodal
+  Integrate Firebase AI Logic (Gemini API) including setup, text generation, multimodal
   input, chat sessions, streaming, image generation, structured JSON output,
   on-device hybrid AI, and App Check security. Use when adding AI features to
   Firebase web or mobile apps.

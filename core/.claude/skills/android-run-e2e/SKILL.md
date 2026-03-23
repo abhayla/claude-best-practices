@@ -11,7 +11,7 @@ triggers:
   - mobile e2e
   - e2e test android
 argument-hint: "[feature-group|all] [--maestro|--gradle]"
-version: "1.0.0"
+version: "2.1.0"
 type: reference
 ---
 
@@ -382,6 +382,55 @@ Screenshots are stored in `test-evidence/{run_id}/screenshots/` with naming:
 
 The `tester-agent` handles injection and evidence collection — flow files
 are NOT permanently modified. Injection is runtime-only.
+
+---
+
+## Auto-Fix and Learn
+
+After all groups have been run, if any group failed:
+
+### Diagnose First (E2E-Specific)
+
+Per Rule 15, E2E failures go through `/systematic-debugging` first because environment issues masquerade as code bugs:
+
+```
+Skill("systematic-debugging", args="E2E group {group_name} failed: <failure_output>")
+```
+
+### Invoke Fix-Loop
+
+Once root cause is isolated by systematic debugging:
+
+```
+Skill("fix-loop", args="<diagnosed_failure>\n\nretest_command: cd {android_dir} && ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class={test_class}")
+```
+
+For Maestro failures:
+```
+Skill("fix-loop", args="<diagnosed_failure>\n\nretest_command: maestro test {flow_path}")
+```
+
+### Capture Learnings (On Fix Success)
+
+If `/fix-loop` reports success:
+
+```
+Skill("learn-n-improve", args="session")
+```
+
+### Batch Processing
+
+When running `all` groups and multiple fail:
+- Group failures by root cause (e.g., multiple groups fail due to same backend issue)
+- Fix each root cause once, then re-run affected groups
+- Do NOT invoke `/fix-loop` separately for each group that shares the same root cause
+
+### Skip Conditions
+
+Do NOT auto-invoke fix pipeline if:
+- No emulator connected
+- Backend not running (if required by tests)
+- Build failed before tests ran (Gradle compilation error)
 
 ---
 

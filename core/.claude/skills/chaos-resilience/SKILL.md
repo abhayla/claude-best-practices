@@ -1,10 +1,9 @@
 ---
 name: chaos-resilience
 description: >
-  Chaos engineering and resilience testing workflow: inject controlled failures
-  (service crash, network partition, OOM, disk full), verify graceful degradation,
-  validate circuit breakers and retry policies, and produce a structured findings
-  report. Covers both local Docker Compose environments and Kubernetes clusters.
+  Inject controlled failures (service crash, network partition, OOM, disk full) and
+  verify graceful degradation, circuit breakers, and retry policies. Use when validating
+  resilience before production deployment or after adding new failure-sensitive components.
 triggers:
   - chaos-resilience
   - chaos test

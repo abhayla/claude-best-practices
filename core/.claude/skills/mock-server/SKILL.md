@@ -1,9 +1,10 @@
 ---
 name: mock-server
 description: >
-  Set up and configure API mock/stub servers for development and testing.
+  Configure API mock and stub servers for development and testing.
   Covers MSW, WireMock, nock, VCR/cassette patterns, and json-server with
-  tool selection guidance, test integration, and CI patterns.
+  selection guidance, test integration, and CI patterns.
+  Use when setting up API mocks for local development or test isolation.
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "<tool-or-question> [language/framework]"

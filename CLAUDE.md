@@ -24,7 +24,7 @@ PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py::TestCopyClaudeDir
 # Provision a project
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 
-# Full local CI replication (validate-pr.yml runs all 4 — run before opening a PR)
+# Full local CI replication (.github/workflows/validate-pr.yml runs all 4 — run before opening a PR)
 PYTHONPATH=. python scripts/dedup_check.py --validate-all
 PYTHONPATH=. python scripts/dedup_check.py --secret-scan
 PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
@@ -43,6 +43,7 @@ A curated hub of Claude Code patterns (agents, skills, rules) organized by stack
 
 ### Key Directories
 
+- **`.claude/rules/`** — Auto-loaded rules. Global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when working with matching files
 - **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, templates
 - **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit directly after adding/removing patterns, then re-run `generate_docs.py`
 - **`config/`** — `settings.yml` (dedup thresholds: semantic 85/70, structural 3; scan limits), `repos.yml` (downstream projects, `auto_sync`/`share_synthesized` flags), `urls.yml`/`topics.yml` (scan sources with freshness tracking), `third-party-skills.yml` (external skill registry), `test-pipeline.yml` (externalized pipeline DAG)

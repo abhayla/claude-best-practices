@@ -1,10 +1,10 @@
 ---
 name: docker-optimize
 description: >
-  Optimize Dockerfiles and Docker Compose configurations for production readiness.
-  Covers multi-stage builds, layer caching, image size reduction, security hardening,
-  health checks, compose orchestration, multi-platform builds, performance tuning,
-  anti-pattern detection, and language-specific optimizations.
+  Optimize Dockerfiles and Docker Compose configurations for production readiness
+  including multi-stage builds, layer caching, image size reduction, and security
+  hardening. Use when preparing containers for production or troubleshooting slow
+  builds and large images.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<dockerfile-path-or-optimization-goal>"
 version: "1.0.0"

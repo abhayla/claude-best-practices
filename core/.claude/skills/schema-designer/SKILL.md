@@ -1,9 +1,10 @@
 ---
 name: schema-designer
 description: >
-  Holistic database schema design: ER modeling, normalization, evolutionary
+  Design database schemas covering ER modeling, normalization, evolutionary
   strategy (expand-contract), PII identification, query plan analysis, API
-  contract alignment, multi-DB support. Use before generating migrations.
+  contract alignment, and multi-DB support. Use when planning schema changes
+  before generating migrations.
 triggers:
   - design schema
   - database design

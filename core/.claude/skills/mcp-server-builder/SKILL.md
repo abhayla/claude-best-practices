@@ -2,8 +2,9 @@
 name: mcp-server-builder
 description: >
   Build MCP (Model Context Protocol) servers that extend Claude Code's capabilities.
-  Covers agent-centric design, Python FastMCP and Node/TypeScript SDK, tool registration,
+  Covers agent-centric design, Python FastMCP and Node/TypeScript SDK, registration,
   resource management, error handling, and evaluation-driven development.
+  Use when creating or extending an MCP server for Claude Code integration.
 triggers:
   - build mcp server
   - create mcp

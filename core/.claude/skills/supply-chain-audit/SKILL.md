@@ -1,11 +1,10 @@
 ---
 name: supply-chain-audit
 description: >
-  Supply chain security audit: dependency inventory, vulnerability scanning,
+  Audit supply chain security covering dependency inventory, vulnerability scanning,
   typosquatting detection, abandoned package identification, license compliance,
-  dependency health scoring, and lockfile integrity verification. Based on
-  Trail of Bits supply chain risk auditing patterns. Use for dependency audits,
-  CVE checks, or pre-merge dependency review.
+  dependency health scoring, and lockfile integrity verification. Use when performing
+  dependency audits, CVE checks, or pre-merge dependency review.
 allowed-tools: "Bash Read Grep Glob"
 triggers: "supply chain, dependency audit, npm audit, pip audit, typosquatting, vulnerable dependency, CVE"
 argument-hint: "<'full-audit' or 'scan <package-name>' or 'license-check' or 'lockfile-verify'>"

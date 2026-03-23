@@ -1,11 +1,10 @@
 ---
 name: semgrep-rules
 description: >
-  Create, test, and optimize custom Semgrep rules for vulnerability detection
+  Build, test, and optimize custom Semgrep rules for vulnerability detection
   and code pattern enforcement. Covers rule anatomy, metavariables, taint mode,
-  cross-language porting, false-positive reduction, and CI integration. Based on
-  Trail of Bits Semgrep rule creation patterns. Use when writing custom static
-  analysis rules or porting rules between languages.
+  cross-language porting, false-positive reduction, and CI integration. Use when
+  writing custom static analysis rules or porting rules between languages.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "semgrep, semgrep rule, custom rule, code pattern, linter rule, security pattern"
 argument-hint: "<'create <pattern-description>' or 'port <rule-id> to <language>' or 'optimize <rule-file>' or 'test <rule-file>'>"

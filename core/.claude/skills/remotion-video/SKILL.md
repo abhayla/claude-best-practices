@@ -1,9 +1,10 @@
 ---
 name: remotion-video
 description: >
-  Programmatic video creation with React/Remotion. Compositions, sequences,
-  frame-based animations, audio sync, captions, 3D (Three.js), charts,
-  transitions, server-side rendering. Data-driven batch video generation.
+  Create programmatic videos with React and Remotion covering compositions, sequences,
+  frame-based animations, audio sync, captions, 3D (Three.js), charts, transitions,
+  and server-side rendering. Use when building data-driven or batch video generation
+  workflows.
 triggers:
   - remotion
   - video

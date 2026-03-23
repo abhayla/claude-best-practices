@@ -1,10 +1,9 @@
 ---
 name: dast-scan
 description: >
-  Dynamic Application Security Testing against a running application.
-  OWASP ZAP / Nuclei scanning, header security checks, session management
-  testing, API + property-based + mutation fuzz testing, and DAST CI integration.
-  Use after deployment to dev/staging.
+  Run Dynamic Application Security Testing against a running application using
+  OWASP ZAP / Nuclei scanning, header security checks, session management testing,
+  and fuzz testing. Use after deploying to dev/staging to detect runtime vulnerabilities.
 triggers:
   - dast scan
   - runtime security

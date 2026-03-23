@@ -1,9 +1,10 @@
 ---
 name: obsidian
 description: >
-  Obsidian vault management — create/edit .md, .base, .canvas files with Obsidian-specific
-  syntax. Log decisions, capture bug fixes, manage knowledge. CLI integration (130+ commands),
-  wikilinks, callouts, properties, bases, canvas, daily notes. Dev brain pattern.
+  Manage Obsidian vaults by creating/editing .md, .base, .canvas files with Obsidian-specific
+  syntax. Log decisions, capture bug fixes, and organize knowledge with CLI integration,
+  wikilinks, callouts, properties, bases, canvas, and daily notes.
+  Use when working with Obsidian vaults or personal knowledge bases.
 triggers:
   - obsidian
   - vault

@@ -4,7 +4,7 @@ description: >
   Generate multi-file working HTML prototypes for websites or mobile apps.
   Produces a shared design system (CSS + JS), one HTML file per screen,
   an index page as screen map, and an implementation mapping doc.
-  Used for stakeholder demos and as the implementation spec.
+  Use when creating stakeholder demos, clickable prototypes, or UI mockups.
 triggers:
   - html prototype
   - prototype page

@@ -3,11 +3,12 @@ name: bun-elysia-test
 description: >
   Run and validate tests for Bun + Elysia applications covering endpoints,
   plugins, and WebSocket handlers. Detects project structure, executes tests
-  via `bun test`, and writes structured JSON results.
+  via `bun test`, and writes structured JSON results. Use when testing Bun + Elysia
+  endpoints or when test failures need automated diagnosis.
 type: workflow
-allowed-tools: "Bash Read Write Edit Grep Glob"
+allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<test-scope> [--endpoint|--plugin|--websocket]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Bun + Elysia Test Workflow
@@ -363,11 +364,47 @@ mkdir -p test-results
 
 ---
 
+## STEP 9: Auto-Fix and Learn (On Failure Only)
+
+If tests failed in STEP 7, automatically invoke the fix-and-learn pipeline. Do NOT just report failures — fix them.
+
+### 9a. Invoke Fix-Loop
+
+```
+Skill("fix-loop", args="<failure_output>\n\nretest_command: bun test {test_scope}")
+```
+
+This iterates: analyze → fix → retest until green (max 5 iterations).
+
+### 9b. Capture Learnings (On Fix Success)
+
+If `/fix-loop` reports `result: PASSED` or `result: FIXED`:
+
+```
+Skill("learn-n-improve", args="session")
+```
+
+### 9c. Escalation (On Fix Failure)
+
+If `/fix-loop` exhausts 5 iterations without success:
+- Report the failure to the user
+- Suggest `/systematic-debugging` for deeper investigation
+- Do NOT silently continue
+
+### Skip Conditions
+
+Do NOT auto-invoke fix-loop if:
+- Bun project was not detected (STEP 1 failed)
+- The failure is an environment error (Bun not installed, missing dependencies)
+
+---
+
 ## CRITICAL RULES
 
 ### MUST DO
 
 - Detect Bun (`bunfig.toml` or `bun.lockb`) before running any test command.
+- Invoke `/fix-loop` on test failure — do not just report failures.
 - Use `app.listen(0)` for ephemeral ports in WebSocket and integration tests.
 - Restore every spy and mock after use (`spy.mockRestore()`, cleanup in `afterAll`).
 - Write `test-results/bun-elysia-test.json` on every run, even if all tests pass.

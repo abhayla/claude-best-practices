@@ -1,9 +1,9 @@
 ---
 name: flutter-dev
 description: >
-  Flutter 3+ development workflow: widget architecture, Riverpod/BLoC state management,
+  Build cross-platform Flutter 3+ apps with widget architecture, Riverpod/BLoC state management,
   GoRouter navigation, Material Design 3 theming, platform-specific implementations,
-  testing, and performance optimization. Use for building cross-platform Flutter apps.
+  testing, and performance optimization. Use when developing or extending Flutter applications.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 triggers: "flutter, dart, widget, riverpod, bloc, gorouter, cross-platform mobile"
 argument-hint: "<feature-description or 'setup' or 'test' or 'optimize'>"

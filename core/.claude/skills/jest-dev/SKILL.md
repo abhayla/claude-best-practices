@@ -1,10 +1,9 @@
 ---
 name: jest-dev
 description: >
-  Jest testing reference: configuration (jest.config, transforms, moduleNameMapper),
-  mocking (jest.mock/jest.fn/jest.spyOn/manual mocks), async testing, snapshot testing,
-  coverage thresholds, parameterized tests, and React Testing Library integration.
-  Use for writing and running Jest tests.
+  Configure and run Jest tests with mocking (jest.mock/jest.fn/jest.spyOn/manual mocks),
+  async testing, snapshot testing, coverage thresholds, parameterized tests, and React
+  Testing Library integration. Use when writing, debugging, or configuring Jest tests.
 allowed-tools: "Read Grep Glob"
 triggers: "jest, jest.mock, jest.fn, jest.spyOn, test runner, unit test jest, testing library jest, snapshot test"
 argument-hint: "<pattern-to-look-up or 'config' or 'mock' or 'coverage' or 'snapshot' or 'async'>"

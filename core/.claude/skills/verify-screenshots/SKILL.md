@@ -1,10 +1,10 @@
 ---
 name: verify-screenshots
 description: >
-  Visual regression testing and screenshot verification. Validates files, uses multimodal
-  Read for content analysis, compares against baselines, manages baseline storage,
-  integrates with CI for automated visual diff reporting. Use for one-off verification
-  or full visual regression pipelines.
+  Validate screenshots against baselines using multimodal content analysis for visual
+  regression testing. Manages baseline storage and integrates with CI for automated
+  visual diff reporting. Use when running one-off screenshot verification or full
+  visual regression pipelines.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<screenshot-path or directory> [--update-baselines] [--strict] [--threshold=N] [--proof-mode --run-id=<id>]"
 version: "1.1.0"

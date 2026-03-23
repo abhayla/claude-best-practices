@@ -273,29 +273,29 @@
     "hash": "210ad2d7dfe68b399c6eb521e6a721629078df6a7d27fc237d8b07b0e225b25c",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
+    "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
+    "description": "Run Android E2E tests via Gradle or Maestro with auto-fix on failure",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
   },
   "android-run-tests": {
     "hash": "9dd060b6c78f873dafabd6dd7fd8e5a3d5cb1ad5947f2af1bc269b968bbcf074",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
+    "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
+    "description": "Run Android tests with class name resolution and auto-fix on failure",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
   },
   "android-test-patterns": {
     "hash": "aad4850a5e8ba60b4aeb330192ccb51d8f115bcc900e3ea3ab522ffb01014e61",
@@ -495,19 +495,19 @@
     "hash": "7ae21ae5f4e33709314d0051742472edb72ab4bbab663dc10061a4fc29913682",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
+    "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Bun + Elysia testing workflow with bun:test, Eden treaty client, plugin and WebSocket testing",
+    "description": "Bun + Elysia testing workflow with bun:test, Eden treaty client, plugin and WebSocket testing. Auto-fix on failure.",
     "tags": [
       "bun",
       "elysia",
       "testing"
     ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit"
+    "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
   },
   "change-risk-scoring": {
     "hash": "735c6543340c0594d2561bef449fd0777a1cf48ca13b57de4b087ba75be1d2c1",
@@ -584,15 +584,15 @@
     "hash": "84015f1d569ae86cf9051f19fbcccc7c177c5c23264b21f6a8e3f006c686d727",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
+    "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
+    "description": "Universal behavioral rules for Claude including mandatory failure response pipeline",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.1.0: Rule 15 strengthened to MANDATORY with /learn-n-improve chaining",
     "tier": "must-have"
   },
   "claude-guardian": {
@@ -1214,15 +1214,15 @@
     "hash": "dcce52eab8016964bdbf3f6171987e003411ba63f7a76f8d20bedc4d8253836b",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
+    "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
+    "description": "Run backend pytest with smart defaults and auto-fix on failure",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
   },
   "feature-flag": {
     "hash": "e0afed803cb88a2cb0976b0aa91376a654038255a141d6aa9a0d40ccab205dd0",
@@ -1306,20 +1306,20 @@
     "hash": "1ff4941b5012db065476ffbeb27131729a8a844b867d49d451fc815b201514c5",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
+    "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Firebase testing workflow with Emulator Suite, Firestore rules, Cloud Functions, and Auth triggers",
+    "description": "Firebase testing workflow with Emulator Suite, Firestore rules, Cloud Functions, and Auth triggers. Auto-fix on failure.",
     "tags": [
       "firebase",
       "testing",
       "emulator",
       "firestore"
     ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit"
+    "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
   },
   "fix-issue": {
     "hash": "81d401b97f74b378816007f5eb96c2d49544b7ae11e84e7bdd22e60fbe7abafb",
@@ -1405,15 +1405,15 @@
     "hash": "07487b54b4a0dafe8d5541ff31b14779393fd9aeec5e504cbe98e368bdec0e08",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Flutter E2E testing across mobile platforms",
+    "description": "Flutter E2E testing across mobile platforms with auto-fix on failure",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.2.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
   },
   "git-manager-agent": {
     "hash": "d70b34e82985ee98daa9fd5d658c55e6000afe1fbe79470d6b89210bb675363a",

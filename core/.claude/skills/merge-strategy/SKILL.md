@@ -4,6 +4,7 @@ description: >
   Recommend the optimal Git merge strategy (squash, merge commit, or rebase) based on
   branch type and team conventions. Runs a pre-merge checklist, executes the merge with
   the chosen strategy, performs post-merge smoke tests, and handles branch cleanup.
+  Use when merging a branch and unsure which strategy to apply.
 triggers:
   - /merge-strategy
   - /merge-plan

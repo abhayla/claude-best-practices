@@ -1,10 +1,10 @@
 ---
 name: github
 description: >
-  Comprehensive GitHub search and discovery skill: search repositories by stars/topic/language/owner,
+  Search GitHub repositories by stars/topic/language/owner,
   search code across GitHub by filename/extension/content, and deep-inspect repos to extract and
-  analyze specific files. Fully generic — works for any content type (skills, agents, CLAUDE.md,
-  code in any language, configs, patterns). Use when user wants to search or discover anything on GitHub.
+  analyze specific files.
+  Use when searching or discovering repositories, code, or patterns on GitHub.
 triggers:
   - github search
   - github repos

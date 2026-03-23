@@ -1,10 +1,10 @@
 ---
 name: feature-flag
 description: >
-  Feature toggle patterns for gradual rollout and incomplete feature management.
-  Covers LaunchDarkly, Unleash, and simple env-var flags. Includes flag type
+  Implement feature toggles for gradual rollout and incomplete feature management.
+  Covers LaunchDarkly, Unleash, and simple env-var flags with flag type
   selection, implementation patterns per language (Python, TypeScript, Kotlin),
-  dual-path testing, and a cleanup checklist to prevent flag debt.
+  dual-path testing, and a cleanup checklist. Use when adding, modifying, or auditing feature flags.
 triggers:
   - feature-flag
   - feature-toggle

@@ -1,10 +1,10 @@
 ---
 name: branching
 description: >
-  Full branch lifecycle management — from creation through merge and cleanup. Creates feature
-  branches with naming conventions, and handles the "last mile" after code review: pre-merge
-  checklist, commit cleanup, changelog generation, merge execution, post-merge verification,
-  branch/worktree cleanup, rollback plans, cross-PR dependencies, and release tagging.
+  Manage the full branch lifecycle from creation through merge and cleanup. Creates feature
+  branches with naming conventions, handles pre-merge checklists, commit cleanup, changelog
+  generation, and post-merge verification. Use when starting a feature branch, finalizing
+  a PR, or cleaning up after merge.
 triggers:
   - /branching
   - /branch

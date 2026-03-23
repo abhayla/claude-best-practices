@@ -1,9 +1,9 @@
 ---
 name: compose-ui
 description: >
-  Jetpack Compose UI development: state hoisting, modifier chains, Material3 theming,
-  performance optimization (recomposition, stability, deferred reads), Compose Navigation
-  with type-safe routes, and Coil image loading. Use when building or refactoring Compose UI.
+  Build Jetpack Compose UIs with state hoisting, modifier chains, Material3 theming,
+  performance optimization, Compose Navigation with type-safe routes, and Coil image loading.
+  Use when building or refactoring Compose UI screens.
 triggers: "jetpack compose, compose ui, compose navigation, compose performance, recomposition, compose theming, material3, coil"
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<composable-name or 'navigation' or 'performance' or 'theme' or 'images'>"

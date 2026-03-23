@@ -1,8 +1,8 @@
 ---
 name: integration-test
 description: >
-  Reference guide for integration testing patterns across service boundaries.
-  Covers database, cache, queue, and external API integrations with real
+  Apply integration testing patterns across service boundaries covering database,
+  cache, queue, and external API integrations with real
   dependencies using testcontainers, fixture strategies, and CI configuration.
   Use when writing or reviewing tests that cross service boundaries.
 type: reference

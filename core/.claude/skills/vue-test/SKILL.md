@@ -2,8 +2,8 @@
 name: vue-test
 description: >
   Run and author tests for Vue.js applications covering components, Pinia stores,
-  composables, Vue Router mocks, and Nuxt server routes. Detects the test framework
-  automatically and produces structured JSON results.
+  composables, Vue Router mocks, and Nuxt server routes. Use when testing Vue.js
+  applications or generating structured test results.
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<test-scope> [--component|--store|--composable|--e2e]"

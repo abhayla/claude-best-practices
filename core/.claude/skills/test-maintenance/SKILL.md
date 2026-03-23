@@ -1,10 +1,10 @@
 ---
 name: test-maintenance
 description: >
-  Audit, clean up, and optimize a test suite. Identifies dead tests, duplicates,
-  slow tests, and readability issues, then produces a health report with actionable
-  recommendations. Use when test suites grow unwieldy, CI times balloon, or test
-  confidence erodes from skips and flakes.
+  Audit and optimize test suites by identifying dead tests, duplicates, slow tests,
+  and readability issues, then producing a health report with actionable recommendations.
+  Use when test suites grow unwieldy, CI times balloon, or test confidence erodes
+  from skips and flakes.
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "[test_directory] [framework: pytest|jest|vitest] [focus: audit|dead|dupes|slow|readability|optimize|all]"

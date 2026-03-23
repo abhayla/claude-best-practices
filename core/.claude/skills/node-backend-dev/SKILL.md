@@ -1,9 +1,9 @@
 ---
 name: node-backend-dev
 description: >
-  Node.js backend development workflow: project setup, routing, middleware, validation,
+  Build Node.js backend services with project setup, routing, middleware, validation,
   database access (Prisma/Drizzle/pg), error handling, auth patterns, WebSocket real-time,
-  and testing. Covers Express, Hono, and ElysiaJS frameworks.
+  and testing. Use when developing APIs or server-side logic with Express, Hono, or ElysiaJS.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "express, hono, elysia, node backend, api server, route handler, node.js server"
 argument-hint: "<feature-description or 'setup' or 'middleware' or 'auth' or 'websocket'>"

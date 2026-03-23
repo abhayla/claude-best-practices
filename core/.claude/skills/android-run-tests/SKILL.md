@@ -1,11 +1,12 @@
 ---
 name: android-run-tests
 description: >
-  Run Android unit, UI, E2E, or journey tests with class name resolution.
-  Auto-detects test type from class name pattern. Suggests /fix-loop on failure.
-allowed-tools: "Bash Read Write Grep Glob"
+  Run Android unit, UI, E2E, or journey tests with class name resolution and auto-fix
+  on failure. Auto-detects test type from class name pattern. Use when executing
+  Android tests or when test failures need automated diagnosis and repair.
+allowed-tools: "Bash Read Write Grep Glob Skill"
 argument-hint: "<TestClassName> [--unit|--ui|--e2e] [-x]"
-version: "1.2.0"
+version: "2.1.0"
 type: workflow
 ---
 
@@ -166,8 +167,7 @@ Failed Tests:
 
 Report: {module}/build/reports/tests/testDebugUnitTest/index.html
 
-Suggested: /fix-loop with retest_command:
-  cd {android_dir} && ./gradlew :app:testDebugUnitTest --tests "*.{ClassName}"
+Auto-invoking /fix-loop (STEP 9)...
 ```
 
 ### Common Failure Patterns
@@ -187,7 +187,7 @@ Suggested: /fix-loop with retest_command:
 | Result | Action |
 |--------|--------|
 | All passed | Report success |
-| Failures found | Suggest `/fix-loop` with exact retest command |
+| Failures found | Auto-invoke `/fix-loop` (see STEP 9) |
 | Compilation error | Suggest fixing build errors first |
 | Flaky (passes on re-run) | Flag as flaky, suggest `@RepeatedTest(3)` |
 
@@ -236,6 +236,49 @@ with open('test-results/android-run-tests.json', 'w') as f:
 
 ---
 
+## STEP 9: Auto-Fix and Learn (On Failure Only)
+
+If tests failed in STEP 6, automatically invoke the fix-and-learn pipeline. Do NOT just suggest — invoke directly.
+
+### 9a. Invoke Fix-Loop
+
+For unit tests:
+```
+Skill("fix-loop", args="<failure_output>\n\nretest_command: cd {android_dir} && ./gradlew :app:testDebugUnitTest --tests \"*.{ClassName}\"")
+```
+
+For instrumented/E2E tests, use `/systematic-debugging` first (environment issues masquerade as code bugs per Rule 15):
+```
+Skill("systematic-debugging", args="Android E2E test failed: <failure_output>")
+```
+Then once root cause is isolated:
+```
+Skill("fix-loop", args="<diagnosed_failure>\n\nretest_command: cd {android_dir} && ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class={fqcn}")
+```
+
+### 9b. Capture Learnings (On Fix Success)
+
+If `/fix-loop` reports `result: PASSED` or `result: FIXED`:
+
+```
+Skill("learn-n-improve", args="session")
+```
+
+### 9c. Escalation (On Fix Failure)
+
+If `/fix-loop` exhausts iterations without success:
+- Report the failure to the user
+- Suggest `/systematic-debugging` for deeper investigation
+- Do NOT silently continue
+
+### Skip Conditions
+
+Do NOT auto-invoke fix-loop if:
+- Build failed before tests ran (Gradle compilation error — fix the build first)
+- No emulator connected (instrumented tests — start emulator first)
+
+---
+
 ## MUST DO
 
 - Always resolve the full class name before running — short names can match multiple files
@@ -243,6 +286,7 @@ with open('test-results/android-run-tests.json', 'w') as f:
 - Always check emulator status before running instrumented tests
 - Always include the exact retest command in failure reports
 - Always use `./gradlew` (Unix) not `gradlew.bat` — bash syntax even on Windows
+- Always invoke `/fix-loop` on failure — do not just suggest it
 
 ## MUST NOT DO
 

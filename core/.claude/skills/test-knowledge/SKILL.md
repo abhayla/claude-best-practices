@@ -1,9 +1,9 @@
 ---
 name: test-knowledge
 description: >
+  Manage a self-improving knowledge base of testing patterns and lessons learned.
   Use when debugging test failures, choosing fixtures, handling platform quirks,
-  or after resolving a tricky test issue worth remembering. Self-improving knowledge
-  base of testing facts. Modes: search, add, review, seed, digest, stats.
+  or recording a resolved test issue. Modes: search, add, review, seed, digest, stats.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode> [query or entry]"
 version: "1.0.0"

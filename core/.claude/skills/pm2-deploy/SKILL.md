@@ -1,8 +1,8 @@
 ---
 name: pm2-deploy
 description: >
-  PM2 process management and deployment patterns for Node.js applications.
-  Use when configuring PM2 ecosystem files, managing processes, or setting up production deployments.
+  Configure PM2 process management and deployment for Node.js applications.
+  Use when setting up PM2 ecosystem files, managing processes, or deploying to production.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[setup|status|deploy|logs]"
 version: "1.0.0"

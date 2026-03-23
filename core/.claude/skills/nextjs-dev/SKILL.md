@@ -1,9 +1,9 @@
 ---
 name: nextjs-dev
 description: >
-  Next.js 14/15 App Router development: Server/Client Components, route handlers,
+  Build Next.js 14/15 App Router applications with Server/Client Components, route handlers,
   middleware, SEO metadata, Radix UI/shadcn patterns, static export, SSR/SSG,
-  and testing with Vitest + Playwright. Use for building Next.js applications.
+  and testing with Vitest + Playwright. Use when developing or extending Next.js applications.
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "nextjs, next.js, next, app router, server components, RSC, route handler"
 argument-hint: "<feature-description or 'setup' or 'api' or 'middleware' or 'seo'>"

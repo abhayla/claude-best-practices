@@ -1,10 +1,9 @@
 ---
 name: auto-verify
 description: >
-  Unified verification pipeline: identifies changed files, maps to targeted tests,
-  runs tests with smart priority, analyzes failures, applies fixes with approval,
-  then runs quality gate, contract verification, and performance baseline checks.
-  Use after making code changes to verify correctness.
+  Run a verification pipeline that identifies changed files, maps to targeted tests,
+  executes tests with smart priority, analyzes failures, and applies fixes with approval.
+  Use after making code changes to verify correctness before committing.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
 argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof | --no-capture-proof]"
 version: "2.0.0"

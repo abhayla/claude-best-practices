@@ -3,7 +3,8 @@ name: xml-to-compose
 description: >
   Convert Android XML layouts to idiomatic Jetpack Compose. Covers layout/widget/attribute
   mapping, interop bridges (ComposeView, AndroidView), LiveData-to-StateFlow migration,
-  include/merge extraction, and incremental screen-by-screen adoption strategy.
+  include/merge extraction, and incremental screen-by-screen adoption strategy. Use when
+  migrating Android UI from XML to Jetpack Compose.
 triggers: "xml to compose, migrate xml, convert layout, xml migration, view to compose"
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<xml-file-path or 'plan' or 'audit' or 'interop'>"

@@ -3,7 +3,8 @@ name: regression-test
 description: >
   Run targeted regression tests based on code changes. Analyze git diffs to identify affected
   source files, map them to test files via import graphs and naming conventions, classify risk,
-  execute tests in priority order, and report confidence in the change.
+  execute tests in priority order, and report confidence. Use when verifying that code changes
+  do not break existing functionality.
 type: workflow
 allowed-tools: "Bash Read Grep Glob Agent"
 argument-hint: "<branch|commit-range|staged> [--full] [--framework pytest|jest|gradle]"

@@ -1,9 +1,9 @@
 ---
 name: prd-parser
 description: >
-  Parse and normalize existing PRDs from various formats (markdown, Notion export,
-  Jira export, Google Docs) into the pipeline's standard PRD format with IEEE 830
-  validation. Produces a gap report and normalized output ready for downstream skills.
+  Parse and normalize existing PRDs from markdown, Notion export,
+  Jira export, or Google Docs into the pipeline's standard PRD format with IEEE 830
+  validation. Use when importing or converting an existing PRD for downstream pipeline consumption.
 triggers:
   - parse prd
   - normalize prd

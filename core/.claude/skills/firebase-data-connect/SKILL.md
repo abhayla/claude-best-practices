@@ -1,7 +1,7 @@
 ---
 name: firebase-data-connect
 description: >
-  Firebase Data Connect (PostgreSQL + GraphQL), Hosting (static sites/SPAs),
+  Configure Firebase Data Connect (PostgreSQL + GraphQL), Hosting (static sites/SPAs),
   and App Hosting (Next.js/Angular SSR). Use when working with Data Connect schemas,
   queries, mutations, security, vector search, or deploying web apps to Firebase.
 allowed-tools: "Bash Read Grep Glob Write Edit"

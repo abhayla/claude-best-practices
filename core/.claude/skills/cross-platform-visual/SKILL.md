@@ -1,9 +1,9 @@
 ---
 name: cross-platform-visual
 description: >
-  Cross-platform visual consistency checking. Captures the same screen/feature across
-  Android, Web, and Flutter, compares them for visual parity, and flags divergence.
-  Use to verify design consistency across platforms.
+  Validate visual consistency by capturing the same screen across Android, Web, and
+  Flutter, comparing for visual parity, and flagging divergence. Use when verifying
+  design consistency across platforms after UI changes.
 allowed-tools: "Bash Read Grep Glob"
 triggers:
   - cross platform visual

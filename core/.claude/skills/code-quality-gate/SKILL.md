@@ -1,10 +1,9 @@
 ---
 name: code-quality-gate
 description: >
-  Post-implementation code quality enforcement: cyclomatic complexity,
-  duplication detection, SOLID checklist, structured logging audit, error
-  handling strategy audit, dead code detection, TDD refactor phase, and
-  clean architecture layer validation.
+  Enforce code quality standards including cyclomatic complexity, duplication detection,
+  SOLID checklist, error handling audit, and dead code detection. Use after implementing
+  a feature or refactoring to validate code meets quality thresholds before merging.
 triggers:
   - code quality
   - quality gate

@@ -1,10 +1,10 @@
 ---
 name: receive-code-review
 description: >
-  Consume, triage, and act on code review feedback systematically. Fetches PR review
-  comments, categorizes them by severity, applies fixes in logical batches, responds
-  to reviewers, tracks thread resolution, and generates re-review summaries. Pairs
-  with /request-code-review to complete the collaboration cycle.
+  Apply code review feedback by fetching PR comments, categorizing by severity,
+  fixing in logical batches, responding to reviewers, tracking thread resolution,
+  and generating re-review summaries. Use when addressing review feedback on a
+  pull request. Pairs with /request-code-review to complete the collaboration cycle.
 triggers:
   - receive-review
   - address-review

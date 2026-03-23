@@ -1,11 +1,10 @@
 ---
 name: batch
 description: >
-  Orchestrate parallel codebase-wide changes — renames, API migrations, pattern updates
-  across many files. Performs exhaustive impact analysis, decomposes changes into independent
-  batches, dispatches parallel subagents in isolated worktrees, verifies consistency across
-  the full codebase, runs auto-simplify cleanup, and creates well-structured PRs with
-  rollback safety. Inspired by Boris Cherny's approach to large-scale codemods.
+  Orchestrate parallel codebase-wide changes including renames, API migrations, and pattern
+  updates across many files. Decomposes changes into independent batches, dispatches parallel
+  subagents, and verifies consistency. Use when applying a rename, migration, or codemod
+  that spans more than 5 files.
 triggers:
   - /batch
   - /codemod

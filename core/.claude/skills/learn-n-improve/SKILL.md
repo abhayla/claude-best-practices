@@ -1,9 +1,9 @@
 ---
 name: learn-n-improve
 description: >
-  Learning system analysis and self-modification. Analyzes session outcomes, updates
-  memory topics (testing-lessons, fix-patterns, skill-gaps). Four modes: session
-  (recent work), deep (modify skills), meta (learning effectiveness), test-run (dry run).
+  Analyze session outcomes and update memory topics (testing-lessons, fix-patterns,
+  skill-gaps) for continuous self-improvement. Four modes: session, deep, meta, test-run.
+  Use when a session ends, after a fix succeeds, or when reviewing learning effectiveness.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: session|deep|meta|test-run>"
 version: "2.0.0"
