@@ -2130,7 +2130,7 @@
     "hash": "3fd847a324f0f2d9182fd6525a600ce80fd0d6a1dfef275378162faa6b5be32f",
     "type": "skill",
     "category": "core",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-03-23",
@@ -2140,10 +2140,11 @@
       "skill-author"
     ],
     "visibility": "public",
-    "description": "Strengthen non-trivial prompts by diagnosing weak spots against 9 failure categories (including XML structure), mapping fixes, rewriting with before/after comparison, and handling resource CRUD with batch approval",
+    "description": "Strengthen non-trivial prompts by diagnosing weak spots against 9 failure categories, mapping fixes, rewriting with before/after comparison, handling resource CRUD with batch approval, and scoring prompt reliability across 5 dimensions with launch risk flags",
     "tags": [
       "prompt-enhancement",
       "prompt-strengthening",
+      "prompt-scoring",
       "xml-tags",
       "context-gathering",
       "resource-management",
@@ -2151,7 +2152,7 @@
       "workflow",
       "format-locking"
     ],
-    "changelog": "v1.4.0: Add format-locking reference for MISSING_OUTPUT_SPEC fix — locked templates, drift dimensions, verification methodology. Source: community pattern by @heyrimsha"
+    "changelog": "v1.5.0: Add prompt reliability scoring mode — 5-dimension rubric (instruction clarity, output format, constraint strength, edge case handling, tone consistency) with evidence-based scores and launch risk flags"
   },
   "prompt-auto-enhance-rule": {
     "hash": "0588116e093fe3077e9ae50d944149652d97733e71131c758f06c8b5d4b1447f",

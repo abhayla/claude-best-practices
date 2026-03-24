@@ -13,10 +13,12 @@ triggers:
   - enrich prompt
   - strengthen prompt
   - fix my prompt
+  - score prompt
+  - evaluate prompt
 allowed-tools: "Read Grep Glob Skill Agent"
-argument-hint: "[prompt text to enhance manually]"
+argument-hint: "[prompt text to enhance or 'score' to evaluate reliability]"
 type: workflow
-version: "1.4.0"
+version: "1.5.0"
 ---
 
 # Prompt Auto-Enhance — Strengthening & Resource CRUD Procedures
@@ -169,6 +171,23 @@ CRUD detection) applies to the strengthened version, not the original.
 | User says "do exactly this" or quotes a specific command | Skip — respect explicit intent |
 | Prompt is a question (not an action request) | Skip — just answer it |
 | All 9 categories score clean | Skip — prompt is already strong |
+
+---
+
+## Prompt Reliability Scoring
+
+Activates when the user explicitly asks to **score**, **evaluate**, or **audit** a prompt's
+production readiness — not during automatic strengthening.
+
+Score the prompt across 5 dimensions (instruction clarity, output format, constraint strength,
+edge case handling, tone consistency) on a 1-10 scale. Every score requires a specific quote
+from the prompt as evidence. Dimensions below 7 are flagged as launch risks.
+
+**Read:** `references/prompt-reliability-scoring.md` for the full scoring rubric with dimension
+definitions, output template, category mapping to the 9-category diagnosis, and anti-patterns.
+
+**After scoring:** If the user asks to fix the prompt, use the category mapping table in the
+reference to feed launch risks directly into the strengthening workflow (Steps 1-5 above).
 
 ---
 
