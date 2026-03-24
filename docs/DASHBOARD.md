@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-24 09:17 UTC (auto-generated)
+> Last updated: 2026-03-24 12:24 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -91,7 +91,7 @@
 | firebase-ai | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-data-connect | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| firebase-test | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
+| firebase-test | skill | 1.1.1 | hub:abhayla/claude-best-practices | — |
 | fix-issue | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | fix-loop | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | flutter | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
