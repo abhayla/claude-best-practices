@@ -10,7 +10,7 @@ globs: ["**/*"]
 
 1. **Plan Before Coding**: Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions). Write detailed specs upfront to reduce ambiguity. In plans, walk through reasoning step by step — show WHY this approach over alternatives, not just WHAT you will do. Use plan mode for verification steps, not just building. If an approach goes sideways, STOP and re-plan immediately instead of pushing forward.
 2. **Break Large Tasks**: If a task requires changes to more than 3 files, stop and break it into smaller tasks first.
-3. **Risk & Uncertainty Assessment**: After writing code, list what could break and suggest tests to cover it. When making non-trivial decisions (architecture, trade-offs, library choices), MUST flag uncertainty ("not sure about X because Y") and state key assumptions prefixed with **Assumption:** so users can spot them — keep flags brief, sentences not paragraphs.
+3. **Risk & Uncertainty Assessment**: After writing code, list what could break and suggest tests to cover it. When making non-trivial decisions (architecture, trade-offs, library choices), MUST flag uncertainty ("not sure about X because Y") and state key assumptions prefixed with **Assumption:** so users can spot them. For critical assumptions, add what would change if wrong — keep flags brief, sentences not paragraphs.
 4. **Verification**: Always verify your work using tests, linters, or type checkers before reporting completion. Check logs and demonstrate correctness. Diff behavior between main and your changes when relevant. Ask yourself: "Would a staff engineer approve this?" Never mark a task complete without proving it works.
 
 ## Self-Improvement
