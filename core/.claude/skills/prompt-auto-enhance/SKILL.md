@@ -106,6 +106,27 @@ Anthropic uses tag names as the instruction itself in system prompts:
 **Reference:** See [references/constraint-engineering.md](references/constraint-engineering.md) for the
 full constraint engineering methodology, measurability test table, and audit output format.
 
+#### Weakening Language Flags
+
+After category diagnosis, scan for words and phrases that weaken instruction
+clarity. These are automatic flags — every occurrence MUST be evaluated for
+removal or replacement (see `references/prompt-pruning.md` for the full source pattern):
+
+| Flag Pattern | Problem | Replace With |
+|---|---|---|
+| "try to", "attempt to" | Permits failure as acceptable | Direct imperative ("do X") |
+| "if possible", "when feasible" | Creates an opt-out clause | Remove, or state the specific condition |
+| "maybe", "perhaps", "might" | Introduces uncertainty into instructions | Commit to a direction or use conditional logic |
+| "I think", "I believe" | Weakens authority of the instruction | State the requirement directly |
+| "please", "kindly" | Politeness filler in technical prompts | Remove — instructions are not requests |
+| "etc.", "and so on", "and more" | Unbounded scope | List all items explicitly |
+| "simple", "just", "easily" | Minimizes complexity, sets false expectations | Remove — let the task speak for itself |
+| "as needed", "as appropriate" | Delegates decision without criteria | Specify the criteria for when/how |
+
+**Pruning rule:** Every removal MUST improve precision — do not cut words just
+to reduce length. If a qualifier serves a genuine purpose (e.g., "if the file
+exists" is a real condition, not hedging), keep it.
+
 If no weaknesses are found (prompt scores clean), skip to execution — do not
 force unnecessary rewrites.
 
@@ -129,6 +150,8 @@ Apply all fixes to produce a strengthened version. Rules:
 - Preserve the user's original intent and voice
 - Do not add complexity unless it directly eliminates a diagnosed weakness
 - Do not change terminology the user chose unless it causes ambiguity
+- Remove qualifiers and hedging language flagged in Step 1 — every removal
+  MUST improve precision, not just reduce length
 - When MISSING_STRUCTURE is diagnosed, wrap distinct prompt sections in XML tags
   (e.g., `<task>`, `<context>`, `<constraints>`, `<output_format>`) — use the
   XML Tag Reference above to select appropriate tags
@@ -140,11 +163,13 @@ MUST show the comparison to the user every time strengthening activates.
 This is NOT optional — visibility builds trust and helps users learn.
 
 ```
-Prompt Strengthened (N fixes):
+Prompt Strengthened (N fixes, M words removed):
 ┌─────────────────┬──────────────────────────────────────────────┐
 │ Original        │ [user's original prompt text]                │
 ├─────────────────┼──────────────────────────────────────────────┤
 │ Strengthened    │ [rewritten prompt text]                      │
+├─────────────────┼──────────────────────────────────────────────┤
+│ Word Count      │ [original count] → [new count] (−N words)   │
 ├─────────────────┼──────────────────────────────────────────────┤
 │ Changes Applied │                                              │
 │  [1]            │ CATEGORY → what was changed and why          │
