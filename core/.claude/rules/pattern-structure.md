@@ -48,7 +48,7 @@ model: inherit                   # inherit | sonnet | haiku | opus
 ---
 ```
 
-Plus `## Core Responsibilities` and `## Output Format` sections in the body.
+Plus `## Core Responsibilities` and `## Output Format` sections in the body. The agent's opening persona line (e.g., "You are a...") MUST specify domain expertise, common failure modes they watch for, and the mental model or framework they apply (when applicable) — vague personas like "expert in X" produce vague output.
 
 ## Rule Structure
 

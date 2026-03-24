@@ -82,6 +82,8 @@ Every agent in `agents/*.md` MUST satisfy ALL of the following:
 - MUST have `## Output Format` section
 - Description MUST include a "use when" clause so the orchestrator knows
   when to dispatch this agent vs another
+- Opening persona line MUST specify domain expertise, failure modes watched
+  for, and mental model/framework applied (when applicable)
 
 ## Rule Quality Checklist
 
