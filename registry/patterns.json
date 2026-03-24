@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-21",
-    "total_patterns": 196
+    "total_patterns": 197
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -2361,6 +2361,25 @@
       "git"
     ],
     "changelog": "v1.0.0: Initial release"
+  },
+  "research-mode": {
+    "hash": "7a5edaa08c01236711283fbd43013dcd71fa1e00caf87dcbbaf1bc10e6df1978",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-24",
+    "last_updated": "2026-03-24",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Citation-backed research with anti-hallucination constraints: direct quotes, source verification, and explicit knowledge gaps",
+    "tags": [
+      "research",
+      "anti-hallucination",
+      "citations",
+      "fact-checking"
+    ],
+    "changelog": "v1.0.0: Initial release — 3 anti-hallucination constraints, structured research brief output"
   },
   "remotion-video": {
     "hash": "5d3150bcdb33969da2b112a2024431557d0f1abb900c85974f5fc3694e9ecf6b",
