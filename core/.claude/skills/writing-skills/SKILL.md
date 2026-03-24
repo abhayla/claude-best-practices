@@ -15,7 +15,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.2.0"
+version: "2.3.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -345,12 +345,12 @@ skill-name/
 
 ---
 
-## STEP 6: Skill Testing
+## STEP 6: Skill Testing and Stress Testing
 
-Generate test scenarios to validate the skill works correctly before promoting it.
+Generate test scenarios to validate the skill works correctly, then stress test with adversarial inputs before promoting it. Covers: 5 validation scenarios (3 happy-path + 2 edge-case), 10 adversarial inputs with severity scoring, and a stress test score gate.
 
 
-**Read:** `references/skill-testing.md` for detailed step 6: skill testing reference material.
+**Read:** `references/skill-testing.md` for detailed step 6: skill testing and stress testing reference material.
 
 ## STEP 7: Hub Promotion Workflow
 
@@ -361,7 +361,8 @@ If the skill is valuable enough to share across projects via the hub.
 | Check | Action |
 |-------|--------|
 | Quality checklist passes (Step 5) | All items green |
-| Tested with 3 scenarios (Step 6) | All pass |
+| Tested with 5 scenarios (Step 6.1) | All pass |
+| Stress tested with 10 adversarial inputs (Step 6.3) | Score >= 90% |
 | Not a duplicate | Run: `PYTHONPATH=. python scripts/dedup_check.py` |
 | Follows naming conventions (Step 4) | Directory and name match, correct prefix if stack-specific |
 | `version` field present | SemVer format in frontmatter |

@@ -205,4 +205,3 @@ After the skill is in use, watch for these signs it needs revision:
 | Errors in later steps | Earlier steps missed validation | Add prerequisite checks |
 
 ---
-
