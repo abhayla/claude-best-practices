@@ -1,6 +1,6 @@
 ---
 name: web-research-specialist-agent
-description: Use this agent for web research — finding documentation, API references, library comparisons, and technical answers from external sources. Lighter-weight alternative to planner-researcher-agent when you need facts, not architecture.
+description: Use this agent for web research — finding documentation, API references, library comparisons, and technical answers from external sources. Lighter-weight alternative to planner-researcher when you need facts, not architecture.
 tools: ["Read", "Grep", "Glob", "WebFetch", "WebSearch"]
 model: sonnet
 ---

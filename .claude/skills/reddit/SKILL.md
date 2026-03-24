@@ -1,12 +1,10 @@
 ---
 name: reddit
 description: >
-  Comprehensive Reddit skill: read posts & threads, compose posts & comments, analyze threads
-  (sentiment, consensus, arguments), post via API, search & discover, engage (upvote/comment/reply),
-  score viral potential (15-element system), monitor keywords & subreddits, manage karma & account
-  health, plan content strategy, and moderate communities. Supports multiple access methods:
-  WebFetch, Reddit API (OAuth2), Gemini CLI fallback, and MCP integration.
-  Use when user wants to interact with Reddit in any way.
+  Manage Reddit interactions: read posts and threads, compose posts and comments, analyze
+  sentiment and consensus, post via API, search and discover, score viral potential, monitor
+  keywords and subreddits, plan content strategy, and moderate communities. Use when
+  interacting with Reddit for reading, posting, analyzing, or monitoring.
 triggers:
   - reddit.com
   - subreddit

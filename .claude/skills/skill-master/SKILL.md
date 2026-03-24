@@ -162,372 +162,29 @@ These key phrases, combined with the complexity assessment from 2.2, feed into t
 
 Present all discovered skills organized by dynamically-inferred category.
 
-### 3.1 Generate Catalog Output
 
-For each category inferred in Step 1.3, list the skills belonging to it:
-
-```
-=== SKILL CATALOG ===
-Discovered {N} skills across {M} categories.
-
---- Architecture ---
-  /brainstorm          — Socratic questioning phase before planning or implementation
-  /strategic-architect — <description from frontmatter>
-
---- Workflow ---
-  /implement           — Implement a feature or fix following a structured workflow
-  /executing-plans     — <description from frontmatter>
-  /writing-plans       — <description from frontmatter>
-  /fix-loop            — <description from frontmatter>
-  /fix-issue           — <description from frontmatter>
-
---- Quality ---
-  /systematic-debugging — <description from frontmatter>
-  /security-audit       — <description from frontmatter>
-  /supply-chain-audit   — <description from frontmatter>
-  /auto-verify          — <description from frontmatter>
-
---- Collaboration ---
-  /request-code-review  — <description from frontmatter>
-  /receive-code-review  — <description from frontmatter>
-  /branching        — <description from frontmatter>
-  /contribute-practice  — <description from frontmatter>
-
---- Stack-Specific ---
-  /fastapi-db-migrate   — <description from frontmatter>
-  /android-run-tests    — <description from frontmatter>
-  /flutter-dev          — <description from frontmatter>
-  ... (all stack-prefixed skills)
-
---- Meta ---
-  /writing-skills       — Guide for authoring new skills
-  /skill-master         — This skill (dynamic router)
-  /skill-factory        — <description from frontmatter>
-
---- Utility ---
-  ... (remaining skills)
-
-=== END CATALOG ===
-```
-
-Every description shown MUST come from the actual frontmatter read in Step 1.2 — never
-from memory or hardcoded text.
-
-### 3.2 Show Usage Hints
-
-After the catalog, display:
-
-```
-USAGE:
-  /skill-master <describe what you want>    — Route to the best skill
-  /skill-master list                        — Show this catalog
-  /skill-master --workflow <task>           — Suggest a multi-skill workflow
-  /skill-master --chain <skill1,skill2>     — Execute skills in sequence
-```
-
-### 3.3 Show Quick Workflows
-
-Scan all skill descriptions for handoff hints (phrases like "proceed with", "next step",
-"feeds into", "then invoke", "follow up with"). Build a list of detected workflows:
-
-```
-DETECTED WORKFLOWS:
-  Feature Development: /brainstorm -> /writing-plans -> /executing-plans -> /implement -> /branching
-  Bug Fix: /systematic-debugging -> /fix-loop -> /auto-verify -> /branching
-  Code Review: /request-code-review -> /receive-code-review -> /branching
-  (workflows above are derived from skill descriptions — they update automatically)
-```
-
-These workflows MUST be derived by reading skill descriptions for handoff references,
-not from a hardcoded list. If a new skill mentions "after this, invoke /deploy", that
-link appears automatically.
-
----
+**Read:** `references/display-skill-catalog.md` for detailed step 3: display skill catalog reference material.
 
 ## STEP 4: Match Intent to Skill
 
 Score each discovered skill against the user's request and route to the best match.
 
-### 4.1 Scoring Algorithm
 
-For each skill in the catalog, calculate a match score:
-
-| Signal | Points | How to Detect |
-|--------|--------|---------------|
-| Exact trigger match | 100 | User input exactly matches a trigger string from frontmatter |
-| Slash command match | 90 | User typed `/<name>` and it matches a skill name |
-| Trigger substring match | 60 | A trigger from frontmatter appears as a substring in the user's input |
-| Description keyword match | 40 | 2+ key phrases from user input appear in the skill's description |
-| Single keyword match | 20 | 1 key phrase from user input appears in the skill's description |
-| Stack prefix match | 30 | User mentions a technology and a skill has the matching stack prefix |
-| Category alignment | 10 | User's action verb maps to the skill's inferred category |
-
-Sum the points for each skill. Rank by total score descending.
-
-### 4.2 Present Results
-
-Based on the scoring results:
-
-| Scenario | Action |
-|----------|--------|
-| Top skill scores >= 80 and is 20+ points ahead of #2 | **Strong match** — Route directly. Present: "Routing to `/skill-name` — {description}. Invoke now? (Y/n)" |
-| Top 2-3 skills score >= 40 with < 20 point spread | **Ambiguous match** — Present top 3 with scores and let user pick |
-| No skill scores >= 40 | **No match** — Go to Step 4.3 |
-
-#### Strong Match Example
-
-```
-MATCH FOUND (confidence: high)
-  Skill: /systematic-debugging
-  Description: Structured debugging methodology with hypothesis testing
-  Match reason: Your request mentions "debug" and "failing test" — exact trigger match
-
-  Invoke /systematic-debugging now? (Y/n)
-```
-
-#### Ambiguous Match Example
-
-```
-MULTIPLE MATCHES — please pick one:
-
-  1. /implement (score: 65)
-     Implement a feature or fix following a structured workflow
-     Match: "build" keyword in your request matches description
-
-  2. /executing-plans (score: 55)
-     Execute tasks from a pre-written plan
-     Match: "build" keyword, but requires a plan as input
-
-  3. /brainstorm (score: 45)
-     Explore approaches before committing to implementation
-     Match: "feature" keyword in your request
-
-  Which skill? (1/2/3 or describe your task in more detail)
-```
-
-### 4.3 Handle No Match
-
-When no skill scores above the threshold:
-
-1. Show the closest match (highest score even if below threshold) with an explanation of the gap:
-   ```
-   CLOSEST MATCH (low confidence):
-     Skill: /implement (score: 25)
-     Gap: Your request mentions "refactor database schema" but no skill
-          specifically handles schema refactoring.
-   ```
-
-2. Suggest alternatives:
-   ```
-   SUGGESTIONS:
-     - Rephrase your request with different keywords
-     - Use /writing-skills to create a new skill for this task
-     - Use /brainstorm to explore the problem space first
-     - Browse the full catalog: /skill-master list
-   ```
-
-3. Offer a keyword-based search across all skill descriptions:
-   ```
-   SEARCH RESULTS for "database schema":
-     /fastapi-db-migrate  — mentions "database" and "migration" in description
-     /pg-query            — mentions "database" and "query" in description
-   ```
-
-### 4.4 Route to Selected Skill
-
-Once the user confirms (or the match is strong enough for auto-routing):
-
-1. Read the full SKILL.md content of the selected skill (not just frontmatter)
-2. Invoke the skill using the Skill tool:
-   ```
-   Skill("<skill-name>", args="<user's original request>")
-   ```
-3. Record the invocation in session state (Step 7)
-
----
+**Read:** `references/match-intent-to-skill.md` for detailed step 4: match intent to skill reference material.
 
 ## STEP 5: Suggest Adaptive Workflow
 
 Analyze the user's task and recommend a multi-skill workflow.
 
-### 5.1 Classify Task Type
 
-Read the user's description and classify the task:
-
-| Task Signal | Detected Type | Notes |
-|-------------|--------------|-------|
-| "bug", "error", "failing", "broken", "crash" | Bug Fix | Start with diagnosis |
-| "new feature", "add", "build", "create" (large scope) | New Feature | Full planning pipeline |
-| "quick fix", "small change", "tweak", "typo" | Quick Fix | Minimal pipeline |
-| "review", "PR", "pull request", "feedback" | Code Review | Review pipeline |
-| "security", "vulnerability", "CVE", "audit" | Security | Audit pipeline |
-| "deploy", "ship", "release", "publish" | Deployment | Deploy pipeline |
-| "refactor", "clean up", "restructure" | Refactoring | Analysis + implementation |
-| "test", "coverage", "failing tests" | Testing | Test-focused pipeline |
-| Stack-specific technology mentioned | Stack Task | Route to stack skill |
-
-### 5.2 Build Workflow from Discovered Skills
-
-For the detected task type, scan the catalog built in Step 1 and assemble a workflow.
-
-**Algorithm:**
-1. Identify the "entry" skill — the one whose description best matches the starting action for this task type
-2. Read that skill's full content and look for handoff suggestions (references to other skills like "proceed with `/implement`" or "next step: `/branching`")
-3. Follow the handoff chain, reading each referenced skill to find the next link
-4. If the chain breaks (a skill has no handoff), fill gaps by matching category to task phase:
-   - Analysis phase: look for Quality/Architecture category skills
-   - Implementation phase: look for Workflow category skills
-   - Verification phase: look for Quality category skills
-   - Delivery phase: look for Collaboration category skills
-
-### 5.3 Define Entry/Exit Criteria
-
-For each step in the workflow, define what must be true before starting (entry) and what the step must produce (exit). This prevents skipping phases or moving forward prematurely.
-
-| Phase | Entry Criteria | Exit Criteria |
-|-------|---------------|---------------|
-| Research/Brainstorm | Clear problem statement from user | Research brief + spec document with chosen approach |
-| Planning | Approved spec/approach | Plan with tasks, verification commands, dependency graph |
-| Execution | Approved plan saved to file | All tasks completed, tests passing, code committed |
-| Standards check | Implementation complete, tests green | Standards report with 0 critical violations |
-| Code review | Standards check passed | PR created with risk analysis and review questions |
-| Review feedback | Review comments received | All must-fix addressed, re-review requested |
-| Finish | PR approved, CI green | Merged, verified, branch cleaned up |
-
-When presenting a workflow, include entry/exit criteria so the user knows what each phase requires and produces.
-
-**Present the workflow:**
-
-```
-SUGGESTED WORKFLOW for: "{user's task description}"
-Task type: New Feature
-
-  Step 1: /brainstorm — Explore approaches and write a spec
-    Entry: clear problem statement | Exit: spec document with chosen approach
-  Step 2: /writing-plans — Break the spec into a task plan
-    Entry: approved spec | Exit: plan with tasks + verification commands
-  Step 3: /executing-plans — Execute each task in the plan
-    Entry: approved plan | Exit: all tasks done, tests passing
-  Step 4: /pr-standards — Check against team standards
-    Entry: implementation complete | Exit: 0 critical violations
-  Step 5: /request-code-review — Get review feedback
-    Entry: standards passed | Exit: PR created with risk analysis
-  Step 6: /receive-code-review — Apply review feedback
-    Entry: review comments | Exit: all must-fix addressed
-  Step 7: /branching finish — Merge and cleanup
-    Entry: PR approved, CI green | Exit: merged, verified, cleaned up
-
-  Estimated steps: 7
-  Note: Steps were derived from skill handoff hints in descriptions.
-        This workflow updates automatically when skills change.
-
-  Start this workflow? (Y/n/modify)
-```
-
-### 5.3 Allow Workflow Modification
-
-If the user says "modify" or suggests changes:
-
-1. Show the full catalog filtered to relevant categories
-2. Let the user add, remove, or reorder skills
-3. Validate the modified workflow: check that each skill exists in the catalog
-4. Confirm the final workflow before starting
-
----
+**Read:** `references/suggest-adaptive-workflow.md` for detailed step 5: suggest adaptive workflow reference material.
 
 ## STEP 6: Chain Skills in Sequence
 
 Execute multiple skills one after another, passing context forward.
 
-### 6.1 Parse the Chain
 
-Accept chain input in these formats:
-
-| Format | Example |
-|--------|---------|
-| Comma-separated names | `brainstorm,writing-plans,executing-plans` |
-| Slash-command list | `/brainstorm /writing-plans /executing-plans` |
-| Workflow from Step 5 | User confirmed a suggested workflow |
-
-Validate every skill name against the catalog from Step 1. If any skill is not found:
-
-```
-ERROR: Skill "{name}" not found in catalog.
-Available skills: {list of all discovered skill names}
-Did you mean: {closest name match}?
-```
-
-### 6.2 Initialize Progress Tracker
-
-Create a progress display:
-
-```
-WORKFLOW PROGRESS: {workflow-name or "Custom Chain"}
-  [x] /brainstorm — completed (output: spec written to docs/specs/feature-spec.md)
-  [ ] /writing-plans — in progress
-  [ ] /executing-plans — pending
-  [ ] /request-code-review — pending
-  [ ] /branching — pending
-
-  Current: Step 2 of 5
-```
-
-### 6.3 Execute Each Skill
-
-For each skill in the chain:
-
-1. **Pre-check** — Read the skill's frontmatter to verify prerequisites
-2. **Invoke** — Call `Skill("<name>", args="<context from previous skill>")`:
-   - For the first skill: pass the user's original request as args
-   - For subsequent skills: pass a summary of the previous skill's output as args
-3. **Capture output** — Record what the skill produced (files created, decisions made, artifacts)
-4. **Update progress** — Mark the skill as completed in the tracker
-5. **Checkpoint** — Between skills, ask the user:
-   ```
-   /brainstorm completed. Output: spec written to docs/specs/feature-spec.md
-   Next: /writing-plans — Break spec into task plan
-   Continue? (Y/skip/stop)
-   ```
-
-| User Response | Action |
-|---------------|--------|
-| Y / yes / enter | Proceed to next skill |
-| skip | Skip this skill, move to the next one |
-| stop | Halt the chain, preserve progress state |
-| modify | Show remaining skills, allow reordering |
-
-### 6.4 Handle Chain Failures
-
-If a skill fails or produces an error during chaining:
-
-| Failure Type | Action |
-|-------------|--------|
-| Skill not found at runtime | Re-scan filesystem (skill may have been deleted), report if still missing |
-| Skill errors during execution | Capture error, ask user: retry / skip / stop |
-| User cancels mid-chain | Save progress state, offer to resume later |
-| Context too large | Summarize previous outputs, trim to essential context |
-
-### 6.5 Chain Completion Report
-
-After all skills in the chain complete (or the chain is stopped):
-
-```
-WORKFLOW COMPLETE
-  Skills executed: 5/6
-  Skills skipped: 1 (request-code-review — skipped by user)
-
-  Artifacts produced:
-    - docs/specs/feature-spec.md (from /brainstorm)
-    - docs/plans/feature-plan.md (from /writing-plans)
-    - 3 files modified (from /executing-plans)
-    - Branch ready for PR (from /branching)
-
-  Suggested follow-up:
-    - /request-code-review (was skipped — run when ready)
-    - /learn-n-improve session (capture learnings)
-```
-
----
+**Read:** `references/chain-skills-in-sequence.md` for detailed step 6: chain skills in sequence reference material.
 
 ## STEP 7: Manage Session State
 
@@ -634,18 +291,90 @@ extracting differences — not from hardcoded knowledge. For any two skills:
 
 ---
 
-## STEP 9: Search and Self-Update
+## STEP 9: Search Skills by Keyword
 
-For keyword search, fuzzy matching, catalog re-scanning, and change detection, see `references/advanced-features.md`.
+When the user's request does not match any skill well, provide a keyword search.
 
-Key principles:
-- **Always re-scan** the filesystem on every invocation — never serve a stale catalog
-- **Full-text search** across all SKILL.md files when no skill matches well
-- **Detect changes** by comparing the new catalog against stored session state
+### 9.1 Full-Text Search
 
-For routing decision examples (direct match, stack-specific, ambiguous, workflow, no-match, conflict), see `references/advanced-features.md`.
+Search across all discovered skill descriptions, triggers, and step content:
+
+```bash
+# Search all SKILL.md files for the user's keywords
+grep -r -l "{keyword}" core/.claude/skills/*/SKILL.md
+```
+
+Use `Grep` to search all SKILL.md files for the user's keywords. Report matches with
+the relevant context line.
+
+### 9.2 Present Search Results
+
+```
+SEARCH RESULTS for "database migration":
+
+  1. /fastapi-db-migrate (3 matches)
+     - Description: "...database migration..."
+     - Step 2: "Run alembic to generate migration..."
+     - Trigger: "migrate database"
+
+  2. /pg-query (1 match)
+     - Description: "...PostgreSQL query patterns..."
+
+  No exact match? Consider:
+    - /writing-skills to create a custom skill for this workflow
+    - /brainstorm to explore the problem before choosing a skill
+```
+
+### 9.3 Fuzzy Matching
+
+When exact keyword search yields no results, try partial matches:
+
+1. Split multi-word keywords and search each word independently
+2. Search for synonyms: "test" also matches "verify", "check", "validate"
+3. Search skill names (not just descriptions) for partial prefix matches
 
 ---
+
+## STEP 10: Self-Update and Re-Scan
+
+Ensure the catalog is always fresh.
+
+### 10.1 Re-Scan on Every Invocation
+
+Every time skill-master is invoked, re-run Step 1 in full. Do NOT cache or reuse
+a previous catalog. Skills may have been added, removed, or modified since the
+last invocation.
+
+### 10.2 Detect Changes
+
+If session state exists from a previous invocation, compare the new catalog against
+the stored snapshot:
+
+```
+CATALOG CHANGES SINCE LAST SCAN:
+  + /new-skill-name (added — description: "...")
+  - /removed-skill (no longer found on disk)
+  ~ /modified-skill (description changed)
+  = {N} skills unchanged
+```
+
+### 10.3 Handle Missing Skills in Active Workflows
+
+If a skill that is part of an active workflow (Step 6) has been removed from disk:
+
+1. Alert the user: "Skill `/removed-skill` is no longer available on disk."
+2. Suggest a replacement by searching the catalog for similar descriptions
+3. Offer to skip the removed skill and continue the workflow
+
+---
+
+## Routing Decision Examples
+
+These examples show how the scoring algorithm routes requests. The specific skills
+mentioned are illustrative — actual routing always uses the live catalog from Step 1.
+
+
+**Read:** `references/routing-decision-examples.md` for detailed routing decision examples reference material.
 
 ## MUST DO
 

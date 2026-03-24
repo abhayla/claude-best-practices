@@ -1,10 +1,10 @@
 ---
 name: twitter-x
 description: >
-  Comprehensive Twitter/X skill: read posts, compose tweets & threads, post via API,
-  search & discover, engage (like/retweet/bookmark), analyze viral potential (19-element scoring),
-  grow audience, monitor keywords, manage followers, and plan content strategy.
-  Use when user wants to interact with Twitter/X in any way.
+  Manage Twitter/X interactions: read posts, compose tweets and threads, post via API,
+  search and discover, analyze viral potential, grow audience, monitor keywords, and
+  plan content strategy. Use when interacting with Twitter/X for reading, posting,
+  analyzing, or monitoring.
 triggers:
   - x.com
   - twitter.com

@@ -1,7 +1,7 @@
 ---
 name: prompt-auto-enhance
 description: >
-  Strengthen non-trivial prompts by diagnosing weak spots, mapping fixes, and
+  Diagnose and strengthen non-trivial prompts by mapping weak spots to fixes and
   rewriting before execution — with visible before/after comparison. Also handles
   resource CRUD batch approval flow, delegation routing, and web search decisions.
   Invoked by the prompt-auto-enhance rule when resource changes are detected,
@@ -18,7 +18,7 @@ triggers:
 allowed-tools: "Read Grep Glob Skill Agent"
 argument-hint: "[prompt text to enhance or 'score' to evaluate reliability]"
 type: workflow
-version: "1.5.0"
+version: "1.5.1"
 ---
 
 # Prompt Auto-Enhance — Strengthening & Resource CRUD Procedures
@@ -31,15 +31,13 @@ detected. The `prompt-auto-enhance` global rule controls when this activates.
 
 ---
 
-## Prompt Strengthening
-
 Activates automatically for **non-trivial prompts** — same threshold as the
 Clarification Gate (ambiguous, multi-file, or multi-step). Skipped for direct
 unambiguous instructions (e.g., "run tests", "rename X to Y", "fix the typo on line 42").
 
 Adapted from community pattern by @heyrimsha (source: x.com/heyrimsha/status/2035995286150234480).
 
-### STEP 1: Diagnose Prompt Weaknesses
+## STEP 1: Diagnose Prompt Weaknesses
 
 Analyze the user's prompt against the failure category table. Classify every
 weakness found — a prompt may have multiple.
@@ -130,7 +128,7 @@ exists" is a real condition, not hedging), keep it.
 If no weaknesses are found (prompt scores clean), skip to execution — do not
 force unnecessary rewrites.
 
-### STEP 2: Map Fixes
+## STEP 2: Map Fixes
 
 For each diagnosed weakness, determine the minimal structural fix. Each fix
 MUST map to exactly one failure category — no fix without a diagnosis, no
@@ -143,7 +141,7 @@ Diagnosis:
   [2] CATEGORY_NAME → specific fix description
 ```
 
-### STEP 3: Rewrite the Prompt
+## STEP 3: Rewrite the Prompt
 
 Apply all fixes to produce a strengthened version. Rules:
 - Targeted changes only — do not rewrite parts that are already clear
@@ -157,7 +155,7 @@ Apply all fixes to produce a strengthened version. Rules:
   XML Tag Reference above to select appropriate tags
 - Place long context above the query, constraints near the task definition
 
-### STEP 4: Show Before/After
+## STEP 4: Show Before/After
 
 MUST show the comparison to the user every time strengthening activates.
 This is NOT optional — visibility builds trust and helps users learn.
@@ -181,7 +179,7 @@ Proceeding with strengthened prompt...
 Update the `*Enhanced:*` indicator to include strengthening:
 `*Enhanced: prompt strengthened (N fixes), git state, 2 rules*`
 
-### STEP 5: Execute
+## STEP 5: Execute
 
 Proceed with the strengthened prompt as if the user had entered it directly.
 The rest of the auto-enhance pipeline (Tier 1/2 context, Clarification Gate,

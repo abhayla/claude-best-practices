@@ -15,7 +15,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.5.0"
+version: "2.6.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -363,6 +363,20 @@ Generate test scenarios to validate the skill works correctly, then stress test 
 
 
 **Read:** `references/skill-testing.md` for detailed step 6: skill testing and stress testing reference material.
+
+### 6.4 Baseline Comparison Testing
+
+When enhancing an existing skill (adding constraints, feedback loops, or
+structural changes), run the original and enhanced versions against the same
+5 inputs to prove the enhancement helps without regressing quality. Triggers
+when modifying an existing skill's constraints/steps/CRITICAL RULES — not for
+brand-new skills.
+
+**Gate rule**: Enhanced version MUST NOT regress on any scoring dimension for
+any input. A single regression blocks promotion.
+
+**Read:** `references/baseline-comparison.md` for the full procedure (input
+selection, scoring dimensions, comparison template) and design philosophy.
 
 ## STEP 6.5: Failure Prevention Map
 
