@@ -3279,15 +3279,15 @@
     "hash": "f6e238a17e13a82ff8ba19f6ce92b780a2b4644465b57a274bfb9fb2b829b108",
     "type": "skill",
     "category": "core",
-    "version": "2.0.1",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-19",
+    "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Skill authoring guide with 6 templates and quality checklist",
+    "description": "Skill authoring guide with failure mode analysis, constraint justification, XML tag conventions, and edge case testing",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v2.2.0: Add XML tag conventions for within-step content separation (per Anthropic docs)"
   },
   "xml-to-compose": {
     "hash": "304619d73900a86b560810adab1b4ada3aa40f6f7cf51c5cb6030adb930690b1",

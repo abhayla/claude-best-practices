@@ -2,12 +2,12 @@
 
 ### 6.1 Define Test Scenarios
 
-Create three scenarios for every skill:
+Create 5 scenarios for every skill: 3 happy-path + 2 edge-case.
 
-#### Happy Path Test
+#### Happy Path Tests (3 required)
 
 ```
-Scenario: Standard use case
+Scenario 1: Standard use case
   Input: <typical argument the user would provide>
   Expected behavior:
     - Step 1 completes: <specific observable outcome>
@@ -15,17 +15,43 @@ Scenario: Standard use case
     - ...
     - Final output: <what the user sees>
   Success criteria: <measurable result>
+
+Scenario 2: Alternate valid input
+  Input: <different but valid argument — tests a secondary path>
+  Success criteria: <correct output for this variation>
+
+Scenario 3: Minimal valid input
+  Input: <the simplest valid argument — tests the base case>
+  Success criteria: <correct output, no unnecessary steps triggered>
 ```
 
-#### Edge Case Test
+#### Edge Case Tests (2 required)
+
+Test against these categories — pick the 2 most relevant to the skill's domain:
+
+| Category | Example Input | What It Tests |
+|---|---|---|
+| Empty/missing input | `""`, no argument, null | Graceful handling of absent data |
+| Boundary values | Very long string, max-size file, 0, -1 | Limits and overflow behavior |
+| Special characters | Paths with spaces, unicode, `../` | Injection and encoding resilience |
+| Conflicting state | File already exists, resource locked, stale cache | Idempotency and conflict resolution |
+| Interrupted execution | Network timeout, missing dependency, permission denied | Partial failure and cleanup behavior |
+| Concurrent invocation | Skill invoked twice on same target | Race conditions and state corruption |
 
 ```
-Scenario: Unusual but valid input
-  Input: <edge case argument — empty string, very long input, special characters>
+Edge Case 1: <chosen category>
+  Input: <specific edge case argument>
   Expected behavior:
     - Skill handles gracefully without crashing
     - User receives clear feedback if input is invalid
+    - No partial/corrupted state left behind
   Success criteria: <no errors, appropriate fallback behavior>
+
+Edge Case 2: <chosen category>
+  Input: <specific edge case argument>
+  Expected behavior:
+    - <describe expected graceful handling>
+  Success criteria: <measurable result>
 ```
 
 #### Error Case Test

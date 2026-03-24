@@ -15,7 +15,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.0.1"
+version: "2.2.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -55,7 +55,23 @@ One sentence explaining what this skill does in practical terms.
 
 The `$ARGUMENTS` variable is replaced with the user's input at runtime. Always include it so the skill knows what to act on.
 
-### 2.3 Structure the Steps
+### 2.3 Failure Mode Analysis
+
+Before writing steps and constraints, identify the 3 most likely failure modes for the skill's domain. This drives what guardrails to build — prevention beats diagnosis.
+
+1. **List 3 failure modes** — What goes wrong when this type of task is done carelessly? (e.g., "reads stale cache instead of live data", "overwrites user changes without confirmation", "proceeds with partial input")
+2. **Map each to a prevention** — Each failure mode becomes a specific MUST DO or MUST NOT DO rule with a concrete guardrail (a validation step, a confirmation prompt, or a precondition check)
+3. **Embed preventions into steps** — Place the guardrail in the earliest step where the failure could occur, not as an afterthought at the end
+
+| Failure Mode | Prevention Type | Where to Place |
+|---|---|---|
+| Wrong/stale input | Validation step | Step 1 or earliest data-reading step |
+| Destructive action without confirmation | User approval gate | Step before the destructive action |
+| Partial execution leaving broken state | Rollback or atomic commit | Step that modifies state |
+| Missing prerequisites | Precondition check | Step 1 |
+| Ambiguous output format | Locked output template | Output-producing step + MUST DO |
+
+### 2.4 Structure the Steps
 
 Steps are the core of every skill. Each step must be actionable — a verb phrase, not a vague noun.
 
@@ -96,11 +112,58 @@ Brief explanation of WHY this step exists (1-2 sentences max).
 - MUST NOT output partial results as final — either complete the task or report what is missing
 ```
 
+#### XML Tags Within Steps (Optional)
+
+Use XML tags to separate content types within a step when the step mixes instructions, context, data, and constraints. This improves Claude's parsing accuracy — per [Anthropic's prompt engineering guide](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags), XML tags reduce misinterpretation in multi-part prompts.
+
+**When to use:** Steps that mix 3+ content types (instructions + context + constraints + data). Skip for simple steps with only instructions.
+
+**When NOT to use:** Do not replace the skill's top-level markdown structure (YAML frontmatter, `## STEP N:` headings, `## MUST DO` sections) with XML. XML tags are for *within-step* content separation only.
+
+Recommended tags (names are flexible — pick what's semantically clear):
+
+| Tag | Purpose | Example |
+|---|---|---|
+| `<context>` | Background info the step needs | `<context>Read the user's $ARGUMENTS and classify input type.</context>` |
+| `<constraints>` | Guardrails for this specific step | `<constraints>MUST NOT proceed if input is empty.</constraints>` |
+| `<input>` | Variable data being processed | `<input>$ARGUMENTS</input>` |
+| `<output>` | Expected output format for this step | `<output>JSON with {result, summary, failures} fields</output>` |
+| `<examples>` | Few-shot examples within a step | Wrap 2-3 input/output pairs |
+
+Example of a step using XML tags:
+
+```markdown
+## STEP 2: Classify the Input
+
+Determine the input type to route to the correct processing path.
+
+<context>
+The user provides either a file path, a URL, or a natural language description.
+Each type requires different validation and processing.
+</context>
+
+<constraints>
+- MUST detect input type before processing — wrong classification causes silent failures
+- MUST reject inputs that match none of the 3 types with a clear error message
+</constraints>
+
+<output>
+One of: `file_path`, `url`, or `description` — stored for use in Step 3.
+</output>
+```
+
+**Key rules for XML tag usage:**
+- Use consistent tag names throughout all steps in one skill — do not mix `<constraints>` and `<rules>` for the same purpose
+- Reference tags by name when pointing to them: "Using the context in `<context>` tags..." not "the context above"
+- No canonical "magic" tag names exist — Claude treats all XML tag names equally (per Anthropic docs)
+
 Rules for writing MUST DO / MUST NOT DO:
 - 4-8 items per section (fewer is better — only include non-obvious rules)
-- Each item explains the consequence of violation ("...causes cascading errors")
+- Each item MUST have a `— Why:` suffix explaining the consequence of violation (e.g., "Always validate input before processing — Why: unvalidated input caused silent data corruption in downstream steps")
+- Every constraint must have a reason — no rules without purpose. If you cannot articulate why a rule exists, do not include it
 - MUST NOT items always state what to do instead
 - Do not repeat what the steps already say — these are for edge cases and guardrails
+- Constraints from the failure mode analysis (Step 2.3) MUST appear here with their mapped preventions
 
 ### 2.7 Validate Before Saving
 
@@ -351,7 +414,9 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always include a verification step in skills that modify state
 - Always use concrete, actionable language in steps — verbs, not adjectives
 - Always present the draft to the user for review before saving
-- Always test the skill with the 3 scenarios from Step 6
+- Always test the skill with 5 scenarios from Step 6 (3 happy-path + 2 edge-case)
+- Always complete failure mode analysis (Step 2.3) before writing constraints — prevention beats diagnosis
+- Always include a `— Why:` justification on every MUST DO / MUST NOT DO item
 
 ## MUST NOT DO
 
