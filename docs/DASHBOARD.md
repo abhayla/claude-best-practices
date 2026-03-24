@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-24 01:24 UTC (auto-generated)
+> Last updated: 2026-03-24 01:44 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -207,7 +207,7 @@
 | websocket-patterns | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | workflow | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | writing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| writing-skills | skill | 2.3.0 | hub:abhayla/claude-best-practices | — |
+| writing-skills | skill | 2.4.0 | hub:abhayla/claude-best-practices | — |
 | xml-to-compose | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 
 ## Quick Start
