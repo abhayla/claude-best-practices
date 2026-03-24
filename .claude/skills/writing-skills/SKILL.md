@@ -1,10 +1,10 @@
 ---
 name: writing-skills
 description: >
-  Guide for intentionally authoring new Claude Code skills from scratch or from
-  observed patterns. Covers YAML frontmatter, step structure, trigger design,
-  quality validation, testing, hub promotion, and a full template library for
-  common skill types. The "how to write skills" manual as a skill itself.
+  Author new Claude Code skills from scratch or from observed patterns. Covers YAML
+  frontmatter, step structure, trigger design, quality validation, testing, hub
+  promotion, and a full template library. Use when creating or refining skills
+  for the .claude/skills/ directory.
 triggers:
   - write-skill
   - create-skill
@@ -43,95 +43,9 @@ Parse `$ARGUMENTS` to choose the path:
 
 Build a skill file from the ground up following the canonical format.
 
-### 2.1 Define the YAML Frontmatter
 
-Every skill requires a `SKILL.md` file with YAML frontmatter. Each field has specific requirements:
+**Read:** `references/skill-authoring-from-scratch.md` for detailed step 2: skill authoring — from scratch reference material.
 
-```yaml
----
-name: lowercase-kebab-case-name
-description: >
-  One to three sentences explaining WHAT the skill does, WHEN to use it,
-  and what it produces. Start with an action verb. Include the primary
-  use case so Claude can match it from natural language requests.
-triggers:
-  - slash-command-name
-  - natural language phrase 1
-  - natural language phrase 2
-  - natural language phrase 3
-allowed-tools: "Tool1 Tool2 Tool3"
-argument-hint: "<required-arg> [optional-arg]"
-type: workflow
-version: "1.0.0"
----
-```
-
-#### Field Reference
-
-| Field | Required | Rules |
-|-------|----------|-------|
-| `name` | Yes | Lowercase kebab-case. Must match the directory name. 2-4 words max. |
-| `description` | Yes | 1-3 sentences. Start with a verb. Include when to use it. Must fit in ~50 words. |
-| `triggers` | Recommended | 3-6 entries. Mix of slash commands and natural language phrases. |
-| `allowed-tools` | Yes | Space-separated list. Use the minimal set needed. Never include tools you do not use. |
-| `argument-hint` | Yes | Show required args in `<angle-brackets>`, optional in `[square-brackets]`. Use descriptive placeholder names. |
-| `type` | Yes | `workflow` (multi-step procedure with numbered STEP sections) or `reference` (knowledge base / lookup guide with organized sections, no step numbering required). |
-| `version` | Yes | SemVer format (`"1.0.0"`). Bump MAJOR for breaking output/arg changes, MINOR for new optional content, PATCH for wording fixes. |
-
-#### Allowed-Tools Selection Guide
-
-Choose the minimal set. Each tool you add expands what the skill can do — and what can go wrong.
-
-| Tool | Include When |
-|------|-------------|
-| `Read` | Skill reads existing files |
-| `Write` | Skill creates new files from scratch |
-| `Edit` | Skill modifies existing files |
-| `Bash` | Skill runs commands (tests, builds, git) |
-| `Grep` | Skill searches file contents |
-| `Glob` | Skill searches for files by name pattern |
-| `Skill` | Skill delegates to other skills |
-| `Agent` | Skill needs subagent delegation for parallel or bulk work |
-| `WebFetch` | Skill fetches content from URLs |
-| `WebSearch` | Skill searches the internet |
-
-**Rule of thumb:** If a step does not use a tool, do not include that tool. A read-only analysis skill should NOT include `Write` or `Edit`.
-
-#### Trigger Design
-
-Triggers determine when Claude activates the skill. Poor triggers cause false activations or missed activations.
-
-**Good triggers:**
-- Specific slash commands: `write-skill`, `create-skill`
-- Natural language that uniquely identifies the task: `how to write a skill`, `author new skill`
-- Problem-oriented phrases: `automate this workflow`, `make a reusable pattern`
-
-**Bad triggers:**
-- Too broad: `help`, `create`, `write` (matches too many unrelated requests)
-- Too narrow: `create a fastapi database migration skill for postgres` (too specific to match)
-- Overlapping with other skills: Check existing triggers before adding yours
-
-To check for trigger overlap:
-```bash
-grep -r "triggers:" core/.claude/skills/*/SKILL.md
-```
-
-#### Argument-Hint Design
-
-The argument hint appears in help text and teaches users what to provide.
-
-| Pattern | Example | When to Use |
-|---------|---------|-------------|
-| `<required>` | `<feature-description>` | Single required input |
-| `<required> [optional]` | `<bug-description> [--verbose]` | Required with optional flags |
-| `<mode> [details]` | `<scan\|propose\|create> [name]` | Multi-mode skills |
-| `<file-or-description>` | `<path/to/file or natural language>` | Flexible input types |
-
-### 2.2 Write the Title and Preamble
-
-After the frontmatter, write a descriptive title and one-line purpose statement:
-
-```markdown
 # Skill Title — Brief Subtitle
 
 One sentence explaining what this skill does in practical terms.
@@ -180,29 +94,23 @@ Each step follows this structure:
 
 Brief explanation of WHY this step exists (1-2 sentences max).
 
-### N.1 Sub-step Title
 
-1. Specific instruction with concrete action
-2. Another specific instruction
-3. Expected outcome or decision point
+**Read:** `references/step-n-action-verb-object.md` for detailed step n: action verb + object reference material.
 
-### N.2 Another Sub-step
+## MUST DO
 
-| Situation | Action |
-|-----------|--------|
-| Happy path | Do X |
-| Error case | Do Y instead |
-| Edge case | Ask user for clarification |
+- Always complete Step 1 before proceeding — skipping it causes cascading errors
+- Always verify output before reporting completion
+- Always clean up temporary files created during execution
+- Run the dedup check if skill will be promoted to the hub
+
+## MUST NOT DO
+
+- MUST NOT skip the verification step — unverified output is unreliable
+- MUST NOT modify files outside the specified scope
+- MUST NOT proceed if prerequisites are not met — ask the user instead
+- MUST NOT output partial results as final — either complete the task or report what is missing
 ```
-
-#### Recommended Step Count
-
-| Skill Type | Steps | Reasoning |
-|------------|-------|-----------|
-| Simple workflow | 3-5 | Focused task, minimal branching |
-| Standard workflow | 5-8 | Most skills fall here |
-| Complex workflow | 8-10 | Multi-phase with verification |
-| Too many | >10 | Split into multiple skills or use subagent delegation |
 
 #### XML Tags Within Steps (Optional)
 
@@ -222,62 +130,32 @@ Recommended tags (names are flexible — pick what's semantically clear):
 | `<output>` | Expected output format for this step | `<output>JSON with {result, summary, failures} fields</output>` |
 | `<examples>` | Few-shot examples within a step | Wrap 2-3 input/output pairs |
 
+Example of a step using XML tags:
+
+```markdown
+## STEP 2: Classify the Input
+
+Determine the input type to route to the correct processing path.
+
+<context>
+The user provides either a file path, a URL, or a natural language description.
+Each type requires different validation and processing.
+</context>
+
+<constraints>
+- MUST detect input type before processing — wrong classification causes silent failures
+- MUST reject inputs that match none of the 3 types with a clear error message
+</constraints>
+
+<output>
+One of: `file_path`, `url`, or `description` — stored for use in Step 3.
+</output>
+```
+
 **Key rules for XML tag usage:**
 - Use consistent tag names throughout all steps in one skill — do not mix `<constraints>` and `<rules>` for the same purpose
 - Reference tags by name when pointing to them: "Using the context in `<context>` tags..." not "the context above"
 - No canonical "magic" tag names exist — Claude treats all XML tag names equally (per Anthropic docs)
-
-### 2.5 Add Tables for Decision Logic
-
-When a step has conditional behavior, use a table instead of nested if-else prose:
-
-```markdown
-| Condition | Action | Next Step |
-|-----------|--------|-----------|
-| All tests pass | Report success | Step 6 |
-| 1-2 tests fail | Attempt auto-fix | Step 5 |
-| >2 tests fail | Escalate to user | STOP |
-| Build error | Check dependencies first | Step 4.2 |
-```
-
-Tables are faster for Claude to parse than nested bullet points and reduce errors in conditional logic.
-
-### 2.6 Add Code Block Templates
-
-When a step produces output or requires specific formatting, include a template:
-
-```markdown
-Output the results in this format:
-\```
-Analysis Results:
-  Files scanned: {count}
-  Issues found: {count}
-  Severity breakdown:
-    Critical: {n}
-    Warning: {n}
-    Info: {n}
-\```
-```
-
-### 2.7 Write MUST DO / MUST NOT DO Sections
-
-Every skill ends with explicit behavioral boundaries. These are the guardrails that prevent the skill from going off-track.
-
-```markdown
-## MUST DO
-
-- Always complete Step 1 before proceeding — skipping it causes cascading errors
-- Always verify output before reporting completion
-- Always clean up temporary files created during execution
-- Run the dedup check if skill will be promoted to the hub
-
-## MUST NOT DO
-
-- MUST NOT skip the verification step — unverified output is unreliable
-- MUST NOT modify files outside the specified scope
-- MUST NOT proceed if prerequisites are not met — ask the user instead
-- MUST NOT output partial results as final — either complete the task or report what is missing
-```
 
 Rules for writing MUST DO / MUST NOT DO:
 - 4-8 items per section (fewer is better — only include non-obvious rules)
@@ -287,7 +165,7 @@ Rules for writing MUST DO / MUST NOT DO:
 - Do not repeat what the steps already say — these are for edge cases and guardrails
 - Constraints from the failure mode analysis (Step 2.3) MUST appear here with their mapped preventions
 
-### 2.8 Validate Before Saving
+### 2.7 Validate Before Saving
 
 Before writing the skill file, run through the quality checklist in Step 5.
 
@@ -409,7 +287,7 @@ Before saving the skill, validate every item. Do NOT skip this step.
 | `triggers` has 3-6 entries | Mix of slash commands and natural language |
 | `allowed-tools` is minimal | No unused tools listed. Read-only skills MUST NOT include `Write`, `Edit`, or `Bash` |
 | `argument-hint` uses `<>` and `[]` correctly | Required in angle brackets, optional in square brackets |
-| No placeholder markers | No `<!-- TODO: -->`, `<!-- FIXME: -->`, `<!-- PLACEHOLDER -->` in the body |
+| No placeholder markers | No TODO/FIXME/PLACEHOLDER HTML comment markers in the body |
 
 ### 5.2 Content Validation
 
@@ -471,9 +349,8 @@ skill-name/
 
 Generate test scenarios to validate the skill works correctly, then stress test with adversarial inputs before promoting it. Covers: 5 validation scenarios (3 happy-path + 2 edge-case), 10 adversarial inputs with severity scoring, and a stress test score gate.
 
-**Read:** `references/skill-testing.md` for detailed testing scenarios, manual testing procedure, adversarial stress testing workflow, and regression indicators.
 
----
+**Read:** `references/skill-testing.md` for detailed step 6: skill testing and stress testing reference material.
 
 ## STEP 7: Hub Promotion Workflow
 
@@ -492,7 +369,7 @@ If the skill is valuable enough to share across projects via the hub.
 | `type` field present | `workflow` or `reference` declared |
 | `allowed-tools` is least-privilege | Read-only skills don't include Write/Edit/Bash |
 | No project-specific hardcoded paths | Replace with `$ARGUMENTS` or documented placeholders |
-| No placeholder markers | No `<!-- TODO: -->` or stub content |
+| No placeholder markers | No TODO/FIXME HTML comment markers or stub content |
 | Under size limit | SKILL.md under 1000 lines; use `references/` for supplementary material |
 | No secrets or credentials | Scan for API keys, tokens, passwords |
 
@@ -513,34 +390,21 @@ If contributing from a downstream project:
 
 ---
 
-## STEP 8: Template Library and Anti-Patterns
 
-Reference material for skill authoring — extracted into separate files for size management.
+## STEP 8: Template Library
 
-### 8.1 Skill Templates
+Pre-built starting skeletons for common skill types. Copy the appropriate template and fill in the placeholders.
 
-Seven pre-built skeletons for common skill types (Workflow, Analysis, Generation, Testing, Deployment, Migration, Reference). Copy and fill in placeholders.
-
-**Read:** `references/templates.md`
-
-### 8.2 Common Anti-Patterns
-
-Eight anti-patterns to avoid: Disguised Rule, Vague Advisor, Kitchen Sink, Trigger Hog, Copy-Paste Trap, Unverified Optimist, Tool Hoarder, Missing Handoff.
-
-**Read:** `references/anti-patterns.md`
-
-### 8.3 Deprecation Workflow
-
-When replacing a skill:
-
-1. Add `deprecated: true` and `deprecated_by: replacement-name` to the old skill's frontmatter
-2. Keep the deprecated skill for 2 version cycles
-3. Update the replacement skill's description
-4. After 2 cycles, remove and update the registry
-
-MUST NOT delete a skill without the deprecation lifecycle.
+> **Reference:** See [references/skill-templates.md](references/skill-templates.md) for the full template library (Templates A-G: Workflow, Analysis, Generation, Testing, Deployment, Migration, Reference).
 
 ---
+
+## Deprecation Workflow and Anti-Patterns
+
+> **Reference:** See [references/anti-patterns.md](references/anti-patterns.md) for the deprecation lifecycle and 8 common skill anti-patterns to avoid.
+
+---
+
 
 ## MUST DO
 

@@ -2,7 +2,7 @@
 
 Pre-built starting skeletons for common skill types. Copy the appropriate template and fill in the placeholders.
 
-## Template A: Workflow Skill
+### Template A: Workflow Skill
 
 Multi-step process that transforms input to output (like `/implement`).
 
@@ -79,7 +79,7 @@ Output summary of what was done, decisions made, and any follow-up needed.
 - {Skill-specific prohibition with alternative}
 ```
 
-## Template B: Analysis Skill
+### Template B: Analysis Skill
 
 Read-only investigation that produces a report (like `/systematic-debugging`).
 
@@ -162,7 +162,7 @@ Recommendations: {prioritized list}
 - MUST NOT skip the structured report — raw observations without synthesis are not useful
 ```
 
-## Template C: Generation Skill
+### Template C: Generation Skill
 
 Creates new output artifacts (like `/brainstorm`).
 
@@ -239,7 +239,7 @@ Do NOT dump everything at once.
 - MUST NOT save output without user approval
 ```
 
-## Template D: Testing Skill
+### Template D: Testing Skill
 
 Runs tests and validates results (like `android-run-tests`).
 
@@ -337,7 +337,7 @@ Result: {PASS/FAIL}
 - MUST NOT proceed past 3 fix iterations without user input
 ```
 
-## Template E: Deployment Skill
+### Template E: Deployment Skill
 
 Builds and ships artifacts.
 
@@ -422,7 +422,7 @@ Run minimal health checks against the deployed environment:
 - MUST NOT deploy to production without explicit user confirmation
 ```
 
-## Template F: Migration Skill
+### Template F: Migration Skill
 
 Transforms code, data, or configuration from one format/version to another.
 
@@ -457,6 +457,15 @@ Structured migration with backup, validation, and rollback support.
 2. Identify patterns and variations in the source format
 3. Detect edge cases (special characters, missing fields, legacy formats)
 4. Count total items and estimate scope
+
+Report:
+\```
+Migration Scope:
+  Items to migrate: {count}
+  Patterns detected: {list}
+  Edge cases: {list}
+  Estimated effort: {assessment}
+\```
 
 ## STEP 2: Plan Migration
 
@@ -508,7 +517,7 @@ For each item:
 - MUST NOT skip the count verification (input items == output items)
 ```
 
-## Template G: Reference Skill
+### Template G: Reference Skill
 
 Knowledge base or lookup guide (like `/ai-gemini-api`). No step-by-step workflow — organized sections for quick reference.
 
@@ -564,3 +573,4 @@ Quick reference for {subject}. Look up specific topics or browse the full guide.
 - Always verify code examples against the project's actual version/configuration
 - If a pattern conflicts with project conventions, follow project conventions
 ```
+

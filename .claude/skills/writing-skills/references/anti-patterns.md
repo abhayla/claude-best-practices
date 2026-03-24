@@ -1,8 +1,30 @@
-# Skill Anti-Patterns
+# Skill Anti-Patterns and Deprecation Workflow
 
-Common mistakes when authoring skills. Avoid these.
+Common mistakes when authoring skills, and the process for deprecating old skills.
 
-## Anti-Pattern 1: The Disguised Rule
+## Deprecation Workflow
+
+When a skill is being replaced by a better version:
+
+1. **Add deprecation fields** to the old skill's frontmatter:
+   ```yaml
+   deprecated: true
+   deprecated_by: replacement-skill-name
+   ```
+
+2. **Keep the deprecated skill** for 2 version cycles — downstream projects may still reference it
+
+3. **Update the replacement skill's description** to mention it replaces the old one
+
+4. **After 2 cycles**, remove the deprecated skill and update the registry
+
+MUST NOT delete a skill without the deprecation lifecycle. Abrupt removal breaks downstream projects that depend on it.
+
+---
+
+## Common Skill Anti-Patterns
+
+### Anti-Pattern 1: The Disguised Rule
 
 **What it looks like:** A "skill" with no steps — just a list of do/don't instructions.
 
@@ -10,7 +32,7 @@ Common mistakes when authoring skills. Avoid these.
 
 **Fix:** Move it to `core/.claude/rules/{name}.md` with appropriate `globs:` frontmatter.
 
-## Anti-Pattern 2: The Vague Advisor
+### Anti-Pattern 2: The Vague Advisor
 
 **What it looks like:** Steps contain phrases like "consider the implications", "think carefully about", "ensure quality".
 
@@ -18,7 +40,7 @@ Common mistakes when authoring skills. Avoid these.
 
 **Fix:** Replace every vague phrase with a concrete action, command, or decision table.
 
-## Anti-Pattern 3: The Kitchen Sink
+### Anti-Pattern 3: The Kitchen Sink
 
 **What it looks like:** A skill with 12+ steps that tries to handle every possible scenario.
 
@@ -26,7 +48,7 @@ Common mistakes when authoring skills. Avoid these.
 
 **Fix:** Split into 2-3 focused skills, or use a primary skill that delegates to sub-skills.
 
-## Anti-Pattern 4: The Trigger Hog
+### Anti-Pattern 4: The Trigger Hog
 
 **What it looks like:** Triggers include broad terms like "help", "fix", "code", "build".
 
@@ -34,7 +56,7 @@ Common mistakes when authoring skills. Avoid these.
 
 **Fix:** Use specific, multi-word triggers. Test by asking: "Would someone say this ONLY when they want this specific skill?"
 
-## Anti-Pattern 5: The Copy-Paste Trap
+### Anti-Pattern 5: The Copy-Paste Trap
 
 **What it looks like:** Two skills that share 70%+ of their steps, with minor variations.
 
@@ -42,7 +64,7 @@ Common mistakes when authoring skills. Avoid these.
 
 **Fix:** Consolidate into one skill with modes (see `skill-factory` for an example of mode-based skills).
 
-## Anti-Pattern 6: The Unverified Optimist
+### Anti-Pattern 6: The Unverified Optimist
 
 **What it looks like:** A skill that performs actions but has no verification step. It reports success after executing commands without checking results.
 
@@ -50,7 +72,7 @@ Common mistakes when authoring skills. Avoid these.
 
 **Fix:** Every skill that modifies state MUST have a verification step that checks the actual outcome.
 
-## Anti-Pattern 7: The Tool Hoarder
+### Anti-Pattern 7: The Tool Hoarder
 
 **What it looks like:** `allowed-tools: "Bash Read Write Edit Grep Glob Agent Skill WebFetch WebSearch"`
 
@@ -58,10 +80,11 @@ Common mistakes when authoring skills. Avoid these.
 
 **Fix:** List only the tools actually used in the skill's steps. A read-only analysis skill should NOT include `Write` or `Edit`.
 
-## Anti-Pattern 8: The Missing Handoff
+### Anti-Pattern 8: The Missing Handoff
 
 **What it looks like:** A skill that ends with "Done!" but does not tell the user what to do next.
 
 **Why it fails:** Skills are often part of larger workflows. Without a handoff, the user has to figure out the next step themselves.
 
 **Fix:** End with a clear next-step recommendation: "Proceed with `/implement`" or "Review the report and decide whether to fix or defer."
+
