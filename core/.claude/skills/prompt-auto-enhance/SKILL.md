@@ -16,7 +16,7 @@ triggers:
 allowed-tools: "Read Grep Glob Skill Agent"
 argument-hint: "[prompt text to enhance manually]"
 type: workflow
-version: "1.3.0"
+version: "1.4.0"
 ---
 
 # Prompt Auto-Enhance — Strengthening & Resource CRUD Procedures
@@ -51,7 +51,7 @@ weakness found — a prompt may have multiple.
 | **CONFLICTING_CONSTRAINTS** | Prompt asks for contradictory things ("make it fast and thorough", "simple but handles all edge cases") | Identify the conflict, prioritize one, note the tradeoff |
 | **OVER_SCOPED** | Prompt asks for too many things at once; would require 5+ files changed | Break into sequential focused prompts, suggest ordering |
 | **UNDER_CONSTRAINED** | Prompt gives freedom where specificity is needed (output format, target files, approach). Apply the measurability test: "Can a reviewer objectively verify this constraint was followed?" (see `references/constraint-engineering.md`) | Add measurable constraints: format, scope boundaries, acceptance criteria. Replace vague terms ("be concise" → "under 100 words", "be thorough" → "cover all N checklist items") |
-| **MISSING_OUTPUT_SPEC** | No indication of what the result should look like | Add explicit output format (table, JSON, diff, file changes) |
+| **MISSING_OUTPUT_SPEC** | No indication of what the result should look like | Add a locked output template with named sections, explicit order, and numeric length bounds (see `references/format-locking.md`) |
 | **AMBIGUOUS_SCOPE** | Unclear which files, modules, or layers are in scope | Add explicit scope boundaries ("only in src/api/", "just the tests") |
 | **IMPLICIT_ASSUMPTIONS** | Prompt relies on assumptions that may not hold (env setup, dependencies, prior steps) | Make assumptions explicit or add verification steps |
 | **MISSING_STRUCTURE** | Complex multi-part prompt uses flat unstructured text where XML tags would improve clarity and adherence | Restructure with XML tags (see XML Tag Reference below) |
