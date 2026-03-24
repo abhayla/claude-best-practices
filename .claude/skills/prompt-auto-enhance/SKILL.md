@@ -13,10 +13,10 @@ triggers:
   - enrich prompt
   - strengthen prompt
   - fix my prompt
-allowed-tools: "Read Grep Glob WebFetch WebSearch Skill Agent"
+allowed-tools: "Read Grep Glob Skill Agent"
 argument-hint: "[prompt text to enhance manually]"
-type: reference
-version: "1.2.0"
+type: workflow
+version: "1.3.0"
 ---
 
 # Prompt Auto-Enhance — Strengthening & Resource CRUD Procedures
@@ -37,7 +37,7 @@ unambiguous instructions (e.g., "run tests", "rename X to Y", "fix the typo on l
 
 Adapted from community pattern by @heyrimsha (source: x.com/heyrimsha/status/2035995286150234480).
 
-### Strengthening Step 1: Diagnose Prompt Weaknesses
+### STEP 1: Diagnose Prompt Weaknesses
 
 Analyze the user's prompt against the failure category table. Classify every
 weakness found — a prompt may have multiple.
@@ -50,7 +50,7 @@ weakness found — a prompt may have multiple.
 | **MISSING_CONTEXT** | Prompt assumes knowledge not provided (file paths, prior decisions, domain terms) | Add explicit context: which files, which module, what prior state |
 | **CONFLICTING_CONSTRAINTS** | Prompt asks for contradictory things ("make it fast and thorough", "simple but handles all edge cases") | Identify the conflict, prioritize one, note the tradeoff |
 | **OVER_SCOPED** | Prompt asks for too many things at once; would require 5+ files changed | Break into sequential focused prompts, suggest ordering |
-| **UNDER_CONSTRAINED** | Prompt gives freedom where specificity is needed (output format, target files, approach) | Add constraints: format, scope boundaries, acceptance criteria |
+| **UNDER_CONSTRAINED** | Prompt gives freedom where specificity is needed (output format, target files, approach). Apply the measurability test: "Can a reviewer objectively verify this constraint was followed?" (see `references/constraint-engineering.md`) | Add measurable constraints: format, scope boundaries, acceptance criteria. Replace vague terms ("be concise" → "under 100 words", "be thorough" → "cover all N checklist items") |
 | **MISSING_OUTPUT_SPEC** | No indication of what the result should look like | Add explicit output format (table, JSON, diff, file changes) |
 | **AMBIGUOUS_SCOPE** | Unclear which files, modules, or layers are in scope | Add explicit scope boundaries ("only in src/api/", "just the tests") |
 | **IMPLICIT_ASSUMPTIONS** | Prompt relies on assumptions that may not hold (env setup, dependencies, prior steps) | Make assumptions explicit or add verification steps |
@@ -101,10 +101,13 @@ Anthropic uses tag names as the instruction itself in system prompts:
 - Place long context ABOVE the query (improves quality by up to 30%)
 - Do not wrap single sentences in tags — tags are for content blocks
 
+**Reference:** See [references/constraint-engineering.md](references/constraint-engineering.md) for the
+full constraint engineering methodology, measurability test table, and audit output format.
+
 If no weaknesses are found (prompt scores clean), skip to execution — do not
 force unnecessary rewrites.
 
-### Strengthening Step 2: Map Fixes
+### STEP 2: Map Fixes
 
 For each diagnosed weakness, determine the minimal structural fix. Each fix
 MUST map to exactly one failure category — no fix without a diagnosis, no
@@ -117,7 +120,7 @@ Diagnosis:
   [2] CATEGORY_NAME → specific fix description
 ```
 
-### Strengthening Step 3: Rewrite the Prompt
+### STEP 3: Rewrite the Prompt
 
 Apply all fixes to produce a strengthened version. Rules:
 - Targeted changes only — do not rewrite parts that are already clear
@@ -129,7 +132,7 @@ Apply all fixes to produce a strengthened version. Rules:
   XML Tag Reference above to select appropriate tags
 - Place long context above the query, constraints near the task definition
 
-### Strengthening Step 4: Show Before/After
+### STEP 4: Show Before/After
 
 MUST show the comparison to the user every time strengthening activates.
 This is NOT optional — visibility builds trust and helps users learn.
@@ -151,7 +154,7 @@ Proceeding with strengthened prompt...
 Update the `*Enhanced:*` indicator to include strengthening:
 `*Enhanced: prompt strengthened (N fixes), git state, 2 rules*`
 
-### Strengthening Step 5: Execute
+### STEP 5: Execute
 
 Proceed with the strengthened prompt as if the user had entered it directly.
 The rest of the auto-enhance pipeline (Tier 1/2 context, Clarification Gate,
@@ -337,27 +340,24 @@ the signals are clear.
 
 ## MUST DO
 
-- ALWAYS gather Tier 1 context before responding to any prompt
-- ALWAYS run Prompt Strengthening for non-trivial prompts before execution
-- ALWAYS show the before/after comparison table when strengthening activates — never silent
-- ALWAYS include strengthening count in the `*Enhanced:*` indicator when fixes are applied
-- ALWAYS run the Clarification Gate for ambiguous or multi-file prompts before acting
-- ALWAYS read relevant code before asking a clarification question — never ask what you can answer yourself
-- ALWAYS present the batch table when resource CRUD is detected
-- ALWAYS wait for explicit user approval before creating/updating/deleting
-- ALWAYS delegate to existing authoring tools — never generate patterns ad-hoc
-- ALWAYS follow quality standards from `pattern-structure.md`,
-  `pattern-portability.md`, `pattern-self-containment.md`
+- ALWAYS gather Tier 1 context before responding to any prompt — Why: without it, you risk duplicating existing patterns or contradicting CLAUDE.md conventions
+- ALWAYS run Prompt Strengthening for non-trivial prompts before execution — Why: vague prompts produce inconsistent outputs that require rework
+- ALWAYS show the before/after comparison table when strengthening activates — Why: silent changes erode user trust and prevent learning
+- ALWAYS include strengthening count in the `*Enhanced:*` indicator when fixes are applied — Why: signals to the user that enhancement ran, enabling feedback
+- ALWAYS run the Clarification Gate for ambiguous or multi-file prompts before acting — Why: acting on assumptions wastes effort when the guess is wrong
+- ALWAYS read relevant code before asking a clarification question — Why: asking answerable questions signals laziness and breaks flow
+- ALWAYS present the batch table when resource CRUD is detected — Why: resource changes without approval create unwanted artifacts
+- ALWAYS wait for explicit user approval before creating/updating/deleting — Why: unauthorized changes force manual cleanup and break trust
+- ALWAYS delegate to existing authoring tools — Why: ad-hoc generation bypasses quality gates and produces inconsistent patterns
+- ALWAYS apply the measurability test to constraints: "Can a reviewer objectively verify this was followed?" (see `references/constraint-engineering.md`) — Why: unmeasurable constraints produce inconsistent behavior across invocations
 
 ## MUST NOT DO
 
-- MUST NOT strengthen direct unambiguous instructions — respect explicit user intent
-- MUST NOT add complexity during strengthening that doesn't map to a diagnosed weakness
-- MUST NOT change the user's original intent during strengthening — only clarify and constrain
-- MUST NOT create, update, or delete resources without batch approval
-- MUST NOT re-prompt for rejected items in the same session
-- MUST NOT web search when local context is sufficient
-- MUST NOT generate patterns directly — use `/writing-skills`, `/claude-guardian`,
-  or `skill-author` agent
-- MUST NOT suggest resource changes when signals are ambiguous — default to
-  no CRUD and proceed normally
+- MUST NOT strengthen direct unambiguous instructions — respect explicit user intent instead — Why: over-strengthening adds latency and annoys the user
+- MUST NOT add complexity during strengthening that doesn't map to a diagnosed weakness — simplify instead — Why: unnecessary constraints degrade prompt quality
+- MUST NOT change the user's original intent during strengthening — only clarify and constrain — Why: intent drift causes the wrong task to be executed
+- MUST NOT create, update, or delete resources without batch approval — present the batch table first — Why: unauthorized resource changes create cleanup overhead
+- MUST NOT re-prompt for rejected items in the same session — drop them silently — Why: nagging after explicit rejection breaks the approval contract
+- MUST NOT web search when local context is sufficient — read code first — Why: web searches add latency and may return outdated information
+- MUST NOT generate patterns directly — use `/writing-skills`, `/claude-guardian`, or `skill-author` agent — Why: direct generation bypasses quality checklist validation
+- MUST NOT suggest resource changes when signals are ambiguous — default to no CRUD and proceed normally — Why: false positives train the user to ignore CRUD suggestions
