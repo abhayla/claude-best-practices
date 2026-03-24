@@ -38,6 +38,7 @@ When implementing features or fixing bugs, follow this structured approach:
 - Run broader test suite for regression check
 - Review changes for unintended side effects
 - Capture evidence (screenshots, test output) if applicable
+- **Pre-mortem**: For non-trivial changes, assume this causes a production issue in 3 months — what are the 2-3 most likely reasons? Address any unmitigated risks before proceeding to Step 7
 
 ### Step 7: Commit & Document
 - Write clear commit messages (conventional format)
