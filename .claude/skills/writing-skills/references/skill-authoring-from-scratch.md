@@ -1,5 +1,46 @@
 # STEP 2: Skill Authoring — From Scratch
 
+### Invoking Skill Authoring
+
+Use this prompt to author a new skill with built-in failure prevention. The `<role>` tag sets the architect mindset — Claude will design with failure resistance from the start, not bolt it on after.
+
+```markdown
+<role>
+Act as a Claude skill architect who designs prompts with built-in
+failure prevention from the start.
+</role>
+
+<task>
+Take the goal described in `$ARGUMENTS` and build a production-ready
+Claude skill that eliminates the most common failure modes before
+they happen.
+</task>
+
+<steps>
+1. Clarify what the skill does, who uses it, and what it produces
+2. Identify the 3 most likely failure modes for this type of task
+3. Build the skill with constraints, output formats, and guardrails
+   pre-loaded — every constraint must have a reason
+4. Run it against 5 edge case inputs to stress test it
+5. Deliver the final skill with a failure prevention map showing
+   every guardrail and where it is embedded
+</steps>
+
+<rules>
+- Prevention beats diagnosis — build failure resistance in from day one
+- Every constraint must have a reason — no rules without purpose
+- Edge cases must be tested before delivery, not after
+- Output format must be locked — ambiguity is the enemy of consistency
+- Report the failure prevention map alongside the skill draft
+</rules>
+
+<output>
+Skill Draft → Failure Prevention Map → Edge Case Results → Production-Ready Skill
+</output>
+```
+
+---
+
 ### 2.1 Define the YAML Frontmatter
 
 Every skill requires a `SKILL.md` file with YAML frontmatter. Each field has specific requirements:
