@@ -3280,15 +3280,15 @@
     "hash": "f6e238a17e13a82ff8ba19f6ce92b780a2b4644465b57a274bfb9fb2b829b108",
     "type": "skill",
     "category": "core",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
     "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Skill authoring guide with architect role framing, failure prevention maps, locked output formats, adversarial stress testing, and XML tag conventions",
+    "description": "Skill authoring guide with architect role framing, failure prevention maps, locked output formats, adversarial stress testing, XML tag conventions, and multi-skill decomposition for end-to-end workflows",
     "tags": [],
-    "changelog": "v2.4.0: Add architect role, failure prevention map deliverable, locked output format rule"
+    "changelog": "v2.5.0: Add multi-skill decomposition reference (Step 2.4) for turning prompts into connected skill systems with handoff contracts and checkpoint patterns"
   },
   "xml-to-compose": {
     "hash": "304619d73900a86b560810adab1b4ada3aa40f6f7cf51c5cb6030adb930690b1",

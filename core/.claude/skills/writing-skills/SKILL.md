@@ -15,7 +15,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.4.0"
+version: "2.5.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -75,7 +75,15 @@ Before writing steps and constraints, identify the 3 most likely failure modes f
 
 **Output format MUST be locked.** Every skill that produces structured output (JSON, reports, tables) MUST define the exact output format in a code block template within the output-producing step. Ambiguity in output format is the #1 cause of inconsistent skill behavior — lock it down with a concrete template, not prose descriptions.
 
-### 2.4 Structure the Steps
+### 2.4 Multi-Skill Decomposition (When One Prompt → Multiple Skills)
+
+If the prompt or workflow being authored covers a full end-to-end pipeline with 4+ distinct phases (input → processing → validation → output), decompose it into connected phase skills instead of building one monolithic skill.
+
+**Read:** `references/multi-skill-decomposition.md` for the full decomposition workflow: phase mapping, handoff contracts with XML-tagged schemas, checkpoint patterns, and end-to-end testing protocol.
+
+**Quick decision:** If the workflow has ≤3 tightly coupled steps, keep it as one skill. If it has 4+ independent phases or exceeds ~400 lines, decompose.
+
+### 2.5 Structure the Steps
 
 Steps are the core of every skill. Each step must be actionable — a verb phrase, not a vague noun.
 
@@ -169,7 +177,7 @@ Rules for writing MUST DO / MUST NOT DO:
 - Do not repeat what the steps already say — these are for edge cases and guardrails
 - Constraints from the failure mode analysis (Step 2.3) MUST appear here with their mapped preventions
 
-### 2.7 Validate Before Saving
+### 2.6 Validate Before Saving
 
 Before writing the skill file, run through the quality checklist in Step 5.
 
@@ -445,6 +453,7 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always include a `— Why:` justification on every MUST DO / MUST NOT DO item
 - Always lock the output format with a code block template for skills that produce structured output — Why: ambiguous output formats cause inconsistent behavior across invocations
 - Always produce a failure prevention map (Step 6.5) before hub promotion — Why: makes guardrails visible and auditable during review
+- Always evaluate multi-phase decomposition (Step 2.4) when a prompt covers a full end-to-end workflow — Why: monolithic skills exceeding 400 lines become hard to test, reuse, and maintain
 
 ## MUST NOT DO
 
