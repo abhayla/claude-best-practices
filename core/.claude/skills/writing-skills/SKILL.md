@@ -15,7 +15,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.3.0"
+version: "2.4.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -41,7 +41,9 @@ Parse `$ARGUMENTS` to choose the path:
 
 ## STEP 2: Skill Authoring — From Scratch
 
-Build a skill file from the ground up following the canonical format.
+<role>Act as a Claude skill architect who designs prompts with built-in failure prevention from the start.</role>
+
+Build a skill file from the ground up following the canonical format. The goal is a production-ready skill that eliminates the most common failure modes before they happen.
 
 
 **Read:** `references/skill-authoring-from-scratch.md` for detailed step 2: skill authoring — from scratch reference material.
@@ -70,6 +72,8 @@ Before writing steps and constraints, identify the 3 most likely failure modes f
 | Partial execution leaving broken state | Rollback or atomic commit | Step that modifies state |
 | Missing prerequisites | Precondition check | Step 1 |
 | Ambiguous output format | Locked output template | Output-producing step + MUST DO |
+
+**Output format MUST be locked.** Every skill that produces structured output (JSON, reports, tables) MUST define the exact output format in a code block template within the output-producing step. Ambiguity in output format is the #1 cause of inconsistent skill behavior — lock it down with a concrete template, not prose descriptions.
 
 ### 2.4 Structure the Steps
 
@@ -352,6 +356,27 @@ Generate test scenarios to validate the skill works correctly, then stress test 
 
 **Read:** `references/skill-testing.md` for detailed step 6: skill testing and stress testing reference material.
 
+## STEP 6.5: Failure Prevention Map
+
+Before promoting, produce a failure prevention map that documents every guardrail in the skill. This is the "proof of failure resistance" artifact.
+
+```
+## Failure Prevention Map: <skill-name>
+
+| # | Failure Mode | Prevention | Step Where Embedded | Constraint (MUST DO/MUST NOT DO) |
+|---|---|---|---|---|
+| 1 | <from Step 2.3> | <validation/gate/check> | Step N | "Always X — Why: Y" |
+| 2 | <from Step 2.3> | <validation/gate/check> | Step N | "MUST NOT X — do Y instead" |
+| 3 | <from Step 2.3> | <validation/gate/check> | Step N | "Always X — Why: Y" |
+
+Output format locked: <YES with template / NO — flag for fix>
+Stress test score: <N%> (from Step 6.3)
+```
+
+Present this map to the user alongside the skill draft. The map makes failure prevention layers visible and auditable — without it, guardrails are buried in the skill body and easy to miss during review.
+
+---
+
 ## STEP 7: Hub Promotion Workflow
 
 If the skill is valuable enough to share across projects via the hub.
@@ -418,6 +443,8 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always test the skill with 5 scenarios from Step 6 (3 happy-path + 2 edge-case)
 - Always complete failure mode analysis (Step 2.3) before writing constraints — prevention beats diagnosis
 - Always include a `— Why:` justification on every MUST DO / MUST NOT DO item
+- Always lock the output format with a code block template for skills that produce structured output — Why: ambiguous output formats cause inconsistent behavior across invocations
+- Always produce a failure prevention map (Step 6.5) before hub promotion — Why: makes guardrails visible and auditable during review
 
 ## MUST NOT DO
 

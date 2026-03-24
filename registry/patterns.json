@@ -3279,15 +3279,15 @@
     "hash": "f6e238a17e13a82ff8ba19f6ce92b780a2b4644465b57a274bfb9fb2b829b108",
     "type": "skill",
     "category": "core",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
     "last_updated": "2026-03-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Skill authoring guide with failure mode analysis, constraint justification, XML tag conventions, adversarial stress testing, and edge case testing",
+    "description": "Skill authoring guide with architect role framing, failure prevention maps, locked output formats, adversarial stress testing, and XML tag conventions",
     "tags": [],
-    "changelog": "v2.3.0: Add adversarial stress testing workflow with role-based invocation, severity scoring, and report format"
+    "changelog": "v2.4.0: Add architect role, failure prevention map deliverable, locked output format rule"
   },
   "xml-to-compose": {
     "hash": "304619d73900a86b560810adab1b4ada3aa40f6f7cf51c5cb6030adb930690b1",
