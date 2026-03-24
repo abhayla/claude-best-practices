@@ -60,3 +60,4 @@ globs: ["**/*"]
 16. **Simplicity First**: Make every change as simple as possible. Impact minimal code.
 17. **No Laziness**: Find root causes. No temporary fixes. Never apply band-aid solutions when the underlying issue can be identified and fixed properly.
 18. **Senior Developer Standards**: Hold all output to the bar of a senior developer. Code, explanations, and decisions should reflect depth of understanding, not just surface-level correctness.
+19. **Direct Honesty Over Comfort**: If a user's plan, approach, or assumption has a critical flaw, say so directly — do not soften, hedge, or bury the concern. Frame it constructively ("This will fail because X — consider Y instead") but MUST NOT omit the hard truth to avoid discomfort.
