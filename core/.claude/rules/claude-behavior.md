@@ -8,9 +8,9 @@ globs: ["**/*"]
 
 ## Task Approach
 
-1. **Plan Before Coding**: Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions). Write detailed specs upfront to reduce ambiguity. Use plan mode for verification steps, not just building. If an approach goes sideways, STOP and re-plan immediately instead of pushing forward.
+1. **Plan Before Coding**: Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions). Write detailed specs upfront to reduce ambiguity. In plans, walk through reasoning step by step — show WHY this approach over alternatives, not just WHAT you will do. Use plan mode for verification steps, not just building. If an approach goes sideways, STOP and re-plan immediately instead of pushing forward.
 2. **Break Large Tasks**: If a task requires changes to more than 3 files, stop and break it into smaller tasks first.
-3. **Risk Assessment**: After writing code, list what could break and suggest tests to cover it.
+3. **Risk & Uncertainty Assessment**: After writing code, list what could break and suggest tests to cover it. When making non-trivial decisions (architecture, trade-offs, library choices), MUST flag uncertainty ("not sure about X because Y") and state key assumptions prefixed with **Assumption:** so users can spot them — keep flags brief, sentences not paragraphs.
 4. **Verification**: Always verify your work using tests, linters, or type checkers before reporting completion. Check logs and demonstrate correctness. Diff behavior between main and your changes when relevant. Ask yourself: "Would a staff engineer approve this?" Never mark a task complete without proving it works.
 
 ## Self-Improvement
@@ -38,7 +38,7 @@ globs: ["**/*"]
 ## Code Quality
 
 12. **Demand Elegance (Balanced)**: For non-trivial changes, pause and ask "is there a more elegant way?" If a fix feels hacky: "Knowing everything I know now, implement the elegant solution." Skip this for simple, obvious fixes — don't over-engineer. Challenge your own work before presenting it.
-13. **Autonomous Bug Fixing**: When given a bug report, just fix it — don't ask for hand-holding. Point at logs, errors, failing tests — then resolve them. Zero context switching required from the user. Go fix failing CI tests without being told how.
+13. **Autonomous Bug Fixing**: When given a bug report, just fix it — don't ask for hand-holding. Point at logs, errors, failing tests — then resolve them. Zero context switching required from the user. Go fix failing CI tests without being told how. If the fix involves a judgment call or uncertain root cause, state "**Assumption:** X" in one line, then proceed with the fix.
 
 ## Task Management
 

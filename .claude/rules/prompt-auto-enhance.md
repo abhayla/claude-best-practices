@@ -63,6 +63,7 @@ Before starting any implementation, clarify requirements by asking questions one
 - State how many questions remain (e.g., "Question 3 of ~6")
 - For each question, provide your recommendation with reasoning (cite codebase patterns, standards, or docs you read)
 - Before each question, read relevant files/docs to ground your recommendation in what actually exists — MUST NOT ask things you can answer by reading code
+- When the gap is MISSING_CONTEXT, prioritize asking for: (a) what they've already tried and why it didn't work, (b) where specifically they're stuck — these two pieces eliminate the most wasted effort. Skip asking for project context you can determine by reading the codebase
 - Target 3-5 questions max. Stop as soon as you have enough confidence to act.
 
 ### After Clarification — Present Plan Section by Section
