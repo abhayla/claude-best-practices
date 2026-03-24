@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-24 06:17 UTC (auto-generated)
+> Last updated: 2026-03-24 07:11 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -140,7 +140,7 @@
 | prisma-orm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | project-manager-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | agent-orchestration |
 | project-scaffold | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup |
-| prompt-auto-enhance | skill | 1.2.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
+| prompt-auto-enhance | skill | 1.4.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
 | prompt-auto-enhance-rule | rule | 1.2.0 | hub:abhayla/claude-best-practices | prompt-auto-enhance |
 | prompt-enhance-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pytest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
