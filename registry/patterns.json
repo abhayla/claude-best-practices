@@ -1306,7 +1306,7 @@
     "hash": "1ff4941b5012db065476ffbeb27131729a8a844b867d49d451fc815b201514c5",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
     "last_updated": "2026-03-23",
