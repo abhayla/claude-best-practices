@@ -6,7 +6,7 @@ description: >
   Use when a session ends, after a fix succeeds, or when reviewing learning effectiveness.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: session|deep|meta|test-run>"
-version: "2.0.0"
+version: "2.2.0"
 type: workflow
 ---
 
@@ -170,6 +170,95 @@ After every 10th entry in `.claude/learnings.json`, scan for systemic patterns:
       - Sequences shorter than 3 steps
       - Sequences that match an existing skill's workflow
 
+## STEP 5.5: Inject Active Constraints into Skills
+
+Close the feedback loop: take proven learnings and propose injecting them as
+active constraints into the specific skills they relate to. This converts
+passive knowledge (recorded in `learnings.json`) into active prevention
+(embedded in skill CRITICAL RULES).
+
+**Trigger**: Only activates when a learning has `reuse_count >= 2` — proven
+recurring, not a one-off. Skip this step entirely if no learnings meet the
+threshold.
+
+### 5.5.1 Map Learnings to Skills
+
+For each learning with `reuse_count >= 2`, identify the target skill:
+
+| Learning Signal | Target Skill | Match Method |
+|---|---|---|
+| Tags match a skill name | That skill | `tags` contains skill name (e.g., `"fix-loop"`) |
+| Error occurred during a skill run | That skill | `context` mentions `/skill-name` invocation |
+| Error file matches a skill's `globs:` | That skill | File path matches skill's operational scope |
+| No skill match found | Skip | Record as general learning, do not force-fit |
+
+```bash
+# Find learnings eligible for constraint injection
+python3 -c "
+import json
+learnings = json.load(open('.claude/learnings.json'))
+eligible = [l for l in learnings.get('learnings', []) if l.get('reuse_count', 0) >= 2]
+for l in eligible:
+    print(f\"  {l['id']}: reuse={l['reuse_count']} tags={l.get('tags', [])} lesson={l['lesson'][:80]}\")
+print(f'Total eligible: {len(eligible)}')
+"
+```
+
+### 5.5.2 Draft Constraint Proposal
+
+For each mapped learning, draft a constraint in the target skill's voice:
+
+```
+Constraint Injection Proposal:
+  Learning: L007 (reuse_count: 3)
+  Lesson: "Always validate ORM query results before accessing attributes"
+  Target skill: /systematic-debugging
+  Proposed addition to CRITICAL RULES:
+
+    - When diagnosing null/undefined errors on ORM objects, check query results
+      FIRST — 60% of these are missing null guards, not logic bugs.
+      Evidence: L007 (seen 3 times across sessions)
+
+  Action: Add to systematic-debugging/SKILL.md MUST DO section? (requires user approval)
+```
+
+### 5.5.3 Approval Gate
+
+MUST NOT modify any skill file without explicit user approval. Present all
+proposals in a batch:
+
+```
+Active Constraint Proposals (N total):
+
+| # | Learning | Target Skill | Proposed Constraint | Reuse Count |
+|---|----------|-------------|-------------------|-------------|
+| 1 | L007     | /systematic-debugging | Check ORM null guards first | 3 |
+| 2 | L012     | /fix-loop | Skip retry if error is import-related | 2 |
+
+Apply all / Select individually / Skip all?
+```
+
+If approved, append the constraint to the target skill's `MUST DO` or
+`CRITICAL RULES` section with an evidence tag linking back to the learning ID.
+
+### 5.5.4 Record Injection
+
+After injection, update the learning entry:
+
+```json
+{
+  "id": "L007",
+  "injected_into": "systematic-debugging",
+  "injected_date": "2026-03-23",
+  "constraint_text": "Check ORM null guards first when diagnosing null errors"
+}
+```
+
+This prevents re-proposing the same constraint in future sessions.
+
+> **Reference:** See [references/self-improving-skill-design.md](references/self-improving-skill-design.md)
+> for the design philosophy behind feedback-as-active-constraints.
+
 ## STEP 6: Report
 
 ```
@@ -238,3 +327,6 @@ This keeps learning semi-automatic — the hook reminds Claude to run the skill 
 - Date-stamp all new entries
 - Cross-reference with existing patterns before adding
 - In `test-run` mode, only show what would change — don't write
+- MUST NOT inject constraints into skills without explicit user approval (Step 5.5.3)
+- MUST NOT inject constraints from learnings with `reuse_count < 2` — one-off errors are not patterns
+- MUST record injection metadata in the learning entry to prevent re-proposing (Step 5.5.4)
