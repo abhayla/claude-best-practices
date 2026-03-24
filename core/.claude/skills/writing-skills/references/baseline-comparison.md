@@ -2,6 +2,62 @@
 
 Reference material for Step 6.4 (Baseline Comparison Testing).
 
+## Procedure
+
+### 6.4.1 Select 5 Test Inputs
+
+Choose inputs that cover the skill's operational range:
+
+| Input # | Type | Selection Criteria |
+|---|---|---|
+| 1-2 | Happy path | Common, straightforward invocations |
+| 3 | Edge case | Boundary condition or unusual input |
+| 4 | Past failure | An input that previously triggered a known issue |
+| 5 | Adversarial | Deliberately tricky input (from Step 6.3 stress test) |
+
+If the skill has entries in `.claude/learnings.json`, use the error contexts
+from those learnings as inputs 4 and 5.
+
+### 6.4.2 Run Baseline
+
+Execute the **original** skill (before your changes) against all 5 inputs.
+Record output quality on 4 dimensions:
+
+| Dimension | Score (1-5) | What to Assess |
+|---|---|---|
+| Correctness | | Did it produce the right output? |
+| Completeness | | Did it cover all aspects of the input? |
+| Constraint adherence | | Did it follow its own MUST DO / MUST NOT DO rules? |
+| Failure handling | | Did it degrade gracefully on edge/adversarial inputs? |
+
+### 6.4.3 Run Enhanced Version
+
+Execute the **modified** skill against the same 5 inputs. Score on the same
+4 dimensions.
+
+### 6.4.4 Compare and Gate
+
+```
+Baseline Comparison: <skill-name>
+
+| Input | Dimension | Baseline | Enhanced | Delta |
+|-------|-----------|----------|----------|-------|
+| 1     | Correctness | 4 | 5 | +1 |
+| 1     | Completeness | 4 | 4 | 0 |
+| ...   | ... | ... | ... | ... |
+
+Summary:
+  Improvements: N dimensions improved
+  Regressions: M dimensions regressed
+  Net score: baseline=X enhanced=Y (delta: +/-Z)
+
+Gate: PASS (no regressions) / FAIL (M regressions detected)
+```
+
+**Gate rule**: Enhanced version MUST NOT regress on any dimension for any input.
+A single regression blocks promotion — fix the enhancement or accept the
+trade-off with explicit user approval.
+
 ## Design Philosophy
 
 When enhancing a skill with new constraints or feedback-driven improvements,

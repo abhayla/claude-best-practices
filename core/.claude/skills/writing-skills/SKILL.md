@@ -368,67 +368,15 @@ Generate test scenarios to validate the skill works correctly, then stress test 
 
 When enhancing an existing skill (adding constraints, feedback loops, or
 structural changes), run the original and enhanced versions against the same
-inputs to prove the enhancement helps without regressing quality.
+5 inputs to prove the enhancement helps without regressing quality. Triggers
+when modifying an existing skill's constraints/steps/CRITICAL RULES — not for
+brand-new skills.
 
-**When to trigger**: Any time you modify an existing skill's constraints, steps,
-or CRITICAL RULES — not for brand-new skills (no baseline exists).
+**Gate rule**: Enhanced version MUST NOT regress on any scoring dimension for
+any input. A single regression blocks promotion.
 
-#### 6.4.1 Select 5 Test Inputs
-
-Choose inputs that cover the skill's operational range:
-
-| Input # | Type | Selection Criteria |
-|---|---|---|
-| 1-2 | Happy path | Common, straightforward invocations |
-| 3 | Edge case | Boundary condition or unusual input |
-| 4 | Past failure | An input that previously triggered a known issue |
-| 5 | Adversarial | Deliberately tricky input (from Step 6.3 stress test) |
-
-If the skill has entries in `.claude/learnings.json`, use the error contexts
-from those learnings as inputs 4 and 5.
-
-#### 6.4.2 Run Baseline
-
-Execute the **original** skill (before your changes) against all 5 inputs.
-Record output quality on 4 dimensions:
-
-| Dimension | Score (1-5) | What to Assess |
-|---|---|---|
-| Correctness | | Did it produce the right output? |
-| Completeness | | Did it cover all aspects of the input? |
-| Constraint adherence | | Did it follow its own MUST DO / MUST NOT DO rules? |
-| Failure handling | | Did it degrade gracefully on edge/adversarial inputs? |
-
-#### 6.4.3 Run Enhanced Version
-
-Execute the **modified** skill against the same 5 inputs. Score on the same
-4 dimensions.
-
-#### 6.4.4 Compare and Gate
-
-```
-Baseline Comparison: <skill-name>
-
-| Input | Dimension | Baseline | Enhanced | Delta |
-|-------|-----------|----------|----------|-------|
-| 1     | Correctness | 4 | 5 | +1 |
-| 1     | Completeness | 4 | 4 | 0 |
-| ...   | ... | ... | ... | ... |
-
-Summary:
-  Improvements: N dimensions improved
-  Regressions: M dimensions regressed
-  Net score: baseline=X enhanced=Y (delta: +/-Z)
-
-Gate: PASS (no regressions) / FAIL (M regressions detected)
-```
-
-**Gate rule**: Enhanced version MUST NOT regress on any dimension for any input.
-A single regression blocks promotion — fix the enhancement or accept the
-trade-off with explicit user approval.
-
-> **Reference:** See [references/baseline-comparison.md](references/baseline-comparison.md)
-> for the design philosophy behind evidence-triggered skill improvement.
+**Read:** `references/baseline-comparison.md` for the full procedure (input
+selection, scoring dimensions, comparison template) and design philosophy.
 
 ## STEP 6.5: Failure Prevention Map
 
