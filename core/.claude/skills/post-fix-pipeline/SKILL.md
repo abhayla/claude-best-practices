@@ -6,7 +6,7 @@ description: >
   succeeds to complete the post-fix workflow. Does NOT re-run tests.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[fixes_applied] [commit_format] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "2.0.0"
+version: "3.0.0"
 type: workflow
 ---
 
@@ -45,11 +45,28 @@ Finalize verified changes: documentation, commit, and learning capture.
    - If any `overrides` exist (passed tests overridden to FAILED) → BLOCK.
    - Report which tests were visually overridden.
 
+4. **Screenshot verdict gate (defense-in-depth):** Read `test-results/auto-verify.json`
+   failures array. If ANY failure has `verdict_source: "screenshot"`, BLOCK commit.
+   This is redundant with auto-verify's own verdict (screenshot FAILED already
+   means auto-verify FAILED), but serves as an independent safety check — two
+   gates must agree before code is committed.
+
 ```bash
 if [ -f test-results/auto-verify.json ]; then
   UPSTREAM_RESULT=$(python3 -c "import json; print(json.load(open('test-results/auto-verify.json'))['result'])")
   if [ "$UPSTREAM_RESULT" = "FAILED" ]; then
     echo "BLOCKED: auto-verify reported FAILED"
+    exit 1
+  fi
+  # Defense-in-depth: check for screenshot-verdict failures even if result is PASSED
+  SCREENSHOT_FAILURES=$(python3 -c "
+import json
+d = json.load(open('test-results/auto-verify.json'))
+failures = [f for f in d.get('failures', []) if f.get('verdict_source') == 'screenshot']
+print(len(failures))
+")
+  if [ "$SCREENSHOT_FAILURES" -gt 0 ]; then
+    echo "BLOCKED: $SCREENSHOT_FAILURES UI test(s) failed screenshot verification"
     exit 1
   fi
   echo "auto-verify result: $UPSTREAM_RESULT — proceeding"

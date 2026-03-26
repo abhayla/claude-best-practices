@@ -7,7 +7,7 @@ description: >
   visual regression pipelines.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<screenshot-path or directory> [--update-baselines] [--strict] [--threshold=N] [--proof-mode --run-id=<id>]"
-version: "1.1.0"
+version: "2.0.0"
 type: workflow
 ---
 
@@ -54,12 +54,77 @@ Ensure files are:
 - Valid image format (PNG, JPG, etc.)
 - Recently created/modified
 
+## STEP 1.5: Verification Strategy Selection
+
+For each screenshot, determine the verification strategy in priority order:
+
+```
+For each screenshot:
+  1. Check for baseline at baselines/{test_name}.png
+     → If exists: use BASELINE COMPARISON (pixel/AI diff — see Step 3)
+  2. Check for text hint:
+     a. In manifest entry: screenshots[].visual_expectation field
+     b. In visual-tests.yml: expectations.{test_name}.description
+     → If exists: use TEXT-HINT AI REVIEW (see Step 2, text-hint mode)
+  3. If neither baseline nor text hint exists:
+     → Use GENERIC AI REVIEW (see Step 2, generic mode)
+```
+
+| Strategy | Precision | Setup Required | Best For |
+|----------|-----------|----------------|----------|
+| Baseline comparison | Highest — pixel-level or AI semantic diff | Baseline screenshots must be committed | Stable UI, design system components |
+| Text-hint AI review | High — verifies specific expected elements | One-line description per test | Dynamic pages, data-driven screens |
+| Generic AI review | Medium — catches obvious failures only | None | First-run, prototype, exploratory tests |
+
+### visual-tests.yml Expectations Format
+
+Projects can define per-test visual expectations in `visual-tests.yml`:
+
+```yaml
+# visual-tests.yml (optional — placed in project root)
+expectations:
+  test_login_page:
+    description: "Login form with email and password fields, submit button enabled"
+  test_dashboard:
+    description: "3 chart widgets populated with data, sidebar navigation visible"
+  test_checkout_flow:
+    description: "Order summary with item list, total price, and payment button"
+
+# Override UI test detection (optional)
+ui_test_patterns:
+  include: ["tests/e2e/**", "tests/visual/**"]
+  exclude: ["tests/e2e/api_only/**"]
+```
+
+### Per-Test Verdict Return (when invoked by tester-agent)
+
+When this skill is invoked by `tester-agent` for per-test screenshot verification
+(not batch mode), return a single structured verdict:
+
+```json
+{
+  "test": "test_name",
+  "verdict": "PASSED|FAILED",
+  "confidence": "HIGH|MEDIUM|LOW",
+  "strategy": "baseline|text_hint|generic_ai",
+  "reason": "One-line explanation of verdict"
+}
+```
+
+Confidence levels:
+- **HIGH** — baseline match within threshold, or AI review with clear pass/fail signals
+- **MEDIUM** — AI review with some ambiguity (e.g., partial data load, borderline layout)
+- **LOW** — generic AI review with no baseline or text hint to compare against
+
 ## STEP 2: Content Analysis
 
 Use multimodal Read to analyze each screenshot:
 
 1. Read the image file to view its contents
-2. Check for:
+2. **If text hint available (from Step 1.5):** Verify the screenshot matches the
+   specific description. Check each element mentioned in the hint is present
+   and correctly rendered. Report which elements match and which are missing.
+3. **If no text hint (generic mode):** Check for:
    - Expected UI elements are visible
    - No error dialogs or crash screens
    - Text is readable and not truncated
@@ -395,3 +460,6 @@ visual-components:
 - Use masks for dynamic content — never disable visual tests because of timestamps or ads
 - In CI, always upload diff artifacts on failure so reviewers can inspect without re-running
 - When baselines are missing for a new screenshot, flag it as "needs baseline" rather than silently passing
+- When invoked by tester-agent for per-test verdict, return a single PASSED/FAILED verdict with confidence and one-line reason — do not produce a full report
+- Verification strategy priority is ALWAYS: baseline > text hint > generic AI — never skip a higher-priority strategy when available
+- For text-hint verification, every element mentioned in the description MUST be checked — partial matches are FAILED with the missing elements listed

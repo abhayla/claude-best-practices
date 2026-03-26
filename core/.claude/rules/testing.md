@@ -415,19 +415,34 @@ Written by `tester-agent` after test execution. Field types annotated.
       "test": "test_login_success",
       "file": "tests/e2e/test_auth.py::test_login_success",
       "result": "PASSED",
+      "verdict_source": "screenshot",
       "screenshot": "screenshots/test_login_success.pass.png",
       "platform": "playwright-chromium",
       "timestamp": "2026-03-17T14:30:12Z",
-      "iteration": null
+      "iteration": null,
+      "visual_expectation": "Login form with email and password fields, submit button enabled"
     },
     {
       "test": "test_checkout_flow",
       "file": "tests/e2e/test_checkout.py::test_checkout_flow",
       "result": "FAILED",
+      "verdict_source": "screenshot",
       "screenshot": "screenshots/test_checkout_flow.iter2.fail.png",
       "platform": "playwright-chromium",
       "timestamp": "2026-03-17T14:30:45Z",
-      "iteration": 2
+      "iteration": 2,
+      "visual_expectation": null
+    },
+    {
+      "test": "test_calculate_total",
+      "file": "tests/unit/test_math.py::test_calculate_total",
+      "result": "PASSED",
+      "verdict_source": "exit_code",
+      "screenshot": null,
+      "platform": "pytest",
+      "timestamp": "2026-03-17T14:30:50Z",
+      "iteration": null,
+      "visual_expectation": null
     }
   ]
 }
@@ -442,10 +457,12 @@ Written by `tester-agent` after test execution. Field types annotated.
 | `screenshots[].test` | string | yes | Test function name |
 | `screenshots[].file` | string | yes | Test file path with function |
 | `screenshots[].result` | enum | yes | `"PASSED"` or `"FAILED"` |
-| `screenshots[].screenshot` | string | yes | Relative path to PNG file |
+| `screenshots[].verdict_source` | enum | yes | `"screenshot"` (UI tests — authoritative) or `"exit_code"` (non-UI tests) |
+| `screenshots[].screenshot` | string\|null | yes | Relative path to PNG file (null for non-UI tests without capture-proof) |
 | `screenshots[].platform` | string | yes | Platform that captured this |
 | `screenshots[].timestamp` | string | yes | ISO-8601 capture time |
 | `screenshots[].iteration` | number\|null | yes | Fix-loop iteration (null if not from fix-loop) |
+| `screenshots[].visual_expectation` | string\|null | yes | Text hint for AI verification (from visual-tests.yml or null) |
 
 #### Visual Review Schema
 
@@ -467,6 +484,7 @@ A summary is also embedded in `test-results/auto-verify.json` via the
     {
       "test": "test_dashboard_loads",
       "original_result": "PASSED",
+      "verdict_source": "screenshot",
       "visual_verdict": "FAILED",
       "reason": "Empty table — no data rows visible",
       "screenshot": "screenshots/test_dashboard_loads.pass.png"
@@ -476,6 +494,7 @@ A summary is also embedded in `test-results/auto-verify.json` via the
     {
       "test": "test_login_timeout",
       "original_result": "FAILED",
+      "verdict_source": "exit_code",
       "visual_observation": "Screenshot shows successful login — possible flaky",
       "screenshot": "screenshots/test_login_timeout.fail.png"
     }
@@ -493,6 +512,33 @@ A summary is also embedded in `test-results/auto-verify.json` via the
 
 `/post-fix-pipeline` reads `test-evidence/{run_id}/visual-review.json` directly
 and blocks commit if any overrides exist.
+
+#### UI Test Classification
+
+The tester-agent auto-detects UI tests by scanning imports. A test is classified
+as UI (requiring screenshot-as-verdict) if it imports ANY of these frameworks:
+
+| Import Pattern | Framework | Platform |
+|---------------|-----------|----------|
+| `playwright` / `@playwright/test` | Playwright | Web |
+| `selenium` / `webdriver` | Selenium | Web |
+| `cypress` | Cypress | Web |
+| `detox` | Detox | React Native |
+| `maestro` | Maestro | Mobile |
+| `androidx.test.espresso` | Espresso | Android |
+| `androidx.compose.ui.test` | Compose Test | Android |
+| `flutter_test` / `integration_test` | Flutter Test | Flutter |
+| `puppeteer` | Puppeteer | Web |
+| `webdriverio` / `wdio` | WebdriverIO | Web |
+
+**Override:** If `visual-tests.yml` exists in the project root, its
+`ui_test_patterns.include` / `exclude` globs override import scanning.
+
+**Verdict authority:**
+- UI tests (`verdict_source: "screenshot"`): screenshot verification is the
+  authoritative pass/fail signal. Exit code is logged but not authoritative.
+- Non-UI tests (`verdict_source: "exit_code"`): exit code is authoritative.
+  Screenshots are supplementary evidence only (when `--capture-proof` enabled).
 
 #### Integration with Stage Gate Aggregator
 

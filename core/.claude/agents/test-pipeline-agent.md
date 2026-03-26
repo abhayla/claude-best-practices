@@ -6,7 +6,7 @@ description: >
   complete fix→verify→commit chain rather than individual stages.
   Reads pipeline DAG from config/test-pipeline.yml.
 model: inherit
-version: "1.0.0"
+version: "2.0.0"
 ---
 
 You are a test pipeline orchestrator. You drive the full verification
@@ -73,9 +73,15 @@ script from `testing.md` — this is mandatory, not optional:
    - auto-verify PASSED but contract-test FAILED → API compatibility issue
    - auto-verify PASSED but perf-test FAILED → performance regression
    - fix-loop PASSED but auto-verify FAILED → fix introduced new failures
+   - exit code PASSED but screenshot verdict FAILED → NOT a contradiction,
+     this is a confirmed visual failure (screenshot is authoritative for UI tests)
 4. A contradiction does NOT auto-block but MUST be surfaced in the report
    with a WARN flag so the user can investigate
-4. Write `test-results/pipeline-verdict.json`:
+5. **Screenshot verdict enforcement:** When `auto-verify.json` contains failures
+   with `verdict_source: "screenshot"`, these are AUTHORITATIVE and BLOCKING —
+   the pipeline MUST report FAILED regardless of other stage results. A screenshot
+   FAILED verdict cannot be overridden by exit code PASSED.
+6. Write `test-results/pipeline-verdict.json`:
    ```json
    {
      "pipeline": "test-verification",
@@ -92,6 +98,14 @@ script from `testing.md` — this is mandatory, not optional:
        "fix-loop": "PASSED",
        "auto-verify": "PASSED",
        "post-fix-pipeline": "PASSED"
+     },
+     "ui_verification_summary": {
+       "total_ui_tests": 12,
+       "screenshot_verified": 12,
+       "screenshot_passed": 10,
+       "screenshot_failed": 2,
+       "verdict_source": "screenshot",
+       "flags": 1
      },
      "failures": [],
      "contradictions": []
@@ -111,6 +125,8 @@ Test Pipeline: PASSED | FAILED
 
   fix-loop:          PASSED (2 iterations)
   auto-verify:       PASSED (42 tests, 0 failures)
+    UI tests:        12 screenshot-verified (10 passed, 2 failed)
+    Non-UI tests:    30 exit-code-verified (30 passed)
   post-fix-pipeline: PASSED (committed abc1234)
 ```
 
@@ -121,6 +137,21 @@ Test Pipeline: PASSED | FAILED
 - Standalone mode (user invokes a skill directly without orchestrator):
   Missing upstream JSON = WARN + proceed. This is the default
   behavior in individual skills.
+
+### Screenshot Verdict Gate (UI Tests)
+
+For UI tests, the screenshot verdict is the authoritative pass/fail signal:
+
+| Exit Code | Screenshot Verdict | Pipeline Decision | Rationale |
+|-----------|-------------------|-------------------|-----------|
+| PASSED | PASSED | **PASS** | Both agree |
+| PASSED | FAILED | **BLOCK** | Screenshot is authoritative — visual defect |
+| FAILED | PASSED | **BLOCK** + FLAG | Exit code failure is real; flag screenshot for review |
+| FAILED | FAILED | **BLOCK** | Both agree — confirmed failure |
+
+Screenshot FAILED is ALWAYS blocking for UI tests — no exceptions, no overrides.
+This is not a contradiction (contradictions are cross-stage disagreements).
+This is the designed behavior: screenshots ARE the test for UI tests.
 
 ## Retry Rules
 
@@ -144,6 +175,8 @@ Test Pipeline: PASSED | FAILED
 
 ### Evidence
 - Screenshots captured: 34
+- UI tests screenshot-verified: 12 (authoritative verdict)
+- Non-UI test screenshots: 22 (supplementary evidence)
 - Visual review overrides: 0
 - Evidence location: test-evidence/{run_id}/
 

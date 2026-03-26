@@ -2073,13 +2073,28 @@ def provision_to_local(
         print(f"  Auto-updated {len(auto_updated)} stale patterns")
     if sync_class["project-only"]:
         print(f"  Skipped {len(sync_class['project-only'])} project-customized patterns")
+    conflict_overwritten = []
     if sync_class["conflict"]:
-        print(f"  CONFLICTS: {len(sync_class['conflict'])} patterns changed in both hub and project:")
+        print(f"\n  CONFLICTS: {len(sync_class['conflict'])} pattern(s) changed in both hub and project:")
         for item in sync_class["conflict"]:
-            print(f"    - {item['name']} ({item['type']})")
+            print(f"\n    {item['name']} ({item['type']})")
+            print(f"      Hub hash:     {item['hub_hash'][:12]}...")
+            print(f"      Project hash: {item['project_hash'][:12]}...")
+            while True:
+                choice = input("      [o]verwrite with hub version / [s]kip (keep project version)? ").strip().lower()
+                if choice in ("o", "overwrite"):
+                    overwritten = update_improved_to_local(hub_root, target_dir, [item])
+                    conflict_overwritten.extend(overwritten)
+                    print(f"      -> Overwritten with hub version")
+                    break
+                elif choice in ("s", "skip"):
+                    print(f"      -> Kept project version")
+                    break
+                else:
+                    print("      Please enter 'o' (overwrite) or 's' (skip)")
 
-    # Update manifest with all synced files (missing copies + auto-updates)
-    all_synced = copied + auto_updated
+    # Update manifest with all synced files (missing copies + auto-updates + conflict overwrites)
+    all_synced = copied + auto_updated + conflict_overwritten
     manifest = update_manifest_after_sync(manifest, all_synced, hub_root)
 
     # Also record up-to-date and project-only files in manifest (they're already synced)
@@ -2120,6 +2135,7 @@ def provision_to_local(
         "conflicts": [
             {"name": i["name"], "type": i["type"]} for i in sync_class["conflict"]
         ],
+        "conflict_overwritten": conflict_overwritten,
         "claude_md": claude_md_status,
         "claude_local_md": claude_local_status,
         "settings_json": settings_status,

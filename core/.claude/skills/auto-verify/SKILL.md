@@ -6,7 +6,7 @@ description: >
   Use after making code changes to verify correctness before committing.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
 argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "2.0.0"
+version: "3.0.0"
 type: workflow
 ---
 
@@ -95,11 +95,14 @@ are reported in the final auto-verify output as warnings.
 ## STEP 2: Execute Tests (via tester-agent)
 
 Delegate test execution to `tester-agent`, which provides:
+- **UI test detection** — auto-classifies tests by scanning imports for UI frameworks
+- **Per-test screenshot verification (UI tests)** — runs each UI test individually,
+  captures screenshot, verifies via AI/baseline, records screenshot-based verdict
+- **Batch execution (non-UI tests)** — standard batch run with exit-code verdicts
 - Smart test ordering (CRITICAL risk first, then HIGH, MEDIUM, LOW)
-- Verdict rules: FAILED if ANY test fails, FAILED if skip rate >10%,
-  FAILED on ResourceWarning or unclosed connections
+- Verdict rules: UI tests use screenshot verdict; non-UI use exit codes
 - Isolated re-run of failures to detect test pollution
-- Structured output with pass/fail/skip/flaky breakdown
+- Structured output with pass/fail/skip/flaky breakdown and verdict_source per test
 
 ```
 Agent("tester-agent", prompt="Run these tests and provide a verdict.
@@ -112,11 +115,21 @@ $OVERALL_RISK
 
 Options:
 - Full suite: $FULL_SUITE
-- Capture proof: $CAPTURE_PROOF
+- Run ID: $RUN_ID
 
-If --capture-proof is enabled, configure the test runner to capture a
-screenshot after every test (pass and fail). Store screenshots in
-test-evidence/{run_id}/screenshots/ with naming:
+IMPORTANT — UI Test Screenshot Verification:
+1. Classify each test file as UI or non-UI by scanning imports
+   (see your UI Test Detection rules). If visual-tests.yml exists
+   in the project root, use its patterns instead of import scanning.
+2. For UI tests: execute the Per-Test Screenshot Orchestration loop —
+   run one test at a time, capture screenshot, verify screenshot
+   (baseline first, then text hint, then generic AI review),
+   record verdict with verdict_source: 'screenshot'.
+   Screenshot verification is MANDATORY and ALWAYS ON for UI tests.
+3. For non-UI tests: run batch execution with exit-code verdicts,
+   verdict_source: 'exit_code'.
+
+Screenshot storage: test-evidence/{run_id}/screenshots/
   {test_name}.{pass|fail}.png
 
 Use the project's test runner (detect from CLAUDE.md, pyproject.toml,
@@ -124,21 +137,32 @@ package.json, or build.gradle). Run targeted tests first unless
 risk >= HIGH or --full-suite specified.
 
 Return: verdict (PASSED/FAILED), test counts, failure details,
-screenshot manifest (if capture-proof enabled).")
+ui_test_count, screenshot manifest, per-test verdict_source.")
 ```
 
-After `tester-agent` returns:
+After `tester-agent` returns, the agent provides TWO verdict dimensions:
 
-1. If verdict is **FAILED** → proceed to STEP 3 (evaluate results, report)
-2. If verdict is **PASSED** → proceed to STEP 2.5 (visual review) or STEP 4 (quality gates)
+| Verdict | Source | Authoritative For |
+|---------|--------|-------------------|
+| `ui_verdict` | Screenshot verification | UI tests |
+| `code_verdict` | Exit codes | Non-UI tests |
+
+1. If EITHER verdict is **FAILED** → proceed to STEP 3 (evaluate results, report)
+2. If BOTH verdicts are **PASSED** → proceed to STEP 2.5 (confirmation review) then STEP 4
 3. Record the agent's screenshot manifest in `test-evidence/{run_id}/manifest.json`
 
 ---
 
-## STEP 2.5: Visual Proof Review (if --capture-proof enabled)
+## STEP 2.5: Visual Proof Review
 
-Skip this step entirely if `--capture-proof` is not enabled or `--no-capture-proof`
-was passed.
+**For UI tests:** This step is MANDATORY and ALWAYS runs. It serves as a
+confirmation pass — the tester-agent already verified each screenshot inline,
+and this step batch-reviews the verdicts for consistency and catches edge cases.
+`--capture-proof` / `--no-capture-proof` flags do NOT affect UI test screenshots.
+
+**For non-UI tests:** Skip this step if `--capture-proof` is not enabled or
+`--no-capture-proof` was passed. When enabled for non-UI tests, it provides
+supplementary visual evidence (not authoritative).
 
 ### 2.5.1 Read Manifest
 
@@ -183,8 +207,20 @@ For EVERY screenshot in the manifest (100% review rate):
 
 3. **Classify** each screenshot:
 
-| Test Result | Visual Assessment | Verdict | Action |
-|-------------|-------------------|---------|--------|
+**UI tests (verdict_source: "screenshot")** — tester-agent already set the
+verdict from screenshot. This pass confirms or catches edge cases:
+
+| Tester Verdict | Confirmation Review | Action |
+|----------------|-------------------|--------|
+| PASSED | Confirms correct | No action — verdict stands |
+| PASSED | Spots missed issue | OVERRIDE → FAILED (add to overrides) |
+| FAILED | Confirms failure | No action — verdict stands |
+| FAILED | Looks actually correct | FLAG for review (possible AI triage error) |
+
+**Non-UI tests (verdict_source: "exit_code")** — screenshot is supplementary:
+
+| Exit Code | Visual Assessment | Verdict | Action |
+|-----------|-------------------|---------|--------|
 | PASSED | Looks correct | CONFIRMED | No action |
 | PASSED | Shows problems | OVERRIDE → FAILED | Add to overrides list |
 | FAILED | Shows the failure | CONFIRMED | Enrich failure diagnosis |
@@ -242,13 +278,31 @@ If visual review `result` is PASSED:
 
 ## STEP 3: Evaluate Results
 
-After test execution (and visual review if enabled):
+After test execution and visual review:
 
-1. **All tests pass** (and no visual overrides) → proceed to STEP 4 (quality gates)
+### Verdict Logic by Test Type
+
+| Test Type | Primary Verdict Source | Secondary Signal |
+|-----------|----------------------|------------------|
+| UI test | Screenshot verification (from tester-agent) | Exit code (logged, not authoritative) |
+| Non-UI test | Exit code | Screenshot (if captured, supplementary only) |
+
+### Verdict Combinations for UI Tests
+
+| Exit Code | Screenshot Verdict | Final Result | Rationale |
+|-----------|-------------------|--------------|-----------|
+| PASSED | PASSED | **PASSED** | Both agree — confident pass |
+| PASSED | FAILED | **FAILED** | Screenshot is authoritative — visual defect detected |
+| FAILED | PASSED | **FAILED** + FLAG | Still failed (exit code indicates code issue), but flag for review — possible assertion bug or timing issue |
+| FAILED | FAILED | **FAILED** | Both agree — confirmed failure |
+
+### Decision Flow
+
+1. **All tests pass** (UI screenshot verdicts + non-UI exit codes, and no visual overrides) → proceed to STEP 4 (quality gates)
 2. **Any test fails:**
-   - Classify each failure using the test output (category, file, message)
+   - Classify each failure using the test output AND verdict_source (category, file, message)
    - Check for pre-existing failures using git-stash verification (see below)
-   - Report FAILED with detailed failure list
+   - Report FAILED with detailed failure list including verdict_source per test
    - Do NOT attempt fixes — fixing belongs in `/fix-loop` upstream
 
 ### Pre-Existing Failure Detection
@@ -328,7 +382,10 @@ Write machine-readable results to `test-results/auto-verify.json`:
     "passed": "<passed_count>",
     "failed": "<failed_count>",
     "skipped": "<skipped_count>",
-    "flaky": "<flaky_count>"
+    "flaky": "<flaky_count>",
+    "ui_tests": "<ui_test_count>",
+    "ui_tests_screenshot_verified": "<count verified via screenshot>",
+    "non_ui_tests": "<non_ui_test_count>"
   },
   "change_scope": {
     "source_files": "<count from regression-test>",
@@ -347,13 +404,25 @@ Write machine-readable results to `test-results/auto-verify.json`:
     "result": "PASSED|FAILED",
     "evidence_dir": "test-evidence/{run_id}/"
   },
-  "failures": [],
+  "failures": [
+    {
+      "test": "test_name",
+      "verdict_source": "screenshot|exit_code",
+      "category": "VISUAL_DEFECT|ASSERTION_FAILURE|...",
+      "file": "tests/test_file.py:42",
+      "message": "description",
+      "confidence": "HIGH|MEDIUM|LOW"
+    }
+  ],
   "warnings": [],
   "duration_ms": "<elapsed>"
 }
 ```
 
-If `--capture-proof` was not enabled, the `visual_review` field is:
+**For UI tests:** `visual_review` is ALWAYS populated (mandatory). The `failures`
+array includes `verdict_source: "screenshot"` for each UI test failure.
+
+**For non-UI tests:** If `--capture-proof` was not enabled:
 ```json
 "visual_review": {
   "enabled": false
