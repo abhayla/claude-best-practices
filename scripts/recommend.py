@@ -941,12 +941,22 @@ def build_sync_classification(
 
 
 def _resolve_resource_files(claude_dir: Path, name: str, resource_type: str) -> list[Path]:
-    """Resolve all files for a resource. Returns empty list if not found."""
+    """Resolve all files for a resource. Returns empty list if not found.
+
+    For skills, SKILL.md is always the primary file (index 0) — sync
+    classification uses the primary file to detect hub-vs-project drift.
+    """
     if resource_type == "skill":
         skill_dir = claude_dir / "skills" / name
         if not skill_dir.is_dir():
             return []
-        return sorted(f for f in skill_dir.rglob("*") if f.is_file())
+        all_files = sorted(f for f in skill_dir.rglob("*") if f.is_file())
+        # Ensure SKILL.md is the primary file (first element) for sync comparison
+        skill_md = skill_dir / "SKILL.md"
+        if skill_md.exists() and skill_md in all_files:
+            all_files.remove(skill_md)
+            all_files.insert(0, skill_md)
+        return all_files
     elif resource_type == "rule":
         path = claude_dir / "rules" / f"{name}.md"
         return [path] if path.exists() else []
