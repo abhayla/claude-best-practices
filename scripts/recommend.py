@@ -2087,23 +2087,42 @@ def provision_to_local(
         print(f"  Skipped {len(sync_class['project-only'])} project-customized patterns")
     conflict_overwritten = []
     if sync_class["conflict"]:
-        print(f"\n  CONFLICTS: {len(sync_class['conflict'])} pattern(s) changed in both hub and project:")
-        for item in sync_class["conflict"]:
-            print(f"\n    {item['name']} ({item['type']})")
-            print(f"      Hub hash:     {item['hub_hash'][:12]}...")
-            print(f"      Project hash: {item['project_hash'][:12]}...")
-            while True:
-                choice = input("      [o]verwrite with hub version / [s]kip (keep project version)? ").strip().lower()
-                if choice in ("o", "overwrite"):
-                    overwritten = update_improved_to_local(hub_root, target_dir, [item])
-                    conflict_overwritten.extend(overwritten)
-                    print(f"      -> Overwritten with hub version")
-                    break
-                elif choice in ("s", "skip"):
-                    print(f"      -> Kept project version")
-                    break
-                else:
-                    print("      Please enter 'o' (overwrite) or 's' (skip)")
+        n = len(sync_class["conflict"])
+        print(f"\n  CONFLICTS: {n} pattern(s) changed in both hub and project:")
+
+        # Show summary with file paths
+        for i, item in enumerate(sync_class["conflict"], 1):
+            print(f"    {i}. {item['name']} ({item['type']}) — {item['rel_path']}")
+
+        # Offer batch options first
+        print(f"\n  Batch options: [A]ll overwrite / [S]kip all / [1] review one-by-one")
+        batch_choice = input("  Choice: ").strip().lower()
+
+        if batch_choice in ("a", "all", "all overwrite"):
+            overwritten = update_improved_to_local(hub_root, target_dir, sync_class["conflict"])
+            conflict_overwritten.extend(overwritten)
+            print(f"  -> Overwritten all {n} conflicts with hub versions")
+        elif batch_choice in ("s", "skip", "skip all"):
+            print(f"  -> Kept all {n} project versions")
+        else:
+            # One-by-one review
+            for item in sync_class["conflict"]:
+                print(f"\n    {item['name']} ({item['type']})")
+                print(f"      File: {item['rel_path']}")
+                print(f"      Hub hash:     {item['hub_hash'][:12]}...")
+                print(f"      Project hash: {item['project_hash'][:12]}...")
+                while True:
+                    choice = input("      [o]verwrite / [s]kip? ").strip().lower()
+                    if choice in ("o", "overwrite", "y", "yes"):
+                        overwritten = update_improved_to_local(hub_root, target_dir, [item])
+                        conflict_overwritten.extend(overwritten)
+                        print(f"      -> Overwritten with hub version")
+                        break
+                    elif choice in ("s", "skip", "n", "no"):
+                        print(f"      -> Kept project version")
+                        break
+                    else:
+                        print("      Please enter 'o' (overwrite) or 's' (skip)")
 
     # Update manifest with all synced files (missing copies + auto-updates + conflict overwrites)
     all_synced = copied + auto_updated + conflict_overwritten
