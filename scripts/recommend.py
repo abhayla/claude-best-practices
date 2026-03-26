@@ -411,6 +411,8 @@ CORE_WORKFLOW_SKILLS = {
     "systematic-debugging", "continue", "handover", "skill-master",
     "pr-standards", "request-code-review", "receive-code-review",
     "code-quality-gate", "writing-plans", "executing-plans",
+    "verify-screenshots", "post-fix-pipeline", "test-pipeline",
+    "regression-test",
 }
 MUST_HAVE_UNIVERSAL_SKILLS = CORE_WORKFLOW_SKILLS  # backward compat alias
 
@@ -431,7 +433,7 @@ NICE_TO_HAVE_UNIVERSAL_SKILLS = {
 MUST_HAVE_RULES = {"context-management", "workflow", "claude-behavior", "testing", "tdd-rule"}
 
 # Universal agents that are high-value
-MUST_HAVE_AGENTS = {"security-auditor-agent"}
+MUST_HAVE_AGENTS = {"security-auditor-agent", "tester-agent", "test-pipeline-agent"}
 
 # Skills/resources to always skip (meta hub skills, wrong-domain)
 # NOTE: Framework skills like vue-dev, flutter-dev, etc. are NOT in this list —
