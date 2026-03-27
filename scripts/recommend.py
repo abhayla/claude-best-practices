@@ -826,19 +826,17 @@ def tier_resource_with_reason(
         return "nice-to-have", "optional skill"
 
     if resource_type == "config":
-        # Config files are must-have when they are runtime dependencies of skills.
-        # Map config names to the skills that read them at runtime.
+        # Config files inherit the tier of their associated skill.
+        # If the skill gets provisioned, its runtime config should too.
         CONFIG_SKILL_MAP = {
             "e2e-pipeline": "e2e-visual-run",
         }
         associated_skill = CONFIG_SKILL_MAP.get(name)
         if associated_skill:
-            # If the associated skill would be must-have, so is the config
-            skill_tier, _ = tier_resource_with_reason(
+            skill_tier, skill_reason = tier_resource_with_reason(
                 associated_skill, "skill", stacks, dep_promoted
             )
-            if skill_tier == "must-have":
-                return "must-have", f"runtime config for {associated_skill}"
+            return skill_tier, f"runtime config for {associated_skill}"
         return "nice-to-have", "optional config"
 
     return "nice-to-have", "optional"
@@ -2127,6 +2125,31 @@ def provision_to_local(
     """
     # Step 1: Copy missing resources
     copied = apply_to_local(hub_root, target_dir, gaps, tier)
+
+    # Step 1b: Copy config files whose associated skills are in the project,
+    # even if the config itself is in a lower tier. Config files are runtime
+    # dependencies — if the skill is present, the config must be too.
+    CONFIG_SKILL_MAP = {
+        "e2e-pipeline": "e2e-visual-run",
+    }
+    project_claude_dir = target_dir / ".claude"
+    for config_name, skill_name in CONFIG_SKILL_MAP.items():
+        skill_present = (project_claude_dir / "skills" / skill_name / "SKILL.md").exists()
+        config_present = any(
+            (project_claude_dir / "config" / f"{config_name}{ext}").exists()
+            for ext in (".yml", ".yaml", ".json")
+        )
+        if skill_present and not config_present:
+            claude_src = hub_root / "core" / ".claude"
+            for ext in (".yml", ".yaml", ".json"):
+                src = claude_src / "config" / f"{config_name}{ext}"
+                if src.exists():
+                    dst = project_claude_dir / "config" / src.name
+                    dst.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dst)
+                    copied.append(f".claude/config/{src.name}")
+                    print(f"  Copied runtime config: .claude/config/{src.name} (required by {skill_name})")
+                    break
 
     # Step 2: Sync existing resources using 3-way manifest comparison
     manifest = load_sync_manifest(target_dir)
