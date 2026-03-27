@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-26 17:08 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-27 04:10 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">197</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">192</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">203</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">198</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">5</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">23</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">8</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">23</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">143</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">27</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">1</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">8</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">23</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">144</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -642,6 +642,33 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>orm, typescript, database</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>e2e-conductor-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>test-scout-agent, visual-inspector-agent, test-healer-agent</td>
+                <td>e2e, orchestration, testing, queue</td>
+            </tr>
+            <tr data-type="config" data-category="core">
+                <td>e2e-pipeline</td>
+                <td><span class="badge badge-config">config</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>e2e, config, pipeline</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>e2e-visual-run</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>fix-loop, verify-screenshots</td>
+                <td>e2e, testing, visual-regression, self-healing, accessibility</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>executing-plans</td>
@@ -1642,6 +1669,15 @@ tr:hover { background: var(--primary-light); }
                 <td>tdd, playwright</td>
                 <td>testing, TDD, BDD, coverage, mutation-testing</td>
             </tr>
+            <tr data-type="agent" data-category="core">
+                <td>test-healer-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>fix-loop, test-failure-analyzer-agent</td>
+                <td>e2e, testing, healing, auto-fix</td>
+            </tr>
             <tr data-type="skill" data-category="core">
                 <td>test-knowledge</td>
                 <td><span class="badge badge-skill">skill</span></td>
@@ -1677,6 +1713,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>test-scout-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>e2e, testing, runner, screenshots</td>
             </tr>
             <tr data-type="agent" data-category="core">
                 <td>tester-agent</td>
@@ -1740,6 +1785,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>visual-inspector-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>verify-screenshots</td>
+                <td>e2e, testing, visual-regression, accessibility, verification</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>vitest-dev</td>

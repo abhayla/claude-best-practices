@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Python 3.12** required (all CI workflows use 3.12)
 - Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt` (Windows: `.venv\Scripts\activate`)
+- Windows: use `set PYTHONPATH=. &&` prefix instead of `PYTHONPATH=.` for commands below, or run in Git Bash where the Unix syntax works
 
 ## Commands
 
@@ -39,14 +40,14 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 ## Architecture
 
-A curated hub of Claude Code patterns (agents, skills, rules) organized by stack. Users provision their project via `recommend.py --provision` or `/synthesize-project`.
+A curated hub of Claude Code patterns (agents, skills, rules) organized by stack. Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project` (hub patterns + project-specific patterns generated from your code).
 
 ### Key Directories
 
 - **`.claude/rules/`** — Auto-loaded rules. Global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when working with matching files
 - **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, templates
 - **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit directly after adding/removing patterns, then re-run `generate_docs.py`
-- **`config/`** — `settings.yml` (dedup thresholds: semantic 85/70, structural 3; scan limits), `repos.yml` (downstream projects, `auto_sync`/`share_synthesized` flags), `urls.yml`/`topics.yml` (scan sources with freshness tracking), `third-party-skills.yml` (external skill registry), `test-pipeline.yml` (externalized pipeline DAG), `workflow-groups.yml` (seed patterns for workflow doc generation — stale seeds silently break docs)
+- **`config/`** — `settings.yml` (dedup thresholds, scan limits), `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow doc generation — stale seeds silently break docs), plus `urls.yml`, `topics.yml`, `third-party-skills.yml`, `test-pipeline.yml`
 - **`docs/stages/`** — Pipeline stage definitions (STAGE-0 through STAGE-11) with executable `Skill()`/`Agent()` dispatch examples
 - **`scripts/`** — All Python tooling (see Key Scripts below for the important ones)
 

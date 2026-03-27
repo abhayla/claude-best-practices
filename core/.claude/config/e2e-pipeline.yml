@@ -1,0 +1,87 @@
+# E2E pipeline configuration
+# Read by e2e-conductor-agent at runtime
+#
+# This config externalizes the pipeline DAG per agent-orchestration rule #4.
+# Modify queue ordering, retry limits, and agent settings here —
+# not in the agent files.
+
+pipeline:
+  name: e2e-test-orchestration
+  version: "1.0.0"
+
+queue:
+  # longest-first reduces total wall time by front-loading slow tests
+  # Options: longest-first | shortest-first | alphabetical | dependency-order
+  ordering: longest-first
+  batch_size: 5
+  # Claude Code is single-threaded; 1 = sequential dispatch
+  max_concurrent_batches: 1
+
+retry:
+  global_budget: 15
+  per_test_max_attempts: 3
+  per_stage_max:
+    test_scout: 3
+    visual_inspector: 2
+    test_healer: 3
+
+agents:
+  test_scout:
+    agent: test-scout-agent
+    # always: screenshot verdict is authoritative — must capture every test
+    screenshot_mode: always
+    capture_a11y_tree: true
+  visual_inspector:
+    agent: visual-inspector-agent
+    dual_signal: true
+    confidence_threshold: 0.8
+  test_healer:
+    agent: test-healer-agent
+    auto_fix_classifications:
+      - SELECTOR
+      - TIMING
+      - DATA
+      - FLAKY_TEST
+      - INFRASTRUCTURE
+      - TEST_POLLUTION
+    human_review_classifications:
+      - LOGIC_BUG
+      - VISUAL_REGRESSION
+
+state:
+  file: ".pipeline/e2e-state.json"
+  evidence_dir: "test-evidence"
+  results_dir: "test-results"
+
+# Historical duration hints for longest-first ordering.
+# Conductor uses these when no runtime data is available.
+# Updated automatically after each pipeline run.
+duration_hints: {}
+  # example:
+  #   test_checkout_flow: 45000
+  #   test_login_flow: 12000
+
+# Healing state machine — read by test-healer-agent at runtime.
+# Per agent-orchestration rule #4, state transitions live in config, not inline.
+healing_state_machine:
+  states:
+    - fix_queue          # items awaiting healing
+    - test_queue         # healed items requeued for re-execution
+    - known_issues       # items that exhausted max attempts
+  transitions:
+    - from: fix_queue
+      to: test_queue
+      condition: "heal_succeeded AND attempt < per_test_max_attempts"
+      action: "increment attempt, record fix in history"
+    - from: fix_queue
+      to: fix_queue
+      condition: "heal_failed AND attempt < per_test_max_attempts"
+      action: "increment attempt, record failed approach, try different strategy"
+    - from: fix_queue
+      to: known_issues
+      condition: "attempt >= per_test_max_attempts"
+      action: "log full diagnosis history, recommended manual action"
+
+cleanup:
+  - ".pipeline/e2e-state.json"
+  - "test-evidence/"

@@ -50,8 +50,18 @@ def _actual_hooks() -> list[str]:
     return sorted(f.stem for f in d.glob("*.sh")) if d.exists() else []
 
 
+def _actual_configs() -> list[str]:
+    d = CORE_CLAUDE / "config"
+    if not d.exists():
+        return []
+    return sorted(
+        f.stem for f in d.iterdir()
+        if f.is_file() and f.suffix in (".yml", ".yaml", ".json")
+    )
+
+
 def _all_actual_names() -> set[str]:
-    return set(_actual_agents() + _actual_skills() + _actual_rules() + _actual_hooks())
+    return set(_actual_agents() + _actual_skills() + _actual_rules() + _actual_hooks() + _actual_configs())
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -92,7 +102,7 @@ class TestRegistryEntryFields:
     """Every registry entry must have all required fields with valid values."""
 
     REQUIRED_FIELDS = ["hash", "type", "category", "version", "source"]
-    VALID_TYPES = {"agent", "skill", "rule", "hook"}
+    VALID_TYPES = {"agent", "skill", "rule", "hook", "config"}
     VALID_CATEGORY_PREFIXES = {"core", "stack:"}
 
     def test_all_entries_have_required_fields(self):

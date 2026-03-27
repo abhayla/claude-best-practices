@@ -566,7 +566,7 @@ def get_stacks_from_config(repo: str, config_path: Path) -> Optional[list[str]]:
 def get_hub_resources(hub_root: Path) -> dict[str, list[dict]]:
     """Get all resources from core/.claude/ organized by type."""
     claude_dir = hub_root / "core" / ".claude"
-    resources = {"skill": [], "agent": [], "rule": [], "hook": []}
+    resources = {"skill": [], "agent": [], "rule": [], "hook": [], "config": []}
 
     # Skills
     skills_dir = claude_dir / "skills"
@@ -600,12 +600,22 @@ def get_hub_resources(hub_root: Path) -> dict[str, list[dict]]:
         for f in sorted(hooks_dir.glob("*.sh")):
             resources["hook"].append({"name": f.stem, "path": f})
 
+    # Config files
+    config_dir = claude_dir / "config"
+    if config_dir.exists():
+        for f in sorted(config_dir.glob("*.yml")):
+            resources["config"].append({"name": f.stem, "path": f})
+        for f in sorted(config_dir.glob("*.yaml")):
+            resources["config"].append({"name": f.stem, "path": f})
+        for f in sorted(config_dir.glob("*.json")):
+            resources["config"].append({"name": f.stem, "path": f})
+
     return resources
 
 
 def get_project_resource_names(claude_dir: Path) -> dict[str, set[str]]:
     """Get names of all resources in a project's .claude/ directory."""
-    names = {"skill": set(), "agent": set(), "rule": set(), "hook": set()}
+    names = {"skill": set(), "agent": set(), "rule": set(), "hook": set(), "config": set()}
 
     skills_dir = claude_dir / "skills"
     if skills_dir.exists():
@@ -630,12 +640,18 @@ def get_project_resource_names(claude_dir: Path) -> dict[str, set[str]]:
         for f in hooks_dir.glob("*.sh"):
             names["hook"].add(f.stem)
 
+    config_dir = claude_dir / "config"
+    if config_dir.exists():
+        for f in config_dir.iterdir():
+            if f.is_file() and f.suffix in (".yml", ".yaml", ".json"):
+                names["config"].add(f.stem)
+
     return names
 
 
 def get_project_resources_from_repo(repo: str) -> dict[str, set[str]]:
     """Get resource names from a remote repo via sparse clone."""
-    names = {"skill": set(), "agent": set(), "rule": set(), "hook": set()}
+    names = {"skill": set(), "agent": set(), "rule": set(), "hook": set(), "config": set()}
 
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
@@ -808,6 +824,9 @@ def tier_resource_with_reason(
 
         # Remaining universal skills not in any list — nice-to-have
         return "nice-to-have", "optional skill"
+
+    if resource_type == "config":
+        return "nice-to-have", "optional"
 
     return "nice-to-have", "optional"
 
@@ -1313,6 +1332,22 @@ def apply_to_local(
                     copied.append(f".claude/hooks/{name}.sh")
                 else:
                     print(f"  WARNING: hub hook '{name}' not found at {src}")
+
+            elif rtype == "config":
+                # Try .yml, .yaml, .json extensions
+                src = None
+                for ext in (".yml", ".yaml", ".json"):
+                    candidate = claude_src / "config" / f"{name}{ext}"
+                    if candidate.exists():
+                        src = candidate
+                        break
+                if src:
+                    dst = target_dir / ".claude" / "config" / src.name
+                    dst.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dst)
+                    copied.append(f".claude/config/{src.name}")
+                else:
+                    print(f"  WARNING: hub config '{name}' not found in {claude_src / 'config'}")
 
     return copied
 
@@ -2237,8 +2272,8 @@ def _format_nice_to_have_pr_body(items: list[dict]) -> str:
     for item in items:
         by_type.setdefault(item["type"], []).append(item)
 
-    type_headers = {"skill": "Skills", "rule": "Rules", "agent": "Agents", "hook": "Hooks"}
-    for rtype in ("skill", "rule", "agent", "hook"):
+    type_headers = {"skill": "Skills", "rule": "Rules", "agent": "Agents", "hook": "Hooks", "config": "Config"}
+    for rtype in ("skill", "rule", "agent", "hook", "config"):
         type_items = by_type.get(rtype, [])
         if not type_items:
             continue

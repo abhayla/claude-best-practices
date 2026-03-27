@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-21",
-    "total_patterns": 197
+    "total_patterns": 203
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -1096,6 +1096,48 @@
       "database"
     ],
     "changelog": "v1.0.0: Initial creation"
+  },
+  "e2e-visual-run": {
+    "hash": "42a0a2694ad413fbe30b9a2420d8792632f607982361c7a47992062b7d95aeca",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-27",
+    "last_updated": "2026-03-27",
+    "dependencies": ["fix-loop", "verify-screenshots"],
+    "visibility": "public",
+    "description": "Run full E2E suite with async queue-based orchestration, dual-signal visual verification, and classification-driven auto-healing",
+    "tags": ["e2e", "testing", "visual-regression", "self-healing", "accessibility"],
+    "changelog": "v1.0.0: Initial release — queue-based orchestration, dual-signal verification, 8-classification healing"
+  },
+  "e2e-pipeline": {
+    "hash": "3f99d9af1414c3b663537b9ba88a955da23db69adf920ef230f8d5b2c7e97d97",
+    "type": "config",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-27",
+    "last_updated": "2026-03-27",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Queue-based E2E pipeline configuration: queue ordering, retry limits, healing state machine, agent dispatch settings",
+    "tags": ["e2e", "config", "pipeline"],
+    "changelog": "v1.0.0: Initial release — externalized DAG for e2e-conductor-agent"
+  },
+  "e2e-conductor-agent": {
+    "hash": "2e95def12b5b3af32082430077b71706a7221a4fb59360e2d93bff0cd2b38a23",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-27",
+    "last_updated": "2026-03-27",
+    "dependencies": ["test-scout-agent", "visual-inspector-agent", "test-healer-agent"],
+    "visibility": "public",
+    "description": "Queue-based E2E test orchestrator: dispatches test-scout, visual-inspector, and test-healer as async worker agents",
+    "tags": ["e2e", "orchestration", "testing", "queue"],
+    "changelog": "v1.0.0: Initial release — async queue-based E2E orchestration pipeline"
   },
   "executing-plans": {
     "hash": "c9e17da615ae37cb820d2a80354f6839c1c661f1f0e42cf6f3413a8e805d3213",
@@ -2931,6 +2973,20 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "nice-to-have"
   },
+  "test-healer-agent": {
+    "hash": "4f4dfba84bcd30983b0de867483a9b8363727b7a665443bc16e5820e26910d1c",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-27",
+    "last_updated": "2026-03-27",
+    "dependencies": ["fix-loop", "test-failure-analyzer-agent"],
+    "visibility": "public",
+    "description": "Classification-driven E2E test failure healer: diagnoses via fix-loop, applies targeted fixes, 3-attempt cap per test",
+    "tags": ["e2e", "testing", "healing", "auto-fix"],
+    "changelog": "v1.0.0: Initial release — 8-classification targeted healing with 3-attempt cap"
+  },
   "test-generator": {
     "hash": "c2e0ba97d16f743bb0dbf2e3b71ac4d6cc962cc9717c365c242537018f2ebeb3",
     "type": "skill",
@@ -3008,6 +3064,20 @@
     "last_updated": "2026-03-26",
     "dependencies": [],
     "visibility": "public"
+  },
+  "test-scout-agent": {
+    "hash": "62f3981b625a041501e96295a3a73c79bdd6dac34b300c5dce331abec45d62d7",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-27",
+    "last_updated": "2026-03-27",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "E2E test runner: executes tests, captures failure screenshots and accessibility tree snapshots, queues results for async verification",
+    "tags": ["e2e", "testing", "runner", "screenshots"],
+    "changelog": "v1.0.0: Initial release — failure-only screenshots, per-test a11y snapshots"
   },
   "tester-agent": {
     "hash": "2cf52b2eb6f4f13394edeaa4453df4a15c6a71e9f2ed15a3ff3f9bb455c7e6fd",
@@ -3147,6 +3217,20 @@
       "vite"
     ],
     "changelog": "v1.0.0: Initial release — grounded in FIREKaro + AlgoChanakya + IPODhan patterns"
+  },
+  "visual-inspector-agent": {
+    "hash": "02faf9b92616cf9b382b4fbee61e6e7445e24e5d73d37117998137efba6e84a7",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-27",
+    "last_updated": "2026-03-27",
+    "dependencies": ["verify-screenshots"],
+    "visibility": "public",
+    "description": "Dual-signal E2E verifier: accessibility tree structure + screenshot AI diff with configurable confidence threshold",
+    "tags": ["e2e", "testing", "visual-regression", "accessibility", "verification"],
+    "changelog": "v1.0.0: Initial release — dual-signal (a11y + screenshot) async verification"
   },
   "vue": {
     "hash": "5009cb248f5765545f29fa9a2df68502cea34772d0d24e12a885f2b006c51647",

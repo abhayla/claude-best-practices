@@ -43,6 +43,10 @@ workflows:
         - test-failure-analyzer-agent
         - test-pipeline-agent
         - quality-gate-evaluator-agent
+        - e2e-conductor-agent
+        - test-scout-agent
+        - visual-inspector-agent
+        - test-healer-agent
       rules:
         - tdd-rule
         - testing
