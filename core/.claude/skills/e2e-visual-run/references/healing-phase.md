@@ -41,6 +41,29 @@ Test failed
        violated, calculation wrong)
 ```
 
+## Confidence Heuristics (Pre-Classification)
+
+These guide the pre-classification routing step in STEP 5. The authoritative
+confidence comes from fix-loop's `test-failure-analyzer-agent` — these heuristics
+are for routing decisions only (e.g., skip fix-loop for VISUAL_REGRESSION).
+
+| Error Pattern | Pre-Classification | Pre-Confidence | Notes |
+|--------------|-------------------|----------------|-------|
+| Exact: "NoSuchElementException", "locator timeout" | SELECTOR | HIGH | Clear element-not-found signal |
+| Exact: "TimeoutError", "waitFor exceeded" | TIMING | HIGH | Unambiguous timeout |
+| Contains "expected" + "got" or "assert" | DATA | MEDIUM | Could be data or logic bug |
+| Passes alone, fails in suite | TEST_POLLUTION | MEDIUM | Needs isolation test to confirm |
+| Intermittent across retries | FLAKY_TEST | LOW | Needs evidence from multiple runs |
+| "ECONNREFUSED", "503", "no such table" | INFRASTRUCTURE | HIGH | Environment issue |
+| Screenshot differs but exit code PASS | VISUAL_REGRESSION | HIGH | Route to human review |
+| API returns wrong data, business rule violated | LOGIC_BUG | HIGH | Route to human review |
+| No clear pattern match | UNKNOWN | LOW | Escalate to user |
+
+**Routing rules:**
+- VISUAL_REGRESSION or LOGIC_BUG → skip fix-loop, move to `known_issues`
+- UNKNOWN with LOW confidence → escalate to user, do not attempt fix
+- All others → proceed to fix-loop for authoritative classification + fix
+
 ## Fix Strategies Per Classification
 
 ### SELECTOR (Auto-Fix)
@@ -48,12 +71,17 @@ Test failed
 **Root cause:** UI element moved, renamed, or restructured.
 
 **Fix approach:**
-1. Read the a11y tree snapshot to find the element by role/label
-2. Replace brittle selectors with resilient ones:
-   - `getByRole('button', { name: 'Submit' })` instead of `#submit-btn`
-   - `getByLabel('Email')` instead of `input[type="email"]`
-   - `getByText('Save Changes')` instead of `.btn-primary`
-3. If element genuinely removed, the test needs updating (not just the selector)
+1. Check `.pipeline/test-history.json` for previously successful locators for this
+   test — if found, try them first before regenerating
+2. Read the a11y tree snapshot to find the element by role/label
+3. Generate 2–3 alternative locators ranked by resilience:
+   - Primary: `getByRole('button', { name: 'Submit' })` (most resilient)
+   - Fallback 1: `getByLabel('Submit')` or `getByText('Submit')`
+   - Fallback 2: `[data-testid='submit-btn']` (if present in DOM)
+4. Apply the highest-resilience locator that matches the current DOM
+5. Record all generated locators in `test-history.json` under `known_locators`
+   for this test — on future SELECTOR failures, these are tried first (step 1)
+6. If element genuinely removed, the test needs updating (not just the selector)
 
 **Anti-pattern:** Never replace one brittle selector with another brittle selector.
 

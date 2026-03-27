@@ -35,6 +35,8 @@ agents:
     agent: visual-inspector-agent
     dual_signal: true
     confidence_threshold: 0.8
+    aria_snapshot_format: yaml   # yaml (uses toMatchAriaSnapshot) | json (raw snapshot)
+    auto_generate_baseline: true # auto-create ARIA baselines on first run
   test_healer:
     agent: test-healer-agent
     auto_fix_classifications:
@@ -48,6 +50,31 @@ agents:
       - LOGIC_BUG
       - VISUAL_REGRESSION
 
+# Confidence gate for healing — fixes below threshold are suggested but not applied.
+# Authoritative confidence comes from fix-loop's test-failure-analyzer-agent.
+healing:
+  confidence_threshold: 0.85
+  low_confidence_action: suggest  # suggest: log fix but don't apply | skip: discard
+
+# Cross-run test history for flakiness detection and quarantine.
+# File persists across runs (not in cleanup list). Builds up naturally.
+history:
+  file: ".pipeline/test-history.json"
+  window_size: 10              # sliding window: keep last N results per test
+  flaky_threshold: 0.7         # score >= this → auto-quarantine (don't spend retry budget)
+  quarantine_flaky: true       # false to disable quarantine (still tracks scores)
+
+# Visual comparison settings — passed to verify-screenshots and applied in scout phase.
+visual:
+  threshold: 0.2                # Playwright default (YIQ perceptual diff, 0=strict, 1=lax)
+  max_diff_pixel_ratio: 0.01   # fail if >1% of pixels differ
+  animations: disabled          # disable CSS animations before screenshot capture
+  mask_selectors:               # hide dynamic content before capture (set visibility:hidden)
+    # - ".timestamp"
+    # - ".avatar"
+    # - "[data-testid='ad-banner']"
+  config_file: null             # path to visual.config.json (if project has one)
+
 state:
   file: ".pipeline/e2e-state.json"
   evidence_dir: "test-evidence"
@@ -55,7 +82,7 @@ state:
 
 # Historical duration hints for longest-first ordering.
 # Conductor uses these when no runtime data is available.
-# Updated automatically after each pipeline run.
+# Auto-updated after each pipeline run (median of current + previous hint).
 duration_hints: {}
   # example:
   #   test_checkout_flow: 45000
@@ -81,6 +108,10 @@ healing_state_machine:
       to: known_issues
       condition: "attempt >= per_test_max_attempts"
       action: "log full diagnosis history, recommended manual action"
+    - from: fix_queue
+      to: known_issues
+      condition: "flakiness_score >= flaky_threshold"
+      action: "quarantine as historically_flaky, preserve retry budget"
 
 cleanup:
   - ".pipeline/e2e-state.json"

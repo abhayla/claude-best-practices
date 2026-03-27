@@ -50,13 +50,68 @@ testWidgets('description', (tester) async {
 });
 ```
 
+## Pre-Capture Preparation
+
+Before taking screenshots, stabilize the page and mask dynamic content:
+
+```typescript
+// Playwright: disable CSS animations
+await page.emulateMedia({ reducedMotion: 'reduce' });
+
+// Apply mask selectors from e2e-pipeline.yml visual.mask_selectors
+const maskSelectors = config.visual?.mask_selectors || [];
+for (const selector of maskSelectors) {
+  await page.locator(selector).evaluateAll(els =>
+    els.forEach(el => el.style.visibility = 'hidden')
+  );
+}
+
+// Wait for page to settle
+await page.waitForLoadState('networkidle');
+```
+
+For non-Playwright frameworks, apply equivalent pre-capture steps:
+- Cypress: `cy.get(selector).invoke('css', 'visibility', 'hidden')`
+- Selenium: execute JavaScript to hide elements
+
 ## Accessibility Tree Capture
 
-### Playwright (Primary)
+### Playwright (Primary) — Dual Format
+
+Capture BOTH JSON (for healing phase element lookup) and YAML (for structural verification):
+
 ```typescript
+// JSON: used by healing phase for role/label lookups
 const snapshot = await page.accessibility.snapshot();
 fs.writeFileSync(`test-evidence/${runId}/a11y/${testName}.json`, JSON.stringify(snapshot, null, 2));
+
+// YAML: used by inspector phase for structural comparison via toMatchAriaSnapshot()
+// On first run, use --update-snapshots to auto-generate baselines in __snapshots__/
+// On subsequent runs, toMatchAriaSnapshot() compares against stored YAML baseline
+await expect(page.locator('body')).toMatchAriaSnapshot();
 ```
+
+ARIA snapshot YAML format (what gets stored in `__snapshots__/`):
+```yaml
+- heading "Dashboard" [level=1]
+- navigation "Main":
+  - list:
+    - listitem:
+      - link "Home"
+    - listitem:
+      - link "Settings"
+- main:
+  - table "Users":
+    - rowgroup:
+      - row "Alice alice@example.com"
+      - row "Bob bob@example.com"
+```
+
+Key properties:
+- Partial matching: omit attributes or names to match flexibly
+- Regex support: `/\d+ results/` for dynamic text
+- Order-sensitive: element order must match a11y tree order
+- Layout-agnostic: CSS changes do not affect YAML snapshots
 
 ### DOM Fallback (Other Frameworks)
 When native a11y tree access is unavailable, capture DOM structure:
@@ -97,8 +152,13 @@ test-evidence/{run_id}/
     test_login.pass.png          # Every test (pass and fail)
     test_checkout.fail.png
   a11y/
-    test_login.json              # Every test (pass and fail)
+    test_login.json              # JSON: for healing phase element lookup
+    test_login.yaml              # YAML: Playwright ARIA snapshot (if Playwright)
     test_checkout.json
     test_dashboard.json
   manifest.json                  # Index of all evidence
 ```
+
+Note: YAML baselines for `toMatchAriaSnapshot()` are stored by Playwright in
+`__snapshots__/` alongside test files (committed to source control), not in
+`test-evidence/`. The YAML files in `a11y/` are per-run captures for debugging.

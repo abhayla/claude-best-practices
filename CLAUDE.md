@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Critical: Two `.claude/` Directories
 
 - **`core/.claude/`** — Distributable template (what users copy to their projects). NEVER put hub-only config here.
-- **`.claude/`** (repo root) — Hub-only operational config: scan skills (`scan-repo`, `scan-url`), `synthesize-hub`, hub rules. NEVER distribute this.
+- **`.claude/`** (repo root) — Hub-only operational config: scan skills (`scan-repo`, `scan-url`), `synthesize-hub`, hub rules, hub-only agents (`code-reviewer-agent`, `planner-researcher-agent`, etc.), and hooks (`auto-learn-trigger.sh`, `pattern-quality-gate.sh`, `prompt-enhance-reminder.sh`). NEVER distribute this.
 
 ## Environment
 
@@ -45,15 +45,16 @@ A curated hub of Claude Code patterns (agents, skills, rules) organized by stack
 ### Key Directories
 
 - **`.claude/rules/`** — Auto-loaded rules. Global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when working with matching files
-- **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, templates
+- **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, `config/` (runtime pipeline configs), templates (`CLAUDE.md.template`, `CLAUDE.local.md.template`)
 - **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit directly after adding/removing patterns, then re-run `generate_docs.py`
-- **`config/`** — `settings.yml` (dedup thresholds, scan limits), `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow doc generation — stale seeds silently break docs), plus `urls.yml`, `topics.yml`, `third-party-skills.yml`, `test-pipeline.yml`
+- **`config/`** — `settings.yml` (dedup thresholds, scan limits), `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow doc generation — stale seeds silently break docs), `pipeline-stages.yaml` (DAG config for project-manager agent), `discoveries.json` (accumulated scan findings), plus `urls.yml`, `topics.yml`, `third-party-skills.yml`, `test-pipeline.yml`
 - **`docs/stages/`** — Pipeline stage definitions (STAGE-0 through STAGE-11) with executable `Skill()`/`Agent()` dispatch examples
+- **`docs/workflows/`** — Auto-generated workflow docs (output of `generate_workflow_docs.py`). Do not edit manually — regenerate after pattern changes
 - **`scripts/`** — All Python tooling (see Key Scripts below for the important ones)
 
 ### Stack Prefix Convention
 
-Stack-specific patterns use filename prefixes (e.g., `fastapi-*`, `android-*`, `react-*`, `flutter-*`, `vue-*`, `firebase-*`, `ai-gemini-*`, `bun-elysia-*`). Universal patterns have no prefix. The bootstrap script filters by these prefixes.
+Two pattern detection mechanisms: (1) **Stack prefixes** in `STACK_PREFIXES` (`bootstrap.py`) — `fastapi-*`, `android-*`, `react-*`, `firebase-*`, `ai-gemini-*` — selected via `--stacks` flag. (2) **Dependency detection** via `DEP_PATTERN_MAP` (`recommend.py`) — matches `flutter-*`, `vue-*`, `bun-elysia-*`, `tailwind-*`, `vitest-*`, `prisma-*`, etc. from project dependencies. Universal patterns have no prefix.
 
 ### Sync Flows
 
@@ -61,13 +62,22 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 
 ### Key Scripts
 
-- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--apply`, `--provision`, `--diff`, `--use-config`. Defines `STACK_DETECTORS` and `DEP_PATTERN_MAP`.
-- **`bootstrap.py`** — Core copy logic. Defines `STACK_PREFIXES` mapping. Imported by `recommend.py`.
+- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--apply`, `--provision`, `--diff`, `--use-config`. Additional flags: `--tier {must-have,nice-to-have}`, `--json`, `--multi-pr`/`--single-pr`, `--skip-third-party`. Defines `STACK_DETECTORS` and `DEP_PATTERN_MAP`.
+- **`bootstrap.py`** — Core copy logic. Standalone CLI: `python scripts/bootstrap.py --stacks <stack1,stack2> --target <dir> [--hub <path>] [--dry-run]`. Defines `STACK_PREFIXES` mapping. Also imported by `recommend.py`.
 - **`workflow_quality_gate_validate_patterns.py`** — CI validator for frontmatter, cross-references, file/registry sync.
 - **`dedup_check.py`** — CI dedup validator (`--validate-all`) and secret scanner (`--secret-scan`).
 - **`generate_docs.py`** / **`generate_workflow_docs.py`** — Rebuild `docs/` dashboard and workflow docs respectively.
+- **`extract_references.py`** — Splits oversized SKILL.md files into `references/` subdirectories: `python scripts/extract_references.py [--threshold 500] [--skill SKILL_NAME]`
+- **`third_party_skills.py`** — Detects third-party skills from project dependencies and recommends install commands.
+- **`check_freshness.py`** — Checks source freshness for internet-sourced patterns.
 
-CI lives in `.github/workflows/validate-pr.yml` — runs all 4 validation commands listed above.
+### CI Workflows
+
+- **`validate-pr.yml`** — Runs all 4 validation commands listed above on PRs.
+- **`update-docs.yml`** — Auto-regenerates and commits `docs/` when registry or `core/.claude/` changes on main. Avoid running `generate_docs.py` manually on main — this workflow handles it.
+- **`test.yml`** — Runs pytest on `scripts/**` changes.
+- **`recommend.yml`** — Weekly cron + manual: runs `recommend.py --provision` for repos in `config/repos.yml`.
+- Other scheduled workflows: `scan-internet.yml`, `scan-projects.yml`, `sync-to-projects.yml`, `expire-sources.yml`.
 
 ## Testing
 

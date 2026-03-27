@@ -4,6 +4,11 @@ Detailed guidance for STEP 4 of the e2e-visual-run skill.
 
 ## Accessibility Tree Verification Checklist
 
+> **Note**: For Playwright projects with ARIA YAML baselines, this checklist is
+> handled automatically by `toMatchAriaSnapshot()`. The manual checklist below
+> applies only when: (a) the framework is not Playwright, (b) it's the first run
+> before baselines exist, or (c) AI-based review is needed without a baseline.
+
 ### Structural Checks
 - [ ] Page has at least one `<main>` landmark
 - [ ] Headings follow hierarchy (no skipped levels: h1 → h3)
