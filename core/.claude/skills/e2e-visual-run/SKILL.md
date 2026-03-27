@@ -228,8 +228,25 @@ For each batch of tests from `test_queue` (batch_size from config):
 
 Dual-signal verification: accessibility tree + screenshot AI diff.
 Read `references/inspection-phase.md` for detailed verification criteria.
+Do NOT verify a11y inline for large test suites — dispatch an agent to
+batch-verify all a11y snapshots at once (prevents context burn from 20+
+inline JSON parses). Screenshot verification uses `verify-screenshots` skill.
 
-For each item in `verify_queue`:
+**Dispatch a11y inspector agent** for all items in `verify_queue`:
+```
+Agent("general-purpose", prompt="
+  You are the accessibility inspector for E2E test verification.
+  Evidence directory: test-evidence/{run_id}/a11y/
+  State file: .pipeline/e2e-state.json (read verify_queue for test list)
+  Reference: read references/inspection-phase.md for the full checklist.
+
+  For each test, apply the framework-dependent verification below, then
+  write per-test verdicts {test: verdict, confidence, reason} to
+  .pipeline/a11y-verdicts.json. Output: N passed, N failed, N changed.
+")
+```
+
+The agent follows these verification rules for each item in `verify_queue`:
 
 1. **Accessibility tree verification** — framework-dependent:
 
