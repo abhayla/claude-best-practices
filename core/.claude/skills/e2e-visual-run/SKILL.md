@@ -192,9 +192,10 @@ For each batch of tests from `test_queue` (batch_size from config):
 4. **Capture screenshot** for EVERY test (pass and fail) — the screenshot
    verdict is authoritative, exit codes are secondary signals:
    - **Playwright**: handled automatically via `screenshot: 'on'` in config
-     (set in Step 0.6). Screenshots saved to `outputDir` by Playwright.
-     After test run, copy screenshots to `test-evidence/{run_id}/screenshots/`
-     with naming convention `{test_name}.{pass|fail}.png`.
+     (set in Step 0.6). Screenshots and attachments are written to
+     `test-evidence/latest/` (the `outputDir` set in Step 0.6). After the
+     test run, rename `test-evidence/latest/` to `test-evidence/{run_id}/`
+     and reorganize into `screenshots/` and `a11y/` subdirectories.
    - **Cypress**: `screenshotOnRunFailure: true` + `cy.screenshot()` in afterEach
    - **Selenium**: `driver.save_screenshot()` in teardown
    - **Detox**: `device.takeScreenshot()` in afterEach
