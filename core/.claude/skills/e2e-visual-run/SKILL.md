@@ -7,7 +7,7 @@ description: >
   execution in any downstream project. Use with optional section filter:
   /e2e-visual-run salary. Use --update-baselines to approve intentional visual changes.
 type: workflow
-allowed-tools: "Bash Read Write Edit Grep Glob Skill"
+allowed-tools: "Bash Read Write Edit Grep Glob Skill Agent"
 argument-hint: "[section-name] [--update-baselines]"
 version: "2.0.0"
 ---
@@ -134,7 +134,7 @@ Verify the environment before running any tests.
      page: async ({ page }, use, testInfo) => {
        await use(page);
        // Post-test: capture a11y tree JSON for healing phase
-       const snapshot = await page.accessibility.snapshot();
+       const snapshot = await page.locator('body').ariaSnapshot();
        const name = testInfo.title.replace(/\s+/g, '_');
        const result = testInfo.status === 'passed' ? 'pass' : 'fail';
        await testInfo.attach(`a11y-${name}.${result}`, {
@@ -177,7 +177,12 @@ Populate the test queue with prioritized ordering.
 Run tests and capture evidence for verification. Read `references/scout-phase.md`
 for detailed framework-specific capture guidance.
 
-For each batch of tests from `test_queue` (batch_size from config):
+Process tests in batches of `batch_size` (default 5) from `test_queue`.
+Each batch runs sequentially via CLI — one `single_test_command` per test.
+Update the state file after EACH individual test completes (not per-batch).
+The batch size controls how many tests run before checking verify_queue.
+
+For each test in the current batch:
 
 1. **Run the test** using the discovered `single_test_command` from Step 0
 2. **Record exit code** and duration
@@ -224,6 +229,28 @@ For each batch of tests from `test_queue` (batch_size from config):
    ```
 7. **Write incrementally** — update state file after EACH test, not in batch
 
+## STEP 3.5: Map Framework Output to Evidence Directory
+
+Playwright saves artifacts to its own directory structure (e.g.,
+`test-results/{hash}/test-finished-1.png` with truncated names). Map
+these to the expected evidence structure before Step 4 verification.
+
+1. **Playwright**: scan `test-evidence/latest/` (the `outputDir` from Step 0.6):
+   - Screenshots: find `*.png` files, rename to
+     `test-evidence/{run_id}/screenshots/{test_name}.{pass|fail}.png`
+     using the test name from the parent directory or Playwright's JSON report
+   - A11y attachments: find `a11y-*.json` attachments, copy to
+     `test-evidence/{run_id}/a11y/{test_name}.json`
+   - Parse `test-evidence/latest/results.json` (Playwright JSON reporter)
+     for test name → artifact path mapping if direct naming is ambiguous
+
+2. **Cypress**: screenshots already saved to configured path — copy to evidence dir
+
+3. **Other frameworks**: artifacts already in evidence dir from capture step
+
+4. **Verify mapping**: log count of mapped screenshots and a11y files.
+   If any test in `verify_queue` has no corresponding screenshot, log warning.
+
 ## STEP 4: Verify Results (Inspector Phase)
 
 Dual-signal verification: accessibility tree + screenshot AI diff.
@@ -268,9 +295,20 @@ The agent follows these verification rules for each item in `verify_queue`:
 
    **If `verify-screenshots` is not provisioned** (skill directory doesn't exist):
    - Playwright: use native `toHaveScreenshot()` with threshold from config
-   - Other frameworks: use Claude multimodal Read for AI-based review
-     (generic checks: no error dialogs, data populated, layout correct)
-   - Log: "verify-screenshots not available — using native/AI fallback"
+   - Other frameworks: dispatch a screenshot inspector agent (do NOT review
+     20+ screenshots inline — it burns context):
+     ```
+     Agent("general-purpose", prompt="
+       You are a visual inspector. For each screenshot in
+       test-evidence/{run_id}/screenshots/:
+       - Read the image using the Read tool
+       - Verify: no error dialogs, data populated (tables have rows, cards
+         have content), layout correct, no stuck spinners, text readable
+       - Ignore timestamps, avatars, and masked regions
+       Write verdicts to .pipeline/screenshot-verdicts.json
+     ")
+     ```
+   - Log: "verify-screenshots not available — using Agent fallback"
 
 3. **Dual-signal verdict:**
 
@@ -318,10 +356,18 @@ For each item in `fix_queue`:
      to `known_issues` with human-review flag. Do not waste a subagent call.
    - Otherwise → proceed to diagnosis
 
-5. **Diagnose and fix** — Invoke `Skill("fix-loop")` with:
-   - `failure_output`: error output from scout phase
-   - `retest_command`: the discovered `single_test_command` from Step 0
-   - `max_iterations`: 1 (one fix attempt per healing pass)
+5. **Diagnose and fix** — dispatch in a subagent to prevent context burn
+   when multiple failures need healing:
+   ```
+   Agent("general-purpose", prompt="
+     Invoke Skill('fix-loop') with:
+     - failure_output: {error_output from scout phase}
+     - retest_command: {single_test_command from Step 0}
+     - max_iterations: 1
+     Return: classification, confidence (HIGH/MEDIUM/LOW), fix description,
+     and whether the fix succeeded.
+   ")
+   ```
 
 6. **Confidence gate** — read fix-loop's returned confidence level:
 

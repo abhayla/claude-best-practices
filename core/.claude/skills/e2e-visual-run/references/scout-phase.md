@@ -74,7 +74,7 @@ export const test = base.extend({
     await use(page);
 
     // Post-test: capture a11y tree JSON as attachment
-    const snapshot = await page.accessibility.snapshot();
+    const snapshot = await page.locator('body').ariaSnapshot();
     const name = testInfo.title.replace(/\s+/g, '_');
     const result = testInfo.status === 'passed' ? 'pass' : 'fail';
     await testInfo.attach(`a11y-${name}.${result}`, {
