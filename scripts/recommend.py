@@ -826,7 +826,20 @@ def tier_resource_with_reason(
         return "nice-to-have", "optional skill"
 
     if resource_type == "config":
-        return "nice-to-have", "optional"
+        # Config files are must-have when they are runtime dependencies of skills.
+        # Map config names to the skills that read them at runtime.
+        CONFIG_SKILL_MAP = {
+            "e2e-pipeline": "e2e-visual-run",
+        }
+        associated_skill = CONFIG_SKILL_MAP.get(name)
+        if associated_skill:
+            # If the associated skill would be must-have, so is the config
+            skill_tier, _ = tier_resource_with_reason(
+                associated_skill, "skill", stacks, dep_promoted
+            )
+            if skill_tier == "must-have":
+                return "must-have", f"runtime config for {associated_skill}"
+        return "nice-to-have", "optional config"
 
     return "nice-to-have", "optional"
 
@@ -1465,6 +1478,13 @@ def _resolve_hub_path(hub_root: Path, name: str, resource_type: str) -> Optional
         p = claude_dir / "rules" / f"{name}.md"
     elif resource_type == "hook":
         p = claude_dir / "hooks" / f"{name}.sh"
+    elif resource_type == "config":
+        # Config files can be .yml, .yaml, or .json
+        for ext in (".yml", ".yaml", ".json"):
+            p = claude_dir / "config" / f"{name}{ext}"
+            if p.exists():
+                return p
+        return None
     else:
         return None
     return p if p.exists() else None
@@ -1480,6 +1500,12 @@ def _resolve_project_path(claude_dir: Path, name: str, resource_type: str) -> Op
         p = claude_dir / "rules" / f"{name}.md"
     elif resource_type == "hook":
         p = claude_dir / "hooks" / f"{name}.sh"
+    elif resource_type == "config":
+        for ext in (".yml", ".yaml", ".json"):
+            p = claude_dir / "config" / f"{name}{ext}"
+            if p.exists():
+                return p
+        return None
     else:
         return None
     return p if p.exists() else None
@@ -2255,6 +2281,19 @@ def _copy_resources_for_tier(
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
                 copied.append(f".claude/hooks/{name}.sh")
+        elif rtype == "config":
+            # Config files can be .yml, .yaml, or .json
+            src = None
+            for ext in (".yml", ".yaml", ".json"):
+                candidate = claude_src / "config" / f"{name}{ext}"
+                if candidate.exists():
+                    src = candidate
+                    break
+            if src:
+                dst = target_dir / ".claude" / "config" / src.name
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+                copied.append(f".claude/config/{src.name}")
 
     return copied
 
