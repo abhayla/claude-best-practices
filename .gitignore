@@ -11,3 +11,11 @@ test-results/
 test-evidence/
 .pipeline/
 .claude/sessions/
+.claude/settings.local.json
+
+# Prevent provisioned core/.claude/ patterns from polluting hub-only .claude/
+# Hub-only .claude/ files are tracked explicitly; everything else is ignored.
+# If you need to add a new hub-only pattern, use `git add -f .claude/path`.
+.claude/config/
+.claude/sync-manifest.json
+CLAUDE.local.md
