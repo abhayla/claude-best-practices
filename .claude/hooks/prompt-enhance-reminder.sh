@@ -2,6 +2,10 @@
 # prompt-enhance-reminder.sh — UserPromptSubmit hook
 # Injects a deterministic reminder so Claude never skips the Enhanced indicator.
 #
+# The prompt-auto-enhance rule (.claude/rules/prompt-auto-enhance-rule.md) is
+# advisory — Claude can skip it under context pressure. This hook makes it
+# deterministic by injecting the reminder on every user prompt.
+#
 # Configuration:
 #   Event: UserPromptSubmit
 #   Matcher: (empty — matches all prompts)

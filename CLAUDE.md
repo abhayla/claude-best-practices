@@ -94,3 +94,45 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 - `/synthesize-project` (in `core/.claude/skills/`) provisions projects; `/synthesize-hub` (in `.claude/skills/`) generalizes patterns back into the hub
 - Adding a new stack requires changes in three places: `STACK_PREFIXES` in `scripts/bootstrap.py` (prefix→stack mapping), `STACK_DETECTORS` in `scripts/recommend.py` (auto-detection rules), and optionally `DEP_PATTERN_MAP` in `recommend.py` (dependency→pattern promotion).
 
+
+<!-- hub:best-practices:start -->
+
+<!-- PROTECTED SECTION — managed by claude-best-practices hub. -->
+<!-- Do NOT condense, rewrite, reorganize, or remove.          -->
+<!-- Any /init or optimization request must SKIP this section.  -->
+
+## Rules for Claude
+
+1. **Bug Fixing**: Use `/fix-loop` or `/fix-issue`. Start by writing a test that reproduces the bug, then fix and prove with a passing test.
+
+### Rules Reference
+
+| Rule File | What It Covers |
+|-----------|---------------|
+| `rules/agent-orchestration.md` | Constraints for multi-agent orchestration patterns in agents and skills. |
+| `rules/claude-behavior.md` | Universal behavioral rules for how Claude should approach all tasks. |
+| `rules/configuration-ssot.md` | Scope: global |
+| `rules/context-management.md` | Rules for managing context window, token usage, and documentation references. |
+| `rules/fastapi-backend.md` | FastAPI backend development rules and patterns. |
+| `rules/fastapi-database.md` | Database and migration rules for FastAPI + SQLAlchemy + Alembic. |
+| `rules/firebase.md` | Firebase Auth, Firestore, and backend token verification patterns. |
+| `rules/pattern-portability.md` | Portability standards for patterns distributed via core/.claude/. Ensures patterns work in any project without modification. |
+| `rules/pattern-self-containment.md` | Self-containment and completeness standards for patterns in core/.claude/. Prevents placeholders, oversized files, and broken dependencies. |
+| `rules/pattern-structure.md` | Structural requirements for skills, agents, and rules in core/.claude/. Enforces frontmatter, versioning, type classification, and scope. |
+| `rules/prompt-auto-enhance.md` | Prompt Auto Enhance |
+| `rules/prompt-auto-enhance-rule.md` | Auto-enhance every user prompt with project-specific context before acting. Prefix every response with a brief *Enhanced: ...* indicator.
+ |
+| `rules/rule-curation.md` | Guidelines for curating all patterns (skills, agents, rules) added to the distributed core/.claude/ template. |
+| `rules/rule-writing-meta.md` | Meta-guidance for writing effective CLAUDE.md rules, choosing config file placement, and structuring project instructions. |
+| `rules/tdd-rule.md` | Test-driven development workflow rules for red-green-refactor cycle. |
+| `rules/testing.md` | Testing conventions and best practices. |
+| `rules/workflow.md` | Development workflow guidelines for structured feature implementation and bug fixes. |
+| `rules/workflow-change-verification.md` | Workflow Change Verification |
+| `rules/workflow-docs-sync.md` | Workflow Docs Sync |
+| `rules/workflow-quality-gate.md` | Workflow Quality Gate |
+
+## Claude Code Configuration
+
+The `.claude/` directory contains 133 skills, 24 agents, and 20 rules for Claude Code.
+
+<!-- hub:best-practices:end -->
