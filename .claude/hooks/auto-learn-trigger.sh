@@ -5,7 +5,7 @@
 #
 # Configuration:
 #   Event: PostToolUse
-#   Matcher: * (all tools)
+#   Matcher: Bash
 #   Exit codes: 0 = no action (advisory only, never blocks)
 #
 # Environment variables (optional):
