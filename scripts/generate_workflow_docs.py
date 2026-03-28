@@ -15,6 +15,7 @@ Usage:
 
 import argparse
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -833,6 +834,13 @@ def main():
         help="Regenerate only a specific workflow doc."
     )
     args = parser.parse_args()
+
+    # 0. Auto-assign orphan patterns before generating docs
+    assign_script = ROOT / "scripts" / "assign_workflow_groups.py"
+    if assign_script.exists():
+        import os
+        env = {**os.environ, "PYTHONPATH": str(ROOT)}
+        subprocess.run([sys.executable, str(assign_script)], check=True, env=env)
 
     # 1. Collect all patterns from both core and hub-only dirs
     skills = collect_skills(CORE_CLAUDE, label="core")
