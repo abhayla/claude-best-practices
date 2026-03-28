@@ -15,11 +15,11 @@
 
 ### 14.2 Structured JSON Output
 
-Write machine-readable results to `test-results/test-generator.json` for stage gate validation:
+Write machine-readable results to `test-results/tdd-failing-test-generator.json` for stage gate validation:
 
 ```json
 {
-  "skill": "test-generator",
+  "skill": "tdd-failing-test-generator",
   "timestamp": "2026-03-14T10:30:00Z",
   "result": "PASSED",
   "summary": {

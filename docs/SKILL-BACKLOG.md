@@ -26,7 +26,7 @@
 | 9 | Automated a11y audit in demo | P2 | Stage 4 | **complete** | axe-core/Lighthouse integration for automated WCAG compliance checking in prototype gate (as `a11y-audit` skill) |
 | 10 | `schema-designer` | P1 | Stage 5 | **complete** | Holistic DB schema design: evolutionary strategy, query plan analysis, PII identification, API contract alignment, multi-DB support |
 | 11 | Stack-neutral `db-migrate` | P2 | Stage 5 | **complete** | Generic migration skill supporting Prisma, Knex, Django, TypeORM, Drizzle (not just Alembic) |
-| 12 | `test-generator` | P1 | Stage 6 | **complete** | Auto-generate test stubs from PRD/schema, BDD/Gherkin, coverage thresholds, property-based testing, mutation testing setup |
+| 12 | `tdd-failing-test-generator` | P1 | Stage 6 | **complete** | Auto-generate test stubs from PRD/schema, BDD/Gherkin, coverage thresholds, property-based testing, mutation testing setup |
 | 13 | `contract-test` | P2 | Stage 6 | **complete** | Consumer-driven contract testing with Pact, provider verification, contract broker integration |
 | 14 | Code quality gate enhancement | P1 | Stage 7 | **complete** | Cyclomatic complexity, duplication detection, SOLID checklist, TDD refactor phase, structured logging enforcement (as `code-quality-gate` skill) |
 | 15 | `api-docs-generator` | P2 | Stage 7 | **complete** | Auto-generate OpenAPI/Swagger docs from code annotations (FastAPI, Express JSDoc) — resolved by P1 #26 |

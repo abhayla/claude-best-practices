@@ -1,5 +1,5 @@
 ---
-name: test-generator
+name: tdd-failing-test-generator
 description: >
   Generate test suites from PRD requirements, schema, or API specs. Produces shared
   test infrastructure, unit, API, E2E stubs, BDD/Gherkin, property-based, snapshot
@@ -12,9 +12,10 @@ triggers:
   - pre-implementation tests
   - write tests from requirements
   - test matrix
+  - tdd-failing-test-generator
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<PRD file path, plan file path, schema file path, feature description, or coverage gap report>"
-version: "1.2.0"
+version: "2.0.0"
 type: workflow
 ---
 
@@ -474,7 +475,7 @@ After generating all test files, present:
 - Always generate BDD scenarios for user-facing features (Step 7)
 - Always generate E2E stubs with `skip` markers and fully-defined Page Objects (Step 6)
 - Always run the red phase gate (Step 13) to verify all tests FAIL
-- Always write structured JSON output to `test-results/test-generator.json` (Step 14)
+- Always write structured JSON output to `test-results/tdd-failing-test-generator.json` (Step 14)
 - After implementation, re-validate the test matrix by scanning test docstrings and comments for requirement IDs (AC-xxx, NFR-xxx). Flag any requirement that has lost its test mapping — a requirement without a corresponding test is a coverage regression that must be fixed before the PR merges
 
 ## MUST NOT DO

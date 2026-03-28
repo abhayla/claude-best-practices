@@ -57,7 +57,7 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 ### Testing
 | Skill | Description |
 |-------|-------------|
-| `/test-generator` | Auto-generate tests from requirements (BDD, property-based, mutation) |
+| `/tdd-failing-test-generator` | Auto-generate tests from requirements (BDD, property-based, mutation) |
 | `/contract-test` | Consumer-driven contract testing with Pact |
 | `/playwright` | Playwright E2E testing with Page Object Model |
 | `/perf-test` | k6 + Lighthouse + bundle analysis with baseline comparison |

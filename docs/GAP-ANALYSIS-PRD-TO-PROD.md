@@ -80,7 +80,7 @@
 | 3 | Scaffolding | Repo setup, CI skeleton, dev env, linters | Stage 1 | `project-scaffold`, `ci-cd-setup` | `STAGE-3-SCAFFOLDING.md` |
 | 4 | HTML Demo | Interactive prototype with sample data | Stages 1, 3 | `html-prototype`, `ui-ux-pro-max`, `a11y-audit`, `d3-viz` | `STAGE-4-HTML-DEMO.md` |
 | 5 | Schema & Data | DB design, migrations, seed data | Stages 2, 3 | `schema-designer`, `db-migrate`, `fastapi-db-migrate`, `pg-query` | `STAGE-5-SCHEMA.md` |
-| 6 | Pre-Impl Tests | TDD red phase: unit + contract + API stubs | Stages 2, 5 | `test-generator`, `tdd`, `contract-test`, `playwright`, `android-test-patterns` | `STAGE-6-PRE-IMPL-TESTS.md` |
+| 6 | Pre-Impl Tests | TDD red phase: unit + contract + API stubs | Stages 2, 5 | `tdd-failing-test-generator`, `tdd`, `contract-test`, `playwright`, `android-test-patterns` | `STAGE-6-PRE-IMPL-TESTS.md` |
 | 7 | Implementation | Code against failing tests | Stage 6 | `implement`, `executing-plans`, `subagent-driven-dev`, `fix-loop`, `code-quality-gate`, `feature-flag`, `api-docs-generator` | `STAGE-7-IMPLEMENTATION.md` |
 | 8 | Post-Impl Tests | E2E, visual, perf, load, security | Stage 7 | `playwright`, `verify-screenshots`, `perf-test`, `dast-scan`, `chaos-resilience`, `security-audit`, `web-quality`, `a11y-audit` | `STAGE-8-POST-IMPL-TESTS.md` |
 | 9 | Review | Code review, quality gates, PR | Stage 8 | `adversarial-review`, `architecture-fitness`, `change-risk-scoring`, `merge-strategy`, `request-code-review`, `pr-standards` | `STAGE-9-REVIEW.md` |
@@ -130,10 +130,10 @@
 | 5.2 | Migrations | ✅ Full | `db-migrate` (6 ORMs) + `fastapi-db-migrate` (Alembic) |
 | 5.3 | Seed data | ✅ Full | `schema-designer` + `fastapi-deploy` |
 | **STAGE 6: Pre-Impl Tests** |||
-| 6.1 | Unit test stubs (TDD red) | ✅ Full | `tdd` + `test-generator` |
+| 6.1 | Unit test stubs (TDD red) | ✅ Full | `tdd` + `tdd-failing-test-generator` |
 | 6.2 | API contract test stubs | ✅ Full | `contract-test` — Pact consumer-driven contracts |
 | 6.3 | E2E test stubs (Playwright) | ✅ Full | `playwright` POM + cross-browser |
-| 6.4 | Batch test generation from specs | ✅ Full | `test-generator` — BDD/Gherkin, property-based, mutation testing |
+| 6.4 | Batch test generation from specs | ✅ Full | `tdd-failing-test-generator` — BDD/Gherkin, property-based, mutation testing |
 | 6.5 | Android test patterns | ✅ Full | `android-test-patterns` — JUnit 5, Compose UI, Espresso |
 | **STAGE 7: Implementation** |||
 | 7.1 | Test-first implementation | ✅ Full | `implement` 7-step workflow |
@@ -189,7 +189,7 @@
 | 3. Scaffolding | 95% | `project-scaffold` — multi-stack |
 | 4. HTML Demo | 90% | `html-prototype` + `a11y-audit` |
 | 5. Schema & Data | 90% | `schema-designer` + `db-migrate` (6 ORMs) |
-| 6. Pre-Impl Tests | 90% | `test-generator` + `contract-test` + `android-test-patterns` |
+| 6. Pre-Impl Tests | 90% | `tdd-failing-test-generator` + `contract-test` + `android-test-patterns` |
 | 7. Implementation | 95% | `implement` + `code-quality-gate` + `feature-flag` |
 | 8. Post-Impl Tests | 90% | `perf-test` + `dast-scan` + `chaos-resilience` |
 | 9. Review | 95% | `architecture-fitness` + `change-risk-scoring` + `merge-strategy` |
@@ -243,7 +243,7 @@ pg-query (schema exploration)
          │
          ▼
 STAGE 6:
-test-generator (batch from ACs, BDD, property-based, mutation)
+tdd-failing-test-generator (batch from ACs, BDD, property-based, mutation)
 tdd (red phase)
 contract-test (Pact CDC)
 playwright (E2E stubs)
@@ -490,7 +490,7 @@ Horizontal bar chart showing autonomy level per stage. Higher fill = greater aut
 | 4-5 | `project-scaffold` | 3 | Scaffolding + security baseline (combined) |
 | 6 | `html-prototype` | 4 | Single-file prototypes with design tokens, Nielsen's heuristics |
 | 7 | `schema-designer` | 5 | ER modeling, PII, evolution strategy, API alignment |
-| 8 | `test-generator` | 6 | BDD, property-based, mutation testing, coverage thresholds |
+| 8 | `tdd-failing-test-generator` | 6 | BDD, property-based, mutation testing, coverage thresholds |
 | 9 | `code-quality-gate` | 7 | SOLID, complexity, DRY, Clean Architecture, logging, refactor |
 | 10 | `dast-scan` | 8 | ZAP + Nuclei + header audit + session testing + API fuzzing |
 | 11 | `architecture-fitness` | 9 | Dependency direction, circular deps, coupling, ADR review |

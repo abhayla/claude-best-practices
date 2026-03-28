@@ -142,7 +142,7 @@ Categorize failures using these standard categories:
 |--------|--------|
 | All passed | Report success, suggest broader suite if only subset was run |
 | Failures found | Auto-invoke `/fix-loop` (see STEP 7) |
-| Coverage below 80% | Highlight uncovered files, suggest `/test-generator` for gap filling |
+| Coverage below 80% | Highlight uncovered files, suggest `/tdd-failing-test-generator` for gap filling |
 | Flaky tests detected | Suggest re-running with `--count=3` (pytest-repeat) to confirm |
 
 ---

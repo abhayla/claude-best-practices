@@ -35,7 +35,7 @@ workflows:
         - test-pipeline
         - code-quality-gate
         - coverage-analysis
-        - test-generator
+        - tdd-failing-test-generator
         - regression-test
         - test-maintenance
       agents:

@@ -26,7 +26,7 @@
   ┌──────────────────────────────┐
   │  Test Matrix Generation      │
   │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
-  │  test-generator skill        │
+  │  tdd-failing-test-generator skill        │
   │  • Map PRD REQ → test cases  │
   │  • Test pyramid distribution │
   │  • Coverage target: 80% line │
@@ -94,7 +94,7 @@
   │  Structured JSON Output      │
   │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
   │  test-results/               │
-  │  test-generator.json         │
+  │  tdd-failing-test-generator.json         │
   └──────────────┬───────────────┘
                  │
                  ▼
@@ -126,7 +126,7 @@
       │                                  │
       │  ███ STAGE 6: PRE-TESTS ███      │
       │                                  │
-      │  test-generator                  │
+      │  tdd-failing-test-generator                  │
       │  tdd                             │
       │  contract-test                   │
       │  playwright                      │
@@ -160,49 +160,49 @@
 |---|-----------|---------------------|--------|-------------|
 | 1 | TDD red-green-refactor (red phase) | `tdd` skill (6 TDD patterns) | ✅ Covered | **Kent Beck TDD** |
 | 2 | Unit test writing (AAA pattern) | `tdd` skill + `tester-agent` | ✅ Covered | — |
-| 3 | API test stubs (CRUD + auth) | `test-generator` (Step 5) | ✅ Covered | — |
-| 4 | E2E test skeletons (Page Objects) | `test-generator` (Step 6) + `playwright` skill (POM pattern) | ✅ Covered | — |
+| 3 | API test stubs (CRUD + auth) | `tdd-failing-test-generator` (Step 5) | ✅ Covered | — |
+| 4 | E2E test skeletons (Page Objects) | `tdd-failing-test-generator` (Step 6) + `playwright` skill (POM pattern) | ✅ Covered | — |
 | 5 | Performance test stubs (k6) | Stage 6 prompt | ✅ Covered | — |
-| 6 | Security test stubs | `test-generator` (Step 5: API auth tests) | ✅ Covered | — |
-| 7 | Test matrix (PRD req → test mapping) | `test-generator` (Step 1) | ✅ Covered | **Requirements Traceability** |
-| 8 | Test fixtures from Stage 5 factories | `test-generator` (Step 4.3: factories + isolation patterns) | ✅ Covered | — |
-| 9 | BDD / Gherkin scenarios | `test-generator` (Step 7: feature files + step defs) | ✅ Covered | **BDD (Dan North)** |
+| 6 | Security test stubs | `tdd-failing-test-generator` (Step 5: API auth tests) | ✅ Covered | — |
+| 7 | Test matrix (PRD req → test mapping) | `tdd-failing-test-generator` (Step 1) | ✅ Covered | **Requirements Traceability** |
+| 8 | Test fixtures from Stage 5 factories | `tdd-failing-test-generator` (Step 4.3: factories + isolation patterns) | ✅ Covered | — |
+| 9 | BDD / Gherkin scenarios | `tdd-failing-test-generator` (Step 7: feature files + step defs) | ✅ Covered | **BDD (Dan North)** |
 | 10 | Contract testing (consumer-driven) | `contract-test` skill (Pact consumer/provider, broker, CI) | ✅ Covered | **Consumer-Driven Contracts (Pact)** |
-| 11 | Mutation testing setup | `test-generator` (Step 10: mutmut/Stryker config) | ✅ Covered | **Mutation Testing (Pitest/Stryker)** |
-| 12 | Test coverage threshold enforcement | `test-generator` (Step 9: pytest-cov / vitest thresholds) | ✅ Covered | **Code Coverage Standards** |
-| 13 | Property-based testing | `test-generator` (Step 8: Hypothesis / fast-check) | ✅ Covered | **Property-Based Testing (Hypothesis/fast-check)** |
-| 14 | Snapshot testing | `test-generator` (Step 11: data snapshots) + `verify-screenshots` (visual) | ✅ Covered | — |
-| 15 | Test data isolation (per-test DB transactions) | `test-generator` (Step 3 + Step 4.3: conftest.py + factories) | ✅ Covered | **Test Isolation** |
-| 16 | Accessibility testing stubs | `test-generator` (Step 12: axe-core + Playwright a11y) | ✅ Covered | **WCAG 2.1 AA** |
-| 17 | E2E stub format (skip + POM) | `test-generator` (Step 6: skipped stubs with Page Objects) | ✅ Covered | — |
-| 18 | Shared test infrastructure | `test-generator` (Step 3: conftest.py / setupTests.ts) | ✅ Covered | — |
-| 19 | Red phase gate verification | `test-generator` (Step 13: run tests, verify 100% fail/skip) | ✅ Covered | **TDD Red Phase** |
-| 20 | Structured JSON output | `test-generator` (Step 14: test-results/test-generator.json) | ✅ Covered | **Stage Gate Protocol** |
-| 21 | Decision criteria (BDD/property/contract) | `test-generator` (Steps 7.4, 8.3, contract criteria) | ✅ Covered | — |
+| 11 | Mutation testing setup | `tdd-failing-test-generator` (Step 10: mutmut/Stryker config) | ✅ Covered | **Mutation Testing (Pitest/Stryker)** |
+| 12 | Test coverage threshold enforcement | `tdd-failing-test-generator` (Step 9: pytest-cov / vitest thresholds) | ✅ Covered | **Code Coverage Standards** |
+| 13 | Property-based testing | `tdd-failing-test-generator` (Step 8: Hypothesis / fast-check) | ✅ Covered | **Property-Based Testing (Hypothesis/fast-check)** |
+| 14 | Snapshot testing | `tdd-failing-test-generator` (Step 11: data snapshots) + `verify-screenshots` (visual) | ✅ Covered | — |
+| 15 | Test data isolation (per-test DB transactions) | `tdd-failing-test-generator` (Step 3 + Step 4.3: conftest.py + factories) | ✅ Covered | **Test Isolation** |
+| 16 | Accessibility testing stubs | `tdd-failing-test-generator` (Step 12: axe-core + Playwright a11y) | ✅ Covered | **WCAG 2.1 AA** |
+| 17 | E2E stub format (skip + POM) | `tdd-failing-test-generator` (Step 6: skipped stubs with Page Objects) | ✅ Covered | — |
+| 18 | Shared test infrastructure | `tdd-failing-test-generator` (Step 3: conftest.py / setupTests.ts) | ✅ Covered | — |
+| 19 | Red phase gate verification | `tdd-failing-test-generator` (Step 13: run tests, verify 100% fail/skip) | ✅ Covered | **TDD Red Phase** |
+| 20 | Structured JSON output | `tdd-failing-test-generator` (Step 14: test-results/tdd-failing-test-generator.json) | ✅ Covered | **Stage Gate Protocol** |
+| 21 | Decision criteria (BDD/property/contract) | `tdd-failing-test-generator` (Steps 7.4, 8.3, contract criteria) | ✅ Covered | — |
 
 ## SE Best Practices Validation
 
 | Standard | Relevant Aspect | Coverage |
 |----------|----------------|----------|
 | **Kent Beck TDD** | Red-green-refactor cycle, test-first development | ✅ Red phase explicitly enforced — all tests must fail |
-| **BDD (Dan North)** | Behavior specs in Given/When/Then format, stakeholder-readable | ✅ Gherkin feature files + step definitions in `test-generator` Step 7 |
+| **BDD (Dan North)** | Behavior specs in Given/When/Then format, stakeholder-readable | ✅ Gherkin feature files + step definitions in `tdd-failing-test-generator` Step 7 |
 | **Consumer-Driven Contracts** | API consumers define expected contract, provider validates | ✅ `contract-test` skill with Pact consumer/provider, broker, CI integration |
-| **Mutation Testing** | Verify test suite quality by injecting faults | ✅ mutmut/Stryker setup + interpretation guide in `test-generator` Step 10 |
-| **Code Coverage** | Minimum coverage thresholds (line, branch, function) | ✅ 80% line / 70% branch thresholds enforced in `test-generator` Step 9 |
-| **Property-Based Testing** | Generate random inputs to find edge cases (Hypothesis, fast-check) | ✅ Hypothesis + fast-check templates in `test-generator` Step 8 |
-| **Test Pyramid** | More unit tests than integration, more integration than E2E | ✅ Test matrix in `test-generator` Step 1 structures by category count |
-| **Snapshot Testing** | Lock down output shapes to detect unintended changes | ✅ Data snapshots in `test-generator` Step 11 + visual via `verify-screenshots` |
-| **Stage Gate Protocol** | Machine-readable pass/fail for pipeline orchestration | ✅ Structured JSON output in `test-generator` Step 14 per `testing.md` rule |
+| **Mutation Testing** | Verify test suite quality by injecting faults | ✅ mutmut/Stryker setup + interpretation guide in `tdd-failing-test-generator` Step 10 |
+| **Code Coverage** | Minimum coverage thresholds (line, branch, function) | ✅ 80% line / 70% branch thresholds enforced in `tdd-failing-test-generator` Step 9 |
+| **Property-Based Testing** | Generate random inputs to find edge cases (Hypothesis, fast-check) | ✅ Hypothesis + fast-check templates in `tdd-failing-test-generator` Step 8 |
+| **Test Pyramid** | More unit tests than integration, more integration than E2E | ✅ Test matrix in `tdd-failing-test-generator` Step 1 structures by category count |
+| **Snapshot Testing** | Lock down output shapes to detect unintended changes | ✅ Data snapshots in `tdd-failing-test-generator` Step 11 + visual via `verify-screenshots` |
+| **Stage Gate Protocol** | Machine-readable pass/fail for pipeline orchestration | ✅ Structured JSON output in `tdd-failing-test-generator` Step 14 per `testing.md` rule |
 
 ## Gap Proposals (All Resolved)
 
-### Gap 6.1: `test-generator` skill (Priority: P1) — ✅ RESOLVED
+### Gap 6.1: `tdd-failing-test-generator` skill (Priority: P1) — ✅ RESOLVED
 
-**Resolution:** `test-generator` skill created (2026-03-13) and expanded (2026-03-14) to 14 steps covering: shared test infrastructure, unit/API/E2E/BDD/property/snapshot stubs, coverage thresholds, mutation testing, red phase gate verification, and structured JSON output.
+**Resolution:** `tdd-failing-test-generator` skill created (2026-03-13) and expanded (2026-03-14) to 14 steps covering: shared test infrastructure, unit/API/E2E/BDD/property/snapshot stubs, coverage thresholds, mutation testing, red phase gate verification, and structured JSON output.
 
 ### Gap 6.2: `contract-test` skill (Priority: P2) — ✅ RESOLVED
 
-**Resolution:** `contract-test` skill created (2026-03-13) with Pact consumer/provider/broker workflow. Decision criteria added to `test-generator` for when contract tests apply (multi-service) vs when to skip (monoliths).
+**Resolution:** `contract-test` skill created (2026-03-13) with Pact consumer/provider/broker workflow. Decision criteria added to `tdd-failing-test-generator` for when contract tests apply (multi-service) vs when to skip (monoliths).
 
 ### Gap 6.3: Security artifact mismatch (Priority: P1) — ✅ RESOLVED
 
@@ -229,7 +229,7 @@
 | `tests/perf/` (k6 stubs) | Stage 8 (Post-Tests — run against deployed) | k6 scripts |
 | `tests/conftest.py` / `tests/setupTests.ts` | Stage 7 + 8 (shared fixtures) | Framework config |
 | `tests/factories.py` | Stage 7 + 8 (test data) | Factory functions |
-| `test-results/test-generator.json` | Stage 0 (Orchestrator — gate validation) | JSON |
+| `test-results/tdd-failing-test-generator.json` | Stage 0 (Orchestrator — gate validation) | JSON |
 | Test matrix | Stage 8 (Post-Tests — verify all pass), Stage 9 (Review) | Table in stage doc |
 
 ## Research Targets
@@ -252,7 +252,7 @@
 
 ## Autonomy Verdict
 
-**✅ Fully autonomous.** All 21 capabilities are ✅ covered. The `test-generator` skill (14 steps) now covers: shared test infrastructure generation (conftest.py/setupTests.ts), requirements-driven test matrix, E2E stub format (skipped tests with fully-defined Page Objects), BDD/Gherkin scenario generation with mandatory/optional criteria, property-based testing with decision guidance, snapshot testing (data + visual), coverage threshold configuration (reads from plan/config before defaults), mutation testing setup, accessibility test stubs, red phase gate verification (runs all tests, asserts 100% fail/skip), and structured JSON output for stage gate validation. Combined with `tdd` skill for red-green-refactor, `playwright` for E2E patterns, `contract-test` for Pact consumer-driven contracts (with decision criteria for when to use), `android-test-patterns` for Android, `android-run-e2e` + `flutter-e2e-test` for mobile E2E, and `verify-screenshots` for visual regression — no gaps remain. Only iOS-native XCUITest patterns are missing (Maestro covers cross-platform flows).
+**✅ Fully autonomous.** All 21 capabilities are ✅ covered. The `tdd-failing-test-generator` skill (14 steps) now covers: shared test infrastructure generation (conftest.py/setupTests.ts), requirements-driven test matrix, E2E stub format (skipped tests with fully-defined Page Objects), BDD/Gherkin scenario generation with mandatory/optional criteria, property-based testing with decision guidance, snapshot testing (data + visual), coverage threshold configuration (reads from plan/config before defaults), mutation testing setup, accessibility test stubs, red phase gate verification (runs all tests, asserts 100% fail/skip), and structured JSON output for stage gate validation. Combined with `tdd` skill for red-green-refactor, `playwright` for E2E patterns, `contract-test` for Pact consumer-driven contracts (with decision criteria for when to use), `android-test-patterns` for Android, `android-run-e2e` + `flutter-e2e-test` for mobile E2E, and `verify-screenshots` for visual regression — no gaps remain. Only iOS-native XCUITest patterns are missing (Maestro covers cross-platform flows).
 
 ---
 
@@ -266,7 +266,7 @@ When the pipeline-orchestrator dispatches this stage, the stage agent executes:
 # Read: docs/schema/erd.md (from Stage 5 — DB models for test fixtures)
 
 # 2. Generate comprehensive test suite (all test types)
-Skill("test-generator", args="docs/plans/<feature>-plan.md")
+Skill("tdd-failing-test-generator", args="docs/plans/<feature>-plan.md")
 
 # This generates:
 #   - tests/unit/ (failing unit tests — AAA pattern)
@@ -275,13 +275,13 @@ Skill("test-generator", args="docs/plans/<feature>-plan.md")
 #   - tests/bdd/ (Gherkin feature files + step definitions)
 #   - tests/property/ (Hypothesis/fast-check stubs)
 #   - tests/perf/ (k6 stubs)
-#   - test-results/test-generator.json (gate result)
+#   - test-results/tdd-failing-test-generator.json (gate result)
 
 # 3. Red phase gate: verify ALL tests fail or are skipped
 # Run test suite — assert 0 passing tests (100% fail/skip)
 ```
 
-**Artifact validation:** Verify `tests/unit/`, `tests/api/`, `tests/e2e/` directories exist and contain test files. Verify `test-results/test-generator.json` exists with gate result. Verify red phase: running tests produces 0 passes (all fail or skip).
+**Artifact validation:** Verify `tests/unit/`, `tests/api/`, `tests/e2e/` directories exist and contain test files. Verify `test-results/tdd-failing-test-generator.json` exists with gate result. Verify red phase: running tests produces 0 passes (all fail or skip).
 
 ---
 
@@ -291,6 +291,6 @@ Skill("test-generator", args="docs/plans/<feature>-plan.md")
 |------|--------|
 | 2026-03-13 | Initial prompt design |
 | 2026-03-13 | Rewritten as AUDIT with capability checklist, SE best practices, gap proposals |
-| 2026-03-13 | P1 gap resolved: `test-generator` skill created with BDD/Gherkin, property-based testing, mutation testing, coverage enforcement, a11y stubs — 6 ❌ items flipped to ✅ |
+| 2026-03-13 | P1 gap resolved: `tdd-failing-test-generator` skill created with BDD/Gherkin, property-based testing, mutation testing, coverage enforcement, a11y stubs — 6 ❌ items flipped to ✅ |
 | 2026-03-13 | P2 gap resolved: `contract-test` skill created with Pact consumer-driven contract testing |
-| 2026-03-14 | Comprehensive autonomy review — 10 gaps fixed: (1) added structured JSON output to `test-generator` Step 14 for stage gate validation; (2) removed security checklist artifact mismatch with Stage 8 — Stage 6 produces security test stubs in tests/api/, Stage 8 produces threat-model.md; (3) defined E2E stub format (skip markers + fully-defined Page Objects) in Step 6; (4) added red phase gate verification (Step 13: run tests, assert 100% fail/skip); (5) fixed Mobile E2E status from ❌ to ✅ (android-run-e2e + flutter-e2e-test exist); (6) added decision criteria for BDD/property-based/contract tests; (7) added coverage threshold source priority (plan > config > defaults); (8) added snapshot testing (Step 11: data + visual) flipping capability #14 from ⚠️ to ✅; (9) added test file naming conventions; (10) added conftest.py/setupTests.ts generation (Step 3). All 21 capabilities now ✅ |
+| 2026-03-14 | Comprehensive autonomy review — 10 gaps fixed: (1) added structured JSON output to `tdd-failing-test-generator` Step 14 for stage gate validation; (2) removed security checklist artifact mismatch with Stage 8 — Stage 6 produces security test stubs in tests/api/, Stage 8 produces threat-model.md; (3) defined E2E stub format (skip markers + fully-defined Page Objects) in Step 6; (4) added red phase gate verification (Step 13: run tests, assert 100% fail/skip); (5) fixed Mobile E2E status from ❌ to ✅ (android-run-e2e + flutter-e2e-test exist); (6) added decision criteria for BDD/property-based/contract tests; (7) added coverage threshold source priority (plan > config > defaults); (8) added snapshot testing (Step 11: data + visual) flipping capability #14 from ⚠️ to ✅; (9) added test file naming conventions; (10) added conftest.py/setupTests.ts generation (Step 3). All 21 capabilities now ✅ |

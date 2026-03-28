@@ -346,12 +346,12 @@ class TestStage6PreTests:
         assert len(all_tests) >= 2, f"Only {len(all_tests)} test files — expected >= 2"
 
     def test_test_generator_json_exists(self):
-        path = SMOKE_PROJECT / "test-results" / "test-generator.json"
+        path = SMOKE_PROJECT / "test-results" / "tdd-failing-test-generator.json"
         if not path.exists():
             # Check alternative location
-            alt_paths = _find_files("test-generator.json", SMOKE_PROJECT)
+            alt_paths = _find_files("tdd-failing-test-generator.json", SMOKE_PROJECT)
             if not alt_paths:
-                pytest.skip("test-results/test-generator.json not found (may use different output format)")
+                pytest.skip("test-results/tdd-failing-test-generator.json not found (may use different output format)")
 
     def test_conftest_exists(self):
         conftest = SMOKE_PROJECT / "tests" / "conftest.py"

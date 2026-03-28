@@ -2987,14 +2987,14 @@
     "tags": ["e2e", "testing", "healing", "auto-fix"],
     "changelog": "v1.0.0: Initial release — 8-classification targeted healing with 3-attempt cap"
   },
-  "test-generator": {
+  "tdd-failing-test-generator": {
     "hash": "c2e0ba97d16f743bb0dbf2e3b71ac4d6cc962cc9717c365c242537018f2ebeb3",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "last_updated": "2026-03-28",
     "dependencies": [
       "tdd",
       "playwright"
@@ -3008,7 +3008,7 @@
       "coverage",
       "mutation-testing"
     ],
-    "changelog": "v1.0.0: Initial release — unit, API, BDD, property, mutation, a11y test generation"
+    "changelog": "v2.0.0: Renamed from test-generator to tdd-failing-test-generator for clarity"
   },
   "test-knowledge": {
     "hash": "f380f6e842e631190c03f53dc6ca2869486b23fe849f3bda2ae46805138f1906",
