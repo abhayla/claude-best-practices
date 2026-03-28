@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-21",
-    "total_patterns": 203
+    "total_patterns": 205
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -1111,6 +1111,20 @@
     "tags": ["e2e", "testing", "visual-regression", "self-healing", "accessibility"],
     "changelog": "v1.0.0: Initial release — queue-based orchestration, dual-signal verification, 8-classification healing"
   },
+  "e2e-best-practices": {
+    "hash": "0759c02c2ae097dd2c5e5d4a38d1740cae9db44c0f7fe9246a32a739ea54b400",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-28",
+    "last_updated": "2026-03-28",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Cross-framework E2E testing best practices for selector strategy, test data isolation, CI pipeline tiering, mock decisions, auth patterns, and parallel execution",
+    "tags": ["e2e", "testing", "best-practices", "cross-framework"],
+    "changelog": "v1.0.0: Initial release — 10 sections covering gaps across existing E2E skills"
+  },
   "e2e-pipeline": {
     "hash": "3f99d9af1414c3b663537b9ba88a955da23db69adf920ef230f8d5b2c7e97d97",
     "type": "config",
@@ -1124,6 +1138,20 @@
     "description": "Queue-based E2E pipeline configuration: queue ordering, retry limits, healing state machine, agent dispatch settings",
     "tags": ["e2e", "config", "pipeline"],
     "changelog": "v1.0.0: Initial release — externalized DAG for e2e-conductor-agent"
+  },
+  "e2e-test-writing": {
+    "hash": "b399f0fa12fb1f13d3cc372ff9fc50e8827bae5e2057c80f490b1e0e5c27f12a",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-28",
+    "last_updated": "2026-03-28",
+    "dependencies": ["e2e-best-practices"],
+    "visibility": "public",
+    "description": "Auto-loaded rule that nudges to e2e-best-practices skill when writing E2E tests",
+    "tags": ["e2e", "testing", "rule"],
+    "changelog": "v1.0.0: Initial release — globs-scoped pointer to e2e-best-practices"
   },
   "e2e-conductor-agent": {
     "hash": "2e95def12b5b3af32082430077b71706a7221a4fb59360e2d93bff0cd2b38a23",
@@ -1444,13 +1472,13 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
   "flutter-e2e-test": {
-    "hash": "07487b54b4a0dafe8d5541ff31b14779393fd9aeec5e504cbe98e368bdec0e08",
+    "hash": "7f4bd83765a154dd4ae3abeb0327295778a062ccfda07822fc414a0b78a78b5d",
     "type": "skill",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-23",
+    "last_updated": "2026-03-28",
     "dependencies": [],
     "visibility": "public",
     "description": "Flutter E2E testing across mobile platforms with auto-fix on failure",
@@ -2026,13 +2054,13 @@
     "tier": "must-have"
   },
   "playwright": {
-    "hash": "64d1bac9cdbea249dfc38048bf7b8372e3bdc2527a01fdb4829e42754781a08c",
+    "hash": "d4bcb87f94b7cda579d4b7fc1cf09accef4a2cd620859719bfba638526cfb7b6",
     "type": "skill",
     "category": "core",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-19",
+    "last_updated": "2026-03-28",
     "dependencies": [],
     "visibility": "public",
     "description": "Browser automation, E2E test generation, Page Object Model",
@@ -2290,13 +2318,13 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
   "react-native-e2e": {
-    "hash": "a1b56c7d0b5c0e145883d337e4031ee32058e70fd4354427f7c70ede854ab715",
+    "hash": "bc884cd88cc41ff0de1ea71a10b34e4421ee285baa01a585cec7e4b9d42ba1af",
     "type": "skill",
     "category": "stack:react-nextjs",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-03-14",
+    "last_updated": "2026-03-28",
     "dependencies": [],
     "visibility": "public",
     "description": "",

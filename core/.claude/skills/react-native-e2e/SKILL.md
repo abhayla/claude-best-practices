@@ -11,7 +11,7 @@ triggers:
   - rn e2e
   - react native visual
 argument-hint: "<test-file|feature-name|all> [--platform android|ios] [--visual]"
-version: "1.0.0"
+version: "1.0.1"
 type: workflow
 ---
 
@@ -89,6 +89,8 @@ detox test --configuration android.emu.debug --retries 2
 ---
 
 ## STEP 2: Writing E2E Tests
+
+**Read:** `e2e-best-practices/SKILL.md` for cross-framework E2E patterns (selectors, data isolation, anti-patterns).
 
 ### Login Flow
 

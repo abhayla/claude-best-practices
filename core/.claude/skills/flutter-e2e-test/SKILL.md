@@ -8,7 +8,7 @@ description: >
 triggers: "flutter test, e2e, integration test, end-to-end, widget test, UI test"
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<test-scope: 'all' | feature-name | 'setup' | 'visual' | 'monkey'>"
-version: "1.2.0"
+version: "1.2.1"
 type: workflow
 ---
 
@@ -77,6 +77,7 @@ flutter test integration_test/ --no-pub 2>&1 | head -5
 
 ## STEP 2: Writing E2E Tests
 
+**Read:** `e2e-best-practices/SKILL.md` for cross-framework E2E patterns (selectors, data isolation, anti-patterns).
 
 **Read:** `references/writing-e2e-tests.md` for detailed step 2: writing e2e tests reference material.
 

@@ -11,7 +11,7 @@ triggers:
   - e2e-web
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<user-flow-or-test-description>"
-version: "1.1.1"
+version: "1.1.2"
 type: workflow
 ---
 
@@ -132,6 +132,7 @@ Key config decisions:
 
 ## STEP 2: Browser Automation Fundamentals
 
+**Read:** `e2e-best-practices/SKILL.md` for cross-framework E2E patterns (selectors, data isolation, anti-patterns).
 
 **Read:** `references/browser-automation-fundamentals.md` for detailed step 2: browser automation fundamentals reference material.
 
