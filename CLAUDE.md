@@ -70,6 +70,9 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 - **`extract_references.py`** — Splits oversized SKILL.md files into `references/` subdirectories: `python scripts/extract_references.py [--threshold 500] [--skill SKILL_NAME]`
 - **`third_party_skills.py`** — Detects third-party skills from project dependencies and recommends install commands.
 - **`check_freshness.py`** — Checks source freshness for internet-sourced patterns.
+- **`sync_to_local.py`** — Syncs hub patterns to local projects.
+- **`discovery_adapter.py`** — Adapts discovery results from scans into normalized format.
+- **`assign_workflow_groups.py`** — Auto-assigns orphan `core/` patterns to workflow groups in `config/workflow-groups.yml`. Called automatically by `generate_workflow_docs.py`.
 
 ### CI Workflows
 
@@ -133,6 +136,6 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 
 ## Claude Code Configuration
 
-The `.claude/` directory contains 133 skills, 24 agents, and 20 rules for Claude Code.
+The `core/.claude/` directory contains 143 skills, 27 agents, and 24 rules for Claude Code.
 
 <!-- hub:best-practices:end -->
