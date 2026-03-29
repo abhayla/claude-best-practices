@@ -25,11 +25,89 @@ import yaml
 
 from scripts.workflow_quality_gate_validate_patterns import parse_frontmatter, get_body
 
+import shutil
+import tempfile
+
 ROOT = Path(__file__).parent.parent
 CORE_CLAUDE = ROOT / "core" / ".claude"
 HUB_CLAUDE = ROOT / ".claude"
 WORKFLOWS_DIR = ROOT / "docs" / "workflows"
 GROUPS_CONFIG = ROOT / "config" / "workflow-groups.yml"
+
+
+# ── SVG Rendering ───────────────────────────────────────────────���
+
+
+def render_mermaid_to_svg(mermaid_code: str, output_path: Path) -> bool:
+    """Render a Mermaid diagram to SVG using mmdc.
+
+    Returns True if rendering succeeded, False otherwise.
+    Requires @mermaid-js/mermaid-cli (mmdc) to be installed.
+    """
+    mmdc = shutil.which("mmdc")
+    if not mmdc:
+        return False
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".mmd", delete=False, encoding="utf-8"
+    ) as f:
+        f.write(mermaid_code)
+        tmp_input = f.name
+
+    try:
+        result = subprocess.run(
+            [mmdc, "-i", tmp_input, "-o", str(output_path), "-b", "transparent"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        return result.returncode == 0 and output_path.exists()
+    except (subprocess.TimeoutExpired, OSError):
+        return False
+    finally:
+        Path(tmp_input).unlink(missing_ok=True)
+
+
+def embed_svg_images(
+    md_content: str, workflow_name: str, images_dir: Path
+) -> str:
+    """Extract Mermaid blocks from markdown, render to SVG, embed image links.
+
+    For each ```mermaid block, renders an SVG to images_dir and inserts
+    an ![diagram](images/...) link above the code block. The Mermaid
+    code block is kept as a fallback for GitHub rendering.
+    """
+    mmdc = shutil.which("mmdc")
+    if not mmdc:
+        return md_content
+
+    images_dir.mkdir(parents=True, exist_ok=True)
+
+    # Find all mermaid code blocks
+    pattern = re.compile(r"(```mermaid\n)(.*?)(```)", re.DOTALL)
+    matches = list(pattern.finditer(md_content))
+
+    if not matches:
+        return md_content
+
+    result = md_content
+    offset = 0
+    for i, m in enumerate(matches):
+        mermaid_code = m.group(2).strip()
+        svg_name = f"{workflow_name}-{i + 1}.svg"
+        svg_path = images_dir / svg_name
+
+        if render_mermaid_to_svg(mermaid_code, svg_path):
+            # Insert image link before the mermaid block
+            diagram_type = "Overview" if i == 0 else f"Detailed Flow"
+            img_link = f"![{diagram_type}](images/{svg_name})\n\n"
+            insert_pos = m.start() + offset
+            result = result[:insert_pos] + img_link + result[insert_pos:]
+            offset += len(img_link)
+
+    return result
 
 MANUAL_MARKER = "<!-- MANUAL ANNOTATIONS -->"
 
@@ -938,9 +1016,15 @@ def main():
                   f"({len(wf_data['skills'])} skills, {len(wf_data['agents'])} agents, "
                   f"{len(wf_data['rules'])} rules)")
         else:
+            # Render SVGs if mmdc is available
+            images_dir = WORKFLOWS_DIR / "images"
+            content = embed_svg_images(content, wf_name, images_dir)
+
             doc_path.write_text(content, encoding="utf-8")
             status = "Updated" if existing else "Created"
-            print(f"  {status}: docs/workflows/{wf_name}.md")
+            svg_count = len(list(images_dir.glob(f"{wf_name}-*.svg"))) if images_dir.exists() else 0
+            svg_info = f" + {svg_count} SVGs" if svg_count else ""
+            print(f"  {status}: docs/workflows/{wf_name}.md{svg_info}")
 
         generated.append(wf_name)
 

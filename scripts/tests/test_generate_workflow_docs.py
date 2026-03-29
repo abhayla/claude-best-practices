@@ -1,14 +1,17 @@
-"""Tests for generate_workflow_docs.py Mermaid generation.
+"""Tests for generate_workflow_docs.py Mermaid generation and SVG rendering.
 
-Covers the five root-cause bugs:
+Covers:
 1. Backticks in step titles break Mermaid labels
 2. Duplicate step numbers produce conflicting node definitions
 3. Dangling _ext references to nonexistent skills/agents
 4. Self-loop edges from duplicate steps
 5. Oversized graphs (too many skills) should be capped
+6. SVG image rendering via mmdc
 """
 
+import shutil
 import pytest
+from pathlib import Path
 
 from scripts.generate_workflow_docs import (
     extract_steps,
@@ -275,3 +278,71 @@ class TestGenerateMermaidFlow:
         assert "connected_a" in result
         assert "connected_b" in result
         assert "isolated_c" not in result
+
+
+# ── SVG rendering tests ──────────────────────────────────────────
+
+
+HAS_MMDC = shutil.which("mmdc") is not None
+
+
+class TestRenderMermaidToSvg:
+    """Tests for rendering Mermaid blocks to SVG images."""
+
+    @pytest.mark.skipif(not HAS_MMDC, reason="mmdc not installed")
+    def test_render_simple_mermaid_to_svg(self, tmp_path):
+        from scripts.generate_workflow_docs import render_mermaid_to_svg
+
+        mermaid_code = "graph LR\n    A --> B\n    B --> C"
+        svg_path = tmp_path / "test.svg"
+        result = render_mermaid_to_svg(mermaid_code, svg_path)
+        assert result is True
+        assert svg_path.exists()
+        content = svg_path.read_text(encoding="utf-8")
+        assert "<svg" in content
+
+    @pytest.mark.skipif(not HAS_MMDC, reason="mmdc not installed")
+    def test_render_invalid_mermaid_returns_false(self, tmp_path):
+        from scripts.generate_workflow_docs import render_mermaid_to_svg
+
+        mermaid_code = "this is not valid mermaid syntax {{{{{"
+        svg_path = tmp_path / "bad.svg"
+        result = render_mermaid_to_svg(mermaid_code, svg_path)
+        assert result is False
+
+    @pytest.mark.skipif(not HAS_MMDC, reason="mmdc not installed")
+    def test_workflow_doc_contains_svg_image_link(self, tmp_path):
+        """After rendering, the markdown should contain ![](images/...) links."""
+        from scripts.generate_workflow_docs import render_workflow_doc, embed_svg_images
+
+        # Create a minimal workflow doc with mermaid
+        workflow = {
+            "description": "Test workflow for SVG rendering.",
+            "skills": ["skill-a", "skill-b"],
+            "agents": [],
+            "rules": [],
+            "edges": [{"from": "skill-a", "to": "skill-b", "type": "Skill()"}],
+        }
+        graph = _make_graph([
+            ("skill-a", [
+                {"num": "1", "title": "Do A"},
+                {"num": "2", "title": "Do B"},
+                {"num": "3", "title": "Do C"},
+            ]),
+            ("skill-b", [
+                {"num": "1", "title": "Do X"},
+                {"num": "2", "title": "Do Y"},
+                {"num": "3", "title": "Do Z"},
+            ]),
+        ])
+        md_content = render_workflow_doc("test-workflow", workflow, graph)
+
+        images_dir = tmp_path / "images"
+        result = embed_svg_images(md_content, "test-workflow", images_dir)
+
+        # Should have image links
+        assert "![" in result
+        assert "images/" in result
+        # SVG files should exist
+        svg_files = list(images_dir.glob("*.svg"))
+        assert len(svg_files) >= 1
