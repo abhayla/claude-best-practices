@@ -151,13 +151,25 @@ def extract_references(name: str, body: str) -> dict:
     return {k: sorted(v) for k, v in refs.items()}
 
 
+PLACEHOLDER_SKILL_REFS = frozenset({
+    "skill-name", "clear", "public", "docs", "redoc", "metrics",
+    "removed-skill", "name", "example", "your-skill",
+})
+
+
+def _sanitize_mermaid_label(text: str) -> str:
+    """Remove characters that break Mermaid double-quoted labels."""
+    return text.replace("`", "").replace('"', "'")
+
+
 def extract_steps(name: str, body: str) -> list[dict]:
     """Extract numbered STEP sections from a skill body.
 
     Returns a list of step dicts with title, delegations, gates, artifacts,
-    and decision points.
+    and decision points. Deduplicates by step number (first match wins).
     """
     steps = []
+    seen_nums: set[str] = set()
     # Match ## STEP N: Title or ## STEP N — Title
     step_pattern = re.compile(
         r'^##\s+STEP\s+(\d+\w*)\s*[:\-—]\s*(.+)', re.MULTILINE
@@ -168,8 +180,14 @@ def extract_steps(name: str, body: str) -> list[dict]:
 
     for i, m in enumerate(matches):
         step_num = m.group(1).strip()
-        step_title = m.group(2).strip()
+        # Deduplicate: keep only the first occurrence of each step number
+        if step_num in seen_nums:
+            continue
+        seen_nums.add(step_num)
+
+        step_title = _sanitize_mermaid_label(m.group(2).strip())
         start = m.end()
+        # Find end: next match (including skipped duplicates)
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
         section = body[start:end]
 
@@ -180,6 +198,8 @@ def extract_steps(name: str, body: str) -> list[dict]:
         for sm in re.finditer(r'`/([a-z0-9_-]+)`', section):
             skill_calls.add(sm.group(1))
         skill_calls.discard(name)
+        # Filter out placeholder/example skill references
+        skill_calls -= PLACEHOLDER_SKILL_REFS
 
         agent_calls = set()
         for am in re.finditer(r'Agent\(["\']([a-z0-9_-]+)["\']\)', section):
@@ -410,17 +430,29 @@ def generate_mermaid_flow(workflow: dict) -> str:
     """Generate a Mermaid flowchart for a single workflow."""
     lines = ["```mermaid", "graph LR"]
 
-    # Define node shapes: skills=rectangles, agents=rounded, rules=hexagons
+    # Build set of names that participate in at least one edge
+    connected_names = set()
+    for edge in workflow["edges"]:
+        connected_names.add(edge["from"])
+        connected_names.add(edge["to"])
+
+    # Define node shapes: only include nodes with edges (skip isolated)
     all_names = set()
     for name in workflow["skills"]:
+        if name not in connected_names:
+            continue
         safe = name.replace("-", "_")
         lines.append(f"    {safe}[/{name}/]")
         all_names.add(name)
     for name in workflow["agents"]:
+        if name not in connected_names:
+            continue
         safe = name.replace("-", "_")
         lines.append(f"    {safe}([{name}])")
         all_names.add(name)
     for name in workflow["rules"]:
+        if name not in connected_names:
+            continue
         safe = name.replace("-", "_")
         lines.append(f"    {safe}{{{{{name}}}}}")
         all_names.add(name)
@@ -460,6 +492,11 @@ def generate_detailed_mermaid(workflow: dict, graph: dict) -> str:
     if not detailed_skills:
         return ""
 
+    # Cap graph complexity: skip detailed flow for large workflows
+    MAX_DETAILED_SKILLS = 20
+    if len(detailed_skills) > MAX_DETAILED_SKILLS:
+        return ""
+
     for sname, steps in detailed_skills:
         safe_skill = sname.replace("-", "_")
 
@@ -495,7 +532,10 @@ def generate_detailed_mermaid(workflow: dict, graph: dict) -> str:
             prev_id = step_id
 
             # Show delegations as edges to external nodes
+            # Only emit _ext nodes for skills/agents that exist in the graph
             for sc in step["skill_calls"]:
+                if sc not in graph["nodes"]:
+                    continue
                 ext_id = sc.replace("-", "_") + "_ext"
                 if ext_id not in node_ids:
                     lines.append(f"        {ext_id}([/{sc}/])")
@@ -503,6 +543,8 @@ def generate_detailed_mermaid(workflow: dict, graph: dict) -> str:
                 lines.append(f"        {step_id} -.-> {ext_id}")
 
             for ac in step["agent_calls"]:
+                if ac not in graph["nodes"]:
+                    continue
                 ext_id = ac.replace("-", "_") + "_ext"
                 if ext_id not in node_ids:
                     lines.append(f"        {ext_id}(({ac}))")
