@@ -168,11 +168,13 @@ class TestComputeAssignments:
         review_entries = assignments[NEEDS_REVIEW_GROUP]
         assert any(e[0] == "mystery-skill" for e in review_entries)
 
-    def test_low_confidence_goes_to_single_best_group(self):
+    def test_low_confidence_with_refs_goes_to_single_best_group(self):
+        """Score 2-3 with at least one ref-graph match → single best group."""
         definitions = _make_definitions()
         graph = _make_graph([
-            ("some-test-helper", "skill", [], [], "Helper for tests"),
-            ("auto-verify", "skill", [], [], ""),
+            # Has a ref to auto-verify (ref_score=3) + keyword "test" (kw_score=0) = 3
+            ("some-test-helper", "skill", ["auto-verify"], [], "Helper utility"),
+            ("auto-verify", "skill", [], ["some-test-helper"], ""),
             ("fix-loop", "skill", [], [], ""),
             ("tester-agent", "agent", [], [], ""),
             ("testing", "rule", [], [], ""),
@@ -180,12 +182,12 @@ class TestComputeAssignments:
             ("diataxis-docs", "skill", [], [], ""),
         ])
         assignments = compute_assignments({"some-test-helper"}, definitions, graph)
-        # Should be in exactly one group (low confidence = single assignment)
         groups_with_entry = [
             wf for wf, entries in assignments.items()
             if wf != NEEDS_REVIEW_GROUP and any(e[0] == "some-test-helper" for e in entries)
         ]
         assert len(groups_with_entry) == 1
+        assert groups_with_entry[0] == "testing-pipeline"
 
     def test_empty_orphans_returns_empty(self):
         definitions = _make_definitions()
@@ -193,3 +195,53 @@ class TestComputeAssignments:
         assignments = compute_assignments(set(), definitions, graph)
         total = sum(len(entries) for entries in assignments.values())
         assert total == 0
+
+    def test_score_1_keyword_only_goes_to_needs_review(self):
+        """Score 1 from keyword match alone is too weak — should go to
+        _needs-manual-review, not a real workflow group."""
+        definitions = {
+            "development-loop": {
+                "description": "The core build cycle: ideate, plan, implement, verify, commit.",
+                "seeds": {
+                    "skills": ["brainstorm", "implement", "writing-plans"],
+                    "agents": [],
+                    "rules": ["workflow"],
+                },
+            },
+        }
+        graph = _make_graph([
+            # "tailwind-dev" has no refs, will score 1 on keyword "dev"
+            # matching "development" in the group name
+            ("tailwind-dev", "skill", [], [], "Apply Tailwind CSS patterns"),
+            ("brainstorm", "skill", [], [], ""),
+            ("implement", "skill", [], [], ""),
+            ("writing-plans", "skill", [], [], ""),
+        ])
+        # Manually add the rule node
+        graph["nodes"]["workflow"] = {
+            "type": "rule", "refs_out": [], "refs_in": [],
+            "description": "", "path": "core/.claude/rules/workflow.md",
+        }
+        assignments = compute_assignments({"tailwind-dev"}, definitions, graph)
+        # Score 1 keyword-only should go to needs-review, not development-loop
+        review_entries = [e[0] for e in assignments.get(NEEDS_REVIEW_GROUP, [])]
+        dev_entries = [e[0] for e in assignments.get("development-loop", [])]
+        assert "tailwind-dev" in review_entries, \
+            f"tailwind-dev should be in needs-review but was in development-loop: {dev_entries}"
+
+
+class TestWorkflowGroupBalance:
+    """Tests for workflow group size balance in current config."""
+
+    def test_no_group_exceeds_50_seeds(self):
+        """No single workflow group should have >50 seeds in the config.
+        Testing-pipeline is naturally the largest (many test frameworks)."""
+        from scripts.generate_workflow_docs import load_workflow_definitions
+
+        definitions = load_workflow_definitions()
+
+        for wf_name, wf_def in definitions.items():
+            seeds = wf_def.get("seeds", {})
+            total = sum(len(seeds.get(cat, [])) for cat in ("skills", "agents", "rules"))
+            assert total <= 50, \
+                f"{wf_name} has {total} seeds (max 50)"

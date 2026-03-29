@@ -493,7 +493,7 @@ def generate_detailed_mermaid(workflow: dict, graph: dict) -> str:
         return ""
 
     # Cap graph complexity: skip detailed flow for large workflows
-    MAX_DETAILED_SKILLS = 20
+    MAX_DETAILED_SKILLS = 25
     if len(detailed_skills) > MAX_DETAILED_SKILLS:
         return ""
 

@@ -239,8 +239,8 @@ class TestGenerateDetailedMermaid:
         assert "skill_name_ext" not in result
 
     def test_large_workflow_capped(self):
-        """Graphs with >20 skills should return empty (use overview only)."""
-        skill_names = [f"skill-{i}" for i in range(25)]
+        """Graphs with >25 skills should return empty (use overview only)."""
+        skill_names = [f"skill-{i}" for i in range(30)]
         skills_data = [
             (name, [
                 {"num": "1", "title": "A"},
@@ -254,7 +254,7 @@ class TestGenerateDetailedMermaid:
         result = generate_detailed_mermaid(workflow, graph)
 
         assert result == "", \
-            "Detailed mermaid should be empty for workflows with >20 skills"
+            "Detailed mermaid should be empty for workflows with >25 skills"
 
 
 # ── generate_mermaid_flow (overview) tests ───────────────────────

@@ -113,6 +113,7 @@ def compute_assignments(
         ptype = node["type"]
 
         scores: dict[str, int] = {}
+        ref_scores: dict[str, int] = {}
         for wf_name, wf_def in definitions.items():
             if wf_name == NEEDS_REVIEW_GROUP:
                 continue
@@ -125,11 +126,16 @@ def compute_assignments(
                 group_seeds[wf_name],
             )
             scores[wf_name] = ref_score + kw_score
+            ref_scores[wf_name] = ref_score
 
         top_score = max(scores.values()) if scores else 0
+        has_any_ref = any(v > 0 for v in ref_scores.values())
 
         if top_score == 0:
             assignments[NEEDS_REVIEW_GROUP].append((orphan, ptype, 0))
+        elif top_score < 2 and not has_any_ref:
+            # Very low keyword-only score — not confident enough to assign
+            assignments[NEEDS_REVIEW_GROUP].append((orphan, ptype, top_score))
         elif top_score < 4:
             # Low confidence: assign to the single best group only
             best_group = max(scores, key=scores.get)
