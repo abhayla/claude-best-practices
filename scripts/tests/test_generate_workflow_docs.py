@@ -7,11 +7,13 @@ Covers:
 4. Self-loop edges from duplicate steps
 5. Oversized graphs (too many skills) should be capped
 6. SVG image rendering via mmdc
+7. --require-svg strict mode for CI enforcement
 """
 
 import shutil
 import pytest
 from pathlib import Path
+from unittest.mock import patch
 
 from scripts.generate_workflow_docs import (
     extract_steps,
@@ -346,3 +348,62 @@ class TestRenderMermaidToSvg:
         # SVG files should exist
         svg_files = list(images_dir.glob("*.svg"))
         assert len(svg_files) >= 1
+
+
+# ── --require-svg strict mode tests ─────────────────────────────
+
+
+class TestRequireSvgFlag:
+    """Tests for --require-svg CLI flag that enforces SVG rendering in CI."""
+
+    @patch("scripts.generate_workflow_docs.shutil.which", return_value=None)
+    def test_require_svg_exits_when_mmdc_missing(self, mock_which):
+        """--require-svg must exit 1 when mmdc is not installed."""
+        from scripts.generate_workflow_docs import check_svg_requirements
+        with pytest.raises(SystemExit) as exc_info:
+            check_svg_requirements(require_svg=True)
+        assert exc_info.value.code == 1
+
+    @patch("scripts.generate_workflow_docs.shutil.which", return_value="/usr/bin/mmdc")
+    def test_require_svg_passes_when_mmdc_available(self, mock_which):
+        """--require-svg must not fail when mmdc is found."""
+        from scripts.generate_workflow_docs import check_svg_requirements
+        # Should not raise
+        check_svg_requirements(require_svg=True)
+
+    @patch("scripts.generate_workflow_docs.shutil.which", return_value=None)
+    def test_no_require_svg_silently_degrades(self, mock_which):
+        """Without --require-svg, missing mmdc should not cause failure."""
+        from scripts.generate_workflow_docs import check_svg_requirements
+        # Should not raise even though mmdc is missing
+        check_svg_requirements(require_svg=False)
+
+    @patch("scripts.generate_workflow_docs.shutil.which", return_value=None)
+    def test_embed_svg_returns_unchanged_when_mmdc_missing(self, mock_which):
+        """embed_svg_images must return content unchanged when mmdc missing."""
+        from scripts.generate_workflow_docs import embed_svg_images
+        md = "```mermaid\ngraph LR\n    A --> B\n```\n"
+        result = embed_svg_images(md, "test", Path("/tmp/fake-images"))
+        assert result == md
+        assert "![" not in result
+
+    def test_validate_svg_output_detects_missing_svgs(self, tmp_path):
+        """validate_svg_output must fail when expected SVGs are missing."""
+        from scripts.generate_workflow_docs import validate_svg_output
+        images_dir = tmp_path / "images"
+        images_dir.mkdir()
+        # No SVG files exist but workflow has mermaid blocks
+        with pytest.raises(SystemExit) as exc_info:
+            validate_svg_output("test-workflow", images_dir, expected_count=2)
+        assert exc_info.value.code == 1
+
+    def test_validate_svg_output_passes_when_svgs_exist(self, tmp_path):
+        """validate_svg_output must pass when expected SVGs are present."""
+        from scripts.generate_workflow_docs import validate_svg_output
+        images_dir = tmp_path / "images"
+        images_dir.mkdir()
+        # Create fake SVG files
+        (images_dir / "test-workflow-1.svg").write_text("<svg></svg>")
+        (images_dir / "test-workflow-2.svg").write_text("<svg></svg>")
+        # Should not raise
+        validate_svg_output("test-workflow", images_dir, expected_count=2)

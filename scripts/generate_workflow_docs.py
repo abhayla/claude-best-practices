@@ -38,6 +38,31 @@ GROUPS_CONFIG = ROOT / "config" / "workflow-groups.yml"
 # ── SVG Rendering ───────────────────────────────────────────────���
 
 
+def check_svg_requirements(require_svg: bool) -> None:
+    """Check if mmdc is available. Exit with error if --require-svg is set."""
+    if require_svg and not shutil.which("mmdc"):
+        print(
+            "ERROR: --require-svg specified but mmdc (mermaid-cli) is not installed.\n"
+            "Install with: npm install -g @mermaid-js/mermaid-cli",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
+def validate_svg_output(
+    workflow_name: str, images_dir: Path, expected_count: int
+) -> None:
+    """Verify that expected SVG files were generated. Exit 1 if not."""
+    actual = len(list(images_dir.glob(f"{workflow_name}-*.svg")))
+    if actual < expected_count:
+        print(
+            f"ERROR: --require-svg: expected {expected_count} SVGs for "
+            f"'{workflow_name}' but found {actual}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
 def render_mermaid_to_svg(mermaid_code: str, output_path: Path) -> bool:
     """Render a Mermaid diagram to SVG using mmdc.
 
@@ -953,7 +978,14 @@ def main():
         "--workflow", type=str, default=None,
         help="Regenerate only a specific workflow doc."
     )
+    parser.add_argument(
+        "--require-svg", action="store_true",
+        help="Fail if mmdc is not available for SVG rendering (use in CI)."
+    )
     args = parser.parse_args()
+
+    # Enforce SVG requirements early if --require-svg is set
+    check_svg_requirements(args.require_svg)
 
     # 0. Auto-assign orphan patterns before generating docs
     assign_script = ROOT / "scripts" / "assign_workflow_groups.py"
@@ -1020,11 +1052,17 @@ def main():
             images_dir = WORKFLOWS_DIR / "images"
             content = embed_svg_images(content, wf_name, images_dir)
 
+            # Count mermaid blocks to know how many SVGs are expected
+            mermaid_block_count = len(re.findall(r"```mermaid\n", content))
+
             doc_path.write_text(content, encoding="utf-8")
             status = "Updated" if existing else "Created"
             svg_count = len(list(images_dir.glob(f"{wf_name}-*.svg"))) if images_dir.exists() else 0
             svg_info = f" + {svg_count} SVGs" if svg_count else ""
             print(f"  {status}: docs/workflows/{wf_name}.md{svg_info}")
+
+            if args.require_svg and mermaid_block_count > 0:
+                validate_svg_output(wf_name, images_dir, expected_count=svg_count or mermaid_block_count)
 
         generated.append(wf_name)
 
