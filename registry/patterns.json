@@ -3491,7 +3491,7 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
   },
   "workflow-master-template": {
-    "hash": "6020e39c8955a2da32ae0408f148eb343fdcf5ce1ce03ca04a3faeef23c34a61",
+    "hash": "966bddab6c93acb5c95ce9718738f0ac0c9bfedc27bed59ae61f25b946b0986b",
     "type": "agent",
     "category": "core",
     "version": "1.0.0",

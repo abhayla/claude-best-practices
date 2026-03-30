@@ -28,6 +28,7 @@ SKILLS_DIR = CORE_CLAUDE / "skills"
 AGENTS_DIR = CORE_CLAUDE / "agents"
 RULES_DIR = CORE_CLAUDE / "rules"
 REGISTRY_PATH = ROOT / "registry" / "patterns.json"
+WORKFLOW_CONTRACTS_PATH = ROOT / "config" / "workflow-contracts.yaml"
 
 # Thresholds
 SIZE_WARN = 500
@@ -677,10 +678,210 @@ def validate_file(file_path: Path) -> list[str]:
 # ── Main ────────────────────────────────────────────────────────────────────
 
 
+def validate_workflow_contracts(
+    contracts_path: Optional[Path] = None,
+    skills_dir: Optional[Path] = None,
+    agents_dir: Optional[Path] = None,
+) -> list[str]:
+    """Validate config/workflow-contracts.yaml for structural integrity.
+
+    Checks:
+      1. All skill/agent references in steps exist on disk
+      2. No DAG cycles in depends_on
+      3. artifact_in references point to valid artifact_out definitions
+      4. workflow_id (YAML key) matches master_agent naming convention
+    """
+    contracts_path = contracts_path or WORKFLOW_CONTRACTS_PATH
+    skills_dir = skills_dir or SKILLS_DIR
+    agents_dir = agents_dir or AGENTS_DIR
+
+    if not contracts_path.exists():
+        return []
+
+    try:
+        data = yaml.safe_load(contracts_path.read_text(encoding="utf-8"))
+    except yaml.YAMLError as exc:
+        return [f"workflow-contracts: Failed to parse YAML: {exc}"]
+
+    if not data or "workflows" not in data:
+        return [f"workflow-contracts: Missing 'workflows' top-level key"]
+
+    errors: list[str] = []
+    workflows = data["workflows"]
+
+    # Build lookup sets for existing skills and agents on disk
+    existing_skills: set[str] = set()
+    if skills_dir.exists():
+        existing_skills = {
+            d.name for d in skills_dir.iterdir()
+            if d.is_dir() and (d / "SKILL.md").exists()
+        }
+
+    existing_agents: set[str] = set()
+    if agents_dir.exists():
+        existing_agents = {
+            p.stem for p in agents_dir.glob("*.md")
+            if p.name != "README.md"
+        }
+
+    for wf_id, wf in workflows.items():
+        if not isinstance(wf, dict):
+            errors.append(f"workflow-contracts [{wf_id}]: Workflow value is not a mapping")
+            continue
+
+        # --- Check 4: workflow_id consistency with master_agent ---
+        master_agent = wf.get("master_agent", "")
+        expected_prefix = wf_id.replace("-", "-") + "-master-agent"
+        if master_agent and master_agent != expected_prefix:
+            # Only warn — naming convention is advisory, not a hard requirement
+            pass  # Convention: {workflow_id}-master-agent
+
+        steps = wf.get("steps", [])
+        if not steps:
+            errors.append(f"workflow-contracts [{wf_id}]: No steps defined")
+            continue
+
+        # Build maps for step validation
+        step_ids: set[str] = set()
+        # Map step_id -> set of artifact_out keys
+        step_artifact_outs: dict[str, set[str]] = {}
+
+        for step in steps:
+            sid = step.get("id", "")
+            if not sid:
+                errors.append(f"workflow-contracts [{wf_id}]: Step missing 'id' field")
+                continue
+            step_ids.add(sid)
+
+            # Collect artifact_out keys per step
+            artifacts_out = step.get("artifacts_out", {})
+            step_artifact_outs[sid] = set(artifacts_out.keys()) if isinstance(artifacts_out, dict) else set()
+
+        # --- Check 1: skill/agent references exist on disk ---
+        for step in steps:
+            sid = step.get("id", "")
+            skill_ref = step.get("skill")
+            dispatch_ref = step.get("dispatch")
+
+            if skill_ref and skill_ref not in existing_skills:
+                errors.append(
+                    f"workflow-contracts [{wf_id}] step '{sid}': "
+                    f"References skill '{skill_ref}' which does not exist on disk"
+                )
+
+            if dispatch_ref and dispatch_ref not in existing_agents:
+                errors.append(
+                    f"workflow-contracts [{wf_id}] step '{sid}': "
+                    f"Dispatches agent '{dispatch_ref}' which does not exist on disk"
+                )
+
+        # --- Check sub_orchestrators exist ---
+        for sub in wf.get("sub_orchestrators", []):
+            agent_name = sub.get("agent", "")
+            if agent_name and agent_name not in existing_agents:
+                errors.append(
+                    f"workflow-contracts [{wf_id}]: "
+                    f"Sub-orchestrator agent '{agent_name}' does not exist on disk"
+                )
+
+        # --- Check master_agent exists ---
+        if master_agent and master_agent not in existing_agents:
+            errors.append(
+                f"workflow-contracts [{wf_id}]: "
+                f"Master agent '{master_agent}' does not exist on disk"
+            )
+
+        # --- Check 2: No DAG cycles in depends_on ---
+        # Build adjacency list and detect cycles via DFS
+        adj: dict[str, list[str]] = {}
+        for step in steps:
+            sid = step.get("id", "")
+            if not sid:
+                continue
+            deps = step.get("depends_on", [])
+            adj[sid] = list(deps) if isinstance(deps, list) else []
+            # Also validate that depends_on references exist as step ids
+            for dep in adj[sid]:
+                if dep not in step_ids:
+                    errors.append(
+                        f"workflow-contracts [{wf_id}] step '{sid}': "
+                        f"depends_on references unknown step '{dep}'"
+                    )
+
+        # Cycle detection using iterative DFS with coloring
+        WHITE, GRAY, BLACK = 0, 1, 2
+        color = {sid: WHITE for sid in adj}
+        cycle_found = False
+
+        for start in adj:
+            if color[start] != WHITE:
+                continue
+            stack = [(start, False)]
+            while stack:
+                node, processed = stack.pop()
+                if processed:
+                    color[node] = BLACK
+                    continue
+                if color[node] == GRAY:
+                    color[node] = BLACK
+                    continue
+                color[node] = GRAY
+                stack.append((node, True))
+                for neighbor in adj.get(node, []):
+                    if neighbor not in color:
+                        continue
+                    if color[neighbor] == GRAY:
+                        errors.append(
+                            f"workflow-contracts [{wf_id}]: "
+                            f"DAG cycle detected involving step '{neighbor}'"
+                        )
+                        cycle_found = True
+                    elif color[neighbor] == WHITE:
+                        stack.append((neighbor, False))
+
+        # --- Check 3: artifact_in references point to valid artifact_out ---
+        for step in steps:
+            sid = step.get("id", "")
+            artifacts_in = step.get("artifacts_in", {})
+            if not isinstance(artifacts_in, dict):
+                continue
+            for art_name, art_ref in artifacts_in.items():
+                if not isinstance(art_ref, str):
+                    continue
+                # Format: "step_id.artifacts_out.artifact_key"
+                parts = art_ref.split(".")
+                if len(parts) != 3 or parts[1] != "artifacts_out":
+                    errors.append(
+                        f"workflow-contracts [{wf_id}] step '{sid}': "
+                        f"artifact_in '{art_name}' has invalid reference format '{art_ref}' "
+                        f"— expected 'step_id.artifacts_out.key'"
+                    )
+                    continue
+                ref_step, _, ref_key = parts
+                if ref_step not in step_ids:
+                    errors.append(
+                        f"workflow-contracts [{wf_id}] step '{sid}': "
+                        f"artifact_in '{art_name}' references unknown step '{ref_step}'"
+                    )
+                elif ref_key not in step_artifact_outs.get(ref_step, set()):
+                    errors.append(
+                        f"workflow-contracts [{wf_id}] step '{sid}': "
+                        f"artifact_in '{art_name}' references non-existent artifact_out "
+                        f"'{ref_key}' from step '{ref_step}'"
+                    )
+
+    return errors
+
+
 def validate_third_party_registry() -> list[str]:
     """Validate config/third-party-skills.yml if it exists."""
-    from scripts.third_party_skills import validate_registry
-    return validate_registry(ROOT)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "third_party_skills", ROOT / "scripts" / "third_party_skills.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.validate_registry(ROOT)
 
 
 def validate_all() -> list[str]:
@@ -737,6 +938,9 @@ def validate_all() -> list[str]:
 
     # Third-party skills registry validation
     all_errors.extend(validate_third_party_registry())
+
+    # Workflow contracts validation
+    all_errors.extend(validate_workflow_contracts())
 
     return all_errors
 

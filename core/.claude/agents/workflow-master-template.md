@@ -1,3 +1,13 @@
+---
+name: workflow-master-template
+description: >
+  Shared orchestration protocol reference for all workflow-master agents.
+  Not an agent itself — a reference document that agents read at runtime
+  for shared protocols. Do not dispatch directly.
+model: inherit
+version: "1.0.0"
+---
+
 # Workflow Master Template — Shared Orchestration Protocol
 
 This is a reference document, not an agent. Every workflow-master agent reads

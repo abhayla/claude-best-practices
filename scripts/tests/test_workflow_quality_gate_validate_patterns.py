@@ -17,6 +17,7 @@ from scripts.workflow_quality_gate_validate_patterns import (
     validate_file,
     validate_rule,
     validate_skill,
+    validate_workflow_contracts,
 )
 
 
@@ -684,3 +685,356 @@ class TestValidateFile:
     def test_looks_like_agent_false_for_rule(self, tmp_path):
         rule_path = _write_rule(tmp_path, "my-rule")
         assert _looks_like_agent(rule_path) is False
+
+
+# ── Workflow Contracts Validation Tests ───────────────────────────────────
+
+
+def _write_contracts(tmp_path, yaml_content):
+    """Write a workflow-contracts.yaml file and return its path."""
+    config_dir = tmp_path / "config"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    contracts_path = config_dir / "workflow-contracts.yaml"
+    contracts_path.write_text(yaml_content, encoding="utf-8")
+    return contracts_path
+
+
+def _setup_skill(tmp_path, name):
+    """Create a minimal skill directory with SKILL.md."""
+    skill_dir = tmp_path / "skills" / name
+    skill_dir.mkdir(parents=True, exist_ok=True)
+    (skill_dir / "SKILL.md").write_text(
+        f"---\nname: {name}\n---\n# {name}\nBody content.",
+        encoding="utf-8",
+    )
+    return skill_dir
+
+
+def _setup_agent(tmp_path, name):
+    """Create a minimal agent .md file."""
+    agents_dir = tmp_path / "agents"
+    agents_dir.mkdir(parents=True, exist_ok=True)
+    (agents_dir / f"{name}.md").write_text(
+        f"---\nname: {name}\nmodel: inherit\n---\n# {name}\nBody.",
+        encoding="utf-8",
+    )
+    return agents_dir / f"{name}.md"
+
+
+class TestValidateWorkflowContracts:
+    def test_missing_file_returns_empty(self, tmp_path):
+        errors = validate_workflow_contracts(
+            contracts_path=tmp_path / "nonexistent.yaml",
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert errors == []
+
+    def test_invalid_yaml(self, tmp_path):
+        path = _write_contracts(tmp_path, ": bad: yaml: [")
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("Failed to parse YAML" in e for e in errors)
+
+    def test_missing_workflows_key(self, tmp_path):
+        path = _write_contracts(tmp_path, "defaults:\n  max_retries: 3\n")
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("Missing 'workflows'" in e for e in errors)
+
+    def test_valid_workflow_no_errors(self, tmp_path):
+        _setup_skill(tmp_path, "brainstorm")
+        _setup_skill(tmp_path, "writing-plans")
+        _setup_agent(tmp_path, "dev-master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              dev:
+                master_agent: dev-master-agent
+                steps:
+                  - id: ideate
+                    skill: brainstorm
+                    depends_on: []
+                    artifacts_out:
+                      spec: { path: "docs/spec.md" }
+                  - id: plan
+                    skill: writing-plans
+                    depends_on: [ideate]
+                    artifacts_in:
+                      spec: "ideate.artifacts_out.spec"
+                    artifacts_out:
+                      plan: { path: "docs/plan.md" }
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert errors == []
+
+    def test_missing_skill_reference(self, tmp_path):
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              test-wf:
+                master_agent: master-agent
+                steps:
+                  - id: do_thing
+                    skill: nonexistent-skill
+                    depends_on: []
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("nonexistent-skill" in e and "does not exist" in e for e in errors)
+
+    def test_missing_dispatch_agent(self, tmp_path):
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              test-wf:
+                master_agent: master-agent
+                steps:
+                  - id: exec
+                    dispatch: ghost-agent
+                    depends_on: []
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("ghost-agent" in e and "does not exist" in e for e in errors)
+
+    def test_missing_master_agent(self, tmp_path):
+        _setup_skill(tmp_path, "my-skill")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              test-wf:
+                master_agent: missing-master-agent
+                steps:
+                  - id: step1
+                    skill: my-skill
+                    depends_on: []
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("missing-master-agent" in e and "does not exist" in e for e in errors)
+
+    def test_missing_sub_orchestrator_agent(self, tmp_path):
+        _setup_skill(tmp_path, "my-skill")
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              test-wf:
+                master_agent: master-agent
+                sub_orchestrators:
+                  - agent: phantom-agent
+                    role: "Does not exist"
+                steps:
+                  - id: step1
+                    skill: my-skill
+                    depends_on: []
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("phantom-agent" in e and "does not exist" in e for e in errors)
+
+    def test_dag_cycle_detected(self, tmp_path):
+        _setup_skill(tmp_path, "skill-a")
+        _setup_skill(tmp_path, "skill-b")
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              cycle-wf:
+                master_agent: master-agent
+                steps:
+                  - id: a
+                    skill: skill-a
+                    depends_on: [b]
+                  - id: b
+                    skill: skill-b
+                    depends_on: [a]
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("DAG cycle" in e for e in errors)
+
+    def test_dag_self_cycle(self, tmp_path):
+        _setup_skill(tmp_path, "skill-a")
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              self-cycle-wf:
+                master_agent: master-agent
+                steps:
+                  - id: a
+                    skill: skill-a
+                    depends_on: [a]
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("DAG cycle" in e for e in errors)
+
+    def test_depends_on_unknown_step(self, tmp_path):
+        _setup_skill(tmp_path, "skill-a")
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              bad-dep-wf:
+                master_agent: master-agent
+                steps:
+                  - id: a
+                    skill: skill-a
+                    depends_on: [nonexistent_step]
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("unknown step 'nonexistent_step'" in e for e in errors)
+
+    def test_artifact_in_valid_reference(self, tmp_path):
+        _setup_skill(tmp_path, "skill-a")
+        _setup_skill(tmp_path, "skill-b")
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              art-wf:
+                master_agent: master-agent
+                steps:
+                  - id: produce
+                    skill: skill-a
+                    depends_on: []
+                    artifacts_out:
+                      data: { path: "out/data.json" }
+                  - id: consume
+                    skill: skill-b
+                    depends_on: [produce]
+                    artifacts_in:
+                      data: "produce.artifacts_out.data"
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert errors == []
+
+    def test_artifact_in_references_unknown_step(self, tmp_path):
+        _setup_skill(tmp_path, "skill-a")
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              bad-art-wf:
+                master_agent: master-agent
+                steps:
+                  - id: consume
+                    skill: skill-a
+                    depends_on: []
+                    artifacts_in:
+                      data: "ghost_step.artifacts_out.data"
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("unknown step 'ghost_step'" in e for e in errors)
+
+    def test_artifact_in_references_nonexistent_artifact_out(self, tmp_path):
+        _setup_skill(tmp_path, "skill-a")
+        _setup_skill(tmp_path, "skill-b")
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              bad-art-key-wf:
+                master_agent: master-agent
+                steps:
+                  - id: produce
+                    skill: skill-a
+                    depends_on: []
+                    artifacts_out:
+                      actual_key: { path: "out/data.json" }
+                  - id: consume
+                    skill: skill-b
+                    depends_on: [produce]
+                    artifacts_in:
+                      data: "produce.artifacts_out.wrong_key"
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("non-existent artifact_out 'wrong_key'" in e for e in errors)
+
+    def test_artifact_in_invalid_format(self, tmp_path):
+        _setup_skill(tmp_path, "skill-a")
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              bad-fmt-wf:
+                master_agent: master-agent
+                steps:
+                  - id: consume
+                    skill: skill-a
+                    depends_on: []
+                    artifacts_in:
+                      data: "just_a_string"
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("invalid reference format" in e for e in errors)
+
+    def test_no_steps_defined(self, tmp_path):
+        _setup_agent(tmp_path, "master-agent")
+        path = _write_contracts(tmp_path, textwrap.dedent("""\
+            workflows:
+              empty-wf:
+                master_agent: master-agent
+                steps: []
+        """))
+        errors = validate_workflow_contracts(
+            contracts_path=path,
+            skills_dir=tmp_path / "skills",
+            agents_dir=tmp_path / "agents",
+        )
+        assert any("No steps defined" in e for e in errors)
+
+    @pytest.mark.skipif(
+        not (Path(__file__).parent.parent.parent / "config" / "workflow-contracts.yaml").exists(),
+        reason="config/workflow-contracts.yaml not found",
+    )
+    def test_real_workflow_contracts_valid(self):
+        """The actual workflow-contracts.yaml should pass validation."""
+        root = Path(__file__).parent.parent.parent
+        errors = validate_workflow_contracts(
+            contracts_path=root / "config" / "workflow-contracts.yaml",
+            skills_dir=root / "core" / ".claude" / "skills",
+            agents_dir=root / "core" / ".claude" / "agents",
+        )
+        assert errors == [], f"Workflow contracts errors:\n" + "\n".join(errors)
