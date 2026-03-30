@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-28 04:53 UTC (auto-generated)
+> Last updated: 2026-03-30 13:23 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 205 |
-| Core (universal) | 200 |
+| Total Patterns | 214 |
+| Core (universal) | 209 |
 | Stack-specific | 5 |
-| Agents | 27 |
+| Agents | 32 |
 | Configs | 1 |
 | Hooks | 8 |
 | Rules | 24 |
-| Skills | 145 |
+| Skills | 149 |
 
 ## Pattern Inventory
 
@@ -51,6 +51,8 @@
 | claude-behavior | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | code-quality-gate | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| code-review-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| code-review-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-reviewer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | compose-ui | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | configuration-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -70,7 +72,11 @@
 | db-migrate | skill | 1.0.0 | hub:abhayla/claude-best-practices | schema-designer |
 | db-migrate-verify | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | debugger-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| debugging-loop | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| debugging-loop-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | deploy-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup, k8s-deploy |
+| development-loop | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| development-loop-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | diataxis-docs | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | disaster-recovery | skill | 1.0.0 | hub:abhayla/claude-best-practices | monitoring-setup, incident-response |
 | doc-staleness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -201,6 +207,8 @@
 | test-scout-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| testing-pipeline-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| testing-pipeline-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | trace-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | twitter-x | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -216,6 +224,7 @@
 | web-scraper | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | websocket-patterns | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | workflow | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| workflow-master-template | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | writing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | writing-skills | skill | 2.6.0 | hub:abhayla/claude-best-practices | — |
 | xml-to-compose | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |

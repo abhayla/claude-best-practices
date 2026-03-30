@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-28 04:53 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-03-30 13:23 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">205</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">200</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">214</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">209</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">5</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">27</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">1</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">8</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">24</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">145</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">32</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">1</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">8</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">24</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">149</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -401,6 +401,24 @@ tr:hover { background: var(--primary-light); }
                 <td>quality, SOLID, complexity, refactoring, logging</td>
             </tr>
             <tr data-type="agent" data-category="core">
+                <td>code-review-master-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, review, quality</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>code-review-workflow</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, review</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
                 <td>code-reviewer-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
@@ -572,6 +590,24 @@ tr:hover { background: var(--primary-light); }
                 <td>—</td>
             </tr>
             <tr data-type="skill" data-category="core">
+                <td>debugging-loop</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, debugging</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>debugging-loop-master-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, debugging, diagnosis</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
                 <td>deploy-strategy</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
@@ -579,6 +615,24 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>ci-cd-setup, k8s-deploy</td>
                 <td>deployment, GitOps, canary, progressive-delivery, zero-downtime, PRR</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>development-loop</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, development</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>development-loop-master-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, development, planning</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>diataxis-docs</td>
@@ -1759,6 +1813,24 @@ tr:hover { background: var(--primary-light); }
                 <td>—</td>
                 <td>—</td>
             </tr>
+            <tr data-type="agent" data-category="core">
+                <td>testing-pipeline-master-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, testing, verification</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>testing-pipeline-workflow</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, testing</td>
+            </tr>
             <tr data-type="skill" data-category="core">
                 <td>trace-test</td>
                 <td><span class="badge badge-skill">skill</span></td>
@@ -1893,6 +1965,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>workflow-master-template</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, workflow, template</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>writing-plans</td>
