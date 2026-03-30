@@ -439,7 +439,7 @@ MUST_HAVE_AGENTS = {"security-auditor-agent", "tester-agent", "test-pipeline-age
 # NOTE: Framework skills like vue-dev, flutter-dev, etc. are NOT in this list —
 # they are "skip unless dep detected" via DEP_PATTERN_MAP.
 ALWAYS_SKIP = {
-    "update-practices", "contribute-practice", "writing-skills",
+    "update-practices", "contribute-practice",
     "obsidian", "solidity-audit", "mcp-server-builder",
     "twitter-x", "reddit", "github",
 }
