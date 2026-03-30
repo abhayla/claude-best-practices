@@ -145,18 +145,71 @@ See [`core/.claude/README.md`](core/.claude/README.md) for the full catalog with
 
 Skills don't just run independently — they coordinate as teams. Each of the 8 workflow groups has a **master-agent** that orchestrates its skills end-to-end with shared context, artifact contracts, and verification gates:
 
-| Workflow | Command | What it orchestrates |
-|----------|---------|---------------------|
-| Development Loop | `/development-loop` | brainstorm → plan → implement → verify → commit |
-| Testing Pipeline | `/testing-pipeline-workflow` | TDD → fix-loop → auto-verify → E2E → quality gates |
-| Debugging Loop | `/debugging-loop` | diagnose → fix → verify → learn |
-| Code Review | `/code-review-workflow` | quality gates → PR creation → feedback resolution |
-| Documentation | `/documentation-workflow` | ADR → API docs → structure → staleness |
-| Session Continuity | `/session-continuity` | save → handover (or restore → briefing) |
-| Learning | `/learning-self-improvement` | capture → detect patterns → validate knowledge |
-| Skill Authoring | `/skill-authoring-workflow` | author → validate → register |
+```
+┌───────────────────────────┬────────────────────────────────────────────────┬──────────────────────────────────┐
+│         Workflow          │                     Agent                      │         Slash Command            │
+├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
+│ Development Loop          │ development-loop-master-agent                  │ /development-loop                │
+│   ideate → plan →         │   dispatches: plan-executor-agent,             │                                  │
+│   implement → verify →    │   planner-researcher-agent                     │                                  │
+│   commit                  │                                                │                                  │
+├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
+│ Testing Pipeline          │ testing-pipeline-master-agent                  │ /testing-pipeline-workflow        │
+│   TDD → fix-loop →        │   dispatches: test-pipeline-agent,             │                                  │
+│   auto-verify → E2E →     │   e2e-conductor-agent, tester-agent,           │                                  │
+│   quality gates           │   test-failure-analyzer-agent                  │                                  │
+├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
+│ Debugging Loop            │ debugging-loop-master-agent                    │ /debugging-loop                  │
+│   diagnose → fix →        │   dispatches: debugger-agent,                  │                                  │
+│   verify → learn          │   test-failure-analyzer-agent                  │                                  │
+├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
+│ Code Review               │ code-review-master-agent                       │ /code-review-workflow            │
+│   quality gates → PR →    │   dispatches: code-reviewer-agent,             │                                  │
+│   feedback resolution     │   security-auditor-agent                       │                                  │
+├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
+│ Documentation             │ documentation-master-agent                     │ /documentation-workflow           │
+│   ADR → API docs →        │   dispatches: docs-manager-agent               │                                  │
+│   structure → staleness   │                                                │                                  │
+├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
+│ Session Continuity        │ session-continuity-master-agent                │ /session-continuity              │
+│   save → handover         │   dispatches: session-summarizer-agent         │                                  │
+│   (or restore → briefing) │                                                │                                  │
+├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
+│ Learning                  │ learning-self-improvement-master-agent         │ /learning-self-improvement       │
+│   capture → detect        │   dispatches: session-summarizer-agent,        │                                  │
+│   patterns → validate     │   context-reducer-agent                        │                                  │
+├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
+│ Skill Authoring           │ skill-authoring-master-agent                   │ /skill-authoring-workflow        │
+│   author → validate →     │   dispatches: skill-author-agent               │                                  │
+│   register                │                                                │                                  │
+└───────────────────────────┴────────────────────────────────────────────────┴──────────────────────────────────┘
+```
 
-Each master-agent works **standalone** (invoke directly) or **dispatched** by `project-manager-agent` as part of the full PRD-to-Production pipeline. Context passes between steps automatically — no skill starts from scratch. See [`docs/specs/workflow-master-agents-spec.md`](docs/specs/workflow-master-agents-spec.md) for the architecture.
+Each master-agent works **standalone** (invoke directly) or **dispatched** by `project-manager-agent` as part of the full PRD-to-Production pipeline. The orchestration hierarchy follows a 4-tier model:
+
+```
+T0  project-manager-agent          ← full pipeline orchestrator
+     │
+T1  ├── development-loop-master    ← workflow master (standalone or dispatched)
+     │    │
+T2  │    ├── plan-executor-agent   ← sub-orchestrator
+     │    │
+T3  │    └── (worker agents)       ← leaf workers (Skill() only)
+     │
+T1  ├── testing-pipeline-master
+     │    │
+T2  │    ├── e2e-conductor-agent
+     │    │    │
+T3  │    │    ├── test-scout-agent
+     │    │    ├── visual-inspector-agent
+     │    │    └── test-healer-agent
+     │    │
+T2  │    └── test-pipeline-agent
+     │
+T1  └���─ ... (6 more workflow masters)
+```
+
+Context passes between steps automatically — no skill starts from scratch. See [`docs/specs/workflow-master-agents-spec.md`](docs/specs/workflow-master-agents-spec.md) for the full architecture.
 
 ---
 
