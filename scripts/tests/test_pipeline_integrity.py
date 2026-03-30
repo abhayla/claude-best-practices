@@ -478,7 +478,13 @@ class TestOrchestrationConstraintsApplied:
         a special case — it's an orchestrator itself (Stage 9).
         """
         # Known orchestrator skills that are allowed to use Agent()
-        allowed_orchestrators = {"review-gate", "pipeline-orchestrator", "subagent-driven-dev"}
+        allowed_orchestrators = {
+            "review-gate", "pipeline-orchestrator", "subagent-driven-dev",
+            # Workflow master dispatch wrappers (thin skills that delegate to master agents)
+            "development-loop", "testing-pipeline-workflow", "debugging-loop",
+            "code-review-workflow", "documentation-workflow", "session-continuity",
+            "learning-self-improvement", "skill-authoring-workflow",
+        }
         skills_dir = CORE_CLAUDE / "skills"
         errors = []
         for skill_dir in sorted(skills_dir.iterdir()):

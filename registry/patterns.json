@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-30",
-    "total_patterns": 214
+    "total_patterns": 222
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -3655,5 +3655,149 @@
       "review"
     ],
     "changelog": "v1.0.0: Initial release \u2014 code review workflow skill wrapper"
+  },
+  "documentation-master-agent": {
+    "hash": "6815700d717f2e09c6bb53439692f59c88bb3dd2e1095390fa37ff713a0fb928",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-03-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate documentation generation: ADRs, API docs, structure enforcement, staleness audits. Parallel step execution for independent doc types.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "documentation"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "session-continuity-master-agent": {
+    "hash": "6832147f0bd0e536921140ca55b25b4daead982f1e51e77ec92b31bfbf7509b4",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-03-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate session save, restore, and handover. Mode-aware (save vs restore) with freshness validation.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "session"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "learning-self-improvement-master-agent": {
+    "hash": "9224f2f35d791e074819c69fa7edb06874f6f3978d5bce161fa3a4a5cf76a66f",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-03-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate learning capture, pattern detection, and skill generation. Enforces 3+ occurrence threshold for proposals.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "learning"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "skill-authoring-master-agent": {
+    "hash": "5eb9aaebec17b580c601d996abf568c78338cac5b47e327e0c23a863f75d08ee",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-03-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate skill creation, validation, and registration. Enforces overlap detection and mandatory quality gates.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "skill-authoring"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "documentation-workflow": {
+    "hash": "d6a6400e2790f4aae45d0770b2bc5c176698613befefed6491ae72eb3ef14fbe",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-03-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Slash-command wrapper for documentation-master-agent. Full doc generation and maintenance orchestration.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "documentation"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "session-continuity": {
+    "hash": "12342269deba26e002bdbe25b7430d000ed293f90a6763c318ac1a4e3b2784ab",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-03-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Slash-command wrapper for session-continuity-master-agent. Session save, restore, and handover.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "session"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "learning-self-improvement": {
+    "hash": "efcc1a9a358dfb1ebde2c6c177192a137ddad5f8cd4232f9dfd42147078e78e9",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-03-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Slash-command wrapper for learning-self-improvement-master-agent. Knowledge accumulation and skill proposal generation.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "learning"
+    ],
+    "changelog": "v1.0.0: Initial release"
+  },
+  "skill-authoring-workflow": {
+    "hash": "83d5d943e3748083af8245f70aceb741ad1f9c8fb3c9bd841f73fd5ba7823da9",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-03-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Slash-command wrapper for skill-authoring-master-agent. Pattern creation with overlap detection and quality gates.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "skill-authoring"
+    ],
+    "changelog": "v1.0.0: Initial release"
   }
 }

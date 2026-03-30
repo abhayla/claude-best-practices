@@ -77,9 +77,11 @@ workflows:
         - skill-factory
         - test-knowledge
         - self-improve
+        - learning-self-improvement
       agents:
         - session-summarizer-agent
         - context-reducer-agent
+        - learning-self-improvement-master-agent
       rules:
         - context-management
 
@@ -92,8 +94,10 @@ workflows:
         - continue
         - handover
         - status
+        - session-continuity
       agents:
         - session-summarizer-agent
+        - session-continuity-master-agent
       rules:
         - context-management
 
@@ -106,8 +110,10 @@ workflows:
         - skill-master
         - claude-guardian
         - prompt-auto-enhance
+        - skill-authoring-workflow
       agents:
         - skill-author-agent
+        - skill-authoring-master-agent
       rules:
         - pattern-structure
         - pattern-portability
@@ -141,8 +147,10 @@ workflows:
         - doc-structure-enforcer
         - changelog-contributing
         - api-docs-generator
+        - documentation-workflow
       agents:
         - docs-manager-agent
+        - documentation-master-agent
       rules: []
 
   hub-sync:
