@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-03-30 13:23 UTC (auto-generated)
+> Last updated: 2026-03-30 13:40 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 214 |
-| Core (universal) | 209 |
+| Total Patterns | 222 |
+| Core (universal) | 217 |
 | Stack-specific | 5 |
-| Agents | 32 |
+| Agents | 36 |
 | Configs | 1 |
 | Hooks | 8 |
 | Rules | 24 |
-| Skills | 149 |
+| Skills | 153 |
 
 ## Pattern Inventory
 
@@ -83,6 +83,8 @@
 | doc-structure-enforcer | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | docker-optimize | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | docs-manager-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| documentation-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| documentation-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | drizzle-orm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-best-practices | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-conductor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | test-scout-agent, visual-inspector-agent, test-healer-agent |
@@ -123,6 +125,8 @@
 | jest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | k8s-deploy | skill | 1.0.2 | hub:abhayla/claude-best-practices | — |
 | learn-n-improve | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
+| learning-self-improvement | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| learning-self-improvement-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | mcp-server-builder | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | middleware-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -179,9 +183,13 @@
 | security-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | security-auditor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| session-continuity | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| session-continuity-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-summarizer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-author-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | writing-skills, pattern-structure |
+| skill-authoring-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| skill-authoring-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-factory | skill | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-master | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | solidity-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
