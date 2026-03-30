@@ -131,14 +131,46 @@ Stage subagents should invoke it via:
 Skill("test-pipeline", args="<failure_output_or_flags>")
 ```
 
+## Workflow-Master Dispatch
+
+Before dispatching a stage, check `config/workflow-contracts.yaml` →
+`stage_to_workflow` mapping:
+
+- **If mapping exists** → dispatch the workflow-master-agent:
+  ```
+  Agent(subagent_type="{workflow-id}-master-agent", prompt="
+    ## Pipeline ID: {pipeline_id}
+    ## Mode: dispatched
+    ## Workflow: {workflow-id}
+    ## Execute Steps: [{mapped_step_ids}]
+    ## Upstream Artifacts:
+      {artifact_name}: {path}
+    ## Expected Outputs:
+      {artifact_name}: {expected_path}
+  ")
+  ```
+  The workflow-master handles all internal coordination (sub-orchestrators,
+  retries, gates) within its scope. You only care about the return contract.
+
+- **If mapping is `null`** → dispatch a direct stage agent (existing behavior
+  via the Stage Dispatch Protocol above)
+
+When multiple pipeline stages map to the same workflow (e.g., stage_1 and
+stage_7 both map to development-loop), dispatch with different `Execute Steps`
+subsets. The workflow-master executes only the requested steps per invocation.
+
+The workflow-master returns the standard stage return contract:
+`{gate, artifacts, decisions, blockers, summary, duration_seconds}`
+
 ## Constraints
 
 - MUST read DAG from `config/pipeline-stages.yaml` — never hardcode stage definitions
+- MUST check `config/workflow-contracts.yaml` → `stage_to_workflow` before dispatching stages
 - MUST persist state to `.pipeline/state.json` after every mutation
 - MUST append to `.pipeline/event-log.jsonl` — never overwrite
 - MUST validate artifact contracts before dispatching downstream stages
 - MUST NOT dispatch a stage before all `depends_on` have passed
 - MUST NOT retry more than 3 times per stage or 15 times globally
-- MUST NOT let dispatched stage agents spawn their own subagents
+- Dispatched workflow-masters follow the tiered nesting model (see agent-orchestration.md Rule #2). They MAY dispatch sub-orchestrators (T2) which MAY dispatch workers (T3).
 - MUST tag git before each stage for clean rollback
 - MUST use `/test-pipeline` for test verification in Stages 7-8 (not raw `/fix-loop` + `/auto-verify`)

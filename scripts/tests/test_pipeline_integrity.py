@@ -447,7 +447,7 @@ class TestOrchestrationRule:
     def test_rule_mentions_key_constraints(self):
         content = _read_file(ORCHESTRATION_RULE)
         constraints = [
-            "2 nesting",           # max 2 levels
+            "Tiered Nesting",      # tiered nesting model
             "Externalize",         # externalize DAGs
             "retry budget",        # global retry budget
             "Single State",        # single state location

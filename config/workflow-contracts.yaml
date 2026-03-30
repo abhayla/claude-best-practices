@@ -1,0 +1,357 @@
+# Workflow Contract Definitions — Read by workflow master-agents at runtime.
+# Edit this file to change skill ordering, artifact contracts, or orchestration rules.
+# Each workflow is an independent DAG that can run standalone or as a stage
+# dispatched by project-manager-agent.
+
+defaults:
+  max_retries_per_step: 3
+  global_retry_budget: 15
+  timeout_default_minutes: 20
+
+workflows:
+
+  development-loop:
+    description: "Ideate → plan → implement → verify → commit"
+    master_agent: development-loop-master-agent
+    state_file: ".workflows/development-loop/state.json"
+    sub_orchestrators:
+      - agent: plan-executor-agent
+        role: "Executes approved plans with task-level granularity"
+      - agent: planner-researcher-agent
+        role: "Deep research before planning decisions"
+    steps:
+      - id: ideate
+        skill: brainstorm
+        depends_on: []
+        artifacts_out:
+          spec: { path: "docs/specs/<feature>-spec.md", schema: spec_v1 }
+        timeout_minutes: 30
+      - id: plan
+        skill: writing-plans
+        depends_on: [ideate]
+        artifacts_in:
+          spec: "ideate.artifacts_out.spec"
+        artifacts_out:
+          plan: { path: "docs/plans/<feature>-plan.md", schema: plan_v1 }
+        timeout_minutes: 25
+      - id: execute
+        dispatch: plan-executor-agent
+        depends_on: [plan]
+        artifacts_in:
+          plan: "plan.artifacts_out.plan"
+        artifacts_out:
+          source: { path: "src/", schema: source_v1 }
+        timeout_minutes: 60
+      - id: verify
+        skill: auto-verify
+        depends_on: [execute]
+        artifacts_in:
+          source: "execute.artifacts_out.source"
+        artifacts_out:
+          verification: { path: "test-results/auto-verify.json", schema: test_result_v1 }
+        gate: "verification.result == PASSED"
+        timeout_minutes: 30
+      - id: commit
+        skill: post-fix-pipeline
+        depends_on: [verify]
+        skip_when: "mode == 'dispatched'"
+        artifacts_out:
+          commit_sha: { type: string, schema: git_sha }
+    handoff_suggestions:
+      - workflow: testing-pipeline
+        when: "verify step PASSED"
+        reason: "Implementation verified — run full test pipeline"
+      - workflow: code-review
+        when: "commit step completed"
+        reason: "Code committed — ready for review"
+
+  testing-pipeline:
+    description: "TDD → test execution → verification → quality gates → fix-verify-commit"
+    master_agent: testing-pipeline-master-agent
+    state_file: ".workflows/testing-pipeline/state.json"
+    sub_orchestrators:
+      - agent: test-pipeline-agent
+        role: "Sequential fix→verify→commit chain"
+      - agent: e2e-conductor-agent
+        role: "Queue-based E2E test orchestration"
+      - agent: tester-agent
+        role: "Test suite execution with screenshot capture"
+      - agent: test-failure-analyzer-agent
+        role: "Root cause classification for test failures"
+    steps:
+      - id: tdd_red
+        skill: tdd-failing-test-generator
+        depends_on: []
+        artifacts_out:
+          failing_tests: { path: "tests/", schema: test_files_v1 }
+        timeout_minutes: 25
+      - id: fix_loop
+        skill: fix-loop
+        depends_on: [tdd_red]
+        artifacts_in:
+          failing_tests: "tdd_red.artifacts_out.failing_tests"
+        artifacts_out:
+          fix_result: { path: "test-results/fix-loop.json", schema: test_result_v1 }
+        gate: "fix_result.result IN (PASSED, FIXED)"
+        timeout_minutes: 30
+      - id: auto_verify
+        skill: auto-verify
+        depends_on: [fix_loop]
+        artifacts_out:
+          verification: { path: "test-results/auto-verify.json", schema: test_result_v1 }
+        gate: "verification.result == PASSED"
+        timeout_minutes: 30
+      - id: e2e
+        dispatch: e2e-conductor-agent
+        depends_on: [fix_loop]
+        skip_when: "no_ui_tests == true"
+        artifacts_out:
+          e2e_state: { path: ".workflows/testing-pipeline/e2e-state.json", schema: e2e_v1 }
+        gate: "e2e_state.status == completed"
+        timeout_minutes: 45
+      - id: quality_gate
+        skill: code-quality-gate
+        depends_on: [auto_verify, e2e]
+        artifacts_out:
+          quality: { path: "test-results/code-quality-gate.json", schema: quality_gate_v1 }
+        gate: "quality.result == PASSED"
+        timeout_minutes: 20
+      - id: post_fix
+        skill: post-fix-pipeline
+        depends_on: [quality_gate]
+        skip_when: "mode == 'dispatched'"
+        artifacts_out:
+          commit_sha: { type: string, schema: git_sha }
+    handoff_suggestions:
+      - workflow: code-review
+        when: "quality_gate step PASSED"
+        reason: "Tests passing, quality verified — ready for review"
+
+  debugging-loop:
+    description: "Bug diagnosis → structured debugging → fix → verify → learn"
+    master_agent: debugging-loop-master-agent
+    state_file: ".workflows/debugging-loop/state.json"
+    sub_orchestrators:
+      - agent: debugger-agent
+        role: "Targeted bug diagnosis"
+      - agent: test-failure-analyzer-agent
+        role: "Failure classification"
+    steps:
+      - id: diagnose
+        skill: systematic-debugging
+        depends_on: []
+        artifacts_out:
+          root_cause: { path: ".workflows/debugging-loop/diagnosis.json", schema: diagnosis_v1 }
+        timeout_minutes: 30
+      - id: fix
+        skill: fix-loop
+        depends_on: [diagnose]
+        artifacts_in:
+          root_cause: "diagnose.artifacts_out.root_cause"
+        artifacts_out:
+          fix_result: { path: "test-results/fix-loop.json", schema: test_result_v1 }
+        gate: "fix_result.result IN (PASSED, FIXED)"
+        timeout_minutes: 30
+      - id: verify
+        skill: auto-verify
+        depends_on: [fix]
+        artifacts_out:
+          verification: { path: "test-results/auto-verify.json", schema: test_result_v1 }
+        gate: "verification.result == PASSED"
+        timeout_minutes: 25
+      - id: learn
+        skill: learn-n-improve
+        depends_on: [verify]
+        artifacts_in:
+          root_cause: "diagnose.artifacts_out.root_cause"
+          fix_result: "fix.artifacts_out.fix_result"
+        artifacts_out:
+          learning: { path: ".claude/learnings.json", schema: learning_v1 }
+        timeout_minutes: 10
+    handoff_suggestions:
+      - workflow: testing-pipeline
+        when: "verify step PASSED"
+        reason: "Bug fixed — run full test pipeline to check for regressions"
+
+  code-review:
+    description: "Quality gates → security audit → risk scoring → PR creation → review feedback"
+    master_agent: code-review-master-agent
+    state_file: ".workflows/code-review/state.json"
+    sub_orchestrators:
+      - agent: code-reviewer-agent
+        role: "Code quality and architecture review"
+      - agent: security-auditor-agent
+        role: "Security audit and threat modeling"
+    steps:
+      - id: quality_gates
+        skill: review-gate
+        depends_on: []
+        artifacts_out:
+          review_report: { path: "test-results/review-gate.json", schema: review_v1 }
+        gate: "review_report.verdict != REJECTED"
+        timeout_minutes: 30
+      - id: create_pr
+        skill: request-code-review
+        depends_on: [quality_gates]
+        artifacts_in:
+          review_report: "quality_gates.artifacts_out.review_report"
+        artifacts_out:
+          pr_url: { type: string, schema: url }
+        skip_when: "mode == 'dispatched'"
+        timeout_minutes: 15
+      - id: handle_feedback
+        skill: receive-code-review
+        depends_on: [create_pr]
+        artifacts_in:
+          pr_url: "create_pr.artifacts_out.pr_url"
+        artifacts_out:
+          feedback_status: { path: ".workflows/code-review/feedback.json", schema: feedback_v1 }
+        gate: "feedback_status.all_resolved == true"
+        skip_when: "mode == 'dispatched'"
+        timeout_minutes: 30
+    handoff_suggestions:
+      - workflow: documentation
+        when: "handle_feedback step completed"
+        reason: "PR approved — update documentation"
+
+  documentation:
+    description: "ADR → API docs → structure enforcement → staleness check"
+    master_agent: documentation-master-agent
+    state_file: ".workflows/documentation/state.json"
+    sub_orchestrators:
+      - agent: docs-manager-agent
+        role: "Documentation generation and maintenance"
+    steps:
+      - id: adr
+        skill: adr
+        depends_on: []
+        skip_when: "no_architecture_decisions == true"
+        artifacts_out:
+          adrs: { path: "docs/adr/", schema: adr_v1 }
+        timeout_minutes: 20
+      - id: api_docs
+        skill: api-docs-generator
+        depends_on: []
+        skip_when: "no_api == true"
+        artifacts_out:
+          api_docs: { path: "docs/api/", schema: openapi_v1 }
+        timeout_minutes: 20
+      - id: structure
+        skill: doc-structure-enforcer
+        depends_on: [adr, api_docs]
+        artifacts_out:
+          structure_report: { path: ".workflows/documentation/structure.json", schema: doc_report_v1 }
+        timeout_minutes: 15
+      - id: staleness
+        skill: doc-staleness
+        depends_on: [structure]
+        artifacts_out:
+          staleness_report: { path: ".workflows/documentation/staleness.json", schema: staleness_v1 }
+        timeout_minutes: 15
+    handoff_suggestions: []
+
+  session-continuity:
+    description: "Save → restore → handover between sessions"
+    master_agent: session-continuity-master-agent
+    state_file: ".workflows/session-continuity/state.json"
+    sub_orchestrators:
+      - agent: session-summarizer-agent
+        role: "Session analysis and summary generation"
+    steps:
+      - id: save
+        skill: save-session
+        depends_on: []
+        artifacts_out:
+          session_file: { path: ".claude/sessions/<session-id>.json", schema: session_v1 }
+        timeout_minutes: 10
+      - id: handover
+        skill: handover
+        depends_on: [save]
+        artifacts_in:
+          session_file: "save.artifacts_out.session_file"
+        artifacts_out:
+          handover_doc: { path: ".claude/handover.md", schema: handover_v1 }
+        timeout_minutes: 10
+    handoff_suggestions: []
+
+  learning-self-improvement:
+    description: "Capture learnings → detect patterns → generate skills → accumulate knowledge"
+    master_agent: learning-self-improvement-master-agent
+    state_file: ".workflows/learning-self-improvement/state.json"
+    sub_orchestrators:
+      - agent: session-summarizer-agent
+        role: "Session analysis for pattern detection"
+      - agent: context-reducer-agent
+        role: "Context compression for knowledge distillation"
+    steps:
+      - id: capture
+        skill: learn-n-improve
+        depends_on: []
+        artifacts_out:
+          learnings: { path: ".claude/learnings.json", schema: learnings_v1 }
+        timeout_minutes: 15
+      - id: detect_patterns
+        skill: skill-factory
+        depends_on: [capture]
+        artifacts_in:
+          learnings: "capture.artifacts_out.learnings"
+        artifacts_out:
+          proposed_skills: { path: ".workflows/learning-self-improvement/proposals.json", schema: skill_proposal_v1 }
+        timeout_minutes: 20
+      - id: knowledge_test
+        skill: test-knowledge
+        depends_on: [detect_patterns]
+        artifacts_out:
+          knowledge_report: { path: ".workflows/learning-self-improvement/knowledge.json", schema: knowledge_v1 }
+        timeout_minutes: 15
+    handoff_suggestions:
+      - workflow: skill-authoring
+        when: "detect_patterns produced proposals"
+        reason: "New skill proposals detected — author and validate them"
+
+  skill-authoring:
+    description: "Author → validate → place → register new skills, agents, and rules"
+    master_agent: skill-authoring-master-agent
+    state_file: ".workflows/skill-authoring/state.json"
+    sub_orchestrators:
+      - agent: skill-author-agent
+        role: "Skill creation and maintenance"
+    steps:
+      - id: author
+        skill: writing-skills
+        depends_on: []
+        artifacts_out:
+          draft_skill: { path: "core/.claude/skills/<skill-name>/SKILL.md", schema: skill_v1 }
+        timeout_minutes: 25
+      - id: validate
+        skill: claude-guardian
+        depends_on: [author]
+        artifacts_in:
+          draft_skill: "author.artifacts_out.draft_skill"
+        artifacts_out:
+          validation: { path: ".workflows/skill-authoring/validation.json", schema: validation_v1 }
+        gate: "validation.passed == true"
+        timeout_minutes: 15
+      - id: catalog
+        skill: skill-master
+        depends_on: [validate]
+        artifacts_out:
+          catalog_entry: { path: ".workflows/skill-authoring/catalog.json", schema: catalog_v1 }
+        timeout_minutes: 10
+    handoff_suggestions: []
+
+# Cross-workflow handoffs — read by project-manager-agent
+# Maps pipeline stages to workflow masters for dispatched mode.
+# null = no workflow master, use direct stage agent dispatch.
+stage_to_workflow:
+  stage_1_prd: development-loop
+  stage_2_plan: development-loop
+  stage_3_scaffold: development-loop
+  stage_4_demo: null
+  stage_5_schema: null
+  stage_6_pre_tests: testing-pipeline
+  stage_7_impl: development-loop
+  stage_8_post_tests: testing-pipeline
+  stage_9_review: code-review
+  stage_10_deploy: null
+  stage_11_docs: documentation

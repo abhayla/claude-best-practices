@@ -10,6 +10,7 @@ venv/
 test-results/
 test-evidence/
 .pipeline/
+.workflows/
 .claude/sessions/
 .claude/settings.local.json
 

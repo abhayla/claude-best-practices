@@ -18,9 +18,11 @@ workflows:
         - implement
         - fix-issue
         - subagent-driven-dev
+        - development-loop
       agents:
         - plan-executor-agent
         - planner-researcher-agent
+        - development-loop-master-agent
       rules:
         - workflow
 
@@ -38,6 +40,7 @@ workflows:
         - tdd-failing-test-generator
         - regression-test
         - test-maintenance
+        - testing-pipeline-workflow
       agents:
         - tester-agent
         - test-failure-analyzer-agent
@@ -47,6 +50,7 @@ workflows:
         - test-scout-agent
         - visual-inspector-agent
         - test-healer-agent
+        - testing-pipeline-master-agent
       rules:
         - tdd-rule
         - testing
@@ -58,9 +62,11 @@ workflows:
         - systematic-debugging
         - fix-loop
         - fix-issue
+        - debugging-loop
       agents:
         - debugger-agent
         - test-failure-analyzer-agent
+        - debugging-loop-master-agent
       rules: []
 
   learning-self-improvement:
@@ -118,9 +124,11 @@ workflows:
         - adversarial-review
         - pr-standards
         - review-gate
+        - code-review-workflow
       agents:
         - code-reviewer-agent
         - security-auditor-agent
+        - code-review-master-agent
       rules: []
 
   documentation:
