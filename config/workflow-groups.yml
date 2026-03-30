@@ -12,17 +12,38 @@ workflows:
     description: "The core build cycle: ideate, plan, implement, verify, commit."
     seeds:
       skills:
+        - a11y-audit
+        - anthropic-agent-orchestration-guide
         - brainstorm
-        - writing-plans
-        - executing-plans
-        - implement
-        - fix-issue
-        - subagent-driven-dev
         - development-loop
+        - disaster-recovery
+        - executing-plans
+        - expo-dev
+        - firebase-dev
+        - fix-issue
+        - flutter-dev
+        - git-worktrees
+        - implement
+        - jest-dev
+        - mcp-server-builder
+        - nextjs-dev
+        - node-backend-dev
+        - nuxt-dev
+        - plan-to-issues
+        - prd-parser
+        - project-scaffold
+        - pytest-dev
+        - ssot-audit
+        - subagent-driven-dev
+        - vue-dev
+        - writing-plans
       agents:
+        - android-build-fixer-agent
+        - development-loop-master-agent
         - plan-executor-agent
         - planner-researcher-agent
-        - development-loop-master-agent
+        - web-research-specialist-agent
+        - workflow-master-template
       rules:
         - workflow
 
@@ -30,28 +51,69 @@ workflows:
     description: "Test execution, verification, quality enforcement, and the fix-verify-commit chain."
     seeds:
       skills:
-        - tdd
+        - android-adb-test
+        - android-run-e2e
+        - android-test-patterns
+        - architecture-fitness
         - auto-verify
-        - fix-loop
-        - post-fix-pipeline
-        - test-pipeline
+        - branching
+        - change-risk-scoring
+        - chaos-resilience
+        - ci-cd-setup
         - code-quality-gate
+        - contract-test
         - coverage-analysis
-        - tdd-failing-test-generator
+        - db-migrate
+        - db-migrate-verify
+        - e2e-best-practices
+        - e2e-visual-run
+        - fastapi-run-backend-tests
+        - fix-loop
+        - flutter-e2e-test
+        - integration-test
+        - merge-strategy
+        - mock-server
+        - perf-test
+        - pipeline-orchestrator
+        - playwright
+        - post-fix-pipeline
+        - react-native-e2e
+        - react-test-patterns
         - regression-test
+        - research-mode
+        - semgrep-rules
+        - solidity-audit
+        - supply-chain-audit
+        - tdd
+        - tdd-failing-test-generator
+        - test-data-management
         - test-maintenance
+        - test-pipeline
         - testing-pipeline-workflow
+        - trace-test
+        - verify-screenshots
+        - vitest-dev
+        - vue-test
       agents:
-        - tester-agent
-        - test-failure-analyzer-agent
-        - test-pipeline-agent
-        - quality-gate-evaluator-agent
+        - android-compose-agent
         - e2e-conductor-agent
-        - test-scout-agent
-        - visual-inspector-agent
+        - fastapi-api-tester-agent
+        - flutter-dart-agent
+        - git-manager-agent
+        - project-manager-agent
+        - quality-gate-evaluator-agent
+        - test-failure-analyzer-agent
         - test-healer-agent
+        - test-pipeline-agent
+        - test-scout-agent
+        - tester-agent
         - testing-pipeline-master-agent
+        - visual-inspector-agent
+        - workflow-master-template
       rules:
+        - agent-orchestration
+        - configuration-ssot
+        - e2e-test-writing
         - tdd-rule
         - testing
 
@@ -59,29 +121,42 @@ workflows:
     description: "Targeted bug diagnosis and structured resolution."
     seeds:
       skills:
-        - systematic-debugging
-        - fix-loop
-        - fix-issue
+        - ai-gemini-api
+        - android-run-tests
+        - bun-elysia-test
+        - db-migrate-verify
         - debugging-loop
+        - fastapi-run-backend-tests
+        - firebase-test
+        - fix-issue
+        - fix-loop
+        - flutter-e2e-test
+        - mobile-a11y-test
+        - systematic-debugging
       agents:
         - debugger-agent
-        - test-failure-analyzer-agent
         - debugging-loop-master-agent
-      rules: []
+        - test-failure-analyzer-agent
+      rules:
+        - claude-behavior
 
   learning-self-improvement:
     description: "Session analysis, pattern detection, knowledge accumulation, and skill auto-generation."
     seeds:
       skills:
+        - dast-scan
+        - iac-deploy
         - learn-n-improve
+        - learning-self-improvement
+        - mcp-server-builder
+        - self-improve
+        - semgrep-rules
         - skill-factory
         - test-knowledge
-        - self-improve
-        - learning-self-improvement
       agents:
-        - session-summarizer-agent
         - context-reducer-agent
         - learning-self-improvement-master-agent
+        - session-summarizer-agent
       rules:
         - context-management
 
@@ -89,15 +164,16 @@ workflows:
     description: "Start, save, resume, and hand over between sessions."
     seeds:
       skills:
-        - start-session
-        - save-session
         - continue
         - handover
-        - status
+        - mcp-server-builder
+        - save-session
         - session-continuity
+        - start-session
+        - status
       agents:
-        - session-summarizer-agent
         - session-continuity-master-agent
+        - session-summarizer-agent
       rules:
         - context-management
 
@@ -105,19 +181,24 @@ workflows:
     description: "Creating, validating, and maintaining skills, agents, and rules."
     seeds:
       skills:
-        - writing-skills
+        - claude-guardian
+        - mcp-server-builder
+        - prompt-auto-enhance
+        - semgrep-rules
+        - skill-authoring-workflow
         - skill-factory
         - skill-master
-        - claude-guardian
-        - prompt-auto-enhance
-        - skill-authoring-workflow
+        - writing-skills
       agents:
+        - fastapi-database-admin-agent
         - skill-author-agent
         - skill-authoring-master-agent
+        - workflow-master-template
       rules:
-        - pattern-structure
         - pattern-portability
         - pattern-self-containment
+        - pattern-structure
+        - prompt-auto-enhance-rule
         - rule-curation
         - rule-writing-meta
 
@@ -125,16 +206,20 @@ workflows:
     description: "Creating, requesting, and acting on code reviews."
     seeds:
       skills:
-        - request-code-review
-        - receive-code-review
         - adversarial-review
-        - pr-standards
-        - review-gate
         - code-review-workflow
+        - mcp-server-builder
+        - pr-standards
+        - receive-code-review
+        - request-code-review
+        - review-gate
+        - security-audit
       agents:
+        - android-kotlin-reviewer-agent
+        - code-review-master-agent
         - code-reviewer-agent
         - security-auditor-agent
-        - code-review-master-agent
+        - workflow-master-template
       rules: []
 
   documentation:
@@ -142,23 +227,85 @@ workflows:
     seeds:
       skills:
         - adr
+        - api-docs-generator
+        - apply-selections
+        - changelog-contributing
         - diataxis-docs
         - doc-staleness
         - doc-structure-enforcer
-        - changelog-contributing
-        - api-docs-generator
         - documentation-workflow
+        - firebase-ai
       agents:
         - docs-manager-agent
         - documentation-master-agent
+        - workflow-master-template
       rules: []
 
   hub-sync:
     description: "Hub-specific pattern management: provisioning, syncing, contributing."
     seeds:
       skills:
-        - update-practices
         - contribute-practice
+        - react-native-dev
         - synthesize-project
+        - update-practices
       agents: []
       rules: []
+
+  _needs-manual-review:
+    description: "Patterns that could not be auto-assigned. Requires manual review."
+    seeds:
+      skills:
+        - android-arch
+        - android-gradle
+        - android-mvi-scaffold
+        - batch
+        - compose-ui
+        - cross-platform-visual
+        - d3-viz
+        - deploy-strategy
+        - docker-optimize
+        - drizzle-orm
+        - fastapi-db-migrate
+        - fastapi-deploy
+        - feature-flag
+        - firebase-data-connect
+        - github
+        - hono-backend
+        - html-prototype
+        - incident-response
+        - k8s-deploy
+        - middleware-test
+        - monitoring-setup
+        - monorepo
+        - obsidian
+        - pg-query
+        - pm2-deploy
+        - prisma-orm
+        - reddit
+        - redis-patterns
+        - remotion-video
+        - scan-discovery-report
+        - schema-designer
+        - strategic-architect
+        - tailwind-dev
+        - twitter-x
+        - ui-ux-pro-max
+        - web-quality
+        - web-scraper
+        - websocket-patterns
+        - xml-to-compose
+      agents:
+        - parallel-worktree-orchestrator-agent
+      rules:
+        - android
+        - android-compose-ui
+        - android-kotlin
+        - bun-elysia
+        - fastapi-backend
+        - fastapi-database
+        - firebase
+        - flutter
+        - react-nextjs
+        - vue
+
