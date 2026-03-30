@@ -1,6 +1,6 @@
 # Claude Best Practices Hub
 
-A curated knowledge hub of **182 battle-tested patterns** (agents, skills, rules, hooks) for [Claude Code](https://claude.ai/code). Copy them to your project, or let `/synthesize-project` analyze your codebase and generate project-specific patterns automatically.
+A curated knowledge hub of **222 battle-tested patterns** (agents, skills, rules, hooks) for [Claude Code](https://claude.ai/code). Copy them to your project, or let `/synthesize-project` analyze your codebase and generate project-specific patterns automatically.
 
 ---
 
@@ -111,9 +111,11 @@ claude
 Once your project has a `.claude/` directory, you can use all the skills directly:
 
 ```
+/development-loop   Full build cycle: ideate → plan → implement → verify → commit
 /implement          Build a feature with TDD workflow
 /fix-issue 42       Fix GitHub issue #42
 /fix-loop           Iterative fix until tests pass
+/debugging-loop     Structured bug diagnosis → fix → verify → learn
 /tdd                Strict red-green-refactor cycle
 /continue           Resume from previous session
 /skill-master       Find the right skill for any task
@@ -132,12 +134,29 @@ Once your project has a `.claude/` directory, you can use all the skills directl
 
 | Component | Count | Description |
 |-----------|-------|-------------|
-| **Agents** | 21 | Sub-agents for code review, debugging, testing, git, planning, security, docs |
-| **Skills** | 136 | Slash-command workflows: `/implement`, `/fix-loop`, `/tdd`, `/synthesize-project`, and more |
+| **Agents** | 35 | Sub-agents for code review, debugging, testing, git, planning, security, docs — including 8 workflow-master orchestrators |
+| **Skills** | 144 | Slash-command workflows: `/implement`, `/fix-loop`, `/tdd`, `/synthesize-project`, `/development-loop`, and more |
 | **Rules** | 19 | Scoped coding rules for workflow, testing, FastAPI, Android, Compose, Firebase, etc. |
 | **Hooks** | 6 | Auto-format, secret scanning, dangerous command blocking, context monitoring |
 
 See [`core/.claude/README.md`](core/.claude/README.md) for the full catalog with descriptions.
+
+### Workflow Master Orchestration
+
+Skills don't just run independently — they coordinate as teams. Each of the 8 workflow groups has a **master-agent** that orchestrates its skills end-to-end with shared context, artifact contracts, and verification gates:
+
+| Workflow | Command | What it orchestrates |
+|----------|---------|---------------------|
+| Development Loop | `/development-loop` | brainstorm → plan → implement → verify → commit |
+| Testing Pipeline | `/testing-pipeline-workflow` | TDD → fix-loop → auto-verify → E2E → quality gates |
+| Debugging Loop | `/debugging-loop` | diagnose → fix → verify → learn |
+| Code Review | `/code-review-workflow` | quality gates → PR creation → feedback resolution |
+| Documentation | `/documentation-workflow` | ADR → API docs → structure → staleness |
+| Session Continuity | `/session-continuity` | save → handover (or restore → briefing) |
+| Learning | `/learning-self-improvement` | capture → detect patterns → validate knowledge |
+| Skill Authoring | `/skill-authoring-workflow` | author → validate → register |
+
+Each master-agent works **standalone** (invoke directly) or **dispatched** by `project-manager-agent` as part of the full PRD-to-Production pipeline. Context passes between steps automatically — no skill starts from scratch. See [`docs/specs/workflow-master-agents-spec.md`](docs/specs/workflow-master-agents-spec.md) for the architecture.
 
 ---
 
@@ -237,8 +256,12 @@ Universal patterns (no prefix) are included for all stacks.
 | `/update-practices` | Pull latest patterns from hub |
 | `/contribute-practice` | Submit a local pattern to the hub |
 | `/skill-master` | Find the right skill for any task |
+| `/development-loop` | Full build cycle: ideate → plan → implement → verify → commit |
+| `/testing-pipeline-workflow` | Full test chain: TDD → fix → verify → quality gates |
+| `/debugging-loop` | Structured diagnosis → fix → verify → learn |
+| `/code-review-workflow` | Quality gates → PR → review feedback |
 
-See [`core/.claude/README.md`](core/.claude/README.md) for all 136 skills.
+See [`core/.claude/README.md`](core/.claude/README.md) for all 144 skills.
 
 ---
 
@@ -246,8 +269,8 @@ See [`core/.claude/README.md`](core/.claude/README.md) for all 136 skills.
 
 ```
 core/.claude/                  # Distributable patterns (copy to your project)
-  agents/                      #   21 specialized sub-agents
-  skills/                      #   136 slash-command workflows
+  agents/                      #   35 specialized sub-agents (incl. 8 workflow masters)
+  skills/                      #   144 slash-command workflows
   rules/                       #   19 scoped coding rules
   hooks/                       #   6 hook examples
   settings.json                #   Minimal defaults
@@ -263,7 +286,8 @@ config/                        # Hub configuration
   repos.yml                    #   Registered downstream projects
   settings.yml                 #   Scan schedules, dedup thresholds, gold standards
 
-registry/patterns.json         # Machine-readable index of all 182 patterns
+config/workflow-contracts.yaml  # Workflow DAGs with artifact contracts (8 workflows)
+registry/patterns.json         # Machine-readable index of all 222 patterns
 scripts/                       # Python tools (bootstrap, recommend, validate, sync, docs)
 docs/                          # Dashboard, getting started, sync architecture, flywheel
 ```
