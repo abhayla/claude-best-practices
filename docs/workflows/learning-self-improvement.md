@@ -290,7 +290,7 @@ graph TD
 | `/learning-self-improvement` | 1.0.0 | Capture session learnings, detect recurring patterns, and generate skill prop... | `/skill-authoring-workflow`, `/skill-factory`, `/test-knowledge`, `/learning-self-improvement-master-agent` | — |
 | `/mcp-server-builder` | 1.0.0 | Build MCP (Model Context Protocol) servers that extend Claude Code's capabili... | — | — |
 | `/reddit` | 1.0.0 | Manage Reddit interactions: read posts and threads, compose posts and comment... | — | `/self-improve` |
-| `/self-improve` | 1.0.0 | Run the full self-improvement cycle: scan external sources (GitHub, Reddit, T... | `/claude-guardian`, `/github`, `/reddit`, `/skill-factory`, `/test-knowledge`, `/writing-skills` | — |
+| `/self-improve` | 1.0.0 | Run the full self-improvement cycle: scan external sources (GitHub, Reddit, T... (hub-only: `.claude/skills/`, not distributed) | `/claude-guardian`, `/github`, `/reddit`, `/skill-factory`, `/test-knowledge`, `/writing-skills` | — |
 | `/semgrep-rules` | 1.0.0 | Build, test, and optimize custom Semgrep rules for vulnerability detection an... | — | — |
 | `/skill-authoring-workflow` | 1.0.0 | Author, validate, and register new skills, agents, and rules end-to-end. Use ... | `/claude-guardian` | `/learning-self-improvement` |
 | `/skill-factory` | 3.0.0 | Detect repeated workflows in session logs and classify them into the right au... | `/claude-guardian`, `/fix-issue`, `/implement`, `/tdd`, `/writing-skills` | `/learning-self-improvement`, `/self-improve` |
