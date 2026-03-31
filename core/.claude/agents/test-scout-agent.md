@@ -1,11 +1,12 @@
 ---
 name: test-scout-agent
 description: >
-  Execute E2E tests in batches, capture screenshots only on failure, and record
-  accessibility tree snapshots for every test. Writes results to the verification
-  queue for async processing by visual-inspector-agent. Use when e2e-conductor-agent
-  dispatches test execution.
+  Use proactively to execute E2E tests in batches, capture screenshots only on failure,
+  and record accessibility tree snapshots for every test. Spawn automatically when E2E
+  test execution is needed. Writes results to the verification queue for async processing
+  by visual-inspector-agent.
 model: sonnet
+color: blue
 version: "1.0.0"
 ---
 

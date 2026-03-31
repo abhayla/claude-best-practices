@@ -63,16 +63,27 @@ Agents do NOT have a dedicated authoring skill. Author directly using the templa
    - If not available, use the template below
 2. Read `pattern-structure.md` for agent frontmatter requirements
 3. Generate the agent file with:
-   - YAML frontmatter: `name`, `description`, `tools` (JSON array), `model: inherit`
+   - YAML frontmatter: `name`, `description`, `tools` (JSON array), `model: inherit`, `color`
    - Body sections: `## Core Responsibilities`, `## Input`, `## Output Format`
    - Domain-specific `## Decision Criteria` section
-4. Validate:
+4. Assign `color` based on agent severity (see `pattern-structure.md` Color Field table):
+   - `red` — Security gates, quality blockers, breaking-change detection
+   - `orange` — Failure diagnosis, build repair, debugging
+   - `yellow` — Code review, context management, session lifecycle
+   - `blue` — Test execution, verification, learning, general workflows
+   - `green` — Documentation, research, planning, information gathering
+5. Determine proactive vs reactive spawning:
+   - If the agent performs quality checks, catches failures, manages context, or captures learnings → add "Use proactively" to description
+   - If the agent orchestrates workflows or requires explicit user intent → do NOT add proactive language
+6. Validate:
    - `tools` is a JSON array (e.g., `["Read", "Grep", "Glob"]`), not a space-separated string
    - `model` field is present (use `inherit` unless there is a reason for a specific model)
+   - `color` field is present and is one of: `red`, `orange`, `yellow`, `blue`, `green`
    - `## Core Responsibilities` has 2-5 concrete responsibilities
    - `## Output Format` includes a structured template (markdown, JSON, or table)
    - Agent has a clear domain focus — reject generic agents ("code helper") that add no value
-5. Return the validated agent file
+   - Proactive agents MUST have "Use proactively" in description
+7. Return the validated agent file
 
 #### Agent Template (fallback)
 
@@ -81,8 +92,10 @@ Agents do NOT have a dedicated authoring skill. Author directly using the templa
 name: agent-name
 description: >
   When and why to use this agent. 1-3 sentences with clear trigger conditions.
+  Include "Use proactively" if this agent should auto-spawn without user request.
 tools: ["Read", "Grep", "Glob"]
 model: inherit
+color: blue                      # red | orange | yellow | blue | green
 ---
 
 You are a [domain] specialist. Your role is to [primary function].

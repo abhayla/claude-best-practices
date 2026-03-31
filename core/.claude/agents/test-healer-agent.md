@@ -1,11 +1,12 @@
 ---
 name: test-healer-agent
 description: >
-  Diagnose and fix E2E test failures from the fix queue using classification-driven
-  targeted repair. Applies up to 3 fix attempts per test, then logs as known issue.
-  Requeues fixed tests for re-verification. Use when e2e-conductor-agent dispatches
-  failure healing after visual-inspector-agent identifies failures.
+  Use proactively to diagnose and fix E2E test failures from the fix queue using
+  classification-driven targeted repair. Spawn automatically when E2E tests fail to
+  attempt auto-healing. Applies up to 3 fix attempts per test, then logs as known issue.
+  Requeues fixed tests for re-verification.
 model: sonnet
+color: orange
 version: "1.0.0"
 ---
 

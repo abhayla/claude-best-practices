@@ -45,8 +45,36 @@ Every agent in `core/.claude/agents/*.md` MUST have:
 name: agent-name
 description: When and why to use this agent.
 model: inherit                   # inherit | sonnet | haiku | opus
+color: blue                      # red | orange | yellow | blue | green
 ---
 ```
+
+### Color Field (Severity/Importance)
+
+Every agent MUST declare a `color` indicating the severity and importance of its work:
+
+| Color | Severity | Use When | Examples |
+|-------|----------|----------|---------|
+| `red` | Critical | Security gates, quality blockers, breaking-change detection | `security-auditor-agent`, `code-reviewer-agent` |
+| `orange` | High | Failure diagnosis, build repair, debugging | `debugger-agent`, `test-failure-analyzer-agent` |
+| `yellow` | Medium | Code review, context management, session lifecycle | `context-reducer-agent`, `android-kotlin-reviewer-agent` |
+| `blue` | Standard | Test execution, verification, learning, general workflows | `test-scout-agent`, `tester-agent` |
+| `green` | Low | Documentation, research, planning, information gathering | `docs-manager-agent`, `web-research-specialist-agent` |
+
+### Proactive Spawning Declaration
+
+Agents that should be spawned **automatically** (without explicit user request) MUST include "Use proactively" or "Spawn proactively" in their description. This signals to Claude Code that the agent should be dispatched whenever its trigger conditions are met — not only when the user explicitly asks.
+
+An agent is proactive if it:
+- Performs quality or security checks (code review, security audit, quality gates)
+- Catches problems early (test failure analysis, build failure diagnosis, debugging)
+- Manages context or session lifecycle (context reduction, session summarization)
+- Improves future work (learning capture, pattern detection)
+
+An agent is reactive (no proactive language) if it:
+- Orchestrates multi-step workflows (master agents, pipeline agents)
+- Requires explicit user intent (planning, implementing, scaffolding)
+- Is stack-specific and only relevant in certain projects
 
 Plus `## Core Responsibilities` and `## Output Format` sections in the body. The agent's opening persona line (e.g., "You are a...") MUST specify domain expertise, common failure modes they watch for, and the mental model or framework they apply (when applicable) — vague personas like "expert in X" produce vague output.
 

@@ -1,11 +1,12 @@
 ---
 name: visual-inspector-agent
 description: >
-  Verify completed E2E test results using dual-signal analysis: accessibility tree
-  structure validation + screenshot AI diff. Reads from the verification queue,
-  records verdicts, and routes failures to the fix queue. Use when e2e-conductor-agent
-  dispatches verification after test-scout-agent completes a batch.
+  Use proactively to verify completed E2E test results using dual-signal analysis:
+  accessibility tree structure validation + screenshot AI diff. Spawn automatically
+  after E2E test batches complete to verify visual correctness. Reads from the
+  verification queue, records verdicts, and routes failures to the fix queue.
 model: sonnet
+color: blue
 version: "1.0.0"
 ---
 

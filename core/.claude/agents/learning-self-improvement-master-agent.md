@@ -1,11 +1,12 @@
 ---
 name: learning-self-improvement-master-agent
 description: >
-  Orchestrate learning capture, pattern detection, skill generation, and
-  knowledge accumulation. Use when capturing session learnings, when detecting
-  recurring patterns that should become skills, or when dispatched by
-  project-manager-agent. Works standalone or as a pipeline worker.
+  Use proactively to capture session learnings, detect recurring patterns, and
+  generate skills from accumulated knowledge. Spawn automatically after completing
+  significant work, after successful fixes, or at session end to preserve learnings.
+  Works standalone or as a pipeline worker dispatched by project-manager-agent.
 model: inherit
+color: blue
 version: "1.0.0"
 ---
 

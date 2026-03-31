@@ -72,6 +72,8 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 - **`check_freshness.py`** — Checks source freshness for internet-sourced patterns.
 - **`sync_to_local.py`** — Syncs hub patterns to local projects.
 - **`discovery_adapter.py`** — Adapts discovery results from scans into normalized format.
+- **`collate.py`** — Extracts reusable patterns from project repositories (project→hub sync direction).
+- **`scan_web.py`** — Scans internet sources for Claude Code best practices (internet→hub sync direction).
 - **`assign_workflow_groups.py`** — Auto-assigns orphan `core/` patterns to workflow groups in `config/workflow-groups.yml`. Called automatically by `generate_workflow_docs.py`.
 
 ### CI Workflows
@@ -114,7 +116,7 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 |-----------|---------------|
 | `rules/agent-orchestration.md` | Constraints for multi-agent orchestration patterns in agents and skills. |
 | `rules/claude-behavior.md` | Universal behavioral rules for how Claude should approach all tasks. |
-| `rules/configuration-ssot.md` | Scope: global |
+| `rules/configuration-ssot.md` | Single source of truth for Claude Code configuration — prevents duplication across CLAUDE.md, rules, skills, and settings.json. |
 | `rules/context-management.md` | Rules for managing context window, token usage, and documentation references. |
 | `rules/fastapi-backend.md` | FastAPI backend development rules and patterns. |
 | `rules/fastapi-database.md` | Database and migration rules for FastAPI + SQLAlchemy + Alembic. |
@@ -136,6 +138,6 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 
 ## Claude Code Configuration
 
-The `core/.claude/` directory contains 143 skills, 27 agents, and 24 rules for Claude Code.
+The `core/.claude/` directory contains 151 skills, 36 agents, and 24 rules for Claude Code.
 
 <!-- hub:best-practices:end -->

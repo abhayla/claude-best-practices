@@ -75,6 +75,7 @@ Every agent in `agents/*.md` MUST satisfy ALL of the following:
 | `name` | MUST | Kebab-case, matches filename (without `.md`) |
 | `description` | MUST | MUST explain WHEN to use, not just WHAT it does |
 | `model` | MUST | One of: `inherit`, `sonnet`, `haiku`, `opus` |
+| `color` | MUST | One of: `red`, `orange`, `yellow`, `blue`, `green` — severity/importance of the agent's work (see `pattern-structure.md` Color Field table) |
 
 ### Body Structure
 
@@ -82,6 +83,13 @@ Every agent in `agents/*.md` MUST satisfy ALL of the following:
 - MUST have `## Output Format` section
 - Description MUST include a "use when" clause so the orchestrator knows
   when to dispatch this agent vs another
+
+### Proactive Spawning Quality Check
+
+- Agents that perform quality checks, catch failures, manage context, or
+  capture learnings MUST include "Use proactively" in their description
+- Agents that orchestrate workflows or require explicit user intent MUST NOT
+  include proactive language — they are reactive by design
 - Opening persona line MUST specify domain expertise, failure modes watched
   for, and mental model/framework applied (when applicable)
 
