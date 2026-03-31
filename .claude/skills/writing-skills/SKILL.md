@@ -15,7 +15,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.6.0"
+version: "2.7.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -399,6 +399,45 @@ Present this map to the user alongside the skill draft. The map makes failure pr
 
 ---
 
+## STEP 6.7: Domain Pattern Review
+
+When the authored pattern is an agent or orchestration-related skill, validate it against
+domain-specific reference patterns — not just structural quality gates.
+
+### When to Trigger
+
+| Authored Pattern Type | Domain References to Check |
+|----------------------|---------------------------|
+| Agent (any `agents/*.md`) | `agent-orchestration.md` rule (tier model, responsibilities, state) |
+| Orchestration agent or skill | `anthropic-agent-orchestration-guide` (5 workflow patterns, decision framework) |
+| Multi-agent system pattern | `anthropic-multi-agent-research-system-skill` (8 principles, evaluation, production) |
+| Non-orchestration skill or rule | **SKIP** — domain review is not applicable |
+
+### How to Review
+
+1. **Identify the authored pattern type** from the table above
+2. **Read the matched reference pattern(s)** — these are the audit baseline
+3. **Spawn `anthropic-multi-agent-reviewer-agent`** with the authored pattern and matched references:
+   ```
+   Agent(subagent_type="anthropic-multi-agent-reviewer-agent",
+         prompt="Review this pattern against the 8 principles: <pattern content>")
+   ```
+4. **Evaluate the gap report:**
+   - **Grade A-B** → PASS — proceed to Step 7
+   - **Grade C** → WARN — present gaps to user, fix if user agrees, then proceed
+   - **Grade D-F** → FAIL — must fix before hub promotion
+
+### Why This Step Exists
+
+Structural quality gates (Step 5) check *shape* — does the pattern have frontmatter, steps,
+MUST DO sections? Domain review checks *substance* — does the orchestrator follow the
+8 principles? Does it scale effort appropriately? Does it have evaluation infrastructure?
+
+A pattern can pass every structural gate while violating every orchestration best practice.
+This step closes that gap.
+
+---
+
 ## STEP 7: Hub Promotion Workflow
 
 If the skill is valuable enough to share across projects via the hub.
@@ -468,6 +507,7 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always lock the output format with a code block template for skills that produce structured output — Why: ambiguous output formats cause inconsistent behavior across invocations
 - Always produce a failure prevention map (Step 6.5) before hub promotion — Why: makes guardrails visible and auditable during review
 - Always evaluate multi-phase decomposition (Step 2.4) when a prompt covers a full end-to-end workflow — Why: monolithic skills exceeding 400 lines become hard to test, reuse, and maintain
+- Always run domain pattern review (Step 6.7) for agents and orchestration patterns before hub promotion — Why: structural gates pass patterns that violate orchestration best practices; domain review catches substance violations
 
 ## MUST NOT DO
 

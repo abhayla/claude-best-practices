@@ -138,6 +138,6 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 
 ## Claude Code Configuration
 
-The `core/.claude/` directory contains 151 skills, 36 agents, and 24 rules for Claude Code.
+The `core/.claude/` directory contains 152 skills, 37 agents, and 24 rules for Claude Code.
 
 <!-- hub:best-practices:end -->

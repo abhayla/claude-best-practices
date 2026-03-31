@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-30",
-    "total_patterns": 222
+    "total_patterns": 224
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -340,6 +340,51 @@
       "agents"
     ],
     "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d comprehensive orchestration reference"
+  },
+  "anthropic-multi-agent-research-system-skill": {
+    "hash": "e482947c99d7e54bd0acde0d277ac588fcfcc1f600808c3863e1c66eefbf982f",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-31",
+    "last_updated": "2026-03-31",
+    "dependencies": [
+      "anthropic-agent-orchestration-guide"
+    ],
+    "visibility": "public",
+    "description": "Reference for building and auditing multi-agent systems based on Anthropic's 8 prompt engineering principles, LLM-as-judge evaluation, and production deployment patterns",
+    "tags": [
+      "multi-agent",
+      "orchestration",
+      "prompt-engineering",
+      "evaluation",
+      "production",
+      "reference"
+    ],
+    "changelog": "v1.0.0: Initial creation — 8 principles, evaluation methodology, production patterns from Anthropic research"
+  },
+  "anthropic-multi-agent-reviewer-agent": {
+    "hash": "600607a2725d59cc342221f0c280205e650670487b382aaa32432bda4e72f66c",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-31",
+    "last_updated": "2026-03-31",
+    "dependencies": [
+      "anthropic-multi-agent-research-system-skill"
+    ],
+    "visibility": "public",
+    "description": "Proactive reviewer agent that audits multi-agent orchestration systems against Anthropic's 8 research-backed principles, evaluation methodology, and production readiness patterns",
+    "tags": [
+      "multi-agent",
+      "review",
+      "orchestration",
+      "quality",
+      "proactive"
+    ],
+    "changelog": "v1.0.0: Initial creation — principle compliance audit, evaluation gap detection, production readiness check"
   },
   "api-docs-generator": {
     "hash": "7a9fab9fc54dc8a082b2dbf1efb564cf5b5c20ab842083aebac7eca9121b0945",
