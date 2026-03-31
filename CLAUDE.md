@@ -47,7 +47,7 @@ A curated hub of Claude Code patterns (agents, skills, rules) organized by stack
 - **`.claude/rules/`** — Auto-loaded rules. Global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when working with matching files
 - **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, `config/` (runtime pipeline configs), templates (`CLAUDE.md.template`, `CLAUDE.local.md.template`)
 - **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit directly after adding/removing patterns, then re-run `generate_docs.py`
-- **`config/`** — `settings.yml` (dedup thresholds, scan limits), `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow doc generation — stale seeds silently break docs), `pipeline-stages.yaml` (DAG config for project-manager agent), `discoveries.json` (accumulated scan findings), plus `urls.yml`, `topics.yml`, `third-party-skills.yml`, `test-pipeline.yml`
+- **`config/`** — `settings.yml` (dedup thresholds, scan limits), `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow doc generation — stale seeds silently break docs), `pipeline-stages.yaml` (DAG config for project-manager agent), `workflow-contracts.yaml` (per-workflow step DAGs, artifact contracts, gate expressions — read by workflow-master agents), `discoveries.json` (accumulated scan findings), plus `urls.yml`, `topics.yml`, `third-party-skills.yml`, `test-pipeline.yml`
 - **`docs/stages/`** — Pipeline stage definitions (STAGE-0 through STAGE-11) with executable `Skill()`/`Agent()` dispatch examples
 - **`docs/workflows/`** — Auto-generated workflow docs (output of `generate_workflow_docs.py`). Do not edit manually — regenerate after pattern changes
 - **`scripts/`** — All Python tooling (see Key Scripts below for the important ones)
@@ -72,6 +72,8 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 - **`check_freshness.py`** — Checks source freshness for internet-sourced patterns.
 - **`sync_to_local.py`** — Syncs hub patterns to local projects.
 - **`discovery_adapter.py`** — Adapts discovery results from scans into normalized format.
+- **`sync_to_projects.py`** — Pushes hub patterns to downstream repos in `config/repos.yml` (hub→projects sync direction). Includes telemetry functions for provision manifests and adoption scanning.
+- **`aggregate_telemetry.py`** — Aggregates pattern effectiveness telemetry from enrolled projects. Computes adoption rates, retention, and error prevention rates. Writes effectiveness data to `registry/patterns.json`.
 - **`collate.py`** — Extracts reusable patterns from project repositories (project→hub sync direction).
 - **`scan_web.py`** — Scans internet sources for Claude Code best practices (internet→hub sync direction).
 - **`assign_workflow_groups.py`** — Auto-assigns orphan `core/` patterns to workflow groups in `config/workflow-groups.yml`. Called automatically by `generate_workflow_docs.py`.
@@ -82,6 +84,7 @@ Six sync directions exist — see `docs/SYNC-ARCHITECTURE.md` for details. Key e
 - **`update-docs.yml`** — Auto-regenerates and commits `docs/` when registry or `core/.claude/` changes on main. Avoid running `generate_docs.py` manually on main — this workflow handles it.
 - **`test.yml`** — Runs pytest on `scripts/**` changes.
 - **`recommend.yml`** — Weekly cron + manual: runs `recommend.py --provision` for repos in `config/repos.yml`.
+- **`apply-selections.yml`** — Applies user-selected pattern recommendations to downstream repos.
 - Other scheduled workflows: `scan-internet.yml`, `scan-projects.yml`, `sync-to-projects.yml`, `expire-sources.yml`.
 
 ## Testing

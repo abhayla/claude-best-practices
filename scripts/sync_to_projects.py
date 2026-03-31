@@ -1,8 +1,10 @@
 """Sync hub patterns to registered project repos via PRs."""
 
 import json
+import re
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -149,3 +151,107 @@ def create_sync_pr(repo: str, branch: str, updates: list[dict]) -> Optional[str]
     except Exception:
         pass
     return None
+
+
+# --- Telemetry: Provision Manifest & Adoption Scanning ---
+
+
+def _pattern_rel_path(name: str, resource_type: str) -> str:
+    """Compute the relative path within .claude/ for a pattern."""
+    if resource_type == "skill":
+        return f"skills/{name}/SKILL.md"
+    elif resource_type == "agent":
+        return f"agents/{name}.md"
+    elif resource_type == "rule":
+        return f"rules/{name}.md"
+    return f"{resource_type}s/{name}"
+
+
+def generate_provision_manifest(updates: list[dict]) -> dict:
+    """Generate a sync manifest recording what was provisioned and when.
+
+    This manifest is written to the target project during sync so that
+    future syncs can compute adoption signals (which patterns were kept
+    vs deleted).
+    """
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+    files = {}
+
+    for update in updates:
+        name = update["name"]
+        rtype = update.get("type", "skill")
+        rel_path = _pattern_rel_path(name, rtype)
+        files[rel_path] = {
+            "provisioned_date": today,
+            "version": update.get("version", "0.0.0"),
+        }
+
+    return {
+        "_meta": {
+            "version": "1.0.0",
+            "hub_repo": "abhayla/claude-best-practices",
+            "created": now.isoformat(),
+            "last_sync": now.isoformat(),
+        },
+        "files": files,
+    }
+
+
+def scan_remote_adoption(
+    manifest: dict, remote_files: list[str]
+) -> dict[str, dict]:
+    """Compute adoption signals by comparing manifest against remote file listing.
+
+    Args:
+        manifest: The sync manifest from the project (what was provisioned).
+        remote_files: List of file paths that currently exist in the project's
+                      .claude/ directory (e.g., from GitHub API tree listing).
+
+    Returns:
+        Dict mapping pattern name to {status, retention_days, provisioned_date}.
+    """
+    files = manifest.get("files", {})
+    if not files:
+        return {}
+
+    # Normalize remote files to be relative to .claude/
+    remote_set = set()
+    for f in remote_files:
+        cleaned = f.replace("\\", "/")
+        if cleaned.startswith(".claude/"):
+            cleaned = cleaned[len(".claude/"):]
+        remote_set.add(cleaned)
+
+    now = datetime.now(timezone.utc)
+    result = {}
+
+    for rel_path, meta in files.items():
+        match = re.match(r"^(skills|agents|rules)/([^/]+)", rel_path)
+        if not match:
+            continue
+
+        resource_type, pattern_name = match.groups()
+        if resource_type in ("agents", "rules"):
+            pattern_name = pattern_name.removesuffix(".md")
+
+        exists = rel_path in remote_set
+
+        provisioned_date = meta.get("provisioned_date")
+        retention_days = 0
+        if provisioned_date:
+            try:
+                pdate = datetime.fromisoformat(provisioned_date)
+                if pdate.tzinfo is None:
+                    pdate = pdate.replace(tzinfo=timezone.utc)
+                retention_days = max(0, (now - pdate).days)
+            except (ValueError, TypeError):
+                retention_days = 0
+
+        result[pattern_name] = {
+            "status": "adopted" if exists else "deleted",
+            "retention_days": retention_days,
+            "provisioned_date": provisioned_date,
+        }
+
+    return result

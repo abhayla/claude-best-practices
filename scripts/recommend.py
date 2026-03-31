@@ -749,6 +749,44 @@ def tier_resource(name: str, resource_type: str, stacks: list[str], dep_promoted
     return tier
 
 
+def effectiveness_tier_adjustment(eff: dict) -> Optional[str]:
+    """Compute tier adjustment signal from effectiveness data.
+
+    Returns:
+        'promote' if high adoption (>= 0.7) across sufficient samples (>= 3).
+        'demote' if low adoption (< 0.3) across sufficient samples (>= 3).
+        None if insufficient data, neutral adoption, or invalid types.
+
+    Boundary behavior:
+        adoption_rate=0.3 → None (neutral, not demoted)
+        adoption_rate=0.7 → 'promote' (inclusive upper threshold)
+        sample_size=3 → eligible (minimum required)
+    """
+    if not eff:
+        return None
+
+    adoption = eff.get("adoption_rate")
+    sample = eff.get("sample_size", 0)
+
+    # Type guards: reject non-numeric values
+    if not isinstance(adoption, (int, float)) or not isinstance(sample, (int, float)):
+        return None
+
+    # Guard against NaN
+    if adoption != adoption or sample != sample:  # NaN != NaN
+        return None
+
+    if sample < 3:
+        return None
+
+    if adoption >= 0.7:
+        return "promote"
+    elif adoption < 0.3:
+        return "demote"
+
+    return None
+
+
 def tier_resource_with_reason(
     name: str, resource_type: str, stacks: list[str], dep_promoted: set[str] | None = None,
 ) -> tuple[str, str]:
@@ -759,6 +797,7 @@ def tier_resource_with_reason(
     2. Always-skip list
     3. Wrong-stack detection
     4. Registry `tier` field (SSOT — every pattern must have this)
+    5. Effectiveness data (advisory — appended to reason, does not override tier)
 
     The registry is the single source of truth for tier classification.
     CI validator (validate_registry_tiers) enforces that every pattern
@@ -794,6 +833,15 @@ def tier_resource_with_reason(
     if name in registry and isinstance(registry[name], dict):
         reg_tier = registry[name].get("tier")
         if reg_tier in ("must-have", "nice-to-have", "skip"):
+            # Append effectiveness signal to reason if available
+            eff = registry[name].get("effectiveness", {})
+            adjustment = effectiveness_tier_adjustment(eff)
+            if adjustment == "promote":
+                adoption = eff.get("adoption_rate", 0)
+                return reg_tier, f"registry tier ({reg_tier}); high effectiveness adoption ({adoption:.0%})"
+            elif adjustment == "demote":
+                adoption = eff.get("adoption_rate", 0)
+                return reg_tier, f"registry tier ({reg_tier}); low effectiveness adoption ({adoption:.0%})"
             return reg_tier, f"registry tier ({reg_tier})"
 
     # Config files inherit the tier of their associated skill.

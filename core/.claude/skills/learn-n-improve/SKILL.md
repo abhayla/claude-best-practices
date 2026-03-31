@@ -6,7 +6,7 @@ description: >
   Use when a session ends, after a fix succeeds, or when reviewing learning effectiveness.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: session|deep|meta|test-run>"
-version: "2.2.0"
+version: "2.3.0"
 type: workflow
 ---
 
@@ -66,11 +66,38 @@ For each error encountered and fixed during the session, record a structured tri
       },
       "lesson": "Always validate ORM query results before accessing attributes. Use Optional types.",
       "tags": ["null-handling", "orm", "python"],
-      "reuse_count": 0
+      "reuse_count": 0,
+      "hub_pattern_link": null
     }
   ]
 }
 ```
+
+### Hub Pattern Linkage (Effectiveness Telemetry)
+
+For each new learning, determine which hub pattern — if any — should have
+prevented or caught this error. This links errors to patterns, enabling
+cross-project effectiveness measurement.
+
+1. **Auto-suggest**: Match the learning's `tags` against `registry/patterns.json`
+   tag fields. If a hub pattern's tags overlap >= 50% with the error's tags,
+   suggest it as `hub_pattern_link`. Present top 1-3 candidates.
+2. **User confirms**: Show the suggestion — the user picks one or skips.
+   If skipped, set `hub_pattern_link: null`.
+3. **Write the link**: Store the selected pattern name as `hub_pattern_link`.
+
+Example:
+```
+Hub pattern link suggestion for L042:
+  Error tags: ["security", "sql"]
+  Candidates:
+    1. security-audit (tags: security, audit — 50% overlap)
+    2. fastapi-backend (tags: fastapi, backend — 0% overlap)
+  → Link to: security-audit? [Y/n/skip]
+```
+
+This data feeds `aggregate_telemetry.py` to compute per-pattern error
+prevention rates across enrolled projects.
 
 For each error→fix pair from the session:
 1. Search existing learnings for similar errors (match by error message, file path, tags)

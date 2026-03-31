@@ -1836,13 +1836,13 @@
     "tier": "nice-to-have"
   },
   "learn-n-improve": {
-    "hash": "9e10245a943b06982a99358e4aae83be312b418e56f0446c0ce7d191446f1ddb",
+    "hash": "abcb13299d5173254c8938963531f792043090fa1b88a4310db51c146f8f3be4",
     "type": "skill",
     "category": "core",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-03-31",
     "dependencies": [],
     "visibility": "public",
     "description": "",
