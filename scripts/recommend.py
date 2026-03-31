@@ -758,8 +758,11 @@ def tier_resource_with_reason(
     1. Dependency promotion (overrides everything)
     2. Always-skip list
     3. Wrong-stack detection
-    4. Registry `tier` field (data-driven, from patterns.json)
-    5. Hardcoded fallback sets (legacy, for entries without `tier` field)
+    4. Registry `tier` field (SSOT — every pattern must have this)
+
+    The registry is the single source of truth for tier classification.
+    CI validator (validate_registry_tiers) enforces that every pattern
+    in registry/patterns.json has a valid tier field.
 
     Returns (tier, reason) where tier is 'must-have', 'nice-to-have', or 'skip'.
     """
@@ -784,50 +787,17 @@ def tier_resource_with_reason(
             # Empty set means "requires dep detection only" — skip if not dep-promoted
             return "skip", "wrong stack"
 
-    # Registry-driven tiering — check patterns.json `tier` field first
+    # Registry-driven tiering — SINGLE SOURCE OF TRUTH
+    # Every pattern in registry/patterns.json must have a tier field.
+    # CI validator (validate_registry_tiers) enforces this.
     registry = _load_tier_registry()
     if name in registry and isinstance(registry[name], dict):
         reg_tier = registry[name].get("tier")
         if reg_tier in ("must-have", "nice-to-have", "skip"):
             return reg_tier, f"registry tier ({reg_tier})"
 
-    # Fallback: hardcoded sets (legacy, for entries without `tier` field)
-    if resource_type == "hook":
-        if name in MUST_HAVE_HOOKS:
-            return "must-have", "essential safety hook"
-        return "nice-to-have", "optional hook"
-
-    if resource_type == "agent":
-        if name in MUST_HAVE_AGENTS:
-            return "must-have", "core agent"
-        return "nice-to-have", "optional agent"
-
-    if resource_type == "rule":
-        if name in MUST_HAVE_RULES:
-            return "must-have", "core rule"
-        return "nice-to-have", "optional rule"
-
-    if resource_type == "skill":
-        # Stack-specific overrides — some stack skills are nice-to-have, not must-have
-        if name in NICE_TO_HAVE_STACK_OVERRIDES:
-            return "nice-to-have", "stack override (not essential for most projects)"
-
-        # Stack-specific skills matching the project's stacks are must-haves
-        if is_stack_specific(name) and matches_stacks(name, stacks):
-            return "must-have", "matches detected stack"
-
-        if name in MUST_HAVE_UNIVERSAL_SKILLS:
-            return "must-have", "core workflow skill"
-
-        if name in NICE_TO_HAVE_UNIVERSAL_SKILLS:
-            return "nice-to-have", "useful but optional"
-
-        # Remaining universal skills not in any list — nice-to-have
-        return "nice-to-have", "optional skill"
-
+    # Config files inherit the tier of their associated skill.
     if resource_type == "config":
-        # Config files inherit the tier of their associated skill.
-        # If the skill gets provisioned, its runtime config should too.
         CONFIG_SKILL_MAP = {
             "e2e-pipeline": "e2e-visual-run",
         }
@@ -837,9 +807,9 @@ def tier_resource_with_reason(
                 associated_skill, "skill", stacks, dep_promoted
             )
             return skill_tier, f"runtime config for {associated_skill}"
-        return "nice-to-have", "optional config"
 
-    return "nice-to-have", "optional"
+    # Default for patterns not yet in registry (shouldn't happen if CI passes)
+    return "nice-to-have", "not in registry (add tier field to patterns.json)"
 
 
 # --- Sync Manifest ---

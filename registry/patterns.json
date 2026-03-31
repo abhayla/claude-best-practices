@@ -24,7 +24,8 @@
       "axe-core",
       "Lighthouse"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d axe-core, Lighthouse a11y, WCAG checklist"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d axe-core, Lighthouse a11y, WCAG checklist",
+    "tier": "nice-to-have"
   },
   "adr": {
     "hash": "1900013d1bcfd25bf035fb99a0ddc40ed5238a198ec71e8f019ba2c9d1995eb1",
@@ -43,7 +44,8 @@
       "ADR",
       "decisions"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Michael Nygard template, lifecycle management, index generation"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Michael Nygard template, lifecycle management, index generation",
+    "tier": "nice-to-have"
   },
   "adversarial-review": {
     "hash": "24ddcf8502d2e1157f892397d16b21e7f74af43d9b0216e719d62c34761c272c",
@@ -76,7 +78,8 @@
       "agents",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d Anthropic-aligned orchestration constraints"
+    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d Anthropic-aligned orchestration constraints",
+    "tier": "nice-to-have"
   },
   "ai-gemini-api": {
     "hash": "6e280c025a59b69519ec07d963702893f7e90f71a3d3a438fb94fcf52978eab8",
@@ -90,7 +93,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "android": {
     "hash": "c7572078c79447a97f1f787d65d6569ed76d465e3fc2b125e7a3edb9a2444e70",
@@ -104,7 +108,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "android-adb-test": {
     "hash": "97324d026cdbdb13d09f551eb300503adb04e5164b169f89a0b7717613db22be",
@@ -118,7 +123,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "android-arch": {
     "hash": "7d7462d667577f819ec62b7e14f8006026dc00b5e01aa57d73ea89a7fa26c1fd",
@@ -141,7 +147,8 @@
       "testing",
       "gradle"
     ],
-    "changelog": "v2.0.0: Merged with claude-android-ninja references and templates"
+    "changelog": "v2.0.0: Merged with claude-android-ninja references and templates",
+    "tier": "must-have"
   },
   "android-build-fixer-agent": {
     "hash": "608284a1954fff8c6dcb3c30ee02b3d7e76a0a0bf8cb242d6ddb519a4e29a0a8",
@@ -163,7 +170,8 @@
       "hilt",
       "room"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d adapted from TaeseongYun build-fixer agent"
+    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d adapted from TaeseongYun build-fixer agent",
+    "tier": "must-have"
   },
   "android-compose-agent": {
     "hash": "e0809c924a1f163fbdca452455a029dcace8ce2593ecdc413de3edc4eeaa7a29",
@@ -177,7 +185,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "android-compose-ui": {
     "hash": "ca8a9d00a52d13a89fb3a205d13d2cfa678872b908fb15271667d09985fa152b",
@@ -191,7 +200,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "android-gradle": {
     "hash": "b6b078f46c254e7b9558b286600c9a6bcf41d511a5c73a31faafd4d8833cd847",
@@ -205,7 +215,8 @@
     "visibility": "public",
     "description": "Android Gradle build optimization and plugin configuration",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "must-have"
   },
   "android-kotlin": {
     "hash": "a248798ea4e4bf0532595fca1992cc31b72507adb7fd2206c791b48b1f708654",
@@ -225,7 +236,8 @@
       "coding-style",
       "testing"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d consolidated from 4 kotlin rule files in everything-claude-code"
+    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d consolidated from 4 kotlin rule files in everything-claude-code",
+    "tier": "must-have"
   },
   "android-kotlin-reviewer-agent": {
     "hash": "6f54c0a1c173f0f12aa66fc4b0500d87cbb229fb92a5548dc5d06740d898c041",
@@ -246,7 +258,8 @@
       "coroutines",
       "kmp"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d adapted from everything-claude-code kotlin-reviewer"
+    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d adapted from everything-claude-code kotlin-reviewer",
+    "tier": "must-have"
   },
   "android-mvi-scaffold": {
     "hash": "2606994217ecc7f5bd4c90d69944c9a7171150d5dbf2fe9d4019f4b2b2c6cf84",
@@ -267,7 +280,8 @@
       "compose",
       "architecture"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d consolidated from ChrisWW + TaeseongYun repos"
+    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d consolidated from ChrisWW + TaeseongYun repos",
+    "tier": "must-have"
   },
   "android-run-e2e": {
     "hash": "210ad2d7dfe68b399c6eb521e6a721629078df6a7d27fc237d8b07b0e225b25c",
@@ -281,7 +295,8 @@
     "visibility": "public",
     "description": "Run Android E2E tests via Gradle or Maestro with auto-fix on failure",
     "tags": [],
-    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
+    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "tier": "must-have"
   },
   "android-run-tests": {
     "hash": "9dd060b6c78f873dafabd6dd7fd8e5a3d5cb1ad5947f2af1bc269b968bbcf074",
@@ -295,7 +310,8 @@
     "visibility": "public",
     "description": "Run Android tests with class name resolution and auto-fix on failure",
     "tags": [],
-    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
+    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "tier": "must-have"
   },
   "android-test-patterns": {
     "hash": "aad4850a5e8ba60b4aeb330192ccb51d8f115bcc900e3ea3ab522ffb01014e61",
@@ -320,7 +336,8 @@
       "turbine",
       "mockk"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns"
+    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns",
+    "tier": "must-have"
   },
   "anthropic-agent-orchestration-guide": {
     "hash": "44939f9bcd3e0044064e5a917f91876dda92663c773010f1f1a5e21b6c216bdf",
@@ -339,7 +356,8 @@
       "patterns",
       "agents"
     ],
-    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d comprehensive orchestration reference"
+    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d comprehensive orchestration reference",
+    "tier": "nice-to-have"
   },
   "anthropic-multi-agent-research-system-skill": {
     "hash": "e482947c99d7e54bd0acde0d277ac588fcfcc1f600808c3863e1c66eefbf982f",
@@ -362,7 +380,8 @@
       "production",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial creation — 8 principles, evaluation methodology, production patterns from Anthropic research"
+    "changelog": "v1.0.0: Initial creation \u2014 8 principles, evaluation methodology, production patterns from Anthropic research",
+    "tier": "nice-to-have"
   },
   "anthropic-multi-agent-reviewer-agent": {
     "hash": "600607a2725d59cc342221f0c280205e650670487b382aaa32432bda4e72f66c",
@@ -384,7 +403,8 @@
       "quality",
       "proactive"
     ],
-    "changelog": "v1.0.0: Initial creation — principle compliance audit, evaluation gap detection, production readiness check"
+    "changelog": "v1.0.0: Initial creation \u2014 principle compliance audit, evaluation gap detection, production readiness check",
+    "tier": "nice-to-have"
   },
   "api-docs-generator": {
     "hash": "7a9fab9fc54dc8a082b2dbf1efb564cf5b5c20ab842083aebac7eca9121b0945",
@@ -403,7 +423,8 @@
       "Swagger",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-framework OpenAPI generation, validation, CI integration"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-framework OpenAPI generation, validation, CI integration",
+    "tier": "nice-to-have"
   },
   "apply-selections": {
     "hash": "f3092ae30bb570de73ebaf512994fe0cf132d02222d4703de1a3178475ee352a",
@@ -422,7 +443,8 @@
       "checkbox",
       "pattern-selection"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d checkbox parsing, file removal via GitHub API"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d checkbox parsing, file removal via GitHub API",
+    "tier": "nice-to-have"
   },
   "architecture-fitness": {
     "hash": "739bc721f36bb96dc9e787daedd04ca2ddc41c3e00e512ac9d4c7f44f1a97c5a",
@@ -441,7 +463,8 @@
       "coupling",
       "dependencies"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dependency direction, circular deps, coupling, ADR review"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dependency direction, circular deps, coupling, ADR review",
+    "tier": "nice-to-have"
   },
   "auto-format": {
     "hash": "5524c30bb72cef2828e16252af36e2301204a4b28be2e5147b2f608eec8df37c",
@@ -534,7 +557,8 @@
       "elysia",
       "typescript"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "must-have"
   },
   "bun-elysia-test": {
     "hash": "7ae21ae5f4e33709314d0051742472edb72ab4bbab663dc10061a4fc29913682",
@@ -552,7 +576,8 @@
       "elysia",
       "testing"
     ],
-    "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
+    "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "tier": "nice-to-have"
   },
   "change-risk-scoring": {
     "hash": "735c6543340c0594d2561bef449fd0777a1cf48ca13b57de4b087ba75be1d2c1",
@@ -571,7 +596,8 @@
       "deploy",
       "metrics"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d composite risk scoring, hotspot analysis"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d composite risk scoring, hotspot analysis",
+    "tier": "nice-to-have"
   },
   "changelog-contributing": {
     "hash": "df799475ed1153f1273a41676d26cd369cd5612b7e0a4a87ab4335bf1b79dc4b",
@@ -590,7 +616,8 @@
       "conventional-commits",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d CHANGELOG + CONTRIBUTING generation"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d CHANGELOG + CONTRIBUTING generation",
+    "tier": "nice-to-have"
   },
   "chaos-resilience": {
     "hash": "3c029e8ea7dac24e075847f8ef2903edc9c9222f5954dfd2bc696646429dcec6",
@@ -609,7 +636,8 @@
       "failure-injection",
       "circuit-breaker"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure injection, degradation verification, gameday"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure injection, degradation verification, gameday",
+    "tier": "nice-to-have"
   },
   "ci-cd-setup": {
     "hash": "0bbedaab3c41d4dd94d31ed383fe3af766e6226cdac7ce91a8fba0d9272fe44d",
@@ -623,7 +651,8 @@
     "visibility": "public",
     "description": "GitHub Actions, GitLab CI, pipeline stages, environment promotion",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "claude-behavior": {
     "hash": "84015f1d569ae86cf9051f19fbcccc7c177c5c23264b21f6a8e3f006c686d727",
@@ -652,7 +681,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "nice-to-have"
   },
   "code-quality-gate": {
     "hash": "630f2dc3906d93baee2d15cd6ff85770163e74aad83dee66abcb9a4fee5291bc",
@@ -702,7 +732,8 @@
     "visibility": "public",
     "description": "Jetpack Compose UI patterns, theming, accessibility",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "configuration-ssot": {
     "hash": "51a52709bb5da53f1323012316f7294d3166e984a5141faf4ac25bc9418c82bc",
@@ -837,7 +868,8 @@
       "API",
       "consumer-driven"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Pact consumer/provider, broker, CI integration"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Pact consumer/provider, broker, CI integration",
+    "tier": "nice-to-have"
   },
   "contribute-practice": {
     "hash": "2cbcbd52aed457c3df3f619faf733a2ee9bd538987649b9636eac6bf4a579e18",
@@ -851,7 +883,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "skip"
   },
   "coverage-analysis": {
     "hash": "80ddf9e9b170fe1e1661bb43278f21753f4e556079b25341636e17de1982944e",
@@ -869,7 +902,8 @@
       "coverage",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "cross-platform-visual": {
     "hash": "9cf3b1b43b0684a22158df4fd35568a25d4813e26a5221915b06288a33aa3c20",
@@ -883,7 +917,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "nice-to-have"
   },
   "d3-viz": {
     "hash": "1d3f6975b0e70416ed120c670d265cebe891c8d92f2a03cb8a223d2e16c55e78",
@@ -897,7 +932,8 @@
     "visibility": "public",
     "description": "D3.js data visualization: selections, scales, 9 chart types, interactions",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "dangerous-command-blocker": {
     "hash": "589ce880dc4ca6de229453f8f03fc9fe7d5a8a5465ddad2533f9a6e4d0e50614",
@@ -935,7 +971,8 @@
       "nuclei",
       "fuzzing"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ZAP, Nuclei, headers, sessions, fuzzing, CI"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ZAP, Nuclei, headers, sessions, fuzzing, CI",
+    "tier": "nice-to-have"
   },
   "db-migrate": {
     "hash": "37d620b0a7bb86c9d3d2e98941d7e1085d2306cf13ba850763e8b0c233206e79",
@@ -958,7 +995,8 @@
       "Django",
       "TypeORM"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-ORM migration with safety rules"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-ORM migration with safety rules",
+    "tier": "nice-to-have"
   },
   "db-migrate-verify": {
     "hash": "73587ed97c823b1a1aef42bc77d7902ae766d5006ea3cdab401383721666b92e",
@@ -972,7 +1010,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "nice-to-have"
   },
   "debugger-agent": {
     "hash": "151b6e58c3428823131ae95caff37e24bc689bc8346d342ce940b1e5b857aff0",
@@ -1011,7 +1050,8 @@
       "zero-downtime",
       "PRR"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d GitOps, canary, blue-green, DB migration ordering, PRR"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d GitOps, canary, blue-green, DB migration ordering, PRR",
+    "tier": "nice-to-have"
   },
   "diataxis-docs": {
     "hash": "5287d419170173c2d6c35690e8c9e9d1a4c47b9615812d40a9f1488b027e8ff0",
@@ -1030,7 +1070,8 @@
       "tutorials",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Di\u00c3\u0192\u00c2\u00a1taxis categorization, templates, migration"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Di\u00c3\u0192\u00c2\u00a1taxis categorization, templates, migration",
+    "tier": "nice-to-have"
   },
   "disaster-recovery": {
     "hash": "6dc9b26604683de6f7ebaaae5c9c0ddee645007d443f7bb04dc9d146018ce72e",
@@ -1054,7 +1095,8 @@
       "RTO",
       "RPO"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d RTO/RPO, backup, restore, failover, DR drills"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d RTO/RPO, backup, restore, failover, DR drills",
+    "tier": "nice-to-have"
   },
   "doc-staleness": {
     "hash": "8495d0fcd3db3ddfbb4b5a4516719e8ef85d9c2c86c195acee9cf5416991cd80",
@@ -1073,7 +1115,8 @@
       "drift-detection",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d file/symbol/command/link staleness detection, severity-prioritized report"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d file/symbol/command/link staleness detection, severity-prioritized report",
+    "tier": "nice-to-have"
   },
   "doc-structure-enforcer": {
     "hash": "ed21cb6e8213bca75f599461d5f5157e8c9317c097652054cfc70be2a09bda4b",
@@ -1093,7 +1136,8 @@
       "pipeline-stages",
       "folder-management"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d stage-based folder structure, pattern + content classification, git mv + ref updates"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d stage-based folder structure, pattern + content classification, git mv + ref updates",
+    "tier": "nice-to-have"
   },
   "docker-optimize": {
     "hash": "eec1b3f0177b7ed19b1001442c3c6979b630c8aedcdf0bde1b38b69a1b3617f6",
@@ -1107,7 +1151,8 @@
     "visibility": "public",
     "description": "Multi-stage Docker builds, layer caching, security scanning",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "docs-manager-agent": {
     "hash": "faad06fa134a5087f6089498991e8a3a823090f70e7f97d2d6be066a759e69c8",
@@ -1140,7 +1185,8 @@
       "typescript",
       "database"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "nice-to-have"
   },
   "e2e-visual-run": {
     "hash": "42a0a2694ad413fbe30b9a2420d8792632f607982361c7a47992062b7d95aeca",
@@ -1163,7 +1209,8 @@
       "self-healing",
       "accessibility"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d queue-based orchestration, dual-signal verification, 8-classification healing"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d queue-based orchestration, dual-signal verification, 8-classification healing",
+    "tier": "nice-to-have"
   },
   "e2e-best-practices": {
     "hash": "0759c02c2ae097dd2c5e5d4a38d1740cae9db44c0f7fe9246a32a739ea54b400",
@@ -1182,7 +1229,8 @@
       "best-practices",
       "cross-framework"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 10 sections covering gaps across existing E2E skills"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 10 sections covering gaps across existing E2E skills",
+    "tier": "nice-to-have"
   },
   "e2e-pipeline": {
     "hash": "3f99d9af1414c3b663537b9ba88a955da23db69adf920ef230f8d5b2c7e97d97",
@@ -1200,7 +1248,8 @@
       "config",
       "pipeline"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d externalized DAG for e2e-conductor-agent"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d externalized DAG for e2e-conductor-agent",
+    "tier": "nice-to-have"
   },
   "e2e-test-writing": {
     "hash": "b399f0fa12fb1f13d3cc372ff9fc50e8827bae5e2057c80f490b1e0e5c27f12a",
@@ -1220,7 +1269,8 @@
       "testing",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d globs-scoped pointer to e2e-best-practices"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d globs-scoped pointer to e2e-best-practices",
+    "tier": "nice-to-have"
   },
   "e2e-conductor-agent": {
     "hash": "2e95def12b5b3af32082430077b71706a7221a4fb59360e2d93bff0cd2b38a23",
@@ -1243,7 +1293,8 @@
       "testing",
       "queue"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d async queue-based E2E orchestration pipeline"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d async queue-based E2E orchestration pipeline",
+    "tier": "nice-to-have"
   },
   "executing-plans": {
     "hash": "c9e17da615ae37cb820d2a80354f6839c1c661f1f0e42cf6f3413a8e805d3213",
@@ -1272,7 +1323,8 @@
     "visibility": "public",
     "description": "Expo/React Native development, routing, deployment",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "fastapi-api-tester-agent": {
     "hash": "100184e8db9ce5ec0913d9a8ffbd65e8051660be2af661b6684bd7ef0a69843c",
@@ -1286,7 +1338,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "fastapi-backend": {
     "hash": "38a08f21a39828fb09a69fa96a3c3fc2a27f691dc799b75ff0dd18b1f0ad793e",
@@ -1300,7 +1353,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "fastapi-database": {
     "hash": "9ba81856021e55bc0f65c030ac7e3439f54045d4301bccaec5ea990ae296641d",
@@ -1314,7 +1368,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "fastapi-database-admin-agent": {
     "hash": "815f232b700eda9a97346070a661833f8e2ed0f70fa96f4f79dd50ba84b80e21",
@@ -1328,7 +1383,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "fastapi-db-migrate": {
     "hash": "dcb0a462a3965dca5084b814255140e0b523458e803ade31cd1828f86e4d2abd",
@@ -1342,7 +1398,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "fastapi-deploy": {
     "hash": "f0669ae641b52aea68667b8c1b81bb3417cbf25fc17f82c1db7391fab6c39434",
@@ -1356,7 +1413,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "fastapi-run-backend-tests": {
     "hash": "dcce52eab8016964bdbf3f6171987e003411ba63f7a76f8d20bedc4d8253836b",
@@ -1370,7 +1428,8 @@
     "visibility": "public",
     "description": "Run backend pytest with smart defaults and auto-fix on failure",
     "tags": [],
-    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
+    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "tier": "must-have"
   },
   "feature-flag": {
     "hash": "e0afed803cb88a2cb0976b0aa91376a654038255a141d6aa9a0d40ccab205dd0",
@@ -1388,7 +1447,8 @@
       "toggles",
       "gradual-rollout"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d flag types, implementation patterns, cleanup"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d flag types, implementation patterns, cleanup",
+    "tier": "nice-to-have"
   },
   "firebase": {
     "hash": "7d173bc7ec83fbadf36727425a02753bb5ed984179927970722d749d1e8c39ae",
@@ -1406,7 +1466,8 @@
       "auth",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in KKB + cric patterns"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in KKB + cric patterns",
+    "tier": "must-have"
   },
   "firebase-ai": {
     "hash": "1e9c9b33be88f0baf245b4d9e279d74550582ea7242b539a16e61349edf5da3a",
@@ -1420,7 +1481,8 @@
     "visibility": "public",
     "description": "Firebase AI Logic with Gemini API integration",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "must-have"
   },
   "firebase-data-connect": {
     "hash": "3c03c80ce2c6c18c5c468ea0c007f9064947fc536ac0cc25f84274900d4e34a4",
@@ -1434,7 +1496,8 @@
     "visibility": "public",
     "description": "Firebase Data Connect with PostgreSQL and GraphQL",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "firebase-dev": {
     "hash": "635680b993358c8fa5334ac4d77b720d60df97811345741fc3ddacb7856f6f51",
@@ -1448,7 +1511,8 @@
     "visibility": "public",
     "description": "Firebase development: Auth, Firestore, Hosting",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "must-have"
   },
   "firebase-test": {
     "hash": "1ff4941b5012db065476ffbeb27131729a8a844b867d49d451fc815b201514c5",
@@ -1467,7 +1531,8 @@
       "emulator",
       "firestore"
     ],
-    "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
+    "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "tier": "must-have"
   },
   "fix-issue": {
     "hash": "81d401b97f74b378816007f5eb96c2d49544b7ae11e84e7bdd22e60fbe7abafb",
@@ -1515,7 +1580,8 @@
       "dart",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns",
+    "tier": "must-have"
   },
   "flutter-dart-agent": {
     "hash": "f7924430ccab1d770896e1779e90316acb08b662946c46be7c02f924c44136df",
@@ -1533,7 +1599,8 @@
       "dart",
       "mobile"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns",
+    "tier": "must-have"
   },
   "flutter-dev": {
     "hash": "d7d209911545999c608b70c24c6d341f44917727002351d42372647c736f082a",
@@ -1547,7 +1614,8 @@
     "visibility": "public",
     "description": "Flutter 3+ development: widgets, state management, navigation, builds",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "flutter-e2e-test": {
     "hash": "7f4bd83765a154dd4ae3abeb0327295778a062ccfda07822fc414a0b78a78b5d",
@@ -1561,7 +1629,8 @@
     "visibility": "public",
     "description": "Flutter E2E testing across mobile platforms with auto-fix on failure",
     "tags": [],
-    "changelog": "v1.2.0: Auto-invoke /fix-loop + /learn-n-improve on failure"
+    "changelog": "v1.2.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "tier": "nice-to-have"
   },
   "git-manager-agent": {
     "hash": "d70b34e82985ee98daa9fd5d658c55e6000afe1fbe79470d6b89210bb675363a",
@@ -1609,7 +1678,8 @@
       "search",
       "discovery"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d repo search, code search, deep inspect modes"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d repo search, code search, deep inspect modes",
+    "tier": "skip"
   },
   "handover": {
     "hash": "7b2480eda367305cefad80c8da51c96b41687b5ee385cf52a40e94fbf2c1c567",
@@ -1642,7 +1712,8 @@
       "typescript",
       "backend"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "nice-to-have"
   },
   "html-prototype": {
     "hash": "7b45bb69aa004f5a5445bb4bbcc60b7cec88232ecf93fadf638c9ec65b2bfcf2",
@@ -1662,7 +1733,8 @@
       "demo",
       "Nielsen"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d single-file prototypes with heuristic validation"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d single-file prototypes with heuristic validation",
+    "tier": "nice-to-have"
   },
   "iac-deploy": {
     "hash": "7b0e0bfa93b93b1259bed278ef6bf022615e2c1d3c657fc059f6b6e921948bd2",
@@ -1676,7 +1748,8 @@
     "visibility": "public",
     "description": "Infrastructure as Code: Terraform, Pulumi, state management",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "implement": {
     "hash": "07528a6cb05faadae33866c2ad1e57e5fcf015024dc5783601a1bdc66619015f",
@@ -1705,7 +1778,8 @@
     "visibility": "public",
     "description": "Incident triage, mitigation, communication, post-mortem",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "integration-test": {
     "hash": "88f6561d0b098940c56bc73ae06ad9e8b3056ec86f03ce0597e66813e88a5db7",
@@ -1723,7 +1797,8 @@
       "integration",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "jest-dev": {
     "hash": "010f61c5ed1b2b9ac90fe10e0056acb72eb7bd940cb71a7e6e5cfb9d529dce68",
@@ -1742,7 +1817,8 @@
       "javascript",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "k8s-deploy": {
     "hash": "62417ac3a03650b6e297cdb6caca9d3c3ef6fe3d0de348adf6ffc1d11a18c245",
@@ -1756,7 +1832,8 @@
     "visibility": "public",
     "description": "Kubernetes manifests, probes, HPA, RBAC, Helm charts",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "learn-n-improve": {
     "hash": "9e10245a943b06982a99358e4aae83be312b418e56f0446c0ce7d191446f1ddb",
@@ -1785,7 +1862,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "skip"
   },
   "merge-strategy": {
     "hash": "dc4e0526d86f5de47f84aae50c4f100bc129b827c6e82e97bf822044d95b632f",
@@ -1806,7 +1884,8 @@
       "branching",
       "post-merge"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d strategy matrix, pre/post-merge checklists"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d strategy matrix, pre/post-merge checklists",
+    "tier": "nice-to-have"
   },
   "middleware-test": {
     "hash": "02793a47a9f5a5a8ebe2b4b69373fa81e3e454f69f68614e9ff8c684b5e67421",
@@ -1820,7 +1899,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "nice-to-have"
   },
   "mobile-a11y-test": {
     "hash": "3a6a81e3d69426d3a80e2c2e328baed64f4930f2e5d3b0754b59691f2c323e65",
@@ -1840,7 +1920,8 @@
       "android",
       "flutter"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "mock-server": {
     "hash": "c73c0ea4824f5a2a54c3280ade9a0761768f37a8c11baa10f17889d6c0b6c53a",
@@ -1859,7 +1940,8 @@
       "API",
       "development"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "monitoring-setup": {
     "hash": "9bd7bae448976d4c6fb6bc00b76caf99501d9b0952f6d6197579008677f9c907",
@@ -1873,7 +1955,8 @@
     "visibility": "public",
     "description": "Prometheus, Grafana, alerting, SLO/SLI dashboards",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "monorepo": {
     "hash": "3ef118a1c0545ec36bdeb2c8063e83d8759525faacb68abd3b1690bd7b5cd681",
@@ -1891,7 +1974,8 @@
       "workspaces",
       "turborepo"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "nice-to-have"
   },
   "nextjs-dev": {
     "hash": "0127fb820f36bfd978182196778e1f49cf27f47146df8a2badc58104ad640865",
@@ -1909,7 +1993,8 @@
       "react",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in BestDematAccount + IPODhan patterns"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in BestDematAccount + IPODhan patterns",
+    "tier": "nice-to-have"
   },
   "node-backend-dev": {
     "hash": "c18c72de006cf77a915cc143f2b807a4a3b950cf8503457504440458380e83c7",
@@ -1929,7 +2014,8 @@
       "hono",
       "elysia"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + BestDematAccount + cric patterns"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + BestDematAccount + cric patterns",
+    "tier": "nice-to-have"
   },
   "nuxt-dev": {
     "hash": "7d9f01d024c2b33e394f27b4c74652213539f22eb0323743b9836a7fa9ef1f20",
@@ -1943,7 +2029,8 @@
     "visibility": "public",
     "description": "Nuxt 3 development: SSR, server routes, modules, deployment",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "obsidian": {
     "hash": "c77858d0d35ded22fda8887803cc352af1d44b0dee64a317f7434fb7deb10c52",
@@ -1957,7 +2044,8 @@
     "visibility": "public",
     "description": "Obsidian vault management: .md, .base, .canvas, CLI, dev brain logging",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "skip"
   },
   "parallel-worktree-orchestrator-agent": {
     "hash": "3cb1f19ee2b5216dc88a06327bf73393143f63cb8df8ddc0e8724e0df31c5d4d",
@@ -1975,7 +2063,8 @@
       "parallel",
       "worktree"
     ],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "nice-to-have"
   },
   "pattern-portability": {
     "hash": "2acb731d2f4f66ddbd0bc68c383ba45bf449971ff0cd20e498712a232356307d",
@@ -1993,7 +2082,8 @@
       "portability",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "tier": "nice-to-have"
   },
   "pattern-self-containment": {
     "hash": "fc1db6e5a967d52d8a5aa5156f3901ab45130953e734d2ff0b2f929b3050b333",
@@ -2011,7 +2101,8 @@
       "self-containment",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "tier": "nice-to-have"
   },
   "pattern-structure": {
     "hash": "d043937586ef78f0b294657c9c9e0779451e6c950d7a6fade7effb8cf56df814",
@@ -2029,7 +2120,8 @@
       "structure",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "tier": "nice-to-have"
   },
   "perf-test": {
     "hash": "dfc961b34652f639a428280a47c24f09d9e929eabee300c060fcee0a4429b7e7",
@@ -2051,7 +2143,8 @@
       "Lighthouse",
       "bundle"
     ],
-    "changelog": "v1.2.0: Add test-results/perf-test.json structured output for stage gate aggregator"
+    "changelog": "v1.2.0: Add test-results/perf-test.json structured output for stage gate aggregator",
+    "tier": "nice-to-have"
   },
   "pg-query": {
     "hash": "4521da934944d454672b33964780cd2cb7659356ae99f785ec018c6455446ae9",
@@ -2065,7 +2158,8 @@
     "visibility": "public",
     "description": "PostgreSQL read-only queries with validation and timeouts",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "pipeline-orchestrator": {
     "hash": "568cdd4d1c1320cf0740b37cf9eaad5dae6582faf6db6fbad09b9bb65725964f",
@@ -2085,7 +2179,8 @@
       "orchestration",
       "DAG"
     ],
-    "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent"
+    "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent",
+    "tier": "nice-to-have"
   },
   "plan-executor-agent": {
     "hash": "16056a4b8212e93e7534b960601e025badf2386ee0c3d81d3adeb860e725d4d5",
@@ -2114,7 +2209,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
+    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "planner-researcher-agent": {
     "hash": "a515c2a3c85d36ad65f8194940c0bdf6158b7ffe73a347ea3ab58a941cd5e67b",
@@ -2143,7 +2239,8 @@
     "visibility": "public",
     "description": "Browser automation, E2E test generation, Page Object Model",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "pm2-deploy": {
     "hash": "f74011ab07f5a39fcfab1c16f7a83f32610cc9d8aa33b151a3f191caa2af19d5",
@@ -2161,7 +2258,8 @@
       "pm2",
       "nodejs"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "nice-to-have"
   },
   "post-fix-pipeline": {
     "hash": "af7b0624c0a8dbca770360a309bed7ea76e98939c57cfaaec9766b1f6b6379db",
@@ -2175,7 +2273,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "must-have"
   },
   "pr-standards": {
     "hash": "4609367190282155424e97a8686d59c4c35f555ab16897c52278b51999b0af19",
@@ -2211,7 +2310,8 @@
       "IEEE-830",
       "parser"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-format PRD parsing and normalization"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-format PRD parsing and normalization",
+    "tier": "nice-to-have"
   },
   "prisma-orm": {
     "hash": "297d2c27b6e475a8da10086c534f4f8032b5064a59ae90b9b5eeee5565858579",
@@ -2230,7 +2330,8 @@
       "typescript",
       "database"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "nice-to-have"
   },
   "project-manager-agent": {
     "hash": "ee4649ce489dc96ce7dc1aa9b7a3c0541754202cf1ede8702cb672b9665cb7f2",
@@ -2251,7 +2352,8 @@
       "DAG",
       "agent"
     ],
-    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent"
+    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent",
+    "tier": "nice-to-have"
   },
   "project-scaffold": {
     "hash": "ab9dc66fbf798cd5908c70f8c5fa42e43b46adf0e0b2f97fbfbe10f21aaa9721",
@@ -2272,7 +2374,8 @@
       "12-factor",
       "security-baseline"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d covers Python, Node/TS, Android, Go, Rust"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d covers Python, Node/TS, Android, Go, Rust",
+    "tier": "nice-to-have"
   },
   "prompt-auto-enhance": {
     "hash": "3fd847a324f0f2d9182fd6525a600ce80fd0d6a1dfef275378162faa6b5be32f",
@@ -2300,7 +2403,8 @@
       "workflow",
       "format-locking"
     ],
-    "changelog": "v1.5.0: Add prompt reliability scoring mode \u00e2\u20ac\u201d 5-dimension rubric (instruction clarity, output format, constraint strength, edge case handling, tone consistency) with evidence-based scores and launch risk flags"
+    "changelog": "v1.5.0: Add prompt reliability scoring mode \u00e2\u20ac\u201d 5-dimension rubric (instruction clarity, output format, constraint strength, edge case handling, tone consistency) with evidence-based scores and launch risk flags",
+    "tier": "nice-to-have"
   },
   "prompt-auto-enhance-rule": {
     "hash": "0588116e093fe3077e9ae50d944149652d97733e71131c758f06c8b5d4b1447f",
@@ -2361,7 +2465,8 @@
       "python",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "quality-gate-evaluator-agent": {
     "hash": "1c530236d13ae545fd569c4cf5fa55c3d8a1df81428fc7afbc4df0625452997d",
@@ -2379,7 +2484,8 @@
       "evaluation",
       "gate"
     ],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "nice-to-have"
   },
   "react-native-dev": {
     "hash": "1956aeeef5daead8b2c03f8fa977c1346092c8b7367887e8ac747eb2c05448fb",
@@ -2393,7 +2499,8 @@
     "visibility": "public",
     "description": "React Native development, profiling, CI/CD, migration",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "must-have"
   },
   "react-native-e2e": {
     "hash": "bc884cd88cc41ff0de1ea71a10b34e4421ee285baa01a585cec7e4b9d42ba1af",
@@ -2407,7 +2514,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "must-have"
   },
   "react-nextjs": {
     "hash": "1e41489400f486be78d60482e8b35cbc13395d5ea0001f58ac7a9e238e5c85cd",
@@ -2425,7 +2533,8 @@
       "react",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d replaces placeholder"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d replaces placeholder",
+    "tier": "must-have"
   },
   "react-test-patterns": {
     "hash": "4c4da888ca4f3818d18856dc4cbb9f52129beb10d64b0a12bfd95464e4ff0889",
@@ -2444,7 +2553,8 @@
       "rtl",
       "nextjs"
     ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit"
+    "changelog": "v1.0.0: Initial creation from testing gap audit",
+    "tier": "must-have"
   },
   "receive-code-review": {
     "hash": "e67b6f46d9c49135ac9671c41463051161989426f50ac724b8a9144b469a56e2",
@@ -2476,7 +2586,8 @@
       "reddit",
       "social"
     ],
-    "changelog": "v1.0.0: Initial registry entry"
+    "changelog": "v1.0.0: Initial registry entry",
+    "tier": "skip"
   },
   "redis-patterns": {
     "hash": "bad35a1425387e5cba770209abb22f3cc5058574bc40fb4a9a6bdad6c74dacbe",
@@ -2490,7 +2601,8 @@
     "visibility": "public",
     "description": "Redis 7+ patterns: caching, rate limiting, pub/sub, vector search",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "regression-test": {
     "hash": "61e38f5e182452ad4bc8d1b7c84608a37045f533eb698aaa3248153dba99844e",
@@ -2508,7 +2620,8 @@
       "regression",
       "git"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "must-have"
   },
   "research-mode": {
     "hash": "7a5edaa08c01236711283fbd43013dcd71fa1e00caf87dcbbaf1bc10e6df1978",
@@ -2527,7 +2640,8 @@
       "citations",
       "fact-checking"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 3 anti-hallucination constraints, structured research brief output"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 3 anti-hallucination constraints, structured research brief output",
+    "tier": "nice-to-have"
   },
   "remotion-video": {
     "hash": "5d3150bcdb33969da2b112a2024431557d0f1abb900c85974f5fc3694e9ecf6b",
@@ -2541,7 +2655,8 @@
     "visibility": "public",
     "description": "Programmatic video with React/Remotion: animations, audio, 3D, captions",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "request-code-review": {
     "hash": "c1fafdc27c66ced0986556dc5f5f59819eed554ddb73abe206126aae7641939b",
@@ -2581,7 +2696,8 @@
       "orchestration",
       "quality-gate"
     ],
-    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps"
+    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps",
+    "tier": "nice-to-have"
   },
   "rule-curation": {
     "hash": "275aeedb96cad33864e018bfa69d748200a607d30f47650395d627a3d258b4f4",
@@ -2603,7 +2719,8 @@
       "quality-gate",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "tier": "nice-to-have"
   },
   "rule-writing-meta": {
     "hash": "1565654a0ac1bb069c30ec375d08e87fec0f53e8b928938b7d1c00da709f6a95",
@@ -2662,7 +2779,8 @@
       "reddit",
       "twitter"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "nice-to-have"
   },
   "scan-repo": {
     "hash": "ec521888561d0430074a0a2a7980d42489b4d1f3a6f87d41fbe3b267f3e159fe",
@@ -2676,7 +2794,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "nice-to-have"
   },
   "scan-url": {
     "hash": "83e17812248a6a1745858c65f4ea2d963977140086af7f5a660304c5db09f46d",
@@ -2690,7 +2809,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "nice-to-have"
   },
   "schema-designer": {
     "hash": "efc65d55d3078a3f2516341ab68dcc0ef92208bf7ccf49d95b79a86db2e67444",
@@ -2712,7 +2832,8 @@
       "migration",
       "data-modeling"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ER design, PII, evolution, API alignment"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ER design, PII, evolution, API alignment",
+    "tier": "nice-to-have"
   },
   "secret-scanner": {
     "hash": "bd304630f63846915a580b1f8995b1608d77f47e2d54e08f103de4e02bc3ed23",
@@ -2771,7 +2892,8 @@
     "visibility": "public",
     "description": "Semgrep custom rule creation and security pattern matching",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "session-reminder": {
     "hash": "3d79cd069b740ee686986fb8234af816685a92a9d28aaa8a519c576770ffbd9d",
@@ -2827,7 +2949,8 @@
       "agent",
       "patterns"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d routes pattern creation to appropriate authoring workflows with quality validation"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d routes pattern creation to appropriate authoring workflows with quality validation",
+    "tier": "nice-to-have"
   },
   "skill-factory": {
     "hash": "7aa98beb094b1b737bf623acf2612abfd63df345864a537e0e00d54f9a8fa82c",
@@ -2841,7 +2964,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "nice-to-have"
   },
   "skill-master": {
     "hash": "7fd63d1aa4e8ac41cb536ef4bdc37efcf08f76fbe4d2ac48ed0111573aef04f2",
@@ -2870,7 +2994,8 @@
     "visibility": "public",
     "description": "Solidity smart contract security: CEI, Foundry, UUPS, gas optimization",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "skip"
   },
   "ssot-audit": {
     "hash": "de811c38020342ac2ed216d85cd4a153dd378de137dace640274db88a46550ef",
@@ -2928,7 +3053,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "nice-to-have"
   },
   "strategic-architect": {
     "hash": "8460508933e1d3dcc9cb84e6537b70f989ec98c8ef3bfc2f5e9640c54bc6673a",
@@ -2942,7 +3068,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "nice-to-have"
   },
   "subagent-driven-dev": {
     "hash": "88eaf83bd7dba0d7501a7bf2bc43952125ac0746f286fae5b949a6ed73f9402d",
@@ -3028,7 +3155,8 @@
       "css",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in AlgoChanakya + IPODhan patterns"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in AlgoChanakya + IPODhan patterns",
+    "tier": "nice-to-have"
   },
   "tdd": {
     "hash": "93e0217f92886f7a70c932185e61707a758a7e19f5e10efb8a3056f4b9c4420f",
@@ -3062,7 +3190,8 @@
       "fixtures",
       "factories"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "test-failure-analyzer-agent": {
     "hash": "adb7f0303fd248932b4ad83cf21cc904b7ad92c68d8d6a93e9fb20c89c104626",
@@ -3099,7 +3228,8 @@
       "healing",
       "auto-fix"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 8-classification targeted healing with 3-attempt cap"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 8-classification targeted healing with 3-attempt cap",
+    "tier": "nice-to-have"
   },
   "tdd-failing-test-generator": {
     "hash": "c2e0ba97d16f743bb0dbf2e3b71ac4d6cc962cc9717c365c242537018f2ebeb3",
@@ -3122,7 +3252,8 @@
       "coverage",
       "mutation-testing"
     ],
-    "changelog": "v2.0.0: Renamed from test-generator to tdd-failing-test-generator for clarity"
+    "changelog": "v2.0.0: Renamed from test-generator to tdd-failing-test-generator for clarity",
+    "tier": "nice-to-have"
   },
   "test-knowledge": {
     "hash": "f380f6e842e631190c03f53dc6ca2869486b23fe849f3bda2ae46805138f1906",
@@ -3136,7 +3267,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "nice-to-have"
   },
   "test-maintenance": {
     "hash": "df1be013c25497fccda7fb36f8f38db12e9501bfa91b8239d4110ebcf2f9002c",
@@ -3155,7 +3287,8 @@
       "cleanup",
       "optimization"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "test-pipeline": {
     "hash": "fe2dc2ed539bd41e85858295587e731f51c0f488b0cd98066640f3bf188e0d07",
@@ -3166,7 +3299,8 @@
     "discovered": "2026-03-17",
     "last_updated": "2026-03-17",
     "dependencies": [],
-    "visibility": "public"
+    "visibility": "public",
+    "tier": "must-have"
   },
   "test-pipeline-agent": {
     "hash": "6c13272ce36655bb49c45b324793f6f19eb93e5be10a34a4f6dbcf37dc4dcd4e",
@@ -3177,7 +3311,8 @@
     "discovered": "2026-03-17",
     "last_updated": "2026-03-26",
     "dependencies": [],
-    "visibility": "public"
+    "visibility": "public",
+    "tier": "must-have"
   },
   "test-scout-agent": {
     "hash": "62f3981b625a041501e96295a3a73c79bdd6dac34b300c5dce331abec45d62d7",
@@ -3196,7 +3331,8 @@
       "runner",
       "screenshots"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure-only screenshots, per-test a11y snapshots"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure-only screenshots, per-test a11y snapshots",
+    "tier": "nice-to-have"
   },
   "tester-agent": {
     "hash": "2cf52b2eb6f4f13394edeaa4453df4a15c6a71e9f2ed15a3ff3f9bb455c7e6fd",
@@ -3211,7 +3347,7 @@
     "description": "",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "tier": "must-have"
   },
   "testing": {
     "hash": "f0c2049ec56abfdb8feb5f90595c925b99aad72dc6fab5bf5e99c01ff3f9383c",
@@ -3258,7 +3394,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "nice-to-have"
   },
   "twitter-x": {
     "hash": "41075122de50a7c2959ff4440782db9d6cb0575b683619d707260533fe090ce1",
@@ -3275,7 +3412,8 @@
       "twitter",
       "social"
     ],
-    "changelog": "v1.0.0: Initial registry entry"
+    "changelog": "v1.0.0: Initial registry entry",
+    "tier": "skip"
   },
   "ui-ux-pro-max": {
     "hash": "13aed7689d14a7dbc337091dce2b4883e471ab46752c7f58e4ae38a74d30082e",
@@ -3289,7 +3427,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "nice-to-have"
   },
   "update-practices": {
     "hash": "1caab0c5a61b8c54fae60e5a9f7e1921a6277beb9823ab5dc26e618905dc8b7c",
@@ -3303,7 +3442,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured"
+    "changelog": "v2.0.0: Genericized and restructured",
+    "tier": "skip"
   },
   "verify-screenshots": {
     "hash": "24341fa2cf1266726047697a9ead24e4f9d256592f60e00503d6d3727e3a713a",
@@ -3317,7 +3457,8 @@
     "visibility": "public",
     "description": "",
     "tags": [],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research"
+    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
+    "tier": "must-have"
   },
   "vitest-dev": {
     "hash": "9fcc330d0316ad19bfabcf20dfbca8b796b2518823390258f14ca2df551b506b",
@@ -3335,7 +3476,8 @@
       "testing",
       "vite"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya + IPODhan patterns"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya + IPODhan patterns",
+    "tier": "nice-to-have"
   },
   "visual-inspector-agent": {
     "hash": "02faf9b92616cf9b382b4fbee61e6e7445e24e5d73d37117998137efba6e84a7",
@@ -3357,7 +3499,8 @@
       "accessibility",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dual-signal (a11y + screenshot) async verification"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dual-signal (a11y + screenshot) async verification",
+    "tier": "nice-to-have"
   },
   "vue": {
     "hash": "5009cb248f5765545f29fa9a2df68502cea34772d0d24e12a885f2b006c51647",
@@ -3375,7 +3518,8 @@
       "frontend",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya patterns"
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya patterns",
+    "tier": "must-have"
   },
   "vue-dev": {
     "hash": "bcc7d55a2bc05636a7aef07ad115635684905fc7a0b04cf952d4619b433bcc67",
@@ -3389,7 +3533,8 @@
     "visibility": "public",
     "description": "Vue 3 development: Composition API, Pinia, Vite, testing",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "vue-test": {
     "hash": "5bdeb413dcbf9e3f24749dadb336c4a0c1f3227e904850b29f7891fd87c6fe01",
@@ -3408,7 +3553,8 @@
       "vitest",
       "pinia"
     ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit"
+    "changelog": "v1.0.0: Initial creation from testing gap audit",
+    "tier": "nice-to-have"
   },
   "web-quality": {
     "hash": "e23cc7c0826d00e2f659334b8baad80db2a39172534e5180566277fc43fd0196",
@@ -3422,7 +3568,8 @@
     "visibility": "public",
     "description": "Core Web Vitals, accessibility, SEO, performance, responsive design",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "web-research-specialist-agent": {
     "hash": "74b5a5b74de0f625a1bc65e1237367a36b476de629ce2f68d26bcd21cae9b0fc",
@@ -3440,7 +3587,8 @@
       "web",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial registration"
+    "changelog": "v1.0.0: Initial registration",
+    "tier": "nice-to-have"
   },
   "web-scraper": {
     "hash": "47ad01d7f11438e865bd9c5d1fcdc251274a02ce93f6daa5648678280649b082",
@@ -3458,7 +3606,8 @@
       "puppeteer",
       "cheerio"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "nice-to-have"
   },
   "websocket-patterns": {
     "hash": "870951aff778168a6d060c01f668da5c949a62a0814d3e2d1cde30cd046e256a",
@@ -3475,7 +3624,8 @@
       "websocket",
       "realtime"
     ],
-    "changelog": "v1.0.0: Initial creation"
+    "changelog": "v1.0.0: Initial creation",
+    "tier": "nice-to-have"
   },
   "workflow": {
     "hash": "742867a0aae60d42736144da122fc529b3460306f5cbaf1e5635c9567672c8b4",
@@ -3519,7 +3669,8 @@
     "visibility": "public",
     "description": "Skill authoring guide with architect role framing, failure prevention maps, locked output formats, adversarial stress testing, XML tag conventions, and multi-skill decomposition for end-to-end workflows",
     "tags": [],
-    "changelog": "v2.5.0: Add multi-skill decomposition reference (Step 2.4) for turning prompts into connected skill systems with handoff contracts and checkpoint patterns"
+    "changelog": "v2.5.0: Add multi-skill decomposition reference (Step 2.4) for turning prompts into connected skill systems with handoff contracts and checkpoint patterns",
+    "tier": "nice-to-have"
   },
   "xml-to-compose": {
     "hash": "304619d73900a86b560810adab1b4ada3aa40f6f7cf51c5cb6030adb930690b1",
@@ -3533,7 +3684,8 @@
     "visibility": "public",
     "description": "Android XML layout to Jetpack Compose migration",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research"
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
   },
   "workflow-master-template": {
     "hash": "966bddab6c93acb5c95ce9718738f0ac0c9bfedc27bed59ae61f25b946b0986b",
@@ -3551,7 +3703,8 @@
       "workflow",
       "template"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 6 shared protocols for workflow masters"
+    "changelog": "v1.0.0: Initial release \u2014 6 shared protocols for workflow masters",
+    "tier": "nice-to-have"
   },
   "development-loop-master-agent": {
     "hash": "b7ab855f12733a73227107fc2aaf5334c8e7aea016606593c0cb62200141a874",
@@ -3570,7 +3723,8 @@
       "development",
       "planning"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 development loop orchestration with complexity detection"
+    "changelog": "v1.0.0: Initial release \u2014 development loop orchestration with complexity detection",
+    "tier": "nice-to-have"
   },
   "testing-pipeline-master-agent": {
     "hash": "de6c38e27842cf9636b7af3a08ee367176bfb2ae7ced9481c6abe642102a5bd7",
@@ -3589,7 +3743,8 @@
       "testing",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 testing pipeline orchestration with screenshot authority"
+    "changelog": "v1.0.0: Initial release \u2014 testing pipeline orchestration with screenshot authority",
+    "tier": "nice-to-have"
   },
   "debugging-loop-master-agent": {
     "hash": "507ed64c8867b1db2a60e5b0ecc5ebc1c4ee481c26180bfeb50ff3864c0312bd",
@@ -3608,7 +3763,8 @@
       "debugging",
       "diagnosis"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 debugging loop with scientific method approach"
+    "changelog": "v1.0.0: Initial release \u2014 debugging loop with scientific method approach",
+    "tier": "nice-to-have"
   },
   "code-review-master-agent": {
     "hash": "a60bd781a1ea0d7bad7a899bb998ef6cf981a9be3d6ef49eb36285ee0a1a41e1",
@@ -3627,7 +3783,8 @@
       "review",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 code review orchestration with defense-in-depth model"
+    "changelog": "v1.0.0: Initial release \u2014 code review orchestration with defense-in-depth model",
+    "tier": "nice-to-have"
   },
   "development-loop": {
     "hash": "e562401be135890b2472e3f886a62ce163b4745672214cc66dc89406b9210ae2",
@@ -3645,7 +3802,8 @@
       "workflow",
       "development"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 development loop skill wrapper"
+    "changelog": "v1.0.0: Initial release \u2014 development loop skill wrapper",
+    "tier": "nice-to-have"
   },
   "testing-pipeline-workflow": {
     "hash": "6605b38181754f0e0ad90315b7de9a4af3d697bec206bf2c1263ba75c29099af",
@@ -3663,7 +3821,8 @@
       "workflow",
       "testing"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 testing pipeline skill wrapper"
+    "changelog": "v1.0.0: Initial release \u2014 testing pipeline skill wrapper",
+    "tier": "nice-to-have"
   },
   "debugging-loop": {
     "hash": "2e642f9459268acf3cd4e57fe0ed0d2d7b5a03a02cea6388020d8d88367cb90f",
@@ -3681,7 +3840,8 @@
       "workflow",
       "debugging"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 debugging loop skill wrapper"
+    "changelog": "v1.0.0: Initial release \u2014 debugging loop skill wrapper",
+    "tier": "nice-to-have"
   },
   "code-review-workflow": {
     "hash": "24827d85e977799519c07439e29d5d9e75007f893f2de9a834af7d72382ebf2b",
@@ -3699,7 +3859,8 @@
       "workflow",
       "review"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 code review workflow skill wrapper"
+    "changelog": "v1.0.0: Initial release \u2014 code review workflow skill wrapper",
+    "tier": "nice-to-have"
   },
   "documentation-master-agent": {
     "hash": "6815700d717f2e09c6bb53439692f59c88bb3dd2e1095390fa37ff713a0fb928",
@@ -3717,7 +3878,8 @@
       "workflow",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "session-continuity-master-agent": {
     "hash": "6832147f0bd0e536921140ca55b25b4daead982f1e51e77ec92b31bfbf7509b4",
@@ -3735,7 +3897,8 @@
       "workflow",
       "session"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "learning-self-improvement-master-agent": {
     "hash": "9224f2f35d791e074819c69fa7edb06874f6f3978d5bce161fa3a4a5cf76a66f",
@@ -3753,7 +3916,8 @@
       "workflow",
       "learning"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "skill-authoring-master-agent": {
     "hash": "5eb9aaebec17b580c601d996abf568c78338cac5b47e327e0c23a863f75d08ee",
@@ -3771,7 +3935,8 @@
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "documentation-workflow": {
     "hash": "d6a6400e2790f4aae45d0770b2bc5c176698613befefed6491ae72eb3ef14fbe",
@@ -3789,7 +3954,8 @@
       "workflow",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "session-continuity": {
     "hash": "12342269deba26e002bdbe25b7430d000ed293f90a6763c318ac1a4e3b2784ab",
@@ -3807,7 +3973,8 @@
       "workflow",
       "session"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "learning-self-improvement": {
     "hash": "efcc1a9a358dfb1ebde2c6c177192a137ddad5f8cd4232f9dfd42147078e78e9",
@@ -3825,7 +3992,8 @@
       "workflow",
       "learning"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   },
   "skill-authoring-workflow": {
     "hash": "83d5d943e3748083af8245f70aceb741ad1f9c8fb3c9bd841f73fd5ba7823da9",
@@ -3843,6 +4011,7 @@
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "v1.0.0: Initial release"
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
   }
 }

@@ -53,6 +53,36 @@ from scripts.recommend import (
 # --- Fixtures ---
 
 
+@pytest.fixture(autouse=True)
+def _clear_tier_cache():
+    """Clear the tier registry cache between tests to prevent cross-contamination."""
+    from scripts.recommend import _load_tier_registry
+    _load_tier_registry._cache = {}
+    yield
+    _load_tier_registry._cache = {}
+
+
+@pytest.fixture
+def _prime_real_registry():
+    """Prime the tier registry cache with the real registry/patterns.json.
+
+    Use this in tests that call tier_resource/tier_resource_with_reason
+    without a hub_root fixture (i.e., they test against the real registry).
+    """
+    from scripts.recommend import _load_tier_registry
+    real_hub = Path(__file__).parent.parent.parent
+    _load_tier_registry(real_hub)
+    yield
+
+
+@pytest.fixture
+def _prime_hub_registry(hub_root):
+    """Prime the tier registry cache with the hub_root fixture's registry."""
+    from scripts.recommend import _load_tier_registry
+    _load_tier_registry(hub_root)
+    yield
+
+
 @pytest.fixture
 def hub_root(tmp_path):
     """Create a minimal hub structure with core/.claude/ resources."""
@@ -98,6 +128,42 @@ def hub_root(tmp_path):
         encoding="utf-8",
     )
     (core / "settings.json").write_text('{\n  "permissions": {\n    "allow": [],\n    "deny": []\n  }\n}\n')
+
+    # Registry with tier assignments (SSOT for tiering)
+    registry_dir = tmp_path / "registry"
+    registry_dir.mkdir()
+    registry = {
+        "_meta": {"version": "1.0.0"},
+        # Skills
+        "fix-loop": {"type": "skill", "tier": "must-have"},
+        "tdd": {"type": "skill", "tier": "must-have"},
+        "skill-master": {"type": "skill", "tier": "must-have"},
+        "systematic-debugging": {"type": "skill", "tier": "must-have"},
+        "fastapi-db-migrate": {"type": "skill", "tier": "must-have"},
+        "android-arch": {"type": "skill", "tier": "must-have"},
+        "d3-viz": {"type": "skill", "tier": "nice-to-have"},
+        "brainstorm": {"type": "skill", "tier": "nice-to-have"},
+        # Agents
+        "debugger-agent": {"type": "agent", "tier": "must-have"},
+        "tester-agent": {"type": "agent", "tier": "must-have"},
+        "security-auditor-agent": {"type": "agent", "tier": "must-have"},
+        "fastapi-api-tester-agent": {"type": "agent", "tier": "must-have"},
+        # Rules
+        "workflow": {"type": "rule", "tier": "must-have"},
+        "context-management": {"type": "rule", "tier": "must-have"},
+        "claude-behavior": {"type": "rule", "tier": "must-have"},
+        "testing": {"type": "rule", "tier": "must-have"},
+        "tdd-rule": {"type": "rule", "tier": "must-have"},
+        "fastapi-backend": {"type": "rule", "tier": "must-have"},
+        # Hooks
+        "dangerous-command-blocker": {"type": "hook", "tier": "must-have"},
+        "secret-scanner": {"type": "hook", "tier": "must-have"},
+        "auto-format": {"type": "hook", "tier": "must-have"},
+        # Skip list
+        "twitter-x": {"type": "skill", "tier": "skip"},
+        "obsidian": {"type": "skill", "tier": "skip"},
+    }
+    (registry_dir / "patterns.json").write_text(json.dumps(registry, indent=2))
 
     return tmp_path
 
@@ -279,6 +345,7 @@ class TestMatchesStacks:
 # --- Tiering ---
 
 
+@pytest.mark.usefixtures("_prime_real_registry")
 class TestTierResource:
     def test_must_have_hook(self):
         assert tier_resource("dangerous-command-blocker", "hook", []) == "must-have"
@@ -382,6 +449,7 @@ class TestTierResource:
 # --- Gap Analysis ---
 
 
+@pytest.mark.usefixtures("_prime_hub_registry")
 class TestAnalyzeGaps:
     def test_finds_missing_resources(self, hub_root, project_dir):
         hub_resources = get_hub_resources(hub_root)
@@ -458,6 +526,7 @@ class TestAnalyzeGaps:
 # --- Report ---
 
 
+@pytest.mark.usefixtures("_prime_hub_registry")
 class TestFormatReport:
     def test_report_contains_sections(self, hub_root, project_dir):
         hub_resources = get_hub_resources(hub_root)
@@ -485,6 +554,7 @@ class TestFormatReport:
 # --- Apply ---
 
 
+@pytest.mark.usefixtures("_prime_hub_registry")
 class TestApplyToLocal:
     def test_copies_must_have_skills(self, hub_root, project_dir):
         hub_resources = get_hub_resources(hub_root)
@@ -1052,6 +1122,7 @@ class TestFormatDivergenceTable:
 # --- Provision: provision_to_local ---
 
 
+@pytest.mark.usefixtures("_prime_hub_registry")
 class TestProvisionToLocal:
     def test_full_integration(self, hub_root, project_dir):
         hub_resources = get_hub_resources(hub_root)
@@ -1352,6 +1423,7 @@ class TestResolveDepPatterns:
         assert "redis-patterns" in promoted
 
 
+@pytest.mark.usefixtures("_prime_real_registry")
 class TestTierResourceWithDeps:
     def test_dep_promotes_from_nice_to_have(self):
         """vue-dev without deps is nice-to-have (universal), with deps is must-have."""
@@ -1380,6 +1452,7 @@ class TestTierResourceWithDeps:
         ) == "must-have"
 
 
+@pytest.mark.usefixtures("_prime_hub_registry")
 class TestAnalyzeGapsWithDeps:
     def test_deps_override_always_skip(self, hub_root, project_dir):
         """d3-viz is no longer skipped when d3 dep is detected."""
@@ -1675,6 +1748,7 @@ class TestGenerateHubSectionCounts:
 # --- MUST_HAVE_RULES Expansion ---
 
 
+@pytest.mark.usefixtures("_prime_real_registry")
 class TestMustHaveRulesExpanded:
     def test_expanded_rules_in_set(self):
         for rule in ["workflow", "claude-behavior", "testing", "tdd-rule", "context-management"]:
@@ -1683,7 +1757,7 @@ class TestMustHaveRulesExpanded:
     def test_tier_workflow_is_must_have(self):
         tier, reason = tier_resource_with_reason("workflow", "rule", [])
         assert tier == "must-have"
-        assert reason == "core rule"
+        assert "must-have" in reason
 
     def test_tier_claude_behavior_is_must_have(self):
         tier, _ = tier_resource_with_reason("claude-behavior", "rule", [])
@@ -1928,3 +2002,148 @@ class TestProvisionWithManifest:
         assert "auto_updated" in summary
         assert "sync_classification" in summary
         assert "conflicts" in summary
+
+
+# --- Registry Tier SSOT ---
+
+
+class TestRegistryTierSSOT:
+    """Every pattern in registry/patterns.json MUST have an explicit tier field.
+    This ensures recommend.py never falls through to hardcoded defaults."""
+
+    def test_all_registry_patterns_have_tier(self):
+        """Every pattern in registry (except _meta) must have a tier field."""
+        registry_path = Path(__file__).parent.parent.parent / "registry" / "patterns.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+
+        missing = []
+        for name, entry in registry.items():
+            if name == "_meta":
+                continue
+            if not isinstance(entry, dict):
+                continue
+            if "tier" not in entry:
+                missing.append(name)
+
+        assert missing == [], (
+            f"{len(missing)} patterns missing 'tier' field: {missing[:10]}..."
+        )
+
+    def test_all_registry_tiers_are_valid(self):
+        """Tier values must be one of: must-have, nice-to-have, skip."""
+        registry_path = Path(__file__).parent.parent.parent / "registry" / "patterns.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+
+        valid_tiers = {"must-have", "nice-to-have", "skip"}
+        invalid = []
+        for name, entry in registry.items():
+            if name == "_meta" or not isinstance(entry, dict):
+                continue
+            tier = entry.get("tier")
+            if tier and tier not in valid_tiers:
+                invalid.append((name, tier))
+
+        assert invalid == [], f"Invalid tier values: {invalid}"
+
+    def test_always_skip_patterns_have_skip_tier(self):
+        """Patterns in ALWAYS_SKIP should have tier: skip in registry."""
+        from scripts.recommend import ALWAYS_SKIP
+        registry_path = Path(__file__).parent.parent.parent / "registry" / "patterns.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+
+        for name in ALWAYS_SKIP:
+            if name in registry:
+                assert registry[name].get("tier") == "skip", (
+                    f"ALWAYS_SKIP pattern '{name}' should have tier: skip, "
+                    f"got: {registry[name].get('tier')}"
+                )
+
+    def test_tier_resource_uses_registry_not_fallback(self, tmp_path):
+        """When registry has a tier, it must be used — no fallback to hardcoded sets."""
+        from scripts.recommend import _load_tier_registry
+
+        # Create a registry where a normally-must-have skill has nice-to-have
+        registry_dir = tmp_path / "registry"
+        registry_dir.mkdir()
+        (registry_dir / "patterns.json").write_text(json.dumps({
+            "tdd": {"tier": "nice-to-have", "type": "skill"},
+        }))
+
+        # Prime the cache
+        _load_tier_registry._cache = {}
+        _load_tier_registry(tmp_path)
+
+        try:
+            tier, reason = tier_resource_with_reason("tdd", "skill", [])
+            assert tier == "nice-to-have", (
+                f"Registry tier should override hardcoded CORE_WORKFLOW_SKILLS. "
+                f"Got tier={tier}, reason={reason}"
+            )
+        finally:
+            _load_tier_registry._cache = {}
+
+    def test_no_hardcoded_fallback_for_unknown_pattern(self, tmp_path):
+        """Patterns not in registry should get nice-to-have default, not crash."""
+        from scripts.recommend import _load_tier_registry
+
+        registry_dir = tmp_path / "registry"
+        registry_dir.mkdir()
+        (registry_dir / "patterns.json").write_text(json.dumps({}))
+
+        _load_tier_registry._cache = {}
+        _load_tier_registry(tmp_path)
+
+        try:
+            # Unknown pattern should still get a reasonable default
+            tier, reason = tier_resource_with_reason("nonexistent-skill", "skill", [])
+            assert tier in ("must-have", "nice-to-have", "skip")
+        finally:
+            _load_tier_registry._cache = {}
+
+
+class TestRegistryTierCI:
+    """CI validation: workflow_quality_gate must catch missing tiers."""
+
+    def test_validator_catches_missing_tier(self, tmp_path):
+        """The validate_registry_tiers function should report patterns without tier."""
+        from scripts.workflow_quality_gate_validate_patterns import validate_registry_tiers
+
+        registry_path = tmp_path / "patterns.json"
+        registry_path.write_text(json.dumps({
+            "_meta": {"version": "1.0.0"},
+            "good-skill": {"type": "skill", "tier": "must-have"},
+            "bad-skill": {"type": "skill"},
+        }))
+
+        errors = validate_registry_tiers(registry_path)
+        assert len(errors) == 1
+        assert "bad-skill" in errors[0]
+
+    def test_validator_catches_invalid_tier(self, tmp_path):
+        """The validate_registry_tiers function should report invalid tier values."""
+        from scripts.workflow_quality_gate_validate_patterns import validate_registry_tiers
+
+        registry_path = tmp_path / "patterns.json"
+        registry_path.write_text(json.dumps({
+            "_meta": {"version": "1.0.0"},
+            "bad-skill": {"type": "skill", "tier": "important"},
+        }))
+
+        errors = validate_registry_tiers(registry_path)
+        assert len(errors) == 1
+        assert "invalid tier" in errors[0].lower() or "bad-skill" in errors[0]
+
+    def test_validator_passes_with_all_tiers(self, tmp_path):
+        """No errors when all patterns have valid tiers."""
+        from scripts.workflow_quality_gate_validate_patterns import validate_registry_tiers
+
+        registry_path = tmp_path / "patterns.json"
+        registry_path.write_text(json.dumps({
+            "_meta": {"version": "1.0.0"},
+            "skill-a": {"type": "skill", "tier": "must-have"},
+            "skill-b": {"type": "skill", "tier": "nice-to-have"},
+            "skill-c": {"type": "skill", "tier": "skip"},
+        }))
+
+        errors = validate_registry_tiers(registry_path)
+        assert errors == []

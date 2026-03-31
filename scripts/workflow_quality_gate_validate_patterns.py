@@ -873,6 +873,39 @@ def validate_workflow_contracts(
     return errors
 
 
+def validate_registry_tiers(registry_path: Path | None = None) -> list[str]:
+    """Validate that every pattern in registry has a valid tier field.
+
+    Every pattern must declare tier: must-have, nice-to-have, or skip.
+    This ensures recommend.py uses the registry as the single source of truth
+    for tier classification instead of falling through to hardcoded defaults.
+    """
+    if registry_path is None:
+        registry_path = REGISTRY_PATH
+    errors = []
+    if not registry_path.exists():
+        return errors
+
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    valid_tiers = {"must-have", "nice-to-have", "skip"}
+
+    for name, entry in registry.items():
+        if name == "_meta" or not isinstance(entry, dict):
+            continue
+        tier = entry.get("tier")
+        if tier is None:
+            errors.append(
+                f"{name}: Missing 'tier' field in registry. "
+                f"Every pattern must declare tier: must-have, nice-to-have, or skip"
+            )
+        elif tier not in valid_tiers:
+            errors.append(
+                f"{name}: Invalid tier '{tier}' in registry. "
+                f"Must be one of: must-have, nice-to-have, skip"
+            )
+    return errors
+
+
 def validate_third_party_registry() -> list[str]:
     """Validate config/third-party-skills.yml if it exists."""
     import importlib.util
@@ -935,6 +968,9 @@ def validate_all() -> list[str]:
     # Cross-reference check
     if SKILLS_DIR.exists():
         all_errors.extend(check_cross_references(SKILLS_DIR))
+
+    # Registry tier SSOT validation
+    all_errors.extend(validate_registry_tiers())
 
     # Third-party skills registry validation
     all_errors.extend(validate_third_party_registry())
