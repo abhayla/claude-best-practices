@@ -785,6 +785,302 @@ def preserve_manual_annotations(existing_content: str) -> str:
     return "\n".join(filtered).strip()
 
 
+def _escape_pipe(text: str) -> str:
+    """Escape pipe characters for markdown table cells."""
+    return text.replace("|", "\\|")
+
+
+def generate_per_skill_mermaid(name: str, steps: list[dict]) -> str:
+    """Generate a small Mermaid flowchart for a single skill's steps.
+
+    Shows step sequence with gate diamonds, delegation dashed edges,
+    and BLOCK branches. Returns empty string if no steps.
+    """
+    if not steps:
+        return ""
+
+    lines = ["```mermaid", "graph TD"]
+
+    prev_id = None
+    for step in steps:
+        sid = f"s{step['num']}"
+        label = _sanitize_mermaid_label(step["title"])
+
+        if step.get("has_gate"):
+            lines.append(f"    {sid}{{{{{sid}: {label}}}}}")
+        else:
+            lines.append(f'    {sid}["{sid}: {label}"]')
+
+        if prev_id:
+            prev_step = next(
+                (s for s in steps if f"s{s['num']}" == prev_id), None
+            )
+            has_block = prev_step and any(
+                b["label"] == "BLOCK" for b in prev_step.get("branches", [])
+            )
+            if has_block:
+                lines.append(f"    {prev_id} -->|OK| {sid}")
+            else:
+                lines.append(f"    {prev_id} --> {sid}")
+        prev_id = sid
+
+        # Dashed edges to delegated skills/agents
+        for sc in step.get("skill_calls", []):
+            ext_id = sc.replace("-", "_") + "_ext"
+            lines.append(f"    {ext_id}([/{sc}/])")
+            lines.append(f"    {sid} -.-> {ext_id}")
+        for ac in step.get("agent_calls", []):
+            ext_id = ac.replace("-", "_") + "_ext"
+            lines.append(f"    {ext_id}(({ac}))")
+            lines.append(f"    {sid} -.-> {ext_id}")
+
+        # BLOCK branches
+        for branch in step.get("branches", []):
+            if branch["label"] == "BLOCK":
+                block_id = f"{sid}_block"
+                lines.append(f"    {block_id}[/BLOCK/]")
+                lines.append(f"    {sid} -->|FAILED| {block_id}")
+
+    lines.append("```")
+    return "\n".join(lines)
+
+
+MAX_CONSOLIDATED_SKILLS = 15
+
+
+def generate_consolidated_step_flow(workflow: dict, graph: dict) -> str:
+    """Generate a consolidated Mermaid diagram stitching all skills' steps.
+
+    Shows each skill as a subgraph with its steps, and cross-skill
+    delegation edges connecting the calling step to the target skill's
+    first step. Returns empty string if no skills have steps or if
+    the workflow is too large.
+    """
+    skilled = []
+    for sname in workflow["skills"]:
+        node = graph["nodes"].get(sname, {})
+        steps = node.get("steps", [])
+        if steps:
+            skilled.append((sname, steps))
+
+    if not skilled:
+        return ""
+
+    if len(skilled) > MAX_CONSOLIDATED_SKILLS:
+        return ""
+
+    lines = ["```mermaid", "graph TD"]
+    all_skill_names = {s[0] for s in skilled}
+
+    for sname, steps in skilled:
+        safe = sname.replace("-", "_")
+        display = sname.replace("-", " ").title()
+        lines.append(f"    subgraph {safe}_sub[\"{display}\"]")
+
+        prev_id = None
+        for step in steps:
+            sid = f"{safe}_s{step['num']}"
+            label = _sanitize_mermaid_label(step["title"])
+
+            if step.get("has_gate"):
+                lines.append(f"        {sid}{{{{{label}}}}}")
+            else:
+                lines.append(f'        {sid}["{label}"]')
+
+            if prev_id:
+                lines.append(f"        {prev_id} --> {sid}")
+            prev_id = sid
+
+        lines.append("    end")
+        lines.append("")
+
+    # Cross-skill delegation edges
+    for sname, steps in skilled:
+        safe = sname.replace("-", "_")
+        for step in steps:
+            sid = f"{safe}_s{step['num']}"
+            for sc in step.get("skill_calls", []):
+                if sc in all_skill_names:
+                    target_steps = graph["nodes"].get(sc, {}).get("steps", [])
+                    if target_steps:
+                        tgt_safe = sc.replace("-", "_")
+                        tgt_id = f"{tgt_safe}_s{target_steps[0]['num']}"
+                        lines.append(f"    {sid} ==> {tgt_id}")
+
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def generate_entry_point_map(workflow: dict, graph: dict) -> str:
+    """Generate a Mermaid diagram showing entry points vs internal patterns.
+
+    Entry points are skills/agents with no incoming references within
+    the workflow. They use a distinct shape (stadium/rounded) vs
+    internal nodes (standard rectangles). Returns empty string if
+    there are no edges (no meaningful distinction).
+    """
+    if not workflow["edges"]:
+        return ""
+
+    all_members = set(workflow["skills"] + workflow.get("agents", []))
+
+    # Determine which members have incoming refs within the workflow
+    has_incoming = set()
+    for edge in workflow["edges"]:
+        if edge["to"] in all_members:
+            has_incoming.add(edge["to"])
+
+    entry_points = all_members - has_incoming
+    internal = all_members & has_incoming
+
+    # Build connected set (only nodes with edges)
+    connected = set()
+    for edge in workflow["edges"]:
+        connected.add(edge["from"])
+        connected.add(edge["to"])
+
+    lines = ["```mermaid", "graph LR"]
+
+    # Entry point nodes — stadium shape ([[ ]])
+    for name in sorted(entry_points):
+        if name not in connected:
+            continue
+        safe = name.replace("-", "_")
+        node = graph["nodes"].get(name, {})
+        if node.get("type") == "agent":
+            lines.append(f"    {safe}([\"{name}\"])")
+        else:
+            lines.append(f"    {safe}[[\"{name}\"]]")
+
+    # Internal nodes — standard shape
+    for name in sorted(internal):
+        if name not in connected:
+            continue
+        safe = name.replace("-", "_")
+        node = graph["nodes"].get(name, {})
+        if node.get("type") == "agent":
+            lines.append(f"    {safe}([\"{name}\"])")
+        else:
+            lines.append(f'    {safe}["{name}"]')
+
+    # Edges
+    seen = set()
+    for edge in workflow["edges"]:
+        src = edge["from"].replace("-", "_")
+        tgt = edge["to"].replace("-", "_")
+        key = f"{src}->{tgt}"
+        if key not in seen:
+            lines.append(f"    {src} --> {tgt}")
+            seen.add(key)
+
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def render_workflow_steps(workflow: dict, graph: dict) -> str:
+    """Render a Workflow Steps section with diagrams and per-skill step tables.
+
+    Includes:
+    1. Consolidated step flow diagram (all skills stitched together)
+    2. Entry point map (user-facing vs internal patterns)
+    3. Per-skill sub-sections with a flowchart + detail table
+
+    Returns empty string if no skills have steps.
+    """
+    skill_sections = []
+
+    for sname in workflow["skills"]:
+        node = graph["nodes"].get(sname, {})
+        steps = node.get("steps", [])
+        if not steps:
+            continue
+
+        lines = [f"### {sname}", ""]
+
+        # Per-skill flowchart (Option A)
+        per_skill_diagram = generate_per_skill_mermaid(sname, steps)
+        if per_skill_diagram:
+            lines.append(per_skill_diagram)
+            lines.append("")
+
+        # Step detail table
+        lines.extend([
+            "| Step | Title | Delegates To | Artifacts | Gates/Decisions |",
+            "|------|-------|-------------|-----------|----------------|",
+        ])
+
+        for step in steps:
+            num = step["num"]
+            title = _escape_pipe(step["title"])
+
+            delegates = []
+            for sc in step.get("skill_calls", []):
+                delegates.append(f"`/{sc}`")
+            for ac in step.get("agent_calls", []):
+                delegates.append(f"`{ac}`")
+            delegates_str = ", ".join(delegates) if delegates else "—"
+
+            art_parts = []
+            for art in step.get("artifacts", []):
+                art_parts.append(f"→ `{art}`")
+            for art in step.get("artifacts_consumed", []):
+                art_parts.append(f"← `{art}`")
+            artifacts_str = ", ".join(art_parts) if art_parts else "—"
+
+            gate_parts = []
+            if step.get("has_gate"):
+                gate_parts.append("gate")
+            if step.get("has_decision"):
+                gate_parts.append("decision")
+            for branch in step.get("branches", []):
+                gate_parts.append(branch["label"])
+            gate_str = ", ".join(gate_parts) if gate_parts else "—"
+
+            lines.append(
+                f"| {num} | {title} | {delegates_str} | {artifacts_str} | {gate_str} |"
+            )
+
+        skill_sections.append("\n".join(lines))
+
+    if not skill_sections:
+        return ""
+
+    # Build the full section
+    parts = ["## Workflow Steps", ""]
+
+    # Consolidated step flow (Option B) at the top
+    consolidated = generate_consolidated_step_flow(workflow, graph)
+    if consolidated:
+        parts.extend([
+            "### Consolidated Step Flow",
+            "",
+            "End-to-end flow across all skills, showing how steps connect "
+            "via delegations (thick arrows).",
+            "",
+            consolidated,
+            "",
+        ])
+
+    # Entry point map
+    entry_map = generate_entry_point_map(workflow, graph)
+    if entry_map:
+        parts.extend([
+            "### Entry Points",
+            "",
+            "Double-bordered nodes are user-facing entry points (no incoming "
+            "references). Rounded nodes are agents.",
+            "",
+            entry_map,
+            "",
+        ])
+
+    # Per-skill sections
+    parts.append("\n\n".join(skill_sections))
+    parts.append("")
+
+    return "\n".join(parts)
+
+
 def render_workflow_doc(
     name: str,
     workflow: dict,
@@ -843,6 +1139,12 @@ def render_workflow_doc(
             calls = ", ".join(f"`/{r}`" for r in refs_out) or "—"
             called_by = ", ".join(f"`/{r}`" for r in refs_in) or "—"
             lines.append(f"| `/{sname}` | {version} | {desc} | {calls} | {called_by} |")
+        lines.append("")
+
+    # Workflow Steps (per-skill step details)
+    steps_section = render_workflow_steps(workflow, graph)
+    if steps_section:
+        lines.append(steps_section)
         lines.append("")
 
     # Agents table

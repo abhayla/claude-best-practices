@@ -1,4 +1,4 @@
-"""Tests for generate_workflow_docs.py Mermaid generation and SVG rendering.
+"""Tests for generate_workflow_docs.py Mermaid generation, SVG rendering, and workflow steps.
 
 Covers:
 1. Backticks in step titles break Mermaid labels
@@ -8,6 +8,7 @@ Covers:
 5. Oversized graphs (too many skills) should be capped
 6. SVG image rendering via mmdc
 7. --require-svg strict mode for CI enforcement
+8. render_workflow_steps textual step detail rendering
 """
 
 import shutil
@@ -19,6 +20,10 @@ from scripts.generate_workflow_docs import (
     extract_steps,
     generate_detailed_mermaid,
     generate_mermaid_flow,
+    generate_per_skill_mermaid,
+    generate_consolidated_step_flow,
+    generate_entry_point_map,
+    render_workflow_steps,
 )
 
 
@@ -289,35 +294,50 @@ HAS_MMDC = shutil.which("mmdc") is not None
 
 
 class TestRenderMermaidToSvg:
-    """Tests for rendering Mermaid blocks to SVG images."""
+    """Tests for rendering Mermaid blocks to SVG images (mocked mmdc)."""
 
-    @pytest.mark.skipif(not HAS_MMDC, reason="mmdc not installed")
-    def test_render_simple_mermaid_to_svg(self, tmp_path):
+    def _mock_mmdc_run(self, output_path):
+        """Create a mock subprocess.run that writes fake SVG to output_path."""
+        def _run(cmd, **kwargs):
+            # cmd is [mmdc_path, "-i", input, "-o", output, "-b", "transparent"]
+            out = Path(cmd[4])
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text("<svg>mocked</svg>", encoding="utf-8")
+            from subprocess import CompletedProcess
+            return CompletedProcess(cmd, 0)
+        return _run
+
+    @patch("scripts.generate_workflow_docs.shutil.which", return_value="/usr/bin/mmdc")
+    def test_render_simple_mermaid_to_svg(self, mock_which, tmp_path):
         from scripts.generate_workflow_docs import render_mermaid_to_svg
 
         mermaid_code = "graph LR\n    A --> B\n    B --> C"
         svg_path = tmp_path / "test.svg"
-        result = render_mermaid_to_svg(mermaid_code, svg_path)
+        with patch("scripts.generate_workflow_docs.subprocess.run",
+                   side_effect=self._mock_mmdc_run(svg_path)):
+            result = render_mermaid_to_svg(mermaid_code, svg_path)
         assert result is True
         assert svg_path.exists()
         content = svg_path.read_text(encoding="utf-8")
         assert "<svg" in content
 
-    @pytest.mark.skipif(not HAS_MMDC, reason="mmdc not installed")
-    def test_render_invalid_mermaid_returns_false(self, tmp_path):
+    @patch("scripts.generate_workflow_docs.shutil.which", return_value="/usr/bin/mmdc")
+    def test_render_invalid_mermaid_returns_false(self, mock_which, tmp_path):
         from scripts.generate_workflow_docs import render_mermaid_to_svg
+        from subprocess import CompletedProcess
 
         mermaid_code = "this is not valid mermaid syntax {{{{{"
         svg_path = tmp_path / "bad.svg"
-        result = render_mermaid_to_svg(mermaid_code, svg_path)
+        with patch("scripts.generate_workflow_docs.subprocess.run",
+                   return_value=CompletedProcess([], 1)):
+            result = render_mermaid_to_svg(mermaid_code, svg_path)
         assert result is False
 
-    @pytest.mark.skipif(not HAS_MMDC, reason="mmdc not installed")
-    def test_workflow_doc_contains_svg_image_link(self, tmp_path):
+    @patch("scripts.generate_workflow_docs.shutil.which", return_value="/usr/bin/mmdc")
+    def test_workflow_doc_contains_svg_image_link(self, mock_which, tmp_path):
         """After rendering, the markdown should contain ![](images/...) links."""
         from scripts.generate_workflow_docs import render_workflow_doc, embed_svg_images
 
-        # Create a minimal workflow doc with mermaid
         workflow = {
             "description": "Test workflow for SVG rendering.",
             "skills": ["skill-a", "skill-b"],
@@ -340,12 +360,12 @@ class TestRenderMermaidToSvg:
         md_content = render_workflow_doc("test-workflow", workflow, graph)
 
         images_dir = tmp_path / "images"
-        result = embed_svg_images(md_content, "test-workflow", images_dir)
+        with patch("scripts.generate_workflow_docs.subprocess.run",
+                   side_effect=self._mock_mmdc_run(images_dir)):
+            result = embed_svg_images(md_content, "test-workflow", images_dir)
 
-        # Should have image links
         assert "![" in result
         assert "images/" in result
-        # SVG files should exist
         svg_files = list(images_dir.glob("*.svg"))
         assert len(svg_files) >= 1
 
@@ -407,3 +427,383 @@ class TestRequireSvgFlag:
         (images_dir / "test-workflow-2.svg").write_text("<svg></svg>")
         # Should not raise
         validate_svg_output("test-workflow", images_dir, expected_count=2)
+
+
+# ── render_workflow_steps tests ────────────────────────────────────
+
+
+class TestRenderWorkflowSteps:
+    """Tests for the textual workflow steps section rendering."""
+
+    def test_basic_step_rendering(self):
+        """Skills with steps should produce a Workflow Steps section with tables."""
+        steps = [
+            {"num": "1", "title": "Analyze Requirements"},
+            {"num": "2", "title": "Write Tests"},
+            {"num": "3", "title": "Implement Code"},
+        ]
+        graph = _make_graph([("my-skill", steps)])
+        workflow = _make_workflow(["my-skill"])
+        result = render_workflow_steps(workflow, graph)
+
+        assert "## Workflow Steps" in result
+        assert "### my-skill" in result
+        assert "| Step | Title | Delegates To | Artifacts | Gates/Decisions |" in result
+        assert "Analyze Requirements" in result
+        assert "Write Tests" in result
+        assert "Implement Code" in result
+
+    def test_skills_without_steps_are_skipped(self):
+        """Skills with no extracted steps should not appear in the section."""
+        graph = _make_graph([
+            ("has-steps", [
+                {"num": "1", "title": "Do A"},
+                {"num": "2", "title": "Do B"},
+            ]),
+            ("no-steps", []),
+        ])
+        workflow = _make_workflow(["has-steps", "no-steps"])
+        result = render_workflow_steps(workflow, graph)
+
+        assert "### has-steps" in result
+        assert "### no-steps" not in result
+
+    def test_empty_section_when_no_skills_have_steps(self):
+        """If no skills have steps, return empty string (no section header)."""
+        graph = _make_graph([("empty-skill", [])])
+        workflow = _make_workflow(["empty-skill"])
+        result = render_workflow_steps(workflow, graph)
+
+        assert result == ""
+
+    def test_delegations_rendered(self):
+        """Skill and agent calls should appear in the Delegates To column."""
+        steps = [
+            {
+                "num": "1", "title": "Setup",
+                "skill_calls": ["fix-loop", "auto-verify"],
+                "agent_calls": ["tester-agent"],
+            },
+            {"num": "2", "title": "Finish"},
+        ]
+        graph = _make_graph([("my-skill", steps)])
+        workflow = _make_workflow(["my-skill"])
+        result = render_workflow_steps(workflow, graph)
+
+        assert "`/fix-loop`" in result
+        assert "`/auto-verify`" in result
+        assert "`tester-agent`" in result
+
+    def test_gate_indicator_rendered(self):
+        """Steps with gates should show a gate indicator."""
+        steps = [
+            {"num": "1", "title": "Check Gate", "has_gate": True},
+            {"num": "2", "title": "No Gate", "has_gate": False},
+        ]
+        graph = _make_graph([("my-skill", steps)])
+        workflow = _make_workflow(["my-skill"])
+        result = render_workflow_steps(workflow, graph)
+
+        # Match only table rows (start with |)
+        lines = result.split("\n")
+        gate_line = [l for l in lines if l.startswith("|") and "Check Gate" in l][0]
+        no_gate_line = [l for l in lines if l.startswith("|") and "No Gate" in l][0]
+        assert "gate" in gate_line.lower()
+        # No Gate line should not have gate indicator in last column
+        last_col = no_gate_line.rsplit("|", 2)[-2].strip()
+        assert "gate" not in last_col.lower()
+
+    def test_artifacts_rendered(self):
+        """Produced and consumed artifacts should appear in the Artifacts column."""
+        steps = [
+            {
+                "num": "1", "title": "Produce",
+                "artifacts": ["test-results/unit.json"],
+                "artifacts_consumed": [],
+            },
+            {
+                "num": "2", "title": "Consume",
+                "artifacts": [],
+                "artifacts_consumed": ["test-results/unit.json"],
+            },
+        ]
+        graph = _make_graph([("my-skill", steps)])
+        workflow = _make_workflow(["my-skill"])
+        result = render_workflow_steps(workflow, graph)
+
+        # Match only table rows (start with |)
+        lines = result.split("\n")
+        produce_line = [l for l in lines if l.startswith("|") and "Produce" in l][0]
+        consume_line = [l for l in lines if l.startswith("|") and "Consume" in l][0]
+        assert "test-results/unit.json" in produce_line
+        assert "test-results/unit.json" in consume_line
+
+    def test_pipe_in_title_escaped(self):
+        """Pipe characters in step titles must be escaped for markdown tables."""
+        steps = [
+            {"num": "1", "title": "Check A | B condition"},
+            {"num": "2", "title": "Normal Title"},
+        ]
+        graph = _make_graph([("my-skill", steps)])
+        workflow = _make_workflow(["my-skill"])
+        result = render_workflow_steps(workflow, graph)
+
+        # The raw pipe should be escaped
+        assert "A \\| B" in result
+        # Table structure should remain intact (no broken columns)
+        # Count unescaped pipes only (exclude \|) — should be 6 for 5 columns
+        for line in result.split("\n"):
+            if line.startswith("|") and "Check A" in line:
+                import re
+                unescaped_pipes = len(re.findall(r'(?<!\\)\|', line))
+                assert unescaped_pipes == 6, f"Broken table row: {line}"
+
+    def test_branches_rendered(self):
+        """Decision branches should appear in the Gates/Decisions column."""
+        steps = [
+            {
+                "num": "1", "title": "Decision Point",
+                "has_gate": True,
+                "has_decision": True,
+                "branches": [{"label": "PASS"}, {"label": "BLOCK"}],
+            },
+        ]
+        graph = _make_graph([("my-skill", steps)])
+        workflow = _make_workflow(["my-skill"])
+        result = render_workflow_steps(workflow, graph)
+
+        # Match only table rows (start with |)
+        lines = result.split("\n")
+        decision_line = [l for l in lines if l.startswith("|") and "Decision Point" in l][0]
+        assert "PASS" in decision_line or "BLOCK" in decision_line
+
+    def test_multiple_skills_each_get_subsection(self):
+        """Each skill with steps gets its own sub-heading and table."""
+        graph = _make_graph([
+            ("skill-a", [{"num": "1", "title": "A1"}, {"num": "2", "title": "A2"}]),
+            ("skill-b", [{"num": "1", "title": "B1"}, {"num": "2", "title": "B2"}]),
+        ])
+        workflow = _make_workflow(["skill-a", "skill-b"])
+        result = render_workflow_steps(workflow, graph)
+
+        assert "### skill-a" in result
+        assert "### skill-b" in result
+        # Each should have its own table header
+        assert result.count("| Step | Title |") == 2
+
+
+# ── generate_per_skill_mermaid tests ──────────────────────────────
+
+
+class TestGeneratePerSkillMermaid:
+    """Tests for per-skill step flowcharts within the Workflow Steps section."""
+
+    def test_basic_step_flow(self):
+        """Should produce a mermaid graph TD with step nodes and edges."""
+        steps = [
+            {"num": "1", "title": "Analyze"},
+            {"num": "2", "title": "Implement"},
+            {"num": "3", "title": "Verify"},
+        ]
+        result = generate_per_skill_mermaid("my-skill", steps)
+        assert "```mermaid" in result
+        assert "graph TD" in result
+        assert "s1" in result
+        assert "s2" in result
+        assert "s3" in result
+        # Sequential edges
+        assert "s1 -->" in result
+        assert "s2 -->" in result
+
+    def test_gate_steps_are_diamonds(self):
+        """Steps with has_gate=True should use diamond shape {{ }}."""
+        steps = [
+            {"num": "1", "title": "Check Gate", "has_gate": True},
+            {"num": "2", "title": "Normal Step", "has_gate": False},
+        ]
+        result = generate_per_skill_mermaid("my-skill", steps)
+        lines = result.split("\n")
+        gate_line = [l for l in lines if "Check Gate" in l][0]
+        normal_line = [l for l in lines if "Normal Step" in l][0]
+        # Diamond uses { }, rectangle uses [ ]
+        assert "{" in gate_line
+        assert "[" in normal_line
+
+    def test_delegations_shown_as_dashed_edges(self):
+        """Skill/agent calls should appear as dashed edges to external nodes."""
+        steps = [
+            {"num": "1", "title": "Setup", "skill_calls": ["fix-loop"]},
+            {"num": "2", "title": "Done"},
+        ]
+        result = generate_per_skill_mermaid("my-skill", steps)
+        assert "fix-loop" in result
+        assert "-.->" in result
+
+    def test_empty_steps_returns_empty(self):
+        """No steps means no diagram."""
+        result = generate_per_skill_mermaid("my-skill", [])
+        assert result == ""
+
+    def test_backticks_sanitized_in_labels(self):
+        """Backticks in titles must not break mermaid labels."""
+        steps = [
+            {"num": "1", "title": "Use `bun:test` Patterns"},
+        ]
+        result = generate_per_skill_mermaid("my-skill", steps)
+        assert "`" not in result.split("```mermaid")[1].split("```")[0]
+
+
+# ── generate_consolidated_step_flow tests ─────────────────────────
+
+
+class TestGenerateConsolidatedStepFlow:
+    """Tests for the consolidated cross-skill step flow diagram."""
+
+    def test_basic_consolidated_flow(self):
+        """Should produce a mermaid diagram stitching skill steps via delegations."""
+        steps_a = [
+            {"num": "1", "title": "Start A"},
+            {"num": "2", "title": "Call B", "skill_calls": ["skill-b"]},
+        ]
+        steps_b = [
+            {"num": "1", "title": "Start B"},
+            {"num": "2", "title": "Finish B"},
+        ]
+        graph = _make_graph([("skill-a", steps_a), ("skill-b", steps_b)])
+        workflow = _make_workflow(["skill-a", "skill-b"])
+        result = generate_consolidated_step_flow(workflow, graph)
+
+        assert "```mermaid" in result
+        assert "graph TD" in result
+        # Both skills should have subgraphs
+        assert "skill-a" in result.lower().replace("_", "-") or "skill_a" in result
+        assert "skill-b" in result.lower().replace("_", "-") or "skill_b" in result
+
+    def test_cross_skill_delegation_edges(self):
+        """Delegation from skill-a step to skill-b should create a cross-edge."""
+        steps_a = [
+            {"num": "1", "title": "Setup"},
+            {"num": "2", "title": "Delegate", "skill_calls": ["skill-b"]},
+        ]
+        steps_b = [
+            {"num": "1", "title": "Receive"},
+            {"num": "2", "title": "Done"},
+        ]
+        graph = _make_graph([("skill-a", steps_a), ("skill-b", steps_b)])
+        workflow = _make_workflow(["skill-a", "skill-b"])
+        result = generate_consolidated_step_flow(workflow, graph)
+
+        # Should have a cross-skill edge (thick arrow ==>)
+        assert "==>" in result
+
+    def test_empty_when_no_skills_have_steps(self):
+        """If no skills have steps, return empty string."""
+        graph = _make_graph([("empty", [])])
+        workflow = _make_workflow(["empty"])
+        result = generate_consolidated_step_flow(workflow, graph)
+        assert result == ""
+
+    def test_single_skill_still_renders(self):
+        """Even one skill with steps should produce a diagram."""
+        steps = [
+            {"num": "1", "title": "Do A"},
+            {"num": "2", "title": "Do B"},
+        ]
+        graph = _make_graph([("only-skill", steps)])
+        workflow = _make_workflow(["only-skill"])
+        result = generate_consolidated_step_flow(workflow, graph)
+        assert "```mermaid" in result
+
+    def test_capped_at_max_skills(self):
+        """Workflows with too many stepped skills should return empty to avoid huge diagrams."""
+        skill_names = [f"skill-{i}" for i in range(20)]
+        skills_data = [
+            (name, [{"num": "1", "title": "A"}, {"num": "2", "title": "B"}])
+            for name in skill_names
+        ]
+        graph = _make_graph(skills_data)
+        workflow = _make_workflow(skill_names)
+        result = generate_consolidated_step_flow(workflow, graph)
+        assert result == ""
+
+
+# ── generate_entry_point_map tests ────────────────────────────────
+
+
+class TestGenerateEntryPointMap:
+    """Tests for the entry point map showing user-facing vs internal skills."""
+
+    def test_identifies_entry_points(self):
+        """Skills with no refs_in within the workflow are entry points."""
+        graph = _make_graph([
+            ("entry-skill", [{"num": "1", "title": "Start"}]),
+            ("internal-skill", [{"num": "1", "title": "Work"}]),
+        ])
+        # entry-skill calls internal-skill, but nothing calls entry-skill
+        graph["nodes"]["entry-skill"]["refs_out"] = ["internal-skill"]
+        graph["nodes"]["internal-skill"]["refs_in"] = ["entry-skill"]
+        graph["edges"] = [{"from": "entry-skill", "to": "internal-skill", "type": "Skill()"}]
+        workflow = _make_workflow(
+            ["entry-skill", "internal-skill"],
+            edges=[{"from": "entry-skill", "to": "internal-skill", "type": "Skill()"}],
+        )
+        result = generate_entry_point_map(workflow, graph)
+
+        assert "```mermaid" in result
+        assert "entry-skill" in result.replace("_", "-")
+        assert "internal-skill" in result.replace("_", "-")
+
+    def test_entry_points_visually_distinct(self):
+        """Entry point nodes should have a different shape than internal nodes."""
+        graph = _make_graph([
+            ("top-skill", [{"num": "1", "title": "Top"}]),
+            ("mid-skill", [{"num": "1", "title": "Mid"}]),
+        ])
+        graph["nodes"]["top-skill"]["refs_out"] = ["mid-skill"]
+        graph["nodes"]["mid-skill"]["refs_in"] = ["top-skill"]
+        graph["edges"] = [{"from": "top-skill", "to": "mid-skill", "type": "Skill()"}]
+        workflow = _make_workflow(
+            ["top-skill", "mid-skill"],
+            edges=[{"from": "top-skill", "to": "mid-skill", "type": "Skill()"}],
+        )
+        result = generate_entry_point_map(workflow, graph)
+        lines = result.split("\n")
+
+        # Entry point (top-skill) should use different shape than internal (mid-skill)
+        top_lines = [l for l in lines if "top_skill" in l and ("[[" in l or "((" in l or "([" in l)]
+        mid_lines = [l for l in lines if "mid_skill" in l and ("[/" in l or '["' in l)]
+        assert len(top_lines) >= 1, "Entry point should have distinct shape"
+        assert len(mid_lines) >= 1, "Internal node should have standard shape"
+
+    def test_empty_when_no_edges(self):
+        """No edges means no meaningful entry point distinction — return empty."""
+        graph = _make_graph([("lone-skill", [{"num": "1", "title": "Solo"}])])
+        workflow = _make_workflow(["lone-skill"])
+        result = generate_entry_point_map(workflow, graph)
+        assert result == ""
+
+    def test_agents_included(self):
+        """Agents dispatched by skills should appear in the entry point map."""
+        graph = _make_graph([
+            ("caller-skill", [{"num": "1", "title": "Call"}]),
+        ])
+        graph["nodes"]["my-agent"] = {
+            "type": "agent",
+            "path": "core/.claude/agents/my-agent.md",
+            "description": "Test agent",
+            "version": "1.0.0",
+            "label": "core",
+            "refs_out": [],
+            "refs_in": ["caller-skill"],
+            "steps": [],
+        }
+        graph["nodes"]["caller-skill"]["refs_out"] = ["my-agent"]
+        graph["edges"] = [{"from": "caller-skill", "to": "my-agent", "type": "Agent()"}]
+        workflow = _make_workflow(
+            ["caller-skill"],
+            edges=[{"from": "caller-skill", "to": "my-agent", "type": "Agent()"}],
+        )
+        workflow["agents"] = ["my-agent"]
+        result = generate_entry_point_map(workflow, graph)
+
+        assert "my-agent" in result.replace("_", "-")

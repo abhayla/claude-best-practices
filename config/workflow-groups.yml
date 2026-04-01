@@ -39,6 +39,7 @@ workflows:
         - writing-plans
       agents:
         - android-build-fixer-agent
+        - anthropic-multi-agent-reviewer-agent
         - development-loop-master-agent
         - plan-executor-agent
         - planner-researcher-agent
@@ -54,6 +55,7 @@ workflows:
         - android-adb-test
         - android-run-e2e
         - android-test-patterns
+        - anthropic-multi-agent-research-system-skill
         - architecture-fitness
         - auto-verify
         - branching
@@ -96,6 +98,7 @@ workflows:
         - vue-test
       agents:
         - android-compose-agent
+        - anthropic-multi-agent-reviewer-agent
         - e2e-conductor-agent
         - fastapi-api-tester-agent
         - flutter-dart-agent

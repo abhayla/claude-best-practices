@@ -271,14 +271,18 @@ class TestStage4Demo:
     def test_demo_exists_or_skipped(self):
         state = _load_state()
         if _is_skipped(state, "stage_4_demo"):
-            pytest.skip("Stage 4 was skipped (API-only project)")
+            # Stage correctly marked as skipped — assert consistency
+            demos = _find_files("index.html", SMOKE_PROJECT / "demos")
+            assert len(demos) == 0, "Stage 4 skipped but demo files exist"
+            return
         demos = _find_files("index.html", SMOKE_PROJECT / "demos")
         assert len(demos) >= 1, "No demo index.html found in demos/"
 
     def test_demo_has_css(self):
         state = _load_state()
         if _is_skipped(state, "stage_4_demo"):
-            pytest.skip("Stage 4 was skipped")
+            # Stage correctly marked as skipped — no CSS expected
+            return
         css_files = _find_files("*.css", SMOKE_PROJECT / "demos")
         assert len(css_files) >= 1, "No CSS files in demos/"
 

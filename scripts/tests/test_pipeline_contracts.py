@@ -341,13 +341,12 @@ class TestReferenceFileIntegrity:
     @pytest.mark.parametrize("skill_dir", [
         d for d in SKILLS_DIR.iterdir()
         if d.is_dir() and (d / "SKILL.md").exists()
+        and _extract_reference_pointers((d / "SKILL.md").read_text(encoding="utf-8"))
     ], ids=lambda d: d.name)
     def test_all_skills_reference_pointers_resolve(self, skill_dir):
-        """For every skill, any Read: `references/X` pointer must have a matching file."""
+        """For every skill with reference pointers, the referenced files must exist."""
         content = _read(skill_dir / "SKILL.md")
         pointers = _extract_reference_pointers(content)
-        if not pointers:
-            pytest.skip(f"{skill_dir.name} has no reference pointers")
         refs_dir = skill_dir / "references"
         for ref in pointers:
             ref_path = refs_dir / ref

@@ -560,8 +560,7 @@ class TestParallelStepDetection:
 
     def test_testing_pipeline_has_parallel_steps(self, workflows):
         """auto_verify and e2e should run in parallel (both depend on fix_loop)."""
-        if "testing-pipeline" not in workflows:
-            pytest.skip("testing-pipeline not found")
+        assert "testing-pipeline" in workflows, "testing-pipeline must exist in workflow contracts"
         steps = workflows["testing-pipeline"]["steps"]
         step_map = {s["id"]: s for s in steps}
 
@@ -580,8 +579,7 @@ class TestParallelStepDetection:
 
     def test_documentation_has_parallel_steps(self, workflows):
         """adr and api_docs should run in parallel (both are roots)."""
-        if "documentation" not in workflows:
-            pytest.skip("documentation not found")
+        assert "documentation" in workflows, "documentation must exist in workflow contracts"
         steps = workflows["documentation"]["steps"]
         step_map = {s["id"]: s for s in steps}
 
