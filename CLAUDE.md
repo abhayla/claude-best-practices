@@ -10,8 +10,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Environment
 
 - **Python 3.12** required (all CI workflows use 3.12)
-- Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt` (Windows: `.venv\Scripts\activate`)
-- Windows: use `set PYTHONPATH=. &&` prefix instead of `PYTHONPATH=.` for commands below, or run in Git Bash where the Unix syntax works
+- Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`
+- **Windows**: activate with `.venv\Scripts\activate`, use `set PYTHONPATH=. &&` prefix instead of `PYTHONPATH=.` for all commands below, or use Git Bash where Unix syntax works
 
 ## Commands
 
