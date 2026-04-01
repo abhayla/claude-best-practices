@@ -2378,20 +2378,20 @@
     "tier": "nice-to-have"
   },
   "prompt-auto-enhance": {
-    "hash": "3fd847a324f0f2d9182fd6525a600ce80fd0d6a1dfef275378162faa6b5be32f",
+    "hash": "4fff02d2a7fb484f2e2d93037702d647631daf63c93012c63feb4175fbbf42ba",
     "type": "skill",
     "category": "core",
-    "version": "1.5.1",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-03-23",
+    "last_updated": "2026-03-31",
     "dependencies": [
       "writing-skills",
       "claude-guardian",
       "skill-author"
     ],
     "visibility": "public",
-    "description": "Strengthen non-trivial prompts by diagnosing weak spots against 9 failure categories, mapping fixes, rewriting with before/after comparison, handling resource CRUD with batch approval, and scoring prompt reliability across 5 dimensions with launch risk flags",
+    "description": "Grade and strengthen non-trivial prompts using a 6-dimension rubric, then diagnose weak dimensions against 11 failure categories with severity-prioritized fixes and 3 guardrails. Also handles resource CRUD batch approval and prompt reliability scoring.",
     "tags": [
       "prompt-enhancement",
       "prompt-strengthening",
@@ -2403,22 +2403,22 @@
       "workflow",
       "format-locking"
     ],
-    "changelog": "v1.5.0: Add prompt reliability scoring mode \u00e2\u20ac\u201d 5-dimension rubric (instruction clarity, output format, constraint strength, edge case handling, tone consistency) with evidence-based scores and launch risk flags",
+    "changelog": "v2.0.0: Add Step 0 prompt grading (6 weighted dimensions), expand to 11 failure categories, add 3 guardrails, expand weakening language to 3 categories including Claude 4.x anti-patterns",
     "tier": "nice-to-have"
   },
   "prompt-auto-enhance-rule": {
-    "hash": "0588116e093fe3077e9ae50d944149652d97733e71131c758f06c8b5d4b1447f",
+    "hash": "e2b2baf67bfe821c28b7fcd7ec60313d046889fd534e1540abd64c26cc8d1a15",
     "type": "rule",
     "category": "core",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-03-24",
+    "last_updated": "2026-03-31",
     "dependencies": [
       "prompt-auto-enhance"
     ],
     "visibility": "public",
-    "description": "Global rule that auto-enhances every prompt with context gathering, prompt strengthening (diagnose + rewrite with before/after), and resource CRUD batch approval",
+    "description": "Global rule that auto-enhances every prompt with context gathering and prompt grading. Delegates to /prompt-auto-enhance skill for the full pipeline. Contains the Clarification Gate and CRUD detection trigger.",
     "tags": [
       "prompt-enhancement",
       "prompt-strengthening",
@@ -2426,7 +2426,7 @@
       "context-gathering",
       "automation"
     ],
-    "changelog": "v1.2.0: Add Prompt Strengthening section with 9 failure categories, mandatory before/after display, XML tag structuring support",
+    "changelog": "v2.0.0: Slim from 97 to 48 lines. Removed duplicated procedural content. Now a lean trigger delegating to /prompt-auto-enhance skill. Fixes SSOT violation.",
     "tier": "must-have"
   },
   "prompt-enhance-reminder": {
