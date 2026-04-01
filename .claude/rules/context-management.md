@@ -1,7 +1,3 @@
----
-description: Rules for managing context window, token usage, and documentation references.
-globs: ["**/*"]
----
 # Scope: global
 
 # Context Management Rules

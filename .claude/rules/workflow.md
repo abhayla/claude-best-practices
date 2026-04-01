@@ -1,7 +1,3 @@
----
-description: Development workflow guidelines for structured feature implementation and bug fixes.
-globs: ["**/*"]
----
 # Scope: global
 
 # Workflow Guidelines

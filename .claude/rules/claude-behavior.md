@@ -1,8 +1,6 @@
----
-description: Universal behavioral rules for how Claude should approach all tasks.
-globs: ["**/*"]
----
 # Scope: global
+
+# description: Behavioral rules for how Claude should approach all tasks in this hub repository.
 
 # Claude Behavior Rules
 

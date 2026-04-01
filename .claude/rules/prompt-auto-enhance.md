@@ -1,9 +1,3 @@
----
-description: >
-  Auto-enhance every user prompt with context gathering, prompt grading,
-  and targeted strengthening. Prefix every response with *Enhanced:* indicator.
-globs: ["**/*"]
----
 # Scope: global
 
 # Prompt Auto-Enhance

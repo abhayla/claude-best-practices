@@ -1,6 +1,6 @@
 ---
-description: Structural requirements for skills, agents, and rules in core/.claude/. Enforces frontmatter, versioning, type classification, and scope.
-globs: ["core/.claude/**/*.md"]
+description: Structural requirements for skills, agents, and rules. Enforces frontmatter, versioning, type classification, and scope.
+globs: [".claude/**/*.md"]
 ---
 
 # Pattern Structure Standards

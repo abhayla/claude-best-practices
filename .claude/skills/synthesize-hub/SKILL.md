@@ -174,7 +174,7 @@ For each GENERALIZABLE sub-cluster with 3+ contributing projects, draft a hub-re
 
 ### 6a. Pre-draft: Curation gate
 
-Before drafting anything, verify each candidate against the hub's curation policy (`.claude/rules/rule-curation.md`):
+Before drafting anything, verify each candidate against the hub's curation policy (`core/.claude/rules/rule-curation.md`):
 
 1. **Source** — The synthesized patterns from 3+ downstream projects are the evidence. But ask: did those projects actually experience the problem this pattern solves, or is it a speculative convention? If the source evidence is "3 projects all auto-synthesized this", verify at least one project has a concrete failure case.
 2. **Problem it solves** — What goes wrong without this pattern (derived from the cluster analysis). Be specific: "tests fail silently" is evidence, "code is less clean" is speculation.
@@ -357,6 +357,6 @@ rm -rf .synthesize-hub/collected/
 - NEVER include project-specific details in generalized patterns. All file paths, class names, env vars, and internal references MUST be replaced with generic placeholders.
 - NEVER skip the validation step. Every generalized pattern MUST pass `workflow_quality_gate_validate_patterns.py`.
 - NEVER draft patterns ad-hoc. Use `/writing-skills` for skills, `/claude-guardian` for rules, and `pattern-structure.md` agent standards for agents. The hub's creator tools enforce standards that ad-hoc drafting misses.
-- NEVER add a pattern to the hub that doesn't pass the curation gate (`.claude/rules/rule-curation.md`): source evidence, problem statement, and dedup check against existing hub patterns are all mandatory.
+- NEVER add a pattern to the hub that doesn't pass the curation gate (`core/.claude/rules/rule-curation.md`): source evidence, problem statement, and dedup check against existing hub patterns are all mandatory.
 - The PR is a proposal — it MUST be reviewed and merged by the hub maintainer. This skill creates the PR but does not merge it.
 - Clean up `.synthesize-hub/collected/` after every run. Do not leave project patterns on disk.

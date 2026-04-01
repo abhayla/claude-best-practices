@@ -1,6 +1,6 @@
 ---
-description: Portability standards for patterns distributed via core/.claude/. Ensures patterns work in any project without modification.
-globs: ["core/.claude/**/*.md"]
+description: Portability standards for distributed patterns. Ensures patterns work in any project without modification.
+globs: [".claude/**/*.md"]
 ---
 
 # Pattern Portability Standards

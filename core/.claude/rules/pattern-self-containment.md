@@ -1,6 +1,6 @@
 ---
-description: Self-containment and completeness standards for patterns in core/.claude/. Prevents placeholders, oversized files, and broken dependencies.
-globs: ["core/.claude/**/*.md"]
+description: Self-containment and completeness standards for patterns. Prevents placeholders, oversized files, and broken dependencies.
+globs: [".claude/**/*.md"]
 ---
 
 # Pattern Self-Containment Standards
