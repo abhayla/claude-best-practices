@@ -308,3 +308,17 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 **Fixes applied:**
 - Registry-only fix: hash, version, description, tags, changelog
 - SKILL.md unchanged — already has triggers, preamble, strong MUST DO/MUST NOT DO
+
+---
+
+## Batch Registry Sync (2026-04-02)
+
+**Scope:** All 225 patterns (skills, agents, rules, hooks)
+
+After evaluating 12 skills individually, the remaining 133 skills + 60 agents/rules/hooks had stale registry metadata. Applied automated batch fix:
+- Synced hashes from actual file contents
+- Populated empty descriptions from SKILL.md frontmatter
+- Generated tags from pattern names and types
+- Updated last_updated timestamps
+
+This batch fix addresses the mechanical registry drift that was the most common issue across all 12 individually evaluated skills. The structural fixes (triggers, preamble, CRITICAL RULES) still require per-skill evaluation.
