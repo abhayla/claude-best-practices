@@ -165,8 +165,10 @@ messages — don't just let exceptions propagate.
 
 **Platform awareness:** Skills on claude.ai can install packages from
 npm/PyPI and pull from GitHub. Skills via the Claude API have no network
-access and no runtime package installation. List required packages in
-SKILL.md and note any platform constraints.
+access and no runtime package installation. Skills in Claude Code have
+full network access but should avoid global package installs (install
+locally to avoid interfering with the user's system). List required
+packages in SKILL.md and note any platform constraints.
 
 Short templates inline in SKILL.md; longer templates in `assets/` or `references/` with conditional loading.
 
@@ -184,3 +186,81 @@ Progress:
 - [ ] Step 4: Execute (run `scripts/execute.py`)
 - [ ] Step 5: Verify output (run `scripts/verify.py`)
 ```
+
+## 9. Input/Output Examples for Quality Calibration
+
+When output quality depends on seeing the expected format, provide 2-3
+input/output pairs. These calibrate Claude's understanding of "good" more
+effectively than prose descriptions.
+
+**Use when:** the skill produces formatted output (commit messages, reports,
+code transformations) where style and structure matter.
+
+```markdown
+## Commit message format
+
+**Example 1:**
+Input: Added user authentication with JWT tokens
+Output:
+feat(auth): implement JWT-based authentication
+
+Add login endpoint and token validation middleware
+
+**Example 2:**
+Input: Fixed bug where dates displayed incorrectly
+Output:
+fix(reports): correct date formatting in timezone conversion
+
+Follow this style: type(scope): description, then detailed explanation.
+```
+
+Keep examples concrete and representative. 2-3 examples is enough —
+more examples increase context cost without proportional quality gain.
+
+## 10. Conditional Workflow Routing
+
+Guide Claude through decision points that branch to different workflows.
+Use when a skill handles multiple operation types that share setup but
+diverge in execution.
+
+```markdown
+## Document modification workflow
+
+1. Determine the modification type:
+
+   **Creating new content?** → Follow "Creation workflow" below
+   **Editing existing content?** → Follow "Editing workflow" below
+
+2. Creation workflow:
+   - Use the generation library
+   - Build from template
+   - Export to target format
+
+3. Editing workflow:
+   - Load existing document
+   - Modify in place
+   - Validate after each change
+```
+
+If sub-workflows grow large (>30 lines each), push them into separate
+reference files and tell Claude to read the appropriate one.
+
+## 11. Install-Then-Use for Dependencies
+
+When a skill requires a package, show the install command before usage.
+Don't assume the package is available — Claude may be in a fresh environment.
+
+```markdown
+Install required package: `pip install pypdf`
+
+Then use it:
+\`\`\`python
+from pypdf import PdfReader
+reader = PdfReader("file.pdf")
+\`\`\`
+```
+
+For runtime-level dependencies (Node.js, Python, etc.), state them in
+SKILL.md prerequisites rather than inline: "Requires Python 3.10+."
+For platform-specific availability, note: "Available on claude.ai (can
+install from PyPI). Not available via Claude API (no network access)."

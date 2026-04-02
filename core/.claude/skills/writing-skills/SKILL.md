@@ -15,7 +15,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.8.0"
+version: "2.9.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -26,14 +26,16 @@ Author new Claude Code skills from scratch, from observed patterns, or from sess
 
 ---
 
+> Aligned with Anthropic's [Skill Authoring Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) and [Skills for Enterprise](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/enterprise) as of 2026-04.
+
 ## STEP 1: Determine Authoring Mode
 
 Parse `$ARGUMENTS` to choose the path:
 
 | Input | Mode | Starting Point |
 |-------|------|----------------|
+| `from-session` | **From Session** (recommended) | Start at Step 3 — best skills come from real tasks |
 | A skill name or description | **From Scratch** | Start at Step 2 |
-| `from-session` | **From Session Analysis** | Start at Step 3 |
 | A URL or file path to existing workflow | **From Reference** | Start at Step 2, pre-fill from reference |
 | Empty / vague | **Interactive** | Ask: "What repeated task do you want to automate?" |
 
@@ -53,84 +55,44 @@ Before authoring, verify the skill adds value over the agent's baseline:
 
 The gaps captured here feed directly into the skill's instructions.
 
+### 1.2 Design Initial Evaluations
+
+Before authoring, formalize the gaps from 1.1 into 3 eval scenarios.
+These become the acceptance criteria that drive Step 2.
+
+1. **Convert each gap into a test case:** realistic user prompt + expected behavior
+2. **Establish baseline:** the without-skill results from 1.1 ARE the baseline
+3. **Store scenarios** for use in Step 6 (formal evaluation)
+
+| Gap Identified | Eval Scenario | Expected Behavior |
+|---|---|---|
+| {from 1.1} | {realistic prompt} | {what success looks like} |
+
+These scenarios drive what to include in Step 2 — write ONLY what's needed
+to pass them. Resist comprehensive documentation until evals confirm value.
+
 ---
 
 ## STEP 2: Skill Authoring — From Scratch
 
 <role>Act as a Claude skill architect who designs prompts with built-in failure prevention from the start.</role>
 
-Build a skill file from the ground up following the canonical format. The goal is a production-ready skill that eliminates the most common failure modes before they happen.
+Build a minimal skill that addresses the gaps identified in Step 1.1.
+Write only what's needed to pass the eval scenarios from Step 1.2 — you'll
+iterate in Step 6. Focus on failure prevention from the start.
 
+### 2.0 Understand the Runtime Model
 
-**Read:** `references/skill-authoring-from-scratch.md` for detailed step 2: skill authoring — from scratch reference material.
+**Read:** `references/runtime-model.md` — how Claude loads and navigates
+skills at runtime. This shapes every structural decision in Step 2.
 
-# Skill Title — Brief Subtitle
+### 2.1–2.2 Frontmatter, Naming, Content Standards
 
-One sentence explaining what this skill does in practical terms.
-
-**Request:** $ARGUMENTS
-```
-
-The `$ARGUMENTS` variable is replaced with the user's input at runtime. Always include it so the skill knows what to act on.
-
-### 2.1b Naming Conventions
-
-- **Gerund form preferred:** `processing-pdfs`, `analyzing-spreadsheets`,
-  `managing-databases`. Also acceptable: noun phrases (`pdf-processing`)
-  or action-oriented (`process-pdfs`)
-- **Hard constraints:** max 64 characters, lowercase letters/numbers/hyphens
-  only, no XML tags, no reserved words (`anthropic`, `claude`)
-- **Avoid:** vague names (`helper`, `utils`, `tools`), overly generic
-  (`documents`, `data`, `files`), inconsistent patterns within a skill
-  collection
-
-### 2.2b Context Budget
-
-Every token competes for the agent's attention. Targets:
-- **SKILL.md body**: under 500 lines / 5,000 tokens
-- **References**: loaded on demand via conditional `**Read:**` pointers
-
-**Include:** Project-specific conventions, domain procedures, non-obvious edge cases, particular tools/APIs — things the agent wouldn't know without the skill.
-
-**Cut:** General knowledge, obvious steps, exhaustive edge case coverage. Concise stepwise guidance with a working example outperforms exhaustive documentation.
-
-**Test:** "Would the agent get this wrong without this instruction?" If no, cut it. If unsure, test with `/skill-evaluator output`.
-
-**Conditional disclosure:** "Read `references/X.md` if the API returns a non-200 status" — not "see references/ for details."
-
-### 2.2c Content Quality
-
-Three rules that improve Claude's ability to follow skill instructions:
-
-1. **Consistent terminology:** Pick one term per concept and use it
-   throughout. Don't mix "API endpoint" / "URL" / "API route" / "path"
-   — Claude loses precision when the same thing has multiple names.
-
-2. **No time-sensitive information:** Don't include date-dependent content
-   ("If before August 2025, use the old API"). Instead, use a collapsible
-   "Old patterns" section for deprecated content:
-   ```markdown
-   <details>
-   <summary>Legacy v1 API (deprecated 2025-08)</summary>
-   The v1 endpoint `api.example.com/v1/messages` is no longer supported.
-   </details>
-   ```
-
-3. **MCP tool references:** Always use fully qualified names
-   `ServerName:tool_name` (e.g., `BigQuery:bigquery_schema`,
-   `GitHub:create_issue`). Without the server prefix, Claude may fail
-   to locate the tool when multiple MCP servers are active.
-
-### 2.2d Reference Structure
-
-- **One level deep:** All reference files MUST link directly from
-  SKILL.md. Never chain references (SKILL.md → advanced.md → details.md).
-  Claude may partially read deeply nested files, resulting in incomplete
-  information.
-
-- **TOC for long references:** Files over 100 lines MUST include a
-  table of contents at the top so Claude can see the full scope even
-  when previewing with partial reads.
+**Read:** `references/skill-authoring-from-scratch.md` for the complete
+authoring reference: YAML frontmatter fields, naming conventions (gerund
+form, 64-char limit), context budget (500-line target), content quality
+(consistent terminology, no time-sensitive info, MCP qualified names),
+and reference structure (one level deep, TOC for >100 lines).
 
 ### 2.3 Failure Mode Analysis
 
@@ -254,9 +216,9 @@ Rules for writing MUST DO / MUST NOT DO:
 
 #### Instruction Writing Patterns
 
-Eight patterns improve instruction quality within steps.
+Eleven patterns improve instruction quality within steps.
 
-**Read:** `references/instruction-writing-patterns.md` for calibrating control, gotchas sections, validation loops, plan-validate-execute, defaults over menus, procedures over declarations, script design for agentic use, and checklists.
+**Read:** `references/instruction-writing-patterns.md` for calibrating control, gotchas sections, validation loops, plan-validate-execute, defaults over menus, procedures over declarations, script design for agentic use, checklists, input/output examples, conditional workflow routing, and install-then-use patterns.
 
 ### 2.6 Validate Before Saving
 
@@ -392,6 +354,7 @@ Before saving the skill, validate every item. Do NOT skip this step.
 | `version` is valid SemVer | Format: `"1.0.0"` — required for version tracking |
 | `triggers` has 3-6 entries | Mix of slash commands and natural language |
 | `allowed-tools` is minimal | No unused tools listed. Read-only skills MUST NOT include `Write`, `Edit`, or `Bash` |
+| No high-risk indicators without justification | Scripts, MCP refs, network access, or broad file access are documented and necessary (see `references/security-review.md` risk tiers) |
 | `argument-hint` uses `<>` and `[]` correctly | Required in angle brackets, optional in square brackets |
 | No placeholder markers | No TODO/FIXME/PLACEHOLDER HTML comment markers in the body |
 
@@ -407,6 +370,8 @@ Before saving the skill, validate every item. Do NOT skip this step.
 | MUST DO section has 4-8 items | Each explains the consequence of skipping |
 | MUST NOT DO section has 4-8 items | Each states what to do instead |
 | No vague language | No "consider", "maybe", "try to", "think about" |
+| No Windows-style paths | All file paths use forward slashes (`/`), even on Windows |
+| Install-then-use for deps | Package usage shows install command before import |
 
 ### 5.3 Overlap Check
 
@@ -462,6 +427,10 @@ target model. What works for Opus may need more guidance for Haiku:
 ## STEP 6: Evaluate and Iterate with /skill-evaluator
 
 Invoke `/skill-evaluator` via the Agent tool. The entire evaluate-fix-re-evaluate loop runs autonomously with one human approval at the end.
+
+**Read:** `references/iterative-development.md` for the full Claude A/B
+development methodology — how to test with fresh instances, diagnose issues
+from observation, and gather team feedback.
 
 **Before formal eval:** Run the skill informally against one real task. Read the execution trace (not just output). Fix obvious issues first.
 
@@ -587,6 +556,7 @@ If the skill is valuable enough to share across projects via the hub.
 | `type` field present | `workflow` or `reference` declared |
 | `allowed-tools` is least-privilege | Read-only skills don't include Write/Edit/Bash |
 | No project-specific hardcoded paths | Replace with `$ARGUMENTS` or documented placeholders |
+| Team feedback gathered (if applicable) | At least one teammate has used the skill on a real task |
 | No placeholder markers | No TODO/FIXME HTML comment markers or stub content |
 | Under size limit | SKILL.md under 1000 lines; use `references/` for supplementary material |
 | No secrets or credentials | Scan for API keys, tokens, passwords |
@@ -609,7 +579,23 @@ If contributing from a downstream project:
 ---
 
 
-## STEP 8: Template Library
+## STEP 8: Post-Promotion Lifecycle
+
+What happens after a skill ships: security vetting, deployment governance,
+monitoring, version management, deprecation, and scaling considerations.
+
+**Read:** `references/post-promotion-lifecycle.md` for the full lifecycle
+covering security review gates (8.1), deployment governance with registry
+requirements (8.2), monitoring and drift detection (8.3), version management
+with rollback plans (8.4), deprecation lifecycle (8.5), and scaling
+considerations including recall limits and consolidation triggers (8.6).
+
+**Also read:** `references/security-review.md` for the detailed risk tier
+assessment and 8-step review checklist referenced by Step 8.1.
+
+---
+
+## STEP 9: Template Library
 
 Pre-built starting skeletons for common skill types. Copy the appropriate template and fill in the placeholders.
 
@@ -617,9 +603,9 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 
 ---
 
-## Deprecation Workflow and Anti-Patterns
+## Anti-Patterns
 
-> **Reference:** See [references/anti-patterns.md](references/anti-patterns.md) for the deprecation lifecycle and 8 common skill anti-patterns to avoid.
+> **Reference:** See [references/anti-patterns.md](references/anti-patterns.md) for 9 common skill anti-patterns to avoid.
 
 ---
 
@@ -661,3 +647,4 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - MUST NOT write descriptions in first or second person ("I analyze...", "You can use...") — always third person ("Analyzes...") because descriptions are injected into the system prompt and inconsistent POV causes discovery problems
 - MUST NOT chain reference files (SKILL.md → ref1.md → ref2.md) — keep one level deep from SKILL.md
 - MUST NOT include time-sensitive content ("before August 2025") — use collapsible "Old patterns" section instead
+- MUST NOT be the sole reviewer of your own skill for hub promotion — Why: separation of duties prevents blind spots and catches adversarial patterns the author may overlook (see Step 8.1)
