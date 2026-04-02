@@ -1,18 +1,31 @@
 ---
 name: fix-issue
 description: >
-  Analyze and implement a fix for a specific GitHub Issue. Fetches issue details,
-  explores codebase, plans implementation, implements fix, verifies with tests,
-  and runs post-fix-pipeline. Use when user says "fix issue #N".
+  Analyze and implement a fix for a specific GitHub Issue. Fetches issue details
+  via `gh`, explores codebase for root cause, plans minimal fix, implements,
+  verifies with tests, and runs post-fix-pipeline. Use when user says "fix
+  issue #N" or references a GitHub Issue. For general feature work, use
+  /implement instead. For iterative test fixing, use /fix-loop directly.
+type: workflow
+triggers:
+  - fix issue
+  - fix github issue
+  - resolve issue
+  - close issue
+  - fix bug from issue
+  - address issue
+  - fix #
+  - gh issue fix
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<issue-number or issue-url>"
-version: "1.0.0"
-type: workflow
+version: "2.1.0"
 ---
 
 # Fix GitHub Issue
 
 Analyze and implement a fix for a specific GitHub Issue.
+
+**Critical:** This skill requires `gh` CLI authenticated. If $ARGUMENTS is empty, ask the user for the issue number. Always fetch the issue first — never guess what the issue is about. Delegate test failures to `/fix-loop`, not manual retry.
 
 **Issue:** $ARGUMENTS
 
@@ -78,7 +91,10 @@ Provide a summary of:
 
 ## CRITICAL RULES
 
-- Always understand the issue before coding
-- Make minimal, focused changes
-- Verify with tests before declaring done
-- If fix requires > 3 files changed, confirm approach with user first
+- MUST fetch the GitHub Issue via `gh issue view` before any code changes — never assume issue content
+- MUST make minimal, focused changes — fix only what the issue describes
+- MUST verify with tests before declaring done — delegate failures to `/fix-loop`
+- MUST confirm approach with user if fix requires changes to > 3 files
+- MUST NOT skip Step 1 (issue fetch) — the issue body is the source of truth
+- MUST NOT guess the issue content from the title alone — read the full body and comments
+- MUST NOT implement unrelated improvements while fixing — scope discipline

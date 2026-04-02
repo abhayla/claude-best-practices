@@ -164,3 +164,31 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Added 2 MUST NOT rules: no diagnosis-only use, no skipping chain steps
 - Synced registry: description, hash, version (1.0.0 → 1.1.0), dependencies (5 added), changelog
 - Bumped version 1.0.0 → 1.1.0
+
+---
+
+## Skill #6: fix-issue (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Empty registry description (Priority 1 auto-pick signal)
+- Missing `triggers:` field
+- Registry version mismatch (registry: 2.0.0, file: 1.0.0)
+- Empty dependencies despite referencing fix-loop and post-fix-pipeline
+- Empty tags in registry
+- Weak CRITICAL RULES (no MUST/MUST NOT language)
+- Missing preamble constraints
+
+**What evaluator missed:**
+- No new evaluator gaps found — Step 0 pre-flight checks caught everything. First skill where v2.0 evaluator had complete coverage on structural issues.
+
+**Proposed evaluator improvements:** None — v2.0 Step 0 was sufficient.
+
+**Fixes applied to fix-issue:**
+- Added `triggers:` list (8 entries) targeting "fix issue" intent
+- Added preamble constraints (gh CLI requirement, empty args guard, fix-loop delegation)
+- Strengthened CRITICAL RULES with MUST/MUST NOT language (7 rules)
+- Updated description to differentiate from /implement and /fix-loop
+- Synced registry: description, hash, version (1.0.0 → 2.1.0), dependencies, tags, changelog
+- Bumped version 1.0.0 → 2.1.0 (aligned with registry 2.0.0 lineage)

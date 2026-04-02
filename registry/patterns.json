@@ -1535,18 +1535,25 @@
     "tier": "must-have"
   },
   "fix-issue": {
-    "hash": "81d401b97f74b378816007f5eb96c2d49544b7ae11e84e7bdd22e60fbe7abafb",
+    "hash": "97db35dde48f832688d81c9717c9e6c2f48d488d96fcc988a6c3fb599f96bfd8",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "fix-loop",
+      "post-fix-pipeline"
+    ],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "description": "Fetch a GitHub Issue via gh CLI, analyze root cause, implement minimal fix, verify with tests, and run post-fix-pipeline. Entry point for 'fix issue #N' requests.",
+    "tags": [
+      "github",
+      "bug-fix",
+      "workflow"
+    ],
+    "changelog": "v2.1.0: Add triggers, preamble constraints, MUST/MUST NOT rules, dependencies, registry sync | v2.0.0: Genericized and restructured",
     "tier": "must-have"
   },
   "fix-loop": {
