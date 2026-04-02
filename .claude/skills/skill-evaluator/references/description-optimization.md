@@ -14,6 +14,11 @@ How to test and improve a skill's description for trigger reliability.
 - **User intent focus:** describe what the user is trying to achieve, not internal mechanics
 - **Err on being pushy:** explicitly list contexts, including cases where user doesn't name the domain
 - **Concise:** a few sentences to a short paragraph. Hard limit: 1024 characters
+- **Third person ONLY:** The description is injected into the system prompt.
+  Inconsistent point-of-view causes discovery problems.
+  - Good: "Processes Excel files and generates reports"
+  - Bad: "I can help you process Excel files"
+  - Bad: "You can use this to process Excel files"
 
 ### Before/After
 

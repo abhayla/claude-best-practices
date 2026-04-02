@@ -171,6 +171,7 @@ nano banana pro and 2
  Agent Skill
  https://agentskills.io/home
  https://claude.com/blog/equipping-agents-for-the-real-world-with-agent-skills
+ https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
 
  Skill Evaluation
  https://agentskills.io/skill-creation/evaluating-skills
@@ -194,7 +195,7 @@ Revised workflow for writing-skill review:
 
 Cross check the implementation plan against below URL
 implementation plan - d:\Abhay\VibeCoding\claude-best-practices\plans\writing-skills-upgrade-and-skill-evaluator.md
-URL - https://agentskills.io/skill-creation/using-scripts
+URL - https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
 see if any gaps or edge case still remain in the plan
 Iterate below steps until any gaps or edge case still remains
   revise plan to close gaps

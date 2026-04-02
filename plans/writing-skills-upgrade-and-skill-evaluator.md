@@ -1,6 +1,6 @@
 # Implementation Plan: Writing-Skills Upgrade + Skill-Evaluator Creation
 
-**Version:** v7 (Implemented + Cross-Checked Against All 4 URLs)
+**Version:** v8 (Cross-Checked Against platform.claude.com Best Practices)
 **Date:** 2026-04-02
 **Status:** IMPLEMENTED
 **Source:** agentskills.io/skill-creation/best-practices (+ evaluating-skills, optimizing-descriptions, using-scripts)
@@ -742,3 +742,267 @@ All 25 original gaps + 2 new gaps from scripts page + autonomy gaps: CLOSED.
 - 38/38 items from optimizing-descriptions URL verified after fixes
 - 48/48 items from evaluating-skills URL verified after fixes
 - 36/36 items from using-scripts URL verified after fixes
+
+---
+
+## v8 Revision: platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+
+**Source:** https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+**Cross-check date:** 2026-04-02
+**Gaps found:** 13 content gaps + 4 edge cases
+
+### Summary of Changes
+
+All changes are additive — no existing content is removed or restructured.
+Five files affected, ~85 lines added total.
+
+---
+
+### FILE 1 EDITS: `.claude/skills/writing-skills/SKILL.md`
+
+#### Edit H: Add Naming Conventions Guidance (Step 2.1 area)
+
+Insert after step anatomy / before instruction-writing-patterns pointer:
+
+```markdown
+### 2.1b Naming Conventions
+
+- **Gerund form preferred:** `processing-pdfs`, `analyzing-spreadsheets`,
+  `managing-databases`. Also acceptable: noun phrases (`pdf-processing`)
+  or action-oriented (`process-pdfs`)
+- **Hard constraints:** max 64 characters, lowercase letters/numbers/hyphens
+  only, no XML tags, no reserved words (`anthropic`, `claude`)
+- **Avoid:** vague names (`helper`, `utils`, `tools`), overly generic
+  (`documents`, `data`, `files`), inconsistent patterns within a skill
+  collection
+```
+
+#### Edit I: Add Content Quality Guidelines (Step 2 area, after Context Budget)
+
+```markdown
+### 2.2c Content Quality
+
+Three rules that improve Claude's ability to follow skill instructions:
+
+1. **Consistent terminology:** Pick one term per concept and use it
+   throughout. Don't mix "API endpoint" / "URL" / "API route" / "path"
+   — Claude loses precision when the same thing has multiple names.
+
+2. **No time-sensitive information:** Don't include date-dependent content
+   ("If before August 2025, use the old API"). Instead, use a collapsible
+   "Old patterns" section for deprecated content:
+   ```markdown
+   <details>
+   <summary>Legacy v1 API (deprecated 2025-08)</summary>
+   The v1 endpoint `api.example.com/v1/messages` is no longer supported.
+   </details>
+   ```
+
+3. **MCP tool references:** Always use fully qualified names
+   `ServerName:tool_name` (e.g., `BigQuery:bigquery_schema`,
+   `GitHub:create_issue`). Without the server prefix, Claude may fail
+   to locate the tool when multiple MCP servers are active.
+```
+
+#### Edit J: Add Reference Structure Rules (Step 2.2b area, after Context Budget)
+
+```markdown
+### 2.2d Reference Structure
+
+- **One level deep:** All reference files MUST link directly from
+  SKILL.md. Never chain references (SKILL.md → advanced.md → details.md).
+  Claude may partially read deeply nested files, resulting in incomplete
+  information.
+
+- **TOC for long references:** Files over 100 lines MUST include a
+  table of contents at the top so Claude can see the full scope even
+  when previewing with partial reads.
+```
+
+#### Edit K: Add Model Compatibility Note (Step 5 quality checklist area)
+
+```markdown
+### 5.x Model Compatibility
+
+If the skill will be used across model tiers, test with the smallest
+target model. What works for Opus may need more guidance for Haiku:
+- **Haiku:** Does the skill provide enough guidance for the task?
+- **Sonnet:** Is the skill clear and efficient?
+- **Opus:** Does the skill avoid over-explaining?
+```
+
+#### Edit L: Update MUST DO
+
+Add:
+```markdown
+- Always use gerund or action-oriented naming — Why: consistent naming improves discoverability and professionalism
+- Always keep reference files one level deep from SKILL.md — Why: Claude partially reads deeply nested files
+```
+
+#### Edit M: Update MUST NOT DO
+
+Add:
+```markdown
+- MUST NOT write descriptions in first or second person ("I analyze...", "You can use...") — always third person ("Analyzes...") because descriptions are injected into the system prompt
+- MUST NOT chain reference files (SKILL.md → ref1.md → ref2.md) — keep one level deep
+- MUST NOT include time-sensitive content ("before August 2025") — use collapsible "Old patterns" section
+```
+
+---
+
+### FILE 2 EDITS: `.claude/skills/writing-skills/references/instruction-writing-patterns.md`
+
+#### Pattern 7 Addition: Voodoo Constants + Solve Don't Punt
+
+Insert after the agentic script design table, before "Referencing scripts":
+
+```markdown
+**Justified constants:** Every magic number or configuration parameter
+MUST have a comment explaining WHY that value. If you don't know the
+right value, how will Claude determine it?
+
+Good:
+```python
+# HTTP requests typically complete within 30 seconds
+# Longer timeout accounts for slow connections
+REQUEST_TIMEOUT = 30
+```
+
+Bad:
+```python
+TIMEOUT = 47  # Why 47?
+```
+
+**Solve, don't punt:** Scripts should handle error conditions explicitly
+rather than failing and leaving Claude to figure it out. Provide
+fallbacks, create defaults for missing files, and return clear error
+messages — don't just let exceptions propagate.
+
+**Platform awareness:** Skills on claude.ai can install packages from
+npm/PyPI and pull from GitHub. Skills via the Claude API have no network
+access and no runtime package installation. List required packages in
+SKILL.md and note any platform constraints.
+```
+
+---
+
+### FILE 3 EDITS: `.claude/skills/skill-evaluator/SKILL.md`
+
+#### Step 0.2 Enhancement: Full Name + Description Validation
+
+Replace current Step 0.2 content with expanded validation:
+
+```markdown
+**0.2 Frontmatter Completeness:**
+
+| Field | Validation Rules |
+|-------|-----------------|
+| `name` | Required. Max 64 chars. Lowercase letters/numbers/hyphens only. No XML tags. No reserved words (`anthropic`, `claude`). Prefer gerund form (`processing-pdfs`) |
+| `description` | Required. Non-empty. Max 1024 chars. No XML tags. Must be third-person ("Processes..." not "I process..." or "You can..."). Should start with verb. Must describe what AND when |
+| `type` | Required |
+| `triggers` | Required. ≥3 entries (BLOCKING if missing) |
+| `allowed-tools` | Flag under/over-declared tools vs actual usage |
+| `version` | Required. SemVer format |
+```
+
+#### Step 0.3 Enhancement: Reference Depth + TOC Check
+
+Add to existing Step 0.3 structural checks:
+
+```markdown
+- **Reference depth:** Scan all `Read:` / `See:` / link references in
+  SKILL.md and referenced files. Flag any file that references another
+  file (depth >1 from SKILL.md)
+- **Reference TOC:** Flag reference files >100 lines that lack a
+  table of contents section at the top
+```
+
+#### Step 3.3 Enhancement: Model Matrix Testing
+
+Add after existing Step 3.3 content:
+
+```markdown
+**3.3b Model Matrix (optional but recommended):**
+
+If the skill targets multiple model tiers, run scenarios across available
+models (e.g., Haiku, Sonnet, Opus). Flag divergent results — a skill
+that works on Opus but fails on Haiku needs more explicit guidance.
+
+When model matrix is not feasible (time/cost), note "Tested on
+<model> only" in the evaluation report.
+```
+
+#### Step 6 Enhancement: Model Coverage in Report
+
+Add to the locked report format after `Output verdict`:
+
+```markdown
+  MODEL COVERAGE
+    Tested on:       <model list or "single model: X">
+    Divergent results: <list or "N/A">
+```
+
+#### MUST DO Addition
+
+```markdown
+- Always validate name constraints (64 chars, lowercase/hyphens, no reserved words) — Why: platform rejects non-conforming names
+- Always check description is third-person — Why: first/second person causes discovery problems per platform docs
+- Always check reference depth ≤1 from SKILL.md — Why: Claude partially reads deeply nested files
+```
+
+---
+
+### FILE 4 EDITS: `.claude/skills/skill-evaluator/references/description-optimization.md`
+
+#### Add Third-Person Requirement
+
+Insert after "Concise: hard limit: 1024 characters":
+
+```markdown
+**Third person ONLY:** The description is injected into the system prompt.
+Inconsistent point-of-view causes discovery problems.
+- Good: "Processes Excel files and generates reports"
+- Bad: "I can help you process Excel files"
+- Bad: "You can use this to process Excel files"
+```
+
+---
+
+### FILE 5: No changes needed
+
+`eval-driven-iteration.md` — no gaps found against the URL.
+
+---
+
+### Edge Case Coverage
+
+| Edge Case | Fix |
+|-----------|-----|
+| **A: MCP tools unavailable in eval context** | skill-evaluator Step 3.3: add note "If skill requires MCP tools not available in eval context, document as 'untestable dependency' in report — do not report false FAIL" |
+| **B: Single-model testing deployed cross-model** | skill-evaluator Step 3.3b model matrix + report MODEL COVERAGE section |
+| **C: Reference depth >1 (chained refs)** | skill-evaluator Step 0.3 reference depth check + writing-skills MUST NOT DO rule |
+| **D: First-person description passes validation** | skill-evaluator Step 0.2 third-person check + description-optimization.md warning |
+
+---
+
+### v8 Gap Closure Verification
+
+| # | Gap | Closed By |
+|---|---|---|
+| 1 | Multi-model testing | skill-evaluator Step 3.3b + report MODEL COVERAGE + writing-skills Step 5.x |
+| 2 | Name validation constraints | skill-evaluator Step 0.2 expanded table |
+| 3 | Third-person descriptions | description-optimization.md + skill-evaluator Step 0.2 |
+| 4 | One-level-deep references | writing-skills Step 2.2d + skill-evaluator Step 0.3 + MUST NOT DO |
+| 5 | TOC for long references | writing-skills Step 2.2d + skill-evaluator Step 0.3 |
+| 6 | Time-sensitive info | writing-skills Step 2.2c rule 2 + MUST NOT DO |
+| 7 | Consistent terminology | writing-skills Step 2.2c rule 1 |
+| 8 | Naming conventions (gerund) | writing-skills Step 2.1b + MUST DO |
+| 9 | Voodoo constants | instruction-writing-patterns Pattern 7 addition |
+| 10 | Solve don't punt | instruction-writing-patterns Pattern 7 addition |
+| 11 | MCP tool references | writing-skills Step 2.2c rule 3 |
+| 12 | Package deps & platform | instruction-writing-patterns Pattern 7 addition |
+| 13 | Checklist alignment | Covered by additions to MUST DO/MUST NOT DO + Step 0.2/0.3 |
+| Edge A | MCP tools in eval | skill-evaluator Step 3.3 untestable dependency note |
+| Edge B | Single-model deployment | skill-evaluator Step 3.3b + MODEL COVERAGE |
+| Edge C | Chained references | skill-evaluator Step 0.3 depth check |
+| Edge D | First-person description | skill-evaluator Step 0.2 + description-optimization.md |

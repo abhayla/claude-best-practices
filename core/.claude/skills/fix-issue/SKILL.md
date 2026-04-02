@@ -8,17 +8,20 @@ description: >
   /implement instead. For iterative test fixing, use /fix-loop directly.
 type: workflow
 triggers:
-  - fix issue
+  - fix issue #
   - fix github issue
+  - resolve issue #
   - resolve issue
-  - close issue
+  - close issue #
   - fix bug from issue
-  - address issue
+  - work on issue
+  - look at issue
+  - address issue #
   - fix #
   - gh issue fix
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<issue-number or issue-url>"
-version: "2.1.0"
+version: "2.3.0"
 ---
 
 # Fix GitHub Issue

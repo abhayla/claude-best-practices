@@ -15,7 +15,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.7.0"
+version: "2.8.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -73,6 +73,17 @@ One sentence explaining what this skill does in practical terms.
 
 The `$ARGUMENTS` variable is replaced with the user's input at runtime. Always include it so the skill knows what to act on.
 
+### 2.1b Naming Conventions
+
+- **Gerund form preferred:** `processing-pdfs`, `analyzing-spreadsheets`,
+  `managing-databases`. Also acceptable: noun phrases (`pdf-processing`)
+  or action-oriented (`process-pdfs`)
+- **Hard constraints:** max 64 characters, lowercase letters/numbers/hyphens
+  only, no XML tags, no reserved words (`anthropic`, `claude`)
+- **Avoid:** vague names (`helper`, `utils`, `tools`), overly generic
+  (`documents`, `data`, `files`), inconsistent patterns within a skill
+  collection
+
 ### 2.2b Context Budget
 
 Every token competes for the agent's attention. Targets:
@@ -86,6 +97,40 @@ Every token competes for the agent's attention. Targets:
 **Test:** "Would the agent get this wrong without this instruction?" If no, cut it. If unsure, test with `/skill-evaluator output`.
 
 **Conditional disclosure:** "Read `references/X.md` if the API returns a non-200 status" — not "see references/ for details."
+
+### 2.2c Content Quality
+
+Three rules that improve Claude's ability to follow skill instructions:
+
+1. **Consistent terminology:** Pick one term per concept and use it
+   throughout. Don't mix "API endpoint" / "URL" / "API route" / "path"
+   — Claude loses precision when the same thing has multiple names.
+
+2. **No time-sensitive information:** Don't include date-dependent content
+   ("If before August 2025, use the old API"). Instead, use a collapsible
+   "Old patterns" section for deprecated content:
+   ```markdown
+   <details>
+   <summary>Legacy v1 API (deprecated 2025-08)</summary>
+   The v1 endpoint `api.example.com/v1/messages` is no longer supported.
+   </details>
+   ```
+
+3. **MCP tool references:** Always use fully qualified names
+   `ServerName:tool_name` (e.g., `BigQuery:bigquery_schema`,
+   `GitHub:create_issue`). Without the server prefix, Claude may fail
+   to locate the tool when multiple MCP servers are active.
+
+### 2.2d Reference Structure
+
+- **One level deep:** All reference files MUST link directly from
+  SKILL.md. Never chain references (SKILL.md → advanced.md → details.md).
+  Claude may partially read deeply nested files, resulting in incomplete
+  information.
+
+- **TOC for long references:** Files over 100 lines MUST include a
+  table of contents at the top so Claude can see the full scope even
+  when previewing with partial reads.
 
 ### 2.3 Failure Mode Analysis
 
@@ -404,6 +449,14 @@ skill-name/
     config.yaml
 ```
 
+### 5.5 Model Compatibility
+
+If the skill will be used across model tiers, test with the smallest
+target model. What works for Opus may need more guidance for Haiku:
+- **Haiku:** Does the skill provide enough guidance for the task?
+- **Sonnet:** Is the skill clear and efficient?
+- **Opus:** Does the skill avoid over-explaining?
+
 ---
 
 ## STEP 6: Evaluate and Iterate with /skill-evaluator
@@ -590,6 +643,8 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always invoke `/skill-evaluator` via Agent tool for evaluation — do not evaluate inline
 - Always apply auto-fix routing for FIX/FAIL verdicts — do not ask user what to fix
 - Always present final skill + eval report for user approval before hub promotion
+- Always use gerund or action-oriented naming for skill names — Why: consistent naming improves discoverability and professionalism across the skill library
+- Always keep reference files one level deep from SKILL.md — Why: Claude partially reads deeply nested files, resulting in incomplete information
 
 ## MUST NOT DO
 
@@ -603,3 +658,6 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - MUST NOT skip the MUST DO / MUST NOT DO sections — they are mandatory guardrails
 - MUST NOT ask user to manually invoke `/skill-evaluator` — invoke it autonomously via Agent tool
 - MUST NOT proceed to Step 7 without user approval of the final skill + eval report
+- MUST NOT write descriptions in first or second person ("I analyze...", "You can use...") — always third person ("Analyzes...") because descriptions are injected into the system prompt and inconsistent POV causes discovery problems
+- MUST NOT chain reference files (SKILL.md → ref1.md → ref2.md) — keep one level deep from SKILL.md
+- MUST NOT include time-sensitive content ("before August 2025") — use collapsible "Old patterns" section instead
