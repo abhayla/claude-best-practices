@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-02 18:06 UTC (auto-generated)
+> Last updated: 2026-04-02 18:49 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -108,7 +108,7 @@
 | firebase-data-connect | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-test | skill | 1.1.1 | hub:abhayla/claude-best-practices | — |
-| fix-issue | skill | 2.1.0 | hub:abhayla/claude-best-practices | fix-loop, post-fix-pipeline |
+| fix-issue | skill | 2.4.0 | hub:abhayla/claude-best-practices | fix-loop, post-fix-pipeline |
 | fix-loop | skill | 1.3.0 | hub:abhayla/claude-best-practices | test-failure-analyzer-agent |
 | flutter | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-dart-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -176,7 +176,7 @@
 | review-gate | skill | 2.0.0 | hub:abhayla/claude-best-practices | code-quality-gate, architecture-fitness, security-audit, adversarial-review, change-risk-scoring, pr-standards |
 | rule-curation | rule | 1.0.0 | hub:abhayla/claude-best-practices | pattern-portability, pattern-structure, pattern-self-containment |
 | rule-writing-meta | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| save-session | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
+| save-session | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | scan-discovery-report | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | scan-repo | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | scan-url | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -192,12 +192,12 @@
 | skill-author-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | writing-skills, pattern-structure |
 | skill-authoring-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-authoring-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| skill-evaluator | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| skill-evaluator | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | skill-factory | skill | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-master | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | solidity-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ssot-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | configuration-ssot |
-| start-session | skill | 1.0.0 | hub:abhayla/claude-best-practices | save-session |
+| start-session | skill | 1.1.0 | hub:abhayla/claude-best-practices | save-session |
 | status | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | subagent-driven-dev | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
@@ -237,7 +237,7 @@
 | workflow | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | workflow-master-template | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | writing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| writing-skills | skill | 2.7.0 | hub:abhayla/claude-best-practices | skill-evaluator |
+| writing-skills | skill | 2.8.0 | hub:abhayla/claude-best-practices | skill-evaluator |
 | xml-to-compose | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 
 ## Quick Start
