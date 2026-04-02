@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-02 18:49 UTC (auto-generated)
+> Last updated: 2026-04-02 20:33 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -99,14 +99,14 @@
 | fastapi-backend | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-database | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-database-admin-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-db-migrate | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-deploy | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-run-backend-tests | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-db-migrate | skill | 1.1.0 | hub:abhayla/claude-best-practices | db-migrate-verify |
+| fastapi-deploy | skill | 1.1.0 | hub:abhayla/claude-best-practices | fastapi-db-migrate, db-migrate-verify |
+| fastapi-run-backend-tests | skill | 2.2.0 | hub:abhayla/claude-best-practices | fix-loop |
 | feature-flag | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| firebase-ai | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| firebase-ai | skill | 1.0.2 | hub:abhayla/claude-best-practices | — |
 | firebase-data-connect | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| firebase-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| firebase-dev | skill | 1.0.2 | hub:abhayla/claude-best-practices | — |
 | firebase-test | skill | 1.1.1 | hub:abhayla/claude-best-practices | — |
 | fix-issue | skill | 2.4.0 | hub:abhayla/claude-best-practices | fix-loop, post-fix-pipeline |
 | fix-loop | skill | 1.3.0 | hub:abhayla/claude-best-practices | test-failure-analyzer-agent |
@@ -202,7 +202,7 @@
 | strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | subagent-driven-dev | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | supply-chain-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| synthesize-project | skill | 4.0.0 | hub:abhayla/claude-best-practices | — |
+| synthesize-project | skill | 4.0.1 | hub:abhayla/claude-best-practices | — |
 | systematic-debugging | skill | 1.1.0 | hub:abhayla/claude-best-practices | test-knowledge |
 | tailwind-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | tdd | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
