@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-03-30",
-    "total_patterns": 224
+    "total_patterns": 225
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -2952,6 +2952,26 @@
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d routes pattern creation to appropriate authoring workflows with quality validation",
     "tier": "nice-to-have"
   },
+  "skill-evaluator": {
+    "hash": "69266767f3e528a148ce8f8c9e59eee054827004bcda0fe97e533186ed45c448",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-02",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Use when testing a new or updated skill before promotion, auditing existing skills for trigger conflicts, or verifying a skill adds value over the agent's baseline",
+    "tags": [
+      "evaluation",
+      "skills",
+      "testing",
+      "quality"
+    ],
+    "changelog": "v1.0.0: Initial release — 4 evaluation modes (trigger, output, full, conflicts), 7-step workflow, standalone and delegated invocation",
+    "tier": "nice-to-have"
+  },
   "skill-factory": {
     "hash": "7aa98beb094b1b737bf623acf2612abfd63df345864a537e0e00d54f9a8fa82c",
     "type": "skill",
@@ -3658,18 +3678,25 @@
     "tier": "must-have"
   },
   "writing-skills": {
-    "hash": "f6e238a17e13a82ff8ba19f6ce92b780a2b4644465b57a274bfb9fb2b829b108",
+    "hash": "05d0095507db647402709ace6906cd962f9dde2a9c1175581a447435da913a53",
     "type": "skill",
     "category": "core",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-23",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "skill-evaluator"
+    ],
     "visibility": "public",
-    "description": "Skill authoring guide with architect role framing, failure prevention maps, locked output formats, adversarial stress testing, XML tag conventions, and multi-skill decomposition for end-to-end workflows",
-    "tags": [],
-    "changelog": "v2.5.0: Add multi-skill decomposition reference (Step 2.4) for turning prompts into connected skill systems with handoff contracts and checkpoint patterns",
+    "description": "Skill authoring guide with architect role framing, skill necessity checks, failure prevention maps, locked output formats, instruction writing patterns, skill-evaluator integration, domain pattern review, and multi-skill decomposition for end-to-end workflows",
+    "tags": [
+      "authoring",
+      "skills",
+      "evaluation",
+      "quality"
+    ],
+    "changelog": "v2.7.0: Add skill necessity check (Step 1.1), context budget guidance (Step 2.2b), instruction writing patterns reference, skill-evaluator integration (Step 6), domain pattern review (Step 6.6), expanded MUST DO/MUST NOT DO sections",
     "tier": "nice-to-have"
   },
   "xml-to-compose": {
