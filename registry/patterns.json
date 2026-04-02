@@ -2281,18 +2281,25 @@
     "tier": "nice-to-have"
   },
   "post-fix-pipeline": {
-    "hash": "af7b0624c0a8dbca770360a309bed7ea76e98939c57cfaaec9766b1f6b6379db",
+    "hash": "05d5c397bc17f9f55747841743c76f23b0abfe62b99d0e30dcf6340ce26e4f91",
     "type": "skill",
     "category": "core",
     "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-26",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "learn-n-improve",
+      "auto-verify"
+    ],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "description": "Finalize verified changes: read auto-verify gate, update docs, commit, capture learnings. Does NOT re-run tests.",
+    "tags": [
+      "pipeline",
+      "commit",
+      "verification"
+    ],
+    "changelog": "v3.0.0: Add triggers, preamble constraints, CRITICAL RULES, dependencies, registry sync | v2.0.0: Genericized and restructured",
     "tier": "must-have"
   },
   "pr-standards": {

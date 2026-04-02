@@ -240,3 +240,20 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Added `triggers:` list (8 entries) for full-cycle development intent
 - Differentiated description from /fix-issue, /debugging-loop, /implement
 - Synced registry: description, hash, version (1.0.0 → 1.1.0), 6 dependencies, changelog
+
+---
+
+## Skill #9: post-fix-pipeline (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Empty registry description, stale hash, empty deps/tags, changelog gap
+- Missing `triggers:`, missing preamble, missing CRITICAL RULES section
+
+**What evaluator missed:** None.
+
+**Fixes applied:**
+- Added 6 triggers, preamble constraint, 6 CRITICAL RULES
+- Differentiated from /auto-verify and /test-pipeline in description
+- Synced registry: description, hash, dependencies (2), tags, changelog
