@@ -65,3 +65,39 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Removed nonexistent `/android-emulator-testing` reference
 - Synced registry: description, hash, version, dependency, changelog
 - Bumped version 1.0.0 → 1.1.0
+
+---
+
+## Skill #3: auto-verify (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator caught:**
+- High cross-skill conflict cluster with regression-test, test-pipeline, testing-pipeline-workflow on generic queries (6 of 10 should-trigger queries had MEDIUM or LOW activation)
+- Hard dependency on `/regression-test` and `tester-agent` with no fallback (MAJOR portability risk)
+- Missing `## CRITICAL RULES` section — pattern-structure.md violation
+- `Edit` in allowed-tools unnecessary (skill only writes new JSON files)
+
+**What evaluator missed (found manually):**
+1. **Missing `triggers:` field entirely** — Not just insufficient triggers, but no triggers field at all. Evaluator's trigger eval (Step 2) generates queries but doesn't first check if the frontmatter field exists. Found during Step 0 registry sync.
+2. **No handling for zero affected tests** — If `/regression-test` returns no mapped tests, skill had no explicit path. Evaluator's stress test caught "no arguments, no git changes" (PASS) but didn't distinguish "changes exist but no tests map to them."
+3. **Stale test-results/ cleanup in standalone mode** — Pipeline mode cleans via test-pipeline-agent, but standalone invocation could read stale results from a previous run. Evaluator didn't check standalone vs pipeline mode differences.
+4. **Registry description empty** — Same class of issue as Skills #1-2. Evaluator still doesn't check registry sync (pending batch apply).
+5. **Registry changelog stale** — Only listed v2.0.0 but version is 3.0.0. Registry version/changelog consistency is a known gap.
+
+**Proposed evaluator improvements (pending batch apply):**
+- [ ] Add frontmatter field existence check: verify `triggers:` field is present before running trigger evaluation (not just testing trigger quality)
+- [ ] Add standalone vs pipeline mode analysis: check if skill behaves differently in each mode and validate both paths
+- [ ] Add zero-result path analysis: for skills that delegate to other skills, check what happens when the delegate returns empty/zero results
+
+**Fixes applied to auto-verify:**
+- Added `triggers:` list (8 entries) designed to minimize cross-skill conflicts
+- Added `## CRITICAL RULES` section (7 rules) at end of file
+- Added fallback for missing `/regression-test` (file-based test mapping)
+- Added fallback for missing `tester-agent` (direct test execution)
+- Added zero-test handling (skip Steps 2-3, write PASSED with warning)
+- Added standalone cleanup for stale `test-results/auto-verify.json`
+- Removed `Edit` from allowed-tools
+- Updated description to clarify boundary with `/fix-loop` and `/test-pipeline`
+- Synced registry: description, hash, version, dependencies, changelog
+- Bumped version 3.0.0 → 3.1.0

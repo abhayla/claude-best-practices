@@ -1,12 +1,22 @@
 ---
 name: auto-verify
 description: >
-  Run a verification pipeline that identifies changed files, maps to targeted tests,
-  executes tests with smart priority, analyzes failures, and applies fixes with approval.
-  Use after making code changes to verify correctness before committing.
-allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
+  Run a post-change verification pipeline that maps changed files to targeted tests,
+  executes via tester-agent with UI screenshot verdicts, enforces quality gates, and
+  produces structured results for pipeline consumption. Does NOT fix — use /fix-loop
+  for fixes, /test-pipeline for the full fix-verify-commit chain.
+triggers:
+  - auto-verify
+  - verify changes
+  - verify my changes
+  - post-change verification
+  - verification pipeline
+  - run verification
+  - verify before commit
+  - verify correctness
+allowed-tools: "Bash Read Grep Glob Write Skill Agent"
 argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "3.0.0"
+version: "3.1.0"
 type: workflow
 ---
 
@@ -79,6 +89,12 @@ execution where tests run once for mapping and again for verification.
 Skill("/regression-test", args="$FILES_ARG --framework auto")
 ```
 
+**Fallback if `/regression-test` is not installed:** Use `git diff --name-only` to
+identify changed files, then map to tests by naming convention (`*_test.py`,
+`test_*.py`, `*.test.ts`, `*.spec.ts`) and directory adjacency. Set risk to
+MEDIUM (no import graph tracing available). Log: "WARN: /regression-test not
+available — using fallback file-based test mapping."
+
 After `/regression-test` completes, read `test-results/regression-test.json`:
 
 1. Extract the affected test list and overall risk level
@@ -88,11 +104,20 @@ After `/regression-test` completes, read `test-results/regression-test.json`:
    (some tests failed during mapping) → note failures but proceed to STEP 2
    (tester-agent will re-run them with full verdict rules)
 4. Use the mapped test files and risk classification for STEP 2
+5. If zero affected tests found → skip Steps 2-3, write auto-verify.json with
+   `result: "PASSED"`, `summary.total: 0`, and `warnings: ["No tests mapped to
+   changed files"]`. Proceed to Step 4 (quality gates still run).
 
 Coverage gaps flagged by `/regression-test` (source files with no mapped tests)
 are reported in the final auto-verify output as warnings.
 
 ## STEP 2: Execute Tests (via tester-agent)
+
+**Fallback if `tester-agent` is not installed:** Run tests directly using the
+project's test runner (detect from CLAUDE.md, pyproject.toml, package.json, or
+build.gradle). All tests use exit-code verdicts (no screenshot verification).
+Log: "WARN: tester-agent not available — running tests directly without UI
+screenshot verification."
 
 Delegate test execution to `tester-agent`, which provides:
 - **UI test detection** — auto-classifies tests by scanning imports for UI frameworks
@@ -430,3 +455,19 @@ array includes `verdict_source: "screenshot"` for each UI test failure.
 ```
 
 Create `test-results/` directory if it doesn't exist. This JSON is consumed by stage gates — see `testing.md` for the full schema.
+
+**Standalone cleanup:** When running outside the pipeline (no Pipeline ID),
+delete stale `test-results/auto-verify.json` before starting to prevent the
+stage gate aggregator from reading results from a previous run.
+
+---
+
+## CRITICAL RULES
+
+- MUST NOT apply fixes — fixing belongs in `/fix-loop`. This skill is verification only.
+- MUST produce `test-results/auto-verify.json` on every run, even when BLOCKED or zero tests found.
+- MUST use `result` as the canonical gate field name — never `status`, `verdict`, or `outcome`.
+- MUST distinguish UI test verdicts (screenshot-authoritative) from non-UI (exit-code-authoritative).
+- MUST NOT proceed past Step 0 if upstream fix-loop reported FAILED or FLAKY.
+- MUST report pre-existing failures separately from regression failures in the output.
+- MUST degrade gracefully if `/regression-test` or `tester-agent` are missing — use fallbacks, not hard failures.

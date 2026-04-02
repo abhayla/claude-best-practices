@@ -482,18 +482,18 @@
     "tier": "must-have"
   },
   "auto-verify": {
-    "hash": "6b45135fff3e5e8141f8c38f3bb6b563b92e144630cd196ded224a2b650efc4f",
+    "hash": "b0fcf979cc26caa72864e25bbf007f1b7d1e4f99512081ec95adcded08845c5c",
     "type": "skill",
     "category": "core",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-26",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": ["regression-test", "tester-agent"],
     "visibility": "public",
-    "description": "",
+    "description": "Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces structured results for pipeline consumption.",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured",
     "tier": "must-have"
   },
   "batch": {
