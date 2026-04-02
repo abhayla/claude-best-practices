@@ -38,6 +38,14 @@ Before evaluating the skill in isolation, check how it fits in the system:
 - Verify: no orphaned code fences (opening without closing or vice versa)
 - Verify: every `**Read:** references/foo.md` directive in SKILL.md has a matching file
 - Verify: no content leaks between reference files and SKILL.md (broken code blocks split across extraction boundary)
+- Verify: reference files are one level deep from SKILL.md (no chained references)
+- Verify: reference files >100 lines have a table of contents at the top
+
+**Frontmatter platform compliance:**
+- `name`: max 64 chars, lowercase/numbers/hyphens only, no reserved words (`anthropic`, `claude`)
+- `description`: must be third-person ("Processes..." not "I process..."), max 1024 chars
+- Check for time-sensitive content ("before August 2025") — flag for removal
+- Check for consistent terminology within the skill (no mixed terms for same concept)
 
 ### Step 1: Run Evaluator
 

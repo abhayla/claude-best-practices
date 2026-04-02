@@ -16,7 +16,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<trigger|output|full|conflicts> <skill-path> [--baseline]"
 type: workflow
-version: "2.0.0"
+version: "2.1.0"
 ---
 
 # Skill Evaluator — Evaluate Skill Quality
@@ -48,14 +48,16 @@ Compare `registry/patterns.json` entry against the skill's SKILL.md:
 
 ### 0.2 Frontmatter Completeness
 
-Verify these fields exist and are non-empty in YAML frontmatter:
+Verify these fields against platform constraints:
 
-- `name:` — MUST match directory name
-- `description:` — MUST start with a verb, be non-empty
-- `type:` — MUST be `workflow` or `reference`
-- `triggers:` — MUST exist with ≥3 entries (BLOCKING if missing — skill is invisible to natural language)
-- `allowed-tools:` — Scan body for `Agent()`, `Skill()`, `Write`, `Edit`, `Bash` usage. Flag tools used in body but not in allowed-tools (under-declared) or in allowed-tools but not used in body (over-declared)
-- `version:` — MUST be SemVer format
+| Field | Validation Rules |
+|-------|-----------------|
+| `name` | Required. Max 64 chars. Lowercase letters/numbers/hyphens only. No XML tags. No reserved words (`anthropic`, `claude`). Prefer gerund form (`processing-pdfs`). MUST match directory name |
+| `description` | Required. Non-empty. Max 1024 chars. No XML tags. Must be third-person ("Processes..." not "I process..." or "You can..."). Should start with verb. Must describe what AND when to use |
+| `type` | Required. Must be `workflow` or `reference` |
+| `triggers` | Required. ≥3 entries (BLOCKING if missing — skill is invisible to natural language) |
+| `allowed-tools` | Scan body for `Agent()`, `Skill()`, `Write`, `Edit`, `Bash` usage. Flag under-declared or over-declared tools |
+| `version` | Required. SemVer format |
 
 ### 0.3 Structural Integrity
 
@@ -68,6 +70,8 @@ Verify these fields exist and are non-empty in YAML frontmatter:
 | Agent references | Find all `*-agent` mentions, verify each exists in `.claude/agents/` | Dead reference |
 | Placeholder markers | Scan for `<!-- TODO -->`, `<!-- FIXME -->`, `<!-- PLACEHOLDER -->` | Any found |
 | Preamble constraints | For workflow skills, verify critical constraints appear in BOTH preamble (top) AND CRITICAL RULES section (bottom) | Missing from either location |
+| Reference depth | Scan all `Read:` / `See:` / link references in SKILL.md and referenced files | Any file that references another file (depth >1 from SKILL.md) |
+| Reference TOC | Check reference files >100 lines for a table of contents section at top | Missing TOC in long reference file |
 
 If ANY check in 0.1-0.3 fails, report it in the evaluation output as a
 **PRE-FLIGHT FAILURE** and include it in the fix recommendations. Do not skip
@@ -167,6 +171,17 @@ assertion writing, grading methodology, and iteration patterns.
 - With-skill run for each test case
 - If `--baseline`: also run against old version
 - Capture outputs + timing (`{total_tokens, duration_ms}`)
+
+### 3.3b Model Matrix (optional but recommended)
+
+If the skill targets multiple model tiers, run scenarios across available
+models (e.g., Haiku, Sonnet, Opus). Flag divergent results — a skill
+that works on Opus but fails on Haiku needs more explicit guidance.
+
+When model matrix is not feasible (time/cost), note "Tested on
+\<model\> only" in the evaluation report. If the skill requires MCP tools
+not available in the eval context, document as "untestable dependency"
+in the report — do not report false FAIL.
 
 ### 3.4 Stress Test
 
@@ -277,6 +292,10 @@ OUTPUT EVALUATION
   Baseline delta:    +N% pass rate, +N tokens, +Ns
   Output verdict:    PASS | FIX | FAIL
 
+MODEL COVERAGE
+  Tested on:         <model list or "single model: X">
+  Divergent results: <list or "N/A">
+
 OVERALL VERDICT: PASS | FIX | FAIL
 Blocking issues: <list or "none">
 Recommended fixes: <prioritized, mapped to failure types>
@@ -305,6 +324,9 @@ Recommended fixes: <prioritized, mapped to failure types>
 - Always test with 5 fresh queries after description optimization — Why: optimized descriptions can overfit to the eval set
 - Always review assertions during grading — Why: broken assertions waste iterations
 - When delegated from writing-skills: skip human review, return verdict directly — Why: writing-skills manages the approval gate
+- Always validate name constraints (64 chars, lowercase/hyphens, no reserved words) in pre-flight — Why: platform rejects non-conforming names
+- Always check description is third-person in pre-flight — Why: first/second person causes discovery problems per platform docs
+- Always check reference depth ≤1 from SKILL.md in pre-flight — Why: Claude partially reads deeply nested files
 
 ## MUST NOT DO
 

@@ -143,6 +143,31 @@ The same relative-path convention works in `references/*.md` files — script pa
 
 **Self-contained scripts with inline dependencies:** For reusable logic, bundle scripts that declare their own deps inline — no separate manifest needed. Python: PEP 723 with `uv run`. Deno: `npm:` imports. Bun: version-pinned imports. Ruby: `bundler/inline`.
 
+**Justified constants (no "voodoo constants"):** Every magic number or
+configuration parameter MUST have a comment explaining WHY that value.
+If you don't know the right value, how will Claude determine it?
+
+```python
+# Good — self-documenting
+# HTTP requests typically complete within 30 seconds
+# Longer timeout accounts for slow connections
+REQUEST_TIMEOUT = 30
+
+# Bad — magic numbers
+TIMEOUT = 47  # Why 47?
+RETRIES = 5   # Why 5?
+```
+
+**Solve, don't punt:** Scripts should handle error conditions explicitly
+rather than failing and leaving Claude to figure it out. Provide
+fallbacks, create defaults for missing files, and return clear error
+messages — don't just let exceptions propagate.
+
+**Platform awareness:** Skills on claude.ai can install packages from
+npm/PyPI and pull from GitHub. Skills via the Claude API have no network
+access and no runtime package installation. List required packages in
+SKILL.md and note any platform constraints.
+
 Short templates inline in SKILL.md; longer templates in `assets/` or `references/` with conditional loading.
 
 ## 8. Checklists for Progress Tracking
