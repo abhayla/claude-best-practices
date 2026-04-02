@@ -1606,25 +1606,25 @@
     "tier": "must-have"
   },
   "fix-issue": {
-    "hash": "97db35dde48f832688d81c9717c9e6c2f48d488d96fcc988a6c3fb599f96bfd8",
+    "hash": "857744758dae1c0d748a11d84a2ba1a525fa2cabc332fe5bbb40d60c392c724a",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-03",
     "dependencies": [
       "fix-loop",
       "post-fix-pipeline"
     ],
     "visibility": "public",
-    "description": "Fetch a GitHub Issue via gh CLI, analyze root cause, implement minimal fix, verify with tests, and run post-fix-pipeline. Entry point for 'fix issue #N' requests.",
+    "description": "Analyze and implement a fix for a specific GitHub Issue. Fetches issue details via gh, explores codebase for root cause, plans minimal fix, implements, verifies with tests, and runs post-fix-pipeline.",
     "tags": [
       "github",
       "bug-fix",
       "workflow"
     ],
-    "changelog": "v2.1.0: Add triggers, preamble constraints, MUST/MUST NOT rules, dependencies, registry sync | v2.0.0: Genericized and restructured",
+    "changelog": "v2.4.0: Tighten triggers (require # for broad phrases), add issue extraction + error handling, lock summary format, always run post-fix-pipeline | v2.1.0: Add triggers, preamble constraints, MUST/MUST NOT rules, dependencies, registry sync | v2.0.0: Genericized and restructured",
     "tier": "must-have"
   },
   "fix-loop": {

@@ -11,17 +11,19 @@ triggers:
   - fix issue #
   - fix github issue
   - resolve issue #
-  - resolve issue
   - close issue #
   - fix bug from issue
-  - work on issue
-  - look at issue
+  - work on issue #
+  - look at issue #
   - address issue #
   - fix #
   - gh issue fix
+  - tackle issue #
+  - handle issue #
+  - investigate issue #
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<issue-number or issue-url>"
-version: "2.3.0"
+version: "2.4.0"
 ---
 
 # Fix GitHub Issue
@@ -34,15 +36,24 @@ Analyze and implement a fix for a specific GitHub Issue.
 
 ---
 
-## STEP 1: Fetch Issue Details
+## STEP 1: Extract Issue Number and Fetch Details
+
+**Extract issue number** from `$ARGUMENTS`:
+- `#42` or `42` → use `42`
+- `https://github.com/owner/repo/issues/42` → extract `42`
+- If no number found, ask the user
 
 ```bash
-gh issue view $ISSUE_NUMBER --json title,body,labels,assignees,comments
+gh issue view $ISSUE_NUMBER --json title,body,labels,assignees,comments,state
 ```
+
+**Error handling:**
+- If `gh` returns error ("Could not resolve to an issue") → report to user and STOP
+- If issue `state` is `CLOSED` → confirm with user before proceeding ("Issue #N is already closed. Continue anyway?")
 
 Parse the issue to understand:
 - What's broken or requested
-- Steps to reproduce (if bug)
+- Steps to reproduce (if bug) — if missing for a bug, attempt to derive from description
 - Expected vs actual behavior
 - Related files or components mentioned
 
@@ -76,19 +87,25 @@ Run tests to verify the fix:
 
 ## STEP 6: Post-Fix Pipeline
 
-If changes were significant, run the post-fix pipeline:
+Run the post-fix pipeline to finalize verified changes:
 
 ```
 Skill("post-fix-pipeline", args="fixes_applied: [summary of changes]")
 ```
 
+If `post-fix-pipeline` is not available in this project, manually: update docs if behavior changed, commit with conventional message referencing the issue (`fix: resolve #N — description`), and capture learnings.
+
 ## STEP 7: Summary
 
-Provide a summary of:
-- Root cause (for bugs) or approach (for features)
-- Files changed
-- Tests added/modified
-- Any follow-up items
+```markdown
+## Fix Summary: Issue #N — <title>
+
+**Root cause:** <1-2 sentences>
+**Fix:** <what was changed and why>
+**Files changed:** <list>
+**Tests:** <added/modified/verified>
+**Follow-up:** <items or "none">
+```
 
 ---
 
