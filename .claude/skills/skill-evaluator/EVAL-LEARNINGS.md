@@ -219,3 +219,24 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Added empty-args default behavior rule
 - Differentiated from /save-session and /handover in description
 - Synced registry: description, hash, tags, changelog
+
+---
+
+## Skill #8: development-loop (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Hash stale
+- Missing `triggers:` field
+- Empty dependencies (6 skills/agents referenced but none declared)
+
+**What evaluator missed:**
+- No new gaps — 3rd consecutive skill with zero new evaluator improvements.
+
+**Proposed evaluator improvements:** None — **stopping criteria met** (3 consecutive skills without new learnings).
+
+**Fixes applied to development-loop:**
+- Added `triggers:` list (8 entries) for full-cycle development intent
+- Differentiated description from /fix-issue, /debugging-loop, /implement
+- Synced registry: description, hash, version (1.0.0 → 1.1.0), 6 dependencies, changelog

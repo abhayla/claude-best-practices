@@ -1,13 +1,25 @@
 ---
 name: development-loop
 description: >
-  Orchestrate the full development cycle from ideation through verified commit.
-  Use when building a feature end-to-end, when the task requires coordinated
-  planning and implementation with verification gates.
+  Orchestrate the full development cycle from ideation through verified commit
+  by chaining brainstorm → writing-plans → executing-plans → auto-verify →
+  post-fix-pipeline via development-loop-master-agent. Use when building a
+  feature end-to-end with coordinated planning and verification gates. For
+  bug fixes, use /fix-issue or /debugging-loop instead. For just implementation
+  without ideation, use /implement.
 type: workflow
+triggers:
+  - build feature end to end
+  - full development cycle
+  - develop feature from scratch
+  - plan and implement
+  - ideate plan build verify
+  - development workflow
+  - full build cycle
+  - feature end to end
 allowed-tools: "Agent Read Grep Glob"
 argument-hint: "<feature description, issue URL, or spec file path>"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Development Loop — Full Cycle Orchestration

@@ -3833,22 +3833,29 @@
     "tier": "nice-to-have"
   },
   "development-loop": {
-    "hash": "e562401be135890b2472e3f886a62ce163b4745672214cc66dc89406b9210ae2",
+    "hash": "37c954a7f8f86fbed9ec037ca1b06f5600ff270dd397cf0f56b0ff56f3a7f057",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-03-30",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "development-loop-master-agent",
+      "brainstorm",
+      "writing-plans",
+      "executing-plans",
+      "auto-verify",
+      "post-fix-pipeline"
+    ],
     "visibility": "public",
-    "description": "Slash-command wrapper for development-loop-master-agent. Full development cycle orchestration from ideation through verified commit.",
+    "description": "Full development cycle orchestrator: chains brainstorm, writing-plans, executing-plans, auto-verify, post-fix-pipeline via development-loop-master-agent.",
     "tags": [
       "orchestration",
       "workflow",
       "development"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 development loop skill wrapper",
+    "changelog": "v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
   "testing-pipeline-workflow": {
