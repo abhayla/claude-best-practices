@@ -3299,13 +3299,13 @@
     "tier": "nice-to-have"
   },
   "synthesize-project": {
-    "hash": "d4a504257a9de20ef7be1d6adbeeb12c443f07c595b12d68dcb396f278b56c11",
+    "hash": "cbf65da2b12600df0b7e16ae58d6bd09b256ddb640403357463aa6f9c9a15177",
     "type": "skill",
     "category": "core",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-03",
     "dependencies": [],
     "visibility": "public",
     "description": "Provision hub patterns and generate project-specific .claude/ patterns from a codebase.",
@@ -3314,7 +3314,7 @@
       "provisioning",
       "unified-flow"
     ],
-    "changelog": "v2.3.0: Add detailed findings presentation after Steps 3 and 4 with user checkpoints",
+    "changelog": "v4.0.1: Add gh auth error handling in remote mode, sparse-project guidance in Step 3 | v4.0.0: Unified hub provision + code synthesis, multi-mode (local/remote/update/dry-run), tiered PRs, deep scan | v2.3.0: Add detailed findings presentation after Steps 3 and 4 with user checkpoints",
     "tier": "must-have"
   },
   "systematic-debugging": {

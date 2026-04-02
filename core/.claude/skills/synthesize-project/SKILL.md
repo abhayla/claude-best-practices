@@ -7,7 +7,7 @@ description: >
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis] [--only skills|rules|agents] [--tier must-have|improved|nice-to-have|all]"
-version: "4.0.0"
+version: "4.0.1"
 type: workflow
 ---
 
@@ -63,6 +63,7 @@ If `--repo owner/name` is provided, set up remote file access. Otherwise, use lo
    ```bash
    gh repo view owner/name --json name,defaultBranchRef
    ```
+   If this command fails (auth error, 404, permission denied), STOP and report the error. Do not proceed — all subsequent `gh api` calls will fail.
 
 2. Fetch the repository file tree:
    ```bash
@@ -158,6 +159,7 @@ Gather project structure and configuration to understand what this project is an
 
 Based on what you learned in Step 2, identify 10-20 candidate conventions worth encoding as patterns.
 
+If fewer than 3 conventions are identified, inform the user: "This project may not have enough code for meaningful synthesis. Consider running again after more code is written." Still generate any conventions found — even 1-2 patterns add value.
 
 **Read:** `references/identify-conventions-with-dedup-against-hub.md` for detailed step 3: identify conventions (with dedup against hub) reference material.
 
