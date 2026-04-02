@@ -292,3 +292,19 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Added 6 triggers for code review intent
 - Differentiated from /review-gate and /request-code-review in description
 - Synced registry: hash, version 1.0.0→1.1.0, 4 dependencies, changelog
+
+---
+
+## Skill #12: tdd (2026-04-02)
+
+**Verdict:** FIX (registry only)
+
+**What evaluator v2.0 Step 0 caught:**
+- Hash stale, version mismatch (registry 1.0.0 vs file 1.0.1), empty tags
+- Registry description exists but could be more specific
+
+**What evaluator missed:** None.
+
+**Fixes applied:**
+- Registry-only fix: hash, version, description, tags, changelog
+- SKILL.md unchanged — already has triggers, preamble, strong MUST DO/MUST NOT DO

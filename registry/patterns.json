@@ -3214,18 +3214,22 @@
     "tier": "nice-to-have"
   },
   "tdd": {
-    "hash": "93e0217f92886f7a70c932185e61707a758a7e19f5e10efb8a3056f4b9c4420f",
+    "hash": "00ec78a5086f3f0dc9814f9a44de45bf48f5e80fce0ee0551952158f2a983168",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
+    "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Self-contained red-green-refactor with phase gates",
-    "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "description": "Strict red-green-refactor TDD cycle with phase gates, regression checks, and refactoring discipline. Use for new logic where correctness matters.",
+    "tags": [
+      "testing",
+      "tdd",
+      "workflow"
+    ],
+    "changelog": "v1.0.1: Registry sync \u2014 hash, version, description, tags | v1.0.0: Initial release",
     "tier": "must-have"
   },
   "test-data-management": {
