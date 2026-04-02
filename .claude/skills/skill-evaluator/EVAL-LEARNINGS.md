@@ -135,3 +135,32 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Updated description to clarify boundary with /fix-issue, /tdd, /development-loop
 - Synced registry: description, hash, version, dependencies, changelog
 - Bumped version 1.0.0 → 2.2.0 (aligned with registry lineage)
+
+---
+
+## Skill #5: debugging-loop (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator caught (would catch):**
+- Missing `triggers:` field entirely — skill invisible to natural language invocation
+- HIGH cross-skill conflict with systematic-debugging — descriptions nearly identical, both mention "root cause isolation," "verification," and handling unclear bugs
+- No CRITICAL RULES section — pattern-structure.md violation
+
+**What evaluator missed (found manually):**
+1. **Near-duplicate resolution required architectural judgment** — Evaluator flags overlap but can't determine if a skill is a legitimate orchestrator wrapper vs a true duplicate. debugging-loop chains 4 skills via an agent; systematic-debugging is standalone. This distinction requires reading the agent file and understanding the orchestration architecture — beyond the evaluator's current scope.
+2. **Registry dependencies empty** — Skill delegates to debugging-loop-master-agent and chains systematic-debugging, fix-loop, auto-verify, learn-n-improve, but registry had `dependencies: []`. Same class of issue as Skills #1-4 (pending batch apply).
+3. **Registry hash stale** — File content changed but hash wasn't updated. Same class as prior skills.
+4. **Missing bidirectional signposting** — systematic-debugging's description doesn't mention debugging-loop as the escalation path. Evaluator checks the target skill but not its neighbors' descriptions for reciprocal pointers.
+
+**Proposed evaluator improvements (pending batch apply):**
+- [ ] Add near-duplicate resolution guidance: when overlap is flagged, prompt evaluator to check if skill delegates to the neighbor (orchestrator pattern) vs reimplements it (true duplicate)
+- [ ] Add bidirectional signposting check: when cross-skill conflict is detected, verify BOTH skills' descriptions mention the other with clear boundary language
+
+**Fixes applied to debugging-loop:**
+- Added `triggers:` list (8 entries) designed for full-cycle intent ("debug and fix", "resolve bug end to end") to avoid conflict with systematic-debugging's diagnosis-oriented triggers
+- Rewrote description to clearly state orchestrator role and chain composition
+- Added preamble constraint: "This is a full-cycle orchestrator, NOT a diagnosis-only tool"
+- Added 2 MUST NOT rules: no diagnosis-only use, no skipping chain steps
+- Synced registry: description, hash, version (1.0.0 → 1.1.0), dependencies (5 added), changelog
+- Bumped version 1.0.0 → 1.1.0

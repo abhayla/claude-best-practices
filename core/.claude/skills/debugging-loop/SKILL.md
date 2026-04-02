@@ -1,13 +1,24 @@
 ---
 name: debugging-loop
 description: >
-  Investigate and resolve bugs through structured diagnosis, root cause
-  isolation, fix-loop iterations, verification, and learning capture.
-  Use when a bug has unclear root cause or when ad-hoc debugging has failed.
+  Orchestrate the full bug resolution cycle by chaining four skills:
+  systematic-debugging (diagnosis) → fix-loop (iterative fix with retries) →
+  auto-verify (structured test verification) → learn-n-improve (knowledge capture).
+  Use when you want end-to-end bug resolution with retry escalation and verified
+  proof — not just diagnosis. For diagnosis only, use /systematic-debugging instead.
 type: workflow
+triggers:
+  - debug and fix
+  - full debugging pipeline
+  - resolve bug end to end
+  - diagnose fix verify
+  - own this bug
+  - take over debugging
+  - complete debug cycle
+  - debug fix and verify
 allowed-tools: "Agent Read Grep Glob"
 argument-hint: "<bug description, error output, or issue URL>"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Debugging Loop — Structured Bug Resolution
@@ -17,8 +28,7 @@ diagnosis-to-fix cycle with mandatory learning capture. Routes to the agent
 which handles root cause classification, fix-loop escalation, and knowledge
 recording.
 
-**Critical:** All debugging orchestration is owned by the agent. Do not
-implement steps inline. Learning capture is MANDATORY — never skip it.
+**Critical:** This is a full-cycle orchestrator, NOT a diagnosis-only tool. For diagnosis without fix, use `/systematic-debugging` instead. All debugging orchestration is owned by the agent — do not implement steps inline. Learning capture is MANDATORY — never skip it.
 
 **Input:** $ARGUMENTS
 
@@ -79,3 +89,5 @@ After the agent completes, relay the debugging summary to the user:
 - MUST NOT implement debugging logic in this skill — delegate to the agent
 - MUST NOT skip the learning capture step — every fix must be recorded
 - MUST NOT retry the same fix approach more than twice — escalate to debugger-agent instead
+- MUST NOT be used for diagnosis-only — use /systematic-debugging for that
+- MUST NOT skip any step in the chain (diagnose → fix → verify → learn) — the value is the full cycle

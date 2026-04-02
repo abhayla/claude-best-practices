@@ -3859,22 +3859,28 @@
     "tier": "nice-to-have"
   },
   "debugging-loop": {
-    "hash": "2e642f9459268acf3cd4e57fe0ed0d2d7b5a03a02cea6388020d8d88367cb90f",
+    "hash": "709d525856ecdf20e45caf081d7bcfe88a5165f8346652f556e7eec9e4622692",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-03-30",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "debugging-loop-master-agent",
+      "systematic-debugging",
+      "fix-loop",
+      "auto-verify",
+      "learn-n-improve"
+    ],
     "visibility": "public",
-    "description": "Slash-command wrapper for debugging-loop-master-agent. Structured bug diagnosis with root cause classification and learning capture.",
+    "description": "Full-cycle bug resolution orchestrator: chains systematic-debugging, fix-loop, auto-verify, and learn-n-improve via debugging-loop-master-agent.",
     "tags": [
       "orchestration",
       "workflow",
       "debugging"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 debugging loop skill wrapper",
+    "changelog": "v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
   "code-review-workflow": {
