@@ -121,7 +121,26 @@ Do NOT pause between skills — proceed immediately after commit.
 - Evaluator SKILL.md stays **frozen** during evaluation — learnings accumulate, batch-applied at the end
 - Ask user only if a fix would fundamentally change a skill's purpose or remove functionality
 
+## CRITICAL RULES — No Exceptions
+
+1. **Every step is mandatory.** Steps 0, 0.5, 1, 2, 2.5, 3, 4, 5, 6 MUST ALL execute for EVERY skill. There are NO shortcuts, NO "registry-only fixes", NO "this skill looks good so I'll skip evaluation". If a step finds nothing wrong, record that explicitly — "Step 0.5: No near-duplicates found" is a valid outcome. Skipping the step is not.
+
+2. **Step 1 MUST use a subagent.** The evaluator MUST run in a clean subagent context against the test project. Reading the SKILL.md and making a judgment without running the evaluator is NOT Step 1 — it's skipping Step 1.
+
+3. **Step 0.5 MUST compare against neighbors.** Every skill has 2-3 nearest neighbors. Identify them, compare descriptions, and verify the boundary is clear. "No near-duplicate concern" requires evidence (which neighbors were checked and why they're different).
+
+4. **Triggers MUST be tested, not guessed.** Adding triggers without running them against the 20-query eval set (Step 2 via evaluator) means untested triggers that may conflict with other skills. Triggers added without evaluation are technical debt, not fixes.
+
+5. **No batch shortcuts for SKILL.md changes.** Registry metadata (hashes, descriptions, tags) MAY be batch-fixed via script because they don't change behavior. But any change to a SKILL.md file (triggers, preamble, CRITICAL RULES, steps) MUST go through the full per-skill evaluation workflow.
+
+6. **Speed is not a metric.** The workflow measures quality (issues found, evaluator improvements, trigger accuracy), not throughput (skills per hour). A thorough evaluation of 3 skills is more valuable than a rushed pass over 15.
+
+7. **Record what you checked, not just what you fixed.** EVAL-LEARNINGS entries MUST list what each step found — including "nothing" results. If Step 0.5 found no near-duplicates, say which neighbors were compared. If Step 1 found no trigger issues, say how many queries were tested. Absence of findings is data; absence of checking is a gap.
+
+8. **Minimum time per skill: read the full SKILL.md.** If a skill has 200+ lines and references/ files, evaluation cannot take 30 seconds. Read the full content, understand the workflow, then evaluate. Frontmatter-only evaluation is NOT evaluation.
+
 ## Flow Direction
+
 
 ```
 Hub core/.claude/skills/ → provision → Test project .claude/skills/
