@@ -4,15 +4,27 @@ description: >
   Analyze session outcomes and update memory topics (testing-lessons, fix-patterns,
   skill-gaps) for continuous self-improvement. Four modes: session, deep, meta, test-run.
   Use when a session ends, after a fix succeeds, or when reviewing learning effectiveness.
+  For one-off session saves, use /save-session instead. For full handover docs, use /handover.
+type: workflow
+triggers:
+  - learn from session
+  - capture learnings
+  - record what we learned
+  - session reflection
+  - update learnings
+  - what did we learn
+  - improve from mistakes
+  - learning capture
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: session|deep|meta|test-run>"
 version: "2.3.0"
-type: workflow
 ---
 
 # Learn & Improve — Session Reflection
 
 Analyze session outcomes and update learning files for future sessions.
+
+**Critical:** MUST NOT inject constraints into skills without user approval. MUST NOT modify learnings.json in `test-run` mode. If $ARGUMENTS is empty, default to `session` mode.
 
 **Mode:** $ARGUMENTS
 
@@ -348,12 +360,13 @@ This keeps learning semi-automatic — the hook reminds Claude to run the skill 
 
 ---
 
-## RULES
+## CRITICAL RULES
 
-- Never delete historical entries without evidence they're wrong
-- Date-stamp all new entries
-- Cross-reference with existing patterns before adding
-- In `test-run` mode, only show what would change — don't write
+- MUST NOT delete historical entries without evidence they're wrong — learnings are append-only by default
+- MUST date-stamp all new entries for temporal context
+- MUST cross-reference with existing patterns before adding — no duplicates
+- MUST NOT write any files in `test-run` mode — show only what would change
 - MUST NOT inject constraints into skills without explicit user approval (Step 5.5.3)
 - MUST NOT inject constraints from learnings with `reuse_count < 2` — one-off errors are not patterns
 - MUST record injection metadata in the learning entry to prevent re-proposing (Step 5.5.4)
+- MUST default to `session` mode when $ARGUMENTS is empty — do not error or ask

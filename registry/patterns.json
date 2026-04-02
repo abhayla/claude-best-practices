@@ -1850,18 +1850,23 @@
     "tier": "nice-to-have"
   },
   "learn-n-improve": {
-    "hash": "abcb13299d5173254c8938963531f792043090fa1b88a4310db51c146f8f3be4",
+    "hash": "5b5279f05a3e7a687b4946d5c0d7ab726c884747e50c2829ad3be8dd4f03d09e",
     "type": "skill",
     "category": "core",
     "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-31",
+    "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
+    "description": "Analyze session outcomes, build error-fix-lesson database, detect patterns, and inject proven learnings as active constraints into skills. Four modes: session, deep, meta, test-run.",
+    "tags": [
+      "learning",
+      "self-improvement",
+      "session",
+      "patterns"
+    ],
+    "changelog": "v2.3.0: Add triggers, preamble constraints, strengthen RULES to CRITICAL RULES with MUST/MUST NOT, registry sync | v2.1.0: Enhanced with community patterns",
     "tier": "nice-to-have"
   },
   "mcp-server-builder": {

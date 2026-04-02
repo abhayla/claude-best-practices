@@ -192,3 +192,30 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Updated description to differentiate from /implement and /fix-loop
 - Synced registry: description, hash, version (1.0.0 → 2.1.0), dependencies, tags, changelog
 - Bumped version 1.0.0 → 2.1.0 (aligned with registry 2.0.0 lineage)
+
+---
+
+## Skill #7: learn-n-improve (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Empty registry description
+- Hash stale (file changed since last registry update)
+- Changelog incomplete (missing v2.2.0 and v2.3.0 entries)
+- Missing `triggers:` field
+- Missing preamble constraints
+- RULES section used weak language ("Never" instead of MUST NOT) for first 4 rules
+
+**What evaluator missed:**
+- No new gaps — v2.0 Step 0 complete coverage again (2nd consecutive skill).
+
+**Proposed evaluator improvements:** None.
+
+**Fixes applied to learn-n-improve:**
+- Added `triggers:` list (8 entries) for learning capture intent
+- Added preamble constraints (no skill injection without approval, test-run read-only, empty args default)
+- Renamed RULES to CRITICAL RULES, strengthened all rules to MUST/MUST NOT
+- Added empty-args default behavior rule
+- Differentiated from /save-session and /handover in description
+- Synced registry: description, hash, tags, changelog
