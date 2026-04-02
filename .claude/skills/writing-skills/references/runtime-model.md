@@ -6,7 +6,7 @@ Understanding the runtime model shapes every authoring decision.
 
 | Layer | When Loaded | Token Cost | Implication |
 |-------|-------------|------------|-------------|
-| **Metadata** (name + description) | Agent startup | Always loaded | Description carries entire triggering burden |
+| **Metadata** (name + description) | Agent startup | ~100 tokens per skill | Description carries entire triggering burden |
 | **SKILL.md body** | When skill becomes relevant | Competes with conversation | Every token displaces conversation history |
 | **Reference files** | When Claude follows a link | On-demand only | Bundle comprehensive resources penalty-free |
 | **Scripts** | When executed via Bash | Output only (not source) | Prefer scripts over inline code generation |

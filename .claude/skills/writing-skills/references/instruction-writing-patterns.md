@@ -165,8 +165,10 @@ messages — don't just let exceptions propagate.
 
 **Platform awareness:** Skills on claude.ai can install packages from
 npm/PyPI and pull from GitHub. Skills via the Claude API have no network
-access and no runtime package installation. List required packages in
-SKILL.md and note any platform constraints.
+access and no runtime package installation. Skills in Claude Code have
+full network access but should avoid global package installs (install
+locally to avoid interfering with the user's system). List required
+packages in SKILL.md and note any platform constraints.
 
 Short templates inline in SKILL.md; longer templates in `assets/` or `references/` with conditional loading.
 
