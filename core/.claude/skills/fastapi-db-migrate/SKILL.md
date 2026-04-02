@@ -4,15 +4,25 @@ description: >
   Generate and manage database migrations for FastAPI + Alembic projects. Creates
   migration scripts and auto-updates model import locations. Use when adding or
   modifying SQLAlchemy models in a FastAPI application.
+triggers:
+  - fastapi migration
+  - alembic migration
+  - add sqlalchemy model
+  - fastapi alembic
+  - create model and migrate
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<model-name or 'run' or 'status' or 'check'>"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 ---
 
 # Database Migration Helper (FastAPI + Alembic)
 
 Automates Alembic migration creation and model import location updates.
+
+**Scope:** New model creation with migration generation. For modifying existing models, manually edit the model file and run `alembic revision --autogenerate`. For stack-neutral migration support (Prisma, Knex, Django, etc.), use `/db-migrate`. After any migration, verify with `/db-migrate-verify`.
+
+**Note:** The `backend/` path is a convention. If your project uses a different layout, adjust paths accordingly.
 
 **Request:** $ARGUMENTS
 
@@ -80,7 +90,21 @@ cd backend && PYTHONPATH=. python -c "from app.models import *; print('All impor
 
 ## STEP 2: Check Mode
 
-Compare model imports across all required locations and report mismatches.
+Verify all model imports are in sync across required locations:
+
+1. List all model files:
+   ```bash
+   ls backend/app/models/*.py | grep -v __init__ | grep -v __pycache__
+   ```
+2. For each model file, check it's imported in:
+   - `backend/app/models/__init__.py`
+   - `backend/app/db/base.py` (or equivalent base import file)
+   - `backend/tests/conftest.py` (if test fixtures reference models)
+3. Report mismatches:
+   ```
+   Import Sync Check:
+   - model_name.py: ✓ __init__.py | ✓ base.py | ✗ conftest.py (MISSING)
+   ```
 
 ## STEP 3: Status Mode
 
@@ -88,10 +112,28 @@ Compare model imports across all required locations and report mismatches.
 cd backend && alembic current && alembic history --verbose | head -20
 ```
 
+Report current head, pending migrations, and any branch divergence.
+
+---
+
+## Output Summary
+
+After any mode, report:
+```
+Migration Summary:
+  Mode: <new-model|migrate|status|check>
+  Model: <name or N/A>
+  Files changed: <list>
+  Migration: <generated|applied|checked|N/A>
+  Import sync: <all OK|N mismatches>
+```
+
 ---
 
 ## CRITICAL RULES
 
-- Never skip any import location — missing ones cause silent failures
-- Always run sync check after adding a model
-- Follow existing naming conventions (snake_case files, PascalCase classes)
+- MUST NOT skip any import location — missing imports cause silent failures at runtime
+- MUST run sync check (Step 2) after adding a model — Why: partial imports break Alembic autogenerate
+- MUST follow existing naming conventions (snake_case files, PascalCase classes) — Why: inconsistent naming causes import confusion
+- MUST NOT modify existing migrations — generate new ones instead
+- After migration, verify with `/db-migrate-verify` if available

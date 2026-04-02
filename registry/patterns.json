@@ -1438,21 +1438,23 @@
     "tier": "must-have"
   },
   "fastapi-db-migrate": {
-    "hash": "a9f8be7e9b7f956a76e667375e3b5d2fff75639250c6a276c46f0e1c7adedcb9",
+    "hash": "90cbd8427d979c2f31f08287d706224e3d89a806b8b84254e68b984b79eac521",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
+    "last_updated": "2026-04-03",
+    "dependencies": [
+      "db-migrate-verify"
+    ],
     "visibility": "public",
     "description": "Generate and manage database migrations for FastAPI + Alembic projects. Creates migration scripts and auto-updates model import locations.",
     "tags": [
       "fastapi",
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v1.1.0: Add triggers, boundary clarification with db-migrate/db-migrate-verify, flesh out check mode, add output format, expand CRITICAL RULES | v1.0.1: Initial release",
     "tier": "must-have"
   },
   "fastapi-deploy": {
