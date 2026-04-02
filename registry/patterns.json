@@ -1458,14 +1458,17 @@
     "tier": "must-have"
   },
   "fastapi-deploy": {
-    "hash": "898082d198af0b116ec03b1756a75ea92cf18e46f364cbaf9026c9ec66859bea",
+    "hash": "7f1aad0624b4d995f0c3fc40747ff9ea26a2a8fba760ba030b242f96d68db76f",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
+    "last_updated": "2026-04-03",
+    "dependencies": [
+      "fastapi-db-migrate",
+      "db-migrate-verify"
+    ],
     "visibility": "public",
     "description": "Orchestrate backend deployment for FastAPI projects by running migrations, seeding data, restarting the server, and performing health checks. Use when deploying or updating a FastAPI service.",
     "tags": [
@@ -1473,7 +1476,7 @@
       "deployment",
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v1.1.0: Add triggers, fix blocking uvicorn (background+no-reload), flesh out seed loop, add CRITICAL RULES, cross-refs, rollback guidance | v1.0.0: Initial release",
     "tier": "must-have"
   },
   "fastapi-run-backend-tests": {
