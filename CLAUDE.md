@@ -40,7 +40,7 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 ## Architecture
 
-A curated hub of ~222 Claude Code patterns (agents, skills, rules, hooks) organized by stack. Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
+A curated hub of ~224 Claude Code patterns (agents, skills, rules, hooks) organized by stack. Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
 
 ### Key Directories
 
@@ -59,7 +59,7 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 
 ### Key Scripts
 
-- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Defines `STACK_DETECTORS` and `DEP_PATTERN_MAP`
+- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Defines `STACK_DETECTORS` and `DEP_PATTERN_MAP`. Calls `third_party_skills.py` during provisioning for third-party agent skill detection
 - **`bootstrap.py`** — Core copy logic. CLI: `python scripts/bootstrap.py --stacks <stack1,stack2> --target <dir>`. Defines `STACK_PREFIXES`
 - **`workflow_quality_gate_validate_patterns.py`** — CI validator for frontmatter, cross-references, registry sync
 - **`dedup_check.py`** — Dedup validator (`--validate-all`) and secret scanner (`--secret-scan`)
@@ -78,6 +78,7 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`update-docs.yml`** — Auto-regenerates docs on main push. Avoid running `generate_docs.py` manually on main
 - **`test.yml`** — Runs pytest on `scripts/**` changes
 - **`recommend.yml`** — Weekly cron: provisions patterns for repos in `config/repos.yml`
+- **`apply-selections.yml`** — Triggered by `/apply` comment on PRs to process pattern selections
 - Scheduled: `scan-internet.yml`, `scan-projects.yml`, `sync-to-projects.yml`, `expire-sources.yml`
 
 ## Testing
