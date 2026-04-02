@@ -874,7 +874,7 @@
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-03",
     "dependencies": [],
     "visibility": "public",
     "description": "Resume work from a previous session with git state briefing and saved session detection",
@@ -2896,13 +2896,13 @@
     "tier": "must-have"
   },
   "save-session": {
-    "hash": "1c7f29cb0c6cb930fd3c3cf39d60f63f6c512f99e6ceb6b575ecc6559cfb46d7",
+    "hash": "5e1219b0129a81a0859bf0764aa44d9773a406762758dd6d7fdbf39131b6ac5c",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-03",
     "dependencies": [],
     "visibility": "public",
     "description": "Save a structured session checkpoint capturing working files, git state, key decisions, and task progress for later resumption via /start-session",
@@ -2911,7 +2911,7 @@
       "context",
       "continuity"
     ],
-    "changelog": "v1.1.0: Add triggers, registry version sync | v1.0.0: Initial release",
+    "changelog": "v1.2.0: Add triggers for natural language discoverability | v1.1.0: Add triggers, registry version sync | v1.0.0: Initial release",
     "tier": "must-have"
   },
   "scan-discovery-report": {
@@ -3207,13 +3207,13 @@
     "tier": "must-have"
   },
   "start-session": {
-    "hash": "8827e854164f71bc8a454409e13bc5a7213f9606f418add68c8fa5499e723fac",
+    "hash": "988d2c3debddc89bc1a1ce5f740468686d50a1571f35cc7103fd022a97347b52",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-03-19",
+    "last_updated": "2026-04-03",
     "dependencies": [
       "save-session"
     ],
@@ -3224,7 +3224,7 @@
       "context",
       "continuity"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d session restoration with priority-ordered file loading",
+    "changelog": "v1.1.0: Add triggers for natural language discoverability | v1.0.0: Initial release \u00e2\u20ac\u201d session restoration with priority-ordered file loading",
     "tier": "must-have"
   },
   "status": {
