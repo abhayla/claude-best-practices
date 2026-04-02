@@ -9,6 +9,13 @@ type: workflow
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "[session-name]"
 version: "1.1.0"
+triggers:
+  - save session
+  - checkpoint progress
+  - save my work
+  - create session checkpoint
+  - save before break
+  - session save
 ---
 
 # Save Session — Checkpoint Your Progress

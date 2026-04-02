@@ -2896,10 +2896,10 @@
     "tier": "must-have"
   },
   "save-session": {
-    "hash": "7d82b8a98ab155a65eed67c58e70701a2e2ccfc0208890bdc82f8074c952127c",
+    "hash": "1c7f29cb0c6cb930fd3c3cf39d60f63f6c512f99e6ceb6b575ecc6559cfb46d7",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
     "last_updated": "2026-04-02",
@@ -2911,7 +2911,7 @@
       "context",
       "continuity"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d structured session checkpointing with portable template",
+    "changelog": "v1.1.0: Add triggers, registry version sync | v1.0.0: Initial release",
     "tier": "must-have"
   },
   "scan-discovery-report": {

@@ -339,3 +339,18 @@ This batch fix addresses the mechanical registry drift that was the most common 
 - Added preamble differentiating from /start-session and /handover
 - Strengthened RULES to CRITICAL RULES with MUST/MUST NOT
 - Fixed registry version to match file (1.1.0)
+
+---
+
+## Skill #14: save-session (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Missing triggers, version mismatch (registry 1.0.0 vs file 1.1.0)
+
+**What evaluator missed:** None. CRITICAL RULES already strong (9 rules with MUST/MUST NOT).
+
+**Fixes applied:**
+- Added 6 triggers for session save intent
+- Fixed registry version to match file (1.1.0)
