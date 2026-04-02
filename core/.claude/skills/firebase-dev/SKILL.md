@@ -6,7 +6,7 @@ description: >
   transactions, realtime listeners, indexes). Use when building Firebase-backed apps.
 allowed-tools: "Read Grep Glob"
 argument-hint: "<what to set up or implement — e.g. 'add Google auth' or 'create Firestore rules for user posts'>"
-version: "1.0.1"
+version: "1.0.2"
 type: reference
 ---
 
@@ -15,6 +15,20 @@ type: reference
 Reference for Firebase project setup, Authentication, and Firestore.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Contents
+
+- Project Setup and CLI
+- Web SDK Initialization
+- Key Files
+- Authentication (Providers, SDK, Email/Password, OAuth, Anonymous, Tokens)
+- Firestore (Provisioning, SDK, Write Ops, Transactions, Read Ops, Queries, Realtime, Security Rules, Indexes)
+- Security Best Practices
+- Common Anti-Patterns
+- Troubleshooting
+- Resources
 
 ---
 
@@ -230,7 +244,7 @@ if (location.hostname === "localhost") {
 ### Write Operations
 
 ```javascript
-import { doc, setDoc, addDoc, updateDoc, collection } from "firebase/firestore";
+import { doc, setDoc, addDoc, updateDoc, deleteDoc, collection } from "firebase/firestore";
 
 // Set (create or overwrite)
 await setDoc(doc(db, "cities", "LA"), {
@@ -247,6 +261,9 @@ const docRef = await addDoc(collection(db, "cities"), {
 
 // Update specific fields (fails if doc doesn't exist)
 await updateDoc(doc(db, "cities", "LA"), { capital: true });
+
+// Delete a document
+await deleteDoc(doc(db, "cities", "LA"));
 ```
 
 ### Transactions

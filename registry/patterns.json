@@ -1575,21 +1575,21 @@
     "tier": "nice-to-have"
   },
   "firebase-dev": {
-    "hash": "e6297b97181a2c679044bd474ca69006ad7d012ae69a79144b17d246c4f06f9e",
+    "hash": "7615b6302137a4015ab9ad06ceeb259091800ac44bac874c8235e1c2fb0c0bbd",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-03",
     "dependencies": [],
     "visibility": "public",
-    "description": "Firebase development: Auth, Firestore, Hosting",
+    "description": "Build Firebase-backed apps with project setup, CLI, Authentication, and Firestore. Covers providers, tokens, security rules, CRUD, transactions, realtime listeners, and indexes.",
     "tags": [
       "firebase",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.2: Add TOC, add deleteDoc to Write Operations (complete CRUD) | v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have"
   },
   "firebase-test": {
