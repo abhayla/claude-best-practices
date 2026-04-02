@@ -3112,23 +3112,23 @@
     "tier": "nice-to-have"
   },
   "skill-evaluator": {
-    "hash": "954282151815358264236faa15f74b501c1ac4ecb6df2c5414e085272bda48cd",
+    "hash": "7d7371f8fc3641c018d51f2d5ecf30963e3c46660286221b92f1dfb3a21c3d68",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-02",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-03",
     "dependencies": [],
     "visibility": "public",
-    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Includes pre-flight checks for registry sync, frontmatter completeness, and structural integrity.",
+    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Includes pre-flight checks for registry sync, frontmatter completeness, structural integrity, and v8 platform compliance.",
     "tags": [
       "evaluation",
       "skills",
       "testing",
       "quality"
     ],
-    "changelog": "v2.0.0: Add Step 0 pre-flight checks (registry sync, frontmatter completeness, structural integrity), cross-skill intelligence (bidirectional signposting, near-duplicate resolution, skill-vs-rule overlap), delegation edge cases in stress test | v1.0.0: Initial release",
+    "changelog": "v2.1.0: Add v8 platform compliance (name constraints, third-person descriptions, reference depth, model matrix testing) | v2.0.0: Add Step 0 pre-flight checks (registry sync, frontmatter completeness, structural integrity), cross-skill intelligence (bidirectional signposting, near-duplicate resolution, skill-vs-rule overlap), delegation edge cases in stress test | v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
   "skill-factory": {
@@ -3889,13 +3889,13 @@
     "tier": "must-have"
   },
   "writing-skills": {
-    "hash": "05d0095507db647402709ace6906cd962f9dde2a9c1175581a447435da913a53",
+    "hash": "fea648381e1d1eb780922cd186d1405997d22af5c33ea2b4ec94d0d6d10e9353",
     "type": "skill",
     "category": "core",
-    "version": "2.7.0",
+    "version": "2.8.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-03",
     "dependencies": [
       "skill-evaluator"
     ],
@@ -3907,7 +3907,7 @@
       "evaluation",
       "quality"
     ],
-    "changelog": "v2.7.0: Add skill necessity check (Step 1.1), context budget guidance (Step 2.2b), instruction writing patterns reference, skill-evaluator integration (Step 6), domain pattern review (Step 6.6), expanded MUST DO/MUST NOT DO sections",
+    "changelog": "v2.8.0: Add v8 platform compliance (naming conventions, content quality, reference structure, model compatibility, third-person descriptions, voodoo constants, solve-dont-punt) | v2.7.0: Add skill necessity check (Step 1.1), context budget guidance (Step 2.2b), instruction writing patterns reference, skill-evaluator integration (Step 6), domain pattern review (Step 6.6), expanded MUST DO/MUST NOT DO sections",
     "tier": "nice-to-have"
   },
   "xml-to-compose": {
