@@ -1480,22 +1480,24 @@
     "tier": "must-have"
   },
   "fastapi-run-backend-tests": {
-    "hash": "92c9db9a1f14ebe630b9c530cd1f77ad52e5309de9e03dc384ce8946523d6fd5",
+    "hash": "7f103b0020da05993d902b953fb958fec3958da336935cab2b5508c7508d484b",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
+    "last_updated": "2026-04-03",
+    "dependencies": [
+      "fix-loop"
+    ],
     "visibility": "public",
-    "description": "Run backend pytest with smart defaults and auto-fix on failure",
+    "description": "Run backend pytest with smart defaults, short-name resolution, and auto-fix on failure. Resolves short names like auth to test_auth.py. Invokes /fix-loop on failure.",
     "tags": [
       "testing",
       "fastapi",
       "workflow"
     ],
-    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "changelog": "v2.2.0: Add triggers, fix monorepo detection (collect all dirs), add failure-count guard (>10 asks user), optional dependency skip | v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "must-have"
   },
   "feature-flag": {

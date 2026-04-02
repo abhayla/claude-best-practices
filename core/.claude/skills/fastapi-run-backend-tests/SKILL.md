@@ -4,9 +4,15 @@ description: >
   Run backend pytest with smart defaults, short-name resolution, and auto-fix on failure.
   Resolves short names like "auth" to test_auth.py. Invokes /fix-loop on failure and
   /learn-n-improve on success. Use when running or re-running FastAPI backend tests.
+triggers:
+  - run backend tests
+  - run pytest fastapi
+  - test the backend
+  - backend test
+  - rerun backend tests
 allowed-tools: "Bash Read Write Grep Glob Skill"
 argument-hint: "[test_path] [--coverage] [--collect-only] [-x] [--file <name>] [--func <name>]"
-version: "2.1.0"
+version: "2.2.0"
 type: workflow
 ---
 
@@ -23,21 +29,23 @@ Run pytest with smart defaults and short-name resolution.
 Locate the project's backend directory by scanning for common indicators:
 
 ```bash
-# Check common backend directory names
+# Collect ALL matching backend directories (don't break on first)
+MATCHES=""
 for dir in backend server app api src; do
-  if [ -d "$dir" ] && [ -f "$dir/conftest.py" -o -d "$dir/tests" ]; then
-    echo "Backend directory: $dir"
-    break
+  if [ -d "$dir" ] && { [ -f "$dir/conftest.py" ] || [ -d "$dir/tests" ]; }; then
+    MATCHES="$MATCHES $dir"
   fi
 done
 
 # Fallback: check for conftest.py or tests/ at project root
 if [ -f "conftest.py" ] || [ -d "tests" ]; then
-  echo "Backend directory: . (project root)"
+  MATCHES="$MATCHES ."
 fi
+
+echo "Detected: $MATCHES"
 ```
 
-Use the detected directory for all subsequent commands. If ambiguous, ask the user.
+If multiple directories found, present the list and ask the user to choose. Do not silently pick the first match — monorepos may have multiple test-bearing directories.
 
 ---
 
@@ -194,6 +202,8 @@ with open('test-results/fastapi-run-backend-tests.json', 'w') as f:
 
 If tests failed in STEP 4, automatically invoke the fix-and-learn pipeline. Do NOT just suggest — invoke directly.
 
+**Failure-count guard:** If >10 test failures, report the count to the user and ask before auto-invoking `/fix-loop` — mass failures usually indicate an environment issue or broken import, not 10+ independent bugs. Fixing blindly wastes iterations and risks cascading changes.
+
 ### 7a. Invoke Fix-Loop
 
 ```
@@ -209,6 +219,8 @@ If `/fix-loop` reports `result: PASSED` or `result: FIXED`:
 ```
 Skill("learn-n-improve", args="session")
 ```
+
+If `/learn-n-improve` is not available in this project, skip this step silently.
 
 ### 7c. Escalation (On Fix Failure)
 
