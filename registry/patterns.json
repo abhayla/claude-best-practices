@@ -3152,18 +3152,18 @@
     "tier": "must-have"
   },
   "systematic-debugging": {
-    "hash": "5fad8fa14bc55ab5294cd72cd7ec3ab0b80d21200f9338d7cec311bd2352df81",
+    "hash": "8f9f39f0c0ef9ff17a982f6c33164791179ea76b959ecd239919455468499afd",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": ["test-knowledge"],
     "visibility": "public",
-    "description": "Structured root cause analysis with past learnings search",
+    "description": "Debug failures methodically using a structured diagnosis workflow: reproduce, isolate, hypothesize, gather evidence, find root cause, apply targeted fix, verify, and prevent recurrence.",
     "tags": [],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Fix orphaned code blocks, add inline step summaries, improve triggers, add preamble constraints, fix step reference, sync registry description",
     "tier": "must-have"
   },
   "tailwind-dev": {

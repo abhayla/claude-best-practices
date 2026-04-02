@@ -6,20 +6,25 @@ description: >
   verify, and prevent recurrence. Use when facing bugs, test failures, or
   unexpected behavior instead of making random code changes.
 triggers:
-  - debug
   - systematic-debug
   - diagnose bug
   - root cause analysis
   - why is this failing
+  - investigate bug
+  - find root cause
+  - unexpected behavior
+  - intermittent failure
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<bug-description, error message, or failing test command>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
 # Systematic Debugging
 
 Debug the reported issue using a structured, evidence-driven workflow. Never guess — diagnose.
+
+**Critical:** Always reproduce before investigating. Always verify with the original reproduction command after fixing. Never skip the regression test. Use `/fix-loop` for simple failures with known retest commands; use this skill when root cause is unclear or fix-loop has failed 2+ times.
 
 **Issue:** $ARGUMENTS
 
@@ -60,7 +65,7 @@ Apply the known fix. If it works, increment `reuse_count` in the learnings datab
 
 ### 0.3 If No Match Found
 
-Proceed to Step 1 (Reproduce the Failure). After resolving the issue, Step 8 will capture it as a new learning.
+Proceed to Step 1 (Reproduce the Failure). After resolving the issue, Step 9 will capture it as a new learning.
 
 ---
 
@@ -71,6 +76,7 @@ Before touching any code, establish a reliable reproduction case.
 
 **Read:** `references/reproduce-the-failure.md` for detailed step 1: reproduce the failure reference material.
 
+```bash
 # Record the exact reproduction command
 {reproduction_command}
 ```
@@ -209,8 +215,12 @@ If multiple tests fail, look for a common root cause rather than fixing each ind
 
 Based on the evidence gathered in Steps 1-2, generate a ranked list of possible causes.
 
+1. Generate at least 3 hypotheses ranked by likelihood (most likely first)
+2. For each hypothesis, state: what would be true if this is the cause, and what evidence would confirm or refute it
+3. Include at least one "surprising" hypothesis — the cause that seems unlikely but would explain all symptoms
+4. Do NOT start fixing yet — hypotheses guide evidence gathering in Step 4
 
-**Read:** `references/form-hypotheses.md` for detailed step 3: form hypotheses reference material.
+**Read:** `references/form-hypotheses.md` for detailed hypothesis generation methodology.
 
 ## STEP 4: Gather Evidence
 
@@ -313,15 +323,23 @@ If all hypotheses are refuted, return to Step 3 and generate new ones based on t
 
 Trace from the symptom to the actual underlying cause. The root cause is the earliest point in the causal chain where a fix would prevent the bug.
 
+1. Pick the confirmed hypothesis from Step 4's evidence
+2. Ask "why?" repeatedly (5 Whys) to trace from symptom to root cause
+3. Verify: make a prediction based on the root cause and test it — if the prediction holds, you have the root cause
+4. The root cause is where a fix prevents the entire class of bug, not just this instance
 
-**Read:** `references/root-cause-analysis.md` for detailed step 5: root cause analysis reference material.
+**Read:** `references/root-cause-analysis.md` for detailed root cause analysis methodology.
 
 ## STEP 6: Apply a Targeted Fix
 
 Fix the root cause with a minimal, focused change.
 
+1. Fix the root cause identified in Step 5 — not the symptom
+2. Make the smallest change that addresses the root cause
+3. Do NOT refactor surrounding code, do NOT change test expectations unless the test is wrong
+4. Prefer fixing source code over fixing tests
 
-**Read:** `references/apply-a-targeted-fix.md` for detailed step 6: apply a targeted fix reference material.
+**Read:** `references/apply-a-targeted-fix.md` for detailed fix application patterns.
 
 ## STEP 7: Verify the Fix
 
@@ -388,13 +406,7 @@ Make sure this class of bug cannot happen again.
 
 **Read:** `references/prevent-recurrence.md` for detailed step 8: prevent recurrence reference material.
 
-# Fix for: users with '+' in email could not log in
-# Root cause: email was used as URL parameter without encoding
-# See: https://github.com/org/repo/issues/123
-user_email = urllib.parse.quote(user_email)
-```
-
-This helps future developers understand WHY unusual-looking code exists.
+Add a regression test for the specific bug scenario. Document non-obvious fixes with a comment explaining WHY (e.g., link to issue, explain the root cause). Consider adding defensive guards (validation, type checks) at the boundary where the bug entered.
 
 ---
 
@@ -406,7 +418,7 @@ After the fix is verified (Step 7 passes), ALWAYS record the learning. This is N
 
 | Fix Category | Record To | Skill |
 |-------------|-----------|-------|
-| Stack-specific issue (emulator, platform, env) | Stack knowledge base if available | Stack-specific skill (e.g., `/android-emulator-testing add`) |
+| Stack-specific issue (emulator, platform, env) | Stack knowledge base if available | Stack-specific skill if available |
 | Test fixture/timing/flaky issue | Test knowledge base | `/test-knowledge add` |
 | General code pattern | Learnings database | Write to `.claude/learnings.json` |
 
