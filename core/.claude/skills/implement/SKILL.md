@@ -3,18 +3,32 @@ name: implement
 description: >
   Implement a feature or fix following a structured workflow: requirements analysis,
   test creation, implementation, test execution, fix-loop delegation, and verification.
-  Use when user requests new functionality or structured bug fixes.
+  Use when user requests new functionality or structured bug fixes. Use /fix-issue
+  for GitHub Issues, /tdd for strict red-green-refactor, /development-loop for
+  full ideation-to-commit orchestration.
+triggers:
+  - implement
+  - implement feature
+  - build feature
+  - add feature
+  - create feature
+  - implement fix
+  - implement the
+  - structured implementation
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<feature-description>"
-version: "1.0.0"
+version: "2.2.0"
 type: workflow
 ---
 
 # Implement Feature/Fix
 
-Implement the requested feature or fix following a structured workflow.
+Tests are mandatory. If tests fail, delegate to `/fix-loop` — do not proceed
+without passing tests. If no test framework exists, note it and proceed.
 
 **Request:** $ARGUMENTS
+
+If no arguments are provided, ask the user what to implement before proceeding.
 
 ---
 
@@ -40,9 +54,13 @@ List all affected layers before proceeding. If 3+ layers are affected, suggest u
 
 Before implementing, write or update tests that define the expected behavior:
 
-1. Identify the appropriate test file(s)
-2. Write tests that will FAIL before implementation (TDD approach)
-3. Follow existing test patterns and conventions in the project
+1. Detect the project's test framework (check CLAUDE.md, pyproject.toml,
+   package.json, build.gradle). If no test framework is configured, log
+   "WARN: No test framework detected — skipping test-first step. Recommend
+   adding tests as a follow-up." and proceed to Step 3.
+2. Identify the appropriate test file(s)
+3. Write tests that will FAIL before implementation (TDD approach)
+4. Follow existing test patterns and conventions in the project
 
 ## STEP 3: Implement the Feature
 
@@ -108,8 +126,9 @@ Verification: PASSED
 
 If any check fails after fix attempts, escalate to user with the report showing what passed and what failed.
 
-4. If significant changes were made (3+ files or complex logic), review with `/post-fix-pipeline`
-5. Summarize what was implemented and any decisions made
+### 6.4 Post-Fix Review
+
+If significant changes were made (3+ files or complex logic), review with `/post-fix-pipeline`.
 
 ## STEP 7: Post-Implementation (Optional)
 
@@ -144,7 +163,10 @@ Create `test-results/` directory if it doesn't exist. This JSON is consumed by s
 
 ## CRITICAL RULES
 
-- Always write tests before or alongside implementation
+- MUST write tests before or alongside implementation — skip only if no test framework is detected
+- MUST NOT apply fixes directly when tests fail — delegate to `/fix-loop`
+- MUST NOT proceed past Step 6 without all verification checks passing or explicitly noted
+- MUST ask for clarification if `$ARGUMENTS` is empty — do not guess what to implement
 - Follow existing project conventions (check CLAUDE.md and .claude/rules/)
 - Make minimal changes — don't refactor unrelated code
 - If stuck after 3 fix-loop iterations, ask the user for guidance

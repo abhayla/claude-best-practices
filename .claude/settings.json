@@ -1,6 +1,11 @@
 {
   "permissions": {
-    "allow": [],
+    "allow": [
+      "Edit",
+      "Write",
+      "Bash(cp * .claude/*)",
+      "Bash(cp * core/.claude/*)"
+    ],
     "deny": []
   },
   "hooks": {

@@ -1759,18 +1759,18 @@
     "tier": "nice-to-have"
   },
   "implement": {
-    "hash": "07528a6cb05faadae33866c2ad1e57e5fcf015024dc5783601a1bdc66619015f",
+    "hash": "2fdffc26370ee90ca81b727955b864851796d4c303536cecd36f8de8b577a431",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-12",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": ["fix-loop", "post-fix-pipeline", "learn-n-improve"],
     "visibility": "public",
-    "description": "",
+    "description": "Implement a feature or fix following a structured workflow: requirements analysis, test creation, implementation, test execution, fix-loop delegation, and verification.",
     "tags": [],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
+    "changelog": "v2.2.0: Added triggers, empty-args guard, test-framework fallback, fixed orphaned lines, strengthened CRITICAL RULES; v2.1.0: Enhanced with community patterns; v2.0.0: Initial structured workflow",
     "tier": "must-have"
   },
   "incident-response": {

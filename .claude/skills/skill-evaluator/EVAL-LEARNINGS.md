@@ -101,3 +101,37 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Updated description to clarify boundary with `/fix-loop` and `/test-pipeline`
 - Synced registry: description, hash, version, dependencies, changelog
 - Bumped version 3.0.0 → 3.1.0
+
+---
+
+## Skill #4: implement (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator caught:**
+- Missing triggers field — no `triggers:` in frontmatter
+- High cross-skill conflict with development-loop, fix-issue, tdd on generic queries
+- No empty-arguments guard — `$ARGUMENTS` could be empty with no handling
+- No graceful degradation for projects without test frameworks
+- CRITICAL RULES section existed but lacked MUST/MUST NOT language
+
+**What evaluator missed (found manually):**
+1. **Orphaned lines after Step 6.3** — Lines 111-112 were dangling numbered items ("4. If significant changes..." and "5. Summarize...") left over from a restructuring. Evaluator's structural checks don't detect orphaned numbered-list items between sections.
+2. **Registry version mismatch** — Registry said v2.1.0 but SKILL.md had v1.0.0. File was edited but version field wasn't bumped. Evaluator still doesn't check registry sync (pending batch apply).
+3. **Overlap with workflow.md rule** — The globally-loaded workflow rule describes a near-identical 7-step process. Evaluator doesn't compare skill content against auto-loaded rules for redundancy.
+
+**Proposed evaluator improvements (pending batch apply):**
+- [ ] Add orphaned numbered-list detection: scan for numbered items that appear between section headers without belonging to a list
+- [ ] Add skill-vs-rule overlap check: compare skill steps against auto-loaded rules for redundancy
+- [ ] (Carried from #1-3) Add registry sync, frontmatter field existence, zero-result path checks
+
+**Fixes applied to implement:**
+- Added `triggers:` list (8 entries)
+- Added empty-arguments guard in preamble and CRITICAL RULES
+- Added test-framework detection fallback in Step 2
+- Fixed orphaned lines 111-112 → proper ### 6.4 Post-Fix Review sub-section
+- Strengthened CRITICAL RULES with MUST/MUST NOT language (4 new rules)
+- Added preamble constraints (tests mandatory, fix-loop delegation)
+- Updated description to clarify boundary with /fix-issue, /tdd, /development-loop
+- Synced registry: description, hash, version, dependencies, changelog
+- Bumped version 1.0.0 → 2.2.0 (aligned with registry lineage)
