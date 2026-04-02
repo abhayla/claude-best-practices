@@ -26,7 +26,7 @@ Author new Claude Code skills from scratch, from observed patterns, or from sess
 
 ---
 
-> Aligned with [Anthropic Skill Authoring Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) as of 2026-04.
+> Aligned with Anthropic's [Skill Authoring Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) and [Skills for Enterprise](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/enterprise) as of 2026-04.
 
 ## STEP 1: Determine Authoring Mode
 
@@ -354,6 +354,7 @@ Before saving the skill, validate every item. Do NOT skip this step.
 | `version` is valid SemVer | Format: `"1.0.0"` — required for version tracking |
 | `triggers` has 3-6 entries | Mix of slash commands and natural language |
 | `allowed-tools` is minimal | No unused tools listed. Read-only skills MUST NOT include `Write`, `Edit`, or `Bash` |
+| No high-risk indicators without justification | Scripts, MCP refs, network access, or broad file access are documented and necessary (see `references/security-review.md` risk tiers) |
 | `argument-hint` uses `<>` and `[]` correctly | Required in angle brackets, optional in square brackets |
 | No placeholder markers | No TODO/FIXME/PLACEHOLDER HTML comment markers in the body |
 
@@ -578,7 +579,23 @@ If contributing from a downstream project:
 ---
 
 
-## STEP 8: Template Library
+## STEP 8: Post-Promotion Lifecycle
+
+What happens after a skill ships: security vetting, deployment governance,
+monitoring, version management, deprecation, and scaling considerations.
+
+**Read:** `references/post-promotion-lifecycle.md` for the full lifecycle
+covering security review gates (8.1), deployment governance with registry
+requirements (8.2), monitoring and drift detection (8.3), version management
+with rollback plans (8.4), deprecation lifecycle (8.5), and scaling
+considerations including recall limits and consolidation triggers (8.6).
+
+**Also read:** `references/security-review.md` for the detailed risk tier
+assessment and 8-step review checklist referenced by Step 8.1.
+
+---
+
+## STEP 9: Template Library
 
 Pre-built starting skeletons for common skill types. Copy the appropriate template and fill in the placeholders.
 
@@ -586,9 +603,9 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 
 ---
 
-## Deprecation Workflow and Anti-Patterns
+## Anti-Patterns
 
-> **Reference:** See [references/anti-patterns.md](references/anti-patterns.md) for the deprecation lifecycle and 8 common skill anti-patterns to avoid.
+> **Reference:** See [references/anti-patterns.md](references/anti-patterns.md) for 9 common skill anti-patterns to avoid.
 
 ---
 
@@ -630,3 +647,4 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - MUST NOT write descriptions in first or second person ("I analyze...", "You can use...") — always third person ("Analyzes...") because descriptions are injected into the system prompt and inconsistent POV causes discovery problems
 - MUST NOT chain reference files (SKILL.md → ref1.md → ref2.md) — keep one level deep from SKILL.md
 - MUST NOT include time-sensitive content ("before August 2025") — use collapsible "Old patterns" section instead
+- MUST NOT be the sole reviewer of your own skill for hub promotion — Why: separation of duties prevents blind spots and catches adversarial patterns the author may overlook (see Step 8.1)

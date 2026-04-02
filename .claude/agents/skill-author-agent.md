@@ -34,7 +34,7 @@ You receive one of:
 2. `/writing-skills` handles the full authoring workflow:
    - Step 2: frontmatter, step structure, MUST DO / MUST NOT DO sections
    - Step 5: quality checklist (structure, content, overlap, length)
-   - Step 8: template selection (A-G based on skill purpose)
+   - Step 9: template selection (A-G based on skill purpose)
 3. After `/writing-skills` returns the draft, validate against pattern rules:
    - Read `pattern-structure.md` — verify frontmatter has all required fields (`name`, `description`, `type`, `allowed-tools`, `argument-hint`, `version`)
    - Read `pattern-portability.md` — verify no hardcoded paths, least-privilege tools, no project-specific references (unless this is a synthesized project-specific pattern)
