@@ -2960,23 +2960,23 @@
     "tier": "nice-to-have"
   },
   "skill-evaluator": {
-    "hash": "69266767f3e528a148ce8f8c9e59eee054827004bcda0fe97e533186ed45c448",
+    "hash": "954282151815358264236faa15f74b501c1ac4ecb6df2c5414e085272bda48cd",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-02",
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Use when testing a new or updated skill before promotion, auditing existing skills for trigger conflicts, or verifying a skill adds value over the agent's baseline",
+    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Includes pre-flight checks for registry sync, frontmatter completeness, and structural integrity.",
     "tags": [
       "evaluation",
       "skills",
       "testing",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release — 4 evaluation modes (trigger, output, full, conflicts), 7-step workflow, standalone and delegated invocation",
+    "changelog": "v2.0.0: Add Step 0 pre-flight checks (registry sync, frontmatter completeness, structural integrity), cross-skill intelligence (bidirectional signposting, near-duplicate resolution, skill-vs-rule overlap), delegation edge cases in stress test | v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
   "skill-factory": {

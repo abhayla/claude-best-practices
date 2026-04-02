@@ -16,7 +16,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<trigger|output|full|conflicts> <skill-path> [--baseline]"
 type: workflow
-version: "1.0.0"
+version: "2.0.0"
 ---
 
 # Skill Evaluator — Evaluate Skill Quality
@@ -26,6 +26,52 @@ cross-skill compatibility. Produces a graded verdict (PASS/FIX/FAIL) with
 evidence and recommended fixes.
 
 **Request:** $ARGUMENTS
+
+---
+
+## STEP 0: Pre-Flight Checks
+
+Run these checks BEFORE evaluation. They catch the issues most commonly missed
+during Skills #1-5 evaluation batch (registry drift, missing frontmatter,
+structural defects). Each check is pass/fail with specific evidence.
+
+### 0.1 Registry Sync
+
+Compare `registry/patterns.json` entry against the skill's SKILL.md:
+
+| Check | How | Fail Condition |
+|-------|-----|----------------|
+| Description match | Compare registry `description` vs frontmatter `description` | Empty registry description, or semantic mismatch |
+| Hash freshness | Compute SHA-256 of SKILL.md, compare to registry `hash` | Hash differs |
+| Version consistency | Compare registry `version` vs frontmatter `version` vs latest `changelog` entry | Any mismatch |
+| Dependency completeness | Scan body for `Agent("...agent")`, `Skill("...skill")`, `/skill-name` references → verify each in registry `dependencies` | Referenced but not listed |
+
+### 0.2 Frontmatter Completeness
+
+Verify these fields exist and are non-empty in YAML frontmatter:
+
+- `name:` — MUST match directory name
+- `description:` — MUST start with a verb, be non-empty
+- `type:` — MUST be `workflow` or `reference`
+- `triggers:` — MUST exist with ≥3 entries (BLOCKING if missing — skill is invisible to natural language)
+- `allowed-tools:` — Scan body for `Agent()`, `Skill()`, `Write`, `Edit`, `Bash` usage. Flag tools used in body but not in allowed-tools (under-declared) or in allowed-tools but not used in body (over-declared)
+- `version:` — MUST be SemVer format
+
+### 0.3 Structural Integrity
+
+| Check | How | Fail Condition |
+|-------|-----|----------------|
+| Code fence balance | Count ``` openings vs closings per section | Unequal (orphaned fence) |
+| Numbered-list continuity | Scan for numbered items (1., 2., ...) between `##` headers | Orphaned items not part of a contiguous list |
+| Step cross-references | Find all "Step N" mentions, verify each N exists as `## STEP N:` | Reference to nonexistent step |
+| Skill name references | Find all `/skill-name` mentions, verify each exists in `.claude/skills/` | Dead reference |
+| Agent references | Find all `*-agent` mentions, verify each exists in `.claude/agents/` | Dead reference |
+| Placeholder markers | Scan for `<!-- TODO -->`, `<!-- FIXME -->`, `<!-- PLACEHOLDER -->` | Any found |
+| Preamble constraints | For workflow skills, verify critical constraints appear in BOTH preamble (top) AND CRITICAL RULES section (bottom) | Missing from either location |
+
+If ANY check in 0.1-0.3 fails, report it in the evaluation output as a
+**PRE-FLIGHT FAILURE** and include it in the fix recommendations. Do not skip
+these checks — they caught issues in 5/5 evaluated skills.
 
 ---
 
@@ -78,6 +124,9 @@ principles, eval query design, and optimization loop methodology.
 - Run should-trigger queries with ALL installed skills active
 - Verify the target skill activates, not a competitor
 - Report: competing skill name + the conflicting query + trigger rates
+- **Bidirectional signposting**: when a conflict is detected, check if BOTH skills' descriptions mention the other with clear boundary language. If not, flag as "missing reciprocal boundary"
+- **Near-duplicate resolution**: if overlap is HIGH, check whether the target skill delegates to the neighbor (orchestrator wrapper pattern) or reimplements its logic (true duplicate). Read the skill body and any dispatched agents to determine this
+- **Skill-vs-rule overlap**: compare skill steps against auto-loaded rules in `.claude/rules/` for redundancy (e.g., a skill that restates a globally-loaded workflow rule)
 
 ### 2.4 Trigger Regression (--baseline only)
 
@@ -137,6 +186,11 @@ assertion writing, grading methodology, and iteration patterns.
 | 10 | Adversarial phrasing | Trigger misfire |
 
 Score each: CRITICAL (wrong output/data loss) / MAJOR (partial/misleading) / MINOR (cosmetic) / PASS (handled correctly).
+
+**Delegation edge cases** (for skills that call other skills/agents):
+- What happens when the delegate returns empty/zero results?
+- Does the skill handle standalone vs pipeline mode differently? Test both paths.
+- If the skill has dual-mode operation, verify skip conditions work correctly.
 
 ### 3.5 Write and Grade Assertions
 
