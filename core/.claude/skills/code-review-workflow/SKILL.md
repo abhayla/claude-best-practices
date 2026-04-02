@@ -1,13 +1,21 @@
 ---
 name: code-review-workflow
 description: >
-  Run pre-merge quality gates, create PR, and handle review feedback.
-  Use when preparing code for review end-to-end or running the complete
-  pre-merge quality pipeline.
+  Run pre-merge quality gates, create PR, and handle review feedback via
+  code-review-master-agent. Use when preparing code for review end-to-end.
+  For just quality gates without PR, use /review-gate. For just PR creation,
+  use /request-code-review.
 type: workflow
+triggers:
+  - code review
+  - prepare for review
+  - pre-merge review
+  - review and create PR
+  - run quality gates and PR
+  - full review pipeline
 allowed-tools: "Agent Read Grep Glob"
 argument-hint: "<branch name, 'current', or review scope description>"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Code Review Workflow — Full Review Orchestration

@@ -489,7 +489,10 @@
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-04-02",
-    "dependencies": ["regression-test", "tester-agent"],
+    "dependencies": [
+      "regression-test",
+      "tester-agent"
+    ],
     "visibility": "public",
     "description": "Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces structured results for pipeline consumption.",
     "tags": [],
@@ -1773,7 +1776,11 @@
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-04-02",
-    "dependencies": ["fix-loop", "post-fix-pipeline", "learn-n-improve"],
+    "dependencies": [
+      "fix-loop",
+      "post-fix-pipeline",
+      "learn-n-improve"
+    ],
     "visibility": "public",
     "description": "Implement a feature or fix following a structured workflow: requirements analysis, test creation, implementation, test execution, fix-loop delegation, and verification.",
     "tags": [],
@@ -3178,7 +3185,9 @@
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
     "last_updated": "2026-04-02",
-    "dependencies": ["test-knowledge"],
+    "dependencies": [
+      "test-knowledge"
+    ],
     "visibility": "public",
     "description": "Debug failures methodically using a structured diagnosis workflow: reproduce, isolate, hypothesize, gather evidence, find root cause, apply targeted fix, verify, and prevent recurrence.",
     "tags": [],
@@ -3357,7 +3366,7 @@
       "pipeline",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release — preamble added, registry sync, dependencies declared",
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared",
     "tier": "must-have"
   },
   "test-pipeline-agent": {
@@ -3922,14 +3931,19 @@
     "tier": "nice-to-have"
   },
   "code-review-workflow": {
-    "hash": "24827d85e977799519c07439e29d5d9e75007f893f2de9a834af7d72382ebf2b",
+    "hash": "c7b8f9ffb3f536c30241c2ab3f3817370ffb47c5a53f685469f8699b1a1b969d",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-03-30",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "code-review-master-agent",
+      "review-gate",
+      "request-code-review",
+      "receive-code-review"
+    ],
     "visibility": "public",
     "description": "Slash-command wrapper for code-review-master-agent. Pre-merge quality gates, PR creation, and review feedback handling.",
     "tags": [
@@ -3937,7 +3951,7 @@
       "workflow",
       "review"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 code review workflow skill wrapper",
+    "changelog": "v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
   "documentation-master-agent": {

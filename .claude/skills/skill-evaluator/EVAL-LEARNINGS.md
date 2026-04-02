@@ -276,3 +276,19 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Added preamble constraint (delegates to agent, differentiate from /testing-pipeline-workflow and /auto-verify)
 - Synced registry: description, hash, 4 dependencies, tags, changelog
 - Note: triggers already present (6 entries) — no trigger fix needed
+
+---
+
+## Skill #11: code-review-workflow (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Hash stale, missing triggers, empty dependencies
+
+**What evaluator missed:** None.
+
+**Fixes applied:**
+- Added 6 triggers for code review intent
+- Differentiated from /review-gate and /request-code-review in description
+- Synced registry: hash, version 1.0.0→1.1.0, 4 dependencies, changelog
