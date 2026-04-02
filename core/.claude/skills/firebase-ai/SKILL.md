@@ -7,7 +7,7 @@ description: >
   Firebase web or mobile apps.
 allowed-tools: "Read Grep Glob"
 argument-hint: "<what to implement — e.g. 'add text generation' or 'set up multimodal chat with images'>"
-version: "1.0.1"
+version: "1.0.2"
 type: reference
 ---
 
@@ -15,7 +15,28 @@ type: reference
 
 Reference for integrating Gemini AI into Firebase applications via Firebase AI Logic.
 
+**Note:** Model names and SDK imports reflect firebase@latest as of early 2026. Verify against current [Firebase AI Logic docs](https://firebase.google.com/docs/ai-logic) for the latest API surface.
+
 **Request:** $ARGUMENTS
+
+---
+
+## Contents
+
+- Overview (API providers, setup)
+- Text Generation
+- Multimodal Input
+- Chat Sessions
+- Streaming
+- Image Generation (Imagen)
+- Structured JSON Output
+- On-Device Hybrid AI
+- App Check Security
+- Remote Config for Model Selection
+- Generation Parameters
+- Common Patterns and Anti-Patterns
+- Troubleshooting
+- Resources
 
 ---
 
@@ -38,7 +59,7 @@ Use the Gemini Developer API as the default. Only use Vertex AI if the applicati
 
 ### Prerequisites
 
-- Node.js 16+ and npm
+- Node.js (LTS) and npm
 - Firebase project with a web app configured
 - Platform: Web, Android, iOS, or Flutter
 
@@ -248,7 +269,7 @@ for await (const chunk of result.stream) {
 
 ## Image Generation
 
-Using the Imagen model (Nano Banana) for image creation.
+Using the Imagen model for image creation.
 
 ```javascript
 import { getImagenModel } from "firebase/ai";

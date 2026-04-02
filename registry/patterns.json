@@ -1539,21 +1539,21 @@
     "tier": "must-have"
   },
   "firebase-ai": {
-    "hash": "ca8f7f326326bab7d6a6f6efea41e05cde52e6ce9e52c77d8ba7ec3087a73eab",
+    "hash": "b987c9109fafedda10a4fa5f627c0cb280483eaf3147e2cd95118e768b06174a",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-03",
     "dependencies": [],
     "visibility": "public",
-    "description": "Firebase AI Logic with Gemini API integration",
+    "description": "Integrate Firebase AI Logic (Gemini API) including setup, text generation, multimodal input, chat sessions, streaming, image generation, structured JSON output, on-device hybrid AI, and App Check security.",
     "tags": [
       "firebase",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.2: Add TOC, version caveat, remove internal nickname, fix Node.js version | v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have"
   },
   "firebase-data-connect": {
