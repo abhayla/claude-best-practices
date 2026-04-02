@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Python 3.12** required (all CI workflows use 3.12)
 - Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`
-- **Windows**: use `set PYTHONPATH=. &&` prefix instead of `PYTHONPATH=.`, or use Git Bash
+- **Windows**: use `set PYTHONPATH=. &&` prefix instead of `PYTHONPATH=.`, or use Git Bash. All commands below assume Unix shell syntax (forward slashes, `PYTHONPATH=.` prefix)
 
 ## Commands
 
@@ -40,7 +40,7 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 ## Architecture
 
-A curated hub of ~226 Claude Code patterns (agents, skills, rules, hooks) organized by stack. Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
+A curated hub of 226 Claude Code patterns (agents, skills, rules, hooks) organized by stack (count from `registry/patterns.json`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
 
 ### Key Directories
 
@@ -105,7 +105,15 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - Pattern curation is reactive, not speculative — see `core/.claude/rules/rule-curation.md`
 - Pattern quality checks (structure, portability, self-containment) via `/pattern-quality` skill
 - `/synthesize-project` provisions projects; `/synthesize-hub` generalizes patterns back into the hub
-- `update-docs.yml` auto-regenerates docs on main — avoid running `generate_docs.py` manually on main
+- `update-docs.yml` auto-regenerates docs on main — do not duplicate this by running `generate_docs.py` manually on main
+
+## Eval Workflow
+
+Skills are validated through an eval workflow before merge. Recent evals live in `evals/` directories within skill folders. Each eval tests the skill against a real or simulated project scenario. When adding or modifying a skill, run its eval to verify correctness.
+
+## Third-Party Skills
+
+`config/third-party-skills.yml` registers external agent skills (e.g., from MCP servers). During provisioning, `third_party_skills.py` detects matching third-party skills and includes them. To add a new third-party skill: add an entry to `config/third-party-skills.yml` with detection criteria and the skill definition.
 
 ## Rules for Claude
 

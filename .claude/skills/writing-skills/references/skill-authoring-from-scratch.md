@@ -125,6 +125,94 @@ The argument hint appears in help text and teaches users what to provide.
 | `<mode> [details]` | `<scan\|propose\|create> [name]` | Multi-mode skills |
 | `<file-or-description>` | `<path/to/file or natural language>` | Flexible input types |
 
+### 2.1b Naming Conventions
+
+- **Gerund form preferred:** `processing-pdfs`, `analyzing-spreadsheets`,
+  `managing-databases`. Also acceptable: noun phrases (`pdf-processing`)
+  or action-oriented (`process-pdfs`)
+- **Hard constraints:** max 64 characters, lowercase letters/numbers/hyphens
+  only, no XML tags, no reserved words (`anthropic`, `claude`)
+- **Avoid:** vague names (`helper`, `utils`, `tools`), overly generic
+  (`documents`, `data`, `files`), inconsistent patterns within a skill
+  collection
+
+### 2.2b Context Budget
+
+Every token competes for the agent's attention. Targets:
+- **SKILL.md body**: under 500 lines / 5,000 tokens
+- **References**: loaded on demand via conditional `**Read:**` pointers
+
+**Include:** Project-specific conventions, domain procedures, non-obvious edge cases, particular tools/APIs — things the agent wouldn't know without the skill.
+
+**Cut:** General knowledge, obvious steps, exhaustive edge case coverage. Concise stepwise guidance with a working example outperforms exhaustive documentation.
+
+**Test:** "Would the agent get this wrong without this instruction?" If no, cut it. If unsure, test with `/skill-evaluator output`.
+
+**Example — concise vs verbose:**
+
+Good (~50 tokens):
+```markdown
+## Extract PDF text
+
+Use pdfplumber for text extraction:
+\`\`\`python
+import pdfplumber
+with pdfplumber.open("file.pdf") as pdf:
+    text = pdf.pages[0].extract_text()
+\`\`\`
+```
+
+Bad (~150 tokens):
+```markdown
+## Extract PDF text
+
+PDF (Portable Document Format) files are a common file format that
+contains text, images, and other content. To extract text from a PDF,
+you'll need to use a library. There are many libraries available for
+PDF processing, but pdfplumber is recommended because it's easy to
+use and handles most cases well. First, you'll need to install it
+using pip. Then you can use the code below...
+```
+
+The concise version assumes Claude knows what PDFs are and how libraries
+work. Only add context Claude doesn't already have.
+
+**Conditional disclosure:** "Read `references/X.md` if the API returns a non-200 status" — not "see references/ for details."
+
+### 2.2c Content Quality
+
+Three rules that improve Claude's ability to follow skill instructions:
+
+1. **Consistent terminology:** Pick one term per concept and use it
+   throughout. Don't mix "API endpoint" / "URL" / "API route" / "path"
+   — Claude loses precision when the same thing has multiple names.
+
+2. **No time-sensitive information:** Don't include date-dependent content
+   ("If before August 2025, use the old API"). Instead, use a collapsible
+   "Old patterns" section for deprecated content:
+   ```markdown
+   <details>
+   <summary>Legacy v1 API (deprecated 2025-08)</summary>
+   The v1 endpoint `api.example.com/v1/messages` is no longer supported.
+   </details>
+   ```
+
+3. **MCP tool references:** Always use fully qualified names
+   `ServerName:tool_name` (e.g., `BigQuery:bigquery_schema`,
+   `GitHub:create_issue`). Without the server prefix, Claude may fail
+   to locate the tool when multiple MCP servers are active.
+
+### 2.2d Reference Structure
+
+- **One level deep:** All reference files MUST link directly from
+  SKILL.md. Never chain references (SKILL.md → advanced.md → details.md).
+  Claude may partially read deeply nested files, resulting in incomplete
+  information.
+
+- **TOC for long references:** Files over 100 lines MUST include a
+  table of contents at the top so Claude can see the full scope even
+  when previewing with partial reads.
+
 ### 2.2 Write the Title and Preamble
 
 After the frontmatter, write a descriptive title and one-line purpose statement:

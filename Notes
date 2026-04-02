@@ -193,19 +193,57 @@ Revised workflow for writing-skill review:
   12. if yes then go to step 3 and repeat
   13. You approve before I implement
 
-Cross check the implementation plan against below URL
-implementation plan - d:\Abhay\VibeCoding\claude-best-practices\plans\writing-skills-upgrade-and-skill-evaluator.md
-URL - https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
-see if any gaps or edge case still remain in the plan
-Iterate below steps until any gaps or edge case still remains
-  revise plan to close gaps
-  audit plan against the original URL and see if any gaps or edge case still remain
-  For questions, follow your recommendation and ask me only if you need my approval. 
-  Your recommendation should fix the root cause, not just the symptom
-  Your recommendation should be based on industry standards, codebase patterns, or docs you've read
-  Before asking questions, read relevant files/docs in the codebase to ground your recommendation in what actually exists — don't ask me things you can answer by reading code
-  Fix the implemntation plan and repeat
-Show me the final for implemntation and wait for my approval before implementation
+**
+  Objective: Audit Anthropic's official agent skill best practices against our skill-authoring patterns and produce an  
+  implementation plan to close all gaps.
+
+  Source URL: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+
+  Phase 1 — Extract topics
+  - Fetch the URL and extract every distinct best-practice topic/section (e.g., "skill naming", "error handling",       
+  "testing", etc.)
+  - List them in a numbered table: #, Topic Name, One-line summary
+
+  Phase 2 — Coverage audit
+  For each topic from Phase 1, check coverage in these two skills:
+  - .claude/skills/writing-skills/SKILL.md (and any files in its references/ subdirectory)
+  - .claude/skills/skill-evaluator/SKILL.md (and any files in its references/ subdirectory)
+
+  Produce a coverage matrix:
+
+  ┌─────┬───────┬─────────────────────────────┬─────────────────────────────┬─────────────────────────────┐
+  │  #  │ Topic │       writing-skills        │       skill-evaluator       │           Verdict           │
+  ├─────┼───────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┤
+  │ 1   │ ...   │ Covered / Partial / Missing │ Covered / Partial / Missing │ OK / Gap / New skill needed │
+  └─────┴───────┴─────────────────────────────┴─────────────────────────────┴─────────────────────────────┘
+
+  "Partial" means the topic is mentioned but lacks depth, edge cases, or actionable guidance compared to the source URL.
+
+  Phase 3 — Gap closure (iterate until clean)
+  For each row with verdict "Gap" or "New skill needed":
+  1. Draft a specific plan: what to add/change, in which file, with rationale grounded in the URL content
+  2. Self-audit the plan against the original URL — are there edge cases or subtleties the plan misses?
+  3. If gaps remain, revise and re-audit. Repeat until the plan fully covers the topic.
+
+  Decision rules (minimize questions to me):
+  - If a topic maps cleanly to an existing skill section → recommend updating that section (don't ask me)
+  - If a topic requires a new skill → recommend it with a name and scope, then ask for my approval before including it  
+  in the plan
+  - If a topic conflicts with an existing pattern in our codebase → flag the conflict with your recommendation and ask  
+  me
+  - For all other decisions, follow your best judgment based on: the URL content, our codebase conventions, and industry
+   standards
+  - Before flagging anything as a question, read the relevant files first — don't ask what you can answer by reading    
+  code
+
+  Output format:
+  Present the final implementation plan as:
+  1. Coverage matrix (Phase 2)
+  2. For each gap: file to modify, section to add/update, summary of changes, rationale
+  3. Any new skills proposed (with name, scope, trigger)
+
+  Wait for my explicit approval before implementing any changes.
+**
 
   How testing of each Hub (core) resources to be done? Create a project to test. If required, create a skills for this testing
 

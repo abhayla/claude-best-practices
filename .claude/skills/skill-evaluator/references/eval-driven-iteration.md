@@ -147,6 +147,23 @@ Read the full trace of what the agent did, not just the final output. Three diag
 | Agent follows instructions that don't apply to the current task | Too many instructions, no conditional gating | Add "only if X" conditions, or move to reference with conditional read |
 | Agent spends time choosing between options | Too many equal options, no default | Pick a default, mention alternatives briefly |
 
+## Skill Navigation Observation
+
+Beyond execution traces, observe HOW Claude navigates the skill's file structure:
+
+| Observation | Signal | Fix |
+|---|---|---|
+| Reads files in unexpected order | Structure isn't intuitive | Reorganize directory, clarify pointers in SKILL.md |
+| Fails to follow reference links | Links not explicit enough | Use `**Read:** file.md` format, not inline links |
+| Repeatedly reads the same reference | Content should be more accessible | Promote key content to SKILL.md body |
+| Never accesses a bundled file | File poorly signaled or unnecessary | Improve pointer text or remove the file |
+| Uses `head -100` on a reference | File too long, no TOC | Add table of contents at top |
+
+**When to check:** During scenario runs (Step 3.3), review not just the
+output but which files Claude read, in what order, and whether any were
+skipped or partially read. This reveals information architecture problems
+that assertion-based testing misses.
+
 ## Adversarial Categories
 
 10 categories for stress testing — pick most realistic for the skill's domain:

@@ -88,3 +88,14 @@ MUST NOT delete a skill without the deprecation lifecycle. Abrupt removal breaks
 
 **Fix:** End with a clear next-step recommendation: "Proceed with `/implement`" or "Review the report and decide whether to fix or defer."
 
+### Anti-Pattern 9: The Backslash Bug
+
+**What it looks like:** File paths in skill content use backslashes:
+`scripts\helper.py`, `reference\guide.md`
+
+**Why it fails:** Claude may interpret backslashes as escape characters
+or generate OS-specific paths. Forward slashes work on all platforms.
+
+**Fix:** Always use forward slashes: `scripts/helper.py`, `reference/guide.md`.
+This applies to paths in SKILL.md body, reference files, and script arguments.
+

@@ -2,7 +2,7 @@
 
 Validates:
 1. writing-skills SKILL.md edits (frontmatter, new sections, cross-references)
-2. instruction-writing-patterns.md reference (8 patterns)
+2. instruction-writing-patterns.md reference (11 patterns)
 3. skill-evaluator SKILL.md (frontmatter, steps, modes)
 4. skill-evaluator reference files (description-optimization, eval-driven-iteration)
 5. Cross-references between writing-skills and skill-evaluator
@@ -65,19 +65,24 @@ class TestWritingSkillsNecessityCheck:
 
 
 class TestWritingSkillsContextBudget:
-    """Context budget guidance must exist after Step 2.2."""
+    """Context budget guidance must exist in SKILL.md or its references."""
 
     def test_context_budget_section_exists(self):
         content = _read(WRITING_SKILLS / "SKILL.md")
-        assert "Context Budget" in content
+        ref_content = _read(WRITING_SKILLS / "references" / "skill-authoring-from-scratch.md")
+        assert "Context Budget" in content or "context budget" in content.lower() or "Context Budget" in ref_content
 
     def test_token_target_mentioned(self):
         content = _read(WRITING_SKILLS / "SKILL.md")
-        assert "5,000" in content or "5000" in content
+        ref_content = _read(WRITING_SKILLS / "references" / "skill-authoring-from-scratch.md")
+        combined = content + ref_content
+        assert "5,000" in combined or "5000" in combined
 
     def test_would_agent_get_wrong_test(self):
         content = _read(WRITING_SKILLS / "SKILL.md")
-        assert "agent get this wrong" in content.lower()
+        ref_content = _read(WRITING_SKILLS / "references" / "skill-authoring-from-scratch.md")
+        combined = (content + ref_content).lower()
+        assert "agent get this wrong" in combined
 
     def test_conditional_disclosure_guidance(self):
         content = _read(WRITING_SKILLS / "SKILL.md")
@@ -165,7 +170,7 @@ class TestWritingSkillsMustDo:
 
 
 class TestInstructionWritingPatterns:
-    """instruction-writing-patterns.md must have all 8 patterns."""
+    """instruction-writing-patterns.md must have all 11 patterns."""
 
     @pytest.fixture(autouse=True)
     def load_content(self):
