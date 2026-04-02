@@ -65,12 +65,20 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`dedup_check.py`** — Dedup validator (`--validate-all`) and secret scanner (`--secret-scan`)
 - **`generate_docs.py`** / **`generate_workflow_docs.py`** — Rebuild docs dashboard and workflow docs
 - **`extract_references.py`** — Splits oversized SKILL.md files into `references/` subdirectories
+- **`collate.py`** — Project→hub sync: collects patterns from downstream projects
+- **`scan_web.py`** — Internet→hub sync: discovers patterns from curated URLs and topics
+- **`sync_to_projects.py`** — Hub→projects sync: pushes updated patterns to repos in `config/repos.yml`
+- **`check_freshness.py`** — Detects stale patterns based on age and activity
+- **`assign_workflow_groups.py`** — Assigns patterns to workflow groups for doc generation
+- **`discovery_adapter.py`** — Adapter for the pattern discovery pipeline
 
 ### Key Config Files
 
 - **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit after adding/removing patterns
 - **`config/workflow-groups.yml`** — Seed patterns for workflow doc generation. Stale seeds silently break docs
 - **`config/workflow-contracts.yaml`** — Per-workflow step DAGs, artifact contracts, gate expressions
+- **`config/third-party-skills.yml`** — Registry of third-party agent skills detected during provisioning
+- **`config/topics.yml`** / **`config/urls.yml`** — Topic mappings and curated URLs for `scan_web.py`
 
 ### CI Workflows
 

@@ -174,3 +174,36 @@ nano banana pro and 2
 
  Skill Evaluation
  https://agentskills.io/skill-creation/evaluating-skills
+
+
+Revised workflow for writing-skill review:
+
+  1. You share URLs or content (one or many, across messages)
+  2. You signal "done sharing" when ready for analysis
+  3. Iterate below steps until you are satisfied with the plan
+  4. I audit writing-skills and any new planned to be created or updated skills against all collected best practices
+  5. I delta-check — filter out what's already covered vs genuinely missing/outdated
+  6. I classify each finding by scope: project-only, hub, or both
+  7. I brainstorm — trade-offs, priorities, alternatives
+  8. I draft an implementation plan
+  9. I self-audit the plan for gaps and edge cases
+  10. I revise plan to close gaps
+  11. audit plan against the original URL and see if any gaps or edge case still remain
+  12. if yes then go to step 3 and repeat
+  13. You approve before I implement
+
+Cross check the implementation plan against below URL
+implementation plan - d:\Abhay\VibeCoding\claude-best-practices\plans\writing-skills-upgrade-and-skill-evaluator.md
+URL - https://agentskills.io/skill-creation/using-scripts
+see if any gaps or edge case still remain in the plan
+Iterate below steps until any gaps or edge case still remains
+  revise plan to close gaps
+  audit plan against the original URL and see if any gaps or edge case still remain
+  For questions, follow your recommendation and ask me only if you need my approval. 
+  Your recommendation should fix the root cause, not just the symptom
+  Your recommendation should be based on industry standards, codebase patterns, or docs you've read
+  Before asking questions, read relevant files/docs in the codebase to ground your recommendation in what actually exists — don't ask me things you can answer by reading code
+  Fix the implemntation plan and repeat
+Show me the final for implemntation and wait for my approval before implementation
+
+  How testing of each Hub (core) resources to be done? Create a project to test. If required, create a skills for this testing
