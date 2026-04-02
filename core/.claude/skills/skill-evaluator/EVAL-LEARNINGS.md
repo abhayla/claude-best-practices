@@ -257,3 +257,22 @@ Accumulated learnings from evaluating real skills. Each entry records what the e
 - Added 6 triggers, preamble constraint, 6 CRITICAL RULES
 - Differentiated from /auto-verify and /test-pipeline in description
 - Synced registry: description, hash, dependencies (2), tags, changelog
+
+---
+
+## Skill #10: test-pipeline (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Registry missing description, tags, and changelog fields entirely (not just empty — absent)
+- Hash stale, dependencies empty
+- Missing preamble constraints
+- Near-duplicate check flagged testing-pipeline-workflow (different scope — broader TDD chain vs thin agent wrapper)
+
+**What evaluator missed:** None.
+
+**Fixes applied:**
+- Added preamble constraint (delegates to agent, differentiate from /testing-pipeline-workflow and /auto-verify)
+- Synced registry: description, hash, 4 dependencies, tags, changelog
+- Note: triggers already present (6 entries) — no trigger fix needed

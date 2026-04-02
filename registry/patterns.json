@@ -3337,15 +3337,27 @@
     "tier": "nice-to-have"
   },
   "test-pipeline": {
-    "hash": "fe2dc2ed539bd41e85858295587e731f51c0f488b0cd98066640f3bf188e0d07",
+    "hash": "d8edff5c6279de2c3788b782dfd75cd520a3582a32b272f9cc091a726080088c",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-03-17",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "test-pipeline-agent",
+      "fix-loop",
+      "auto-verify",
+      "post-fix-pipeline"
+    ],
     "visibility": "public",
+    "description": "Full test verification pipeline: fix failures, verify changes, review visual proof, commit. Thin wrapper dispatching test-pipeline-agent.",
+    "tags": [
+      "testing",
+      "pipeline",
+      "verification"
+    ],
+    "changelog": "v1.0.0: Initial release — preamble added, registry sync, dependencies declared",
     "tier": "must-have"
   },
   "test-pipeline-agent": {
