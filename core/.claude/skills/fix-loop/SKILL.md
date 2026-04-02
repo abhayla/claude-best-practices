@@ -4,9 +4,16 @@ description: >
   Analyze failures and iteratively apply minimal fixes, optionally retesting until resolved.
   Full Loop mode (with retest command) iterates until green. Single Fix mode
   (no retest) does one pass. Use when tests fail, builds break, or runtime errors occur.
-allowed-tools: "Bash Read Grep Glob Write Edit Skill"
+triggers:
+  - fix-loop
+  - fix tests
+  - fix build
+  - iterate fix
+  - fix failures
+  - retest until green
+allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
 argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "1.2.0"
+version: "1.3.0"
 type: workflow
 ---
 

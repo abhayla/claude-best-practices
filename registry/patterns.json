@@ -1550,18 +1550,25 @@
     "tier": "must-have"
   },
   "fix-loop": {
-    "hash": "192d78878d1728ace982319cc1f31f8656348172da2dc4a1c3bff5391654b417",
+    "hash": "143e9b3e69167d413d167e243f07ebb5c1472f9b276fcc41f56aaaac5873ae87",
     "type": "skill",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "test-failure-analyzer-agent"
+    ],
     "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "description": "Analyze failures and iteratively apply minimal fixes, optionally retesting until resolved. Full Loop mode (with retest command) iterates until green. Single Fix mode (no retest) does one pass. Use when tests fail, builds break, or runtime errors occur.",
+    "tags": [
+      "testing",
+      "fix",
+      "iteration",
+      "debugging"
+    ],
+    "changelog": "v1.3.0: Add triggers list, add Agent to allowed-tools (required for test-failure-analyzer-agent delegation), add test-failure-analyzer-agent dependency",
     "tier": "must-have"
   },
   "flutter": {
