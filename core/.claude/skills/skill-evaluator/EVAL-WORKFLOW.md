@@ -84,9 +84,21 @@ Commit hub changes: `core/` fix + registry update + learnings entry.
 - **Registry fixed:** what synced
 - **Evaluator learned:** what was missed (logged, not applied)
 
-### Step 7: Next Skill
+### Step 7: Next Skill (AUTO)
 
-Pick next skill, repeat from Step 0.
+Automatically pick the next skill and repeat from Step 0 without waiting for
+user input. Selection priority:
+
+1. **Empty registry description** — highest signal of incomplete metadata
+2. **Registry hash mismatch** — file changed but registry not updated
+3. **Missing triggers field** — activation reliability gap
+4. **High-frequency skills first** — skills in the core testing/dev workflow
+   (implement, tdd, code-quality-gate) before niche/stack-specific skills
+5. **Near-duplicates** — if flagged during a previous evaluation (e.g.,
+   debugging-loop vs systematic-debugging), evaluate next to resolve
+
+Skip skills already evaluated in this batch (check EVAL-LEARNINGS.md headers).
+Do NOT pause between skills — proceed immediately after commit.
 
 ## Checkpoints
 
