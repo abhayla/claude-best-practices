@@ -322,3 +322,20 @@ After evaluating 12 skills individually, the remaining 133 skills + 60 agents/ru
 - Updated last_updated timestamps
 
 This batch fix addresses the mechanical registry drift that was the most common issue across all 12 individually evaluated skills. The structural fixes (triggers, preamble, CRITICAL RULES) still require per-skill evaluation.
+
+---
+
+## Skill #13: continue (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Missing triggers, version mismatch (registry 2.1.0 vs file 1.1.0), weak RULES section, missing preamble
+
+**What evaluator missed:** None.
+
+**Fixes applied:**
+- Added 6 triggers for session resumption intent
+- Added preamble differentiating from /start-session and /handover
+- Strengthened RULES to CRITICAL RULES with MUST/MUST NOT
+- Fixed registry version to match file (1.1.0)

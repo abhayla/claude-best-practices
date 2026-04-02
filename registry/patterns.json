@@ -868,10 +868,10 @@
     "tier": "nice-to-have"
   },
   "continue": {
-    "hash": "1d379f0d4b7c3501efcfcc8f578f505a76e78877ea318bb3fc32a8839071c49a",
+    "hash": "eece6c04cc9243a0abfb41882f8715218d36853715461114135a46368d4dcd53",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-04-02",
@@ -883,7 +883,7 @@
       "context",
       "continuity"
     ],
-    "changelog": "v2.1.0: Added saved session detection \u00e2\u20ac\u201d suggests /start-session when .claude/sessions/ exists",
+    "changelog": "v1.1.0: Add triggers, preamble, strengthen RULES to CRITICAL RULES, differentiate from /start-session and /handover | v1.0.0: Initial release",
     "tier": "must-have"
   },
   "contract-test": {

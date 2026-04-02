@@ -8,11 +8,20 @@ allowed-tools: "Bash Read Grep Glob"
 argument-hint: ""
 version: "1.1.0"
 type: workflow
+triggers:
+  - continue
+  - resume work
+  - pick up where I left off
+  - what was I working on
+  - continue previous session
+  - resume session
 ---
 
 # Continue — Resume Previous Work
 
 Resume work from where the last session left off.
+
+**Critical:** This skill is read-only — MUST NOT modify any files. For restoring a saved session checkpoint, use `/start-session` instead. For a full handover document, use `/handover`.
 
 ---
 
@@ -63,8 +72,9 @@ Present a concise briefing:
 
 ---
 
-## RULES
+## CRITICAL RULES
 
-- Do NOT modify any files — this skill is read-only
-- Keep the briefing concise — under 30 lines
-- Always include a specific suggested next action
+- MUST NOT modify any files — this skill is strictly read-only
+- MUST keep the briefing concise — under 30 lines
+- MUST include a specific suggested next action
+- MUST check for saved session files in .claude/sessions/ before falling back to git-only briefing
