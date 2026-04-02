@@ -8,6 +8,12 @@ type: workflow
 allowed-tools: "Agent Read Grep Glob"
 argument-hint: "<'save', 'restore', 'handover', or session file path>"
 version: "1.0.0"
+triggers:
+  - session continuity
+  - manage session
+  - save or restore session
+  - session management
+  - preserve session context
 ---
 
 # Session Continuity — Save, Restore, and Handover

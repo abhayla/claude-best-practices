@@ -354,3 +354,18 @@ This batch fix addresses the mechanical registry drift that was the most common 
 **Fixes applied:**
 - Added 6 triggers for session save intent
 - Fixed registry version to match file (1.1.0)
+
+---
+
+## Skill #15: session-continuity (2026-04-02)
+
+**Verdict:** FIX
+
+**What evaluator v2.0 Step 0 caught:**
+- Missing triggers
+
+**What evaluator missed:** None. Already has 5 MUST rules.
+
+**Fixes applied:**
+- Added 5 triggers for session management intent
+- Registry hash sync

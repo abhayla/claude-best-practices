@@ -4217,7 +4217,7 @@
     "tier": "nice-to-have"
   },
   "session-continuity": {
-    "hash": "8c544bbcb7a14cde52c801cfad76006826150fb55b91d9c48c19382925957feb",
+    "hash": "cf41114386b729057f8c7b667611d7d303a21b821f3311e6ba40db5ffc2fc2ea",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -4232,7 +4232,7 @@
       "workflow",
       "session"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.0.0: Add triggers, registry sync",
     "tier": "nice-to-have"
   },
   "learning-self-improvement": {
