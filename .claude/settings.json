@@ -3,8 +3,7 @@
     "allow": [
       "Edit",
       "Write",
-      "Bash(cp * .claude/*)",
-      "Bash(cp * core/.claude/*)"
+      "Bash(cp *)"
     ],
     "deny": []
   },

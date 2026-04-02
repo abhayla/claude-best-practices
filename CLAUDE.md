@@ -48,6 +48,8 @@ A curated hub of ~225 Claude Code patterns (agents, skills, rules, hooks) organi
 - **`.claude/rules/`** — Auto-loaded rules. Global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when working with matching files
 - **`config/`** — `settings.yml`, `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow docs), `pipeline-stages.yaml` (DAG config), `workflow-contracts.yaml` (step DAGs + artifact contracts)
 - **`docs/workflows/`** — Auto-generated workflow docs. Do not edit manually — regenerate after pattern changes
+- **`internet-sources/`** — Pending and archived sources for `scan_web.py` (`pending/`, `archived/`)
+- **`plans/`** — Implementation plan files for larger initiatives
 
 ### Stack Detection
 
@@ -71,6 +73,8 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`check_freshness.py`** — Detects stale patterns based on age and activity
 - **`assign_workflow_groups.py`** — Assigns patterns to workflow groups for doc generation
 - **`discovery_adapter.py`** — Adapter for the pattern discovery pipeline
+- **`aggregate_telemetry.py`** — Aggregates telemetry data from pattern usage across projects
+- **`sync_to_local.py`** — Hub→local sync: pulls patterns into a local project directory
 
 ### Key Config Files
 
