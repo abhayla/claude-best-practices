@@ -10,12 +10,12 @@ allowed-tools: "Agent Read Grep Glob"
 argument-hint: "[--capture-proof | --no-capture-proof] [--skip-fix] [failure_output]"
 triggers:
   - test pipeline
-  - run tests
+  - fix verify commit
   - verify and commit
-  - full test
-  - test verification
-  - run full test
-version: "1.0.0"
+  - full test pipeline
+  - test verification pipeline
+  - run test pipeline
+version: "1.1.0"
 ---
 
 # Test Pipeline — Full Verification Chain

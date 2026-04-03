@@ -4,10 +4,18 @@ description: >
   Run the complete test verification chain from TDD through quality gates.
   Use when running the full testing workflow end-to-end rather than
   individual test skills.
+  NOT for running specific test frameworks (use /pytest-dev, /jest-dev, /vitest-dev) or the fix-verify-commit chain (use /test-pipeline).
+triggers:
+  - full testing pipeline
+  - tdd through quality gates
+  - complete test verification
+  - end-to-end testing workflow
+  - testing pipeline orchestration
+  - run full test chain
 type: workflow
 allowed-tools: "Agent Read Grep Glob"
 argument-hint: "<test target, failure output, or 'full-suite'>"
-version: "1.0.0"
+version: "1.2.0"
 ---
 
 # Testing Pipeline Workflow — Full Verification Orchestration
@@ -72,12 +80,14 @@ After the agent completes, relay the testing summary to the user:
 
 ## MUST DO
 
-- Always dispatch via testing-pipeline-master-agent — do not inline orchestration
-- Always relay the unified verdict and any screenshot override details
-- Always report flaky tests detected during the run
+- Always dispatch via testing-pipeline-master-agent — do not inline orchestration — Why: the agent owns state, gates, and retry logic; inlining breaks observability
+- Always relay the unified verdict and any screenshot override details — Why: overrides indicate tests that passed by exit code but failed visually, which blocks commit
+- Always report flaky tests detected during the run — Why: flaky tests erode CI confidence and must be quarantined per testing.md rules
+- If $ARGUMENTS is empty, default to "full-suite" — Why: the most common invocation is a full pipeline run
 
 ## MUST NOT DO
 
-- MUST NOT implement test orchestration logic in this skill — delegate to the agent
-- MUST NOT modify test artifact directories directly — the agent handles cleanup and writes
-- MUST NOT proceed past a FAILED gate — the agent enforces fail-closed semantics
+- MUST NOT implement test orchestration logic in this skill — delegate to the agent — Why: duplicating orchestration creates state divergence between skill and agent
+- MUST NOT modify test artifact directories directly — the agent handles cleanup and writes — Why: concurrent writes corrupt test-results/ JSON files
+- MUST NOT proceed past a FAILED gate — the agent enforces fail-closed semantics — Why: shipping past a failed gate defeats the purpose of the pipeline
+- MUST NOT skip the E2E step even if no UI tests exist — let the agent detect and skip — Why: the agent's skip logic handles edge cases like unconfigured visual-tests.yml

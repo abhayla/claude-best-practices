@@ -8,7 +8,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "[test_directory] [framework: pytest|jest|vitest] [focus: audit|dead|dupes|slow|readability|optimize|all]"
-version: "1.2.0"
+version: "1.3.0"
 triggers:
   - test maintenance
   - test cleanup
@@ -227,10 +227,11 @@ Include stale stub count and stub-to-implemented ratio in the STEP 7 health repo
 
 ## STEP 3: Detect Duplicates
 
-Duplicate tests waste CI time and create maintenance burden.
+Duplicate tests waste CI time and create maintenance burden. Compare test function bodies using
+AST similarity (Python) or string diff (JS/TS). Flag pairs with >80% body similarity. Also check
+for tests with identical assertions on the same function but different names.
 
-
-**Read:** `references/detect-duplicates.md` for detailed step 3: detect duplicates reference material.
+**Read:** `references/detect-duplicates.md` for detailed AST comparison techniques and thresholds.
 
 ## STEP 4: Identify Slow Tests
 
@@ -283,20 +284,25 @@ For each slow test, estimate time saved if the fix is applied:
 
 ## STEP 5: Improve Readability
 
+Audit test names, structure, and assertions for clarity. Rename vague test names to
+`test_{action}_{condition}_{expected}`. Split tests with multiple unrelated assertions.
+Replace magic numbers with named constants. Ensure Arrange-Act-Assert structure is clear.
 
-**Read:** `references/improve-readability.md` for detailed step 5: improve readability reference material.
+**Read:** `references/improve-readability.md` for detailed patterns and before/after examples.
 
 ## STEP 6: Optimize Execution
 
+Configure parallel execution (`pytest-xdist`, `jest --maxWorkers`), optimize fixture scoping,
+split slow integration tests into a separate CI stage, and enable test sharding for large suites.
 
-**Read:** `references/optimize-execution.md` for detailed step 6: optimize execution reference material.
+**Read:** `references/optimize-execution.md` for framework-specific optimization commands.
 
 ## STEP 7: Report
 
-Generate a test health dashboard summarizing all findings.
+Generate a test health dashboard with: total tests by type, pass/fail/skip counts, top 10 slowest
+tests, dead test count, duplicate count, quarantine count, E2E stub ratio, and overall health grade.
 
-
-**Read:** `references/report.md` for detailed step 7: report reference material.
+**Read:** `references/report.md` for the full dashboard template and grading criteria.
 
 ## STEP 8: Quarantine Age Audit
 

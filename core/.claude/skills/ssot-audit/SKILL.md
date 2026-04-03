@@ -4,15 +4,26 @@ description: >
   Audit project's Claude Code configuration for Single Source of Truth violations.
   Detects duplicated constraints, misplaced config, bloated CLAUDE.md, and layer misuse.
   Use when editing CLAUDE.md or .claude/ files to catch configuration drift.
+  NOT for placing individual rules (use /claude-guardian) or authoring new patterns (use /skill-authoring-workflow).
+triggers:
+  - ssot audit
+  - config duplication check
+  - CLAUDE.md bloat audit
+  - configuration drift detection
+  - layer misuse check
+  - single source of truth violations
 type: workflow
 allowed-tools: "Read Grep Glob"
 argument-hint: "[--fix]"
-version: "1.0.0"
+version: "1.2.0"
 ---
 
 # SSOT Audit
 
 Scan the project's `.claude/` directory and CLAUDE.md for Single Source of Truth violations: duplicated constraints, misplaced configuration, bloated files, and content that lives in the wrong layer.
+
+**This skill is read-only** (allowed-tools: Read Grep Glob). It MUST NOT modify any files.
+MUST distinguish intentional pointers (e.g., "see .claude/rules/X.md") from actual duplication.
 
 **Default mode is read-only.** Pass `--fix` to get concrete edit suggestions for each violation.
 
@@ -281,11 +292,11 @@ Present fixes as suggestions only. Do not apply edits -- allowed-tools is read-o
 
 ## CRITICAL RULES
 
-- MUST NOT modify any files -- this skill is read-only (allowed-tools: Read Grep Glob)
-- MUST NOT report false positives for intentional pointers (e.g., "see .claude/rules/X.md" in CLAUDE.md is a cross-reference, not duplication)
-- MUST distinguish between exact duplication and intentional cross-references -- a one-line pointer to a rule file is correct SSOT behavior
-- MUST use semantic comparison, not just string matching -- the same concept expressed in different words counts as duplication
-- MUST provide a suggested fix for every violation -- reports without actionable fixes waste the user's time
-- MUST read the `configuration-ssot` rule (if present in `.claude/rules/`) to use as the authoritative reference for what belongs in which layer
-- MUST NOT flag stack-prefixed rule pairs (e.g., `android.md` and `react-nextjs.md`) as duplicates when they express similar patterns for different stacks
-- MUST count content lines only (excluding frontmatter, blank lines, and headings) when assessing whether a skill is a stub
+- MUST NOT modify any files -- Why: this skill is read-only (allowed-tools: Read Grep Glob); edits would violate least-privilege and surprise the user
+- MUST NOT report false positives for intentional pointers (e.g., "see .claude/rules/X.md" in CLAUDE.md is a cross-reference, not duplication) -- Why: pointers are correct SSOT behavior; flagging them erodes trust in the audit
+- MUST distinguish between exact duplication and intentional cross-references -- Why: a one-line pointer to a rule file is the prescribed pattern per configuration-ssot.md; treating it as duplication would recommend removing correct config
+- MUST use semantic comparison, not just string matching -- Why: the same concept expressed in different words counts as duplication; string-only matching misses the majority of real violations
+- MUST provide a suggested fix for every violation -- Why: reports without actionable fixes waste the user's time and require a second pass to determine remediation
+- MUST read the `configuration-ssot` rule (if present in `.claude/rules/`) to use as the authoritative reference for what belongs in which layer -- Why: the rule is the SSOT for layer taxonomy; hardcoding the taxonomy in this skill would itself be an SSOT violation
+- MUST NOT flag stack-prefixed rule pairs (e.g., `android.md` and `react-nextjs.md`) as duplicates when they express similar patterns for different stacks -- Why: stack-specific rules legitimately restate similar concepts for different ecosystems
+- MUST count content lines only (excluding frontmatter, blank lines, and headings) when assessing whether a skill is a stub -- Why: frontmatter and structural headings inflate line counts and mask genuinely thin content

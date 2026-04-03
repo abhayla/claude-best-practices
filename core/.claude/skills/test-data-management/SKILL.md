@@ -7,20 +7,24 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "<test-data-concern> [language]"
-version: "1.0.0"
+version: "1.1.0"
 triggers:
-  - test data
-  - factory
-  - faker
-  - seed data
-  - test fixtures
+  - test data management
+  - test factory
   - factory boy
-  - fishery
+  - faker seed
+  - seed data
+  - test data isolation
 ---
 
 # Test Data Management Reference
 
 Patterns for creating, managing, and maintaining test data in Python and TypeScript.
+**Stack scope:** Python (factory_boy, Faker) and TypeScript (Fishery, @faker-js/faker).
+For Kotlin/Android test data patterns, use `/android-test-patterns` instead.
+For pytest fixture mechanics (scope, yield, autouse), see `/pytest-dev`.
+
+**Install:** `pip install factory-boy faker` (Python) / `npm install fishery @faker-js/faker` (TypeScript)
 
 **Request:** $ARGUMENTS
 
@@ -239,7 +243,8 @@ class OrderBuilder {
 
 ## Fixture Files
 
-For static reference data, load from JSON or YAML files.
+Static data files (JSON/YAML) for test reference data. These are NOT pytest fixture functions —
+for `@pytest.fixture` mechanics (scope, yield, autouse, conftest), see `/pytest-dev`.
 
 ### Organization Convention
 
@@ -374,6 +379,15 @@ Each test must set up its own data and assert against it.
 
 **Over-specified test data** — Specifying irrelevant fields obscures what the test checks.
 Only set fields relevant to the assertion; let factories handle the rest.
+
+---
+
+## See Also
+
+- `/pytest-dev` — pytest fixture mechanics (scope, yield, autouse, conftest)
+- `/tdd-failing-test-generator` — generates factory stubs as part of the TDD red phase
+- `/integration-test` — database container setup and session management
+- `/android-test-patterns` — Kotlin/Android test data patterns
 
 ---
 

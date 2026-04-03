@@ -5,9 +5,15 @@ description: >
   mocking (monkeypatch, pytest-mock), plugins, and conftest.py. Use when writing
   or running Python tests with pytest.
 allowed-tools: "Read Grep Glob"
-triggers: "pytest, conftest, fixture, parametrize, monkeypatch, pytest-mock, python test"
+triggers:
+  - pytest
+  - conftest
+  - fixture
+  - parametrize
+  - monkeypatch
+  - pytest-mock
 argument-hint: "<pattern-to-look-up or 'config' or 'fixtures' or 'mock' or 'markers' or 'async'>"
-version: "1.0.0"
+version: "1.0.1"
 type: reference
 ---
 

@@ -9,16 +9,21 @@ triggers:
   - tdd
   - test-driven
   - red-green-refactor
-allowed-tools: "Bash Read Write Edit Grep Glob Skill"
+  - test first
+  - write tests before code
+  - failing test first
+allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<feature-or-behavior-description>"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 ---
 
 # Test-Driven Development (Red-Green-Refactor)
 
 Build the requested feature using strict TDD discipline. Every line of production code
-must be justified by a failing test.
+must be justified by a failing test. MUST NOT write production code without a failing test.
+MUST NOT skip the green baseline check. For bulk test generation from PRDs/specs before
+starting TDD cycles, use `/tdd-failing-test-generator` instead.
 
 **Request:** $ARGUMENTS
 
@@ -58,6 +63,10 @@ If the baseline is not green, do NOT proceed. TDD builds on a foundation of pass
 Ask the user whether to fix existing failures first or proceed with a known-broken baseline
 (not recommended).
 
+If no test framework is found, STOP and present framework options appropriate for the
+project's language (e.g., pytest for Python, Jest/Vitest for TypeScript, JUnit for Kotlin).
+Install the chosen framework before continuing. TDD requires a working test runner.
+
 4. Identify where new tests should live (follow existing test file conventions)
 5. Identify where production code should live
 
@@ -65,13 +74,21 @@ Ask the user whether to fix existing failures first or proceed with a known-brok
 
 ## STEP 1: RED — Write a Failing Test
 
+Choose the smallest meaningful behavior. Write ONE test using Arrange-Act-Assert with a
+descriptive name (`test_{action}_{scenario}_{expected}`). Run the test — it MUST fail.
+Verify it fails for the RIGHT reason (missing behavior, not syntax error). If it passes
+unexpectedly, STOP and investigate. MUST NOT write any production code during this phase.
 
-**Read:** `references/red-write-a-failing-test.md` for detailed step 1: red — write a failing test reference material.
+**Read:** `references/red-write-a-failing-test.md` for detailed sub-steps (1.1–1.6), failure gate table, and phase rules.
 
 ## STEP 2: GREEN — Minimal Implementation
 
+Write the SIMPLEST code that makes the failing test pass — hardcode if possible (e.g.,
+`return 3` instead of `return a + b`). The next test will force generalization. Run the
+new test, then run ALL existing tests for regression. MUST NOT refactor, rename, or
+beautify during this phase.
 
-**Read:** `references/green-minimal-implementation.md` for detailed step 2: green — minimal implementation reference material.
+**Read:** `references/green-minimal-implementation.md` for detailed sub-steps (2.1–2.5), regression handling, and phase rules.
 
 ## STEP 3: REFACTOR — Clean Up
 

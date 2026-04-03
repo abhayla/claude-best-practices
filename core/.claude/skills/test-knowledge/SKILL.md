@@ -4,9 +4,17 @@ description: >
   Manage a self-improving knowledge base of testing patterns and lessons learned.
   Use when debugging test failures, choosing fixtures, handling platform quirks,
   or recording a resolved test issue. Modes: search, add, review, seed, digest, stats.
+  NOT for general learning capture (use /learn-n-improve) or test suite maintenance (use /test-maintenance).
+triggers:
+  - search test knowledge
+  - add test lesson
+  - test pattern lookup
+  - testing knowledge base
+  - record test fix pattern
+  - test knowledge digest
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode> [query or entry]"
-version: "1.0.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -93,13 +101,15 @@ Count entries per category and report.
 
 ## MUST DO
 
-- Always use the standard entry format (category code, context, pattern, example, date)
-- Always store knowledge in `.claude/test-knowledge.md` — never inside the skill template directory
-- Always check for duplicate entries before adding (search by title keywords first)
-- Always include a concrete code or command example in every entry
+- Always use the standard entry format (category code, context, pattern, example, date) — Why: consistent format enables grep-based search across all entries
+- Always store knowledge in `.claude/test-knowledge.md` — never inside the skill template directory — Why: project-specific knowledge must stay with the project, not in the distributed template
+- Always check for duplicate entries before adding (search by title keywords first) — Why: duplicates create contradictions when patterns evolve
+- Always include a concrete code or command example in every entry — Why: entries without examples are theory, not actionable knowledge
+- If $ARGUMENTS is empty, default to `stats` mode — Why: shows the current state of the knowledge base without modifying anything
 
 ## MUST NOT DO
 
-- MUST NOT store project-specific knowledge inside `core/.claude/` — use the project's own `.claude/` directory
-- MUST NOT add speculative entries — only record patterns that solved a real problem
-- MUST NOT delete entries without review — use review mode to flag candidates first
+- MUST NOT store project-specific knowledge inside `core/.claude/` — use the project's own `.claude/` directory — Why: distributed templates must not contain project-specific data
+- MUST NOT add speculative entries — only record patterns that solved a real problem — Why: untested patterns create false confidence
+- MUST NOT delete entries without review — use review mode to flag candidates first — Why: deleted knowledge may be needed for a future regression of the same issue
+- MUST NOT duplicate `/learn-n-improve` entries — this skill is for testing-specific patterns only — Why: general session learnings belong in /learn-n-improve, not here

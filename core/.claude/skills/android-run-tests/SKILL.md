@@ -4,9 +4,18 @@ description: >
   Run Android unit, UI, E2E, or journey tests with class name resolution and auto-fix
   on failure. Auto-detects test type from class name pattern. Use when executing
   Android tests or when test failures need automated diagnosis and repair.
+  For raw ADB testing without frameworks, use /android-adb-test. For E2E-only
+  via Gradle/Maestro, use /android-run-e2e.
+triggers:
+  - run android tests
+  - android test
+  - run android unit test
+  - gradle test android
+  - android test failure
+  - run kotlin tests
 allowed-tools: "Bash Read Write Grep Glob Skill"
 argument-hint: "<TestClassName> [--unit|--ui|--e2e] [-x]"
-version: "2.1.0"
+version: "2.2.0"
 type: workflow
 ---
 

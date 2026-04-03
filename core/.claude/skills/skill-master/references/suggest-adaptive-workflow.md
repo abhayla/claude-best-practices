@@ -74,7 +74,7 @@ Task type: New Feature
   Start this workflow? (Y/n/modify)
 ```
 
-### 5.3 Allow Workflow Modification
+### 5.4 Allow Workflow Modification
 
 If the user says "modify" or suggests changes:
 

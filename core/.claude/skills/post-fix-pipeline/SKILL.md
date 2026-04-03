@@ -13,9 +13,9 @@ triggers:
   - commit verified changes
   - finalize and commit
   - post-fix commit
-allowed-tools: "Bash Read Grep Glob Write Edit Skill"
+allowed-tools: "Bash Read Grep Glob Write Agent Skill"
 argument-hint: "[fixes_applied] [commit_format] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "3.0.0"
+version: "3.1.0"
 ---
 
 # Post-Fix Pipeline

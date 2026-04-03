@@ -12,10 +12,9 @@ triggers:
   - handle review
   - address comments
   - fix review
-  - review response
-allowed-tools: "Bash Read Write Edit Grep Glob Skill"
+allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<PR-number or PR-url> [--reviewer <name>] [--round <N>]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -404,6 +403,16 @@ gh api repos/{owner}/{repo}/pulls/$PR_NUMBER/requested_reviewers \
 ```
 
 ---
+
+## Failure Modes
+
+| Failure Mode | Prevention |
+|-------------|-----------|
+| Start fixing before triaging all comments, miss blocking items | Step 1 mandatory triage gate — MUST categorize all comments before any code change |
+| Silently follow one reviewer when feedback conflicts | Step 7 conflict detection + explicit escalation protocol |
+| Request re-review with open threads, waste reviewer time | Step 8.3 pre-re-review checklist + GraphQL thread count verification |
+| One commit per comment clutters git history | Step 5 batches nits into single commit; Step 2 groups related must-fixes |
+| PR argument beyond 2 rounds blocks progress | Step 6 escalation protocol caps at 2 reply rounds |
 
 ## CRITICAL RULES
 

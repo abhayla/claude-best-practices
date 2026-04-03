@@ -4,10 +4,15 @@ description: >
   Scaffold a complete MVI (Model-View-Intent) feature module with Contract (State/Intent/Effect),
   ViewModel, Screen composable, UseCase, Repository, and DI module. Use when creating new feature
   modules in Android projects using MVI architecture.
-triggers: "mvi, scaffold feature, create feature, new feature module, android mvi"
+triggers:
+  - mvi scaffold
+  - scaffold feature
+  - create feature module
+  - new feature module
+  - android mvi
 allowed-tools: "Read Write Edit Grep Glob Bash"
 argument-hint: "<feature name to scaffold, e.g., 'ItemList' or 'UserProfile'>"
-version: "1.0.0"
+version: "1.0.1"
 type: workflow
 ---
 

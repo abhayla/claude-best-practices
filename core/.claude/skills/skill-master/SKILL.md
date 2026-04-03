@@ -5,18 +5,19 @@ description: >
   skills at runtime. Scans the filesystem for SKILL.md files, reads their frontmatter
   to build a live catalog, matches intent, suggests workflows, and chains skills
   in sequence. Use as the universal entry point when unsure which skill to invoke.
+  NOT for prompt strengthening or quality grading (use /prompt-auto-enhance),
+  NOT for detecting repeated patterns (use /skill-factory),
+  NOT for full development lifecycle orchestration (use /development-loop).
 triggers:
   - skill-master
-  - master
-  - route
   - which skill
   - what skills are available
   - list skills
   - skill catalog
   - help me pick a skill
-allowed-tools: "Bash Read Grep Glob Skill"
+allowed-tools: "Read Grep Glob Skill"
 argument-hint: "<request or 'list'|'catalog'|'help'> [--workflow] [--chain]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -36,15 +37,8 @@ Scan the filesystem to build a live catalog of every skill that exists right now
 
 ### 1.1 Locate Skill Directories
 
-Search for all SKILL.md files in the skills directory:
+Search for all SKILL.md files in the skills directory using `Glob`:
 
-```bash
-# Find all skill definitions relative to the project root
-# Try both paths — hub layout and user-project layout
-find core/.claude/skills/*/SKILL.md .claude/skills/*/SKILL.md 2>/dev/null
-```
-
-Use `Glob` to find all matching files:
 - Pattern: `core/.claude/skills/*/SKILL.md`
 - Fallback pattern: `.claude/skills/*/SKILL.md`
 
@@ -297,15 +291,9 @@ When the user's request does not match any skill well, provide a keyword search.
 
 ### 9.1 Full-Text Search
 
-Search across all discovered skill descriptions, triggers, and step content:
-
-```bash
-# Search all SKILL.md files for the user's keywords
-grep -r -l "{keyword}" core/.claude/skills/*/SKILL.md
-```
-
-Use `Grep` to search all SKILL.md files for the user's keywords. Report matches with
-the relevant context line.
+Search across all discovered skill descriptions, triggers, and step content using `Grep`
+with the user's keywords against all SKILL.md files. Report matches with the relevant
+context line.
 
 ### 9.2 Present Search Results
 
@@ -378,14 +366,14 @@ mentioned are illustrative — actual routing always uses the live catalog from 
 
 ## MUST DO
 
-- Always re-scan the filesystem on every invocation — never serve a stale catalog
-- Always read actual YAML frontmatter from SKILL.md files — never guess or assume skill metadata
-- Always present match confidence and reasoning — users need to understand why a skill was chosen
-- Always offer alternatives when confidence is below "high" — do not force a weak match
-- Always persist session state to `.skill-master-state.json` — context compaction will erase in-memory state
-- Always validate that a skill exists on disk before invoking it — the catalog may reference a deleted skill
-- Always derive categories from skill descriptions — never maintain a hardcoded category-to-skill mapping
-- Always build workflows by reading skill handoff hints — never assume a fixed pipeline sequence
+- Always re-scan the filesystem on every invocation — never serve a stale catalog — Why: skills may be added, removed, or modified between invocations
+- Always read actual YAML frontmatter from SKILL.md files — never guess or assume skill metadata — Why: descriptions and triggers change; stale metadata causes misroutes
+- Always present match confidence and reasoning — Why: users need to understand why a skill was chosen so they can correct misroutes
+- Always offer alternatives when confidence is below "high" — Why: forcing a weak match wastes time if the wrong skill runs
+- Always persist session state to `.skill-master-state.json` — Why: context compaction erases in-memory state; disk state survives
+- Always validate that a skill exists on disk before invoking it — Why: the catalog may reference a skill that was deleted mid-session
+- Always derive categories from skill descriptions — Why: hardcoded mappings break when skills are added or renamed
+- Always build workflows by reading skill handoff hints — Why: fixed pipeline sequences become stale when skills change
 
 ## MUST NOT DO
 

@@ -6,10 +6,20 @@ description: >
   confidence-gated auto-healing, and framework auto-detection for autonomous
   execution in any downstream project. Use with optional section filter:
   /e2e-visual-run salary. Use --update-baselines to approve intentional visual changes.
+  NOT for one-off screenshot comparison (use /verify-screenshots), post-change
+  targeted verification (use /auto-verify), or E2E best practices reference
+  (use /e2e-best-practices).
+triggers:
+  - run e2e with screenshots
+  - e2e visual verification
+  - run e2e suite visually
+  - visual e2e test run
+  - e2e dual-signal verification
+  - run e2e with auto-healing
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob Skill Agent"
 argument-hint: "[section-name] [--update-baselines]"
-version: "2.0.0"
+version: "2.2.0"
 ---
 
 Autonomous E2E test suite runner with visual verification and self-healing.
@@ -53,6 +63,9 @@ This step makes the skill work in any downstream project without manual config.
    | `detox.config.{ts,js}` | Detox | `npx detox test` | `npx detox test {file} --configuration {config}` |
    | `pubspec.yaml` + `integration_test/` | Flutter | `flutter test integration_test/` | `flutter test {file} --name "{test}"` |
    | `conftest.py` with selenium/playwright imports | Python E2E | `python -m pytest {e2e_dir} -v` | `python -m pytest {file}::{test} -v` |
+
+   **Headless CI:** Playwright defaults to headless (no action needed). For Cypress,
+   add `--headless` flag. For Selenium, configure headless browser options in conftest.py.
 
    If no framework detected: fail with "No E2E framework found — expected
    playwright.config.*, cypress.config.*, detox.config.*, pubspec.yaml with
@@ -113,6 +126,7 @@ Verify the environment before running any tests.
    queue.batch_size: 5
    retry.global_budget: 15
    retry.per_test_max_attempts: 3
+   pipeline.timeout_minutes: 30
    healing.confidence_threshold: 0.85
    visual.threshold: 0.2
    visual.animations: disabled

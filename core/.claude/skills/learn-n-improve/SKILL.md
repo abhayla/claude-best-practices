@@ -4,20 +4,21 @@ description: >
   Analyze session outcomes and update memory topics (testing-lessons, fix-patterns,
   skill-gaps) for continuous self-improvement. Four modes: session, deep, meta, test-run.
   Use when a session ends, after a fix succeeds, or when reviewing learning effectiveness.
-  For one-off session saves, use /save-session instead. For full handover docs, use /handover.
+  For full learning cycles (capture + pattern detection + skill proposals), use
+  /learning-self-improvement instead. For one-off session saves, use /save-session.
+  For full handover docs, use /handover.
 type: workflow
 triggers:
   - learn from session
   - capture learnings
   - record what we learned
   - session reflection
-  - update learnings
   - what did we learn
   - improve from mistakes
-  - learning capture
+  - learn-n-improve
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: session|deep|meta|test-run>"
-version: "2.3.0"
+version: "2.4.0"
 ---
 
 # Learn & Improve — Session Reflection
@@ -43,19 +44,39 @@ Analyze session outcomes and update learning files for future sessions.
 
 ## STEP 1: Gather Session Evidence
 
-Read recent session artifacts:
-- Git log (recent commits)
-- Test results (if any)
-- Fix-loop outcomes (if any)
-- Files modified
+In `test-run` mode: read-only throughout — skip all writes, print proposed changes only.
+
+Collect evidence from these sources:
+
+```bash
+git log --oneline -20
+```
+
+```bash
+ls test-results/*.json 2>/dev/null
+```
+
+Read `.claude/learnings.json` if it exists. Read any scratchpad or session files from `.claude/sessions/`.
+
+| Source | What to extract |
+|--------|----------------|
+| `git log` | Commit messages, files changed, reverts (indicate failures) |
+| `test-results/*.json` | Pass/fail counts, failure categories, flaky tests |
+| `test-evidence/` | Fix-loop iteration count, screenshot evidence |
+| Modified files | Which areas of codebase were touched |
 
 ## STEP 2: Analyze Outcomes
 
-Categorize session work:
-- **Successes** — What worked well, patterns to reinforce
-- **Failures** — What went wrong, root causes identified
-- **Workarounds** — Temporary fixes that should become permanent
-- **Knowledge gaps** — Areas where more context was needed
+Categorize session work using this decision table:
+
+| Evidence Signal | Category | Action |
+|----------------|----------|--------|
+| `git revert` in log | **Failure** | Record what was reverted and why |
+| test-results `FAILED` | **Failure** | Extract root cause from failure entries |
+| test-results `PASSED` after prior `FAILED` | **Success** | Record the fix pattern |
+| Fix-loop iterations > 1 | **Workaround** | Check if the fix was minimal or structural |
+| New files created with no test coverage | **Knowledge gap** | Flag for test creation |
+| Repeated Grep/Read on same area | **Knowledge gap** | Record as area needing documentation |
 
 ## STEP 3: Build Error→Fix→Lesson Database
 
@@ -169,45 +190,7 @@ After every 10th entry in `.claude/learnings.json`, scan for systemic patterns:
    Add to: .claude/rules/ ? (requires user approval)
    ```
 
-5. **Workflow pattern detection** — Scan session transcripts for repeated tool call sequences that could become skills:
-
-   a. **Fingerprint tool sequences** — Identify recurring multi-step patterns:
-      - Extract tool call sequences from the session (e.g., Read→Grep→Edit→Bash(test))
-      - Compare against previously recorded sequences in `.claude/workflow-patterns.json`
-      - A "match" is 3+ identical tool steps in the same order on similar file types
-
-   b. **Track frequency** — Record each workflow pattern with a count:
-      ```json
-      {
-        "patterns": [
-          {
-            "id": "WP001",
-            "sequence": ["Read(test file)", "Edit(test file)", "Bash(run test)", "Edit(source)", "Bash(run test)"],
-            "description": "TDD cycle: read test, update test, run, fix source, run again",
-            "seen_count": 4,
-            "first_seen": "2026-03-01",
-            "last_seen": "2026-03-12"
-          }
-        ]
-      }
-      ```
-
-   c. **Promotion threshold** — When a workflow pattern is seen 3+ times:
-      ```
-      Workflow pattern detected: "WP001" seen 3 times.
-      Sequence: Read(test) → Edit(test) → Bash(test) → Edit(source) → Bash(test)
-      Description: TDD cycle
-
-      This repeated workflow could be a skill.
-      Suggested action: Run /writing-skills to create a skill from this pattern.
-      Promote to skill? (requires user approval)
-      ```
-
-   d. **Noise filtering** — Do NOT flag as workflow patterns:
-      - Simple read→edit sequences (too generic)
-      - Single-tool repetition (e.g., Read, Read, Read)
-      - Sequences shorter than 3 steps
-      - Sequences that match an existing skill's workflow
+5. **Workflow pattern detection** — Delegate to `/skill-factory scan` for repeated tool sequence detection. Do NOT reimplement workflow fingerprinting here — skill-factory owns that capability. If tag frequency or file hotspot analysis suggests a recurring workflow, mention it in the report and suggest running `/skill-factory scan` to investigate.
 
 ## STEP 5.5: Inject Active Constraints into Skills
 
@@ -362,11 +345,11 @@ This keeps learning semi-automatic — the hook reminds Claude to run the skill 
 
 ## CRITICAL RULES
 
-- MUST NOT delete historical entries without evidence they're wrong — learnings are append-only by default
-- MUST date-stamp all new entries for temporal context
-- MUST cross-reference with existing patterns before adding — no duplicates
-- MUST NOT write any files in `test-run` mode — show only what would change
-- MUST NOT inject constraints into skills without explicit user approval (Step 5.5.3)
-- MUST NOT inject constraints from learnings with `reuse_count < 2` — one-off errors are not patterns
-- MUST record injection metadata in the learning entry to prevent re-proposing (Step 5.5.4)
-- MUST default to `session` mode when $ARGUMENTS is empty — do not error or ask
+- MUST NOT delete historical entries without evidence they're wrong — Why: learnings are training data for pattern detection; deleting breaks frequency analysis
+- MUST date-stamp all new entries — Why: enables staleness detection and temporal pattern analysis
+- MUST cross-reference with existing patterns before adding — Why: duplicate entries inflate frequency counts and produce false pattern alerts
+- MUST NOT write any files in `test-run` mode — Why: test-run is for previewing changes without side effects; writing defeats its purpose
+- MUST NOT inject constraints into skills without explicit user approval (Step 5.5.3) — Why: unsolicited skill modifications break trust and may conflict with user intent
+- MUST NOT inject constraints from learnings with `reuse_count < 2` — Why: one-off errors are noise, not patterns; premature injection creates brittle rules
+- MUST record injection metadata in the learning entry to prevent re-proposing (Step 5.5.4) — Why: without tracking, the same constraint gets proposed every session
+- MUST default to `session` mode when $ARGUMENTS is empty — Why: asking for mode selection adds friction when the common case is always "session"

@@ -3,17 +3,32 @@ name: compose-ui
 description: >
   Build Jetpack Compose UIs with state hoisting, modifier chains, Material3 theming,
   performance optimization, Compose Navigation with type-safe routes, and Coil image loading.
-  Use when building or refactoring Compose UI screens.
-triggers: "jetpack compose, compose ui, compose navigation, compose performance, recomposition, compose theming, material3, coil"
+  Use when building or refactoring Compose UI screens. NOT for full-app architecture
+  (Hilt, Room, Retrofit — use /android-arch), XML migration (use /xml-to-compose),
+  or Compose test patterns (use /android-test-patterns).
+triggers:
+  - jetpack compose
+  - compose ui
+  - compose navigation
+  - compose performance
+  - material3 theming
+  - recomposition
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<composable-name or 'navigation' or 'performance' or 'theme' or 'images'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
 # Compose UI
 
 Build performant, testable Jetpack Compose interfaces with correct state management, Material3 theming, type-safe navigation, and optimized image loading.
+Use `modifier: Modifier = Modifier` on every Composable. Use `ImmutableList` for
+list parameters. Use `@Serializable` routes for navigation. Use `MaterialTheme`
+tokens — never hardcode colors or dimensions.
+
+Before applying Compose patterns, verify the project uses Compose
+(`implementation("androidx.compose...")` in build.gradle). If not, suggest
+`/xml-to-compose` for migration.
 
 **Request:** $ARGUMENTS
 
@@ -99,8 +114,9 @@ Use this when a screen has 4+ distinct user actions. For simple screens with 1-2
 
 ## STEP 2: Modifiers
 
+Modifiers apply sequentially — order determines behavior (padding before background differs from background before padding). Always accept `modifier: Modifier = Modifier` as the first optional parameter and apply it to the root element. Extract repeated modifier chains into extension functions.
 
-**Read:** `references/modifiers.md` for detailed step 2: modifiers reference material.
+**Read:** `references/modifiers.md` for the full modifier chain patterns and ordering rules.
 
 ## STEP 3: Theming
 
@@ -189,15 +205,15 @@ private fun UserCardPreview() {
 
 ## STEP 5: Performance
 
+Avoid unnecessary recompositions: use `ImmutableList` for collection parameters, `derivedStateOf` for derived state, `remember` for expensive calculations, and lambda modifier variants (e.g., `Modifier.offset { }`) to defer state reads to the Layout phase. Profile with Layout Inspector before declaring performance acceptable.
 
-**Read:** `references/performance.md` for detailed step 5: performance reference material.
+**Read:** `references/performance.md` for the full recomposition, stability, and profiling patterns.
 
 ## STEP 6: Compose Navigation
 
-Use Navigation Compose with `@Serializable` route objects for type-safe navigation.
+Use Navigation Compose with `@Serializable` route objects for type-safe navigation. Pass IDs/primitives as arguments — never complex objects. Use `popUpTo` with `saveState`/`restoreState` for bottom navigation tabs.
 
-
-**Read:** `references/compose-navigation.md` for detailed step 6: compose navigation reference material.
+**Read:** `references/compose-navigation.md` for route definitions, nested graphs, deep links, and adaptive scaffold patterns.
 
 ## STEP 7: Coil Image Loading
 
@@ -312,33 +328,33 @@ Keep shared composables in `commonMain`, platform-specific implementations in `a
 
 ## MUST DO
 
-- Use `modifier: Modifier = Modifier` as the first optional parameter on every Composable
-- Hoist state out of reusable Composables (value + onValueChange pattern)
-- Mark data classes with `@Immutable` when all properties are `val` and stable
-- Use `ImmutableList` for list parameters to ensure stability
-- Use `remember {}` for expensive calculations, `derivedStateOf {}` for derived state
-- Use `@Serializable` route objects for Compose Navigation (not string-based routes)
-- Use `AsyncImage` with `crossfade(true)` for image loading
-- Create `@Preview` (Light + Dark) for every public Composable
-- Use `MaterialTheme.colorScheme` and `MaterialTheme.typography` for all styling
-- Add `key = { item.id }` to `LazyColumn`/`LazyRow` items
-- Profile with Layout Inspector and Perfetto before declaring performance acceptable
-- Use `popUpTo` with `launchSingleTop` and `restoreState` for bottom navigation tabs
-- Provide `contentDescription` on all images (or explicit `null` for decorative)
+- Use `modifier: Modifier = Modifier` as the first optional parameter on every Composable — Why: callers cannot apply layout without it; missing modifier breaks composability
+- Hoist state out of reusable Composables (value + onValueChange pattern) — Why: stateless composables are testable, previewable, and reusable across screens
+- Mark data classes with `@Immutable` when all properties are `val` and stable — Why: Compose compiler skips recomposition for stable types, improving performance
+- Use `ImmutableList` for list parameters to ensure stability — Why: stdlib `List<T>` is treated as unstable by the compiler, causing unnecessary recompositions
+- Use `remember {}` for expensive calculations, `derivedStateOf {}` for derived state — Why: unremembered work re-executes on every recomposition frame
+- Use `@Serializable` route objects for Compose Navigation (not string-based routes) — Why: type-safe routes catch navigation errors at compile time instead of runtime
+- Use `AsyncImage` with `crossfade(true)` for image loading — Why: AsyncImage handles sizing automatically; alternatives require manual size configuration
+- Create `@Preview` (Light + Dark) for every public Composable — Why: previews catch visual regressions without running the app
+- Use `MaterialTheme.colorScheme` and `MaterialTheme.typography` for all styling — Why: hardcoded values break dark mode and theme consistency
+- Add `key = { item.id }` to `LazyColumn`/`LazyRow` items — Why: without keys, items recompose unnecessarily and animations break on list changes
+- Profile with Layout Inspector and Perfetto before declaring performance acceptable — Why: recomposition issues are invisible without tooling
+- Use `popUpTo` with `launchSingleTop` and `restoreState` for bottom navigation tabs — Why: without these, back stack accumulates duplicate destinations
+- Provide `contentDescription` on all images (or explicit `null` for decorative) — Why: missing descriptions make the app inaccessible to screen reader users
 
 ## MUST NOT DO
 
-- Pass complex objects as navigation arguments -- pass IDs/primitives only, load data in the destination ViewModel
-- Read state in Composition phase when it can be deferred to Layout/Drawing -- use lambda modifier variants instead
-- Use `SubcomposeAsyncImage` inside `LazyColumn`/`LazyRow` -- use `AsyncImage` instead
-- Use `List<T>` / `Set<T>` / `Map<K,V>` from stdlib as Composable parameters when stability matters -- use kotlinx-collections-immutable instead
-- Hardcode colors, font sizes, or dimensions -- use MaterialTheme tokens instead
-- Create `NavController` inside `NavHost` -- create it at the caller and pass it in
-- Navigate inside `LaunchedEffect` without proper keys -- this causes repeated navigation on recomposition
-- Skip `const` on stable widgets or omit `@Immutable`/`@Stable` annotations on data types
-- Use string-based route paths (legacy pattern) -- use `@Serializable` objects/data classes instead
-- Perform sorting, filtering, or formatting inside a Composable body without `remember` -- this re-executes on every recomposition
-- Forget `FLAG_IMMUTABLE` on `PendingIntent` for deep links (required on Android 12+)
+- Pass complex objects as navigation arguments — Why: Parcelable/Serializable in nav args couples screens; IDs are stable across process death
+- Read state in Composition phase when it can be deferred to Layout/Drawing — Why: composition-phase reads trigger full recomposition; lambda modifiers defer to the correct phase
+- Use `SubcomposeAsyncImage` inside `LazyColumn`/`LazyRow` — Why: subcomposition is slower and causes scroll jank in lazy lists
+- Use `List<T>` / `Set<T>` / `Map<K,V>` from stdlib as Composable parameters — Why: compiler treats stdlib collections as unstable, forcing unnecessary recompositions
+- Hardcode colors, font sizes, or dimensions — Why: breaks dark mode, dynamic color, and theme consistency across the app
+- Create `NavController` inside `NavHost` — Why: NavController must survive recomposition; creating it inside NavHost loses navigation state
+- Navigate inside `LaunchedEffect` without proper keys — Why: recomposition re-triggers the effect, causing repeated navigation
+- Skip `@Immutable`/`@Stable` annotations on data types — Why: compiler cannot infer stability without annotations, skipping recomposition optimization
+- Use string-based route paths (legacy pattern) — Why: string routes are error-prone; `@Serializable` objects catch mismatches at compile time
+- Perform sorting, filtering, or formatting inside a Composable body without `remember` — Why: expensive work re-executes on every recomposition frame
+- Forget `FLAG_IMMUTABLE` on `PendingIntent` for deep links — Why: required on Android 12+; missing flag causes a runtime SecurityException
 
 ---
 

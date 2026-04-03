@@ -3,7 +3,10 @@ name: fix-loop
 description: >
   Analyze failures and iteratively apply minimal fixes, optionally retesting until resolved.
   Full Loop mode (with retest command) iterates until green. Single Fix mode
-  (no retest) does one pass. Use when tests fail, builds break, or runtime errors occur.
+  (no retest) does one pass. Use when tests fail, builds break, or runtime errors
+  occur. For unclear root causes or repeated failures, escalate to
+  /systematic-debugging. For end-to-end bug resolution with verified proof,
+  use /debugging-loop instead.
 triggers:
   - fix-loop
   - fix tests
@@ -13,13 +16,15 @@ triggers:
   - retest until green
 allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
 argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "1.3.0"
+version: "1.4.0"
 type: workflow
 ---
 
 # Fix Loop — Iterative Fix Cycle
 
 Analyze failures, apply minimal fixes, and optionally retest until resolved.
+
+**Critical:** Maximum {max_iterations} fix attempts — each MUST try a different approach. For simple failures with a known retest command, use this skill. When root cause is unclear or fix-loop has failed 2+ times, escalate to `/systematic-debugging`. For end-to-end bug resolution with verified proof, use `/debugging-loop` instead.
 
 **Input:** $ARGUMENTS
 
@@ -194,8 +199,8 @@ This ensures the same failure is auto-resolved next time without re-diagnosing.
 
 ## CRITICAL RULES
 
-- Maximum {max_iterations} iterations — do NOT infinite loop
-- Each iteration must try a DIFFERENT fix approach
-- Never suppress errors or add broad exception handlers
-- If confidence is Low, explain reasoning and ask for user input
-- ALWAYS record learning after successful fix — no exceptions
+- Maximum {max_iterations} iterations — do NOT infinite loop — Why: unbounded retries waste compute and mask unfixable issues
+- Each iteration must try a DIFFERENT fix approach — Why: repeating the same fix wastes iterations and hits max without progress
+- Never suppress errors or add broad exception handlers — Why: suppression hides the real bug and creates silent failures downstream
+- If confidence is Low, explain reasoning and ask for user input — Why: low-confidence fixes often introduce new bugs that compound the original failure
+- ALWAYS record learning after successful fix — no exceptions — Why: unrecorded fixes get re-diagnosed from scratch next time, wasting future sessions

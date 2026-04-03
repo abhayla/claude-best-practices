@@ -14,7 +14,7 @@ triggers:
   - refactor phase
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<file paths, directory, or 'all changed files'>"
-version: "1.2.0"
+version: "1.2.1"
 type: workflow
 ---
 
@@ -337,7 +337,7 @@ Include mutation score in the Step 11 report. Gate: <40% = BLOCK, 40-59% = WARN.
 
 After all tests pass (green), execute the refactor phase:
 
-### 7.1 Refactoring Checklist
+### 9.1 Refactoring Checklist
 
 - [ ] Extract methods for any function > 20 lines
 - [ ] Rename variables/functions for clarity
@@ -346,14 +346,14 @@ After all tests pass (green), execute the refactor phase:
 - [ ] Simplify conditional expressions
 - [ ] Apply design patterns where appropriate
 
-### 7.2 Refactoring Rules
+### 9.2 Refactoring Rules
 
 1. **Tests must stay green** — Run tests after every refactoring step
 2. **One refactoring at a time** — Don't change behavior and structure simultaneously
 3. **Commit after each refactoring** — Separate refactor commits from feature commits
 4. **No new features** — Refactoring changes structure, not behavior
 
-### 7.3 Common Refactoring Catalog
+### 9.3 Common Refactoring Catalog
 
 | Smell | Refactoring | When to Apply |
 |-------|------------|---------------|

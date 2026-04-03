@@ -1,13 +1,21 @@
 ---
 name: pm2-deploy
 description: >
-  Configure PM2 process management and deployment for Node.js applications.
-  Use when setting up PM2 ecosystem files, managing processes, or deploying to production.
-allowed-tools: "Bash Read Grep Glob"
+  Configure PM2 process management and deployment for Node.js and Python
+  applications. Use when setting up PM2 ecosystem files, managing processes,
+  or deploying to production. NOT for deployment strategies (use /deploy-strategy)
+  or FastAPI-specific orchestration (use /fastapi-deploy).
+allowed-tools: "Read Grep Glob"
 argument-hint: "[setup|status|deploy|logs]"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
-triggers: pm2, ecosystem, process-manager
+triggers:
+  - pm2
+  - pm2 deploy
+  - pm2 ecosystem config
+  - process manager node
+  - pm2 cluster mode
+  - pm2 setup production
 ---
 
 # PM2 Deployment Reference

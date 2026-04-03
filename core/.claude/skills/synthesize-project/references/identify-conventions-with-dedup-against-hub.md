@@ -1,5 +1,14 @@
 # STEP 3: Identify Conventions (with Dedup Against Hub)
 
+## Table of Contents
+- [Rules](#rules--conventions-worth-encoding-as-always-on-constraints)
+- [Skills](#skills--workflows-worth-encoding-as-on-demand-procedures)
+- [Agents](#agents--tasks-worth-delegating-to-a-specialized-subagent)
+- [NOT worth encoding](#not-worth-encoding-any-type)
+- [Identification checklist](#identification-checklist)
+- [Present findings to user](#present-findings-to-user)
+- [Dedup against hub patterns](#dedup-against-hub-patterns)
+
 ### Rules — conventions worth encoding as always-on constraints
 
 A convention is worth a **rule** when:

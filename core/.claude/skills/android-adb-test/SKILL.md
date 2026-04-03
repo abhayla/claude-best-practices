@@ -3,10 +3,18 @@ name: android-adb-test
 description: >
   Run Android E2E tests via ADB using uiautomator dump, screencap, and input tap.
   Use when testing app screens without the Compose test framework, debugging emulator UI,
-  or validating user flows manually.
+  or validating user flows manually. For framework-based E2E tests (Espresso/Compose/Maestro),
+  use /android-run-e2e instead.
+triggers:
+  - adb test
+  - uiautomator test
+  - manual android test
+  - adb screencap
+  - monkey test android
+  - test via adb
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[screen-name|flow-name|all]"
-version: "1.0.0"
+version: "1.2.0"
 type: reference
 ---
 
@@ -23,6 +31,7 @@ Test app screens via ADB commands — uiautomator dump, screencap, input tap.
 1. **Emulator running:** `adb devices` should show a device
 2. **App installed:** Build and install debug APK
 3. **Backend running** (if testing API-connected screens)
+4. **Multiple devices:** Use `adb -s <serial>` prefix when more than one device is connected. List serials with `adb devices`
 
 ## ADB Patterns
 
@@ -80,7 +89,7 @@ adb emu avd snapshot load clean_state
 
 ```bash
 # Filter by app package
-adb logcat --pid=$(adb shell pidof com.app.package)
+adb logcat --pid=$(adb shell pidof com.example.app)
 
 # Filter by tag and priority
 adb logcat -s MyTag:D ActivityManager:I
@@ -105,8 +114,8 @@ adb pull /data/misc/perfetto-traces/trace.pb ./trace.pb
 
 ```bash
 # Cold start timing
-adb shell am force-stop com.app.package
-adb shell am start-activity -W -S com.app.package/.MainActivity
+adb shell am force-stop com.example.app
+adb shell am start-activity -W -S com.example.app/.MainActivity
 
 # Output includes: TotalTime (ms) — the metric that matters
 ```

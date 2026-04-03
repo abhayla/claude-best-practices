@@ -4,13 +4,22 @@ description: >
   Parse a markdown plan into GitHub Issues with labels and duplicate detection.
   Supports text input or file path. Use when converting a structured plan into
   tracked GitHub Issues.
+triggers:
+  - convert plan to issues
+  - create github issues from plan
+  - plan to github issues
+  - parse plan into issues
+  - markdown plan to issues
+  - bulk create issues from plan
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<plan-file-path or plan text>"
-version: "1.0.0"
+version: "1.2.0"
 type: workflow
 ---
 
 # Plan to Issues
+
+**Critical:** Requires `gh` CLI authenticated with repo access. If `$ARGUMENTS` is empty, prompt the user for a plan file path or inline text. NOT for creating plans (use /writing-plans) or executing plans (use /executing-plans).
 
 Parse a structured plan into tracked GitHub Issues.
 
@@ -128,12 +137,17 @@ Skipped D duplicates:
 
 ---
 
-## RULES
+## CRITICAL RULES
 
-- Maximum 20 issues per invocation
-- Auto-detect labels from content keywords
-- Always check for duplicates before creating
-- Preserve the original plan's ordering
-- Create epics only when plan has logical groupings (5+ tasks with sections)
-- Always link tasks back to their parent epic
-- Update epic checklists with actual issue numbers after creation
+### MUST DO
+- Always validate `$ARGUMENTS` is non-empty before proceeding — Why: empty input produces no issues and wastes API calls on duplicate checks
+- Always check for duplicates via `gh issue list` before creating — Why: duplicate issues create confusion and tracking overhead
+- Always preserve the original plan's ordering in issue creation — Why: issue numbers should reflect the plan's priority/sequence
+- Always link tasks back to their parent epic with actual issue numbers — Why: orphaned tasks without epic references break traceability
+- Always cap at 20 issues per invocation — Why: bulk creation beyond 20 overwhelms reviewers and risks rate limiting
+
+### MUST NOT DO
+- MUST NOT create issues without `gh` CLI access — verify authentication first
+- MUST NOT create epics for plans with fewer than 5 tasks — use flat issue list instead
+- MUST NOT skip duplicate detection even for small plans — Why: duplicate issues accumulate as technical debt
+- MUST NOT create issues with titles longer than 80 characters — Why: GitHub truncates long titles in list views

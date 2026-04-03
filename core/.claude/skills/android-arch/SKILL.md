@@ -6,9 +6,15 @@ description: >
   Use when building, refactoring, or debugging modern Android apps following Google's
   Guide to App Architecture.
 allowed-tools: "Bash Read Write Edit Grep Glob"
-triggers: "android architecture, clean architecture, viewmodel, stateflow, room, retrofit, repository pattern, kotlin coroutines, offline-first, hilt, android debug, compose patterns, navigation, gradle convention, android security, android performance, android testing"
+triggers:
+  - android architecture
+  - clean architecture
+  - viewmodel stateflow
+  - room retrofit
+  - hilt dependency injection
+  - offline-first android
 argument-hint: "<feature-name or 'setup' or 'debug' or 'offline-sync'>"
-version: "1.0.0"
+version: "1.0.1"
 type: workflow
 ---
 

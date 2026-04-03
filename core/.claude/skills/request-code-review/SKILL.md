@@ -6,14 +6,15 @@ description: >
   on what matters. Use when preparing a PR for review to ensure it gets reviewed
   faster and more thoroughly.
 triggers:
-  - request-review
-  - pr-review
+  - request code review
   - create review pr
-  - prepare for review
   - review-ready pr
+  - submit for review
+  - need code review
+  - open pull request for review
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<branch-name or description of changes to prepare for review>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -81,6 +82,9 @@ Categorize every changed file by the risk its changes introduce. Present high-ri
 
 **Read:** `references/classify-changes-by-risk-level.md` for detailed step 2: classify changes by risk level reference material.
 
+### 2.2 Security Pattern Scan
+
+```bash
 # Security-sensitive patterns in the diff
 git diff "$BASE_BRANCH"...HEAD | grep -n -E "(password|secret|token|api_key|private_key|credential)" || true
 
@@ -341,7 +345,22 @@ Rules:
 
 Execute the PR creation with all gathered information.
 
-### 9.1 Build and Submit the PR
+### 9.1 Verify Prerequisites
+
+```bash
+# Verify gh CLI is available
+if ! command -v gh &>/dev/null; then
+  echo "ERROR: gh CLI not found. Install from https://cli.github.com/"
+  echo "Falling back to manual PR creation — printing PR body to stdout."
+fi
+
+# Verify gh is authenticated
+gh auth status 2>/dev/null || echo "WARNING: gh not authenticated. Run: gh auth login"
+```
+
+If `gh` is not available, print the generated PR title, body, and suggested reviewers to stdout so the user can create the PR manually.
+
+### 9.2 Build and Submit the PR
 
 ```bash
 # Ensure we're on the feature branch and it's pushed
@@ -357,7 +376,7 @@ gh pr create \
   --assignee "@me"
 ```
 
-### 9.2 Post-Creation Steps
+### 9.3 Post-Creation Steps
 
 After creating the PR:
 
@@ -396,7 +415,7 @@ for file in $(git diff --name-only "$BASE_BRANCH"...HEAD); do
 done
 ```
 
-### 10.3 Cross-Service Impact
+### 10.2 Cross-Service Impact
 
 For changes that might affect other services or deployments:
 

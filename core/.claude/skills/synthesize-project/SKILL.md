@@ -5,15 +5,24 @@ description: >
   Writes ONLY to the target project's .claude/ directory (local) or creates a PR on the target repo (remote).
   NEVER writes to core/.claude/ — that is the hub template. If running from the hub repo, --repo or --local is REQUIRED.
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
+triggers:
+  - synthesize project patterns
+  - provision hub patterns
+  - generate project-specific claude config
+  - sync patterns to project
+  - onboard project with hub patterns
+  - provision target project
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis] [--only skills|rules|agents] [--tier must-have|improved|nice-to-have|all]"
-version: "4.0.1"
+version: "4.2.0"
 type: workflow
 ---
 
 # Synthesize Project Patterns
 
 Provision hub patterns and generate project-specific `.claude/` patterns by reading the actual codebase.
+
+**Critical constraints:** This skill writes ONLY to the TARGET PROJECT's `.claude/` directory. NEVER write to `core/.claude/` — that is the hub template. In remote mode, creates a PR on the target repo. If running from the hub repo, `--repo` or `--local` is REQUIRED.
 
 **Arguments:** $ARGUMENTS
 
@@ -49,7 +58,7 @@ test -d core/.claude && test -f registry/patterns.json && test -f scripts/recomm
 - `--repo owner/name` is REQUIRED. You MUST be targeting a different repo.
 - If `--repo` was NOT provided and no `--local /path` was given, STOP and ask: "You're running inside the hub repo. Which project should I synthesize patterns for? Use `--repo owner/name` or `--local /path/to/project`."
 - NEVER write synthesized patterns to `core/.claude/`. That directory is the hub's distributable template — only curated, generic patterns belong there. Project-specific patterns go to the TARGET project's `.claude/`.
-- NEVER treat scanning a downstream repo as "adding patterns to the hub." That is the job of `collate.py` and `/synthesize-hub`, NOT this skill.
+- NEVER treat scanning a downstream repo as "adding patterns to the hub." That is the job of `collate.py` and the hub's own synthesis workflow, NOT this skill.
 
 **If you are NOT in the hub repo:** Proceed normally — local mode targets the current directory.
 

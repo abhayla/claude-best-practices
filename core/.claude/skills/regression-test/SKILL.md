@@ -14,7 +14,7 @@ triggers:
   - affected tests
   - impact analysis
   - change impact
-version: "1.1.0"
+version: "1.2.0"
 ---
 
 # Regression Test — Change-Aware Test Execution
@@ -61,6 +61,14 @@ Argument modes: `staged` (cached only), branch name (diff HEAD against it), `abc
 | Test fixtures/factories | `tests/factories/**`, `tests/fixtures/**`, `tests/conftest.py`, `**/conftest.py`, `tests/helpers/**` | Re-run ALL tests that import the changed fixture — shared fixtures affect many tests |
 
 Record `CHANGED_SOURCE_FILES`, `CHANGED_TEST_FILES`, `CHANGED_CONFIG_FILES`, and `TOTAL_CHANGED`.
+
+### 1.2 Empty Changeset Gate
+
+If `TOTAL_CHANGED == 0`, exit early: write `test-results/regression-test.json` with
+`result: "PASSED"`, `confidence: "HIGH"`, `summary.total: 0`, and stop.
+
+If all changed files are Documentation category (SKIP), exit early with the same
+PASSED result and a warning: "Only documentation files changed — no tests required."
 
 ---
 
@@ -187,7 +195,14 @@ go test ./... -run "TestAuth|TestUser" -v                   # pattern match
 bundle exec rspec spec/services/auth_spec.rb spec/models/user_spec.rb
 ```
 
-Record pass/fail/skip status, duration, and failure messages for each test. If any test **fails**, stop — do not expand scope until failures are addressed.
+Detect the test runner from project config (`pyproject.toml`, `package.json`,
+`build.gradle`, `go.mod`, `Gemfile`). If no test framework is detected, write
+`test-results/regression-test.json` with `result: "FAILED"`,
+`confidence: "BLOCKED"`, and stop.
+
+Record pass/fail/skip status, duration, and failure messages for each test. If any
+test **fails**, skip STEP 5 (expansion) and proceed directly to STEP 6 (report)
+with the failure details.
 
 ---
 
@@ -278,6 +293,16 @@ Write to `test-results/regression-test.json`:
 - Downstream consumer `/auto-verify` checks: if `confidence == "BLOCKED"` → halt pipeline; if `result == "FAILED"` with `confidence != "BLOCKED"` → proceed with caution (tester-agent will re-run)
 
 ---
+
+## Failure Modes
+
+| Failure Mode | Prevention |
+|-------------|-----------|
+| Missed transitive dependency causes undetected regression | 2-level import graph tracing with 20-dependent escalation cap |
+| False confidence from passing targeted tests with coverage gaps | Confidence level explicitly downgrades to MEDIUM when gaps exist |
+| Stale coverage.json maps wrong tests to changed files | Coverage mapping is one of 3 strategies; naming + import graph provide fallback |
+| Massive diff runs full suite unnecessarily | >20 transitive dependents triggers controlled escalation, not blind full-suite |
+| Test infrastructure broken misreported as code failure | BLOCKED confidence level distinguishes infra failure from code failure |
 
 ## MUST DO
 

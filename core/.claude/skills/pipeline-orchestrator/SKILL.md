@@ -2,9 +2,10 @@
 name: pipeline-orchestrator
 description: >
   Orchestrate multi-stage pipelines for PRD-to-Production delivery using a
-  DAG-based execution model. Use when
-  coordinating 2+ sequential/parallel stages that produce artifacts consumed
-  by downstream stages.
+  DAG-based execution model. Use when coordinating 2+ sequential/parallel
+  stages that produce artifacts consumed by downstream stages. NOT for
+  feature development cycles (use /development-loop) or test verification
+  chains (use /test-pipeline).
 triggers:
   - pipeline
   - orchestrate stages
@@ -12,15 +13,15 @@ triggers:
   - multi-stage
   - coordinate stages
   - run pipeline
-allowed-tools: "Agent Read Grep Glob"
+allowed-tools: "Agent Read Glob"
 argument-hint: "<feature description, PRD file path, or GitHub Issue URL>"
-version: "2.0.1"
+version: "2.1.0"
 type: workflow
 ---
 
 # Pipeline Orchestrator — Dispatch Wrapper
 
-Dispatch the `project-manager-agent` agent to coordinate a multi-stage pipeline from PRD to Production.
+**Critical:** All orchestration logic is owned by `project-manager-agent`. Do not implement pipeline steps inline — this skill is a dispatch wrapper only. Requires `config/pipeline-stages.yaml` to exist.
 
 **Input:** $ARGUMENTS
 
@@ -53,7 +54,6 @@ The orchestrator manages the full lifecycle of a pipeline run:
 - **Gate Validation**: After each worker completes, validates its gate result and output artifacts before advancing
 - **Retry Management**: Retries failed stages up to 3 times per stage, with a global budget of 15 retries across the entire pipeline run
 - **State Persistence**: Writes pipeline state to `.pipeline/state.json` after every mutation so runs can be resumed if interrupted
-### Agent Dispatch DetailsThe orchestrator reads `config/pipeline-stages.yaml` to build a directed acyclic graph of stages. Stages with no unmet dependencies are grouped into waves and dispatched in parallel via `Agent()` calls. Each worker agent receives a structured prompt containing its objective, input artifact paths, expected output paths, and verification commands. When a worker completes, the orchestrator validates its gate result and artifacts before advancing to the next wave. If a stage fails, the orchestrator retries up to 3 times per stage while respecting the global budget of 15 retries across the entire pipeline run.
 
 ## STEP 2: Report Results
 
@@ -69,10 +69,17 @@ After the agent completes, relay the pipeline summary to the user:
 
 ## MUST DO
 
-- Always dispatch via the `project-manager-agent` agent — do not inline orchestration logic
-- Always relay the full pipeline summary to the user after completion
+- Always validate `$ARGUMENTS` is non-empty before dispatch — Why: empty prompt causes agent to produce undefined output
+- Always verify `config/pipeline-stages.yaml` exists before dispatch — Why: the agent depends on this config; missing file causes immediate failure
+- Always dispatch via the `project-manager-agent` agent — Why: orchestration logic is complex and maintained in the agent, not this wrapper
+- Always relay the full pipeline summary including per-stage status to the user — Why: users need visibility into which stages passed/failed and why
+- Always check for existing `.pipeline/state.json` and warn about in-progress runs — Why: concurrent runs corrupt shared state
+- Always relay agent failures with actionable context (which stage, what error) — Why: "pipeline failed" without details forces users to dig through logs
 
 ## MUST NOT DO
 
-- MUST NOT implement pipeline logic in this skill — delegate to the agent
+- MUST NOT implement pipeline logic in this skill — delegate to the agent. Use /development-loop for feature cycles or /test-pipeline for test chains instead
 - MUST NOT modify `.pipeline/state.json` directly — the agent owns state management
+- MUST NOT dispatch with empty arguments — prompt user for input instead
+- MUST NOT dispatch if `config/pipeline-stages.yaml` is missing — report prerequisite failure clearly
+- MUST NOT run concurrent pipelines against the same `.pipeline/state.json` — warn and abort if state file shows an active run

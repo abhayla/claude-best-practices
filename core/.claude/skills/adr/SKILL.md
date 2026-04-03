@@ -5,10 +5,19 @@ description: >
   create new ADRs from the Michael Nygard template, list existing decisions, supersede
   or deprecate old ADRs, and generate an ADR index. Use when making architectural
   decisions that need formal documentation or when reviewing past decisions.
+  For single ADR operations. Use /documentation-workflow for batch documentation
+  generation that includes ADRs.
+triggers:
+  - adr
+  - architecture decision record
+  - create adr
+  - document architecture decision
+  - record decision
+  - decision log
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<new \"Decision Title\" | list | index | supersede <ADR-number> | deprecate <ADR-number>>"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Architecture Decision Records (ADR)
@@ -17,11 +26,13 @@ Create, manage, and index Architecture Decision Records following the Michael Ny
 template. ADRs capture the context, decision, and consequences of architecturally
 significant choices.
 
+**Critical:** Never delete ADRs — supersede or deprecate instead. ADR numbers are never reused.
+
 **Arguments:** $ARGUMENTS
 
 ---
 
-## STEP 1: Parse Command
+## STEP 1: Parse and Validate Command
 
 | Command | Action |
 |---------|--------|
@@ -31,6 +42,12 @@ significant choices.
 | `supersede <N>` | Mark ADR-N as superseded, prompt for replacement ADR |
 | `deprecate <N>` | Mark ADR-N as deprecated |
 | No argument | Interactive — ask what the user wants to do |
+| Unrecognized | Report error: "Unknown command. Use: new, list, index, supersede, or deprecate" |
+
+**Input validation (before proceeding):**
+- `new` requires a non-empty quoted title
+- `supersede` / `deprecate` require a valid ADR number (positive integer)
+- If target ADR file does not exist, report: "ADR NNNN not found" and stop
 
 ---
 
@@ -142,6 +159,8 @@ If the decision warrants it, include additional sections:
 ---
 
 ## STEP 4: List ADRs (`list`)
+
+First verify the ADR directory exists. If not, report "No ADR directory found. Run `/adr new` to create your first ADR." and stop.
 
 Scan the ADR directory and produce a status table:
 

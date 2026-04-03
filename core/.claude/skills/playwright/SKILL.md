@@ -7,15 +7,20 @@ description: >
   Use when building or maintaining end-to-end tests for web UIs.
 triggers:
   - playwright
-  - playwright-test
-  - e2e-web
+  - playwright test
+  - write e2e test
+  - web e2e testing
+  - browser automation test
+  - visual regression test
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<user-flow-or-test-description>"
-version: "1.1.2"
+version: "1.2.0"
 type: workflow
 ---
 
 # Playwright E2E Testing
+
+**Critical:** This skill is Playwright-specific. For cross-framework E2E best practices, use /e2e-best-practices. For orchestrated visual E2E runs with auto-healing, use /e2e-visual-run.
 
 Write, run, and debug Playwright end-to-end tests for the requested user flow or scenario.
 

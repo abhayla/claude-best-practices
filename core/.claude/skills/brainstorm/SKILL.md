@@ -3,24 +3,27 @@ name: brainstorm
 description: >
   Explore intent through Socratic questioning, propose approaches with trade-offs,
   and produce a spec document. Use before building anything non-trivial to clarify
-  requirements and evaluate alternatives.
+  requirements and evaluate alternatives. NOT for project-wide strategic planning
+  (use /strategic-architect) or UI design (use /compose-ui, /ui-ux-pro-max).
 triggers:
   - brainstorm
   - explore ideas
-  - design
-  - spec
-  - requirements
-  - trade-offs
-  - approaches
-allowed-tools: "Bash Read Write Edit Grep Glob Agent"
+  - brainstorm feature
+  - write feature spec
+  - compare trade-offs
+  - explore approaches
+allowed-tools: "Read Write Edit Grep Glob"
 argument-hint: "<feature or problem description>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
 # Brainstorm — Socratic Exploration & Spec Writing
 
 Structured exploration of a problem space before committing to implementation.
+MUST NOT skip Step 1 questioning. MUST NOT begin implementation — this skill
+produces specs, not code. For trivial changes (single field, config tweak),
+suggest the user skip brainstorm and use `/implement` directly.
 
 **Topic:** $ARGUMENTS
 
@@ -51,7 +54,7 @@ Conduct thorough research before proposing anything. Delegate to subagents for b
 4. Note any prior attempts or partial implementations
 
 ### 2.2 External Research (when applicable)
-5. **Similar implementations** — Search for how other projects solve this problem. Use `WebSearch` to find open-source implementations, blog posts, or Stack Overflow discussions with concrete patterns.
+5. **Similar implementations** — Search for how other projects solve this problem. Look for open-source implementations, blog posts, or Stack Overflow discussions with concrete patterns.
 6. **Documentation & standards** — Review official documentation for relevant libraries, APIs, or protocols. Check for best practices, known pitfalls, and recommended patterns.
 7. **Design patterns** — Identify applicable design patterns (e.g., event sourcing, CQRS, circuit breaker, saga). Reference pattern names so the team has shared vocabulary.
 8. **Known failure modes** — Research common mistakes when implementing this type of feature. What do post-mortems say? What do "things I wish I knew" articles highlight?
@@ -245,16 +248,16 @@ Summarize the spec/PRD in 3-5 bullet points and suggest the appropriate next ste
 
 ## MUST DO
 
-- Always complete Step 1 questioning, even for "obvious" requests
-- Always present trade-offs across multiple approaches, not just the "best" option
-- Always wait for user approval between Steps 3, 4, and 5
-- Always ground proposals in actual codebase research (Step 2)
-- Update the spec document when new information surfaces
+- Always complete Step 1 questioning, even for "obvious" requests — Why: skipped questions lead to misunderstood requirements and wasted implementation effort
+- Always present trade-offs across multiple approaches, not just the "best" option — Why: users need to make informed decisions, not accept your first instinct
+- Always wait for user approval between Steps 3, 4, and 5 — Why: incremental alignment prevents costly late-stage redesigns
+- Always ground proposals in actual codebase research (Step 2) — Why: proposals disconnected from the codebase create unrealistic plans
+- Update the spec document when new information surfaces — Why: stale specs cause implementation drift
 
 ## MUST NOT DO
 
-- MUST NOT skip questioning and jump straight to solutions
-- MUST NOT present a single approach as the only option — always offer alternatives
-- MUST NOT dump the entire design at once — present section by section
-- MUST NOT treat the spec as final — it evolves with the conversation
-- MUST NOT begin implementation during this skill — brainstorm produces a spec, not code
+- MUST NOT skip questioning and jump straight to solutions — Why: premature solutions solve the wrong problem
+- MUST NOT present a single approach as the only option — always offer alternatives — Why: users lose trust when they suspect you're anchoring
+- MUST NOT dump the entire design at once — present section by section — Why: cognitive overload causes users to rubber-stamp instead of review
+- MUST NOT treat the spec as final — it evolves with the conversation — Why: rigid specs break on contact with reality
+- MUST NOT begin implementation during this skill — brainstorm produces a spec, not code — Why: mixing exploration and execution leads to premature commitment

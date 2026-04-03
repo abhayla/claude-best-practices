@@ -4,10 +4,16 @@ description: >
   Configure Gradle convention plugins, version catalogs, and build performance optimization
   for Android projects. Use when setting up build-logic/, configuring libs.versions.toml,
   debugging slow builds, migrating kapt to KSP, or optimizing CI/CD build pipelines.
-triggers: "gradle, build-logic, convention plugin, build performance, gradle optimization, version catalog, libs.versions.toml"
+triggers:
+  - android gradle
+  - convention plugin
+  - build performance
+  - version catalog
+  - gradle optimization
+  - build-logic
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<task-description or 'setup' or 'optimize' or 'diagnose'>"
-version: "1.0.0"
+version: "1.0.1"
 type: workflow
 ---
 

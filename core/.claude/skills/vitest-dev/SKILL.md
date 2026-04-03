@@ -6,9 +6,15 @@ description: >
   integration (React Testing Library, Vue Test Utils). Use when writing or running
   Vitest tests.
 allowed-tools: "Bash Read Grep Glob"
-triggers: "vitest, vi.mock, vi.fn, test runner, unit test vite, testing library vitest"
+triggers:
+  - vitest
+  - vi.mock
+  - vi.fn
+  - test runner
+  - unit test vite
+  - testing library vitest
 argument-hint: "<pattern-to-look-up or 'config' or 'mock' or 'coverage' or 'workspace'>"
-version: "1.0.0"
+version: "1.0.1"
 type: reference
 ---
 

@@ -12,16 +12,19 @@ triggers:
   - pre-implementation tests
   - write tests from requirements
   - test matrix
-  - tdd-failing-test-generator
-allowed-tools: "Bash Read Write Edit Grep Glob Agent"
+allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<PRD file path, plan file path, schema file path, feature description, or coverage gap report>"
-version: "2.0.0"
+version: "2.1.0"
 type: workflow
 ---
 
 # Test Generator — Requirements-Driven Test Suite Generation
 
-Auto-generate comprehensive test suites from PRD requirements, schema definitions, or API specs. Produces failing tests (TDD red phase) ready for implementation.
+Auto-generate comprehensive test suites from PRD requirements, schema definitions, or API specs.
+Produces failing tests (TDD red phase) ready for implementation. MUST NOT begin implementation —
+this skill produces stubs only. For the full red-green-refactor cycle, use `/tdd` after generating
+stubs. If `$ARGUMENTS` is empty, ask the user for at least one source: PRD file path, schema
+file path, API spec, feature description, or coverage gap report path.
 
 **Input:** $ARGUMENTS
 
@@ -37,9 +40,10 @@ Read and extract testable requirements from available sources:
 4. **API spec** — Endpoints, request/response shapes, error codes, auth requirements
 5. **Coverage gap report** — File paths with uncovered lines from `/coverage-analysis` output. Parse the gap report to extract file paths, line ranges, and branch coverage gaps. Generate targeted tests that exercise the specific uncovered code paths identified in the report. Prioritize gaps in domain and service layers over infrastructure code
 
-Build the test matrix:
+Build the test matrix mapping each requirement to its test type (unit, API, E2E, property-based, BDD). Use the test matrix template from `references/test-matrix.md`.
 
-```markdown
+---
+
 ## STEP 2: Detect Test Framework
 
 Auto-detect the project's test framework by scanning for config files:
@@ -387,8 +391,11 @@ def test_order_total_is_non_negative(amount):
 
 ## STEP 9: Coverage Configuration
 
+Configure coverage thresholds per the project's tool. Minimum defaults: 80% line coverage,
+70% branch coverage. Security-critical paths (auth, payment) require 90%. Read plan/config
+for project-specific thresholds before using defaults.
 
-**Read:** `references/coverage-configuration.md` for detailed step 9: coverage configuration reference material.
+**Read:** `references/coverage-configuration.md` for tool-specific configuration commands.
 
 ## STEP 10: Mutation Testing Setup
 
@@ -413,24 +420,19 @@ mutmut results
 
 ## STEP 11: Snapshot Test Stubs
 
-For projects with UI, generate data and visual snapshot test stubs:
+Generate data snapshot stubs (API response shapes) and visual snapshot stubs (component renders)
+for projects with UI. Use `pytest-snapshot`/`syrupy` (Python) or inline snapshots (Vitest/Jest).
+Generate one snapshot test per API endpoint response shape and per serialized domain entity.
 
-
-**Read:** `references/snapshot-test-stubs.md` for detailed step 11: snapshot test stubs reference material.
-
-# tests/snapshots/test_api_responses.py
-
-def test_user_response_shape(client, snapshot):
-    """Snapshot test: GET /users/:id response shape."""
-    response = client.get("/users/1")
-    assert response.json() == snapshot
-```
-
-Requires `pytest-snapshot` or `syrupy`. Generate one snapshot test per API endpoint response shape and per serialized domain entity.
+**Read:** `references/snapshot-test-stubs.md` for full templates and framework-specific patterns.
 
 ## STEP 12: Accessibility Test Stubs
 
-**Read:** `references/accessibility-test-stubs.md` for detailed step 12: accessibility test stubs reference material.
+Generate accessibility test stubs using axe-core assertions for WCAG 2.1 AA compliance.
+Include page-level axe scans, focus management tests, and ARIA attribute validation.
+Skip for non-UI projects.
+
+**Read:** `references/accessibility-test-stubs.md` for full templates and framework-specific patterns.
 
 ## STEP 13: Red Phase Gate Verification
 

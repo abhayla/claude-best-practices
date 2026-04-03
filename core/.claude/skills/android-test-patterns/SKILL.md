@@ -4,7 +4,8 @@ description: >
   Apply Android test writing patterns including JUnit 5 unit tests, Compose UI tests,
   Espresso instrumented tests, Hilt test modules, coroutine test utilities,
   Room database testing, and test fixture factories. Use when writing new
-  Android tests or setting up test infrastructure.
+  Android tests or setting up test infrastructure. For raw ADB-based testing
+  without frameworks (uiautomator, screencap, monkey), use /android-adb-test.
 triggers:
   - android test
   - write android tests
