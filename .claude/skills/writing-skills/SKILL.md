@@ -1,9 +1,9 @@
 ---
 name: writing-skills
 description: >
-  Author new Claude Code skills from scratch or from observed patterns. Covers YAML
-  frontmatter, step structure, trigger design, quality validation, testing, hub
-  promotion, and a full template library. Use when creating or refining skills
+  Author new Claude Code skills or update existing ones. Covers YAML frontmatter,
+  step structure, trigger design, quality validation, testing, hub promotion,
+  and a full template library. Use when creating, updating, or refining skills
   for the .claude/skills/ directory.
 triggers:
   - write-skill
@@ -12,15 +12,20 @@ triggers:
   - how to write a skill
   - new skill
   - author skill
+  - update skill
+  - modify skill
+  - improve skill
+  - edit skill
+  - refine skill
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "2.9.0"
+version: "3.0.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
 
-Author new Claude Code skills from scratch, from observed patterns, or from session analysis.
+Author new Claude Code skills or update existing ones — from scratch, from observed patterns, or from session analysis.
 
 **Request:** $ARGUMENTS
 
@@ -35,9 +40,11 @@ Parse `$ARGUMENTS` to choose the path:
 | Input | Mode | Starting Point |
 |-------|------|----------------|
 | `from-session` | **From Session** (recommended) | Start at Step 3 — best skills come from real tasks |
-| A skill name or description | **From Scratch** | Start at Step 2 |
+| A skill name or description | **From Scratch** or **Update** | Check if skill exists → Update (Step 1.3) or create (Step 2) |
 | A URL or file path to existing workflow | **From Reference** | Start at Step 2, pre-fill from reference |
 | Empty / vague | **Interactive** | Ask: "What repeated task do you want to automate?" |
+
+**Auto-detect Update mode:** When `$ARGUMENTS` names an existing skill (directory exists in `.claude/skills/` or `core/.claude/skills/`), switch to Update mode (Step 1.3). Do not treat updates as new skill creation.
 
 ### 1.1 Skill Necessity Check
 
@@ -70,6 +77,26 @@ These become the acceptance criteria that drive Step 2.
 
 These scenarios drive what to include in Step 2 — write ONLY what's needed
 to pass them. Resist comprehensive documentation until evals confirm value.
+
+### 1.3 Update Mode — Modify an Existing Skill
+
+When the target skill already exists, follow this workflow instead of creating from scratch.
+
+1. **Read the existing skill** — load the full SKILL.md and any references
+2. **Identify what needs to change** — based on user request, conversation context, or known gaps
+3. **Classify the change scope** for SemVer bump:
+
+| Change Type | Version Bump | Examples |
+|---|---|---|
+| Breaking: output format change, removed steps, renamed arguments | **MAJOR** | Changing JSON output schema, removing a step |
+| Additive: new optional steps, new modes, expanded examples | **MINOR** | Adding an update mode, new decision table |
+| Fix: typo, wording, formatting, bug fix | **PATCH** | Fixing a code block, clarifying a step |
+
+4. **Apply changes** — edit the existing SKILL.md using the Edit tool (not rewrite)
+5. **Bump the version** in frontmatter per the classification above
+6. **Skip Steps 1.1–1.2 and Steps 2–3** — the skill's value is already proven
+7. **Run Steps 4–5** — validate naming, organization, and quality checklist
+8. **Run Step 6** with `--baseline` flag — evaluates the update against the previous version
 
 ---
 
