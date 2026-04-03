@@ -83,6 +83,8 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`config/workflow-contracts.yaml`** — Per-workflow step DAGs, artifact contracts, gate expressions
 - **`config/third-party-skills.yml`** — Registry of third-party agent skills detected during provisioning
 - **`config/topics.yml`** / **`config/urls.yml`** — Topic mappings and curated URLs for `scan_web.py`
+- **`config/discoveries.json`** — Accumulated pattern discoveries from external sources, dedup'd across runs
+- **`config/test-pipeline.yml`** — Test pipeline stage definitions (fix-loop, auto-verify, post-fix stages)
 
 ### CI Workflows
 
