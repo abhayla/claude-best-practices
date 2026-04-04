@@ -412,7 +412,8 @@ CORE_WORKFLOW_SKILLS = {
     "pr-standards", "request-code-review", "receive-code-review",
     "code-quality-gate", "writing-plans", "executing-plans",
     "verify-screenshots", "post-fix-pipeline", "test-pipeline",
-    "regression-test",
+    "regression-test", "prompt-auto-enhance", "e2e-best-practices",
+    "e2e-visual-run",
 }
 MUST_HAVE_UNIVERSAL_SKILLS = CORE_WORKFLOW_SKILLS  # backward compat alias
 
@@ -427,6 +428,9 @@ NICE_TO_HAVE_UNIVERSAL_SKILLS = {
     "batch",
     "supply-chain-audit",
     "learn-n-improve",
+    "twitter-x",
+    "reddit",
+    "github",
 }
 
 # Universal rules that are high-value
@@ -441,7 +445,6 @@ MUST_HAVE_AGENTS = {"security-auditor-agent", "tester-agent", "test-pipeline-age
 ALWAYS_SKIP = {
     "update-practices", "contribute-practice",
     "obsidian", "solidity-audit", "mcp-server-builder",
-    "twitter-x", "reddit", "github",
 }
 
 # Stack-specific skills that should be downgraded to nice-to-have
