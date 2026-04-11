@@ -1,12 +1,12 @@
-# Summary Output Format
+# STEP 9: Summary
 
-Reference material for Step 10 (Summary) of `/synthesize-project`.
+## STEP 9: Summary
 
-## Reading Sharing Status
+Print a summary showing both hub provisioning and synthesis results.
 
-Read `synthesis-config.yml` to determine sharing status before printing the summary.
+**Read `synthesis-config.yml`** to determine sharing status.
 
-## Sharing OFF (default)
+**If sharing is OFF (default):**
 
 ```
 Provision complete:
@@ -50,7 +50,7 @@ All patterns are local — nothing has been shared.
 ╰─────────────────────────────────────────────────────────────────╯
 ```
 
-## Sharing ON
+**If sharing is ON:**
 
 ```
 Provision complete:
@@ -79,11 +79,9 @@ Synthesized patterns:
 Hub sharing is ON — your patterns contribute to the hub, and you receive updates.
 ```
 
-## Conditional Sections
+**If `--skip-hub` was set,** omit the "Hub patterns" and "CLAUDE.md section audit" sections entirely.
 
-**If `--skip-hub` was set:** Omit the "Hub patterns" and "CLAUDE.md section audit" sections entirely.
-
-**If `--skip-synthesis` was set:** Omit the "Synthesized patterns" section entirely.
+**If `--skip-synthesis` was set,** omit the "Synthesized patterns" section entirely.
 
 **If `--update` mode, also show:**
 
@@ -95,7 +93,7 @@ Hub sharing is ON — your patterns contribute to the hub, and you receive updat
 
 ## Warnings Section
 
-If any integrity issues were found during Step 2f (rules table validation) or Step 8 (reconciliation), display before the main summary:
+If any integrity issues were found during the workflow, display before the main summary. Sources: Step 1 (provision warnings), Step 3 (hub dedup drops), Step 4 (rejected conventions), Step 7 (validation failures).
 
 ```
 Warnings:

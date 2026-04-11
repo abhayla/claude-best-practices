@@ -5,15 +5,24 @@ description: >
   Writes ONLY to the target project's .claude/ directory (local) or creates a PR on the target repo (remote).
   NEVER writes to core/.claude/ — that is the hub template. If running from the hub repo, --repo or --local is REQUIRED.
   Use --skip-hub for synthesis only, --skip-synthesis for hub patterns only.
+triggers:
+  - synthesize project patterns
+  - provision hub patterns
+  - generate project-specific claude config
+  - sync patterns to project
+  - onboard project with hub patterns
+  - provision target project
 allowed-tools: "Bash Read Grep Glob Write Edit"
-argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis] [--only skills|rules|agents] [--tier must-have|improved|nice-to-have|all]"
-version: "4.0.0"
+argument-hint: "[--repo owner/name] [--update] [--dry-run] [--skip-hub] [--skip-synthesis] [--tier must-have|nice-to-have]"
+version: "4.3.0"
 type: workflow
 ---
 
 # Synthesize Project Patterns
 
 Provision hub patterns and generate project-specific `.claude/` patterns by reading the actual codebase.
+
+**Critical constraints:** This skill writes ONLY to the TARGET PROJECT's `.claude/` directory. NEVER write to `core/.claude/` — that is the hub template. In remote mode, creates a PR on the target repo. If running from the hub repo, `--repo` or `--local` is REQUIRED.
 
 **Arguments:** $ARGUMENTS
 
@@ -28,7 +37,7 @@ Provision hub patterns and generate project-specific `.claude/` patterns by read
 | `--update` | Delta only — skip hub provision, synthesize only new/stale conventions |
 | `--dry-run` | Preview only, no writes |
 | `--skip-hub` | Skip Step 1 (no hub patterns, synthesis only — old behavior) |
-| `--skip-synthesis` | Skip Steps 2-8 (hub patterns only — equivalent to `recommend.py --provision`) |
+| `--skip-synthesis` | Skip Steps 2-8 (hub patterns only — equivalent to `recommend.py --provision`). Jumps to Step 9. |
 
 `--repo` can be combined with `--update`, `--dry-run`, `--skip-hub`, or `--skip-synthesis`.
 
@@ -49,7 +58,7 @@ test -d core/.claude && test -f registry/patterns.json && test -f scripts/recomm
 - `--repo owner/name` is REQUIRED. You MUST be targeting a different repo.
 - If `--repo` was NOT provided and no `--local /path` was given, STOP and ask: "You're running inside the hub repo. Which project should I synthesize patterns for? Use `--repo owner/name` or `--local /path/to/project`."
 - NEVER write synthesized patterns to `core/.claude/`. That directory is the hub's distributable template — only curated, generic patterns belong there. Project-specific patterns go to the TARGET project's `.claude/`.
-- NEVER treat scanning a downstream repo as "adding patterns to the hub." That is the job of `collate.py` and `/synthesize-hub`, NOT this skill.
+- NEVER treat scanning a downstream repo as "adding patterns to the hub." That is the job of `collate.py` and the hub's own synthesis workflow, NOT this skill.
 
 **If you are NOT in the hub repo:** Proceed normally — local mode targets the current directory.
 
@@ -63,6 +72,7 @@ If `--repo owner/name` is provided, set up remote file access. Otherwise, use lo
    ```bash
    gh repo view owner/name --json name,defaultBranchRef
    ```
+   If this command fails (auth error, 404, permission denied), STOP and report the error. Do not proceed — all subsequent `gh api` calls will fail.
 
 2. Fetch the repository file tree:
    ```bash
@@ -72,7 +82,7 @@ If `--repo owner/name` is provided, set up remote file access. Otherwise, use lo
 3. Define a helper function for reading remote files (use throughout all subsequent steps instead of `Read`):
    ```bash
    # Fetch a single file's content from the repo
-   gh api repos/owner/name/contents/PATH --jq '.content' | base64 -d
+   gh api repos/owner/name/contents/PATH --jq '.content | @base64d'
    ```
 
 4. For `--update` mode, also fetch existing `.claude/` patterns from the repo:
@@ -89,9 +99,9 @@ If `--repo owner/name` is provided, set up remote file access. Otherwise, use lo
 
 ## STEP 1: Provision Hub Patterns
 
-**Skip this step if:** `--skip-hub` is set, OR `--update` is set (hub patterns were already provisioned on first run), OR `--dry-run` is set (preview mode — do not provision, just note that hub provisioning would run).
+**Skip this step if:** `--skip-hub` is set, OR `--update` is set (hub patterns were already provisioned on first run).
 
-If `--dry-run`: Print "Would run: recommend.py --provision for [project]" and skip to Step 2. Do NOT execute recommend.py.
+If `--dry-run`: Run `recommend.py --json` (WITHOUT `--provision`) to capture the gap analysis for dedup context, but do NOT copy any files. Print "Dry-run: captured hub gap analysis for dedup (no files copied)." Note: dry-run synthesis results may differ slightly from real runs since hub patterns are not physically present in the project directory.
 
 Run `recommend.py --provision --json` to copy matching hub patterns and generate CLAUDE.md/settings.json for the project. The `--json` flag outputs structured 5-category results (must-have, improved, nice-to-have, synthesized, skip) that this skill parses.
 
@@ -128,7 +138,7 @@ Store these counts for the summary in Step 9.
 
 **If recommend.py is not available** (e.g., this skill is running in a project that doesn't have the hub repo locally), skip this step gracefully and proceed to Step 2. Print a note: "Hub repo not found — skipping hub provisioning. Use --skip-hub to suppress this message."
 
-**If `--skip-synthesis` is set:** After this step, jump directly to Step 8 (generate synthesis-config.yml) and then Step 9 (summary). Skip Steps 2-7.
+**If `--skip-synthesis` is set:** After this step, jump directly to Step 9 (summary). Skip Steps 2-8 entirely — synthesis-config.yml is a synthesis artifact and should not be generated when synthesis is skipped.
 
 ---
 
@@ -148,16 +158,25 @@ Gather project structure and configuration to understand what this project is an
 
 3. Read **entry points** — files matching: `main.*`, `app.*`, `index.*`, `server.*`, `manage.py`, `wsgi.py`
 
-4. Find the test directory, then read one representative test file (pick the largest test file — it likely demonstrates the most conventions)
+4. Find the test directory, then read one representative test file (pick the largest test file — it likely demonstrates the most conventions). If no test directory or test files are found, note "No test files detected — skipping test convention analysis" and proceed.
 
-**If `--update` mode:** Also read all existing `.claude/rules/*.md`, `.claude/skills/*/SKILL.md`, and `.claude/agents/*.md` to understand what patterns already exist.
+**If `--update` mode:** Also read all existing `.claude/rules/*.md`, `.claude/skills/*/SKILL.md`, and `.claude/agents/*.md` to understand what patterns already exist. For each existing pattern with `synthesized: true`, record its evidence files (mentioned in pattern body) for staleness detection in Step 3.
 
 **Output of this step:** A mental model of the project's stack, structure, dependencies, and testing approach.
+
+### Monorepo detection
+
+Check for monorepo indicators: `workspaces` field in `package.json`, `pnpm-workspace.yaml`, `lerna.json`, `nx.json`, or multiple `go.mod` files at different levels.
+
+If detected, ask: "This appears to be a monorepo with [N] packages. Which package(s) should I synthesize for? (Enter names, or `all` for shared conventions.)" Scope Steps 3-7 to the selected package(s).
 
 ## STEP 3: Identify Conventions (with Dedup Against Hub)
 
 Based on what you learned in Step 2, identify 10-20 candidate conventions worth encoding as patterns.
 
+If fewer than 3 conventions are identified, inform the user: "This project may not have enough code for meaningful synthesis. Consider running again after more code is written." Still generate any conventions found — even 1-2 patterns add value.
+
+> **Note:** The `confidence` field (high/medium/low) is a transient signal for identification and tier classification. It is NOT persisted in generated pattern files. Low-confidence candidates are dropped; high/medium determine the tier for remote-mode PR separation.
 
 **Read:** `references/identify-conventions-with-dedup-against-hub.md` for detailed step 3: identify conventions (with dedup against hub) reference material.
 
@@ -166,12 +185,14 @@ Based on what you learned in Step 2, identify 10-20 candidate conventions worth 
 For each remaining candidate convention, read the source files listed in "evidence needed."
 
 1. Read the files using `Read` — deduplicate across conventions (if two conventions need the same file, you already have it in context). **Deep scan (default):** Read ALL evidence files needed to confirm conventions. Do NOT cap at an arbitrary number. If total evidence files exceed 15, delegate overflow to subagents to manage context — but NEVER skip evidence files entirely.
+
+   **Subagent delegation** (when evidence files > 15): Split conventions into groups of 5-8. For each group, launch a subagent with: "Read [file list]. For each convention hypothesis [list], report: confirmed/rejected/refined, key finding (1 line), counter-evidence count." Merge results before presenting the evidence report.
 2. For each convention, confirm or reject:
    - **Confirmed** — the convention holds across the evidence files with no major counter-examples
    - **Rejected** — the evidence is inconsistent, or the convention is weaker than hypothesized
    - **Refined** — the convention exists but needs to be stated differently than hypothesized
 3. Note any **counter-evidence** — files that deviate from the convention. If more than 30% of evidence files deviate, reject the convention
-4. Assess **sensitivity** — does the pattern reveal auth flows, secrets handling, billing logic, or internal architecture that the team might want private?
+4. Assess **sensitivity** — scan for keywords: `auth`, `secret`, `token`, `credential`, `billing`, `payment`, `session`, `encryption`, `API key`, `password`, `private key`. Flag patterns containing these for the user to decide on `private: true`.
 
 Drop rejected conventions. Refine any that need it.
 
@@ -214,10 +235,15 @@ Before generating patterns, load the format standards and examples that guide ge
    - `core/.claude/rules/pattern-structure.md` (or the project's local copy if it exists)
    - `core/.claude/rules/pattern-portability.md`
    - `core/.claude/rules/pattern-self-containment.md`
+   - `core/.claude/rules/rule-writing-meta.md` (RFC 2119 language guidance for rules)
 
-2. Read 2-3 existing patterns from `core/.claude/` as format examples — pick patterns that match the project's detected stack. If no stack match, use any well-structured universal pattern. These show what good output looks like.
+2. Read 2-3 existing patterns from `core/.claude/` as format examples matching the project's stack:
+   - **Python:** `rules/testing.md`, `skills/pytest-dev/SKILL.md`
+   - **TypeScript/Node:** `rules/testing.md`, `skills/vitest-dev/SKILL.md`
+   - **Android:** `rules/android.md`, `skills/android-arch/SKILL.md`
+   - **Fallback:** `rules/pattern-structure.md`, any skill with `synthesized: false`
 
-   If hub patterns were copied in Step 1, you can read examples from the project's own `.claude/` directory — they're now local.
+   If hub patterns were copied in Step 1, read from the project's own `.claude/` instead.
 
 If the hub patterns are not available locally (project was not bootstrapped from the hub), skip this step and use the format requirements embedded in Step 6 below.
 
@@ -255,7 +281,7 @@ allowed-tools: "[minimal tool set]"
 argument-hint: "[required-arg] [--optional-flag]"
 version: "1.0.0"
 synthesized: true
-private: false
+private: false  # Set to true if pattern mentions auth/secrets/billing
 ---
 
 # [Skill Title]
@@ -282,8 +308,9 @@ description: >
   When and why to use this agent. [1-3 sentences]
 tools: ["Read", "Grep", "Glob"]  # JSON array, least-privilege
 model: inherit
+color: blue  # red|orange|yellow|blue|green — adjust based on agent severity
 synthesized: true
-private: false
+private: false  # Set to true if pattern mentions auth/secrets/billing
 ---
 
 # [Agent Title]
@@ -312,6 +339,7 @@ Agents MUST have a clear domain focus specific to this project. A generic "code 
 - For skills: does it have a `## CRITICAL RULES` section at the end?
 - For agents: does frontmatter include `tools` as a JSON array (e.g., `["Read", "Grep", "Glob"]`)?
 - For agents: does body include `## Core Responsibilities` and `## Output Format` sections?
+- For agents: does frontmatter include `color` field with a valid value (`red`|`orange`|`yellow`|`blue`|`green`)?
 - For rules: does it have `globs:` in frontmatter OR `# Scope: global` in first 5 lines?
 
 **Portability (pattern-portability.md):**
@@ -352,6 +380,8 @@ Scan each generated pattern for keywords: `auth`, `secret`, `token`, `credential
 
 ## STEP 8: Generate synthesis-config.yml
 
+**Skip this step if:** `--skip-synthesis` is set (no synthesized patterns to configure).
+
 **Generate `synthesis-config.yml`** if it doesn't exist — create with sharing OFF:
 
 ```yaml
@@ -372,6 +402,7 @@ allow_hub_sharing: false
 private_patterns: []
 
 # Project-specific details to strip from patterns before they leave.
+# Note: stripping is planned but not yet implemented in the hub scan pipeline.
 strip_before_sharing:
   - file_paths
   - class_names
@@ -395,7 +426,7 @@ scan_log: false
 - NEVER overwrite `synthesis-config.yml` if it already exists. The user's consent settings are sacred.
 - In local mode, this skill runs entirely in-session with no network requests (except for recommend.py which reads the hub registry locally). In remote mode (`--repo`), it fetches files from GitHub via `gh api` and creates a PR.
 - If `--update` mode finds stale patterns, do NOT delete them automatically. Write them to the summary as "candidates for removal" and let the developer decide.
-- Mark patterns as `private: true` if they mention auth, secrets, tokens, credentials, billing, payment, or similar sensitive topics. When in doubt, mark private.
+- Mark patterns as `private: true` if they mention auth, secret, token, credential, billing, payment, session, encryption, API key, password, private key, or similar sensitive topics. When in doubt, mark private.
 - Each generated pattern MUST have at least 30 lines of actual content. No stubs.
 - NEVER cap, limit, or prioritize a subset of confirmed conventions. Generate ALL of them. Do NOT pick "top 10" or defer to a follow-up run. The user expects complete, exhaustive coverage.
 - ALWAYS create SEPARATE PRs for each tier (must-have, nice-to-have, enhanced) in remote mode. NEVER combine tiers into a single PR. NEVER skip a tier that has patterns. NEVER make arbitrary decisions about which resources to include or exclude from a PR.

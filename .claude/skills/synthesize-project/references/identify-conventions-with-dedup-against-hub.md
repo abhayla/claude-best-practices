@@ -6,8 +6,8 @@
 - [Agents](#agents--tasks-worth-delegating-to-a-specialized-subagent)
 - [NOT worth encoding](#not-worth-encoding-any-type)
 - [Identification checklist](#identification-checklist)
-- [Present findings to user](#present-findings-to-user)
 - [Dedup against hub patterns](#dedup-against-hub-patterns)
+- [Present findings to user](#present-findings-to-user-after-dedup)
 
 ### Rules — conventions worth encoding as always-on constraints
 
@@ -63,36 +63,9 @@ For each candidate, note:
 
 Drop any candidate with `low` confidence immediately. A missing pattern is better than a wrong one.
 
-### Present findings to user
-
-Before proceeding, print the full candidate list as a table for the user to review:
-
-```
-Candidate Conventions ([N] identified):
-
-| # | Name | Type | Category | Confidence | Hypothesis |
-|---|------|------|----------|------------|------------|
-| 1 | ... | rule | correctness | high | ... |
-| 2 | ... | skill | consistency | medium | ... |
-| 3 | ... | agent | testing | medium | ... |
-
-Type mix: [N] rules, [N] skills, [N] agents
-```
-
-Then list which conventions were dropped and why:
-
-```
-Dropped ([N]):
-- [name]: low confidence (seen in 1 file only)
-- [name]: already enforced by [linter/formatter]
-- [name]: generic best practice, not project-specific
-```
-
-**Wait for user acknowledgment** before proceeding to Step 4. The user may want to add, remove, or reprioritize conventions.
-
 ### Dedup against hub patterns
 
-Before proceeding, compare each candidate convention against the hub patterns copied in Step 1 (if Step 1 ran). If a hub pattern already covers the convention (even generically), check whether the project-specific version adds genuine value beyond what the hub provides. Drop conventions where the hub pattern is sufficient.
+Before presenting findings to the user, compare each candidate convention against the hub patterns copied in Step 1 (if Step 1 ran). If a hub pattern already covers the convention (even generically), check whether the project-specific version adds genuine value beyond what the hub provides. Drop conventions where the hub pattern is sufficient.
 
 **Examples of "hub covers it":**
 - Hub has `android-arch` skill covering clean architecture → don't generate `module-dependency-direction` rule unless project has non-standard dependency rules
@@ -112,7 +85,53 @@ Hub dedup: [N] conventions dropped (already covered by hub patterns):
 Remaining after dedup: [N] conventions to investigate
 ```
 
-**If `--update` mode:** Compare candidates against existing patterns. Only keep:
+**If `--update` mode:** Compare candidates against existing patterns using the staleness detection below. Only keep:
 - New conventions not covered by existing patterns
-- Existing patterns that are now stale (code changed, pattern didn't)
+- Stale patterns that need refreshing (will be regenerated in Steps 5-6)
 
+#### Staleness detection (--update mode only)
+
+For each existing pattern with `synthesized: true`:
+1. Extract the evidence file paths mentioned in the pattern body
+2. Check if those files still exist (local: `test -f`; remote: check against tree from Step 0)
+3. If evidence files exist, read them and verify the convention still holds
+4. Mark as **stale** if: evidence files are deleted/renamed, OR the convention no longer matches the code (>30% counter-evidence)
+5. Mark as **intentionally removed** if: the pattern file itself was deleted by the user (not present in `.claude/` but was in a previous synthesis run — check git log if available)
+
+Report staleness findings:
+
+```
+Update check:
+  New conventions:  [N]
+  Stale (refresh):  [N] — [list names and why]
+  Current (skip):   [N] — already up to date
+  Removed by user:  [N] — will not regenerate (intentional deletion)
+```
+
+### Present findings to user (after dedup)
+
+Print the remaining candidate list as a table for the user to review:
+
+```
+Candidate Conventions after hub dedup ([N] remaining):
+
+| # | Name | Type | Category | Confidence | Hypothesis |
+|---|------|------|----------|------------|------------|
+| 1 | ... | rule | correctness | high | ... |
+| 2 | ... | skill | consistency | medium | ... |
+| 3 | ... | agent | testing | medium | ... |
+
+Type mix: [N] rules, [N] skills, [N] agents
+```
+
+Then list which conventions were dropped and why:
+
+```
+Dropped ([N]):
+- [name]: low confidence (seen in 1 file only)
+- [name]: already enforced by [linter/formatter]
+- [name]: generic best practice, not project-specific
+- [name]: covered by hub pattern [pattern-name]
+```
+
+**Wait for user acknowledgment** before proceeding to Step 4. The user may want to add, remove, or reprioritize conventions.
