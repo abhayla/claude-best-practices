@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-03 18:03 UTC (auto-generated)
+> Last updated: 2026-04-11 05:54 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 225 |
-| Core (universal) | 220 |
+| Total Patterns | 224 |
+| Core (universal) | 219 |
 | Stack-specific | 5 |
 | Agents | 37 |
 | Configs | 1 |
 | Hooks | 8 |
 | Rules | 24 |
-| Skills | 155 |
+| Skills | 154 |
 
 ## Pattern Inventory
 
@@ -202,7 +202,6 @@
 | strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | subagent-driven-dev | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | supply-chain-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| synthesize-project | skill | 4.0.1 | hub:abhayla/claude-best-practices | — |
 | systematic-debugging | skill | 1.1.0 | hub:abhayla/claude-best-practices | test-knowledge |
 | tailwind-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | tdd | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
