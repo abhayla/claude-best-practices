@@ -11,6 +11,8 @@
 3. **Risk & Uncertainty Assessment**: After writing code, list what could break and suggest tests to cover it. When making non-trivial decisions (architecture, trade-offs, library choices), MUST flag uncertainty ("not sure about X because Y") and state key assumptions prefixed with **Assumption:** so users can spot them. For critical assumptions, add what would change if wrong — keep flags brief, sentences not paragraphs.
 4. **Verification**: Always verify your work using tests, linters, or type checkers before reporting completion. Check logs and demonstrate correctness. Diff behavior between main and your changes when relevant. Ask yourself: "Would a staff engineer approve this?" Never mark a task complete without proving it works.
 
+> **IMPORTANT: Codex will review your output once you are done.** Write every response, code change, and commit message knowing it will be audited by Codex. Do not cut corners.
+
 ## Self-Improvement
 
 5. **Self-Improving Rules**: Every time I correct you, propose a new rule to add to this CLAUDE.md file so the mistake never happens again. Also update `.claude/tasks/lessons.md` with the pattern so lessons persist across sessions. Periodically review existing rules and propose removing any that Claude already follows without being told, or that have become outdated. All rule additions and removals MUST be explicitly approved by the user before applying. Review lessons at session start for the relevant project. Ruthlessly iterate on lessons until mistake rate drops.
