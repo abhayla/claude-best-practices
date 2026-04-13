@@ -16,7 +16,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<trigger|output|full|conflicts> <skill-path> [--baseline]"
 type: workflow
-version: "2.2.0"
+version: "2.3.0"
 ---
 
 # Skill Evaluator — Evaluate Skill Quality
@@ -75,16 +75,22 @@ Verify these fields against platform constraints:
 
 ### 0.4 Reference Self-Update Mechanism
 
-For skills that have a `references/` directory, verify they include a Reference Completeness Check step:
+For skills that have a `references/` directory, verify the full self-update protocol is present and correctly configured:
 
-| Check | How | Fail Condition |
-|-------|-----|----------------|
-| Self-update step exists | Scan for a step containing "Reference Completeness Check" or equivalent (scans conversation for new knowledge, compares against existing references, presents gaps to user) | Skill has `references/` but no self-update step |
-| User approval gate | Verify the step requires user approval before writing reference updates | Updates written without user confirmation |
-| Version bump on update | Verify the step bumps patch version after reference updates | References updated without version bump |
-| Knowledge filtering | Verify the step distinguishes domain-specific knowledge from generic/ephemeral content | No filtering criteria defined |
+| # | Check | How | Fail Condition | Severity |
+|---|-------|-----|----------------|----------|
+| 1 | Protocol file exists | Check for self-update-protocol.md in the skill's references/ dir | Missing | MAJOR |
+| 2 | Protocol content valid | Verify protocol contains all 7 sections: N.1 (mode detection), N.2 (scan), N.3 (admission gate), N.4 (entry format), N.5 (scoring), N.6 (consolidation), N.7 (version bump) | Missing sections | MAJOR |
+| 3 | Reference Completeness Check step | Scan for a step that reads the self-update protocol file | Skill has `references/` but no self-update step | MAJOR |
+| 4 | CHANGELOG.jsonl exists | Check for `references/CHANGELOG.jsonl` | Missing audit sidecar | MINOR |
+| 5 | Entry format matches spec | Verify protocol's entry format has all 13 fields (ID, State, Temporal, Scope, Date, Context, Observation, Application, Confidence, Applied-In, Source, Supersedes, Tags) | Missing fields | MAJOR |
+| 6 | Mode detection present | Protocol includes FULL vs STANDALONE mode detection based on learn-n-improve presence | No mode detection | MAJOR |
+| 7 | Admission gate present | Protocol has explicit exclusion criteria (generic knowledge, temp workarounds, user-specific data, etc.) | No admission gate | MAJOR |
+| 8 | Scoring mechanism present | STANDALONE mode has independent scoring (haiku subagent or equivalent); FULL mode routes through learnings.json | No quality gate beyond user approval | MAJOR |
+| 9 | Two-tier file structure | Protocol defines Consolidated Principles + Active Observations sections | Missing two-tier structure | MINOR |
+| 10 | User approval gate | Protocol requires user approval before any reference writes | Auto-writes without approval | CRITICAL |
 
-**Severity:** Skills with `references/` that lack a self-update mechanism get a **MAJOR** finding (not CRITICAL — the skill works, but it won't improve over time).
+**Overall severity:** Skills with `references/` that lack the self-update mechanism entirely get a **MAJOR** finding. Missing user approval gate is **CRITICAL**.
 
 If ANY check in 0.1-0.4 fails, report it in the evaluation output as a
 **PRE-FLIGHT FAILURE** and include it in the fix recommendations. Do not skip
@@ -222,23 +228,43 @@ Score each: CRITICAL (wrong output/data loss) / MAJOR (partial/misleading) / MIN
 
 ### 3.4b Reference Self-Update Behavior (skills with references/ only)
 
-For skills that have a `references/` directory, test that the Reference Completeness Check step actually works during execution:
+For skills that have a `references/` directory and a self-update-protocol.md file within it, test the full self-update mechanism across both runtime modes.
 
-1. **Introduce novel knowledge** — run the skill with a scenario that surfaces a domain-specific pattern, edge case, or gotcha NOT already in any reference file
-2. **Verify detection** — the skill should identify the gap and present it to the user with: what was found, which reference file to update/create, and the proposed action
-3. **Verify gating** — the skill MUST ask for user approval before writing any reference updates (auto-writing without approval is a CRITICAL failure)
-4. **Verify filtering** — the skill should NOT propose adding generic programming knowledge, one-time user-specific data, or ephemeral conversation context
-5. **Verify version bump** — after approved reference updates, the skill should bump its patch version
+**Test A — Mode Detection:** Verify the skill detects its runtime environment correctly.
+- Run with `.claude/skills/learn-n-improve/SKILL.md` present → should enter FULL mode (write to learnings.json)
+- Run without learn-n-improve → should enter STANDALONE mode (score with haiku subagent)
+- Check that `references/CHANGELOG.jsonl` is created if missing
+
+**Test B — Gap Detection with Novel Knowledge:** Run the skill with a scenario that surfaces a domain-specific pattern, edge case, or gotcha NOT in any reference file.
+- Skill should identify ≥1 new knowledge item
+- Entry should use the structured 13-field format (ID, State, Type, Confidence, etc.)
+- Confidence should be ≥0.70 for persisted entries
+
+**Test C — Admission Gate + Scoring:** Inject both valid and invalid knowledge:
+- Valid: domain-specific gotcha discovered during execution → should pass admission gate
+- Invalid: generic knowledge ("use try/catch"), user-specific path, ephemeral debug info → should be filtered
+- In STANDALONE mode: verify haiku subagent scoring produces KEEP/REVIEW/DISCARD verdicts
+- In FULL mode: verify entries are written to learnings.json, NOT directly to references
+
+**Test D — User Approval Gate:** The skill MUST present findings and wait for user approval before any reference writes.
+- Auto-writing without approval is a **CRITICAL** failure
+- Verify the presentation includes: what was found, target file, proposed action, and score
+
+**Test E — Post-Update Integrity:** After approved updates:
+- Verify patch version bumped in SKILL.md frontmatter
+- Verify `CHANGELOG.jsonl` has a new entry with CREATE action
+- Verify two-tier structure maintained (Consolidated Principles + Active Observations)
+- Verify no-gap scenario: when all knowledge is already covered, skill reports "References are up to date"
 
 | Test | Pass Criteria | Failure Severity |
 |---|---|---|
-| Gap detection | Skill identifies ≥1 new knowledge item from novel scenario | MAJOR if missed |
-| User approval gate | Skill presents findings and waits before writing | CRITICAL if skipped |
-| Knowledge filtering | Skill does NOT propose adding generic/ephemeral content | MAJOR if unfiltered |
-| Version bump | Patch version incremented after reference update | MINOR if missed |
-| No-gap scenario | When all knowledge is already covered, skill reports "References are up to date" and skips | MINOR if still proposes updates |
+| A: Mode detection | Correct mode selected based on learn-n-improve presence | MAJOR |
+| B: Gap detection | ≥1 new entry with valid 13-field format and confidence ≥0.70 | MAJOR |
+| C: Admission + scoring | Generic content filtered; valid content scored independently | MAJOR |
+| D: User approval gate | Findings presented, writes blocked until approval | CRITICAL |
+| E: Post-update integrity | Version bumped, CHANGELOG updated, two-tier structure intact | MINOR |
 
-Add results to the evaluation report under a `REFERENCE SELF-UPDATE` section.
+Add results to the evaluation report under the `REFERENCE SELF-UPDATE` section.
 
 ### 3.5 Write and Grade Assertions
 
@@ -326,12 +352,15 @@ OUTPUT EVALUATION
   Output verdict:    PASS | FIX | FAIL
 
 REFERENCE SELF-UPDATE (skills with references/ only)
-  Self-update step:  <present | missing>
-  Gap detection:     <PASS | MAJOR — missed novel knowledge>
-  Approval gate:     <PASS | CRITICAL — auto-wrote without approval>
-  Knowledge filter:  <PASS | MAJOR — proposed generic content>
-  Version bump:      <PASS | MINOR — not bumped>
-  No-gap handling:   <PASS | MINOR — proposed updates when none needed>
+  Pre-flight (0.4):  <N/10 checks passed>
+  Protocol file:     <present + valid | missing | incomplete>
+  CHANGELOG.jsonl:   <present | missing>
+  Test A (mode):     <PASS — detected FULL/STANDALONE correctly | MAJOR>
+  Test B (gaps):     <PASS — N entries, valid format, confidence ≥0.70 | MAJOR>
+  Test C (gate+score): <PASS — generic filtered, valid scored | MAJOR>
+  Test D (approval): <PASS — waited for user | CRITICAL — auto-wrote>
+  Test E (integrity): <PASS — version bumped, CHANGELOG updated | MINOR>
+  Self-update verdict: <PASS | FIX | FAIL>
 
 MODEL COVERAGE
   Tested on:         <model list or "single model: X">
@@ -368,8 +397,9 @@ Recommended fixes: <prioritized, mapped to failure types>
 - Always validate name constraints (64 chars, lowercase/hyphens, no reserved words) in pre-flight — Why: platform rejects non-conforming names
 - Always check description is third-person in pre-flight — Why: first/second person causes discovery problems per platform docs
 - Always check reference depth ≤1 from SKILL.md in pre-flight — Why: Claude partially reads deeply nested files
-- Always check for Reference Self-Update step in skills with `references/` directory — Why: skills without self-update become stale as their domain evolves; this is the mechanism that makes skills iteratively self-improving
-- Always test reference self-update behavior with a novel knowledge scenario in output evaluation — Why: structural presence of the step is not enough; it must actually detect gaps and gate on user approval
+- Always run all 10 pre-flight checks (0.4) for skills with `references/` — Why: the protocol file, CHANGELOG, entry format, mode detection, admission gate, scoring, two-tier structure, and approval gate must all be present for the self-update mechanism to work
+- Always run Tests A-E (3.4b) for skills with `references/` during output evaluation — Why: structural presence is not enough; mode detection, gap detection, scoring, approval gating, and post-update integrity must all work at runtime
+- Always test both FULL and STANDALONE modes when learn-n-improve is available in the project — Why: downstream projects may or may not have learn-n-improve; skills must work correctly in both environments
 
 ## MUST NOT DO
 
