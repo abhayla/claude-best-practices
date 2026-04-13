@@ -20,7 +20,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "3.0.0"
+version: "3.1.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -247,7 +247,75 @@ Eleven patterns improve instruction quality within steps.
 
 **Read:** `references/instruction-writing-patterns.md` for calibrating control, gotchas sections, validation loops, plan-validate-execute, defaults over menus, procedures over declarations, script design for agentic use, checklists, input/output examples, conditional workflow routing, and install-then-use patterns.
 
-### 2.6 Validate Before Saving
+### 2.6 Embed Reference Self-Update Mechanism
+
+Every skill that uses `references/` MUST include a **Reference Completeness Check** as its final step (or penultimate, before a commit/output step). This makes skills iteratively self-improving — each invocation can grow the skill's knowledge base.
+
+#### What the Embedded Step Does
+
+When the skill is invoked and executes its workflow, the Reference Completeness Check:
+
+1. **Scans the conversation** for domain knowledge, patterns, edge cases, gotchas, or solutions encountered during execution
+2. **Compares against existing references** — reads each file in the skill's `references/` directory to check coverage
+3. **Identifies gaps** — new knowledge that is NOT already documented in any reference file
+4. **Presents findings to the user** with a table:
+
+```markdown
+## Reference Completeness Check
+
+| New Knowledge Found | Relevant Reference File | Action |
+|---|---|---|
+| {description of new pattern/gotcha/edge case} | `references/existing-file.md` (append) | Add section on X |
+| {description of new domain knowledge} | `references/new-file.md` (create) | New reference covering Y |
+| {description of correction/update} | `references/existing-file.md` (update) | Update section Z with new info |
+
+Proceed with reference updates? [User approves before any writes]
+```
+
+5. **On approval**, writes the updates — appending to existing reference files or creating new ones
+6. **Bumps the skill's patch version** in frontmatter (e.g., `1.0.0` → `1.0.1`)
+
+#### Template for the Embedded Step
+
+Add this step template to every skill that has a `references/` directory:
+
+```markdown
+## STEP N: Reference Completeness Check
+
+Check whether this invocation surfaced knowledge not yet captured in references.
+This step makes the skill self-improving — each run can grow its knowledge base.
+
+1. **Scan execution context** — review the conversation for:
+   - Domain patterns or conventions discovered during this run
+   - Edge cases or gotchas encountered and resolved
+   - Solutions to problems not covered by existing references
+   - Corrections to assumptions that existing references make
+2. **Read existing references** — scan all files in this skill's `references/` directory
+3. **Identify gaps** — list knowledge from step 1 not covered in step 2
+4. **If no gaps found** — report "References are up to date" and skip to next step
+5. **If gaps found** — present a table showing: what was found, which reference file to update/create, and the proposed action
+6. **Wait for user approval** before writing any reference updates
+7. **Apply approved updates** — append to existing files or create new reference files
+8. **Bump patch version** in SKILL.md frontmatter
+```
+
+#### When to Skip
+
+- Skills with no `references/` directory (simple skills under 200 lines)
+- Skills that are read-only / analysis-only with no domain knowledge accumulation
+- If the skill already has a learning/feedback step that writes to a different persistence mechanism
+
+#### What Qualifies as "New Knowledge"
+
+| Include | Exclude |
+|---|---|
+| Domain-specific patterns discovered during execution | Generic programming knowledge |
+| Edge cases that caused failures or workarounds | One-time user-specific data (paths, credentials) |
+| API behaviors that differ from documentation | Conversation-specific context |
+| Gotchas that would trip up future invocations | Information already in CLAUDE.md or rules |
+| Corrections to existing reference content | Temporary workarounds for known bugs |
+
+### 2.7 Validate Before Saving
 
 Before writing the skill file, run through the quality checklist in Step 5.
 
@@ -384,6 +452,7 @@ Before saving the skill, validate every item. Do NOT skip this step.
 | No high-risk indicators without justification | Scripts, MCP refs, network access, or broad file access are documented and necessary (see `references/security-review.md` risk tiers) |
 | `argument-hint` uses `<>` and `[]` correctly | Required in angle brackets, optional in square brackets |
 | No placeholder markers | No TODO/FIXME/PLACEHOLDER HTML comment markers in the body |
+| Reference self-update step present | Skills with `references/` directory include a Reference Completeness Check step (per 2.6) |
 
 ### 5.2 Content Validation
 
@@ -658,6 +727,8 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always present final skill + eval report for user approval before hub promotion
 - Always use gerund or action-oriented naming for skill names — Why: consistent naming improves discoverability and professionalism across the skill library
 - Always keep reference files one level deep from SKILL.md — Why: Claude partially reads deeply nested files, resulting in incomplete information
+- Always embed a Reference Completeness Check step in skills that use `references/` — Why: skills that don't self-update become stale as their domain evolves; each invocation is an opportunity to capture new knowledge
+- Always require user approval before writing reference updates — Why: unreviewed auto-updates can introduce incorrect or low-quality content into the knowledge base
 
 ## MUST NOT DO
 
@@ -675,3 +746,6 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - MUST NOT chain reference files (SKILL.md → ref1.md → ref2.md) — keep one level deep from SKILL.md
 - MUST NOT include time-sensitive content ("before August 2025") — use collapsible "Old patterns" section instead
 - MUST NOT be the sole reviewer of your own skill for hub promotion — Why: separation of duties prevents blind spots and catches adversarial patterns the author may overlook (see Step 8.1)
+- MUST NOT auto-update references without user approval — present findings and wait for confirmation before writing
+- MUST NOT add generic programming knowledge to references — only domain-specific patterns, edge cases, and gotchas that are unique to the skill's problem space
+- MUST NOT skip the Reference Completeness Check for skills with `references/` — the step is what makes skills self-improving rather than static

@@ -10,7 +10,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/prompt-enhance-reminder.sh"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/prompt-enhance-reminder.sh\""
           }
         ]
       }

@@ -72,6 +72,10 @@ Example:
 - We don't use raw SQL — use the ORM query builder
 -->
 
+## Conventions
+
+- Always use repo-relative paths (e.g., `src/utils/`) in output — never absolute paths like `C:\Users\...` or `/home/user/...`
+
 <!-- TODO: Add project-specific rules here. Examples:
 - "MUST use pnpm, NOT npm or yarn"
 - "All API endpoints MUST have integration tests"

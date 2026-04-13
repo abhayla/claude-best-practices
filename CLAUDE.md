@@ -40,7 +40,7 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 ## Architecture
 
-A curated hub of 225 Claude Code patterns (agents, skills, rules, hooks) organized by stack (count from `registry/patterns.json`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
+A curated hub of 224 Claude Code patterns (agents, skills, rules, hooks) organized by stack (count from `registry/patterns.json`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
 
 ### Key Directories
 
@@ -54,6 +54,19 @@ A curated hub of 225 Claude Code patterns (agents, skills, rules, hooks) organiz
 ### Stack Detection
 
 Two mechanisms: (1) **Stack prefixes** in `STACK_PREFIXES` (`bootstrap.py`) — `fastapi-*`, `android-*`, `react-*`, `firebase-*`, `ai-gemini-*`. (2) **Dependency detection** via `DEP_PATTERN_MAP` (`recommend.py`) — matches `flutter-*`, `vue-*`, `bun-elysia-*`, etc. from project dependencies. Universal patterns have no prefix. Adding a new stack requires changes in `STACK_PREFIXES` (bootstrap.py), `STACK_DETECTORS` (recommend.py), and optionally `DEP_PATTERN_MAP` (recommend.py).
+
+Available stacks and their prefixes:
+
+| Stack | Prefix | Detection |
+|-------|--------|-----------|
+| FastAPI/Python | `fastapi-*` | `STACK_PREFIXES` |
+| Android/Compose | `android-*` | `STACK_PREFIXES` |
+| AI/Gemini | `ai-gemini-*` | `STACK_PREFIXES` |
+| Firebase | `firebase-*` | `STACK_PREFIXES` |
+| React/Next.js | `react-*` | `STACK_PREFIXES` |
+| Flutter | `flutter-*` | `DEP_PATTERN_MAP` |
+| Vue/Nuxt | `vue-*` / `nuxt-*` | `DEP_PATTERN_MAP` |
+| Bun/Elysia | `bun-elysia-*` | `DEP_PATTERN_MAP` |
 
 ### Sync Flows
 
@@ -75,6 +88,7 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`discovery_adapter.py`** — Adapter for the pattern discovery pipeline
 - **`aggregate_telemetry.py`** — Aggregates telemetry data from pattern usage across projects
 - **`sync_to_local.py`** — Hub→local sync: pulls patterns into a local project directory
+- **`third_party_skills.py`** — Detects and includes third-party agent skills during provisioning (called by `recommend.py`)
 
 ### Key Config Files
 

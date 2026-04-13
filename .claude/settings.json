@@ -14,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/pattern-quality-gate.sh",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/pattern-quality-gate.sh\"",
             "timeout": 30
           }
         ]
@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/auto-learn-trigger.sh",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/auto-learn-trigger.sh\"",
             "timeout": 5
           }
         ]
@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/post-failure-capture.sh",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/post-failure-capture.sh\"",
             "timeout": 5
           }
         ]
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/prompt-enhance-reminder.sh"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/prompt-enhance-reminder.sh\""
           }
         ]
       }

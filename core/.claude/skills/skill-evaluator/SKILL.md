@@ -16,7 +16,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<trigger|output|full|conflicts> <skill-path> [--baseline]"
 type: workflow
-version: "2.1.0"
+version: "2.2.0"
 ---
 
 # Skill Evaluator — Evaluate Skill Quality
@@ -73,7 +73,20 @@ Verify these fields against platform constraints:
 | Reference depth | Scan all `Read:` / `See:` / link references in SKILL.md and referenced files | Any file that references another file (depth >1 from SKILL.md) |
 | Reference TOC | Check reference files >100 lines for a table of contents section at top | Missing TOC in long reference file |
 
-If ANY check in 0.1-0.3 fails, report it in the evaluation output as a
+### 0.4 Reference Self-Update Mechanism
+
+For skills that have a `references/` directory, verify they include a Reference Completeness Check step:
+
+| Check | How | Fail Condition |
+|-------|-----|----------------|
+| Self-update step exists | Scan for a step containing "Reference Completeness Check" or equivalent (scans conversation for new knowledge, compares against existing references, presents gaps to user) | Skill has `references/` but no self-update step |
+| User approval gate | Verify the step requires user approval before writing reference updates | Updates written without user confirmation |
+| Version bump on update | Verify the step bumps patch version after reference updates | References updated without version bump |
+| Knowledge filtering | Verify the step distinguishes domain-specific knowledge from generic/ephemeral content | No filtering criteria defined |
+
+**Severity:** Skills with `references/` that lack a self-update mechanism get a **MAJOR** finding (not CRITICAL — the skill works, but it won't improve over time).
+
+If ANY check in 0.1-0.4 fails, report it in the evaluation output as a
 **PRE-FLIGHT FAILURE** and include it in the fix recommendations. Do not skip
 these checks — they caught issues in 5/5 evaluated skills.
 
@@ -207,6 +220,26 @@ Score each: CRITICAL (wrong output/data loss) / MAJOR (partial/misleading) / MIN
 - Does the skill handle standalone vs pipeline mode differently? Test both paths.
 - If the skill has dual-mode operation, verify skip conditions work correctly.
 
+### 3.4b Reference Self-Update Behavior (skills with references/ only)
+
+For skills that have a `references/` directory, test that the Reference Completeness Check step actually works during execution:
+
+1. **Introduce novel knowledge** — run the skill with a scenario that surfaces a domain-specific pattern, edge case, or gotcha NOT already in any reference file
+2. **Verify detection** — the skill should identify the gap and present it to the user with: what was found, which reference file to update/create, and the proposed action
+3. **Verify gating** — the skill MUST ask for user approval before writing any reference updates (auto-writing without approval is a CRITICAL failure)
+4. **Verify filtering** — the skill should NOT propose adding generic programming knowledge, one-time user-specific data, or ephemeral conversation context
+5. **Verify version bump** — after approved reference updates, the skill should bump its patch version
+
+| Test | Pass Criteria | Failure Severity |
+|---|---|---|
+| Gap detection | Skill identifies ≥1 new knowledge item from novel scenario | MAJOR if missed |
+| User approval gate | Skill presents findings and waits before writing | CRITICAL if skipped |
+| Knowledge filtering | Skill does NOT propose adding generic/ephemeral content | MAJOR if unfiltered |
+| Version bump | Patch version incremented after reference update | MINOR if missed |
+| No-gap scenario | When all knowledge is already covered, skill reports "References are up to date" and skips | MINOR if still proposes updates |
+
+Add results to the evaluation report under a `REFERENCE SELF-UPDATE` section.
+
 ### 3.5 Write and Grade Assertions
 
 - Write assertions AFTER first run — you don't know "good" until the skill runs
@@ -292,6 +325,14 @@ OUTPUT EVALUATION
   Baseline delta:    +N% pass rate, +N tokens, +Ns
   Output verdict:    PASS | FIX | FAIL
 
+REFERENCE SELF-UPDATE (skills with references/ only)
+  Self-update step:  <present | missing>
+  Gap detection:     <PASS | MAJOR — missed novel knowledge>
+  Approval gate:     <PASS | CRITICAL — auto-wrote without approval>
+  Knowledge filter:  <PASS | MAJOR — proposed generic content>
+  Version bump:      <PASS | MINOR — not bumped>
+  No-gap handling:   <PASS | MINOR — proposed updates when none needed>
+
 MODEL COVERAGE
   Tested on:         <model list or "single model: X">
   Divergent results: <list or "N/A">
@@ -327,6 +368,8 @@ Recommended fixes: <prioritized, mapped to failure types>
 - Always validate name constraints (64 chars, lowercase/hyphens, no reserved words) in pre-flight — Why: platform rejects non-conforming names
 - Always check description is third-person in pre-flight — Why: first/second person causes discovery problems per platform docs
 - Always check reference depth ≤1 from SKILL.md in pre-flight — Why: Claude partially reads deeply nested files
+- Always check for Reference Self-Update step in skills with `references/` directory — Why: skills without self-update become stale as their domain evolves; this is the mechanism that makes skills iteratively self-improving
+- Always test reference self-update behavior with a novel knowledge scenario in output evaluation — Why: structural presence of the step is not enough; it must actually detect gaps and gate on user approval
 
 ## MUST NOT DO
 
