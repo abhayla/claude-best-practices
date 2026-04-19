@@ -1,6 +1,5 @@
 ---
-paths:
-  - "android/**/presentation/**/*.kt"
+globs: ["android/**/presentation/**/*.kt"]
 description: Jetpack Compose UI patterns and conventions.
 ---
 

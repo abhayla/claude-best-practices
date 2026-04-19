@@ -1,10 +1,5 @@
 ---
-paths:
-  - "**/firebase/**"
-  - "**/auth/**/*.ts"
-  - "**/auth/**/*.kt"
-  - "**/auth/**/*.dart"
-  - "**/auth/**/*.py"
+globs: ["**/firebase/**", "**/auth/**/*.ts", "**/auth/**/*.kt", "**/auth/**/*.dart", "**/auth/**/*.py"]
 description: Firebase Auth, Firestore, and backend token verification patterns.
 ---
 

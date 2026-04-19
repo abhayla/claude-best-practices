@@ -1,8 +1,5 @@
 ---
-paths:
-  - "backend/app/models/**/*.py"
-  - "backend/app/db/**/*.py"
-  - "backend/alembic/**/*.py"
+globs: ["backend/app/models/**/*.py", "backend/app/db/**/*.py", "backend/alembic/**/*.py"]
 description: Database and migration rules for FastAPI + SQLAlchemy + Alembic.
 ---
 

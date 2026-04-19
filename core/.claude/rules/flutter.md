@@ -1,6 +1,5 @@
 ---
-paths:
-  - "**/lib/**/*.dart"
+globs: ["**/lib/**/*.dart"]
 description: Flutter/Dart development patterns and conventions.
 ---
 
