@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Python 3.12** required (all CI workflows use 3.12)
 - Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`
 - **Windows**: use `set PYTHONPATH=. &&` prefix instead of `PYTHONPATH=.`, or use Git Bash. All commands below assume Unix shell syntax (forward slashes, `PYTHONPATH=.` prefix)
+- **`CLAUDE.local.md`** (repo root, gitignored) — per-developer overrides and local notes. Safe to read/update; never commit.
 
 ## Commands
 
@@ -40,7 +41,9 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 ## Architecture
 
-A curated hub of 224 Claude Code patterns (agents, skills, rules, hooks) organized by stack (count from `registry/patterns.json`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
+A curated hub of 225 Claude Code patterns (agents, skills, rules, hooks) organized by stack (count from `registry/patterns.json`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
+
+For sync direction semantics (hub↔projects, hub↔internet, aggregation flows), read `docs/SYNC-ARCHITECTURE.md` before modifying any sync script.
 
 ### Key Directories
 
@@ -49,7 +52,8 @@ A curated hub of 224 Claude Code patterns (agents, skills, rules, hooks) organiz
 - **`config/`** — `settings.yml`, `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow docs), `pipeline-stages.yaml` (DAG config), `workflow-contracts.yaml` (step DAGs + artifact contracts)
 - **`docs/workflows/`** — Auto-generated workflow docs. Do not edit manually — regenerate after pattern changes
 - **`internet-sources/`** — Pending and archived sources for `scan_web.py` (`pending/`, `archived/`)
-- **`plans/`** — Implementation plan files for larger initiatives
+- **`plans/`** — Durable implementation plans for multi-session initiatives. Write a plan here when work spans sessions or needs cross-subagent handoff; use in-session plan mode for single-session tasks.
+- **`.claude/tasks/`** — `todo.md` (current task checklist per `claude-behavior.md` rule 14) and `lessons.md` (correction patterns accumulated across sessions). Read `lessons.md` at session start; append after corrections.
 
 ### Stack Detection
 
@@ -86,7 +90,7 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`check_freshness.py`** — Detects stale patterns based on age and activity
 - **`assign_workflow_groups.py`** — Assigns patterns to workflow groups for doc generation
 - **`discovery_adapter.py`** — Adapter for the pattern discovery pipeline
-- **`aggregate_telemetry.py`** — Aggregates telemetry data from pattern usage across projects
+- **`aggregate_telemetry.py`** — Collects adoption signals + learnings from enrolled repos, writes effectiveness metrics to `registry/patterns.json`. Remote mode (default) vs local (`--local`). Runs weekly via `aggregate-telemetry.yml`
 - **`sync_to_local.py`** — Hub→local sync: pulls patterns into a local project directory
 - **`third_party_skills.py`** — Detects and includes third-party agent skills during provisioning (called by `recommend.py`)
 
@@ -99,6 +103,10 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`config/topics.yml`** / **`config/urls.yml`** — Topic mappings and curated URLs for `scan_web.py`
 - **`config/discoveries.json`** — Accumulated pattern discoveries from external sources, dedup'd across runs
 - **`config/test-pipeline.yml`** — Test pipeline stage definitions (fix-loop, auto-verify, post-fix stages)
+- **`config/repos.yml`** — Downstream project repos for `sync_to_projects.py` and `recommend.yml`
+- **`config/settings.yml`** — Hub-level settings
+- **`config/pipeline-stages.yaml`** — DAG config for pipeline orchestration
+- **`config/telemetry-aggregates.json`** — Historical effectiveness data from `aggregate_telemetry.py` runs
 
 ### CI Workflows
 
@@ -107,6 +115,7 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`test.yml`** — Runs pytest on `scripts/**` changes
 - **`recommend.yml`** — Weekly cron: provisions patterns for repos in `config/repos.yml`
 - **`apply-selections.yml`** — Triggered by `/apply` comment on PRs to process pattern selections
+- **`aggregate-telemetry.yml`** — Weekly cron (Friday): runs `aggregate_telemetry.py` against enrolled repos
 - Scheduled: `scan-internet.yml`, `scan-projects.yml`, `sync-to-projects.yml`, `expire-sources.yml`
 
 ## Testing
@@ -126,6 +135,8 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 ## Eval Workflow
 
 Skills are validated through an eval workflow before merge. Recent evals live in `evals/` directories within skill folders. Each eval tests the skill against a real or simulated project scenario. When adding or modifying a skill, run its eval to verify correctness.
+
+Invoke via the `/skill-evaluator` skill: `/skill-evaluator full <skill-path>` (modes: `trigger`, `output`, `full`, `conflicts`; add `--baseline` to compare against agent baseline). See `.claude/skills/skill-evaluator/EVAL-WORKFLOW.md` for the mandatory step sequence — do not batch multiple skills into one eval run.
 
 ## Third-Party Skills
 
