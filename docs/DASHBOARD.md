@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-13 19:19 UTC (auto-generated)
+> Last updated: 2026-04-19 13:34 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -40,7 +40,7 @@
 | apply-selections | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| auto-verify | skill | 3.1.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
+| auto-verify | skill | 3.2.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | brainstorm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | branching | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
@@ -109,7 +109,7 @@
 | firebase-dev | skill | 1.0.2 | hub:abhayla/claude-best-practices | — |
 | firebase-test | skill | 1.1.1 | hub:abhayla/claude-best-practices | — |
 | fix-issue | skill | 2.4.0 | hub:abhayla/claude-best-practices | fix-loop, post-fix-pipeline |
-| fix-loop | skill | 1.3.0 | hub:abhayla/claude-best-practices | test-failure-analyzer-agent |
+| fix-loop | skill | 1.4.0 | hub:abhayla/claude-best-practices | test-failure-analyzer-agent |
 | flutter | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-dart-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -152,7 +152,7 @@
 | planner-researcher-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | playwright | skill | 1.1.2 | hub:abhayla/claude-best-practices | — |
 | pm2-deploy | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| post-fix-pipeline | skill | 3.0.0 | hub:abhayla/claude-best-practices | learn-n-improve, auto-verify |
+| post-fix-pipeline | skill | 3.1.0 | hub:abhayla/claude-best-practices | learn-n-improve, auto-verify |
 | pr-standards | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | prd-parser | skill | 1.0.0 | hub:abhayla/claude-best-practices | brainstorm |
 | prisma-orm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -223,7 +223,7 @@
 | twitter-x | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | update-practices | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| verify-screenshots | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | visual-inspector-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |
 | vitest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | vue | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
