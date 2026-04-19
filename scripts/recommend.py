@@ -2150,6 +2150,23 @@ def format_divergence_table(overlaps: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def _resolve_conflict_mode(on_conflict: str) -> str:
+    """Resolve the `auto` mode based on TTY state. Both stdin and stdout must
+    be TTYs for `auto` to resolve to `interactive`; if either is redirected
+    the caller is programmatic and we fall back to `skip` to avoid EOFError
+    on the input() prompt.
+
+    Windows-specific: pseudo-terminals inside subprocesses often report
+    sys.stdin.isatty()=True even when the caller redirected stdout, so
+    checking stdin alone is insufficient. Live /synthesize-project runs
+    crashed with EOFError on input() before this was tightened.
+    """
+    if on_conflict != "auto":
+        return on_conflict
+    is_interactive = sys.stdin.isatty() and sys.stdout.isatty()
+    return "interactive" if is_interactive else "skip"
+
+
 def provision_to_local(
     hub_root: Path,
     target_dir: Path,
@@ -2230,15 +2247,18 @@ def provision_to_local(
         for i, item in enumerate(sync_class["conflict"], 1):
             print(f"    {i}. {item['name']} ({item['type']}) — {item['rel_path']}")
 
-        # Resolve `auto` mode: TTY → interactive, no TTY → skip (safe for CI)
-        effective_mode = on_conflict
-        if effective_mode == "auto":
-            effective_mode = "interactive" if sys.stdin.isatty() else "skip"
-            if effective_mode == "skip":
-                print(
-                    f"  -> on-conflict=auto with no TTY: keeping all {n} project "
-                    f"versions (use --on-conflict=overwrite to flip)"
-                )
+        # Resolve `auto` mode. Both stdin AND stdout must be TTYs to count as
+        # interactive — if either is redirected, the caller is programmatic
+        # (e.g. `recommend.py --json > out.json`, /synthesize-project
+        # subprocess). Windows pseudo-terminals report stdin isatty=True
+        # inside subprocesses even when the caller redirected stdout, so
+        # checking stdin alone is insufficient.
+        effective_mode = _resolve_conflict_mode(on_conflict)
+        if on_conflict == "auto" and effective_mode == "skip":
+            print(
+                f"  -> on-conflict=auto with no interactive terminal: keeping "
+                f"all {n} project versions (use --on-conflict=overwrite to flip)"
+            )
 
         if effective_mode == "error":
             raise RuntimeError(

@@ -2154,6 +2154,39 @@ class TestHeadlessConflictResolution:
         # Should not raise
         provision_to_local(hub_root, project, gaps, ["general"])  # on_conflict defaults to "auto"
 
+    def test_resolve_conflict_mode_auto_with_both_ttys(self, monkeypatch):
+        """Pure-function test: auto → interactive only when BOTH stdin and stdout are TTYs."""
+        from scripts.recommend import _resolve_conflict_mode
+        monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+        monkeypatch.setattr("sys.stdout.isatty", lambda: True)
+        assert _resolve_conflict_mode("auto") == "interactive"
+
+    def test_resolve_conflict_mode_auto_skips_when_stdout_redirected(self, monkeypatch):
+        """Regression: a live /synthesize-project run on Windows crashed with
+        EOFError because stdin reported isatty=True inside the subprocess
+        even though stdout was redirected via `recommend.py --json > out.json`.
+        When stdout is redirected, the caller is programmatic. Fall back to skip."""
+        from scripts.recommend import _resolve_conflict_mode
+        monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+        monkeypatch.setattr("sys.stdout.isatty", lambda: False)
+        assert _resolve_conflict_mode("auto") == "skip"
+
+    def test_resolve_conflict_mode_auto_skips_when_stdin_redirected(self, monkeypatch):
+        from scripts.recommend import _resolve_conflict_mode
+        monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+        monkeypatch.setattr("sys.stdout.isatty", lambda: True)
+        assert _resolve_conflict_mode("auto") == "skip"
+
+    def test_resolve_conflict_mode_explicit_values_pass_through(self, monkeypatch):
+        from scripts.recommend import _resolve_conflict_mode
+        # Explicit modes ignore TTY state
+        monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+        monkeypatch.setattr("sys.stdout.isatty", lambda: True)
+        assert _resolve_conflict_mode("skip") == "skip"
+        assert _resolve_conflict_mode("overwrite") == "overwrite"
+        assert _resolve_conflict_mode("error") == "error"
+        assert _resolve_conflict_mode("interactive") == "interactive"
+
 
 # --- Registry Tier SSOT ---
 
