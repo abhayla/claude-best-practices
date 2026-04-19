@@ -37,7 +37,7 @@ class TestDetectPatternType:
         rules_dir = tmp_path / "rules"
         rules_dir.mkdir()
         rule = rules_dir / "workflow.md"
-        rule.write_text("---\npaths:\n  - '**/*.py'\n---\n# Rules")
+        rule.write_text("---\nglobs:\n  - '**/*.py'\n---\n# Rules")
         assert detect_pattern_type(rule) == "rule"
 
 

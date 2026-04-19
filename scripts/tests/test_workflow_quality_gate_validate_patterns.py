@@ -462,6 +462,69 @@ class TestValidateRule:
         errors = validate_rule(rule_path)
         assert any("Missing scope" in e for e in errors)
 
+    def test_paths_field_is_rejected(self, tmp_path):
+        """`paths:` is NOT a Claude Code field — reject it so CI catches
+        regressions. Rules using `paths:` silently load on every session
+        instead of being path-scoped."""
+        rule_path = _write_rule(tmp_path, "paths-field-rule", content=textwrap.dedent("""\
+            ---
+            description: Buggy rule using legacy paths field.
+            paths:
+              - "**/*.py"
+            ---
+
+            # Paths Field Rule
+
+            MUST do X when Y happens.
+            Use Z instead of W.
+            This prevents bugs.
+            Always verify outcomes.
+
+            ## Details
+
+            More content here.
+            Additional context.
+            Final notes.
+        """))
+        errors = validate_rule(rule_path)
+        # Pin to the stable sentinel phrase so a future message refactor that
+        # drops the diagnostic surface is caught.
+        assert any("Invalid `paths:` field" in e for e in errors), (
+            f"Expected error containing literal 'Invalid `paths:` field'. "
+            f"Got errors: {errors}"
+        )
+
+    @pytest.mark.parametrize("bad_field", ["Paths", "PATHS", "path", "Path"])
+    def test_paths_field_variants_are_rejected(self, tmp_path, bad_field):
+        """Case variants (`Paths:`, `PATHS:`) and singular (`path:`) are also
+        invalid and must be flagged. YAML is case-sensitive, so these would
+        otherwise slip past the lowercase `paths` check."""
+        rule_path = _write_rule(tmp_path, f"bad-{bad_field.lower()}-rule",
+                                content=textwrap.dedent(f"""\
+            ---
+            description: Buggy rule using a {bad_field} field variant.
+            {bad_field}:
+              - "**/*.py"
+            ---
+
+            # Variant Rule
+
+            MUST do X when Y happens.
+            Use Z instead of W.
+            This prevents bugs.
+            Always verify outcomes.
+
+            ## Details
+
+            More content here.
+            Additional context.
+            Final notes.
+        """))
+        errors = validate_rule(rule_path)
+        assert any("Invalid `paths:` field" in e for e in errors), (
+            f"Expected rejection of `{bad_field}:` variant. Got errors: {errors}"
+        )
+
     def test_placeholder_in_rule(self, tmp_path):
         rule_path = _write_rule(tmp_path, "stub-rule", content=textwrap.dedent("""\
             ---
@@ -1038,3 +1101,74 @@ class TestValidateWorkflowContracts:
             agents_dir=root / "core" / ".claude" / "agents",
         )
         assert errors == [], f"Workflow contracts errors:\n" + "\n".join(errors)
+
+
+class TestCheckCrossReferencesFalsePositives:
+    """Regression guards for `check_cross_references` false positives.
+
+    The validator matches backticked `/slash-command` strings as skill
+    references. Two categories must NOT be flagged:
+      1. Claude Code built-in commands (`/update-config`, `/compact`, etc.)
+      2. Template placeholders using ellipsis (`Skill("...skill")`)
+    """
+
+    def _write_skill_with_refs(self, tmp_path, name, refs_content):
+        skill_dir = tmp_path / "skills" / name
+        skill_dir.mkdir(parents=True, exist_ok=True)
+        (skill_dir / "SKILL.md").write_text(textwrap.dedent(f"""\
+            ---
+            name: {name}
+            description: Test skill for cross-ref false-positive coverage.
+            type: workflow
+            allowed-tools: "Read"
+            argument-hint: "<arg>"
+            version: "1.0.0"
+            ---
+
+            # {name.title()}
+
+            {refs_content}
+
+            ## STEP 1: Do Something
+
+            Some content here.
+
+            ## CRITICAL RULES
+            - MUST follow rules
+        """))
+        return tmp_path / "skills"
+
+    def test_builtin_update_config_command_ignored(self, tmp_path):
+        """`/update-config` is a Claude Code built-in, not a repo skill."""
+        skills_dir = self._write_skill_with_refs(
+            tmp_path, "uses-builtin",
+            "Route deterministic enforcement to `/update-config` (hooks)."
+        )
+        errors = check_cross_references(skills_dir)
+        assert not any("update-config" in e for e in errors), (
+            f"Built-in `/update-config` command should not be flagged. Errors: {errors}"
+        )
+
+    def test_ellipsis_template_placeholder_ignored(self, tmp_path):
+        """`Skill("...skill")` is a documentation placeholder."""
+        skills_dir = self._write_skill_with_refs(
+            tmp_path, "uses-template",
+            "Scan body for `Skill(\"...skill\")` references to verify registry entries."
+        )
+        errors = check_cross_references(skills_dir)
+        # Pin the exact ref string so a weaker match (e.g. any dot in error text)
+        # cannot accidentally satisfy the negation.
+        assert not any("...skill" in e for e in errors), (
+            f"Ellipsis template `...skill` should not be flagged. Errors: {errors}"
+        )
+
+    def test_actual_missing_skill_still_flagged(self, tmp_path):
+        """Negative control: a genuinely missing skill reference MUST still error."""
+        skills_dir = self._write_skill_with_refs(
+            tmp_path, "broken-ref",
+            "Delegate to `/nonexistent-skill-xyz` for validation."
+        )
+        errors = check_cross_references(skills_dir)
+        assert any("nonexistent-skill-xyz" in e for e in errors), (
+            f"Genuinely missing skill should still be flagged. Errors: {errors}"
+        )

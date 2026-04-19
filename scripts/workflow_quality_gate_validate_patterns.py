@@ -80,6 +80,7 @@ ACTION_VERBS = {
     "auto", "apply", "push", "pull", "compare", "trace", "measure",
     "design", "diagnose", "author", "finalize", "inject", "integrate",
     "assess", "capture", "classify", "define", "explore", "identify",
+    "evaluate",
 }
 
 
@@ -544,10 +545,23 @@ def validate_rule(rule_path: Path) -> list[str]:
 
     fm = parse_frontmatter(rule_path)
 
-    # Check scope declaration (globs: or paths: both valid)
-    has_globs = fm and ("globs" in fm or "paths" in fm)
+    # Check scope declaration — `globs:` is the canonical Claude Code field.
+    # `paths:` (and casing/singular variants like `Paths:`, `path:`) are
+    # invalid fields; rules using them silently load on every session instead
+    # of being path-scoped. Lowercase keys once so case-variants can't slip through.
+    fm_lower = {k.lower(): v for k, v in fm.items()} if fm else {}
+    has_globs = "globs" in fm_lower
+    invalid_scope_fields = [k for k in ("paths", "path") if k in fm_lower]
     first_lines = "\n".join(content.splitlines()[:10])
     has_scope_global = "# Scope: global" in first_lines
+
+    if invalid_scope_fields:
+        field_list = ", ".join(f"`{k}:`" for k in invalid_scope_fields)
+        errors.append(
+            f"{name}: Invalid `paths:` field in frontmatter (found {field_list}) — "
+            f"Claude Code uses `globs:` instead. Rename to `globs:` so the rule "
+            f"is actually path-scoped (it currently loads on every session)."
+        )
 
     if not has_globs and not has_scope_global:
         errors.append(f"{name}: Missing scope — add 'globs:' in frontmatter or '# Scope: global' in first 5 lines")
@@ -602,6 +616,9 @@ def check_cross_references(skills_dir: Path) -> list[str]:
         "name", "skill-name", "removed-skill",  # template placeholders
         "clear", "docs", "redoc", "metrics", "proc",  # generic single words
         "login", "settings", "public", "test", "build",  # common non-skill terms
+        # Claude Code built-in slash commands — these are CLI features, not repo skills:
+        "update-config", "continue", "compact", "help", "status",
+        "model", "cost", "memory", "review", "agents", "exit",
     }
 
     # Hub-only skills that exist in .claude/skills/ (not core/.claude/skills/) and
@@ -634,6 +651,9 @@ def check_cross_references(skills_dir: Path) -> list[str]:
         for ref in set(refs):
             # Skip placeholders, generic words, and angle-bracket templates
             if ref in IGNORE_REFS or ref.startswith("<") or len(ref) < 4:
+                continue
+            # Skip ellipsis-prefixed template placeholders (e.g. "...skill", "...agent")
+            if ref.startswith("..."):
                 continue
             # Skip hub-only skills that are valid references but not in core/.claude/
             if ref in HUB_ONLY_VALID_REFS:
