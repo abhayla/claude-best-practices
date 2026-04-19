@@ -6,7 +6,13 @@ from pathlib import Path
 
 import pytest
 
+from unittest.mock import patch, MagicMock
+
 from scripts.aggregate_telemetry import (
+    _fetch_repo_file,
+    _list_repo_claude_files,
+    collect_from_repos,
+    aggregate_remote,
     compute_adoption_rate,
     compute_retention_days,
     compute_error_prevention_rate,
@@ -556,3 +562,249 @@ class TestEdgeCases:
         (claude_dir / "sync-manifest.json").write_text(json.dumps(manifest))
         result = scan_project_adoption(tmp_path)
         assert result == {}  # Hooks are not tracked
+
+
+# --- Tests: _fetch_repo_file ---
+
+
+class TestFetchRepoFile:
+    """Test fetching individual files from GitHub repos."""
+
+    @patch("scripts.aggregate_telemetry.subprocess.run")
+    def test_returns_content_on_success(self, mock_run):
+        mock_run.return_value = MagicMock(
+            returncode=0, stdout='{"files": {}}'
+        )
+        result = _fetch_repo_file("owner/repo", ".claude/sync-manifest.json")
+        assert result == '{"files": {}}'
+
+    @patch("scripts.aggregate_telemetry.subprocess.run")
+    def test_returns_none_on_failure(self, mock_run):
+        mock_run.return_value = MagicMock(returncode=1, stdout="")
+        result = _fetch_repo_file("owner/repo", ".claude/sync-manifest.json")
+        assert result is None
+
+    @patch("scripts.aggregate_telemetry.subprocess.run")
+    def test_returns_none_on_empty_response(self, mock_run):
+        mock_run.return_value = MagicMock(returncode=0, stdout="   ")
+        result = _fetch_repo_file("owner/repo", ".claude/sync-manifest.json")
+        assert result is None
+
+    @patch("scripts.aggregate_telemetry.subprocess.run")
+    def test_returns_none_on_timeout(self, mock_run):
+        from subprocess import TimeoutExpired
+        mock_run.side_effect = TimeoutExpired(cmd="gh", timeout=30)
+        result = _fetch_repo_file("owner/repo", ".claude/sync-manifest.json")
+        assert result is None
+
+    @patch("scripts.aggregate_telemetry.subprocess.run")
+    def test_returns_none_when_gh_not_installed(self, mock_run):
+        mock_run.side_effect = FileNotFoundError("gh not found")
+        result = _fetch_repo_file("owner/repo", ".claude/file.json")
+        assert result is None
+
+
+# --- Tests: _list_repo_claude_files ---
+
+
+class TestListRepoClaudeFiles:
+    """Test listing .claude/ tree from GitHub repos."""
+
+    @patch("scripts.aggregate_telemetry.subprocess.run")
+    def test_returns_file_list(self, mock_run):
+        mock_run.side_effect = [
+            MagicMock(returncode=0, stdout="abc123sha\n"),
+            MagicMock(returncode=0, stdout="skills/fix-loop/SKILL.md\nrules/tdd.md\n"),
+        ]
+        result = _list_repo_claude_files("owner/repo")
+        assert result == ["skills/fix-loop/SKILL.md", "rules/tdd.md"]
+
+    @patch("scripts.aggregate_telemetry.subprocess.run")
+    def test_returns_empty_on_no_claude_dir(self, mock_run):
+        mock_run.return_value = MagicMock(returncode=1, stdout="")
+        result = _list_repo_claude_files("owner/repo")
+        assert result == []
+
+    @patch("scripts.aggregate_telemetry.subprocess.run")
+    def test_returns_empty_on_timeout(self, mock_run):
+        from subprocess import TimeoutExpired
+        mock_run.side_effect = TimeoutExpired(cmd="gh", timeout=30)
+        result = _list_repo_claude_files("owner/repo")
+        assert result == []
+
+
+# --- Tests: collect_from_repos ---
+
+
+class TestCollectFromRepos:
+    """Test end-to-end collection from enrolled repos."""
+
+    def _make_repos_config(self, tmp_path, repos):
+        config_path = tmp_path / "config" / "repos.yml"
+        config_path.parent.mkdir(parents=True)
+        import yaml
+        config_path.write_text(yaml.dump({"repos": repos}))
+        return config_path
+
+    @patch("scripts.aggregate_telemetry._list_repo_claude_files")
+    @patch("scripts.aggregate_telemetry._fetch_repo_file")
+    def test_collects_adoption_signals(self, mock_fetch, mock_list, tmp_path):
+        config_path = self._make_repos_config(tmp_path, [{"repo": "owner/project-a"}])
+
+        manifest = {
+            "files": {
+                "skills/fix-loop/SKILL.md": {"provisioned_date": "2026-03-01"},
+                "skills/tdd/SKILL.md": {"provisioned_date": "2026-03-01"},
+            }
+        }
+        mock_fetch.side_effect = [
+            json.dumps(manifest),  # sync-manifest.json
+            None,                  # learnings.json (doesn't exist)
+        ]
+        mock_list.return_value = ["skills/fix-loop/SKILL.md"]  # tdd deleted
+
+        signals, learnings = collect_from_repos(config_path)
+
+        assert len(signals) == 1
+        assert signals[0]["fix-loop"]["status"] == "adopted"
+        assert signals[0]["tdd"]["status"] == "deleted"
+        assert learnings == []
+
+    @patch("scripts.aggregate_telemetry._list_repo_claude_files")
+    @patch("scripts.aggregate_telemetry._fetch_repo_file")
+    def test_collects_learnings(self, mock_fetch, mock_list, tmp_path):
+        config_path = self._make_repos_config(tmp_path, [{"repo": "owner/project-a"}])
+
+        manifest = {"files": {"skills/fix-loop/SKILL.md": {"provisioned_date": "2026-03-01"}}}
+        learnings_data = {
+            "learnings": [
+                {"id": "L001", "tags": ["testing"], "hub_pattern_link": "fix-loop"}
+            ]
+        }
+        mock_fetch.side_effect = [
+            json.dumps(manifest),
+            json.dumps(learnings_data),
+        ]
+        mock_list.return_value = ["skills/fix-loop/SKILL.md"]
+
+        signals, learnings = collect_from_repos(config_path)
+
+        assert len(learnings) == 1
+        assert learnings[0]["learnings"][0]["hub_pattern_link"] == "fix-loop"
+
+    @patch("scripts.aggregate_telemetry._list_repo_claude_files")
+    @patch("scripts.aggregate_telemetry._fetch_repo_file")
+    def test_skips_repo_without_manifest(self, mock_fetch, mock_list, tmp_path):
+        config_path = self._make_repos_config(tmp_path, [{"repo": "owner/no-manifest"}])
+
+        mock_fetch.return_value = None  # No manifest
+        signals, learnings = collect_from_repos(config_path)
+
+        assert signals == []
+        assert learnings == []
+
+    @patch("scripts.aggregate_telemetry._list_repo_claude_files")
+    @patch("scripts.aggregate_telemetry._fetch_repo_file")
+    def test_skips_malformed_manifest(self, mock_fetch, mock_list, tmp_path):
+        config_path = self._make_repos_config(tmp_path, [{"repo": "owner/bad-json"}])
+
+        mock_fetch.side_effect = ["not valid json {{{", None]
+        signals, learnings = collect_from_repos(config_path)
+
+        assert signals == []
+
+    def test_returns_empty_for_missing_config(self, tmp_path):
+        signals, learnings = collect_from_repos(tmp_path / "nonexistent.yml")
+        assert signals == []
+        assert learnings == []
+
+    def test_returns_empty_for_empty_repos(self, tmp_path):
+        config_path = self._make_repos_config(tmp_path, [])
+        signals, learnings = collect_from_repos(config_path)
+        assert signals == []
+        assert learnings == []
+
+    @patch("scripts.aggregate_telemetry._list_repo_claude_files")
+    @patch("scripts.aggregate_telemetry._fetch_repo_file")
+    def test_multiple_repos(self, mock_fetch, mock_list, tmp_path):
+        config_path = self._make_repos_config(tmp_path, [
+            {"repo": "owner/project-a"},
+            {"repo": "owner/project-b"},
+        ])
+
+        manifest_a = {"files": {"skills/fix-loop/SKILL.md": {"provisioned_date": "2026-03-01"}}}
+        manifest_b = {"files": {"skills/fix-loop/SKILL.md": {"provisioned_date": "2026-02-15"}}}
+
+        mock_fetch.side_effect = [
+            json.dumps(manifest_a), None,  # project-a: manifest, no learnings
+            json.dumps(manifest_b), None,  # project-b: manifest, no learnings
+        ]
+        mock_list.side_effect = [
+            ["skills/fix-loop/SKILL.md"],  # project-a: kept
+            [],                             # project-b: deleted
+        ]
+
+        signals, learnings = collect_from_repos(config_path)
+
+        assert len(signals) == 2
+        assert signals[0]["fix-loop"]["status"] == "adopted"
+        assert signals[1]["fix-loop"]["status"] == "deleted"
+
+
+# --- Tests: aggregate_remote ---
+
+
+class TestAggregateRemote:
+    """Test the end-to-end remote aggregation pipeline."""
+
+    @patch("scripts.aggregate_telemetry.collect_from_repos")
+    def test_writes_effectiveness_to_registry(self, mock_collect, tmp_path):
+        registry = {
+            "fix-loop": {"hash": "abc", "type": "skill", "tier": "must-have"},
+            "tdd": {"hash": "def", "type": "skill", "tier": "must-have"},
+        }
+        registry_path = tmp_path / "registry" / "patterns.json"
+        registry_path.parent.mkdir(parents=True)
+        registry_path.write_text(json.dumps(registry, indent=2))
+
+        output_path = tmp_path / "config" / "telemetry-aggregates.json"
+
+        mock_collect.return_value = (
+            [
+                {"fix-loop": {"status": "adopted", "retention_days": 30, "provisioned_date": "2026-03-01"},
+                 "tdd": {"status": "adopted", "retention_days": 30, "provisioned_date": "2026-03-01"}},
+                {"fix-loop": {"status": "adopted", "retention_days": 45, "provisioned_date": "2026-02-15"},
+                 "tdd": {"status": "deleted", "retention_days": 10, "provisioned_date": "2026-02-15"}},
+                {"fix-loop": {"status": "adopted", "retention_days": 20, "provisioned_date": "2026-03-10"},
+                 "tdd": {"status": "deleted", "retention_days": 5, "provisioned_date": "2026-03-10"}},
+            ],
+            [],  # no learnings
+        )
+
+        result = aggregate_remote(
+            config_path=tmp_path / "config" / "repos.yml",
+            registry_path=registry_path,
+            output_path=output_path,
+        )
+
+        assert result["fix-loop"]["adoption_rate"] == 1.0
+        assert result["fix-loop"]["sample_size"] == 3
+        # tdd: adopted in 1 of 3 = 0.33
+        assert result["tdd"]["adoption_rate"] == pytest.approx(0.33, abs=0.01)
+
+        # Verify registry was updated
+        updated_registry = json.loads(registry_path.read_text())
+        assert "effectiveness" in updated_registry["fix-loop"]
+        assert updated_registry["fix-loop"]["effectiveness"]["adoption_rate"] == 1.0
+        assert updated_registry["fix-loop"]["tier"] == "must-have"  # preserved
+
+    @patch("scripts.aggregate_telemetry.collect_from_repos")
+    def test_returns_empty_on_no_signals(self, mock_collect, tmp_path):
+        mock_collect.return_value = ([], [])
+
+        result = aggregate_remote(
+            config_path=tmp_path / "repos.yml",
+            registry_path=tmp_path / "patterns.json",
+            output_path=tmp_path / "aggregates.json",
+        )
+        assert result == {}
