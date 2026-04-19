@@ -593,20 +593,32 @@ class TestApplyToLocal:
         # d3-viz is in ALWAYS_SKIP — should not be copied
         assert not any("d3-viz" in f for f in copied)
 
-    def test_nice_to_have_tier_includes_both(self, hub_root, project_dir):
+    def test_nice_to_have_tier_includes_both(self, hub_root, project_dir, tmp_path):
+        """nice-to-have tier should cover a superset of must-have patterns.
+        Use two separate project dirs so the idempotent _copy_if_changed
+        behavior doesn't skew the count comparison."""
         hub_resources = get_hub_resources(hub_root)
-        project_names = get_project_resource_names(project_dir / ".claude")
         stacks = ["fastapi-python"]
+        gaps = analyze_gaps(
+            hub_resources,
+            get_project_resource_names(project_dir / ".claude"),
+            stacks,
+        )
 
-        gaps = analyze_gaps(hub_resources, project_names, stacks)
-        must_only = apply_to_local(hub_root, project_dir, gaps, tier="must-have")
+        # Project A: must-have only
+        proj_a = tmp_path / "project-a"
+        proj_a.mkdir()
+        must_only = apply_to_local(hub_root, proj_a, gaps, tier="must-have")
 
-        # Reset project dir for second test
-        import shutil
-        shutil.rmtree(project_dir / ".claude" / "skills" / "tdd", ignore_errors=True)
+        # Project B: nice-to-have (superset)
+        proj_b = tmp_path / "project-b"
+        proj_b.mkdir()
+        both = apply_to_local(hub_root, proj_b, gaps, tier="nice-to-have")
 
-        both = apply_to_local(hub_root, project_dir, gaps, tier="nice-to-have")
-        assert len(both) >= len(must_only)
+        assert len(both) >= len(must_only), (
+            f"nice-to-have tier ({len(both)} files) should cover at least as "
+            f"much as must-have tier ({len(must_only)} files)"
+        )
 
     def test_copies_agents(self, hub_root, project_dir):
         hub_resources = get_hub_resources(hub_root)
@@ -993,6 +1005,62 @@ class TestProvisionClaudeMd:
         # Hub markers should be present from the dynamic section
         assert PROVISION_START_MARKER in content
         assert PROVISION_END_MARKER in content
+
+    def test_backup_created_when_replacing(self, hub_root, tmp_path):
+        """Safety net: replacing an existing CLAUDE.md MUST write a backup of
+        the prior content to CLAUDE.md.backup so the user can recover if the
+        new content drops anything they cared about."""
+        target = tmp_path / "myproject"
+        target.mkdir()
+        prior = (
+            "# My Project\n\nBefore.\n\n"
+            f"{PROVISION_START_MARKER}\nOLD CONTENT\n{PROVISION_END_MARKER}\n\n"
+            "After.\n"
+        )
+        (target / "CLAUDE.md").write_text(prior)
+        provision_claude_md(hub_root, target, [], ["workflow"])
+        backup = target / "CLAUDE.md.backup"
+        assert backup.exists(), "CLAUDE.md.backup must exist after replace"
+        assert backup.read_text() == prior, "backup must contain the pre-provision content verbatim"
+
+    def test_backup_created_when_appending(self, hub_root, tmp_path):
+        """Same safety net for the append case (CLAUDE.md exists without markers)."""
+        target = tmp_path / "myproject"
+        target.mkdir()
+        prior = "# My Project\n\nHand-authored content.\n"
+        (target / "CLAUDE.md").write_text(prior)
+        provision_claude_md(hub_root, target, [], ["workflow"])
+        backup = target / "CLAUDE.md.backup"
+        assert backup.exists(), "CLAUDE.md.backup must exist after append"
+        assert backup.read_text() == prior, "backup must contain the pre-provision content verbatim"
+
+    def test_no_backup_when_creating_from_template(self, hub_root, tmp_path):
+        """Case 1: no pre-existing CLAUDE.md -> nothing to back up."""
+        target = tmp_path / "myproject"
+        target.mkdir()
+        provision_claude_md(hub_root, target, ["fastapi-python"], ["workflow"])
+        assert not (target / "CLAUDE.md.backup").exists(), (
+            "No backup should be written when there was no prior CLAUDE.md"
+        )
+
+    def test_real_template_surfaces_preservation_guidance(self):
+        """The REAL core/.claude/CLAUDE.md.template must tell users which parts
+        of CLAUDE.md are preserved across re-provisions, and point at the
+        backup path. Tested against the actual template file, not the minimal
+        fixture used by hub_root."""
+        real_template = (
+            Path(__file__).parent.parent.parent
+            / "core" / ".claude" / "CLAUDE.md.template"
+        )
+        assert real_template.exists(), f"Template missing at {real_template}"
+        content = real_template.read_text(encoding="utf-8")
+        assert "PRESERVED ON RE-PROVISION" in content, (
+            "Template should include explicit guidance about which sections "
+            "survive re-provisioning"
+        )
+        assert "CLAUDE.md.backup" in content, (
+            "Template should mention the backup file so users know recovery exists"
+        )
 
 
 # --- Provision: CLAUDE.local.md ---
@@ -2004,6 +2072,89 @@ class TestProvisionWithManifest:
         assert "conflicts" in summary
 
 
+# --- Headless Conflict Resolution ---
+
+
+class TestHeadlessConflictResolution:
+    """provision_to_local must not hang on input() when run non-interactively.
+    The `on_conflict` parameter + TTY auto-detection drive the fallback."""
+
+    def _build_project_with_conflict(self, hub_root, project):
+        """Create a conflict: a skill that exists in both hub and project,
+        where both sides have diverged from the manifest hash."""
+        from scripts.recommend import load_sync_manifest, save_sync_manifest
+        # First pass: copy the skill in cleanly
+        gaps = {"must-have": [
+            {"name": "tdd", "type": "skill", "tier": "must-have"},
+        ], "improved": [], "nice-to-have": [], "skip": []}
+        provision_to_local(hub_root, project, gaps, ["general"], on_conflict="skip")
+        # Mutate the project's copy to diverge from the hub
+        skill_md = project / ".claude" / "skills" / "tdd" / "SKILL.md"
+        skill_md.write_text(skill_md.read_text() + "\n## Local customization\n")
+        # Mutate the manifest's recorded hash so the hub side is seen as changed
+        manifest = load_sync_manifest(project)
+        for rel in manifest["files"]:
+            if rel.startswith(".claude/skills/tdd/"):
+                manifest["files"][rel]["hub_hash"] = "0" * 64  # stale hash
+        save_sync_manifest(project, manifest)
+
+    def test_on_conflict_skip_does_not_call_input(self, hub_root, tmp_path, monkeypatch):
+        """With on_conflict='skip', conflict resolution must not prompt stdin."""
+        project = tmp_path / "proj-skip"
+        project.mkdir()
+        self._build_project_with_conflict(hub_root, project)
+
+        def _forbid_input(prompt=""):
+            raise AssertionError(f"input() must not be called in skip mode — prompt was: {prompt!r}")
+        monkeypatch.setattr("builtins.input", _forbid_input)
+
+        gaps = {"must-have": [], "improved": [
+            {"name": "tdd", "type": "skill", "tier": "improved"},
+        ], "nice-to-have": [], "skip": []}
+        summary = provision_to_local(hub_root, project, gaps, ["general"], on_conflict="skip")
+        # Conflict was kept local (skipped)
+        assert summary["sync_classification"]["conflict"] >= 0  # no crash
+        # conflict_overwritten should be empty — nothing was overwritten
+        assert summary.get("conflict_overwritten", []) == []
+
+    def test_on_conflict_overwrite_does_not_call_input(self, hub_root, tmp_path, monkeypatch):
+        """With on_conflict='overwrite', every conflict is auto-overwritten without prompting."""
+        project = tmp_path / "proj-over"
+        project.mkdir()
+        self._build_project_with_conflict(hub_root, project)
+
+        def _forbid_input(prompt=""):
+            raise AssertionError(f"input() must not be called in overwrite mode — prompt was: {prompt!r}")
+        monkeypatch.setattr("builtins.input", _forbid_input)
+
+        gaps = {"must-have": [], "improved": [
+            {"name": "tdd", "type": "skill", "tier": "improved"},
+        ], "nice-to-have": [], "skip": []}
+        provision_to_local(hub_root, project, gaps, ["general"], on_conflict="overwrite")
+
+    def test_on_conflict_auto_falls_back_to_skip_when_no_tty(self, hub_root, tmp_path, monkeypatch):
+        """When on_conflict='auto' (default) and stdin is not a TTY, the behavior
+        MUST fall back to 'skip' rather than hang on input()."""
+        project = tmp_path / "proj-auto"
+        project.mkdir()
+        self._build_project_with_conflict(hub_root, project)
+
+        # Force non-TTY environment
+        monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+
+        def _forbid_input(prompt=""):
+            raise AssertionError(
+                f"input() must not be called when stdin is not a TTY — prompt was: {prompt!r}"
+            )
+        monkeypatch.setattr("builtins.input", _forbid_input)
+
+        gaps = {"must-have": [], "improved": [
+            {"name": "tdd", "type": "skill", "tier": "improved"},
+        ], "nice-to-have": [], "skip": []}
+        # Should not raise
+        provision_to_local(hub_root, project, gaps, ["general"])  # on_conflict defaults to "auto"
+
+
 # --- Registry Tier SSOT ---
 
 
@@ -2147,3 +2298,118 @@ class TestRegistryTierCI:
 
         errors = validate_registry_tiers(registry_path)
         assert errors == []
+
+
+class TestProvisionIdempotency:
+    """Running provision_to_local twice in a row should leave the project in
+    the same state — no spurious conflicts, no re-copied files, no churn."""
+
+    def test_second_run_reports_no_new_work(self, hub_root, tmp_path):
+        project = tmp_path / "proj"
+        project.mkdir()
+        gaps = {"must-have": [
+            {"name": "tdd", "type": "skill", "tier": "must-have"},
+        ], "improved": [], "nice-to-have": [], "skip": []}
+
+        first = provision_to_local(hub_root, project, gaps, ["general"], on_conflict="skip")
+        second = provision_to_local(hub_root, project, gaps, ["general"], on_conflict="skip")
+
+        # No conflicts on second run (the first run fully synced the pattern)
+        assert second["sync_classification"]["conflict"] == 0
+        # No auto-updates on second run (nothing stale)
+        assert len(second["auto_updated"]) == 0
+        # No new copies (files already exist locally)
+        assert len(second["copied_files"]) == 0
+
+    def test_second_run_does_not_mutate_claude_md(self, hub_root, tmp_path):
+        project = tmp_path / "proj"
+        project.mkdir()
+        gaps = {"must-have": [], "improved": [], "nice-to-have": [], "skip": []}
+
+        provision_to_local(hub_root, project, gaps, ["fastapi-python"], on_conflict="skip")
+        first_claude_md = (project / "CLAUDE.md").read_text(encoding="utf-8")
+
+        provision_to_local(hub_root, project, gaps, ["fastapi-python"], on_conflict="skip")
+        second_claude_md = (project / "CLAUDE.md").read_text(encoding="utf-8")
+
+        assert first_claude_md == second_claude_md, (
+            "CLAUDE.md content drifted between consecutive provisioning runs — "
+            "this is a nondeterminism bug that creates noise for users"
+        )
+
+    def test_second_run_does_not_mutate_sync_manifest_beyond_timestamps(self, hub_root, tmp_path):
+        project = tmp_path / "proj"
+        project.mkdir()
+        gaps = {"must-have": [
+            {"name": "tdd", "type": "skill", "tier": "must-have"},
+        ], "improved": [], "nice-to-have": [], "skip": []}
+
+        provision_to_local(hub_root, project, gaps, ["general"], on_conflict="skip")
+        import json
+        manifest_path = project / ".claude" / "sync-manifest.json"
+        first = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+        provision_to_local(hub_root, project, gaps, ["general"], on_conflict="skip")
+        second = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+        # File entries should be a stable set across runs
+        assert set(first["files"].keys()) == set(second["files"].keys()), (
+            "Tracked-file set changed between consecutive provisions"
+        )
+        # Hub hashes per file should match (content didn't change)
+        for rel, entry in first["files"].items():
+            assert entry["hub_hash"] == second["files"][rel]["hub_hash"], (
+                f"Hub hash for {rel} drifted between runs — possible "
+                f"nondeterministic hashing"
+            )
+
+
+class TestResourceStackRequirementsIntegrity:
+    """RESOURCE_STACK_REQUIREMENTS entries must have a viable promotion path.
+
+    - Entries with a non-empty set of required stacks: each required stack
+      must be a known stack (present in STACK_PREFIXES values or as a stack
+      emitted by STACK_DETECTORS).
+    - Entries with an empty set: must have a corresponding DEP_PATTERN_MAP
+      entry that can promote them via dependency detection. Otherwise the
+      rule is dead and will never fire.
+    """
+
+    def test_empty_stack_requirements_have_dep_promotion_path(self):
+        from scripts.recommend import (
+            DEP_PATTERN_MAP,
+            RESOURCE_STACK_REQUIREMENTS,
+        )
+        # Collect all pattern names that DEP_PATTERN_MAP can promote
+        dep_promotable = set()
+        for patterns in DEP_PATTERN_MAP.values():
+            dep_promotable.update(patterns)
+
+        dead = []
+        for name, required in RESOURCE_STACK_REQUIREMENTS.items():
+            if not required and name not in dep_promotable:
+                dead.append(name)
+        assert dead == [], (
+            f"RESOURCE_STACK_REQUIREMENTS has entries with empty required-stacks "
+            f"and no DEP_PATTERN_MAP promotion path — these rules can NEVER fire: "
+            f"{dead}. Either add a dep mapping in DEP_PATTERN_MAP or add explicit "
+            f"stack requirements."
+        )
+
+    def test_non_empty_stack_requirements_reference_known_stacks(self):
+        from scripts.recommend import (
+            RESOURCE_STACK_REQUIREMENTS,
+            STACK_DETECTORS,
+        )
+        from scripts.bootstrap import STACK_PREFIXES
+        known = set(STACK_PREFIXES.keys()) | {stack for _, _, stack in STACK_DETECTORS}
+        orphans = {}
+        for name, required in RESOURCE_STACK_REQUIREMENTS.items():
+            missing = required - known
+            if missing:
+                orphans[name] = sorted(missing)
+        assert orphans == {}, (
+            f"RESOURCE_STACK_REQUIREMENTS entries reference unknown stacks: "
+            f"{orphans}. Every required stack must appear in STACK_PREFIXES or "
+            f"be emitted by STACK_DETECTORS."
+        )

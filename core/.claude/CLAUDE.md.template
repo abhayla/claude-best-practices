@@ -89,6 +89,18 @@ Example:
 
 <!-- hub:best-practices:end -->
 
+<!-- =====================================================================
+     PRESERVED ON RE-PROVISION
+     Anything outside the hub:best-practices markers above is preserved
+     when `/synthesize-project` or `recommend.py --provision` runs again.
+     A backup of the prior CLAUDE.md is also written to CLAUDE.md.backup
+     before any modification. Add your own sections below this line.
+     ===================================================================== -->
+
+## Project Context
+<!-- Your project-specific notes, gotchas, commands go here. -->
+<!-- These survive every re-provision. -->
+
 <!-- These are auto-filled by bootstrap: -->
 Synced from: {{HUB_REPO}} ({{SELECTED_STACKS}})
 Last sync: {{LAST_SYNC_TIMESTAMP}}

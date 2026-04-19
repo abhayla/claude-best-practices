@@ -1298,6 +1298,19 @@ def format_report(
 # --- Apply ---
 
 
+def _copy_if_changed(src: Path, dest: Path) -> bool:
+    """Copy src to dest only if dest is missing or has different content.
+
+    Returns True if a copy was performed, False if dest was already in sync
+    (idempotent no-op). Keeps repeated provisioning runs from churning
+    unchanged files.
+    """
+    if dest.exists() and src.read_bytes() == dest.read_bytes():
+        return False
+    shutil.copy2(src, dest)
+    return True
+
+
 def apply_to_local(
     hub_root: Path,
     target_dir: Path,
@@ -1307,6 +1320,7 @@ def apply_to_local(
     """Copy recommended resources from hub to a local project directory.
 
     Only copies resources at or above the specified tier.
+    Idempotent: files already matching the hub content are skipped.
     """
     copied = []
     claude_src = hub_root / "core" / ".claude"
@@ -1330,8 +1344,8 @@ def apply_to_local(
                             rel = f.relative_to(src)
                             dest_file = dst / rel
                             dest_file.parent.mkdir(parents=True, exist_ok=True)
-                            shutil.copy2(f, dest_file)
-                            copied.append(str(Path(".claude/skills") / name / rel))
+                            if _copy_if_changed(f, dest_file):
+                                copied.append(str(Path(".claude/skills") / name / rel))
                 else:
                     print(f"  WARNING: hub skill '{name}' not found at {src}")
 
@@ -1340,8 +1354,8 @@ def apply_to_local(
                 dst = target_dir / ".claude" / "agents" / f"{name}.md"
                 if src.exists():
                     dst.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src, dst)
-                    copied.append(f".claude/agents/{name}.md")
+                    if _copy_if_changed(src, dst):
+                        copied.append(f".claude/agents/{name}.md")
                 else:
                     print(f"  WARNING: hub agent '{name}' not found at {src}")
 
@@ -1350,8 +1364,8 @@ def apply_to_local(
                 dst = target_dir / ".claude" / "rules" / f"{name}.md"
                 if src.exists():
                     dst.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src, dst)
-                    copied.append(f".claude/rules/{name}.md")
+                    if _copy_if_changed(src, dst):
+                        copied.append(f".claude/rules/{name}.md")
                 else:
                     print(f"  WARNING: hub rule '{name}' not found at {src}")
 
@@ -1360,8 +1374,8 @@ def apply_to_local(
                 dst = target_dir / ".claude" / "hooks" / f"{name}.sh"
                 if src.exists():
                     dst.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src, dst)
-                    copied.append(f".claude/hooks/{name}.sh")
+                    if _copy_if_changed(src, dst):
+                        copied.append(f".claude/hooks/{name}.sh")
                 else:
                     print(f"  WARNING: hub hook '{name}' not found at {src}")
 
@@ -1376,8 +1390,8 @@ def apply_to_local(
                 if src:
                     dst = target_dir / ".claude" / "config" / src.name
                     dst.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src, dst)
-                    copied.append(f".claude/config/{src.name}")
+                    if _copy_if_changed(src, dst):
+                        copied.append(f".claude/config/{src.name}")
                 else:
                     print(f"  WARNING: hub config '{name}' not found in {claude_src / 'config'}")
 
@@ -2027,6 +2041,12 @@ def provision_claude_md(
     # File exists — read it
     content = claude_md.read_text(encoding="utf-8")
 
+    # Safety net: write a rolling backup of the prior content before we
+    # modify CLAUDE.md, so users can recover if the regenerated hub section
+    # drops something they cared about. Single `.backup` file is overwritten
+    # on each provision — if durable history is needed, that's git's job.
+    (claude_md.parent / "CLAUDE.md.backup").write_text(content, encoding="utf-8")
+
     start_idx = content.find(PROVISION_START_MARKER)
     end_idx = content.find(PROVISION_END_MARKER)
 
@@ -2136,12 +2156,23 @@ def provision_to_local(
     gaps: dict[str, list[dict]],
     stacks: list[str],
     tier: str = "must-have",
+    on_conflict: str = "auto",
 ) -> dict:
     """Orchestrate full provisioning to a local directory.
 
     Copies missing resources, auto-updates stale hub patterns (hub-only changes),
     skips project-customized patterns, and reports conflicts.
     Provisions CLAUDE.md, CLAUDE.local.md, and settings.json.
+
+    on_conflict controls how provisioning handles files that diverged in BOTH
+    the hub and the project since last sync:
+      - "auto" (default): interactive prompt if stdin is a TTY; silently skip
+        if not (keeps CI and non-interactive automation from hanging)
+      - "skip": always keep project versions, never prompt
+      - "overwrite": always overwrite with hub versions, never prompt
+      - "error": raise RuntimeError on any conflict (strict CI mode)
+      - "interactive": force interactive prompt even without a TTY (will hang
+        if stdin is closed — use only when you know a human is attached)
     Returns a summary dict.
     """
     # Step 1: Copy missing resources
@@ -2199,35 +2230,62 @@ def provision_to_local(
         for i, item in enumerate(sync_class["conflict"], 1):
             print(f"    {i}. {item['name']} ({item['type']}) — {item['rel_path']}")
 
-        # Offer batch options first
-        print(f"\n  Batch options: [A]ll overwrite / [S]kip all / [1] review one-by-one")
-        batch_choice = input("  Choice: ").strip().lower()
+        # Resolve `auto` mode: TTY → interactive, no TTY → skip (safe for CI)
+        effective_mode = on_conflict
+        if effective_mode == "auto":
+            effective_mode = "interactive" if sys.stdin.isatty() else "skip"
+            if effective_mode == "skip":
+                print(
+                    f"  -> on-conflict=auto with no TTY: keeping all {n} project "
+                    f"versions (use --on-conflict=overwrite to flip)"
+                )
 
-        if batch_choice in ("a", "all", "all overwrite"):
+        if effective_mode == "error":
+            raise RuntimeError(
+                f"{n} conflict(s) detected and on_conflict=error. "
+                f"First conflict: {sync_class['conflict'][0]['name']}"
+            )
+        elif effective_mode == "overwrite":
             overwritten = update_improved_to_local(hub_root, target_dir, sync_class["conflict"])
             conflict_overwritten.extend(overwritten)
-            print(f"  -> Overwritten all {n} conflicts with hub versions")
-        elif batch_choice in ("s", "skip", "skip all"):
-            print(f"  -> Kept all {n} project versions")
+            print(f"  -> on-conflict=overwrite: replaced all {n} project versions with hub versions")
+        elif effective_mode == "skip":
+            print(f"  -> on-conflict=skip: kept all {n} project versions")
+        elif effective_mode == "interactive":
+            # Offer batch options first
+            print(f"\n  Batch options: [A]ll overwrite / [S]kip all / [1] review one-by-one")
+            batch_choice = input("  Choice: ").strip().lower()
+
+            if batch_choice in ("a", "all", "all overwrite"):
+                overwritten = update_improved_to_local(hub_root, target_dir, sync_class["conflict"])
+                conflict_overwritten.extend(overwritten)
+                print(f"  -> Overwritten all {n} conflicts with hub versions")
+            elif batch_choice in ("s", "skip", "skip all"):
+                print(f"  -> Kept all {n} project versions")
+            else:
+                # One-by-one review
+                for item in sync_class["conflict"]:
+                    print(f"\n    {item['name']} ({item['type']})")
+                    print(f"      File: {item['rel_path']}")
+                    print(f"      Hub hash:     {item['hub_hash'][:12]}...")
+                    print(f"      Project hash: {item['project_hash'][:12]}...")
+                    while True:
+                        choice = input("      [o]verwrite / [s]kip? ").strip().lower()
+                        if choice in ("o", "overwrite", "y", "yes"):
+                            overwritten = update_improved_to_local(hub_root, target_dir, [item])
+                            conflict_overwritten.extend(overwritten)
+                            print(f"      -> Overwritten with hub version")
+                            break
+                        elif choice in ("s", "skip", "n", "no"):
+                            print(f"      -> Kept project version")
+                            break
+                        else:
+                            print("      Please enter 'o' (overwrite) or 's' (skip)")
         else:
-            # One-by-one review
-            for item in sync_class["conflict"]:
-                print(f"\n    {item['name']} ({item['type']})")
-                print(f"      File: {item['rel_path']}")
-                print(f"      Hub hash:     {item['hub_hash'][:12]}...")
-                print(f"      Project hash: {item['project_hash'][:12]}...")
-                while True:
-                    choice = input("      [o]verwrite / [s]kip? ").strip().lower()
-                    if choice in ("o", "overwrite", "y", "yes"):
-                        overwritten = update_improved_to_local(hub_root, target_dir, [item])
-                        conflict_overwritten.extend(overwritten)
-                        print(f"      -> Overwritten with hub version")
-                        break
-                    elif choice in ("s", "skip", "n", "no"):
-                        print(f"      -> Kept project version")
-                        break
-                    else:
-                        print("      Please enter 'o' (overwrite) or 's' (skip)")
+            raise ValueError(
+                f"Invalid on_conflict={on_conflict!r}. "
+                f"Valid: auto, skip, overwrite, error, interactive"
+            )
 
     # Update manifest with all synced files (missing copies + auto-updates + conflict overwrites)
     all_synced = copied + auto_updated + conflict_overwritten
@@ -2748,6 +2806,11 @@ def main():
     parser.add_argument("--tier", choices=["must-have", "nice-to-have"],
                         default="must-have",
                         help="Minimum tier to apply (default: must-have)")
+    parser.add_argument("--on-conflict",
+                        choices=["auto", "skip", "overwrite", "error", "interactive"],
+                        default="auto",
+                        help="How to handle files changed in both hub and project "
+                             "(default: auto — interactive if TTY, skip if not)")
     parser.add_argument("--use-config", action="store_true",
                         help="Use stacks from config/repos.yml instead of auto-detection")
     parser.add_argument("--diff", action="store_true",
@@ -2878,7 +2941,10 @@ def main():
         provision_summary = None
 
         if args.local:
-            summary = provision_to_local(hub_root, Path(args.local), gaps, stacks, args.tier)
+            summary = provision_to_local(
+                hub_root, Path(args.local), gaps, stacks, args.tier,
+                on_conflict=args.on_conflict,
+            )
             # Install third-party skills after hub patterns are copied
             if third_party_matched:
                 tp_results = try_install_third_party(Path(args.local), third_party_matched)
