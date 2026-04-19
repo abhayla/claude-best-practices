@@ -321,14 +321,20 @@ def extract_skill(skill_dir: Path, threshold: int = 500, dry_run: bool = False) 
             result["extracted_files"].append(ext["filename"])
         return result
 
-    # Write reference files
+    # Write reference files. Idempotent: re-running on an already-extracted
+    # skill must not accumulate `-new.md` orphans. If the target file already
+    # contains identical content, skip silently (idempotent no-op). If it
+    # contains different content, overwrite — the extracted content is the
+    # canonical derived artifact of the current SKILL.md body. Anyone who
+    # edited a reference file by hand should either edit SKILL.md and
+    # re-extract, or keep their edits in a separate file.
     refs_dir.mkdir(exist_ok=True)
     for ext in extractions:
         ref_path = refs_dir / ext["filename"]
-        # Don't overwrite existing reference files
-        if ref_path.exists():
-            ext["filename"] = ext["filename"].replace(".md", "-new.md")
-            ref_path = refs_dir / ext["filename"]
+        if ref_path.exists() and ref_path.read_text(encoding="utf-8") == ext["content"]:
+            # Identical — no write needed, keep the skill idempotent
+            result["extracted_files"].append(ext["filename"])
+            continue
         ref_path.write_text(ext["content"], encoding="utf-8")
         result["extracted_files"].append(ext["filename"])
 
