@@ -4,7 +4,7 @@ description: >
   Manage a self-improving knowledge base of testing patterns and lessons learned.
   Use when debugging test failures, choosing fixtures, handling platform quirks,
   or recording a resolved test issue. Modes: search, add, review, seed, digest, stats.
-  NOT for general learning capture (use /learn-n-improve) or test suite maintenance (use /test-maintenance).
+  NOT for cross-cutting learning capture (use /learn-n-improve) or test suite maintenance (use /test-maintenance).
 triggers:
   - search test knowledge
   - add test lesson

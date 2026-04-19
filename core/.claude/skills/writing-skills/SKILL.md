@@ -46,59 +46,8 @@ Parse `$ARGUMENTS` to choose the path:
 
 **Auto-detect Update mode:** When `$ARGUMENTS` names an existing skill (directory exists in `.claude/skills/` or `core/.claude/skills/`), switch to Update mode (Step 1.3). Do not treat updates as new skill creation.
 
-### 1.1 Skill Necessity Check
 
-Before authoring, verify the skill adds value over the agent's baseline:
-
-1. **Auto-generate 3 representative tasks** from `$ARGUMENTS` — realistic prompts a user would type within the skill's intended scope
-2. **Run each task WITHOUT a skill** in a subagent (clean context)
-3. **Evaluate results:**
-
-| Result | Action |
-|--------|--------|
-| Agent handles all 3 well | STOP — report "skill not needed" |
-| Agent struggles on 1-2 | Capture gaps — these define the skill's value. Proceed |
-| Agent fails on all 3 | Strong signal — use failure patterns to drive Step 2.3 |
-
-The gaps captured here feed directly into the skill's instructions.
-
-### 1.2 Design Initial Evaluations
-
-Before authoring, formalize the gaps from 1.1 into 3 eval scenarios.
-These become the acceptance criteria that drive Step 2.
-
-1. **Convert each gap into a test case:** realistic user prompt + expected behavior
-2. **Establish baseline:** the without-skill results from 1.1 ARE the baseline
-3. **Store scenarios** for use in Step 6 (formal evaluation)
-
-| Gap Identified | Eval Scenario | Expected Behavior |
-|---|---|---|
-| {from 1.1} | {realistic prompt} | {what success looks like} |
-
-These scenarios drive what to include in Step 2 — write ONLY what's needed
-to pass them. Resist comprehensive documentation until evals confirm value.
-
-### 1.3 Update Mode — Modify an Existing Skill
-
-When the target skill already exists, follow this workflow instead of creating from scratch.
-
-1. **Read the existing skill** — load the full SKILL.md and any references
-2. **Identify what needs to change** — based on user request, conversation context, or known gaps
-3. **Classify the change scope** for SemVer bump:
-
-| Change Type | Version Bump | Examples |
-|---|---|---|
-| Breaking: output format change, removed steps, renamed arguments | **MAJOR** | Changing JSON output schema, removing a step |
-| Additive: new optional steps, new modes, expanded examples | **MINOR** | Adding an update mode, new decision table |
-| Fix: typo, wording, formatting, bug fix | **PATCH** | Fixing a code block, clarifying a step |
-
-4. **Apply changes** — edit the existing SKILL.md using the Edit tool (not rewrite)
-5. **Bump the version** in frontmatter per the classification above
-6. **Skip Steps 1.1–1.2 and Steps 2–3** — the skill's value is already proven
-7. **Run Steps 4–5** — validate naming, organization, and quality checklist
-8. **Run Step 6** with `--baseline` flag — evaluates the update against the previous version
-
----
+**Read:** `references/determine-authoring-mode.md` for detailed step 1: determine authoring mode reference material.
 
 ## STEP 2: Skill Authoring — From Scratch
 
@@ -108,64 +57,9 @@ Build a minimal skill that addresses the gaps identified in Step 1.1.
 Write only what's needed to pass the eval scenarios from Step 1.2 — you'll
 iterate in Step 6. Focus on failure prevention from the start.
 
-### 2.0 Understand the Runtime Model
 
-**Read:** `references/runtime-model.md` — how Claude loads and navigates
-skills at runtime. This shapes every structural decision in Step 2.
+**Read:** `references/skill-authoring-from-scratch.md` for detailed step 2: skill authoring — from scratch reference material.
 
-### 2.1–2.2 Frontmatter, Naming, Content Standards
-
-**Read:** `references/skill-authoring-from-scratch.md` for the complete
-authoring reference: YAML frontmatter fields, naming conventions (gerund
-form, 64-char limit), context budget (500-line target), content quality
-(consistent terminology, no time-sensitive info, MCP qualified names),
-and reference structure (one level deep, TOC for >100 lines).
-
-### 2.3 Failure Mode Analysis
-
-Before writing steps and constraints, identify the 3 most likely failure modes for the skill's domain. This drives what guardrails to build — prevention beats diagnosis.
-
-1. **List 3 failure modes** — What goes wrong when this type of task is done carelessly? (e.g., "reads stale cache instead of live data", "overwrites user changes without confirmation", "proceeds with partial input")
-2. **Map each to a prevention** — Each failure mode becomes a specific MUST DO or MUST NOT DO rule with a concrete guardrail (a validation step, a confirmation prompt, or a precondition check)
-3. **Embed preventions into steps** — Place the guardrail in the earliest step where the failure could occur, not as an afterthought at the end
-
-| Failure Mode | Prevention Type | Where to Place |
-|---|---|---|
-| Wrong/stale input | Validation step | Step 1 or earliest data-reading step |
-| Destructive action without confirmation | User approval gate | Step before the destructive action |
-| Partial execution leaving broken state | Rollback or atomic commit | Step that modifies state |
-| Missing prerequisites | Precondition check | Step 1 |
-| Ambiguous output format | Locked output template | Output-producing step + MUST DO |
-
-**Output format MUST be locked.** Every skill that produces structured output (JSON, reports, tables) MUST define the exact output format in a code block template within the output-producing step. Ambiguity in output format is the #1 cause of inconsistent skill behavior — lock it down with a concrete template, not prose descriptions.
-
-### 2.4 Multi-Skill Decomposition (When One Prompt → Multiple Skills)
-
-If the prompt or workflow being authored covers a full end-to-end pipeline with 4+ distinct phases (input → processing → validation → output), decompose it into connected phase skills instead of building one monolithic skill.
-
-**Read:** `references/multi-skill-decomposition.md` for the full decomposition workflow: phase mapping, handoff contracts with XML-tagged schemas, checkpoint patterns, and end-to-end testing protocol.
-
-**Quick decision:** If the workflow has ≤3 tightly coupled steps, keep it as one skill. If it has 4+ independent phases or exceeds ~400 lines, decompose.
-
-### 2.5 Structure the Steps
-
-Steps are the core of every skill. Each step must be actionable — a verb phrase, not a vague noun.
-
-#### Step Writing Rules
-
-| Rule | Good Example | Bad Example |
-|------|-------------|-------------|
-| Start with a verb | "Run the test suite" | "Test execution" |
-| Be specific | "Search `src/` for files matching `*Service.ts`" | "Look at the code" |
-| Include the command or action | "Run: `pytest tests/ -v`" | "Execute the tests" |
-| State the expected outcome | "All tests should pass with 0 failures" | "Verify it works" |
-| Handle failure | "If tests fail, proceed to Step 5" | (nothing) |
-
-#### Step Anatomy
-
-Each step follows this structure:
-
-```markdown
 ## STEP N: Action Verb + Object
 
 Brief explanation of WHY this step exists (1-2 sentences max).
@@ -296,155 +190,21 @@ Before writing the skill file, run through the quality checklist in Step 5.
 
 Extract skill candidates from the current conversation by identifying repeated workflows.
 
-### 3.1 Scan for Repeated Patterns
 
-Review conversation history for multi-step sequences performed 2+ times:
-1. **Steps that worked** — action sequence that led to success
-2. **Corrections you made** — where you steered the agent's approach
-3. **Input/output formats** — data shape going in and out
-4. **Context you provided** — project-specific facts the agent didn't know
-5. **Repeated tool call sequences** — same 3+ calls in same order
-6. **Repeated file access patterns** — same files across tasks
-
-### 3.1b Synthesize from Project Artifacts
-
-**Warning:** Do NOT generate a skill from LLM general knowledge alone — the result is vague procedures ("handle errors appropriately"). Always ground in project-specific material:
-
-- Internal documentation, runbooks, and style guides
-- API specifications, schemas, and configuration files
-- Code review comments and issue trackers
-- Version control history, especially patches and fixes
-- Real-world failure cases and their resolutions
-
-### 3.2 Classify Candidates
-
-For each detected pattern, classify it:
-
-| Pattern | Times Seen | Steps | Parameterizable? | Skill Candidate? |
-|---------|-----------|-------|-------------------|-------------------|
-| {description} | {N} | {count} | Yes/No | Strong/Weak/No |
-
-A **strong candidate** has:
-- 3+ steps in a consistent order
-- Appeared 2+ times in the session
-- Variable parts that can be parameterized (file names, feature names, etc.)
-- Not already covered by an existing skill
-
-A **weak candidate** has:
-- Only 2 steps, or appeared only once but is clearly reusable
-- Investigate further before creating a skill
-
-### 3.3 Present Findings to User
-
-Present findings conversationally:
-
-```
-I noticed you performed this workflow 3 times this session:
-
-  1. Search for files matching a pattern in src/
-  2. Read each file and extract the interface definition
-  3. Generate a mock implementation
-  4. Write the mock to tests/mocks/
-
-Want me to create a /generate-mock skill for this?
-```
-
-Wait for user approval before creating the skill. If approved, proceed to Step 2 with the extracted pattern as the starting point, parameterizing the variable parts (file pattern, source directory, output directory).
-
----
+**Read:** `references/session-log-analysis.md` for detailed step 3: session log analysis reference material.
 
 ## STEP 4: Naming and Organization
 
-### 4.1 Directory Naming Convention
 
-Skills live in `core/.claude/skills/<name>/SKILL.md` (or `.claude/skills/<name>/SKILL.md` for project-local skills).
-
-| Type | Naming Rule | Example |
-|------|------------|---------|
-| Universal skill | Descriptive kebab-case | `systematic-debugging`, `writing-plans` |
-| Stack-specific skill | Stack prefix + descriptive name | `fastapi-db-migrate`, `android-run-tests` |
-| Compound skill | Primary-action + object | `fix-loop`, `request-code-review` |
-
-#### Stack Prefixes
-
-| Stack | Prefix |
-|-------|--------|
-| FastAPI + Python | `fastapi-` |
-| Android + Compose | `android-` |
-| React + Next.js | `react-` |
-| Flutter | `flutter-` |
-| Firebase | `firebase-` |
-| AI / Gemini | `ai-gemini-` |
-| Vue / Nuxt | `vue-` or `nuxt-` |
-| Expo | `expo-` |
-
-### 4.2 When to Create a New Skill vs. Extend an Existing One
-
-| Situation | Action |
-|-----------|--------|
-| New workflow that does not overlap with any existing skill | Create new skill |
-| Existing skill covers 80%+ of the workflow | Extend the existing skill with a new mode or step |
-| Two skills share 50%+ of their steps | Consolidate into one skill with modes |
-| Skills scoped too narrowly for one task | Broaden — multiple narrow skills loading risks overhead and conflicting instructions |
-| Workflow is a single rule (no steps) | Use `.claude/rules/` instead — skills are for multi-step workflows |
-| Workflow is a one-liner command | Use a hook instead — skills are overkill for single commands |
-
-### 4.3 When to Use Rules Instead of Skills
-
-Skills and rules serve different purposes:
-
-| Aspect | Skill | Rule |
-|--------|-------|------|
-| Activation | On-demand (slash command or natural language) | Automatic (always loaded or glob-matched) |
-| Structure | Multi-step workflow | Declarative constraints |
-| Length | 100-600 lines | 5-30 lines |
-| Context cost | Zero when unused (loaded on-demand) | Always consumes context when matched |
-| Use for | "Do this workflow" | "Always/never do X" |
-
-**If your "skill" has no steps and is just a list of rules, make it a rule file instead.**
-
----
+**Read:** `references/naming-and-organization.md` for detailed step 4: naming and organization reference material.
 
 ## STEP 5: Quality Checklist
 
 Before saving the skill, validate every item. Do NOT skip this step.
 
-### 5.1 Structure Validation
 
-| Check | Pass Criteria |
-|-------|---------------|
-| YAML frontmatter is valid | All required fields present, YAML parses without error |
-| `name` matches directory name | `name: foo-bar` lives in `skills/foo-bar/SKILL.md` |
-| `description` starts with a verb | "Debug...", "Generate...", "Analyze..." |
-| `type` is declared | `workflow` or `reference` — determines required body structure |
-| `version` is valid SemVer | Format: `"1.0.0"` — required for version tracking |
-| `triggers` has 3-6 entries | Mix of slash commands and natural language |
-| `allowed-tools` is minimal | No unused tools listed. Read-only skills MUST NOT include `Write`, `Edit`, or `Bash` |
-| No high-risk indicators without justification | Scripts, MCP refs, network access, or broad file access are documented and necessary (see `references/security-review.md` risk tiers) |
-| `argument-hint` uses `<>` and `[]` correctly | Required in angle brackets, optional in square brackets |
-| No placeholder markers | No TODO/FIXME/PLACEHOLDER HTML comment markers in the body |
-| Reference self-update mechanism present | Skills with `references/` include: (1) `references/self-update-protocol.md` copied from this skill, (2) a Reference Completeness Check step pointing to it, (3) an empty `references/CHANGELOG.jsonl` |
+**Read:** `references/quality-checklist.md` for detailed step 5: quality checklist reference material.
 
-### 5.2 Content Validation
-
-| Check | Pass Criteria |
-|-------|---------------|
-| Steps are numbered sequentially | STEP 1, STEP 2, STEP 3... |
-| Each step starts with a verb | "Analyze", "Run", "Create" — not "Analysis", "Running", "Creation" |
-| Steps have concrete actions | Commands, file paths, or specific instructions — not "consider" or "think about" |
-| Conditional logic uses tables | No nested if/else bullet points |
-| Output format is templated | Expected outputs shown in code blocks |
-| MUST DO section has 4-8 items | Each explains the consequence of skipping |
-| MUST NOT DO section has 4-8 items | Each states what to do instead |
-| No vague language | No "consider", "maybe", "try to", "think about" |
-| No Windows-style paths | All file paths use forward slashes (`/`), even on Windows |
-| Install-then-use for deps | Package usage shows install command before import |
-
-### 5.3 Overlap Check
-
-Scan existing skills for trigger and purpose overlap:
-
-```bash
 # Check for trigger overlap
 grep -r "triggers:" core/.claude/skills/*/SKILL.md -A 8
 
@@ -501,56 +261,9 @@ from observation, and gather team feedback.
 
 **Before formal eval:** Run the skill informally against one real task. Read the execution trace (not just output). Fix obvious issues first.
 
-### 6.1 Invoke Evaluation
 
-For new skills:
-```
-Agent(subagent_type="general-purpose",
-  prompt="/skill-evaluator full <skill-path>")
-```
+**Read:** `references/evaluate-and-iterate-with-skill-evaluator.md` for detailed step 6: evaluate and iterate with /skill-evaluator reference material.
 
-For updated skills:
-```
-Agent(subagent_type="general-purpose",
-  prompt="/skill-evaluator full <skill-path> --baseline")
-```
-
-### 6.2 Auto-Fix Routing
-
-When skill-evaluator returns FIX or FAIL, apply the mapped fix:
-
-| Eval Failure Type | Automated Fix |
-|---|---|
-| Should-trigger failing (<80%) | Broaden description: add user-intent phrases, expand scope |
-| Should-not-trigger firing (>20%) | Narrow description: add boundary ("do NOT use when...") |
-| Cross-skill conflict | Make triggers more specific, add distinguishing context |
-| Trigger regression (--baseline) | Restore key phrases from old description |
-| Scenario assertion failures | Add/clarify the step that produces the failing output |
-| Stress test CRITICAL | Add guardrail to MUST DO, embed prevention in earliest step |
-| Stress test MAJOR | Add edge case handling to relevant step's decision table |
-| Stress score <90% overall | Re-run failure mode analysis (Step 2.3), add preventions |
-| Skill adds no value over baseline | STOP — report to user: "skill not needed" |
-
-### 6.3 Iterate Until PASS
-
-1. Apply fix from routing table
-2. Re-invoke `/skill-evaluator full <skill-path>`
-3. If FIX/FAIL: apply next fix (each iteration MUST try a different fix)
-4. If PASS: proceed to 6.4
-
-**Max 5 iterations.** After 5 without PASS: STOP, present full iteration history, user decides.
-
-### 6.4 Present for Approval
-
-Present to user: final skill draft, eval report, iteration history, skill necessity delta.
-
-**Wait for user approval before proceeding to Step 7.** This is the single human touchpoint.
-
-### 6.5 Failure Prevention Map
-
-Before promoting, produce a failure prevention map that documents every guardrail in the skill. This is the "proof of failure resistance" artifact.
-
-```
 ## Failure Prevention Map: <skill-name>
 
 | # | Failure Mode | Prevention | Step Where Embedded | Constraint (MUST DO/MUST NOT DO) |
@@ -567,44 +280,8 @@ Present this map to the user alongside the skill draft. The map makes failure pr
 
 ---
 
-### 6.6 Domain Pattern Review
 
-When the authored pattern is an agent or orchestration-related skill, validate it against
-domain-specific reference patterns — not just structural quality gates.
-
-### When to Trigger
-
-| Authored Pattern Type | Domain References to Check |
-|----------------------|---------------------------|
-| Agent (any `agents/*.md`) | `agent-orchestration.md` rule (tier model, responsibilities, state) |
-| Orchestration agent or skill | `anthropic-agent-orchestration-guide` (5 workflow patterns, decision framework) |
-| Multi-agent system pattern | `anthropic-multi-agent-research-system-skill` (8 principles, evaluation, production) |
-| Non-orchestration skill or rule | **SKIP** — domain review is not applicable |
-
-### How to Review
-
-1. **Identify the authored pattern type** from the table above
-2. **Read the matched reference pattern(s)** — these are the audit baseline
-3. **Spawn `anthropic-multi-agent-reviewer-agent`** with the authored pattern and matched references:
-   ```
-   Agent(subagent_type="anthropic-multi-agent-reviewer-agent",
-         prompt="Review this pattern against the 8 principles: <pattern content>")
-   ```
-4. **Evaluate the gap report:**
-   - **Grade A-B** → PASS — proceed to Step 7
-   - **Grade C** → WARN — present gaps to user, fix if user agrees, then proceed
-   - **Grade D-F** → FAIL — must fix before hub promotion
-
-### Why This Step Exists
-
-Structural quality gates (Step 5) check *shape* — does the pattern have frontmatter, steps,
-MUST DO sections? Domain review checks *substance* — does the orchestrator follow the
-8 principles? Does it scale effort appropriately? Does it have evaluation infrastructure?
-
-A pattern can pass every structural gate while violating every orchestration best practice.
-This step closes that gap.
-
----
+**Read:** `references/failure-prevention-map-skill-name.md` for detailed failure prevention map: <skill-name> reference material.
 
 ## STEP 7: Hub Promotion Workflow
 

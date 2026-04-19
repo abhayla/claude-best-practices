@@ -4,7 +4,7 @@ description: >
   Analyze and implement a fix for a specific GitHub Issue. Fetches issue details
   via `gh`, explores codebase for root cause, plans minimal fix, implements,
   verifies with tests, and runs post-fix-pipeline. Use when user says "fix
-  issue #N" or references a GitHub Issue. For general feature work without a
+  issue #N" or references a GitHub Issue. For new feature work without a
   GitHub Issue, use /implement instead. For iterative test fixing, use /fix-loop.
   For bugs without a GitHub Issue, use /debugging-loop or /systematic-debugging.
 type: workflow

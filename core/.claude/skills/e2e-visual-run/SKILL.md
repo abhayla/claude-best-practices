@@ -487,8 +487,7 @@ After all queues drain (or global budget exhausted):
 
 - NEVER skip Step 0 (environment discovery) — autonomous execution depends on framework detection
 - NEVER skip pre-flight checks — environment issues masquerade as test failures
-- ALWAYS capture screenshots for EVERY test (pass and fail) — screenshot verdict is authoritative
-- NEVER treat exit code as authoritative for UI tests — dual-signal verdict is authoritative
+- ALWAYS capture screenshots for EVERY test (pass and fail); NEVER treat exit code as authoritative for UI tests — the dual-signal verdict (accessibility + screenshot) is the source of truth
 - NEVER auto-fix LOGIC_BUG or VISUAL_REGRESSION — flag for human review via pre-classification gate
 - NEVER auto-apply a fix with LOW confidence — suggest it but do not modify code
 - NEVER apply the same fix twice — track history, try different approaches each attempt
