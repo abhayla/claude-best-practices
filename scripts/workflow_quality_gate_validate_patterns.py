@@ -611,12 +611,24 @@ def check_cross_references(skills_dir: Path) -> list[str]:
     errors = []
     existing_skills = set()
 
-    # Words that look like skill references but are generic terms or placeholders
+    # Words that look like skill references but are generic terms or placeholders.
+    #
+    # MAINTENANCE NOTE — CLAUDE CODE BUILT-IN COMMANDS (the bottom cluster):
+    # Claude Code ships with built-in slash commands (e.g. `/update-config`,
+    # `/compact`) that are NOT repo skills. Listing them here suppresses false-
+    # positive "References non-existent skill" errors.
+    # Source of truth: https://docs.claude.com/en/docs/claude-code/slash-commands
+    # This list drifts as new built-ins ship. The test
+    # `test_builtin_commands_list_is_current` (in
+    # test_workflow_quality_gate_validate_patterns.py) prints a reminder when
+    # more than ~6 months have passed since this comment was last touched — on
+    # drift, re-check the upstream docs and add any new built-ins here.
+    # Last reviewed against upstream docs: 2026-04-19
     IGNORE_REFS = {
         "name", "skill-name", "removed-skill",  # template placeholders
         "clear", "docs", "redoc", "metrics", "proc",  # generic single words
         "login", "settings", "public", "test", "build",  # common non-skill terms
-        # Claude Code built-in slash commands — these are CLI features, not repo skills:
+        # Claude Code built-in slash commands — see MAINTENANCE NOTE above:
         "update-config", "continue", "compact", "help", "status",
         "model", "cost", "memory", "review", "agents", "exit",
     }

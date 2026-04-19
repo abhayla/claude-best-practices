@@ -1172,3 +1172,35 @@ class TestCheckCrossReferencesFalsePositives:
         assert any("nonexistent-skill-xyz" in e for e in errors), (
             f"Genuinely missing skill should still be flagged. Errors: {errors}"
         )
+
+    def test_builtin_commands_list_is_current(self):
+        """Drift reminder: the IGNORE_REFS list includes Claude Code built-in
+        slash commands, which change as new CLI features ship. The validator
+        source file carries a `Last reviewed against upstream docs: YYYY-MM-DD`
+        comment. If that date is more than 180 days old, fail with a link to
+        the upstream docs so a maintainer re-checks the list.
+
+        This is intentionally a soft-lock: the failure is informational, not
+        blocking the user from editing the list. It just prevents silent drift."""
+        import datetime
+        import re as _re
+        from pathlib import Path as _Path
+
+        src = (_Path(__file__).parent.parent
+               / "workflow_quality_gate_validate_patterns.py").read_text(encoding="utf-8")
+        match = _re.search(r"Last reviewed against upstream docs: (\d{4}-\d{2}-\d{2})", src)
+        assert match, (
+            "Missing `Last reviewed against upstream docs: YYYY-MM-DD` marker "
+            "in scripts/workflow_quality_gate_validate_patterns.py near IGNORE_REFS. "
+            "Add it so drift can be tracked."
+        )
+        last_review = datetime.date.fromisoformat(match.group(1))
+        age_days = (datetime.date.today() - last_review).days
+        assert age_days <= 180, (
+            f"IGNORE_REFS built-in commands list last reviewed {age_days} days "
+            f"ago (on {last_review}). Check upstream docs for new built-in "
+            f"commands and update the list: "
+            f"https://docs.claude.com/en/docs/claude-code/slash-commands\n"
+            f"After re-checking, bump the `Last reviewed` date in the "
+            f"IGNORE_REFS MAINTENANCE NOTE."
+        )
