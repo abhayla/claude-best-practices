@@ -888,11 +888,36 @@ class TestGenerateHubPracticesSection:
         assert "Bug Fixing" in section
         assert "/fix-loop" in section
 
-    def test_contains_dynamic_rules_table(self, hub_root):
+    def test_section_points_at_rules_directory_not_enumeration(self, hub_root):
+        """The hub section must describe where rules live without enumerating
+        them. Enumerating 50+ rule rows costs ~4k tokens per session for zero
+        enforcement benefit (path-scoped rules auto-load via `globs:`)."""
         section = generate_hub_practices_section(hub_root, ["workflow", "context-management"])
-        assert "Rules Reference" in section
-        assert "`rules/workflow.md`" in section
-        assert "`rules/context-management.md`" in section
+        # Still mentions .claude/rules/ so users know where to look
+        assert ".claude/rules/" in section or "rules/" in section
+        # Points at globs auto-loading (the actual enforcement mechanism)
+        assert "globs" in section.lower() or "auto-load" in section.lower() or "path-scoped" in section.lower()
+
+    def test_section_length_bounded_regardless_of_rule_count(self, hub_root):
+        """The hub section MUST stay compact (≤25 lines) regardless of how
+        many rules the project has. A 50-rule project and a 5-rule project
+        should produce sections of similar length."""
+        few_rules = generate_hub_practices_section(hub_root, ["workflow"])
+        many_rules = generate_hub_practices_section(
+            hub_root,
+            [f"rule-{i:03d}" for i in range(100)],
+        )
+        few_lines = len(few_rules.splitlines())
+        many_lines = len(many_rules.splitlines())
+        assert many_lines <= 25, (
+            f"Hub section with 100 rules grew to {many_lines} lines — "
+            f"must stay bounded to avoid CLAUDE.md bloat"
+        )
+        # And the count must not scale with rules (no enumeration)
+        assert abs(many_lines - few_lines) <= 2, (
+            f"Section length scales with rule count: {few_lines} lines for 1 "
+            f"rule vs {many_lines} for 100 rules. Enumeration re-introduced?"
+        )
 
     def test_contains_sync_metadata(self, hub_root):
         section = generate_hub_practices_section(hub_root, ["workflow"])
@@ -970,28 +995,38 @@ class TestProvisionClaudeMd:
         content = (target / "CLAUDE.md").read_text()
         assert content.count(PROVISION_START_MARKER) == 2  # old broken + new
 
-    def test_create_from_template_uses_dynamic_rules_table(self, hub_root, tmp_path):
-        """Case 1a: template-based creation uses dynamic hub_section, not hardcoded content."""
+    def test_create_from_template_uses_dynamic_hub_section(self, hub_root, tmp_path):
+        """Case 1a: template-based creation uses dynamic hub_section, not hardcoded content.
+        After the lean-section refactor, the hub section points at `.claude/rules/`
+        rather than enumerating each rule — but it's still dynamic (not a fixed
+        template placeholder)."""
         target = tmp_path / "myproject"
         target.mkdir()
         result = provision_claude_md(hub_root, target, ["fastapi-python"], ["workflow", "context-management"])
         assert result == "created"
         content = (target / "CLAUDE.md").read_text()
-        # Dynamic rules table should contain only the rules that were passed
-        assert "`rules/workflow.md`" in content
-        assert "`rules/context-management.md`" in content
+        # Hub section is present and points at the rules directory
+        assert ".claude/rules/" in content or "rules/" in content
+        # Dynamic — contains the Bug Fixing rule and marker
+        assert "Bug Fixing" in content
         # Should NOT contain the old placeholder text from the template
         assert "Placeholder replaced at provision time" not in content
 
-    def test_create_from_template_excludes_removed_rules(self, hub_root, tmp_path):
-        """Case 1a: rules not in rules_present must not appear in generated CLAUDE.md."""
+    def test_create_from_template_does_not_enumerate_rules(self, hub_root, tmp_path):
+        """Case 1a: the hub section MUST NOT enumerate individual rule files.
+        Enumerating scales linearly with rule count and costs ~4k tokens at 50
+        rules for zero enforcement benefit (path-scoping is done via `globs:`)."""
         target = tmp_path / "myproject"
         target.mkdir()
-        # Only pass "workflow" — rule-writing-meta should NOT appear
-        provision_claude_md(hub_root, target, [], ["workflow"])
+        provision_claude_md(hub_root, target, [], ["workflow", "context-management", "testing"])
         content = (target / "CLAUDE.md").read_text()
-        assert "`rules/workflow.md`" in content
-        assert "rule-writing-meta" not in content
+        # None of these rule-row markers should appear — they indicate a regression
+        # back to the bulky table format.
+        for row_marker in ("`rules/workflow.md`", "`rules/context-management.md`", "`rules/testing.md`"):
+            assert row_marker not in content, (
+                f"Hub section regressed to per-rule enumeration: found {row_marker!r}. "
+                f"The lean format points at `.claude/rules/` generically."
+            )
 
     def test_create_from_template_preserves_user_sections(self, hub_root, tmp_path):
         """Case 1a: user-editable sections from the template survive hub section replacement."""

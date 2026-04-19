@@ -1910,7 +1910,15 @@ def generate_hub_practices_section(
 ) -> str:
     """Build the hub best-practices section for CLAUDE.md.
 
-    Contains: Bug Fixing rule, dynamic Rules Reference table, sync metadata.
+    Intentionally compact — the previous version enumerated every rule in a
+    large table, which cost ~4k tokens per session at 50+ rules. Path-scoped
+    rules auto-load via `globs:` when matching files are opened; the table
+    added zero enforcement value. Discovery for planning conversations is
+    served by `ls .claude/rules/` or grep, not by in-file enumeration.
+
+    Contents: protected-section header, Bug Fixing pointer, a one-line
+    description of how rules are activated, and the `.claude/` inventory
+    count. Length is bounded regardless of rule count.
     """
     lines = []
     lines.append(PROVISION_START_MARKER)
@@ -1926,20 +1934,13 @@ def generate_hub_practices_section(
         "Start by writing a test that reproduces the bug, "
         "then fix and prove with a passing test."
     )
+    lines.append(
+        "2. **Rules**: Path-scoped rules live in `.claude/rules/` and "
+        "auto-load via `globs:` frontmatter when matching files are opened. "
+        "Browse with `ls .claude/rules/` — enumerating each rule here would "
+        "cost ~4k tokens per session for zero enforcement benefit."
+    )
     lines.append("")
-
-    # Dynamic rules reference table
-    if rules_present:
-        descriptions = get_rule_descriptions(hub_root, rules_present)
-        lines.append("### Rules Reference")
-        lines.append("")
-        lines.append("| Rule File | What It Covers |")
-        lines.append("|-----------|---------------|")
-        for name in sorted(rules_present):
-            desc = descriptions.get(name, name.replace("-", " ").title())
-            lines.append(f"| `rules/{name}.md` | {desc} |")
-        lines.append("")
-
     lines.append("## Claude Code Configuration")
     lines.append("")
     if project_names:
