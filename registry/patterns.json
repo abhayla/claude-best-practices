@@ -230,13 +230,13 @@
     "tier": "must-have"
   },
   "android-kotlin": {
-    "hash": "8535a142141279b89f66e3a76db2a360e419f3da6c141e3f4f168e05740ec794",
+    "hash": "1c40f0bfca4faacc2b1fe20a2177773f4b0724ef193bce56e724460086e84388",
     "type": "rule",
     "category": "android-compose",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "scan:affaan-m/everything-claude-code",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Kotlin idioms, null safety, scope functions, DSL patterns, KMP testing conventions",
@@ -247,7 +247,7 @@
       "coding-style",
       "testing"
     ],
-    "changelog": "v1.0.0: Initial â€” consolidated from 4 kotlin rule files in everything-claude-code",
+    "changelog": "v1.0.1: Add pointer to error-handling.md for CancellationException rule | v1.0.0: Initial â€” consolidated from 4 kotlin rule files in everything-claude-code",
     "tier": "must-have"
   },
   "android-kotlin-reviewer-agent": {
@@ -4262,10 +4262,10 @@
     "tier": "nice-to-have"
   },
   "security-baseline": {
-    "hash": "f5cadda4257d8a7710e33707738525dcfc9545ea482135027d9e7e35f66c9b7e",
+    "hash": "c410e31b70b74c30be00989660ff9a66626f14e84648f756ecf98756ccabe0c9",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-21",
     "last_updated": "2026-04-21",
@@ -4277,7 +4277,7 @@
       "baseline",
       "owasp"
     ],
-    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
     "tier": "must-have"
   },
   "error-handling": {
@@ -4339,10 +4339,10 @@
     "tier": "must-have"
   },
   "git-collaboration": {
-    "hash": "a4b03cd3a46f8dcc79cfb23bdcfb8e273262465a5bc08a65fa061fa97780944a",
+    "hash": "0257afb4c4326dc74c97b04aa672c1627ca9d71e36f21d9ccec10ad44beb5da4",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-21",
     "last_updated": "2026-04-21",
@@ -4355,7 +4355,7 @@
       "pull-requests",
       "collaboration"
     ],
-    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
     "tier": "must-have"
   }
 }

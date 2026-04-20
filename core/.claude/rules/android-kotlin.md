@@ -50,7 +50,7 @@ val name = requireNotNull(user) { "User must be set before accessing name" }.nam
 
 - Use `Result<T>` or custom sealed types — not exceptions for control flow
 - Use `runCatching {}` for wrapping throwable code
-- NEVER catch `CancellationException` — always rethrow it
+- NEVER catch `CancellationException` — always rethrow it (see `error-handling.md` for the language-agnostic rule)
 
 ## DSL Builder Pattern
 

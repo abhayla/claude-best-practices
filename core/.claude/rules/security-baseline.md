@@ -33,7 +33,7 @@ Every principal (code, service account, database user, CI token, deploy credenti
 - Per-service database users, never a shared superuser
 - CI tokens scoped to one repo and the minimum actions (read, not admin)
 - Service accounts never granted `*` or `Admin` — enumerate the exact permissions needed
-- Review granted permissions quarterly; revoke unused ones
+- When touching code that uses a credential, audit its current permissions and drop any the code no longer needs
 
 ## Dependency Hygiene
 

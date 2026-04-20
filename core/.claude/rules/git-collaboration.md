@@ -24,7 +24,7 @@ All commit messages MUST follow the [Conventional Commits v1.0.0](https://www.co
 
 Each pull request MUST represent one logical change, reviewable end-to-end in ~15 minutes.
 
-- Target diff size: under 400 lines of changed code — larger PRs have exponentially higher bug rates (DORA)
+- Target diff size: under 400 lines of changed code — industry studies (Cisco, SmartBear) consistently show bug-detection effectiveness drops sharply past this threshold
 - Split large changes vertically (feature per PR) or horizontally (backend + frontend + docs as three PRs with explicit merge order)
 - PR description MUST include: motivation (why), approach (how), test plan (what you ran and what you verified), risk / rollback plan if non-trivial
 - Draft PRs MAY be large while iterating; ready-for-review PRs MUST meet the size and scope bar
