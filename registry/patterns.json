@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.0.0",
-    "last_updated": "2026-04-19",
-    "total_patterns": 224
+    "last_updated": "2026-04-21",
+    "total_patterns": 229
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -24,7 +24,7 @@
       "axe-core",
       "Lighthouse"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d axe-core, Lighthouse a11y, WCAG checklist",
+    "changelog": "v1.0.0: Initial release â€” axe-core, Lighthouse a11y, WCAG checklist",
     "tier": "nice-to-have"
   },
   "adr": {
@@ -44,7 +44,7 @@
       "ADR",
       "decisions"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Michael Nygard template, lifecycle management, index generation",
+    "changelog": "v1.0.0: Initial release â€” Michael Nygard template, lifecycle management, index generation",
     "tier": "nice-to-have"
   },
   "adversarial-review": {
@@ -80,7 +80,7 @@
       "agents",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d Anthropic-aligned orchestration constraints",
+    "changelog": "v1.0.0: Initial creation â€” Anthropic-aligned orchestration constraints",
     "tier": "nice-to-have"
   },
   "ai-gemini-api": {
@@ -168,7 +168,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Android Gradle build failure diagnostics \u00e2\u20ac\u201d 10 common issue categories with solutions",
+    "description": "Android Gradle build failure diagnostics â€” 10 common issue categories with solutions",
     "tags": [
       "android",
       "gradle",
@@ -178,7 +178,7 @@
       "hilt",
       "room"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d adapted from TaeseongYun build-fixer agent",
+    "changelog": "v1.0.0: Initial â€” adapted from TaeseongYun build-fixer agent",
     "tier": "must-have"
   },
   "android-compose-agent": {
@@ -191,7 +191,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use this agent for Compose UI work \u2014 building screens, fixing UI bugs, implementing design system changes, or reviewing Compose code for performance and correctness. Scoped to the presentation layer.",
+    "description": "Use this agent for Compose UI work — building screens, fixing UI bugs, implementing design system changes, or reviewing Compose code for performance and correctness. Scoped to the presentation layer.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have"
@@ -247,7 +247,7 @@
       "coding-style",
       "testing"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d consolidated from 4 kotlin rule files in everything-claude-code",
+    "changelog": "v1.0.0: Initial â€” consolidated from 4 kotlin rule files in everything-claude-code",
     "tier": "must-have"
   },
   "android-kotlin-reviewer-agent": {
@@ -269,7 +269,7 @@
       "coroutines",
       "kmp"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d adapted from everything-claude-code kotlin-reviewer",
+    "changelog": "v1.0.0: Initial â€” adapted from everything-claude-code kotlin-reviewer",
     "tier": "must-have"
   },
   "android-mvi-scaffold": {
@@ -282,7 +282,7 @@
     "last_updated": "2026-03-13",
     "dependencies": [],
     "visibility": "public",
-    "description": "MVI feature scaffolder \u00e2\u20ac\u201d generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
+    "description": "MVI feature scaffolder â€” generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
     "tags": [
       "android",
       "kotlin",
@@ -291,7 +291,7 @@
       "compose",
       "architecture"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d consolidated from ChrisWW + TaeseongYun repos",
+    "changelog": "v1.0.0: Initial â€” consolidated from ChrisWW + TaeseongYun repos",
     "tier": "must-have"
   },
   "android-run-e2e": {
@@ -355,7 +355,7 @@
       "turbine",
       "mockk"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns",
+    "changelog": "v1.0.0: Initial â€” JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns",
     "tier": "must-have"
   },
   "anthropic-agent-orchestration-guide": {
@@ -375,7 +375,7 @@
       "patterns",
       "agents"
     ],
-    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d comprehensive orchestration reference",
+    "changelog": "v1.0.0: Initial creation â€” comprehensive orchestration reference",
     "tier": "nice-to-have"
   },
   "anthropic-multi-agent-research-system-skill": {
@@ -399,7 +399,7 @@
       "production",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial creation \u2014 8 principles, evaluation methodology, production patterns from Anthropic research",
+    "changelog": "v1.0.0: Initial creation — 8 principles, evaluation methodology, production patterns from Anthropic research",
     "tier": "nice-to-have"
   },
   "anthropic-multi-agent-reviewer-agent": {
@@ -422,7 +422,7 @@
       "quality",
       "proactive"
     ],
-    "changelog": "v1.0.0: Initial creation \u2014 principle compliance audit, evaluation gap detection, production readiness check",
+    "changelog": "v1.0.0: Initial creation — principle compliance audit, evaluation gap detection, production readiness check",
     "tier": "nice-to-have"
   },
   "api-docs-generator": {
@@ -442,7 +442,7 @@
       "Swagger",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-framework OpenAPI generation, validation, CI integration",
+    "changelog": "v1.0.0: Initial release â€” multi-framework OpenAPI generation, validation, CI integration",
     "tier": "nice-to-have"
   },
   "apply-selections": {
@@ -462,7 +462,7 @@
       "checkbox",
       "pattern-selection"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d checkbox parsing, file removal via GitHub API",
+    "changelog": "v1.0.0: Initial release â€” checkbox parsing, file removal via GitHub API",
     "tier": "nice-to-have"
   },
   "architecture-fitness": {
@@ -482,7 +482,7 @@
       "coupling",
       "dependencies"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dependency direction, circular deps, coupling, ADR review",
+    "changelog": "v1.0.0: Initial release â€” dependency direction, circular deps, coupling, ADR review",
     "tier": "nice-to-have"
   },
   "auto-format": {
@@ -617,14 +617,14 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Quantified change risk score (files \u00c3\u0192\u00e2\u20ac\u201d complexity \u00c3\u0192\u00e2\u20ac\u201d inverse coverage) for deploy go/no-go decisions with hotspot analysis",
+    "description": "Quantified change risk score (files Ãƒâ€” complexity Ãƒâ€” inverse coverage) for deploy go/no-go decisions with hotspot analysis",
     "tags": [
       "risk",
       "change-management",
       "deploy",
       "metrics"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d composite risk scoring, hotspot analysis",
+    "changelog": "v1.0.0: Initial release â€” composite risk scoring, hotspot analysis",
     "tier": "nice-to-have"
   },
   "changelog-contributing": {
@@ -644,7 +644,7 @@
       "conventional-commits",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d CHANGELOG + CONTRIBUTING generation",
+    "changelog": "v1.0.0: Initial release â€” CHANGELOG + CONTRIBUTING generation",
     "tier": "nice-to-have"
   },
   "chaos-resilience": {
@@ -664,7 +664,7 @@
       "failure-injection",
       "circuit-breaker"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure injection, degradation verification, gameday",
+    "changelog": "v1.0.0: Initial release â€” failure injection, degradation verification, gameday",
     "tier": "nice-to-have"
   },
   "ci-cd-setup": {
@@ -686,18 +686,18 @@
     "tier": "nice-to-have"
   },
   "claude-behavior": {
-    "hash": "78248d16ca14eadfac088a81f2354e5b75eabcc582a2167c12a0982fc8296a5c",
+    "hash": "40f8cecb68b7e51170897db121746d9c115a82b169d0cd15ad34062ef39c2740",
     "type": "rule",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Universal behavioral rules for Claude including mandatory failure response pipeline",
     "tags": [],
-    "changelog": "v1.1.0: Rule 15 strengthened to MANDATORY with /learn-n-improve chaining",
+    "changelog": "v1.2.0: Add rule 21 (YAGNI) + rule 22 (Measure Before You Optimize); label rule 16 with KISS | v1.1.0: Rule 15 strengthened to MANDATORY with /learn-n-improve chaining",
     "tier": "must-have"
   },
   "claude-guardian": {
@@ -735,7 +735,7 @@
       "refactoring",
       "logging"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d complexity, duplication, SOLID, logging, refactor, layer checks",
+    "changelog": "v1.0.0: Initial release â€” complexity, duplication, SOLID, logging, refactor, layer checks",
     "tier": "must-have"
   },
   "code-reviewer-agent": {
@@ -789,7 +789,7 @@
       "CLAUDE.md",
       "architecture"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d four-layer model, anti-duplication rules, pointer pattern, migration guide",
+    "changelog": "v1.0.0: Initial release â€” four-layer model, anti-duplication rules, pointer pattern, migration guide",
     "tier": "must-have"
   },
   "context-management": {
@@ -904,7 +904,7 @@
       "API",
       "consumer-driven"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Pact consumer/provider, broker, CI integration",
+    "changelog": "v1.0.0: Initial release â€” Pact consumer/provider, broker, CI integration",
     "tier": "nice-to-have"
   },
   "contribute-practice": {
@@ -1013,7 +1013,7 @@
       "nuclei",
       "fuzzing"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ZAP, Nuclei, headers, sessions, fuzzing, CI",
+    "changelog": "v1.0.0: Initial release â€” ZAP, Nuclei, headers, sessions, fuzzing, CI",
     "tier": "nice-to-have"
   },
   "db-migrate": {
@@ -1037,7 +1037,7 @@
       "Django",
       "TypeORM"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-ORM migration with safety rules",
+    "changelog": "v1.0.0: Initial release â€” multi-ORM migration with safety rules",
     "tier": "nice-to-have"
   },
   "db-migrate-verify": {
@@ -1094,7 +1094,7 @@
       "zero-downtime",
       "PRR"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d GitOps, canary, blue-green, DB migration ordering, PRR",
+    "changelog": "v1.0.0: Initial release â€” GitOps, canary, blue-green, DB migration ordering, PRR",
     "tier": "nice-to-have"
   },
   "diataxis-docs": {
@@ -1107,14 +1107,14 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Organize documentation using the Di\u00c3\u0192\u00c2\u00a1taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
+    "description": "Organize documentation using the DiÃƒÂ¡taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
     "tags": [
       "documentation",
       "Diataxis",
       "tutorials",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Di\u00c3\u0192\u00c2\u00a1taxis categorization, templates, migration",
+    "changelog": "v1.0.0: Initial release â€” DiÃƒÂ¡taxis categorization, templates, migration",
     "tier": "nice-to-have"
   },
   "disaster-recovery": {
@@ -1139,7 +1139,7 @@
       "RTO",
       "RPO"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d RTO/RPO, backup, restore, failover, DR drills",
+    "changelog": "v1.0.0: Initial release â€” RTO/RPO, backup, restore, failover, DR drills",
     "tier": "nice-to-have"
   },
   "doc-staleness": {
@@ -1152,14 +1152,14 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Detect documentation that has drifted from the codebase \u00e2\u20ac\u201d stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
+    "description": "Detect documentation that has drifted from the codebase â€” stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
     "tags": [
       "documentation",
       "staleness",
       "drift-detection",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d file/symbol/command/link staleness detection, severity-prioritized report",
+    "changelog": "v1.0.0: Initial release â€” file/symbol/command/link staleness detection, severity-prioritized report",
     "tier": "nice-to-have"
   },
   "doc-structure-enforcer": {
@@ -1180,7 +1180,7 @@
       "pipeline-stages",
       "folder-management"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d stage-based folder structure, pattern + content classification, git mv + ref updates",
+    "changelog": "v1.0.0: Initial release â€” stage-based folder structure, pattern + content classification, git mv + ref updates",
     "tier": "nice-to-have"
   },
   "docker-optimize": {
@@ -1211,7 +1211,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use this agent for documentation updates \u2014 continuation prompts, requirement traceability, testing docs, and generated documentation. Referenced by post-fix-pipeline skill.",
+    "description": "Use this agent for documentation updates — continuation prompts, requirement traceability, testing docs, and generated documentation. Referenced by post-fix-pipeline skill.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "nice-to-have"
@@ -1256,7 +1256,7 @@
       "self-healing",
       "accessibility"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d queue-based orchestration, dual-signal verification, 8-classification healing",
+    "changelog": "v1.0.0: Initial release â€” queue-based orchestration, dual-signal verification, 8-classification healing",
     "tier": "nice-to-have"
   },
   "e2e-best-practices": {
@@ -1276,7 +1276,7 @@
       "best-practices",
       "cross-framework"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 10 sections covering gaps across existing E2E skills",
+    "changelog": "v1.0.0: Initial release â€” 10 sections covering gaps across existing E2E skills",
     "tier": "nice-to-have"
   },
   "e2e-pipeline": {
@@ -1295,7 +1295,7 @@
       "config",
       "pipeline"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d externalized DAG for e2e-conductor-agent",
+    "changelog": "v1.0.0: Initial release â€” externalized DAG for e2e-conductor-agent",
     "tier": "nice-to-have"
   },
   "e2e-test-writing": {
@@ -1316,7 +1316,7 @@
       "testing",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d globs-scoped pointer to e2e-best-practices",
+    "changelog": "v1.0.0: Initial release â€” globs-scoped pointer to e2e-best-practices",
     "tier": "nice-to-have"
   },
   "e2e-conductor-agent": {
@@ -1340,7 +1340,7 @@
       "testing",
       "queue"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d async queue-based E2E orchestration pipeline",
+    "changelog": "v1.0.0: Initial release â€” async queue-based E2E orchestration pipeline",
     "tier": "nice-to-have"
   },
   "executing-plans": {
@@ -1432,7 +1432,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use this agent for database tasks \u2014 PostgreSQL queries, Alembic migrations, schema questions, model import rules, or diagnosing query issues.",
+    "description": "Use this agent for database tasks — PostgreSQL queries, Alembic migrations, schema questions, model import rules, or diagnosing query issues.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have"
@@ -1516,7 +1516,7 @@
       "toggles",
       "gradual-rollout"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d flag types, implementation patterns, cleanup",
+    "changelog": "v1.0.0: Initial release â€” flag types, implementation patterns, cleanup",
     "tier": "nice-to-have"
   },
   "firebase": {
@@ -1535,7 +1535,7 @@
       "auth",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in KKB + cric patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in KKB + cric patterns",
     "tier": "must-have"
   },
   "firebase-ai": {
@@ -1672,7 +1672,7 @@
       "dart",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in cric repo patterns",
     "tier": "must-have"
   },
   "flutter-dart-agent": {
@@ -1691,7 +1691,7 @@
       "dart",
       "mobile"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in cric repo patterns",
     "tier": "must-have"
   },
   "flutter-dev": {
@@ -1779,7 +1779,7 @@
       "search",
       "discovery"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d repo search, code search, deep inspect modes",
+    "changelog": "v1.0.0: Initial release â€” repo search, code search, deep inspect modes",
     "tier": "skip"
   },
   "handover": {
@@ -1836,7 +1836,7 @@
       "demo",
       "Nielsen"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d single-file prototypes with heuristic validation",
+    "changelog": "v1.0.0: Initial release â€” single-file prototypes with heuristic validation",
     "tier": "nice-to-have"
   },
   "iac-deploy": {
@@ -2006,7 +2006,7 @@
       "branching",
       "post-merge"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d strategy matrix, pre/post-merge checklists",
+    "changelog": "v1.0.0: Initial release â€” strategy matrix, pre/post-merge checklists",
     "tier": "nice-to-have"
   },
   "middleware-test": {
@@ -2120,7 +2120,7 @@
       "react",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in BestDematAccount + IPODhan patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in BestDematAccount + IPODhan patterns",
     "tier": "nice-to-have"
   },
   "node-backend-dev": {
@@ -2133,7 +2133,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Node.js backends: Express, Hono, ElysiaJS \u00e2\u20ac\u201d routing, middleware, DB, auth, WebSocket",
+    "description": "Node.js backends: Express, Hono, ElysiaJS â€” routing, middleware, DB, auth, WebSocket",
     "tags": [
       "nodejs",
       "backend",
@@ -2141,7 +2141,7 @@
       "hono",
       "elysia"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + BestDematAccount + cric patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + BestDematAccount + cric patterns",
     "tier": "nice-to-have"
   },
   "nuxt-dev": {
@@ -2213,7 +2213,7 @@
       "portability",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
     "tier": "nice-to-have"
   },
   "pattern-self-containment": {
@@ -2232,7 +2232,7 @@
       "self-containment",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
     "tier": "nice-to-have"
   },
   "pattern-structure": {
@@ -2251,7 +2251,7 @@
       "structure",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
     "tier": "nice-to-have"
   },
   "perf-test": {
@@ -2456,7 +2456,7 @@
       "IEEE-830",
       "parser"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-format PRD parsing and normalization",
+    "changelog": "v1.0.0: Initial release â€” multi-format PRD parsing and normalization",
     "tier": "nice-to-have"
   },
   "prisma-orm": {
@@ -2498,7 +2498,7 @@
       "DAG",
       "agent"
     ],
-    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent",
+    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill â€” orchestration logic now lives in the agent",
     "tier": "nice-to-have"
   },
   "project-scaffold": {
@@ -2520,7 +2520,7 @@
       "12-factor",
       "security-baseline"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d covers Python, Node/TS, Android, Go, Rust",
+    "changelog": "v1.0.0: Initial release â€” covers Python, Node/TS, Android, Go, Rust",
     "tier": "nice-to-have"
   },
   "prompt-auto-enhance": {
@@ -2591,7 +2591,7 @@
       "prompt-enhance",
       "deterministic"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d deterministic Enhanced indicator reminder",
+    "changelog": "v1.0.0: Initial release â€” deterministic Enhanced indicator reminder",
     "tier": "must-have"
   },
   "pytest-dev": {
@@ -2686,7 +2686,7 @@
       "react",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d replaces placeholder",
+    "changelog": "v1.0.0: Initial release â€” replaces placeholder",
     "tier": "must-have"
   },
   "react-test-patterns": {
@@ -2797,7 +2797,7 @@
       "citations",
       "fact-checking"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 3 anti-hallucination constraints, structured research brief output",
+    "changelog": "v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output",
     "tier": "nice-to-have"
   },
   "remotion-video": {
@@ -2880,7 +2880,7 @@
       "quality-gate",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
     "tier": "nice-to-have"
   },
   "rule-writing-meta": {
@@ -2899,7 +2899,7 @@
       "rule-authoring",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
     "tier": "must-have"
   },
   "save-session": {
@@ -2993,7 +2993,7 @@
       "migration",
       "data-modeling"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ER design, PII, evolution, API alignment",
+    "changelog": "v1.0.0: Initial release â€” ER design, PII, evolution, API alignment",
     "tier": "nice-to-have"
   },
   "secret-scanner": {
@@ -3039,7 +3039,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use proactively for security assessments \u2014 OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Spawn automatically when changes",
+    "description": "Use proactively for security assessments — OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Spawn automatically when changes",
     "tags": [],
     "changelog": "v1.0.0: Initial registration",
     "tier": "must-have"
@@ -3077,7 +3077,7 @@
       "hooks",
       "reminder"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d counter-based session save reminder",
+    "changelog": "v1.0.0: Initial release â€” counter-based session save reminder",
     "tier": "must-have"
   },
   "session-summarizer-agent": {
@@ -3115,7 +3115,7 @@
       "agent",
       "patterns"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d routes pattern creation to appropriate authoring workflows with quality validation",
+    "changelog": "v1.0.0: Initial release â€” routes pattern creation to appropriate authoring workflows with quality validation",
     "tier": "nice-to-have"
   },
   "skill-evaluator": {
@@ -3210,7 +3210,7 @@
       "duplication",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 6-step audit workflow, cross-layer duplication detection, health scoring",
+    "changelog": "v1.0.0: Initial release â€” 6-step audit workflow, cross-layer duplication detection, health scoring",
     "tier": "must-have"
   },
   "start-session": {
@@ -3231,7 +3231,7 @@
       "context",
       "continuity"
     ],
-    "changelog": "v1.1.0: Add triggers for natural language discoverability | v1.0.0: Initial release \u00e2\u20ac\u201d session restoration with priority-ordered file loading",
+    "changelog": "v1.1.0: Add triggers for natural language discoverability | v1.0.0: Initial release â€” session restoration with priority-ordered file loading",
     "tier": "must-have"
   },
   "status": {
@@ -3338,7 +3338,7 @@
       "css",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in AlgoChanakya + IPODhan patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in AlgoChanakya + IPODhan patterns",
     "tier": "nice-to-have"
   },
   "tdd": {
@@ -3357,7 +3357,7 @@
       "tdd",
       "workflow"
     ],
-    "changelog": "v1.0.1: Registry sync \u2014 hash, version, description, tags | v1.0.0: Initial release",
+    "changelog": "v1.0.1: Registry sync — hash, version, description, tags | v1.0.0: Initial release",
     "tier": "must-have"
   },
   "test-data-management": {
@@ -3390,7 +3390,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use proactively to diagnose test failures \u2014 reads test output, classifies by root cause, and suggests targeted fixes. Spawn automatically whenever tests fail to provide immediate",
+    "description": "Use proactively to diagnose test failures — reads test output, classifies by root cause, and suggests targeted fixes. Spawn automatically whenever tests fail to provide immediate",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "nice-to-have"
@@ -3415,7 +3415,7 @@
       "healing",
       "auto-fix"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 8-classification targeted healing with 3-attempt cap",
+    "changelog": "v1.0.0: Initial release â€” 8-classification targeted healing with 3-attempt cap",
     "tier": "nice-to-have"
   },
   "tdd-failing-test-generator": {
@@ -3501,7 +3501,7 @@
       "pipeline",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared",
+    "changelog": "v1.0.0: Initial release â€” preamble added, registry sync, dependencies declared",
     "tier": "must-have"
   },
   "test-pipeline-agent": {
@@ -3534,7 +3534,7 @@
       "runner",
       "screenshots"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure-only screenshots, per-test a11y snapshots",
+    "changelog": "v1.0.0: Initial release â€” failure-only screenshots, per-test a11y snapshots",
     "tier": "nice-to-have"
   },
   "tester-agent": {
@@ -3553,18 +3553,18 @@
     "tier": "must-have"
   },
   "testing": {
-    "hash": "d15b6453c72874a74eea1fea233c3dba09634f38232b66e90fe6f9f2ddc88967",
+    "hash": "1e18efaca843dca8fd7a539b15851bdde9680cdcb2d15a6441ba8a5077ae7e12",
     "type": "rule",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Testing conventions and best practices.",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.2.0: Add FIRST principles mnemonic section at top | v2.0.0: Genericized and restructured",
     "tier": "must-have"
   },
   "tdd-rule": {
@@ -3595,7 +3595,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Validate distributed traces with OpenTelemetry and Tracetest by asserting on spans instead of just HTTP responses \u2014 verify downstream calls, latency per span, error propagation, and correlation ID flow. Use when testing microservice integration and observability.",
+    "description": "Validate distributed traces with OpenTelemetry and Tracetest by asserting on spans instead of just HTTP responses — verify downstream calls, latency per span, error propagation, and correlation ID flow. Use when testing microservice integration and observability.",
     "tags": [
       "testing",
       "workflow"
@@ -3688,7 +3688,7 @@
       "testing",
       "vite"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya + IPODhan patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya + IPODhan patterns",
     "tier": "nice-to-have"
   },
   "visual-inspector-agent": {
@@ -3711,7 +3711,7 @@
       "accessibility",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dual-signal (a11y + screenshot) async verification",
+    "changelog": "v1.0.0: Initial release â€” dual-signal (a11y + screenshot) async verification",
     "tier": "nice-to-have"
   },
   "vue": {
@@ -3730,7 +3730,7 @@
       "frontend",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya patterns",
     "tier": "must-have"
   },
   "vue-dev": {
@@ -3932,7 +3932,7 @@
       "workflow",
       "template"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 6 shared protocols for workflow masters",
+    "changelog": "v1.0.0: Initial release — 6 shared protocols for workflow masters",
     "tier": "nice-to-have"
   },
   "development-loop-master-agent": {
@@ -3952,7 +3952,7 @@
       "development",
       "planning"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 development loop orchestration with complexity detection",
+    "changelog": "v1.0.0: Initial release — development loop orchestration with complexity detection",
     "tier": "nice-to-have"
   },
   "testing-pipeline-master-agent": {
@@ -3972,7 +3972,7 @@
       "testing",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 testing pipeline orchestration with screenshot authority",
+    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority",
     "tier": "nice-to-have"
   },
   "debugging-loop-master-agent": {
@@ -3992,7 +3992,7 @@
       "debugging",
       "diagnosis"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 debugging loop with scientific method approach",
+    "changelog": "v1.0.0: Initial release — debugging loop with scientific method approach",
     "tier": "nice-to-have"
   },
   "code-review-master-agent": {
@@ -4012,7 +4012,7 @@
       "review",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 code review orchestration with defense-in-depth model",
+    "changelog": "v1.0.0: Initial release — code review orchestration with defense-in-depth model",
     "tier": "nice-to-have"
   },
   "development-loop": {
@@ -4057,7 +4057,7 @@
       "workflow",
       "testing"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 testing pipeline skill wrapper",
+    "changelog": "v1.0.0: Initial release — testing pipeline skill wrapper",
     "tier": "nice-to-have"
   },
   "debugging-loop": {
@@ -4260,5 +4260,102 @@
     ],
     "changelog": "v1.0.0: Initial release",
     "tier": "nice-to-have"
+  },
+  "security-baseline": {
+    "hash": "f5cadda4257d8a7710e33707738525dcfc9545ea482135027d9e7e35f66c9b7e",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal security baseline: input validation, secret management, least privilege, dependency hygiene, defense in depth, output encoding. Global scope.",
+    "tags": [
+      "security",
+      "baseline",
+      "owasp"
+    ],
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
+  },
+  "error-handling": {
+    "hash": "be8fc6427420d12d592c1037400ff1b7ec57babcc57e9fd2f066e87129bcf181",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal error handling constraints: fail fast, no silent failures, explicit over implicit, validate at boundaries, resource cleanup. Global scope.",
+    "tags": [
+      "error-handling",
+      "defensive-coding",
+      "baseline"
+    ],
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
+  },
+  "design-principles": {
+    "hash": "555feb71136a5bc1cfaf2315e77c56ac261efa21570e923e915e5f5afbd9eed5",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal design principles: SOLID, DRY, Law of Demeter, Composition over Inheritance, Separation of Concerns, no magic values. Global scope.",
+    "tags": [
+      "design",
+      "solid",
+      "dry",
+      "architecture"
+    ],
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
+  },
+  "code-readability": {
+    "hash": "81f236c7f2b47e86e4f0bb0983399cf0beed57b3bbbd109d8d691c67c526d965",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal readability standards: meaningful names, small functions, single level of abstraction, Boy Scout Rule. Global scope.",
+    "tags": [
+      "readability",
+      "maintainability",
+      "naming"
+    ],
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
+  },
+  "git-collaboration": {
+    "hash": "a4b03cd3a46f8dcc79cfb23bdcfb8e273262465a5bc08a65fa061fa97780944a",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal Git collaboration: Conventional Commits, small focused PRs, trunk-based development, review before merge, protected branches. Global scope.",
+    "tags": [
+      "git",
+      "commits",
+      "pull-requests",
+      "collaboration"
+    ],
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
   }
 }

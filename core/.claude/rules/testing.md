@@ -5,11 +5,23 @@ globs: ["**/test_*", "**/*_test.*", "**/tests/**", "**/*.test.*", "**/*.spec.*"]
 
 # Testing Rules
 
+## FIRST Principles
+
+Every test MUST satisfy all five FIRST properties (Ottinger & Schuchert, *Clean Code* appendix):
+
+- **F**ast — unit tests run in milliseconds; if they're slow, developers skip them
+- **I**ndependent — tests do not depend on execution order or shared mutable state
+- **R**epeatable — same inputs yield same outputs on every run (no wall-clock / random / network dependency)
+- **S**elf-validating — each test passes or fails with an explicit assertion; no manual inspection of output
+- **T**imely — tests are written before or alongside the code they cover, not retrofitted weeks later
+
+A test that violates any FIRST property is a bug in the test suite, not a stylistic preference.
+
 ## General Principles
 
 1. **Test Isolation** — Each test should be independent; no shared mutable state
 2. **Descriptive Names** — Test names should describe the scenario and expected outcome: `test_<method>_<condition>_<expected>` (Python), `should <verb> when <condition>` (JS)
-3. **Arrange-Act-Assert** — Structure tests clearly with setup, action, and verification
+3. **Arrange-Act-Assert (AAA)** — Structure tests clearly with setup, action, and verification
 4. **One Assertion Focus** — Each test should verify one behavior (multiple asserts OK if related)
 5. **No Test Interdependence** — Tests must pass in any order; use `--randomly` / `--randomize` to verify
 6. **No Empty Assertions** — Every test MUST contain at least one meaningful assertion. Tests with no `assert` / `expect` / `verify`, or with trivial assertions (`assert True`, `expect(1).toBe(1)`) are bugs — they pass without testing anything

@@ -1,6 +1,6 @@
 # Claude Best Practices Hub
 
-A curated knowledge hub of **224 battle-tested patterns** (agents, skills, rules, hooks) for [Claude Code](https://claude.ai/code). Copy them to your project, or let `/synthesize-project` analyze your codebase and generate project-specific patterns automatically.
+A curated knowledge hub of **229 battle-tested patterns** (agents, skills, rules, hooks) for [Claude Code](https://claude.ai/code). Copy them to your project, or let `/synthesize-project` analyze your codebase and generate project-specific patterns automatically.
 
 ---
 

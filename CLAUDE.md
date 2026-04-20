@@ -41,7 +41,7 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 ## Architecture
 
-A curated hub of 225 Claude Code patterns (agents, skills, rules, hooks) organized by stack (count from `registry/patterns.json`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
+A curated hub of 229 Claude Code patterns (agents, skills, rules, hooks) organized by stack (count from `registry/patterns.json`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
 
 For sync direction semantics (hub↔projects, hub↔internet, aggregation flows), read `docs/SYNC-ARCHITECTURE.md` before modifying any sync script.
 
