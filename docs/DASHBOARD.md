@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-20 19:30 UTC (auto-generated)
+> Last updated: 2026-04-20 19:38 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -117,7 +117,7 @@
 | flutter-dart-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-e2e-test | skill | 1.2.1 | hub:abhayla/claude-best-practices | — |
-| git-collaboration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| git-collaboration | rule | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | git-manager-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | git-worktrees | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | github | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -188,7 +188,7 @@
 | secret-scanner | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | security-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | security-auditor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| security-baseline | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| security-baseline | rule | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
