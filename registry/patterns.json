@@ -3393,8 +3393,8 @@
     "visibility": "public",
     "description": "Use proactively to diagnose test failures — reads test output, classifies by root cause, and suggests targeted fixes. Spawn automatically whenever tests fail to provide immediate",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "changelog": "v2.0.0: Genericized and restructured; promoted to must-have — invoked by /fix-loop (must-have) for every test failure",
+    "tier": "must-have"
   },
   "test-healer-agent": {
     "hash": "5a379dbdb7c639ced194687a61a3e8bb8cbf00148c309781ae1a5423467296b6",
@@ -3973,8 +3973,8 @@
       "testing",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority. v2.0.0 (2026-04-22): promoted to must-have — T1 orchestrator must match its must-have T2 child test-pipeline-agent for the full workflow to be provisioned coherently. E2E sub-step auto-skips when no_ui_tests so non-Playwright projects absorb zero overhead.",
+    "tier": "must-have"
   },
   "debugging-loop-master-agent": {
     "hash": "4c790c3e2075beaad30b664b45229027bf81472fa1c61bff3b5db1657baf5913",
