@@ -26,14 +26,15 @@ Branch: `feat/testing-pipeline-overhaul`. Started: 2026-04-22.
 - [ ] Commit Phase B
 
 ### Phase C — Architectural gap fixes (state, retry, cleanup)
-- [ ] State-file path: standalone vs dispatched detection in `e2e-conductor-agent.md`
-- [ ] State schema versioning: add `schema_version: "1.0.0"` to all state file schemas
-- [ ] Cleanup-at-init guard: wrap `rm -rf` in `if mode == 'standalone'` in `test-pipeline-agent.md` and `e2e-conductor-agent.md`
-- [ ] Retry-budget composition: T1 master passes `remaining_budget` in dispatch context; T2 uses passed budget
-- [ ] Aggregation consolidation: T1 aggregates, T2 does not duplicate
-- [ ] Contradictions-as-blockers config flag in `testing-pipeline-master-agent.md`
-- [ ] Silent-degradation gate in `auto-verify/SKILL.md` Step 4
-- [ ] `config/workflow-contracts.yaml` — fix e2e step `artifacts_out.e2e_state.path`
+- [x] State-file path: standalone vs dispatched detection in `e2e-conductor-agent.md`
+- [x] State schema versioning: add `schema_version: "1.0.0"` to all state file schemas
+- [x] Cleanup-at-init guard: wrap `rm -rf` in `if mode == 'standalone'` in `test-pipeline-agent.md` and `e2e-conductor-agent.md`
+- [x] Retry-budget composition: T1 master passes `remaining_budget` in dispatch context; T2 uses passed budget
+- [x] Aggregation consolidation: T1 aggregates, T2 does not duplicate
+- [x] Contradictions-as-blockers config flag in `testing-pipeline-master-agent.md`
+- [x] Silent-degradation gate in `auto-verify/SKILL.md` Step 4
+- [x] `config/workflow-contracts.yaml` — already matched (e2e path points to `.workflows/testing-pipeline/e2e-state.json`)
+- [x] `core/.claude/config/e2e-pipeline.yml` — schema_version, MCP, regex rules, contradictions, issue_creation, decay/probe history
 - [ ] Commit Phase C
 
 ### Phase D — Issue tracking integration

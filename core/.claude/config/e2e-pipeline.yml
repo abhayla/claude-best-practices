@@ -1,13 +1,14 @@
 # E2E pipeline configuration
-# Read by e2e-conductor-agent at runtime
+# Read by e2e-conductor-agent at runtime (standalone mode) or
+# by testing-pipeline-master-agent via the sub-orchestrator (dispatched mode).
 #
 # This config externalizes the pipeline DAG per agent-orchestration rule #4.
-# Modify queue ordering, retry limits, and agent settings here —
-# not in the agent files.
+# Modify queue ordering, retry limits, classification rules, and agent
+# settings here — not in the agent files.
 
 pipeline:
   name: e2e-test-orchestration
-  version: "1.0.0"
+  version: "2.0.0"
 
 queue:
   # longest-first reduces total wall time by front-loading slow tests
@@ -18,12 +19,18 @@ queue:
   max_concurrent_batches: 1
 
 retry:
+  # In dispatched mode, the T1 master passes remaining_budget via context
+  # and this local default is NOT used. In standalone mode, this is the
+  # conductor's total shared retry pool across all healing across all tests.
   global_budget: 15
   per_test_max_attempts: 3
   per_stage_max:
     test_scout: 3
     visual_inspector: 2
     test_healer: 3
+  # When true, test-pipeline-agent and e2e-conductor-agent inherit remaining_budget
+  # from the parent orchestrator rather than using the local default.
+  compose_across_tiers: true
 
 agents:
   test_scout:
@@ -55,14 +62,81 @@ agents:
 healing:
   confidence_threshold: 0.85
   low_confidence_action: suggest  # suggest: log fix but don't apply | skip: discard
+  # Playwright MCP server provides live browser inspection during healing
+  # (browser_snapshot, browser_evaluate, console_messages, network_requests).
+  # HARD dependency — downstream projects must install @playwright/mcp in
+  # package.json devDependencies. Provisioning warns if missing.
+  use_playwright_mcp: true
+  mcp_package: "@playwright/mcp"
 
-# Cross-run test history for flakiness detection and quarantine.
+# Deterministic pre-classification regex rules.
+# Read by test-failure-analyzer-agent BEFORE invoking the LLM classifier.
+# First-match-wins, ordered most-specific to most-general.
+# Clear-cut failures bypass the LLM — saves cost AND eliminates variance.
+classification_rules:
+  - id: playwright_locator_failure
+    pattern: "Locator:\\s+[^\\n]+[\\s\\S]{0,200}(waiting for|not found\\b|resolved to 0)"
+    flags: i
+    category: SELECTOR
+    confidence: 0.93
+    reason: "Playwright locator-resolution failure"
+  - id: selenium_detox_selector
+    pattern: "\\b(NoSuchElementException|ElementNotFound)\\b"
+    flags: i
+    category: SELECTOR
+    confidence: 0.93
+    reason: "Selenium/Detox selector failure"
+  - id: playwright_timeout
+    pattern: "\\b(TimeoutError|playwright\\..*timeout)\\b"
+    flags: i
+    category: TIMEOUT
+    confidence: 0.90
+    reason: "Unambiguous async timeout"
+  - id: wait_for_timeout
+    pattern: "waitFor(?:Selector)?\\b.*(exceeded|timed out)"
+    flags: i
+    category: TIMEOUT
+    confidence: 0.90
+  - id: network_layer_failure
+    pattern: "\\b(ECONNREFUSED|ENOTFOUND|EHOSTUNREACH)\\b"
+    flags: i
+    category: INFRASTRUCTURE
+    confidence: 0.95
+  - id: upstream_unavailable
+    pattern: "\\b503 Service Unavailable\\b|\\bconnection refused\\b"
+    flags: i
+    category: INFRASTRUCTURE
+    confidence: 0.95
+  - id: sql_missing_schema
+    pattern: "no such (table|column)|relation \"[^\"]+\" does not exist"
+    flags: i
+    category: MIGRATION_FAILURE
+    confidence: 0.95
+  - id: pact_mismatch
+    pattern: "Pact verification failed"
+    flags: i
+    category: CONTRACT_MISMATCH
+    confidence: 0.95
+  - id: screenshot_baseline_diff
+    pattern: "Screenshot (differs from baseline|comparison failed)"
+    flags: i
+    category: VISUAL_REGRESSION
+    confidence: 0.95
+  - id: resource_leak_warning
+    pattern: "ResourceWarning:\\s+unclosed"
+    flags: i
+    category: RESOURCE_LEAK
+    confidence: 0.90
+
+# Cross-run test history for flakiness detection, quarantine, and decay.
 # File persists across runs (not in cleanup list). Builds up naturally.
 history:
   file: ".pipeline/test-history.json"
   window_size: 10              # sliding window: keep last N results per test
   flaky_threshold: 0.7         # score >= this → auto-quarantine (don't spend retry budget)
   quarantine_flaky: true       # false to disable quarantine (still tracks scores)
+  decay_window: 3              # last N runs all PASSED → reset flakiness_score to 0
+  probe_interval: 5            # every N runs, force a probe-run through full healing cycle
 
 # Visual comparison settings — passed to verify-screenshots and applied in scout phase.
 visual:
@@ -74,11 +148,34 @@ visual:
     # - ".avatar"
     # - "[data-testid='ad-banner']"
   config_file: null             # path to visual.config.json (if project has one)
+  baseline_dir: "test-evidence/baselines"
 
+# State-file configuration. Dual-mode: standalone uses .pipeline/, dispatched
+# uses .workflows/testing-pipeline/. Agents detect mode and pick the right path.
 state:
-  file: ".pipeline/e2e-state.json"
+  schema_version: "1.0.0"       # MUST be first field of every state file
+  standalone_file: ".pipeline/e2e-state.json"
+  dispatched_file: ".workflows/testing-pipeline/e2e-state.json"
   evidence_dir: "test-evidence"
   results_dir: "test-results"
+
+# Cross-stage contradiction handling. T1 master detects contradictions during
+# aggregation (e.g., auto-verify PASSED but contract-test FAILED).
+# - warn: surface in report but do not block the pipeline verdict (default)
+# - block: escalate to FAILED if any contradiction detected
+contradictions:
+  action: warn
+
+# Automatic GitHub Issue creation for known_issues with LOGIC_BUG or
+# VISUAL_REGRESSION classification. Requires `gh auth status` OK when enabled.
+# See testing-pipeline-master-agent.md for signature + dedup semantics.
+issue_creation:
+  enabled: true
+  labels:
+    - pipeline-auto
+  dedup_window_days: 30
+  # If true, pipeline fails fast when gh auth is missing AND enabled=true.
+  require_gh_auth: true
 
 # Historical duration hints for longest-first ordering.
 # Conductor uses these when no runtime data is available.
@@ -94,25 +191,41 @@ healing_state_machine:
   states:
     - fix_queue          # items awaiting healing
     - test_queue         # healed items requeued for re-execution
-    - known_issues       # items that exhausted max attempts
+    - known_issues       # items that exhausted max attempts or hit pre-gate
+    - expected_changes   # intentional UI drift (requires user approval via --update-baselines)
   transitions:
     - from: fix_queue
       to: test_queue
-      condition: "heal_succeeded AND attempt < per_test_max_attempts"
-      action: "increment attempt, record fix in history"
+      condition: "heal_succeeded AND confidence >= healing.confidence_threshold AND attempt < per_test_max_attempts"
+      action: "increment attempt, record fix in history, decrement remaining_budget"
     - from: fix_queue
       to: fix_queue
-      condition: "heal_failed AND attempt < per_test_max_attempts"
-      action: "increment attempt, record failed approach, try different strategy"
+      condition: "heal_succeeded AND confidence BETWEEN 0.5 AND 0.85 AND attempt < per_test_max_attempts"
+      action: "increment attempt, flag low_confidence_fix, try different strategy next pass"
+    - from: fix_queue
+      to: known_issues
+      condition: "heal_succeeded AND confidence < 0.5"
+      action: "revert fix, log suggestion, do not decrement budget for LOW-confidence failures"
     - from: fix_queue
       to: known_issues
       condition: "attempt >= per_test_max_attempts"
       action: "log full diagnosis history, recommended manual action"
     - from: fix_queue
       to: known_issues
-      condition: "flakiness_score >= flaky_threshold"
+      condition: "classification IN (LOGIC_BUG, VISUAL_REGRESSION)"
+      action: "pre-gate routing — skip fix-loop entirely, flag human_review=true"
+    - from: fix_queue
+      to: known_issues
+      condition: "flakiness_score >= flaky_threshold AND NOT probe_run"
       action: "quarantine as historically_flaky, preserve retry budget"
+    - from: known_issues
+      to: fix_queue
+      condition: "probe_runs_since_quarantine % probe_interval == 0"
+      action: "probe-run recovery — force one healing attempt through full cycle"
 
-cleanup:
-  - ".pipeline/e2e-state.json"
+# Ephemeral directories wiped at standalone-mode INIT.
+# In dispatched mode, the T1 master owns cleanup and this list is ignored.
+cleanup_standalone_only:
+  - ".pipeline/"
   - "test-evidence/"
+  - "test-results/"
