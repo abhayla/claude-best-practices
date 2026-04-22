@@ -55,7 +55,33 @@ def scan_claude_dir(claude_dir: Path) -> dict:
     return inventory
 
 
-def generate_dashboard_md(registry: dict, scan_history: list, sync_status: dict) -> str:
+def _list_research_docs(docs_dir: Path | None) -> list[tuple[str, str]]:
+    """Return sorted (filename, title) tuples for research docs in docs/ (non-recursive)."""
+    if docs_dir is None or not docs_dir.exists():
+        return []
+    found: list[tuple[str, str]] = []
+    for p in sorted(docs_dir.iterdir()):
+        if not (p.is_file() and p.suffix == ".md"):
+            continue
+        if "research" not in p.name.lower():
+            continue
+        title = p.name
+        try:
+            first_line = p.read_text(encoding="utf-8").splitlines()[0].strip()
+            if first_line.startswith("# "):
+                title = first_line[2:].strip()
+        except (OSError, IndexError):
+            pass
+        found.append((p.name, title))
+    return found
+
+
+def generate_dashboard_md(
+    registry: dict,
+    scan_history: list,
+    sync_status: dict,
+    docs_dir: Path | None = None,
+) -> str:
     """Generate DASHBOARD.md content."""
     counts = count_patterns(registry)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -89,6 +115,12 @@ def generate_dashboard_md(registry: dict, scan_history: list, sync_status: dict)
                 f"| {name} | {entry.get('type', '?')} | {entry.get('version', '?')} | "
                 f"{entry.get('source', '?')} | {deps} |"
             )
+
+    research_docs = _list_research_docs(docs_dir)
+    if research_docs:
+        lines.extend(["", "## Research & References", ""])
+        for filename, title in research_docs:
+            lines.append(f"- [{title}]({filename})")
 
     lines.extend([
         "",
@@ -380,7 +412,7 @@ if __name__ == "__main__":
 
     claude_dir = root / "core" / ".claude"
 
-    dashboard = generate_dashboard_md(registry, [], {})
+    dashboard = generate_dashboard_md(registry, [], {}, docs_dir=docs_dir)
     (docs_dir / "DASHBOARD.md").write_text(dashboard)
     print("Generated docs/DASHBOARD.md")
 

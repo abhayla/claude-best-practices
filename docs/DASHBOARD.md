@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-22 11:31 UTC (auto-generated)
+> Last updated: 2026-04-22 13:06 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -243,6 +243,11 @@
 | writing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | writing-skills | skill | 2.8.0 | hub:abhayla/claude-best-practices | skill-evaluator |
 | xml-to-compose | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+
+## Research & References
+
+- [QA Agent Ecosystem — GitHub Research](QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md)
+- [Claude Code Skills Research — Twitter/X + Reddit Combined Results](SKILL-RESEARCH-by-Twitter-x-and-redit-skills 2026-03-11.md)
 
 ## Quick Start
 
