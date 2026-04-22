@@ -12,7 +12,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Python 3.12** required (all CI workflows use 3.12)
 - Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`
 - **Windows**: use `set PYTHONPATH=. &&` prefix instead of `PYTHONPATH=.`, or use Git Bash. All commands below assume Unix shell syntax (forward slashes, `PYTHONPATH=.` prefix)
-- **`CLAUDE.local.md`** (repo root, gitignored) — per-developer overrides and local notes. Safe to read/update; never commit.
+- **New here?** For downstream provisioning options (copy-all, smart, full synthesis), see `README.md`.
+- **`CLAUDE.local.md`** (repo root, gitignored) — per-developer overrides and local notes (e.g., local paths, secrets-free environment tweaks, in-progress scratch notes that shouldn't ship). Distinct from: auto-memory (cross-session user prefs) and `.claude/tasks/lessons.md` (correction patterns across sessions). Safe to read/update; never commit.
 
 ## Commands
 
@@ -41,7 +42,7 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 ## Architecture
 
-A curated hub of 229 Claude Code patterns (agents, skills, rules, hooks) organized by stack (count from `registry/patterns.json`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
+A curated hub of Claude Code patterns (agents, skills, rules, hooks) organized by stack — for the live count, see `registry/patterns.json` (one top-level key per pattern, excluding `_meta`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
 
 For sync direction semantics (hub↔projects, hub↔internet, aggregation flows), read `docs/SYNC-ARCHITECTURE.md` before modifying any sync script.
 
@@ -144,5 +145,4 @@ Invoke via the `/skill-evaluator` skill: `/skill-evaluator full <skill-path>` (m
 
 ## Rules for Claude
 
-1. **Bug Fixing**: Use `/fix-loop` or `/fix-issue`. Write a test that reproduces the bug, then fix and prove with a passing test.
-2. **Rules**: Auto-loaded from `.claude/rules/` — global rules load always, path-scoped rules load when working with matching files. See rule files for details.
+Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when editing matching files. See the rule files directly for behavioral guidance (task approach, git hygiene, context management, workflow, prompt auto-enhance).
