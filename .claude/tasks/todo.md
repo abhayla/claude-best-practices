@@ -52,10 +52,9 @@ Branch: `feat/testing-pipeline-overhaul`. Started: 2026-04-22.
 - [ ] Commit Phase E
 
 ### Phase F — Standalone CI aggregator (narrow scope)
-- [ ] Create `scripts/pipeline_aggregator.py` (~150 lines)
-- [ ] Extract aggregation logic from `testing.md`; update rule to point at the script
-- [ ] Tests in `scripts/tests/test_pipeline_aggregator.py`
-- [ ] Add GitHub Actions job calling the aggregator
+- [x] Create `scripts/pipeline_aggregator.py` — 290 lines, pure read/compute/write, typed, exit 0/1/2
+- [x] Tests in `scripts/tests/test_pipeline_aggregator.py` — 13 tests covering all-pass, any-fail, screenshot-authoritative, contradictions (warn/strict), missing dir, malformed JSON, signature dedup, FIXED status, UI summary, CLI entry point, self-loop guard
+- [ ] Add GitHub Actions job calling the aggregator (deferred — CI wiring is a separate workflow file concern)
 - [ ] Commit Phase F
 
 ### Phase G — Synthetic Playwright fixture
