@@ -243,6 +243,43 @@ else:
 # write test-results/pipeline-verdict.json
 ```
 
+### pipeline-verdict.json Schema
+
+```json
+{
+  "pipeline": "testing-pipeline",
+  "schema_version": "1.0.0",
+  "run_id": "{ISO-8601}_{7-char-git-sha}",
+  "timestamp": "{ISO-8601}",
+  "result": "PASSED|FAILED|BLOCKED",
+  "stages_completed": 6,
+  "stages_failed": 0,
+  "retries_used": 3,
+  "retries_remaining": 12,
+  "capture_proof": true,
+  "evidence_dir": "test-evidence/{run_id}/",
+  "stage_results": {
+    "tdd_red": "PASSED",
+    "fix_loop": "PASSED",
+    "auto_verify": "PASSED",
+    "e2e": "PASSED",
+    "quality_gate": "PASSED",
+    "post_fix": "PASSED"
+  },
+  "ui_verification_summary": {
+    "total_ui_tests": 12,
+    "screenshot_verified": 12,
+    "screenshot_passed": 10,
+    "screenshot_failed": 2,
+    "verdict_source": "screenshot",
+    "flags": 1
+  },
+  "failures": [],
+  "known_issues_created_as_issues": [],
+  "contradictions": []
+}
+```
+
 **Note:** Phase F of the overhaul plan extracts this into `scripts/pipeline_aggregator.py`
 so CI can run the same logic headlessly. When that script exists, this agent
 invokes it via `Bash` instead of reimplementing inline.

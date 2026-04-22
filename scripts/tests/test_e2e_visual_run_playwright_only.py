@@ -1,8 +1,13 @@
 """Content assertions for the Playwright-only scope of /e2e-visual-run.
 
-These tests encode the acceptance criteria for the v3.0.0 scope cut: the skill
-and its references must mention only Playwright, drop Cypress/Selenium/Detox/
-Flutter, and the registry entry must be in sync with the SKILL.md version.
+These tests encode the acceptance criteria for the v4.0.0 consolidation:
+- /e2e-visual-run is a thin skill wrapper that dispatches e2e-conductor-agent.
+- e2e-conductor-agent absorbs all queue + healing behaviors previously in
+  the skill and its references/ directory.
+- The skill must still be Playwright-scoped, and the conductor must still
+  encode the dual-signal verdict lanes (including expected_changes), section
+  filter semantics, git-status pre-check on commit, and flakiness decay /
+  probe-run recovery.
 """
 
 import json
@@ -14,7 +19,8 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILL_DIR = REPO_ROOT / "core" / ".claude" / "skills" / "e2e-visual-run"
 SKILL_MD = SKILL_DIR / "SKILL.md"
-SCOUT_REF = SKILL_DIR / "references" / "scout-phase.md"
+CONDUCTOR_AGENT = REPO_ROOT / "core" / ".claude" / "agents" / "e2e-conductor-agent.md"
+SCOUT_AGENT = REPO_ROOT / "core" / ".claude" / "agents" / "test-scout-agent.md"
 REGISTRY = REPO_ROOT / "registry" / "patterns.json"
 
 OTHER_FRAMEWORKS = ["Cypress", "Selenium", "Detox", "Flutter"]
@@ -29,12 +35,38 @@ def _parse_frontmatter_version(text: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
-# ── SKILL.md content assertions ─────────────────────────────────────────────
+# ── SKILL.md (thin wrapper) content assertions ──────────────────────────────
 
 
-def test_skill_md_version_is_3_0_0():
+def test_skill_md_version_is_4_0_0():
     version = _parse_frontmatter_version(_read(SKILL_MD))
-    assert version == "3.0.0", f"expected 3.0.0, got {version!r}"
+    assert version == "4.0.0", f"expected 4.0.0, got {version!r}"
+
+
+def test_skill_md_is_thin_wrapper():
+    """v4.0.0 consolidation: skill must be under 100 lines of wrapper logic."""
+    content = _read(SKILL_MD)
+    lines = content.count("\n")
+    assert lines <= 150, (
+        f"SKILL.md has {lines} lines — expected thin wrapper (<=150). "
+        "Queue/healing logic should live in e2e-conductor-agent, not the skill."
+    )
+
+
+def test_skill_md_dispatches_conductor_agent():
+    """The skill's sole job is to dispatch e2e-conductor-agent."""
+    content = _read(SKILL_MD)
+    assert "e2e-conductor-agent" in content, (
+        "SKILL.md must dispatch e2e-conductor-agent for the queue/healing work"
+    )
+
+
+def test_skill_md_references_directory_is_removed():
+    """references/ content was migrated into the agents in v4.0.0."""
+    references_dir = SKILL_DIR / "references"
+    assert not references_dir.exists(), (
+        f"{references_dir} should be removed; content migrated into agents"
+    )
 
 
 @pytest.mark.parametrize("framework", OTHER_FRAMEWORKS)
@@ -42,15 +74,11 @@ def test_skill_md_does_not_support_non_playwright_frameworks(framework):
     """Non-Playwright frameworks may appear ONLY in scope-exclusion prose,
     never in support/capture/fallback instructions."""
     content = _read(SKILL_MD)
-    # A support phrase names the framework as a *target* of instruction:
-    # section headers, "for Cypress do X" fallbacks, config examples.
-    # Scope-exclusion lists like "Cypress, Selenium, Detox, and Flutter"
-    # are allowed because they clarify what is NOT supported.
     forbidden_support_phrases = [
-        f"**{framework}**:",               # bold framework + colon = instruction
-        f"### {framework}",                # subsection header
-        f"{framework}: ",                  # inline framework instruction
-        f"{framework}.config",             # references a framework config file
+        f"**{framework}**:",
+        f"### {framework}",
+        f"{framework}: ",
+        f"{framework}.config",
     ]
     for phrase in forbidden_support_phrases:
         assert phrase not in content, (
@@ -65,25 +93,39 @@ def test_skill_md_frontmatter_says_playwright_only():
     )
 
 
-# ── scout-phase.md content assertions ───────────────────────────────────────
+# ── e2e-conductor-agent content assertions (absorbed from skill references) ─
 
 
 @pytest.mark.parametrize("framework", OTHER_FRAMEWORKS)
-def test_scout_phase_does_not_support_non_playwright_frameworks(framework):
-    """Same rule as SKILL.md: no support instructions for non-Playwright."""
-    content = _read(SCOUT_REF)
+def test_conductor_does_not_support_non_playwright_frameworks(framework):
+    """Conductor inherits the Playwright-only scope from v3.0.0 e2e-visual-run."""
+    content = _read(CONDUCTOR_AGENT)
     forbidden_support_phrases = [
         f"**{framework}**:",
         f"### {framework}",
         f"{framework}: ",
         f"{framework}.config",
-        f"| {framework} |",                # framework row in a support table
+        f"| {framework} |",
     ]
     for phrase in forbidden_support_phrases:
         assert phrase not in content, (
-            f"scout-phase.md still provides {framework} support via "
-            f"phrase {phrase!r}"
+            f"e2e-conductor-agent provides {framework} support via phrase {phrase!r}"
         )
+
+
+def test_scout_agent_does_not_support_non_playwright_frameworks():
+    """test-scout-agent absorbed scout-phase.md; Playwright-only scope stands."""
+    content = _read(SCOUT_AGENT)
+    for framework in OTHER_FRAMEWORKS:
+        forbidden_support_phrases = [
+            f"**{framework}**:",
+            f"### {framework}",
+            f"| {framework} |",
+        ]
+        for phrase in forbidden_support_phrases:
+            assert phrase not in content, (
+                f"test-scout-agent provides {framework} support via phrase {phrase!r}"
+            )
 
 
 # ── Registry sync assertions ────────────────────────────────────────────────
@@ -101,21 +143,32 @@ def test_registry_e2e_visual_run_version_matches_skill_md():
     )
 
 
-# ── Audit-gap fixes: state-machine schema ───────────────────────────────────
-
-
-def test_skill_md_declares_expected_changes_queue():
-    """Gap B: EXPECTED_CHANGE verdict must have a declared queue in state schema."""
-    content = _read(SKILL_MD)
-    assert "expected_changes" in content, (
-        "EXPECTED_CHANGE verdict has no declared queue in state schema"
+def test_registry_e2e_conductor_version_matches_agent():
+    with REGISTRY.open(encoding="utf-8") as f:
+        registry = json.load(f)
+    entry = registry.get("e2e-conductor-agent")
+    assert entry is not None, "registry is missing e2e-conductor-agent entry"
+    agent_version = _parse_frontmatter_version(_read(CONDUCTOR_AGENT))
+    assert entry["version"] == agent_version, (
+        f"registry version {entry['version']!r} does not match "
+        f"agent version {agent_version!r}"
     )
 
 
-def test_skill_md_specifies_section_filter_semantics():
+# ── Audit-gap fixes: now enforced on the conductor, not the skill ───────────
+
+
+def test_conductor_declares_expected_changes_queue():
+    """Gap B: EXPECTED_CHANGE verdict must have a declared queue in state schema."""
+    content = _read(CONDUCTOR_AGENT)
+    assert "expected_changes" in content, (
+        "EXPECTED_CHANGE verdict has no declared queue in conductor state schema"
+    )
+
+
+def test_conductor_specifies_section_filter_semantics():
     """Gap P: section filter must define what a 'section' is."""
-    content = _read(SKILL_MD).lower()
-    # Accept any concrete definition: describe block, tag, file path, or grep
+    content = _read(CONDUCTOR_AGENT).lower()
     has_semantics = any(
         term in content
         for term in [
@@ -127,27 +180,53 @@ def test_skill_md_specifies_section_filter_semantics():
         ]
     )
     assert has_semantics, (
-        "STEP 2 section filter must define section matching semantics"
+        "conductor STEP 2 section filter must define matching semantics"
     )
 
 
-def test_skill_md_has_git_status_precheck_in_step_6():
-    """Gap N: Step 6 commit must check git status before staging."""
-    content = _read(SKILL_MD)
-    # Look for a git-status-aware commit block
-    assert "git status" in content.lower() or "only test files" in content.lower(), (
-        "Step 6 commit lacks git-status pre-check or scoped staging discipline"
+def test_conductor_has_git_status_precheck_in_commit_step():
+    """Gap N: commit step must check git status before staging."""
+    content = _read(CONDUCTOR_AGENT)
+    assert "git status" in content.lower() or "explicit files only" in content.lower(), (
+        "conductor commit step lacks git-status pre-check or scoped staging"
     )
 
 
-def test_skill_md_has_flakiness_decay_or_probe_rule():
+def test_conductor_has_flakiness_decay_or_probe_rule():
     """Gap C: quarantined flaky tests must have a recovery path."""
-    content = _read(SKILL_MD).lower()
+    content = _read(CONDUCTOR_AGENT).lower()
     has_recovery = any(
         term in content
-        for term in ["probe run", "decay", "rehabilitat", "recovery"]
+        for term in ["probe run", "probe-run", "decay", "rehabilitat", "recovery"]
     )
     assert has_recovery, (
-        "STEP 5 flakiness quarantine has no decay or probe-run rule — "
-        "tests are permanently quarantined"
+        "conductor flakiness quarantine has no decay or probe-run rule — "
+        "tests would be permanently quarantined"
+    )
+
+
+# ── v2.0.0 consolidation invariants ─────────────────────────────────────────
+
+
+def test_conductor_is_dual_mode():
+    """v2.0.0: agent must support standalone + dispatched modes."""
+    content = _read(CONDUCTOR_AGENT).lower()
+    assert "standalone" in content and "dispatched" in content, (
+        "conductor must declare dual-mode operation (standalone + dispatched)"
+    )
+
+
+def test_conductor_declares_state_schema_version():
+    """Phase C gap #17: state files must carry a schema_version for safe resume."""
+    content = _read(CONDUCTOR_AGENT)
+    assert "schema_version" in content, (
+        "conductor state schema must include schema_version field"
+    )
+
+
+def test_conductor_uses_mcp_aware_healer():
+    """Phase B: test-healer-agent has Playwright MCP as a hard dependency."""
+    healer = _read(REPO_ROOT / "core" / ".claude" / "agents" / "test-healer-agent.md")
+    assert "@playwright/mcp" in healer or "playwright-test" in healer, (
+        "test-healer-agent must declare Playwright MCP server"
     )
