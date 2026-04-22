@@ -1,0 +1,84 @@
+# Test pipeline configuration
+# Read by test-pipeline-agent at runtime (standalone mode for the
+# fix-verify-commit sub-chain). Complements e2e-pipeline.yml which
+# covers the E2E-specific queue + healing orchestration.
+#
+# Ships as a default with hub provisioning so downstream projects can
+# run /test-pipeline out of the box. Provisioned to
+# .claude/config/test-pipeline.yml in target projects. Override any
+# value locally without modifying the hub template.
+
+schema_version: "1.0.0"
+
+pipeline:
+  name: fix-verify-commit
+  version: "1.0.0"
+
+  # Stage DAG driven by the T2 test-pipeline-agent. Each stage is a
+  # Skill() dispatched in order; gate expressions read the `result`
+  # field from the written artifact.
+  stages:
+    - id: fix_loop
+      skill: fix-loop
+      depends_on: []
+      writes: test-results/fix-loop.json
+      gate: "result IN (PASSED, FIXED)"
+      timeout_minutes: 30
+
+    - id: auto_verify
+      skill: auto-verify
+      depends_on: [fix_loop]
+      reads: test-results/fix-loop.json
+      writes: test-results/auto-verify.json
+      gate: "result == PASSED"
+      timeout_minutes: 30
+
+    - id: post_fix
+      skill: post-fix-pipeline
+      depends_on: [auto_verify]
+      reads: test-results/auto-verify.json
+      writes: test-results/post-fix-pipeline.json
+      # Skipped in dispatched mode — parent orchestrator (T1 master)
+      # handles the commit step itself.
+      skip_when: "mode == 'dispatched'"
+
+# Retry budget — shared pool across all stages. In dispatched mode the
+# T1 parent passes `remaining_budget` via context and this default is
+# ignored. Standalone mode uses this as the starting budget.
+retry:
+  global_budget: 15
+  per_stage_max_attempts: 3
+  # Each retry must attempt a DIFFERENT approach (per /fix-loop rules).
+  # When the budget is exhausted, pipeline stops, escalates to the user.
+
+# Screenshot-capture policy for UI tests. Drives /auto-verify Step 2.5
+# (visual proof review) and tester-agent's per-test screenshot loop.
+capture_proof:
+  enabled: true
+  # When enabled:
+  # - UI tests capture screenshots on every run (pass and fail)
+  # - Non-UI tests capture only on failure (supplementary evidence)
+  # Override with --no-capture-proof on the CLI.
+
+# Contradiction handling when multiple skills produce disagreeing
+# verdicts (e.g., auto-verify PASSED but contract-test FAILED).
+# - warn: surface in report, don't block (default for test-pipeline)
+# - block: escalate to FAILED
+contradictions:
+  action: warn
+
+# State file for cross-stage bookkeeping. Mode-dependent: standalone
+# writes to .pipeline/; dispatched mode lets the T1 parent manage state
+# under .workflows/testing-pipeline/.
+state:
+  standalone_file: ".pipeline/test-pipeline-state.json"
+  dispatched_owner: "testing-pipeline-master-agent"
+  results_dir: "test-results"
+  evidence_dir: "test-evidence"
+
+# Ephemeral directories wiped at standalone-mode INIT.
+# In dispatched mode, the T1 parent owns cleanup and this list is ignored.
+cleanup_standalone_only:
+  - "test-results/"
+  - "test-evidence/"
+  - ".pipeline/test-pipeline-state.json"
