@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-22 07:57 UTC (auto-generated)
+> Last updated: 2026-04-22 11:31 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -94,7 +94,7 @@
 | e2e-conductor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | test-scout-agent, visual-inspector-agent, test-healer-agent |
 | e2e-pipeline | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
-| e2e-visual-run | skill | 1.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
+| e2e-visual-run | skill | 3.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
 | error-handling | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | executing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | expo-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
