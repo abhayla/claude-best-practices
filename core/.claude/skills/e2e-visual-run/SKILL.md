@@ -1,14 +1,15 @@
 ---
 name: e2e-visual-run
 description: >
-  Run full E2E suite with async queue-based orchestration, per-test screenshot
-  capture, dual-signal visual verification (ARIA snapshot + screenshot AI diff),
-  confidence-gated auto-healing, and framework auto-detection for autonomous
-  execution in any downstream project. Use with optional section filter:
-  /e2e-visual-run salary. Use --update-baselines to approve intentional visual changes.
-  NOT for one-off screenshot comparison (use /verify-screenshots), post-change
-  targeted verification (use /auto-verify), or E2E best practices reference
-  (use /e2e-best-practices).
+  Run a full Playwright E2E suite with queue-based orchestration, per-test
+  screenshot capture, dual-signal visual verification (ARIA snapshot + screenshot
+  AI diff), and confidence-gated auto-healing. Auto-detects the Playwright
+  config and dev server for zero-config execution. Use with optional section
+  filter: /e2e-visual-run salary. Use --update-baselines to approve intentional
+  visual changes. Playwright-only — NOT for Cypress/Selenium/Detox/Flutter
+  (use their native runners), one-off screenshot comparison (use
+  /verify-screenshots), post-change targeted verification (use /auto-verify),
+  or E2E best practices reference (use /e2e-best-practices).
 triggers:
   - run e2e with screenshots
   - e2e visual verification
@@ -19,16 +20,22 @@ triggers:
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob Skill Agent"
 argument-hint: "[section-name] [--update-baselines]"
-version: "2.2.0"
+version: "3.0.0"
 ---
 
-Autonomous E2E test suite runner with visual verification and self-healing.
-Auto-detects framework and dev server for zero-config execution. Screenshots
-captured for EVERY test (pass and fail) because the screenshot verdict is
-authoritative — exit codes are secondary signals. Dual-signal verification
-ensures both structural (ARIA snapshot) and visual (screenshot) correctness.
-Failures classified with confidence scores — only high-confidence fixes are
-auto-applied. Global retry budget prevents runaway fixing.
+Autonomous Playwright E2E test suite runner with visual verification and
+self-healing. Auto-detects the Playwright config and dev server for zero-config
+execution. Screenshots captured for EVERY test (pass and fail) because the
+screenshot verdict is authoritative — exit codes are secondary signals.
+Dual-signal verification ensures both structural (ARIA snapshot) and visual
+(screenshot) correctness. Failures classified with confidence scores — only
+high-confidence fixes are auto-applied. Global retry budget prevents runaway
+fixing.
+
+**Scope:** This skill targets Playwright only. Cypress, Selenium, Detox, and
+Flutter are intentionally out of scope — use their native runners. Removing
+multi-framework support in v3.0.0 tightened the dual-signal contract (ARIA
+YAML baselines + `toHaveScreenshot()`), which is Playwright-specific.
 
 ## Mode Detection
 
@@ -51,41 +58,47 @@ Can be combined with section filter: `/e2e-visual-run salary --update-baselines`
 
 ## STEP 0: Environment Discovery
 
-Auto-detect framework, test commands, and dev server for autonomous execution.
-This step makes the skill work in any downstream project without manual config.
+Auto-detect the Playwright config, test commands, and dev server for
+autonomous execution. This step makes the skill work in any Playwright
+project without manual config.
 
-1. **Detect E2E framework** — scan in priority order, stop on first match:
+1. **Detect the Playwright config** — scan for `playwright.config.{ts,js,mjs}`
+   in the project root. Record:
 
-   | Signal File | Framework | Test Command | Single-Test Command |
-   |-------------|-----------|-------------|---------------------|
-   | `playwright.config.{ts,js,mjs}` | Playwright | `npx playwright test` | `npx playwright test {file} --grep "{test}" --workers=1` |
-   | `cypress.config.{ts,js,mjs}` | Cypress | `npx cypress run` | `npx cypress run --spec {file}` |
-   | `detox.config.{ts,js}` | Detox | `npx detox test` | `npx detox test {file} --configuration {config}` |
-   | `pubspec.yaml` + `integration_test/` | Flutter | `flutter test integration_test/` | `flutter test {file} --name "{test}"` |
-   | `conftest.py` with selenium/playwright imports | Python E2E | `python -m pytest {e2e_dir} -v` | `python -m pytest {file}::{test} -v` |
+   | Setting | Value |
+   |---------|-------|
+   | Framework | Playwright |
+   | Test command | `npx playwright test` |
+   | Single-test command | `npx playwright test {file} --grep "{test}" --workers=1` |
 
-   **Headless CI:** Playwright defaults to headless (no action needed). For Cypress,
-   add `--headless` flag. For Selenium, configure headless browser options in conftest.py.
+   Playwright defaults to headless in CI; no flag needed.
 
-   If no framework detected: fail with "No E2E framework found — expected
-   playwright.config.*, cypress.config.*, detox.config.*, pubspec.yaml with
-   integration_test/, or conftest.py with selenium/playwright imports."
+   If no config found: fail with `"No playwright.config.{ts,js,mjs} found.
+   This skill is Playwright-only — for Cypress, Selenium, Detox, or Flutter
+   E2E suites, use the framework's native test runner."`
 
 2. **Detect dev server** — scan in priority order:
-   a. Playwright: read `webServer.command` and `webServer.url` from playwright config
-   b. `package.json` scripts: check for `dev`, `start`, `serve` keys (in that order)
-   c. Python: check for `uvicorn`/`gunicorn` in scripts, Procfile, or Makefile
-   d. Flutter: skip (flutter test launches its own app process)
+   a. Read `webServer.command` and `webServer.url` from `playwright.config.*`
+   b. Fall back to `package.json` scripts: check for `dev`, `start`, `serve`
+      keys (in that order)
 
 3. **Start dev server if not running**:
-   - Check if detected URL responds (`curl -sf --max-time 2 {url}`)
-   - If not responding: start dev server in background, wait up to 30s for health
+   - Check if the detected URL responds (`curl -sf --max-time 2 {url}`)
+   - If not responding: start the dev server in background, wait up to 30s
+     for health
    - Store PID in `.pipeline/dev-server.pid` for cleanup
+   - **PID safety:** record the process command alongside the PID; in Step 1
+     and Step 6, verify the process name matches before killing (prevents
+     killing an unrelated process that reused the PID)
+   - **Port-in-use guard:** if the URL responds but was not started by us,
+     and the Playwright config has `webServer.reuseExistingServer: false`,
+     fail with `"Port {port} is in use by another process — stop it before
+     running the suite."`
    - If no dev server detected and no URL responds: warn but continue (tests
      may manage their own server via `globalSetup`)
 
-4. **Detect test directory** — scan: `e2e/`, `tests/e2e/`, `test/e2e/`,
-   `integration_test/`, or read `testDir` from framework config
+4. **Detect test directory** — read `testDir` from `playwright.config.*`;
+   fall back to scanning `e2e/`, `tests/e2e/`, or `test/e2e/`
 
 5. **Write discovered config** to state file for downstream steps:
    ```json
@@ -93,15 +106,21 @@ This step makes the skill work in any downstream project without manual config.
      "framework": "playwright",
      "test_command": "npx playwright test",
      "single_test_command": "npx playwright test {file} --grep \"{test}\" --workers=1",
-     "dev_server": {"command": "npm run dev", "url": "http://localhost:3000", "started_by_us": true},
+     "dev_server": {
+       "command": "npm run dev",
+       "url": "http://localhost:3000",
+       "pid": 12345,
+       "process_name": "node",
+       "started_by_us": true
+     },
      "test_dir": "e2e/"
    }
    ```
 
-6. **Ensure framework config supports evidence capture** (Playwright only):
-   Read `playwright.config.*` and verify these settings exist. If missing, add them:
+6. **Ensure the Playwright config supports evidence capture:**
+   Read `playwright.config.*` and verify these settings exist. If missing,
+   add them:
    ```typescript
-   // Required in playwright.config.ts for autonomous evidence capture
    use: {
      screenshot: 'on',                    // capture every test (pass and fail)
    },
@@ -109,7 +128,10 @@ This step makes the skill work in any downstream project without manual config.
    ```
    If the project has no shared fixture for a11y snapshot capture, create
    `{test_dir}/e2e-evidence.setup.ts` (see Step 1 for fixture details).
-   Log all config modifications so the user can review them.
+   Log all config modifications so the user can review them on the next
+   `git status`. First-run artifacts (config edits, fixture, generated
+   baselines in `__snapshots__/`) are flagged in the Step 6 report so the
+   user can commit them intentionally — they are NOT auto-committed.
 
 ## STEP 1: Pre-Flight Checks
 
@@ -171,10 +193,18 @@ Verify the environment before running any tests.
 
 Populate the test queue with prioritized ordering.
 
-1. Discover test files using the discovered `test_command` with `--list` flag,
+1. Discover test files using `npx playwright test --list` (machine-readable),
    or scan the discovered `test_dir` from Step 0
 2. If a section argument was provided (e.g., `/e2e-visual-run salary`),
-   filter to only that section's tests
+   filter using Playwright's `--grep` on the test title. Section matching
+   semantics (applied in this order, stop on first match):
+   - **Describe block title**: matches any test inside a `test.describe("{section}")` block
+   - **Test title substring**: matches any test whose title contains `{section}` (case-insensitive)
+   - **@tag**: if `{section}` starts with `@`, matches tests tagged via `test("title @tag", ...)`
+   - **File path substring**: matches any test in a file whose path contains `{section}`
+
+   Generate the grep pattern accordingly (e.g., `--grep "salary"` or
+   `--grep "@salary"`) and record it in the state file under `section_filter`.
 3. Order tests by estimated duration (longest-first) using `duration_hints`
    from config. When no hints exist, fall back to alphabetical order.
    Longest-first reduces total wall time by front-loading slow tests.
@@ -200,35 +230,30 @@ For each test in the current batch:
 
 1. **Run the test** using the discovered `single_test_command` from Step 0
 2. **Record exit code** and duration
-3. **Pre-capture preparation** — handled via config, not in-test API calls:
-   - **Playwright**: Step 0.6 ensures `screenshot: 'on'` in config. Additionally,
-     if `visual.mask_selectors` are configured, add them to playwright config as
-     `expect.toHaveScreenshot.stylePath` or inject a CSS stylesheet that sets
-     `visibility: hidden` on masked selectors. CSS animations are disabled via
-     the evidence fixture's `reducedMotion: 'reduce'` media emulation.
-   - **Other frameworks**: see `references/scout-phase.md` for framework-specific
-     pre-capture configuration.
+3. **Pre-capture preparation** — handled via config and fixtures, not in-test
+   API calls (the skill runs tests via CLI and cannot inject page-object calls):
+   - Step 0.6 ensures `screenshot: 'on'` in `playwright.config.*`
+   - If `visual.mask_selectors` are configured, inject a CSS stylesheet that
+     sets `visibility: hidden` on masked selectors via Playwright's
+     `expect.toHaveScreenshot.stylePath` or the evidence fixture
+   - CSS animations are disabled via the evidence fixture's
+     `reducedMotion: 'reduce'` media emulation
 4. **Capture screenshot** for EVERY test (pass and fail) — the screenshot
    verdict is authoritative, exit codes are secondary signals:
-   - **Playwright**: handled automatically via `screenshot: 'on'` in config
-     (set in Step 0.6). Screenshots and attachments are written to
-     `test-evidence/latest/` (the `outputDir` set in Step 0.6). After the
-     test run, rename `test-evidence/latest/` to `test-evidence/{run_id}/`
-     and reorganize into `screenshots/` and `a11y/` subdirectories.
-   - **Cypress**: `screenshotOnRunFailure: true` + `cy.screenshot()` in afterEach
-   - **Selenium**: `driver.save_screenshot()` in teardown
-   - **Detox**: `device.takeScreenshot()` in afterEach
+   - Handled automatically via `screenshot: 'on'` in config (set in Step 0.6)
+   - Screenshots and attachments are written to `test-evidence/latest/`
+     (the `outputDir` set in Step 0.6)
+   - After the test run (Step 3.5), rename `test-evidence/latest/` to
+     `test-evidence/{run_id}/` and reorganize into `screenshots/` and `a11y/`
+     subdirectories
 5. **Capture accessibility tree** for EVERY test (pass or fail):
-   - **Playwright**: the evidence fixture (`e2e-evidence.setup.ts` from Step 1.5)
-     auto-captures a11y JSON as a test attachment after each test. Collect
-     attachments from Playwright's output and copy to
-     `test-evidence/{run_id}/a11y/{test_name}.json`.
-     For YAML baselines: run with `--update-snapshots` on first run to generate
+   - The evidence fixture (`e2e-evidence.setup.ts` from Step 1.5) auto-captures
+     a11y JSON as a test attachment after each test
+   - Collect attachments from Playwright's output and copy to
+     `test-evidence/{run_id}/a11y/{test_name}.json`
+   - For YAML baselines: run with `--update-snapshots` on first run to generate
      `__snapshots__/` baselines. On subsequent runs, `toMatchAriaSnapshot()` in
-     tests compares against stored baselines automatically.
-   - **Other frameworks**: capture DOM structure as JSON fallback
-     → `test-evidence/{run_id}/a11y/{test_name}.json`
-     (see `references/scout-phase.md` for DOM walk code)
+     tests compares against stored baselines automatically
 6. **Move item** from `test_queue` to `verify_queue` in state file with results:
    ```json
    {
@@ -243,13 +268,13 @@ For each test in the current batch:
    ```
 7. **Write incrementally** — update state file after EACH test, not in batch
 
-## STEP 3.5: Map Framework Output to Evidence Directory
+## STEP 3.5: Map Playwright Output to Evidence Directory
 
 Playwright saves artifacts to its own directory structure (e.g.,
 `test-results/{hash}/test-finished-1.png` with truncated names). Map
-these to the expected evidence structure before Step 4 verification.
+these to the canonical evidence structure before Step 4 verification.
 
-1. **Playwright**: scan `test-evidence/latest/` (the `outputDir` from Step 0.6):
+1. Scan `test-evidence/latest/` (the `outputDir` from Step 0.6):
    - Screenshots: find `*.png` files, rename to
      `test-evidence/{run_id}/screenshots/{test_name}.{pass|fail}.png`
      using the test name from the parent directory or Playwright's JSON report
@@ -258,12 +283,9 @@ these to the expected evidence structure before Step 4 verification.
    - Parse `test-evidence/latest/results.json` (Playwright JSON reporter)
      for test name → artifact path mapping if direct naming is ambiguous
 
-2. **Cypress**: screenshots already saved to configured path — copy to evidence dir
-
-3. **Other frameworks**: artifacts already in evidence dir from capture step
-
-4. **Verify mapping**: log count of mapped screenshots and a11y files.
-   If any test in `verify_queue` has no corresponding screenshot, log warning.
+2. **Verify mapping**: log count of mapped screenshots and a11y files.
+   If any test in `verify_queue` has no corresponding screenshot, log a
+   warning and flag that verdict as `low_confidence` (single-signal only).
 
 ## STEP 4: Verify Results (Inspector Phase)
 
@@ -289,16 +311,17 @@ Agent("general-purpose", prompt="
 
 The agent follows these verification rules for each item in `verify_queue`:
 
-1. **Accessibility tree verification** — framework-dependent:
+1. **Accessibility tree verification:**
 
-   **Playwright (with ARIA YAML baseline):**
+   **With ARIA YAML baseline:**
    - Run `toMatchAriaSnapshot()` against stored YAML baseline in `__snapshots__/`
    - If baseline doesn't exist (first run): auto-generate it, log "A11y baseline
-     created — will compare on next run", treat as PASS for this run
+     created — will compare on next run", treat as PASS for this run (flag
+     as `first_run_baseline` in the verdict so Step 6 can surface it)
    - Partial matching: omit attributes that vary between runs
    - Regex for dynamic text: `/\d+ items/`, `/Updated .*/`
 
-   **Playwright (no baseline) or other frameworks:**
+   **Without a baseline (before first `--update-snapshots` run):**
    - Parse the a11y snapshot JSON using the checklist in
      `references/inspection-phase.md` (structural, state, data population checks)
 
@@ -307,35 +330,41 @@ The agent follows these verification rules for each item in `verify_queue`:
    Skill("verify-screenshots", args="--proof-mode --run-id={run_id} --threshold={visual.threshold}")
    ```
 
-   **If `verify-screenshots` is not provisioned** (skill directory doesn't exist):
-   - Playwright: use native `toHaveScreenshot()` with threshold from config
-   - Other frameworks: dispatch a screenshot inspector agent (do NOT review
-     20+ screenshots inline — it burns context):
-     ```
-     Agent("general-purpose", prompt="
-       You are a visual inspector. For each screenshot in
-       test-evidence/{run_id}/screenshots/:
-       - Read the image using the Read tool
-       - Verify: no error dialogs, data populated (tables have rows, cards
-         have content), layout correct, no stuck spinners, text readable
-       - Ignore timestamps, avatars, and masked regions
-       Write verdicts to .pipeline/screenshot-verdicts.json
-     ")
-     ```
-   - Log: "verify-screenshots not available — using Agent fallback"
+   **Provisioning check:** before calling `Skill("verify-screenshots")`, verify
+   the skill is installed by checking that
+   `.claude/skills/verify-screenshots/SKILL.md` exists (`Glob` pattern). If
+   the file is missing, use the fallback below and log:
+   "verify-screenshots not provisioned — falling back to Playwright native
+   `toHaveScreenshot()`. Provision /verify-screenshots for richer diffs."
+
+   **Fallback (verify-screenshots missing):**
+   - Use Playwright native `toHaveScreenshot()` with threshold from config
+   - On first run (no baseline): `toHaveScreenshot()` auto-creates the
+     baseline and passes. Treat this as `first_run_baseline` and surface it
+     in Step 6 so the user commits the baseline intentionally
 
 3. **Dual-signal verdict:**
 
-   | A11y Tree | Screenshot | Exit Code | Verdict | Action |
-   |-----------|-----------|-----------|---------|--------|
-   | PASS | PASS | PASS | **PASS** | Move to `completed` |
-   | CHANGED | CHANGED | PASS | **EXPECTED_CHANGE** | Prompt: run with `--update-baselines` to approve |
-   | PASS | FAIL | any | **FAIL** | Visual regression — route to `fix_queue` |
-   | FAIL | PASS | any | **FAIL** | Accessibility regression — route to `fix_queue` |
-   | FAIL | FAIL | any | **FAIL** | Both broken — route to `fix_queue` (high priority) |
+   | A11y Tree | Screenshot | Exit Code | Verdict | Destination |
+   |-----------|-----------|-----------|---------|-------------|
+   | PASS | PASS | PASS | **PASS** | `completed` |
+   | CHANGED | CHANGED | PASS | **EXPECTED_CHANGE** | `expected_changes` |
+   | CHANGED | PASS | PASS | **EXPECTED_CHANGE** | `expected_changes` |
+   | PASS | CHANGED | PASS | **EXPECTED_CHANGE** | `expected_changes` |
+   | PASS | FAIL | any | **FAIL** (visual regression) | `fix_queue` |
+   | FAIL | PASS | any | **FAIL** (a11y regression) | `fix_queue` |
+   | FAIL | FAIL | any | **FAIL** (both broken) | `fix_queue` (high priority) |
 
    **EXPECTED_CHANGE detection:** if exit code is PASS but visual or a11y differs
-   from baseline, the UI likely changed intentionally. Do not route to `fix_queue`.
+   from baseline, the UI likely changed intentionally. Route to the declared
+   `expected_changes` queue in state (NOT `fix_queue`, NOT `completed`). Step 6
+   reports these separately so the user can run `/e2e-visual-run --update-baselines`
+   to approve them.
+
+   **State schema addendum:** the state file declares four queues plus a
+   completion lane — `test_queue`, `verify_queue`, `fix_queue`, `expected_changes`,
+   `completed`, `known_issues`. Every verdict MUST route to exactly one of
+   these; there is no implicit "other" bucket.
 
 4. **Dynamic content handling** — Before flagging as FAILED, check for:
    - Timestamps/dates: ignore in comparison
@@ -360,8 +389,17 @@ For each item in `fix_queue`:
 
 3. **Check flakiness history** — if `history.quarantine_flaky` is true (default),
    read the test's `flakiness_score` from `.pipeline/test-history.json`:
-   - score >= `history.flaky_threshold` (default 0.7) → auto-quarantine, move to
-     `known_issues` with `"reason": "historically_flaky"`. Do not spend retry budget.
+   - score >= `history.flaky_threshold` (default 0.7) → AUTO-QUARANTINE CHECK:
+     - Read `quarantined_since_run` and `probe_runs_since_quarantine` from history
+     - **Probe-run recovery rule**: every `history.probe_interval` runs (default 5),
+       force one probe attempt through the full healing cycle even if quarantined.
+       This prevents permanent quarantine when the underlying flake is fixed.
+     - If this is a probe run: proceed normally, label attempt as `probe_run: true`
+     - Otherwise: move to `known_issues` with `"reason": "historically_flaky"`,
+       record `probe_runs_since_quarantine += 1`. Do not spend retry budget.
+   - **Decay rule**: if the most recent `history.decay_window` runs (default 3)
+     all PASSED, reset `flakiness_score` to 0 and remove from quarantine — the
+     flake is considered rehabilitated.
    - score 0.3–0.7 → proceed but flag as `POSSIBLY_FLAKY` in warnings
    - score < 0.3 or no history → genuine failure, proceed normally
 
@@ -449,7 +487,7 @@ After all queues drain (or global budget exhausted):
      "timestamp": "<ISO-8601>",
      "result": "PASSED|NEEDS_REVIEW|FAILED",
      "run_id": "<run_id>",
-     "framework": "<detected framework>",
+     "framework": "playwright",
      "summary": {
        "total": 42, "passed": 38, "failed": 0,
        "healed": 3, "expected_changes": 0, "known_issues": 1, "skipped": 0
@@ -460,9 +498,17 @@ After all queues drain (or global budget exhausted):
      "failures": [],
      "known_issues": [],
      "expected_changes": [],
+     "first_run_artifacts": {
+       "config_edits": [],
+       "fixture_created": null,
+       "baselines_generated": []
+     },
      "warnings": []
    }
    ```
+   `first_run_artifacts` lists uncommitted changes the skill made to the
+   project (config edits, fixture, baselines) so the user can review and
+   commit them intentionally.
 
 6. **Present summary:**
    ```
@@ -480,8 +526,29 @@ After all queues drain (or global budget exhausted):
        Run `/e2e-visual-run --update-baselines` to approve visual changes
    ```
 
-7. **Git checkpoint** — if any tests were healed, commit the test fixes:
-   `fix(e2e): heal N test failures (SELECTOR: X, TIMING: Y, DATA: Z)`
+7. **Git checkpoint** — if any tests were healed, commit the test fixes with
+   discipline:
+
+   **Pre-commit guards** (ALL must pass or skip the commit and report the fixes
+   as uncommitted):
+   - Run `git status --porcelain` first. If the working tree has modifications
+     outside the healed test files and `{test_dir}/`, do NOT auto-commit —
+     report "healed N tests but working tree has unrelated changes; fixes left
+     staged for manual review" and stage only the healed test files.
+   - Check current branch: if on `main` or `master`, do NOT commit — heal
+     fixes must land on a feature branch per `git-collaboration.md`.
+   - Stage explicit files only (healed test file paths from `fix_queue`
+     history), never `git add -A` or `git add .`.
+
+   **Commit message** (conventional commits):
+   ```
+   fix(e2e): heal N test failures (SELECTOR: X, TIMING: Y, DATA: Z)
+   ```
+
+   **First-run artifacts are NOT auto-committed:** config edits from Step 0.6,
+   the evidence fixture from Step 1.5, and newly-generated `__snapshots__/`
+   baselines remain uncommitted. Step 6 lists them in the report so the user
+   can review and commit them intentionally.
 
 ## CRITICAL RULES
 

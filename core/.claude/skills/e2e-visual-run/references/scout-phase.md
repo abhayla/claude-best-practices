@@ -2,9 +2,8 @@
 
 Detailed guidance for STEP 3 of the e2e-visual-run skill.
 
-## Framework-Specific Screenshot Capture
+## Screenshot Capture (Playwright)
 
-### Playwright
 ```typescript
 // playwright.config.ts — capture EVERY test (screenshot verdict is authoritative)
 use: {
@@ -14,49 +13,13 @@ use: {
 }
 ```
 
-### Cypress
-```javascript
-// cypress.config.js — capture every test
-screenshotOnRunFailure: true,
-// Also add cy.screenshot() in afterEach for passing tests
-video: false  // enable only if needed — expensive
-```
-
-### Selenium (Python)
-```python
-# In test teardown
-def teardown_method(self, method):
-    if self._outcome.errors:
-        self.driver.save_screenshot(f"test-evidence/{run_id}/screenshots/{test_name}.fail.png")
-```
-
-### Detox (React Native)
-```javascript
-afterEach(async () => {
-  if (jasmine.currentTest.failedExpectations.length > 0) {
-    await device.takeScreenshot(testName);
-  }
-});
-```
-
-### Flutter
-```dart
-// In integration_test
-testWidgets('description', (tester) async {
-  // ... test logic
-  // On failure, capture:
-  await tester.pumpAndSettle();
-  await expectLater(find.byType(MaterialApp), matchesGoldenFile('failures/$testName.png'));
-});
-```
-
 ## Pre-Capture Preparation
 
 Pre-capture stabilization is handled via **config and fixtures**, not in-test API
 calls. The skill runs tests via CLI (`npx playwright test`), so it cannot inject
 page-object calls. Instead, it ensures the right settings are in place before running.
 
-### Playwright (config-level)
+### Config-Level Setup
 
 Step 0.6 ensures `playwright.config.ts` has `screenshot: 'on'`. For masking and
 animation disabling, the evidence fixture handles it:
@@ -94,15 +57,9 @@ For mask selectors, create a CSS file that the skill injects via playwright conf
 ```
 Reference it in playwright config: `use: { ...use, stylePath: './e2e-masks.css' }`
 
-### Other Frameworks
-
-- Cypress: `cy.get(selector).invoke('css', 'visibility', 'hidden')` in `beforeEach`
-- Selenium: execute JavaScript to hide elements in test setup
-- These require in-test code changes — the skill logs instructions for the developer
-
 ## Accessibility Tree Capture
 
-### Playwright (via Evidence Fixture)
+### Via Evidence Fixture
 
 The evidence fixture (`e2e-evidence.setup.ts`) auto-captures a11y JSON as a test
 attachment after each test. The skill collects these from Playwright's output dir.
@@ -139,36 +96,16 @@ Key properties:
 - Order-sensitive: element order must match a11y tree order
 - Layout-agnostic: CSS changes do not affect YAML snapshots
 
-### DOM Fallback (Other Frameworks)
-When native a11y tree access is unavailable, capture DOM structure:
-```javascript
-const domTree = await page.evaluate(() => {
-  function walk(el) {
-    return {
-      tag: el.tagName,
-      role: el.getAttribute('role'),
-      ariaLabel: el.getAttribute('aria-label'),
-      text: el.textContent?.substring(0, 100),
-      children: Array.from(el.children).map(walk)
-    };
-  }
-  return walk(document.body);
-});
+## Single Test Execution Command
+
+Playwright single-test command (set by Step 0, used throughout Step 3):
+
+```
+npx playwright test <file> --grep "<test_name>" --workers=1
 ```
 
-## Single Test Execution Commands
-
-Detect the project's test framework and use the appropriate single-test command:
-
-| Framework | Single Test Command |
-|-----------|-------------------|
-| Playwright | `npx playwright test <file> --grep "<test_name>" --workers=1` |
-| Cypress | `npx cypress run --spec <file>` |
-| Jest | `npx jest <file> -t "<test_name>"` |
-| Vitest | `npx vitest run <file> -t "<test_name>"` |
-| pytest | `python -m pytest <file>::<test_name> -v` |
-| Detox | `npx detox test <file> --configuration <config>` |
-| Flutter | `flutter test <file> --name "<test_name>"` |
+`--workers=1` forces serialized execution so the skill's own queue controls
+ordering and evidence capture per test.
 
 ## Evidence Directory Structure
 

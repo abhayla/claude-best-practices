@@ -1236,27 +1236,28 @@
     "tier": "nice-to-have"
   },
   "e2e-visual-run": {
-    "hash": "12b733c9456f0c53ebe3286ca319570b1c5570422451ad8d73ee90709778c007",
+    "hash": "7e61241a60468c9e248d8adcc09fca59fccff222c0d7dfd9a300f0ad819de164",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-22",
     "dependencies": [
       "fix-loop",
       "verify-screenshots"
     ],
     "visibility": "public",
-    "description": "Run full E2E suite with async queue-based orchestration, dual-signal visual verification, and classification-driven auto-healing",
+    "description": "Playwright-only: run full E2E suite with queue-based orchestration, dual-signal visual verification, and classification-driven auto-healing",
     "tags": [
       "e2e",
       "testing",
       "visual-regression",
       "self-healing",
-      "accessibility"
+      "accessibility",
+      "playwright"
     ],
-    "changelog": "v1.0.0: Initial release â€” queue-based orchestration, dual-signal verification, 8-classification healing",
+    "changelog": "v3.0.0: BREAKING — scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv1.0.0: Initial release — queue-based orchestration, dual-signal verification, 8-classification healing.",
     "tier": "nice-to-have"
   },
   "e2e-best-practices": {
