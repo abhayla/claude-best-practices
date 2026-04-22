@@ -318,6 +318,10 @@ After queues drain (or budget exhausted):
    - `PASSED`: all tests in `completed` with PASS, zero `known_issues`, zero `expected_changes`
    - `NEEDS_REVIEW`: any `expected_changes` entries (intentional UI drift detected)
    - `FAILED`: any `known_issues` OR any FAIL verdict in `completed`
+   - `BASELINES_UPDATED`: `--update-baselines` mode ran successfully (Steps
+     0–3 only; verification + healing deliberately skipped). Downstream
+     aggregators treat this as a non-failing result equivalent to PASSED
+     for gate purposes (see `scripts/pipeline_aggregator.py` PASS_STATUSES).
 
 2. **Update duration_hints** in `.claude/config/e2e-pipeline.yml` — median of
    observed + existing. Self-improving loop for queue ordering.
@@ -334,7 +338,7 @@ After queues drain (or budget exhausted):
      "skill": "e2e-conductor-agent",
      "schema_version": "1.0.0",
      "timestamp": "<ISO-8601>",
-     "result": "PASSED|NEEDS_REVIEW|FAILED",
+     "result": "PASSED|NEEDS_REVIEW|FAILED|BASELINES_UPDATED",
      "run_id": "<run_id>",
      "mode": "standalone|dispatched",
      "framework": "playwright",

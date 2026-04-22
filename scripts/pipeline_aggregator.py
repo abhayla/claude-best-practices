@@ -35,12 +35,24 @@ RESULT_PASSED = "PASSED"
 RESULT_FAILED = "FAILED"
 RESULT_FIXED = "FIXED"
 RESULT_BLOCKED = "BLOCKED"
+RESULT_BASELINES_UPDATED = "BASELINES_UPDATED"
+RESULT_NEEDS_REVIEW = "NEEDS_REVIEW"
 
 EXIT_PASSED = 0
 EXIT_FAILED = 1
 EXIT_BLOCKED = 2
 
-PASS_STATUSES = {RESULT_PASSED, RESULT_FIXED}
+# Results that count as non-failures for stage-gate purposes. BASELINES_UPDATED
+# is emitted by e2e-conductor-agent for --update-baselines runs (which
+# deliberately skip verification + healing per the v2 spec) and must be
+# treated as a pass. NEEDS_REVIEW is emitted when expected_changes are
+# detected (intentional UI drift awaiting human approval).
+PASS_STATUSES = {
+    RESULT_PASSED,
+    RESULT_FIXED,
+    RESULT_BASELINES_UPDATED,
+    RESULT_NEEDS_REVIEW,
+}
 
 
 class Contradiction(TypedDict):
