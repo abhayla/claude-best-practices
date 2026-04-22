@@ -14,9 +14,10 @@ Branch: `feat/testing-pipeline-overhaul`. Started: 2026-04-22.
 - [x] `test-scout-agent.md` — absorb `references/scout-phase.md`
 - [x] `visual-inspector-agent.md` — absorb `references/inspection-phase.md`
 - [x] `test-healer-agent.md` — absorb `references/healing-phase.md`
-- [ ] `e2e-visual-run/SKILL.md` — shrink to <100 lines, dispatch to `e2e-conductor-agent`
-- [ ] Delete `core/.claude/skills/e2e-visual-run/references/*`
-- [ ] Commit Phase A
+- [x] `e2e-conductor-agent.md` — absorb e2e-visual-run user-facing behaviors (sections, baseline-update, first-run artifacts, env discovery, commit guards, return contract); dual-mode state path; cleanup guard
+- [x] `e2e-visual-run/SKILL.md` — shrunk to ~80 lines, dispatches agent
+- [x] Delete `core/.claude/skills/e2e-visual-run/references/*`
+- [x] Commit Phase A
 
 ### Phase B — Healer upgrade (MCP + deterministic classification)
 - [x] `test-healer-agent.md` — add Playwright MCP server to frontmatter (hard dep)
