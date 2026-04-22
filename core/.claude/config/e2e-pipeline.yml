@@ -73,60 +73,99 @@ healing:
 # Read by test-failure-analyzer-agent BEFORE invoking the LLM classifier.
 # First-match-wins, ordered most-specific to most-general.
 # Clear-cut failures bypass the LLM — saves cost AND eliminates variance.
+#
+# Rule ORDER matters: more-specific rules MUST precede more-general ones.
+# Example: `playwright_locator_failure` runs before `playwright_timeout`
+# because Playwright's real locator errors include both "TimeoutError:" AND
+# "waiting for getByRole(...)" in the same message. If the generic timeout
+# rule ran first, every SELECTOR failure would misclassify as TIMEOUT.
+# (Runtime-verified 2026-04-23 against Playwright 1.49 output — see
+# scripts/tests/test_classification_rules.py for the real error strings.)
 classification_rules:
-  - id: playwright_locator_failure
-    pattern: "Locator:\\s+[^\\n]+[\\s\\S]{0,200}(waiting for|not found\\b|resolved to 0)"
-    flags: i
-    category: SELECTOR
-    confidence: 0.93
-    reason: "Playwright locator-resolution failure"
-  - id: selenium_detox_selector
-    pattern: "\\b(NoSuchElementException|ElementNotFound)\\b"
-    flags: i
-    category: SELECTOR
-    confidence: 0.93
-    reason: "Selenium/Detox selector failure"
-  - id: playwright_timeout
-    pattern: "\\b(TimeoutError|playwright\\..*timeout)\\b"
-    flags: i
-    category: TIMEOUT
-    confidence: 0.90
-    reason: "Unambiguous async timeout"
-  - id: wait_for_timeout
-    pattern: "waitFor(?:Selector)?\\b.*(exceeded|timed out)"
-    flags: i
-    category: TIMEOUT
-    confidence: 0.90
+  # --- Infrastructure (network / DB / upstream) ---------------------------
+  # Most-specific signatures — no ambiguity with higher-level failures.
   - id: network_layer_failure
     pattern: "\\b(ECONNREFUSED|ENOTFOUND|EHOSTUNREACH)\\b"
     flags: i
     category: INFRASTRUCTURE
     confidence: 0.95
+    reason: "Network-layer connection failure"
   - id: upstream_unavailable
-    pattern: "\\b503 Service Unavailable\\b|\\bconnection refused\\b"
+    pattern: "\\b503 (Service Unavailable|Service Temporarily Unavailable)\\b|\\bupstream unavailable\\b"
     flags: i
     category: INFRASTRUCTURE
     confidence: 0.95
+    reason: "Upstream service returning 503"
   - id: sql_missing_schema
     pattern: "no such (table|column)|relation \"[^\"]+\" does not exist"
     flags: i
     category: MIGRATION_FAILURE
     confidence: 0.95
+    reason: "SQL schema drift — table or column missing"
+
+  # --- Visual / UI (before generic timeouts) ------------------------------
+  - id: playwright_locator_failure
+    # Real Playwright 1.49 output captured 2026-04-23:
+    #   TimeoutError: locator.click: Timeout 5000ms exceeded.
+    #   Call log:
+    #     - waiting for getByRole('button', { name: 'Refresh' })
+    # The distinguishing feature is the Call-log "waiting for <locator>" line.
+    # MUST run before playwright_timeout — otherwise TimeoutError prefix wins
+    # and the SELECTOR failure misclassifies as TIMEOUT.
+    pattern: "waiting for (getByRole|getByLabel|getByText|getByTestId|getByPlaceholder|getByAltText|getByTitle|locator\\()"
+    flags: i
+    category: SELECTOR
+    confidence: 0.93
+    reason: "Playwright locator-resolution failure (waiting-for pattern)"
+  - id: selenium_detox_selector
+    pattern: "\\b(NoSuchElementException|ElementNotFound|ElementNotVisibleException)\\b"
+    flags: i
+    category: SELECTOR
+    confidence: 0.93
+    reason: "Selenium/Detox selector failure"
+  - id: screenshot_baseline_diff
+    # Real Playwright 1.49 output captured 2026-04-23:
+    #   Error: expect(locator).toHaveScreenshot(expected) failed
+    #     1769 pixels (ratio 0.06 of all image pixels) are different.
+    #     Snapshot: dashboard-heading.png
+    # The old pattern "Screenshot (differs from baseline|comparison failed)"
+    # matched nothing Playwright actually emits.
+    pattern: "toHaveScreenshot.*failed|\\d+ pixels.*(ratio [0-9.]+ of all image pixels)?.*are different|Snapshot:\\s+\\S+\\.png"
+    flags: i
+    category: VISUAL_REGRESSION
+    confidence: 0.95
+    reason: "Playwright screenshot baseline diff"
+
+  # --- Generic async timeouts (after specific locator/visual rules) -------
+  - id: wait_for_timeout
+    pattern: "waitFor(?:Selector)?\\b.*(exceeded|timed out)"
+    flags: i
+    category: TIMEOUT
+    confidence: 0.90
+    reason: "Explicit waitFor timeout"
+  - id: playwright_timeout
+    # Runs AFTER playwright_locator_failure so pure timeouts (e.g. page.goto)
+    # classify as TIMEOUT while locator.click timeouts with a waiting-for
+    # context classify as SELECTOR above.
+    pattern: "\\b(TimeoutError|playwright\\..*timeout)\\b"
+    flags: i
+    category: TIMEOUT
+    confidence: 0.90
+    reason: "Unambiguous async timeout"
+
+  # --- Other structural categories ---------------------------------------
   - id: pact_mismatch
     pattern: "Pact verification failed"
     flags: i
     category: CONTRACT_MISMATCH
     confidence: 0.95
-  - id: screenshot_baseline_diff
-    pattern: "Screenshot (differs from baseline|comparison failed)"
-    flags: i
-    category: VISUAL_REGRESSION
-    confidence: 0.95
+    reason: "Consumer-driven contract mismatch"
   - id: resource_leak_warning
     pattern: "ResourceWarning:\\s+unclosed"
     flags: i
     category: RESOURCE_LEAK
     confidence: 0.90
+    reason: "Unclosed resource detected at teardown"
 
 # Cross-run test history for flakiness detection, quarantine, and decay.
 # File persists across runs (not in cleanup list). Builds up naturally.
