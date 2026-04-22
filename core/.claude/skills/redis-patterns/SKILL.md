@@ -342,7 +342,7 @@ r.xack("orders:stream", "workers", message_id)
 ```python
 r = redis.Redis(
     host='redis-host', port=6379,
-    password='your-strong-password',
+    password=os.environ['REDIS_PASSWORD'],  # never hardcode
     ssl=True,
     ssl_cert_reqs='required'
 )

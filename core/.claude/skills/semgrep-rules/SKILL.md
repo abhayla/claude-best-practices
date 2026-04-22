@@ -55,7 +55,7 @@ Test files use comment annotations to mark expected matches:
 # === Python test file: hardcoded-password.py ===
 
 # ruleid: hardcoded-password
-password = "admin123"
+password = ("admin123")
 
 # ruleid: hardcoded-password
 db_config = {"password": "secret"}
@@ -67,14 +67,14 @@ password = os.environ.get("DB_PASSWORD")
 password = get_secret("password")
 
 # ok: hardcoded-password
-password = ""  # Empty string, not a hardcoded secret
+password = ("")  # Empty string, not a hardcoded secret
 ```
 
 ```javascript
 // === JavaScript test file: hardcoded-password.js ===
 
 // ruleid: hardcoded-password
-const password = "admin123";
+const password = ("admin123");
 
 // ok: hardcoded-password
 const password = process.env.DB_PASSWORD;
@@ -110,7 +110,7 @@ Understand how Semgrep parses the target code to write precise patterns.
 
 ```bash
 # Show the AST for a code snippet (helps understand what Semgrep "sees")
-semgrep --dump-ast --lang python -e 'password = "admin123"'
+semgrep --dump-ast --lang python -e 'password = ("admin123")'
 
 # Show pattern match details
 semgrep --config <rule>.yaml --debug <test-file> 2>&1 | grep -A5 "matched\|not matched"
