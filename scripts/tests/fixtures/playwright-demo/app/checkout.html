@@ -28,11 +28,11 @@
     const SCENARIO = "__SCENARIO__";
 
     async function loadOrders() {
-      // Timing scenario: introduce a 3s delay so tests using fixed waits
-      // (or optimistic selectors) fail. TIMING auto-heal should replace
-      // the brittle wait with an event-driven `await expect(...).toBeVisible()`.
-      const delay = SCENARIO === 'timing' ? 3000 : 0;
-      await new Promise((r) => setTimeout(r, delay));
+      // Timing scenario: server-side /api/orders delay (8s) pushes the
+      // response past Playwright's default expect auto-retry timeout.
+      // No client-side wait needed — the fetch itself blocks long enough
+      // to trip auto-retrying assertions. Keep this handler free of
+      // artificial client delays so the timing signal is unambiguous.
       const res = await fetch('/api/orders');
       if (!res.ok) {
         document.getElementById('status').textContent = 'Failed to load orders';
