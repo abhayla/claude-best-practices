@@ -229,7 +229,13 @@ def aggregate(
     stages_completed = sum(1 for r in results if r.get("result") in PASS_STATUSES)
     stages_failed = sum(1 for r in results if r.get("result") == RESULT_FAILED)
 
-    if failures or screenshot_failures:
+    # Any stage reporting FAILED fails the pipeline, even when the stage
+    # provided an empty failures[] array (e.g., a skill that moved a test
+    # to known_issues without an individual failure entry). The "union of
+    # failures" rule is a superset — stage-level FAILED counts.
+    any_stage_failed = stages_failed > 0
+
+    if failures or screenshot_failures or any_stage_failed:
         result = RESULT_FAILED
         exit_code = EXIT_FAILED
     elif contradictions and strict_contradictions:

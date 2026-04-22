@@ -188,6 +188,21 @@ def test_known_issues_get_dedup_signatures(tmp_path: Path) -> None:
     assert issues[0]["signature"] != issues[1]["signature"]
 
 
+def test_stage_failed_with_empty_failures_still_fails(tmp_path: Path) -> None:
+    """A skill that reports FAILED without individual failure entries (e.g.,
+    a conductor that moves a test to known_issues without a failures[] entry)
+    MUST still fail the pipeline. The 'union of failures' rule is a
+    superset — stage-level FAILED counts."""
+    _write_result(tmp_path, "fix-loop", result="PASSED")
+    _write_result(tmp_path, "e2e-conductor-agent", result="FAILED", failures=[])
+
+    exit_code, verdict = aggregate(tmp_path, strict_contradictions=False, run_id=None)
+
+    assert exit_code == EXIT_FAILED
+    assert verdict["result"] == "FAILED"
+    assert verdict["stages_failed"] == 1
+
+
 def test_fixed_result_counts_as_passed(tmp_path: Path) -> None:
     """FIXED is a success state (fix-loop healed failures in place)."""
     _write_result(tmp_path, "fix-loop", result="FIXED")
