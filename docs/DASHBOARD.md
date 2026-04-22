@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-22 13:06 UTC (auto-generated)
+> Last updated: 2026-04-22 14:34 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -40,7 +40,7 @@
 | apply-selections | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| auto-verify | skill | 3.2.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
+| auto-verify | skill | 4.0.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | brainstorm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | branching | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
@@ -91,10 +91,10 @@
 | documentation-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | drizzle-orm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-best-practices | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| e2e-conductor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | test-scout-agent, visual-inspector-agent, test-healer-agent |
+| e2e-conductor-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | test-scout-agent, visual-inspector-agent, test-healer-agent |
 | e2e-pipeline | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
-| e2e-visual-run | skill | 3.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
+| e2e-visual-run | skill | 4.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
 | error-handling | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | executing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | expo-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -213,23 +213,23 @@
 | tdd-failing-test-generator | skill | 2.0.0 | hub:abhayla/claude-best-practices | tdd, playwright |
 | tdd-rule | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-data-management | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| test-failure-analyzer-agent | agent | 1.1.1 | hub:abhayla/claude-best-practices | — |
-| test-healer-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
+| test-failure-analyzer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| test-healer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-pipeline | skill | 1.0.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
-| test-pipeline-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| test-scout-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| test-pipeline-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
+| test-scout-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
-| testing-pipeline-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| testing-pipeline-master-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | testing-pipeline-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | trace-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | twitter-x | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | update-practices | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
-| visual-inspector-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |
+| visual-inspector-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |
 | vitest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | vue | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | vue-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |

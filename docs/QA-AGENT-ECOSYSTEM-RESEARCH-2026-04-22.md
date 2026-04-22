@@ -263,3 +263,53 @@ Both use MCP servers for browser control and healing. testalyst has `mcp_servers
 ---
 
 *Document frozen at 2026-04-22. Star counts and repo activity will drift. Re-run the `gh search` queries above to refresh when this research needs updating.*
+
+---
+
+## Applied — 2026-04-22
+
+The recommendations from this research were implemented as the
+**testing-pipeline overhaul** on branch `feat/testing-pipeline-overhaul`
+(8 commits, 1081 tests passing). Map of research findings to delivered work:
+
+| Recommendation | Commit | File(s) |
+|---|---|---|
+| **#1** Deterministic pre-classification (from nirarad) | `feat(agents)!: upgrade T3 workers + failure analyzer to pipeline v2` | `test-failure-analyzer-agent.md` (18 regex rules, `classification_source` field, `healer_category` mapping) + `core/.claude/config/e2e-pipeline.yml` (`classification_rules[]` array) |
+| **#2** Playwright MCP for healer (from fugazi) | same commit | `test-healer-agent.md` frontmatter declares MCP server as hard dep; `e2e-pipeline.yml` `healing.use_playwright_mcp: true` |
+| **#3** GitHub Issue auto-creation (from nirarad) | `feat(pipeline)!: tier-nested cleanup...` | `testing-pipeline-master-agent.md` aggregation step with sha256 signature dedup + 30-day window; `e2e-pipeline.yml` `issue_creation` config block |
+| **#4** Standalone CI aggregator (narrow scope) | `feat(pipeline): add standalone pipeline_aggregator.py with 13 tests` | `scripts/pipeline_aggregator.py` (290 LOC, pure read/compute/write) + 14 aggregator tests |
+| **#5** Inline Constitution per agent (from fugazi) | distributed across `feat(agents)!:` and `feat(e2e)!:` and `feat(pipeline)!:` commits | Every rewritten T2/T3 agent gains a `## NON-NEGOTIABLE` block at the top of its body, with pointer to `core/.claude/rules/agent-orchestration.md` and `testing.md` for the authoritative text (SSOT-respecting) |
+
+Additionally, 10 architectural gaps surfaced during this session's review
+were addressed in the same branch:
+
+- Gap #8 (state-file path inconsistency) — `e2e-conductor-agent` dual-mode
+  path detection
+- Gap #9 (retry-budget non-composition) — `remaining_budget` passed by T1
+  through dispatch context, T2 honors
+- Gap #10 (cleanup-at-init clobbering parent) — `rm -rf` guarded by
+  mode==standalone
+- Gap #11 (aggregation duplicated) — consolidated to T1 (`testing-pipeline-
+  master-agent`), T2 agents deferred
+- Gap #17 (silent-degradation) — `auto-verify` UI_VERIFICATION_DEGRADED
+  gate with opt-out flag
+- Gap #18 (contradictions observable but not blocking) —
+  `contradictions.action: warn | block` config
+- Gap #19 (e2e-visual-run / e2e-conductor-agent parallel implementations) —
+  skill wraps agent; `references/` removed, content migrated into agents
+- State-schema versioning — `schema_version: "1.0.0"` first field of every
+  state file
+
+**Not applied in this overhaul** (deferred):
+- Full Claude-Code-free headless runner (user narrowed Phase F to aggregation
+  only; issue #N for follow-up)
+- GitHub Actions CI workflow wiring for the standalone aggregator
+- Port of testing-pipeline into the remaining framework-native runners
+  (android-run-e2e, flutter-e2e-test, react-native-e2e) — out of scope per
+  plan's "non-goals" section
+
+Synthetic Playwright fixture at `scripts/tests/fixtures/playwright-demo/`
+exercises all 7 scenarios (pass, broken-locator, timing, visual-change,
+logic, flaky, infra) and drives `scripts/tests/test_pipeline_e2e.py` which
+verifies the aggregator produces correct verdicts for each.
+

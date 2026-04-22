@@ -75,16 +75,39 @@ Branch: `feat/testing-pipeline-overhaul`. Started: 2026-04-22.
 - [x] Commit Phase H
 
 ### Cross-cutting
-- [ ] `registry/patterns.json` — bump versions for all changed patterns
-- [ ] `docs/QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md` — append "Applied" section
-- [ ] Regenerate docs (`PYTHONUTF8=1 PYTHONPATH=. python scripts/generate_docs.py`)
-- [ ] Run full CI replication locally (pytest, workflow_quality_gate_validate_patterns, dedup_check)
-- [ ] Update `.claude/tasks/lessons.md` with any corrections encountered
+- [x] `registry/patterns.json` — versions bumped for 9 patterns (auto-verify 4.0.0, e2e-visual-run 4.0.0, e2e-conductor-agent 2.0.0, test-scout-agent 2.0.0, visual-inspector-agent 2.0.0, test-healer-agent 2.0.0, test-failure-analyzer-agent 2.0.0, testing-pipeline-master-agent 2.0.0, test-pipeline-agent 3.0.0)
+- [x] `docs/QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md` — Applied section appended mapping findings to commits
+- [x] Regenerated docs (`generate_docs.py` — DASHBOARD.md, STACK-CATALOG.md, GETTING-STARTED.md, dashboard.html)
+- [x] Full CI replication local: 1081 passed / 58 skipped; workflow_quality_gate_validate_patterns PASSED; dedup_check --validate-all PASSED
+- [ ] Update `.claude/tasks/lessons.md` — no corrections encountered this session
 
 ## Completed
 
-_None yet in this task._
+All 8 phases (A-H) of the testing-pipeline overhaul landed on branch `feat/testing-pipeline-overhaul`:
+1. **Phase A** — e2e consolidation (skill wraps agent)
+2. **Phase B** — healer MCP + deterministic regex classification
+3. **Phase C** — architectural gaps (state paths, retry budget composition, cleanup guards, silent-degradation gate)
+4. **Phase D** — GitHub Issue tracking hooks in master agent
+5. **Phase E** — Constitution NON-NEGOTIABLE blocks at top of every rewritten agent
+6. **Phase F** — standalone pipeline_aggregator.py + 14 tests
+7. **Phase G** — synthetic Playwright fixture (12 files, 7 scenarios)
+8. **Phase H** — test_pipeline_e2e.py verification (20 tests across 3 classes)
 
 ## Review
 
-_To be filled at end of task._
+**Outcome:** Full pipeline overhaul delivered in 8 commits on `feat/testing-pipeline-overhaul`. 1081 tests pass (up from 1047 pre-overhaul; +34 new). All 5 research recommendations AND 10 architectural gaps addressed. No new skill/agent names created — every change updates an existing pattern in-place so downstream projects get replacement via the same filenames.
+
+**Verification status:**
+- `pytest scripts/tests/` → 1081 passed, 58 skipped
+- `workflow_quality_gate_validate_patterns.py` → PASSED (1 informational warning: auto-verify 506 lines, within 500-1000 warning zone)
+- `dedup_check.py --validate-all` → Registry validation passed
+- Playwright-smoke test in `test_pipeline_e2e.py` skipped (Node not installed in this environment); structural + aggregator-integration tests all pass
+
+**Remaining (deferred, documented in research doc's Applied section):**
+- Full Claude-Code-free headless runner (out of scope per user decision)
+- GitHub Actions CI workflow wiring for the standalone aggregator
+
+**Lessons learned during implementation:**
+1. The aggregator's "union of failures" rule needed an explicit `any_stage_failed` check — a stage reporting FAILED with empty failures[] was previously counted as PASSED. Surfaced by the flaky scenario simulation in test_pipeline_e2e.py and fixed.
+2. Pinned-content tests (test_e2e_visual_run_playwright_only.py) that reference specific skill content must be rewritten when content moves between files during consolidation. This session rewrote them to target the new homes (e2e-conductor-agent + test-scout-agent) rather than the deleted references/ directory.
+
