@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Playwright Demo — Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 720px; }
+    nav { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #cbd5e1; padding: .5rem; text-align: left; }
+    /* visual-change scenario: intentional color shift to drive EXPECTED_CHANGE */
+    body[data-scenario="visual-change"] h1 { color: #db2777; }
+  </style>
+</head>
+<body data-scenario="__SCENARIO__">
+  <nav aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/checkout">Checkout</a>
+  </nav>
+  <main>
+    <h1>Users Dashboard</h1>
+
+    <!--
+      broken-locator scenario renders the "refresh" button with a renamed
+      label so the test's original locator (`Refresh`) fails to resolve.
+      SELECTOR auto-heal should regenerate the locator against the live ARIA
+      tree and re-run the test successfully.
+    -->
+    <button id="refresh-button"
+            data-testid="refresh-users">
+      <span data-render-on="broken-locator">Reload Users</span>
+      <span data-render-on="default">Refresh</span>
+    </button>
+
+    <table aria-label="Users">
+      <thead>
+        <tr><th>ID</th><th>Name</th><th>Email</th></tr>
+      </thead>
+      <tbody id="users-tbody"></tbody>
+    </table>
+
+    <p>Metric: <span data-testid="metric">loading...</span></p>
+  </main>
+
+  <script>
+    const SCENARIO = "__SCENARIO__";
+    // Toggle the two refresh-button variants based on scenario.
+    document.querySelectorAll('[data-render-on]').forEach((el) => {
+      const mode = el.getAttribute('data-render-on');
+      const active = (SCENARIO === 'broken-locator' && mode === 'broken-locator') ||
+                     (SCENARIO !== 'broken-locator' && mode === 'default');
+      el.style.display = active ? 'inline' : 'none';
+    });
+
+    async function loadUsers() {
+      const res = await fetch('/api/users');
+      const { users } = await res.json();
+      const tbody = document.getElementById('users-tbody');
+      tbody.innerHTML = '';
+      for (const u of users) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${u.id}</td><td>${u.name}</td><td>${u.email || ''}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function loadMetric() {
+      try {
+        const res = await fetch('/api/metric');
+        if (!res.ok) throw new Error('metric endpoint failed');
+        const { value } = await res.json();
+        document.querySelector('[data-testid="metric"]').textContent = String(value);
+      } catch {
+        document.querySelector('[data-testid="metric"]').textContent = 'error';
+      }
+    }
+
+    loadUsers();
+    loadMetric();
+    document.getElementById('refresh-button').addEventListener('click', () => {
+      loadUsers();
+      loadMetric();
+    });
+  </script>
+</body>
+</html>

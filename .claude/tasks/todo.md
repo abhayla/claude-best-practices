@@ -58,11 +58,14 @@ Branch: `feat/testing-pipeline-overhaul`. Started: 2026-04-22.
 - [ ] Commit Phase F
 
 ### Phase G — Synthetic Playwright fixture
-- [ ] Create `scripts/tests/fixtures/playwright-demo/` (app + tests + config)
-- [ ] 7 test scenarios with `DEMO_SCENARIO` env var seeding
-- [ ] `playwright.config.ts` with webServer, outputDir, screenshot: 'on'
-- [ ] `package.json` with Playwright + express
-- [ ] Commit Phase G
+- [x] Create `scripts/tests/fixtures/playwright-demo/` with Express app + Playwright config + 7 scenarios
+- [x] 7 test scenarios (home/pass, dashboard/broken-locator, checkout/timing, visual/visual-change, logic/LOGIC_BUG, flaky, infra) with `DEMO_SCENARIO` env var seeding
+- [x] `playwright.config.ts` — webServer on port 4317, outputDir test-evidence/latest, screenshot: 'on', json reporter
+- [x] `package.json` with Playwright 1.49 + express 4.21 + @playwright/mcp dependency (matches test-healer-agent's declared MCP server)
+- [x] Tiny Express server (90 LOC, no framework) with DEMO_SCENARIO-aware endpoints (/health, /api/users, /api/orders, /api/metric) and 3 static HTML pages
+- [x] README.md documenting the scenario matrix and how to run standalone vs through the pipeline
+- [x] .gitignore excluding node_modules, test-results, test-evidence, .pipeline, .workflows, playwright-report
+- [x] Commit Phase G
 
 ### Phase H — Verification (end-to-end proof)
 - [ ] `scripts/tests/test_pipeline_e2e.py` with parametrized scenarios
