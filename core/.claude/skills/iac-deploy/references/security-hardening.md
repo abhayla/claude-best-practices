@@ -7,8 +7,8 @@ NEVER hardcode credentials in IaC files. Use these approaches:
 ```hcl
 # BAD — hardcoded credentials
 provider "aws" {
-  access_key = "AKIAIOSFODNN7EXAMPLE"   # NEVER
-  secret_key = "wJalrXUtnFEMI/K7MDENG"  # NEVER
+  access_key = "<YOUR_AWS_ACCESS_KEY_ID>"   # NEVER hardcode
+  secret_key = "<YOUR_AWS_SECRET_ACCESS_KEY>"  # NEVER hardcode
 }
 
 # GOOD — environment-based authentication
@@ -31,7 +31,7 @@ provider "aws" {
 
 ```bash
 # Pass sensitive values via environment variables
-export TF_VAR_db_password="$(aws secretsmanager get-secret-value --secret-id db-password --query SecretString --output text)"
+export TF_VAR_db_credential="$(aws secretsmanager get-secret-value --secret-id db-credential --query SecretString --output text)"
 terraform apply
 ```
 

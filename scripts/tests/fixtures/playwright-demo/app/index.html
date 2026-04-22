@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Playwright Demo — Home</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 720px; }
+    nav { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    h1 { color: #0f172a; }
+  </style>
+</head>
+<body>
+  <nav aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/checkout">Checkout</a>
+  </nav>
+  <main>
+    <h1>Demo Fixture — Home</h1>
+    <p>Scenario: <span data-testid="scenario">__SCENARIO__</span></p>
+    <button data-testid="go-dashboard" onclick="window.location='/dashboard'">Go to dashboard</button>
+  </main>
+</body>
+</html>

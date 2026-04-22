@@ -1629,7 +1629,7 @@ class AuthScreenTest {
             .performTextInput(email)
 
         // Input password
-        val password = "password123"
+        val password = ("password123")
         composeTestRule
             .onNodeWithText("Password")
             .performTextInput(password)

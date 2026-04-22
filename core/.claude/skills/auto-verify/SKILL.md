@@ -13,8 +13,8 @@ triggers:
   - verify before commit
   - verify correctness
 allowed-tools: "Bash Read Grep Glob Write Skill Agent"
-argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "3.2.0"
+argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof | --no-capture-proof] [--allow-degraded-ui]"
+version: "4.0.0"
 type: workflow
 ---
 
@@ -36,6 +36,7 @@ enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 | `--strict-gates` | false | Missing upstream JSON = BLOCK (set by orchestrator) |
 | `--capture-proof` | true (from config) | Capture screenshots on every test, pass or fail |
 | `--no-capture-proof` | — | Disable screenshot capture even if config says true |
+| `--allow-degraded-ui` | false | Allow PASSED verdict when UI tests are mapped but not screenshot-verified (silent-degradation opt-out) |
 
 ---
 
@@ -340,8 +341,22 @@ After test execution and visual review:
 
 ### Decision Flow
 
-1. **All tests pass** (UI screenshot verdicts + non-UI exit codes, and no visual overrides) → proceed to STEP 4 (quality gates)
-2. **Any test fails:**
+1. **Silent-degradation gate (MANDATORY for UI tests):**
+   Before declaring PASSED, verify that UI tests actually underwent screenshot
+   verification. Compute: `ui_tests_mapped = count(test_files where UI framework imported)`.
+   If `ui_tests_mapped > 0` AND `summary.ui_tests_screenshot_verified < ui_tests_mapped`,
+   this is a silent-degradation event — tester-agent fell back to exit-code-only
+   verification for UI tests. Gate outcome:
+   - **Default (strict):** set `result: FAILED` with
+     `category: "UI_VERIFICATION_DEGRADED"` and list the unverified tests in
+     `failures[]`. Log: "BLOCKED: {N} UI tests mapped, only {M} screenshot-verified.
+     Either provision tester-agent with MCP / verify-screenshots, or explicitly
+     pass --allow-degraded-ui to proceed."
+   - **With `--allow-degraded-ui`:** set `result: PASSED` but add a WARN to
+     `warnings[]` with the list of unverified UI tests.
+2. **All tests pass** (UI screenshot verdicts + non-UI exit codes, no visual
+   overrides, AND silent-degradation gate satisfied) → proceed to STEP 4 (quality gates)
+3. **Any test fails:**
    - Classify each failure using the test output AND verdict_source (category, file, message)
    - Check for pre-existing failures using git-stash verification (see below)
    - Report FAILED with detailed failure list including verdict_source per test
@@ -488,3 +503,4 @@ stage gate aggregator from reading results from a previous run.
 - MUST NOT proceed past Step 0 if upstream fix-loop reported FAILED or FLAKY. — Why: verifying known-broken code wastes compute and produces misleading results.
 - MUST report pre-existing failures separately from regression failures in the output. — Why: blocking on pre-existing failures prevents any new work from passing verification.
 - MUST degrade gracefully if `/regression-test` or `tester-agent` are missing — use fallbacks, not hard failures. — Why: not all projects have these installed; hard failure makes the skill unusable in simpler setups.
+- MUST fail the silent-degradation gate when UI tests are mapped but screenshot verification was skipped, unless `--allow-degraded-ui` was explicitly passed. — Why: a silent fallback to exit-code-only verification for UI tests reintroduces exactly the "green tests, broken UI" failure mode the dual-signal architecture exists to prevent.

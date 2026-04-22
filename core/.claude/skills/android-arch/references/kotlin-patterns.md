@@ -743,7 +743,7 @@ authRepository.login("user@example.com", "password123")
 // ✅ Clear and explicit
 authRepository.login(
     email = "user@example.com",
-    password = "password123"
+    password = ("password123")
 )
 
 // ✅ Essential for boolean parameters

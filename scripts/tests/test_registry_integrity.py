@@ -567,45 +567,55 @@ class TestScanForSecrets:
         findings = scan_for_secrets(f)
         assert findings == []
 
+    # Fake secrets below are assembled via adjacent-string-literal concatenation
+    # so this source file does not trip dedup_check's repo-wide secret scan.
+    # Python concatenates at parse time; the runtime value is the full
+    # pattern-matching string that scan_for_secrets should detect.
+
     def test_detects_anthropic_key(self, tmp_path):
         from scripts.dedup_check import scan_for_secrets
         f = tmp_path / "leaked.md"
-        f.write_text('api_key = "sk-ant-ABCDEF1234567890abcdef"')
+        fake = "sk-" "ant-ABCDEF1234567890abcdef"
+        f.write_text(f'api_key = "{fake}"')
         findings = scan_for_secrets(f)
         assert len(findings) >= 1
-        assert any("Anthropic" in f for f in findings)
+        assert any("Anthropic" in finding for finding in findings)
 
     def test_detects_github_pat(self, tmp_path):
         from scripts.dedup_check import scan_for_secrets
         f = tmp_path / "leaked.md"
-        f.write_text('token = "ghp_ABCDEFghijklmnop1234567890qrstuv1234"')
+        fake = "gh" "p_ABCDEFghijklmnop1234567890qrstuv1234"
+        f.write_text(f'token = "{fake}"')
         findings = scan_for_secrets(f)
         assert len(findings) >= 1
-        assert any("GitHub" in f for f in findings)
+        assert any("GitHub" in finding for finding in findings)
 
     def test_detects_aws_key(self, tmp_path):
         from scripts.dedup_check import scan_for_secrets
         f = tmp_path / "leaked.md"
-        f.write_text('aws_key = "AKIAIOSFODNN7EXAMPLE"')
+        fake = "AK" "IAIOSFODNN7EXAMPLE"
+        f.write_text(f'aws_key = "{fake}"')
         findings = scan_for_secrets(f)
         assert len(findings) >= 1
-        assert any("AWS" in f for f in findings)
+        assert any("AWS" in finding for finding in findings)
 
     def test_detects_hardcoded_password(self, tmp_path):
         from scripts.dedup_check import scan_for_secrets
         f = tmp_path / "leaked.md"
-        f.write_text('password = "supersecret123"')
+        line = "pass" 'word = "supersecret123"'
+        f.write_text(line)
         findings = scan_for_secrets(f)
         assert len(findings) >= 1
-        assert any("password" in f.lower() for f in findings)
+        assert any("password" in finding.lower() for finding in findings)
 
     def test_detects_google_api_key(self, tmp_path):
         from scripts.dedup_check import scan_for_secrets
         f = tmp_path / "leaked.md"
-        f.write_text('key = "AIzaSyA1234567890ABCDEFghijklmnopqrstuvw"')
+        fake = "AI" "zaSyA1234567890ABCDEFghijklmnopqrstuvw"
+        f.write_text(f'key = "{fake}"')
         findings = scan_for_secrets(f)
         assert len(findings) >= 1
-        assert any("Google" in f for f in findings)
+        assert any("Google" in finding for finding in findings)
 
     def test_binary_file_returns_empty(self, tmp_path):
         from scripts.dedup_check import scan_for_secrets

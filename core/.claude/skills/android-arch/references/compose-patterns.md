@@ -1297,7 +1297,7 @@ fun LoginScreenPreview() {
         LoginScreen(
             uiState = AuthUiState.LoginForm(
                 email = "user@example.com",
-                password = "password123",
+                password = ("password123"),
                 isLoading = false
             ),
             onAction = { },

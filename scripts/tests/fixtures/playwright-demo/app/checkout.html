@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Playwright Demo — Checkout</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 720px; }
+    nav { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    .order-list { list-style: none; padding: 0; }
+    .order-list li { padding: .5rem 0; border-bottom: 1px solid #e2e8f0; }
+    .loading { color: #64748b; }
+  </style>
+</head>
+<body>
+  <nav aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/checkout">Checkout</a>
+  </nav>
+  <main>
+    <h1>Checkout</h1>
+    <p id="status" aria-busy="true" class="loading" data-testid="order-status">Loading orders...</p>
+    <ul id="orders" class="order-list" data-testid="orders-list"></ul>
+    <button data-testid="submit" id="submit-btn" disabled>Submit payment</button>
+  </main>
+
+  <script>
+    const SCENARIO = "__SCENARIO__";
+
+    async function loadOrders() {
+      // Timing scenario: introduce a 3s delay so tests using fixed waits
+      // (or optimistic selectors) fail. TIMING auto-heal should replace
+      // the brittle wait with an event-driven `await expect(...).toBeVisible()`.
+      const delay = SCENARIO === 'timing' ? 3000 : 0;
+      await new Promise((r) => setTimeout(r, delay));
+      const res = await fetch('/api/orders');
+      if (!res.ok) {
+        document.getElementById('status').textContent = 'Failed to load orders';
+        document.getElementById('status').removeAttribute('aria-busy');
+        return;
+      }
+      const { orders } = await res.json();
+      const ul = document.getElementById('orders');
+      ul.innerHTML = '';
+      for (const o of orders) {
+        const li = document.createElement('li');
+        li.textContent = `${o.id} — $${o.total.toFixed(2)} (${o.status})`;
+        li.setAttribute('data-order-id', o.id);
+        ul.appendChild(li);
+      }
+      const status = document.getElementById('status');
+      status.classList.remove('loading');
+      status.removeAttribute('aria-busy');
+      status.textContent = `${orders.length} orders loaded`;
+      document.getElementById('submit-btn').removeAttribute('disabled');
+    }
+
+    loadOrders();
+  </script>
+</body>
+</html>

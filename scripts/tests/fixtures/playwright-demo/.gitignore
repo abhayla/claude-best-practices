@@ -1,0 +1,13 @@
+node_modules/
+package-lock.json
+test-results/
+test-evidence/
+.pipeline/
+.workflows/
+playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Committed ARIA YAML baselines live here — keep them
+!__snapshots__/
+!__snapshots__/**

@@ -223,10 +223,15 @@ class TestGateJsonContracts:
         assert "pipeline-verdict.json" in content
 
     def test_pipeline_verdict_schema_in_orchestrator(self):
-        """Orchestrator defines pipeline-verdict.json with required fields."""
-        content = _read(TEST_PIPELINE_AGENT)
+        """T1 master is the authoritative aggregator and defines the
+        pipeline-verdict.json schema (v2.0.0 consolidation moved this from
+        test-pipeline-agent to testing-pipeline-master-agent)."""
+        master_agent = AGENTS_DIR / "testing-pipeline-master-agent.md"
+        content = _read(master_agent)
         for field in ["run_id", "result", "stages_completed", "stage_results", "failures"]:
-            assert field in content, f"pipeline-verdict.json missing field: {field}"
+            assert field in content, (
+                f"pipeline-verdict.json missing field in master agent: {field}"
+            )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
