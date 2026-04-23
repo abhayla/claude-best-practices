@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-23 14:58 UTC (auto-generated)
+> Last updated: 2026-04-23 15:12 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -41,7 +41,7 @@
 | apply-selections | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| auto-verify | skill | 4.0.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
+| auto-verify | skill | 4.1.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | brainstorm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | branching | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
