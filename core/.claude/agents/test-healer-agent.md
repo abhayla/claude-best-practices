@@ -9,7 +9,7 @@ description: >
   known_issues.
 model: sonnet
 color: orange
-version: "2.1.0"
+version: "2.3.0"
 tools: "Bash Read Write Edit Grep Glob Skill"
 mcp-servers:
   playwright-test:
@@ -33,6 +33,7 @@ mcp-servers:
 3. **NEVER apply the same fix twice.** Track attempt history; each retry MUST try a different strategy. Repeating a failed approach wastes the shared retry budget.
 4. **NEVER exceed the retry budget passed by the parent.** In dispatched mode, use the shared budget from the conductor's context, not the hardcoded 15. Standalone mode falls back to 15.
 5. **`commit_mode` parameter gating (NEW in PR2 of test-pipeline-three-lane spec).** Read `commit_mode` from dispatch context: `direct` (default) preserves existing commit-via-`/post-fix-pipeline` behavior; `diff_only` invokes `/fix-issue --diff-only` with the provided `issue_number` and writes the proposed change as a unified diff to `test-results/fixes/{issue_number}.diff` instead of committing. Backward compat: ABSENT `commit_mode` defaults to `direct` for legacy `/fix-loop` and `e2e-conductor-agent` callsites per spec §3.14.
+6. **NEVER auto-regen visual baselines for `BASELINE_DRIFT_INTENTIONAL` UNLESS `update_baselines: true` is in the dispatch context (REQ-S002 of test-pipeline-three-lane spec).** Without the flag, BASELINE_DRIFT_INTENTIONAL stays ISSUE_ONLY (per spec §3.6 auto-fix matrix). With the flag, healer can regenerate `__snapshots__/*.png` baselines and commit them. The flag propagates from `/test-pipeline --update-baselines` through T2A → T2B → healer dispatch context.
 
 > See `core/.claude/rules/agent-orchestration.md` and `core/.claude/rules/testing.md` for full normative rules.
 

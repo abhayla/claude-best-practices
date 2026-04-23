@@ -1616,10 +1616,10 @@
     "tier": "must-have"
   },
   "escalation-report": {
-    "hash": "df515b51027d3b0f0ee8a1fdf5836e34b467ccc53168bcb02b36d663b390fb90",
+    "hash": "a3b08c1e75cdd3985afb036024ed8c1c9156e633d26ee5cc04f9f5ce30161eed",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
     "last_updated": "2026-04-23",
@@ -3491,10 +3491,10 @@
     "tier": "nice-to-have"
   },
   "serialize-fixes": {
-    "hash": "450692d5df0501acd0dc7853c4c268aa55c87bb3eefe08ff04c4f796b8c55688",
+    "hash": "56df3101f963758b33b8e2bc45cd4ba02a83d69a44d652c5d370173e2c1363da",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
     "last_updated": "2026-04-23",
@@ -3963,10 +3963,10 @@
     "tier": "must-have"
   },
   "test-healer-agent": {
-    "hash": "524518af1430bb2b5ff72da794124809c95a476f898c86bfec0e44d526aa7faa",
+    "hash": "11785f95c70cd17a5e762a208544b671964fc5fa1857dda7167b6c560946bee7",
     "type": "agent",
     "category": "core",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
     "last_updated": "2026-04-23",
@@ -4048,10 +4048,10 @@
     "tier": "must-have"
   },
   "test-pipeline-agent": {
-    "hash": "8bb42caf2f3c88249f7164a71c8bea6059730b84d7b982a9f9cde196bb342047",
+    "hash": "fcfbc74c933f527ac03c3c28f76968c7977b5cf6b8577e9a18872090310e6928",
     "type": "agent",
     "category": "core",
-    "version": "4.1.0",
+    "version": "4.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-04-23",

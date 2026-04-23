@@ -34,6 +34,7 @@ lanes:
     enabled: true
     runs_after: functional             # waits for functional lane to produce screenshots
     intra_lane_parallelism: 1          # multimodal review is sequential per agent
+    use_checkpoint: false              # REQ-S006: when true, UI lane starts on functional.ui-tests-complete.flag instead of full functional return (reduces wall-clock on projects with many slow non-UI tests after UI tests)
 
 # Scout track-detection rules (closes spec §3.1 + reviewer Gap 9)
 track_detection:
@@ -94,7 +95,7 @@ auto_heal:
   IMPORT_ERROR: AUTO_HEAL
   MISSING_FIXTURE: AUTO_HEAL
   SCHEMA_MISMATCH: AUTO_HEAL
-  BASELINE_DRIFT_INTENTIONAL: AUTO_HEAL_WITH_FLAG
+  BASELINE_DRIFT_INTENTIONAL: AUTO_HEAL_WITH_FLAG   # only when /test-pipeline --update-baselines is passed (REQ-S002)
   FLAKY: QUARANTINE
   INFRASTRUCTURE: RETRY_INFRA
   LOGIC_BUG: ISSUE_ONLY
@@ -102,6 +103,21 @@ auto_heal:
   CONTRACT_BROKEN: ISSUE_ONLY
   VISUAL_REGRESSION: ISSUE_ONLY
   NEEDS_CONTRACT_VALIDATION: ISSUE_ONLY
+
+# Optional CLI flags supported by /test-pipeline (REQ-S001, S002, S005)
+cli_flags:
+  only_issues:
+    description: "Re-run pipeline against only the tests linked to the given GitHub Issue numbers. Comma-separated list."
+    example: "/test-pipeline --only-issues 1234,1235,1236"
+    spec_ref: "REQ-S001"
+  update_baselines:
+    description: "Allow healer to auto-regen visual baselines for BASELINE_DRIFT_INTENTIONAL category."
+    example: "/test-pipeline --update-baselines"
+    spec_ref: "REQ-S002"
+  autosquash:
+    description: "After successful run with multiple fix commits, consolidate via git rebase -i --autosquash."
+    example: "/test-pipeline --autosquash"
+    spec_ref: "REQ-S005"
 
 # GitHub Issue creation config (active in PR2 — declared here for forward-compat)
 issue_creation:

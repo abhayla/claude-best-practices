@@ -9,7 +9,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write"
 argument-hint: "<run-id> <state-json-path>"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Escalation Report — Generate Pipeline Escalation Markdown
@@ -123,7 +123,45 @@ To re-run the pipeline against just the unresolved tests:
 
 ---
 
-## STEP 3: Return contract
+## STEP 3: Optional notifications + reviewer auto-assign (REQ-C002, REQ-C004)
+
+### REQ-C002: Slack notification
+
+If `SLACK_WEBHOOK_URL` env var is set, post a summary to Slack:
+
+```bash
+if [ -n "$SLACK_WEBHOOK_URL" ]; then
+    SUMMARY="🚨 Test pipeline escalation — run ${run_id}\n\nResolved: ${resolved_count}\nFix-failed: ${fix_failed_count}\nIssue-only: ${issue_only_count}\n\nReport: test-results/escalation-report.md\nOpen Issues: \`gh issue list --label pipeline-fix-failed --state open\`"
+    curl -fsS -X POST -H 'Content-type: application/json' \
+         --data "{\"text\": \"$SUMMARY\"}" \
+         "$SLACK_WEBHOOK_URL" || echo "WARN: Slack post failed (non-fatal)"
+fi
+```
+
+Best-effort. Failures here MUST NOT abort the escalation report itself (fail-soft for notifications).
+
+### REQ-C004: CODEOWNERS auto-assign
+
+For each `fix_failed` Issue, parse `CODEOWNERS` (or `.github/CODEOWNERS`) to find owners of the failing test file path, then auto-assign:
+
+```bash
+CODEOWNERS_FILE=$(find . -maxdepth 3 -iname CODEOWNERS | head -1)
+if [ -n "$CODEOWNERS_FILE" ]; then
+    for issue in $fix_failed_issues; do
+        test_file=$(extract_test_file_from_issue "$issue")
+        owners=$(grep_codeowners_for_path "$CODEOWNERS_FILE" "$test_file")
+        if [ -n "$owners" ]; then
+            for owner in $owners; do
+                gh issue edit "$issue" --add-assignee "$owner" 2>/dev/null || true
+            done
+        fi
+    done
+fi
+```
+
+Best-effort; auto-assign failures (e.g., user not a repo collaborator) MUST NOT abort.
+
+## STEP 4: Return contract
 
 ```json
 {
@@ -131,7 +169,9 @@ To re-run the pipeline against just the unresolved tests:
   "resolved_count": <N>,
   "fix_failed_count": <N>,
   "issue_only_count": <N>,
-  "labels_applied": <N>
+  "labels_applied": <N>,
+  "slack_notified": <true|false>,
+  "reviewers_assigned": <N>
 }
 ```
 
