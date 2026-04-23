@@ -11,9 +11,15 @@ to verify:
 - The auto-fix matrix correctly classifies this as `ISSUE_ONLY` (no auto-heal attempt)
 - Per-test gate evaluates: required = ["functional"], functional verdict = FAILED → overall FAIL
 
+Marked `xfail(strict=True)` so the hub's pytest run reports XFAIL, NOT FAILURE.
+The three-lane test pipeline runs this fixture in a project context (separate
+pytest invocation) where the failure IS the signal it's testing for.
+
 Used by:
 - `scripts/tests/test_pipeline_three_lane.py::test_per_test_gate_functional_only`
 """
+
+import pytest
 
 
 def add(a: int, b: int) -> int:
@@ -21,6 +27,7 @@ def add(a: int, b: int) -> int:
     return a - b   # noqa — the bug is the point
 
 
+@pytest.mark.xfail(strict=True, reason="Deliberate LOGIC_BUG fixture; expected to fail")
 def test_add_two_plus_three_equals_five():
     """Should pass — fails because of the bug in `add()` above.
 

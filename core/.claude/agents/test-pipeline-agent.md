@@ -202,10 +202,16 @@ Receive lane contract.
 
 ### STEP 5 — JOIN + per-test report
 
-Read all three lane result files:
+Read all three lane result files under `test-results/`:
 - `test-results/functional.json`
 - `test-results/api.json` (may be skip/empty)
 - `test-results/ui.json` (may be skip/empty)
+
+After JOIN, T2A also writes an advisory mirror at `test-results/pipeline-verdict.json`
+for backward-compat with downstream consumers that previously read T1's authoritative
+aggregator output. T1 remains the single source of truth for the authoritative
+verdict (spec §3.4); T2A's mirror is marked `t1_authoritative: false` to make the
+distinction explicit.
 
 For each `test_id` in the union of all three queues, evaluate the per-test gate:
 
@@ -312,9 +318,15 @@ Per spec §3.10.1, T2A tracks two measurable budgets (NOT tokens — Claude Code
 
 Either budget exceeded → return BLOCKED contract → T1 propagates → exit code 2.
 
+## Gate Enforcement Rules
+
+- **`--strict-gates` (always passed by this orchestrator to lane workers):** Missing lane return JSON = BLOCK. No "proceed without gate check." This T2A runs fail-closed by design — fail-closed means missing evidence is treated as a failure, not an excuse to skip.
+- **`capture_proof: true`** is passed to the functional lane (read from `lanes.functional.capture_proof` in `core/.claude/config/test-pipeline.yml`) so UI tests produce screenshots into `test-evidence/{run_id}/screenshots/` for the UI lane (Wave 2) to review. Non-UI tests also get capture_proof on failure per testing.md for supplementary evidence.
+- Screenshot verdict for UI tests is ALWAYS blocking when FAILED — same rule as T1 master.
+
 ## Skill Cross-References
 
-- Read `core/.claude/config/test-pipeline.yml` for lane definitions, track detection rules, concurrency caps, budgets
+- Read `core/.claude/config/test-pipeline.yml` for lane definitions (including `capture_proof`), track detection rules, concurrency caps, budgets
 - Read `core/.claude/rules/testing.md` for verdict authority rules (UI screenshot is authoritative)
 - Read `core/.claude/rules/agent-orchestration.md` rules 6 and 8 (state ownership, responsibility cap)
 

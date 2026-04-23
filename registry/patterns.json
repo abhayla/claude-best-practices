@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-04-23",
-    "total_patterns": 231
+    "total_patterns": 232
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -2506,6 +2506,26 @@
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "skip"
+  },
+  "orchestrator-responsibility-allowlist": {
+    "hash": "ada479986414e04fcef229ee64cf50378bdb0c37cae387eb6e6669a438a8d2e1",
+    "type": "config",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-23",
+    "last_updated": "2026-04-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Allowlist for orchestrator agents that exceed the agent-orchestration.md rule-8 responsibility cap (max 4) with documented justifications. Read by workflow_quality_gate_validate_patterns.py per REQ-M035 of test-pipeline-three-lane PR1.",
+    "tags": [
+      "orchestration",
+      "validation",
+      "allowlist",
+      "rule-8"
+    ],
+    "changelog": "v1.0.0: Initial release with failure-triage-agent inaugural entry",
+    "tier": "must-have"
   },
   "parallel-worktree-orchestrator-agent": {
     "hash": "76f622e14a1052c54b47586ff094f565f1b63771ea5cc4552ab90484d72c61df",
