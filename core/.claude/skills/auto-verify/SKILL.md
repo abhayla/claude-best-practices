@@ -14,7 +14,7 @@ triggers:
   - verify correctness
 allowed-tools: "Bash Read Grep Glob Write Skill Agent"
 argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof | --no-capture-proof] [--allow-degraded-ui]"
-version: "4.0.0"
+version: "4.1.0"
 type: workflow
 ---
 
@@ -207,115 +207,21 @@ and this step batch-reviews the verdicts for consistency and catches edge cases.
 `--no-capture-proof` was passed. When enabled for non-UI tests, it provides
 supplementary visual evidence (not authoritative).
 
-### 2.5.1 Read Manifest
+### Sub-steps (detailed in `references/visual-proof-review.md`)
 
-```bash
-MANIFEST="test-evidence/${RUN_ID}/manifest.json"
-if [ ! -f "$MANIFEST" ]; then
-  echo "No screenshot manifest found — skipping visual review"
-  # Set visual_review.enabled = false in structured output, proceed to STEP 3
-fi
-```
+1. **2.5.1 Read Manifest** — parse `test-evidence/{run_id}/manifest.json`; skip gracefully if absent or zero screenshots (non-UI project)
+2. **2.5.2 Review All Screenshots** — 100% review rate; multimodal Read each screenshot, evaluate against 8-point criteria, classify per UI/non-UI verdict-source tables
+3. **2.5.3 Write Visual Review Results** — emit `test-evidence/{run_id}/visual-review.json` with overrides + flags; `result: FAILED` if ANY overrides exist
+4. **2.5.4 Gate Impact** — FAILED overrides add to STEP 3's main failure list; PASSED proceeds normally
 
-If the manifest exists but has zero screenshots (`screenshot_count: 0` or
-empty `screenshots` array), this is normal for non-UI projects (API servers,
-CLI tools, libraries). Handle gracefully:
+**Gate signal:** STEP 3 reads `visual-review.json` to incorporate overrides into its failure union. Visual review is the authoritative screenshot-signal; exit code is secondary.
 
-```bash
-SCREENSHOT_COUNT=$(python3 -c "import json; print(json.load(open('$MANIFEST')).get('screenshot_count', 0))")
-if [ "$SCREENSHOT_COUNT" = "0" ]; then
-  echo "Manifest found but 0 screenshots (non-UI project) — skipping visual review"
-  # Write visual-review.json with result: PASSED, screenshots_reviewed: 0
-  # Proceed to STEP 3
-fi
-```
-
-Parse the manifest to get the list of all screenshots with their test names,
-results, and file paths.
-
-### 2.5.2 Review All Screenshots
-
-For EVERY screenshot in the manifest (100% review rate):
-
-1. **Read the screenshot** using multimodal Read (the image file)
-2. **Evaluate** against these criteria (from `/verify-screenshots` Step 2):
-   - No error dialogs, crash screens, or unhandled exception modals
-   - Text is readable and not truncated
-   - Layout appears correct (no overlapping elements)
-   - Loading states are resolved (no spinners in final screenshots)
-   - Data containers are populated (tables have rows, lists have items)
-   - No empty-state placeholders when data is expected
-   - No placeholder text ("Lorem ipsum", "undefined", "null", "NaN")
-   - Timestamps/dates are within expected recency
-
-3. **Classify** each screenshot:
-
-**UI tests (verdict_source: "screenshot")** — tester-agent already set the
-verdict from screenshot. This pass confirms or catches edge cases:
-
-| Tester Verdict | Confirmation Review | Action |
-|----------------|-------------------|--------|
-| PASSED | Confirms correct | No action — verdict stands |
-| PASSED | Spots missed issue | OVERRIDE → FAILED (add to overrides) |
-| FAILED | Confirms failure | No action — verdict stands |
-| FAILED | Looks actually correct | FLAG for review (possible AI triage error) |
-
-**Non-UI tests (verdict_source: "exit_code")** — screenshot is supplementary:
-
-| Exit Code | Visual Assessment | Verdict | Action |
-|-----------|-------------------|---------|--------|
-| PASSED | Looks correct | CONFIRMED | No action |
-| PASSED | Shows problems | OVERRIDE → FAILED | Add to overrides list |
-| FAILED | Shows the failure | CONFIRMED | Enrich failure diagnosis |
-| FAILED | Looks correct | FLAG for review | Possible flaky/timing issue |
-
-### 2.5.3 Write Visual Review Results
-
-Write `test-evidence/{run_id}/visual-review.json`:
-
-```json
-{
-  "skill": "visual-proof-review",
-  "run_id": "{run_id}",
-  "timestamp": "{ISO-8601}",
-  "screenshots_reviewed": 50,
-  "screenshots_total": 50,
-  "confirmed_passes": 43,
-  "confirmed_failures": 5,
-  "overrides": [
-    {
-      "test": "test_dashboard_loads",
-      "original_result": "PASSED",
-      "visual_verdict": "FAILED",
-      "reason": "Dashboard shows empty table — no data rows visible despite test asserting element presence",
-      "screenshot": "screenshots/test_dashboard_loads.pass.png"
-    }
-  ],
-  "flags": [
-    {
-      "test": "test_login_timeout",
-      "original_result": "FAILED",
-      "visual_observation": "Screenshot shows successful login page — possible timing/flaky issue",
-      "screenshot": "screenshots/test_login_timeout.fail.png"
-    }
-  ],
-  "result": "PASSED|FAILED"
-}
-```
-
-`result` is FAILED if ANY overrides exist (a passed test was visually broken).
-`result` is PASSED if zero overrides (all passes confirmed, all failures confirmed).
-
-### 2.5.4 Gate Impact
-
-If visual review `result` is FAILED:
-- Report each override with the reason and screenshot path
-- The override failures are added to the main failure list in STEP 3
-- These count as real failures for the auto-verify verdict
-
-If visual review `result` is PASSED:
-- Log: "Visual proof review: {N} screenshots confirmed, 0 overrides"
-- Proceed normally
+See `references/visual-proof-review.md` for:
+- Full bash snippets for manifest read + skip logic
+- 8-point evaluation criteria for each screenshot
+- Verdict classification tables (UI `screenshot` source; non-UI `exit_code` source)
+- Full `visual-review.json` schema with override/flag examples
+- STEP 3 gate-impact rules
 
 ---
 
