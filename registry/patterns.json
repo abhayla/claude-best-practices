@@ -1257,8 +1257,8 @@
       "accessibility",
       "playwright"
     ],
-    "changelog": "v3.0.0: BREAKING — scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv1.0.0: Initial release — queue-based orchestration, dual-signal verification, 8-classification healing.",
-    "tier": "nice-to-have"
+    "changelog": "v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing.",
+    "tier": "must-have"
   },
   "e2e-best-practices": {
     "hash": "2e4989ba4ab2f6381c5b5528b9f28d7cf83f8252012892c997ab37db6571741c",
@@ -1341,8 +1341,8 @@
       "testing",
       "queue"
     ],
-    "changelog": "v1.0.0: Initial release â€” async queue-based E2E orchestration pipeline",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release - async queue-based E2E orchestration pipeline. v2.0.0: absorbed user-facing modes from e2e-visual-run. Promoted to must-have 2026-04-23 so `testing-pipeline-master-agent` (must-have) does not have a dangling Agent() dispatch under default provisioning.",
+    "tier": "must-have"
   },
   "executing-plans": {
     "hash": "98c6393239714ba2a4f215e4bd140c93fba8196b0d70610fbf7a7bb3e0999acf",
@@ -3416,8 +3416,8 @@
       "healing",
       "auto-fix"
     ],
-    "changelog": "v1.0.0: Initial release â€” 8-classification targeted healing with 3-attempt cap",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release - 8-classification targeted healing with 3-attempt cap. v2.0.0: Playwright MCP hard dep, Constitution at top. Promoted to must-have 2026-04-23 so `e2e-conductor-agent` (now must-have) has its T3 worker available by default.",
+    "tier": "must-have"
   },
   "tdd-failing-test-generator": {
     "hash": "e9c306a70e2a0cce22a4ba55454005d3e2a50fb55d120fca58c8754ed30f6b02",
@@ -3535,8 +3535,8 @@
       "runner",
       "screenshots"
     ],
-    "changelog": "v1.0.0: Initial release â€” failure-only screenshots, per-test a11y snapshots",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release - failure-only screenshots, per-test a11y snapshots. v2.0.0: every-test screenshot capture, Constitution at top. Promoted to must-have 2026-04-23 so `e2e-conductor-agent` (now must-have) has its T3 worker available by default.",
+    "tier": "must-have"
   },
   "tester-agent": {
     "hash": "859b0e7fd3ca94eabf5d60a7d8efa3794c9d91cd4f689222f98b543feada0927",
@@ -3712,8 +3712,8 @@
       "accessibility",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release â€” dual-signal (a11y + screenshot) async verification",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release - dual-signal (a11y + screenshot) async verification. v2.0.0: EXPECTED_CHANGE lane, confidence caps, Constitution at top. Promoted to must-have 2026-04-23 so `e2e-conductor-agent` (now must-have) has its T3 worker available by default.",
+    "tier": "must-have"
   },
   "vue": {
     "hash": "fb50e74191257a8a83f1a87d92dae7a4316159525e0673e7fdc04dca9c2822a9",
