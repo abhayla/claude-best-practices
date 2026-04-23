@@ -6,7 +6,7 @@ description: >
   enforcement. Alternative entry point to `testing-pipeline-master-agent`
   for teams that only want the iteration-focused subchain without the full
   tdd_red → e2e → quality_gate workflow. Invoked by `/test-pipeline` slash
-  command. Reads pipeline config from `config/test-pipeline.yml`.
+  command. Reads pipeline config from `.claude/config/test-pipeline.yml`.
 tools: "Agent Bash Read Write Edit Grep Glob Skill"
 model: inherit
 color: blue
@@ -16,7 +16,7 @@ version: "3.1.0"
 ## NON-NEGOTIABLE
 
 1. **Cleanup happens at INIT ONLY in standalone mode.** When dispatched (Pipeline ID in prompt), the T1 parent owns cleanup. Wiping test-results/ in dispatched mode corrupts the parent's state.
-2. **Retry budget comes from the parent when dispatched.** Read `remaining_budget` from dispatch context, not from local config. Standalone falls back to `config/test-pipeline.yml` `retry.global_budget`.
+2. **Retry budget comes from the parent when dispatched.** Read `remaining_budget` from dispatch context, not from local config. Standalone falls back to `.claude/config/test-pipeline.yml` `retry.global_budget`.
 3. **Aggregation belongs to the parent, NOT here.** When dispatched, report per-stage results via the return contract and let the T1 master aggregate. Do NOT run the union-aggregation script locally.
 4. **Missing upstream gate JSON is BLOCK, never WARN.** This agent always runs with `--strict-gates`.
 
@@ -76,7 +76,7 @@ else:
 ### INIT (mode-gated)
 
 **Standalone:**
-1. Read `config/test-pipeline.yml` for stage definitions
+1. Read `.claude/config/test-pipeline.yml` for stage definitions
 2. Read `test-evidence-config.json` (if exists) for `capture_proof` setting
 3. Generate run_id: `{ISO-8601-timestamp}_{7-char-git-sha}` (colons → dashes)
 4. Clean:
@@ -87,7 +87,7 @@ else:
 5. Write initial state with `schema_version: "1.0.0"`
 
 **Dispatched:**
-1. Read `config/test-pipeline.yml`
+1. Read `.claude/config/test-pipeline.yml`
 2. Use run_id from parent's dispatch context
 3. Verify `test-results/` and `test-evidence/{run_id}/` exist (parent created)
 4. Do NOT wipe — parent owns cleanup
@@ -186,14 +186,14 @@ Test Pipeline: PASSED | FAILED | BLOCKED
 
 - **Dispatched mode:** use parent-passed `remaining_budget`. Report
   `retry_budget_consumed` in return contract.
-- **Standalone mode:** per-stage retry limit from `config/test-pipeline.yml`;
+- **Standalone mode:** per-stage retry limit from `.claude/config/test-pipeline.yml`;
   global budget default 15. Each retry MUST try a DIFFERENT approach.
 - When global budget exhausted: STOP, report remaining failures.
 
 ## MUST NOT
 
 - MUST NOT dispatch `Agent()` — T2 uses `Skill()` calls only
-- MUST NOT hardcode stage order — read from `config/test-pipeline.yml`
+- MUST NOT hardcode stage order — read from `.claude/config/test-pipeline.yml`
 - MUST NOT skip cleanup at INIT in standalone mode — stale results corrupt gates
 - MUST NOT wipe directories in dispatched mode — parent owns cleanup
 - MUST NOT run aggregation in dispatched mode — parent owns it
