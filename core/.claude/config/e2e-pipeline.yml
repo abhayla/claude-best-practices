@@ -229,3 +229,58 @@ cleanup_standalone_only:
   - ".pipeline/"
   - "test-evidence/"
   - "test-results/"
+
+# Enriched error-context schema. The analyzer agent (test-failure-analyzer-agent)
+# is a T3 leaf and MUST NOT call MCP tools directly. Instead, callers that have
+# MCP access (T2 sub-orchestrators like e2e-conductor-agent, or healer with
+# @playwright/mcp) capture live browser signals and embed them in the dispatch
+# prompt under the `enriched_context` key.
+#
+# The analyzer matches its regex rules against `test_output` PLUS any populated
+# fields in `enriched_context`. When enrichment is absent, the analyzer falls
+# back to test_output only — the enrichment is purely additive. This preserves
+# T3 leaf purity (no Agent() dispatch, no MCP tool grants) per
+# agent-orchestration.md rule #11 (mandatory context passing).
+error_context_enrichment:
+  schema_version: "1.0.0"
+  # Whether the dispatcher MUST populate enrichment before calling the analyzer.
+  # When required=false, enrichment is opt-in and analyzer falls back gracefully.
+  required: false
+  # Maximum bytes of each enrichment field to carry in the dispatch prompt.
+  # Prevents runaway prompt size when a test produces thousands of console lines.
+  max_field_bytes: 4096
+  # Fields the caller captures from live browser state (via @playwright/mcp or
+  # equivalent) and pastes into the analyzer's dispatch prompt.
+  captured_fields:
+    - console_messages   # browser_console_messages output, last N lines
+    - network_failures   # browser_network_requests filtered to non-2xx
+    - dom_snapshot       # browser_snapshot (ARIA YAML) at failure time
+    - last_url           # page.url() at failure time
+    - page_title         # page.title() at failure time
+  # Regex rules that match against enriched_context fields, in addition to the
+  # test_output rules above. Same first-match-wins semantics.
+  enriched_rules:
+    - id: console_cors_error
+      pattern: "has been blocked by CORS policy"
+      field: console_messages
+      category: INFRASTRUCTURE
+      confidence: 0.93
+      reason: "Browser blocked cross-origin request — server CORS config issue"
+    - id: console_csp_violation
+      pattern: "Refused to (load|execute|connect).*Content Security Policy"
+      field: console_messages
+      category: INFRASTRUCTURE
+      confidence: 0.92
+      reason: "CSP header blocked resource load"
+    - id: network_5xx
+      pattern: "\\b5\\d\\d\\b"
+      field: network_failures
+      category: INFRASTRUCTURE
+      confidence: 0.90
+      reason: "Upstream server returned 5xx during test run"
+    - id: network_401_403
+      pattern: "\\b(401|403)\\b"
+      field: network_failures
+      category: AUTH_ERROR
+      confidence: 0.90
+      reason: "Auth/permission failure during test run"
