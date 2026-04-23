@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-23 15:12 UTC (auto-generated)
+> Last updated: 2026-04-23 16:06 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 236 |
-| Core (universal) | 231 |
+| Total Patterns | 237 |
+| Core (universal) | 232 |
 | Stack-specific | 5 |
 | Agents | 39 |
 | Configs | 2 |
 | Hooks | 8 |
 | Rules | 29 |
-| Skills | 158 |
+| Skills | 159 |
 
 ## Pattern Inventory
 
@@ -101,7 +101,7 @@
 | escalation-report | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | executing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | expo-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| failure-triage-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| failure-triage-agent | agent | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-api-tester-agent | agent | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-backend | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-database | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -156,6 +156,7 @@
 | pattern-structure | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | perf-test | skill | 1.2.0 | hub:abhayla/claude-best-practices | web-quality |
 | pg-query | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| pipeline-fix-pr | skill | 1.0.0 | hub:abhayla/claude-best-practices | serialize-fixes |
 | pipeline-orchestrator | skill | 2.0.0 | hub:abhayla/claude-best-practices | project-manager-agent |
 | plan-executor-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | plan-to-issues | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
@@ -225,7 +226,7 @@
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-pipeline | skill | 1.0.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
-| test-pipeline-agent | agent | 4.2.0 | hub:abhayla/claude-best-practices | — |
+| test-pipeline-agent | agent | 4.3.0 | hub:abhayla/claude-best-practices | — |
 | test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
