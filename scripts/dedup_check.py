@@ -100,7 +100,7 @@ def validate_pattern_integrity(file_path: Path) -> list[str]:
 def validate_registry(registry_path: Path, patterns_root: Path) -> list[str]:
     """Validate registry consistency with actual files."""
     errors = []
-    with open(registry_path) as f:
+    with open(registry_path, encoding="utf-8") as f:
         registry = json.load(f)
 
     for name, entry in registry.items():
@@ -150,7 +150,7 @@ def check_file(file_path: Path) -> list[str]:
     root = Path(__file__).parent.parent
     registry_path = root / "registry" / "patterns.json"
     if registry_path.exists():
-        with open(registry_path) as f:
+        with open(registry_path, encoding="utf-8") as f:
             registry = json.load(f)
         file_hash = hash_pattern(str(file_path))
         dup = check_exact_duplicate(file_hash, registry)

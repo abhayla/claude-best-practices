@@ -33,7 +33,7 @@ def _read(path: Path) -> str:
 
 def _load_registry() -> dict:
     import json
-    with open(REGISTRY_PATH) as f:
+    with open(REGISTRY_PATH, encoding="utf-8") as f:
         return json.load(f)
 
 
