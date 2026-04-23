@@ -287,28 +287,52 @@ invokes it via `Bash` instead of reimplementing inline.
 
 ## STEP: GitHub Issue Creation
 
-For each entry in aggregated `known_issues` with classification
-`LOGIC_BUG` or `VISUAL_REGRESSION`:
+<!--
+PR1-TEMPORARY EXTENSION: The 4 new API-lane categories (SCHEMA_MISMATCH,
+STATUS_CODE_DRIFT, CONTRACT_BROKEN, NEEDS_CONTRACT_VALIDATION) added below are
+PR1-only handlers. In PR2, this entire STEP is DELETED and Issue creation
+moves to `github-issue-manager-agent` invoked via `failure-triage-agent` (T2B).
+The PR2 atomic switchover removes this section in the same commit that
+activates the T2B body. See spec §8 PR2 implementation order.
+-->
 
-1. Compute signature:
+For each entry in aggregated `known_issues` with classification in the
+**handled-categories set**:
+- Original (pre-PR1): `LOGIC_BUG`, `VISUAL_REGRESSION`
+- **NEW in PR1**: `SCHEMA_MISMATCH`, `STATUS_CODE_DRIFT`, `CONTRACT_BROKEN`, `NEEDS_CONTRACT_VALIDATION`
+
+The 4 new categories are emitted by the API lane (per `tester-agent` and
+`fastapi-api-tester-agent` extensions in PR1). T1 must handle them so PR1
+deployments don't silently drop API-lane Issues during the PR1→PR2 window.
+
+1. Compute signature (PR1 keeps the existing 2-field hash for backward compat):
    ```python
    sig = hashlib.sha256(
        f"{entry['test']}|{entry['final_classification']}|{entry.get('top_stack_frame','')}".encode()
    ).hexdigest()[:12]
    ```
+   (PR2 will replace this with the 3-field hash including `failing_commit_sha_short`
+   when the new system activates. PR2's pre-merge migration script closes all
+   PR1-format Issues to prevent cross-PR-boundary dedup misses.)
 
 2. Check existing open issues:
    ```bash
    gh issue list --search "in:body {sig}" --state open --json number --jq '.[0].number'
    ```
 
-3. **If no match:** create with full diagnosis + signature + screenshot link:
+3. **If no match:** create with full diagnosis + signature + (for VISUAL_REGRESSION) screenshot link:
    ```bash
    gh issue create \
      --title "{classification}: {test_name}" \
      --body "<<full diagnosis>> \n\nsignature: {sig}" \
      --label "pipeline-auto,{classification.lower()}"
    ```
+
+   For the 4 new API categories, use a category-tailored body section:
+   - `SCHEMA_MISMATCH`: include the failing request payload + expected Pydantic schema diff
+   - `STATUS_CODE_DRIFT`: include observed status code + expected status code per endpoint contract
+   - `CONTRACT_BROKEN`: include Pact / OpenAPI contract diff (reference `/contract-test` skill output)
+   - `NEEDS_CONTRACT_VALIDATION`: explain that no contract files were detected; recommend adding `pact/` directory or `openapi.yaml` to enable contract validation
 
 4. **If match exists:** comment on the existing issue with the new run_id
    and updated diagnosis (do NOT create a new issue within

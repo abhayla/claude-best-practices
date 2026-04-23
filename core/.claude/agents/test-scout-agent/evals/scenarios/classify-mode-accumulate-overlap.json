@@ -1,0 +1,32 @@
+{
+  "scenario_name": "classify-mode-accumulate-overlap",
+  "description": "Test in tests/api/ AND imports Playwright → BOTH api and ui (accumulate -- closes Reviewer Gap 9).",
+  "input": {
+    "dispatch_context": {
+      "mode": "classify",
+      "pipeline_id": "test-pipeline-RUN004",
+      "run_id": "RUN004"
+    },
+    "filesystem_setup": {
+      "tests/api/test_widget.spec.ts": "import { test } from \"@playwright/test\";\ntest(\"widget\", async ({ page }) => { await page.request.get(\"/api/widget\"); });"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "mode": "classify",
+    "tests_discovered": 1,
+    "queue_counts": {
+      "functional": 1,
+      "api": 1,
+      "ui": 1
+    },
+    "overlap_count": 1
+  },
+  "rubric_hints": {
+    "trigger_reliability": "BOTH path glob (api) AND import scan (ui) match -- accumulate not first-match-wins",
+    "output_structure": "tracks_required_per_test entry includes all three: functional, api, ui",
+    "non_negotiable_adherence": "NN#6 explicit accumulate semantics; overlap_count incremented",
+    "side_effect_correctness": "Test appears in BOTH queues.api AND queues.ui (duplicated test_id by design)",
+    "error_propagation": "No errors -- overlap is intentional"
+  }
+}

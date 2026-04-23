@@ -9,7 +9,8 @@ description: >
   known_issues.
 model: sonnet
 color: orange
-version: "2.0.0"
+version: "2.1.0"
+tools: "Bash Read Write Edit Grep Glob Skill"
 mcp-servers:
   playwright-test:
     type: stdio

@@ -1,0 +1,32 @@
+{
+  "scenario_name": "classify-mode-ui-track-from-import",
+  "description": "Test in tests/ but imports Playwright → classified as functional + ui.",
+  "input": {
+    "dispatch_context": {
+      "mode": "classify",
+      "pipeline_id": "test-pipeline-RUN003",
+      "run_id": "RUN003"
+    },
+    "filesystem_setup": {
+      "tests/checkout.spec.ts": "import { test } from \"@playwright/test\";\ntest(\"checkout\", async ({ page }) => {});"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "mode": "classify",
+    "tests_discovered": 1,
+    "queue_counts": {
+      "functional": 1,
+      "api": 0,
+      "ui": 1
+    },
+    "overlap_count": 0
+  },
+  "rubric_hints": {
+    "trigger_reliability": "@playwright/test import detected → UI track required",
+    "output_structure": "tracks_required_per_test entry includes functional and ui; NOT api",
+    "non_negotiable_adherence": "NN#6: import scan runs even though path didn't match API",
+    "side_effect_correctness": "queues.ui contains test_id; queues.api is empty",
+    "error_propagation": "No errors"
+  }
+}

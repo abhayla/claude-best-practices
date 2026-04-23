@@ -1,0 +1,27 @@
+{
+  "scenario_name": "legacy-no-lane-parameter-backward-compat",
+  "description": "Legacy invocation WITHOUT lane parameter -- defaults to single-lane mode for backward compat.",
+  "input": {
+    "dispatch_context": {
+      "queue": [
+        "tests/test_login.py::test_oauth"
+      ]
+    },
+    "filesystem_setup": {
+      "tests/test_login.py": "fixture-content"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "tests_processed": 1,
+    "passed": "*",
+    "failed": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent recognizes lane parameter is absent → falls back to legacy single-lane",
+    "output_structure": "Return contract is in legacy shape (no lane field; no .jsonl)",
+    "non_negotiable_adherence": "NN#1: lane parameter is mandatory ONLY for three-lane T2A dispatch",
+    "side_effect_correctness": "Does not write to test-results/{lane}.jsonl (no lane); legacy report only",
+    "error_propagation": "Backward compat is not an error -- normal verdict"
+  }
+}

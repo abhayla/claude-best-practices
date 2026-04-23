@@ -1,0 +1,31 @@
+{
+  "scenario_name": "lane-api-with-contract-test",
+  "description": "API lane with contract files -- combined verdict (pytest AND /contract-test).",
+  "input": {
+    "dispatch_context": {
+      "lane": "api",
+      "run_id": "2026-04-23T14-30-00Z_abc1234",
+      "queue": [
+        "tests/api/test_users.py::test_create_user_with_wrong_field_name_returns_422"
+      ]
+    },
+    "filesystem_setup": {
+      "openapi.yaml": "openapi: 3.0.0\ninfo: {title: api, version: 1.0.0}\npaths: {}",
+      "tests/api/test_users.py": "fixture-content"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "lane": "api",
+    "tests_processed": 1,
+    "passed": "*",
+    "failed": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent detects openapi.yaml and invokes Skill(contract-test) after pytest",
+    "output_structure": "Lane contract includes both pytest verdict AND contract-test verdict",
+    "non_negotiable_adherence": "NN#2 lane=api: combined exit code + contract-test; emits CONTRACT_BROKEN if drift",
+    "side_effect_correctness": "Skill(contract-test) invoked once per lane invocation, after pytest",
+    "error_propagation": "Contract drift surfaces as CONTRACT_BROKEN in failures[]"
+  }
+}

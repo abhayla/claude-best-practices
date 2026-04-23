@@ -1,0 +1,32 @@
+{
+  "scenario_name": "classify-mode-basic-functional-only",
+  "description": "Single unit test, no path/import signals -- classified as functional-only.",
+  "input": {
+    "dispatch_context": {
+      "mode": "classify",
+      "pipeline_id": "test-pipeline-RUN001",
+      "run_id": "RUN001"
+    },
+    "filesystem_setup": {
+      "tests/test_simple.py": "def test_x(): assert 1 == 1"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "mode": "classify",
+    "tests_discovered": 1,
+    "queue_counts": {
+      "functional": 1,
+      "api": 0,
+      "ui": 0
+    },
+    "overlap_count": 0
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent enters classify mode on `mode: classify`; does NOT execute tests",
+    "output_structure": "Return contract per spec §3.1: mode/tests_discovered/queue_counts/overlap_count",
+    "non_negotiable_adherence": "NN#9 classify does NOT execute; NN#7 schema_version 2.0.0 written",
+    "side_effect_correctness": "Writes .workflows/testing-pipeline/sub/test-pipeline.json with queues + tracks_required_per_test",
+    "error_propagation": "No errors expected for valid input"
+  }
+}

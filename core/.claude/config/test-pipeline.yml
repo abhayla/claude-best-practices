@@ -1,58 +1,78 @@
-# Test pipeline configuration
-# Read by test-pipeline-agent at runtime (standalone mode for the
-# fix-verify-commit sub-chain). Complements e2e-pipeline.yml which
-# covers the E2E-specific queue + healing orchestration.
+# Test pipeline configuration — three-lane model (PR1 of test-pipeline-three-lane-spec)
+#
+# Read by:
+#   - test-pipeline-agent (T2A, lane orchestration)
+#   - failure-triage-agent (T2B, skeleton in PR1; full body in PR2)
+#   - testing-pipeline-master-agent (T1, cleanup + global retry budget)
 #
 # Ships as a default with hub provisioning so downstream projects can
 # run /test-pipeline out of the box. Provisioned to
 # .claude/config/test-pipeline.yml in target projects. Override any
 # value locally without modifying the hub template.
+#
+# Spec reference: docs/specs/test-pipeline-three-lane-spec.md v1.6 §3.13
 
-schema_version: "1.0.0"
+schema_version: "2.0.0"   # bumped from 1.0.0 for three-lane refactor
 
 pipeline:
-  name: fix-verify-commit
-  version: "1.0.0"
+  name: three-lane-test-pipeline
+  version: "2.0.0"
 
-  # Stage DAG driven by the T2 test-pipeline-agent. Each stage is a
-  # Skill() dispatched in order; gate expressions read the `result`
-  # field from the written artifact.
-  stages:
-    - id: fix_loop
-      skill: fix-loop
-      depends_on: []
-      writes: test-results/fix-loop.json
-      gate: "result IN (PASSED, FIXED)"
-      timeout_minutes: 30
+# Lane definitions (closes Reviewer Gap 1 / spec §3.3)
+lanes:
+  functional:
+    enabled: true
+    intra_lane_parallelism: auto      # auto | <int> | 1 (off) — delegates to test runner
+    capture_proof: true                # functional lane runs UI tests with screenshots
+  api:
+    enabled: true
+    intra_lane_parallelism: auto
+    invoke_skills_after_runner:        # API lane runs runner THEN these skills
+      - contract-test
+      - integration-test
+  ui:
+    enabled: true
+    runs_after: functional             # waits for functional lane to produce screenshots
+    intra_lane_parallelism: 1          # multimodal review is sequential per agent
 
-    - id: auto_verify
-      skill: auto-verify
-      depends_on: [fix_loop]
-      reads: test-results/fix-loop.json
-      writes: test-results/auto-verify.json
-      gate: "result == PASSED"
-      timeout_minutes: 30
+# Scout track-detection rules (closes spec §3.1 + reviewer Gap 9)
+track_detection:
+  api_path_globs:
+    - "**/tests/api/**"
+    - "**/tests/integration/**"
+    - "**/tests/contract/**"
+  api_import_signals:
+    - httpx
+    - requests
+    - axios
+    - node-fetch
+    - supertest
+    - pact
+    - "@pact-foundation/pact"
+  override_file: "core/.claude/config/test-track-overrides.yml"
+  detection_mode: accumulate           # ALL rules run; results accumulate (NOT first-match-wins)
 
-    - id: post_fix
-      skill: post-fix-pipeline
-      depends_on: [auto_verify]
-      reads: test-results/auto-verify.json
-      writes: test-results/post-fix-pipeline.json
-      # Skipped in dispatched mode — parent orchestrator (T1 master)
-      # handles the commit step itself.
-      skip_when: "mode == 'dispatched'"
-
-# Retry budget — shared pool across all stages. In dispatched mode the
-# T1 parent passes `remaining_budget` via context and this default is
-# ignored. Standalone mode uses this as the starting budget.
+# Retry budget — shared pool across all stages
 retry:
   global_budget: 15
   per_stage_max_attempts: 3
-  # Each retry must attempt a DIFFERENT approach (per /fix-loop rules).
-  # When the budget is exhausted, pipeline stops, escalates to the user.
+  per_test_cap: 3                      # max retries per single test
+  # In dispatched mode the T1 parent passes `remaining_budget` via context and this
+  # default is ignored. Standalone mode uses this as the starting budget.
 
-# Screenshot-capture policy for UI tests. Drives /auto-verify Step 2.5
-# (visual proof review) and tester-agent's per-test screenshot loop.
+# Parallel fan-out caps (closes Reviewer Gap 5 / spec §3.8.1)
+concurrency:
+  max_concurrent_analyzers: 5
+  max_concurrent_issue_managers: 5
+  max_concurrent_fixers: 5
+
+# Measurable budget enforcement (NOT token-based — Claude Code doesn't expose tokens_used)
+budget:
+  max_total_dispatches: 100            # hard cap on total Agent() calls per pipeline run
+  max_wall_clock_minutes: 90           # pipeline-wide timeout budget
+  warn_at_dispatch_pct: 0.75           # emit warning at 75% consumption
+
+# Screenshot-capture policy for UI tests
 capture_proof:
   enabled: true
   # When enabled:
@@ -60,21 +80,56 @@ capture_proof:
   # - Non-UI tests capture only on failure (supplementary evidence)
   # Override with --no-capture-proof on the CLI.
 
-# Contradiction handling when multiple skills produce disagreeing
-# verdicts (e.g., auto-verify PASSED but contract-test FAILED).
+# Contradiction handling when multiple skills produce disagreeing verdicts
 # - warn: surface in report, don't block (default for test-pipeline)
 # - block: escalate to FAILED
 contradictions:
   action: warn
 
-# State file for cross-stage bookkeeping. Mode-dependent: standalone
-# writes to .pipeline/; dispatched mode lets the T1 parent manage state
-# under .workflows/testing-pipeline/.
+# Per-category auto-heal matrix (active in PR2 — declared here for forward-compat)
+auto_heal:
+  BROKEN_LOCATOR: AUTO_HEAL
+  TIMEOUT_TIMING: AUTO_HEAL
+  ASSERTION_ERROR: AUTO_HEAL
+  IMPORT_ERROR: AUTO_HEAL
+  MISSING_FIXTURE: AUTO_HEAL
+  SCHEMA_MISMATCH: AUTO_HEAL
+  BASELINE_DRIFT_INTENTIONAL: AUTO_HEAL_WITH_FLAG
+  FLAKY: QUARANTINE
+  INFRASTRUCTURE: RETRY_INFRA
+  LOGIC_BUG: ISSUE_ONLY
+  STATUS_CODE_DRIFT: ISSUE_ONLY
+  CONTRACT_BROKEN: ISSUE_ONLY
+  VISUAL_REGRESSION: ISSUE_ONLY
+  NEEDS_CONTRACT_VALIDATION: ISSUE_ONLY
+
+# GitHub Issue creation config (active in PR2 — declared here for forward-compat)
+issue_creation:
+  enabled: true                        # set false to disable Issue creation entirely
+  preflight_required: true             # MUST be true to honor "no silent skip"
+  dedup_window_days: 30
+  dedup_hash_fields: ["test_id", "category", "failing_commit_sha_short"]   # 3-field hash (PR2)
+  labels_default:
+    - pipeline-failure
+  comment_on_dedup: true               # if dedup hits, append comment with new run_id
+  partial_failure_policy: abort_on_first_blocked   # T2B fan-in policy
+
+# Re-verification policy (active in PR2)
+reverify:
+  affected_tests_only: true            # iteration loop runs only affected tests
+  final_full_suite_check: true         # after green, run full suite once for collateral regression check
+
+# State file conventions
 state:
-  standalone_file: ".pipeline/test-pipeline-state.json"
-  dispatched_owner: "testing-pipeline-master-agent"
+  master_file: ".workflows/testing-pipeline/state.json"               # owned by T1
+  sub_file: ".workflows/testing-pipeline/sub/test-pipeline.json"      # owned by T2A (NEW in PR1)
+  triage_file: ".workflows/testing-pipeline/sub/failure-triage.json"  # owned by T2B (NEW for PR2 activation)
   results_dir: "test-results"
   evidence_dir: "test-evidence"
+  fixes_dir: "test-results/fixes"      # diff staging dir (active in PR2)
+  schema_compatibility:
+    minimum_required: "2.0.0"
+    on_mismatch: "abort_with_STATE_SCHEMA_INCOMPATIBLE"
 
 # Ephemeral directories wiped at standalone-mode INIT.
 # In dispatched mode, the T1 parent owns cleanup and this list is ignored.
@@ -82,3 +137,4 @@ cleanup_standalone_only:
   - "test-results/"
   - "test-evidence/"
   - ".pipeline/test-pipeline-state.json"
+  - ".workflows/testing-pipeline/sub/"   # NEW for T2A sub-state
