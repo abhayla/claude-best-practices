@@ -197,6 +197,13 @@ state:
   dispatched_file: ".workflows/testing-pipeline/e2e-state.json"
   evidence_dir: "test-evidence"
   results_dir: "test-results"
+  # Per-run state archive. After each pipeline completes, the canonical state
+  # file is COPIED (not moved) to {dir}/runs/{run_id}/e2e-state.json for audit.
+  # The canonical path stays unchanged — existing callers are unaffected.
+  # Operators get a durable cross-run trail; debugging a regression no longer
+  # depends on catching the state before the next run overwrites it.
+  archive_enabled: true
+  archive_max_runs: 10          # keep N most-recent runs/ subdirs; older pruned at INIT
 
 # Cross-stage contradiction handling. T1 master detects contradictions during
 # aggregation (e.g., auto-verify PASSED but contract-test FAILED).
@@ -215,6 +222,11 @@ issue_creation:
   dedup_window_days: 30
   # If true, pipeline fails fast when gh auth is missing AND enabled=true.
   require_gh_auth: true
+  # If true, pipeline fails fast when no `origin` git remote exists AND
+  # enabled=true. Downstream projects with no GitHub remote (local-only,
+  # GitLab, Gitea) should set enabled=false rather than require_git_remote=false
+  # — the latter would silently skip issue creation with no audit trail.
+  require_git_remote: true
 
 # Historical duration hints for longest-first ordering.
 # Conductor uses these when no runtime data is available.

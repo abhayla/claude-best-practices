@@ -333,6 +333,26 @@ After queues drain (or budget exhausted):
 4. **Tear down dev server** (standalone mode, if `started_by_us: true`):
    verify process name before kill, remove PID file.
 
+4.5. **Archive per-run state snapshot** (non-destructive audit trail):
+   After the canonical state file is final, copy it (do NOT move) to
+   `.pipeline/runs/{run_id}/e2e-state.json` (standalone) or
+   `.workflows/testing-pipeline/runs/{run_id}/e2e-state.json` (dispatched).
+   The canonical path (`.pipeline/e2e-state.json` or
+   `.workflows/testing-pipeline/e2e-state.json`) STAYS where it is — this
+   preserves backward compatibility with callers that read the canonical
+   path, while giving operators a durable per-run audit trail.
+
+   ```bash
+   ARCHIVE_DIR="$(dirname "$state_path")/runs/${run_id}"
+   mkdir -p "$ARCHIVE_DIR"
+   cp "$state_path" "$ARCHIVE_DIR/e2e-state.json"
+   ```
+
+   Retention: keep the most recent `state.archive_max_runs` (default 10).
+   Older `runs/` directories are deleted at INIT of the next standalone run,
+   same lifecycle as the canonical file (dispatched mode leaves archive
+   cleanup to the T1 master).
+
 5. **Write `test-results/e2e-pipeline.json`**:
    ```json
    {
