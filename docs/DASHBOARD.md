@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-23 14:03 UTC (auto-generated)
+> Last updated: 2026-04-23 14:58 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -98,7 +98,7 @@
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
 | e2e-visual-run | skill | 4.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
 | error-handling | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| escalation-report | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| escalation-report | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | executing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | expo-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | failure-triage-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -196,7 +196,7 @@
 | security-auditor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | security-baseline | rule | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| serialize-fixes | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| serialize-fixes | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -221,11 +221,11 @@
 | tdd-rule | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-data-management | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-failure-analyzer-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | — |
-| test-healer-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
+| test-healer-agent | agent | 2.3.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-pipeline | skill | 1.0.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
-| test-pipeline-agent | agent | 4.1.0 | hub:abhayla/claude-best-practices | — |
+| test-pipeline-agent | agent | 4.2.0 | hub:abhayla/claude-best-practices | — |
 | test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
