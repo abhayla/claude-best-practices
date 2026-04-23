@@ -10,8 +10,8 @@ description: >
   --hard HEAD` to clean the working tree (mandatory).
 type: workflow
 allowed-tools: "Bash Read"
-argument-hint: "<diffs-glob-or-list>"
-version: "1.0.0"
+argument-hint: "<diffs-glob-or-list> [--autosquash]"
+version: "1.1.0"
 ---
 
 # Serialize Fixes — Atomic Sequential Diff Application
@@ -88,9 +88,36 @@ record_in_state "$issue_num" "applied" "$commit_sha"
 
 ---
 
+## STEP 1.5: Optional autosquash (REQ-S005)
+
+When `--autosquash` is present in `$ARGUMENTS` AND `commits_made > 1`, consolidate the fix commits via interactive rebase with autosquash.
+
+```bash
+# Identify the commit BEFORE the first fix commit (the merge base of the fix batch)
+FIRST_FIX_SHA=$(echo "$applied_commits" | head -1)
+PRE_FIX_PARENT=$(git rev-parse "${FIRST_FIX_SHA}~1")
+
+# Mark all fix commits as fixup of the first one (so they squash into it)
+# Use git rebase --autosquash with --interactive=false-equivalent (--keep-base + autosquash)
+GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash "$PRE_FIX_PARENT" 2>&1 || {
+    # On rebase failure, abort — original history preserved
+    git rebase --abort
+    echo "WARN: autosquash failed; original fix commits preserved"
+    return autosquash_result="FAILED"
+}
+
+return autosquash_result="SUCCESS" with consolidated_commit_sha=$(git rev-parse --short HEAD)
+```
+
+**Safety:**
+- Only runs when `commits_made > 1` (no point squashing a single commit)
+- Uses `GIT_SEQUENCE_EDITOR=:` to make the rebase non-interactive (accepts the auto-generated todo list as-is)
+- On failure: `git rebase --abort` restores the pre-rebase state; original commits preserved
+- Each original fix commit message MUST be in conventional `fix(test-pipeline): heal {test_id} (#{issue_num})` format for autosquash to recognize them as fixup candidates of each other (or use explicit `fixup!` prefix)
+
 ## STEP 2: Return aggregated contract
 
-After all diffs processed, return:
+After all diffs processed (and optional autosquash), return:
 
 ```json
 {
@@ -107,7 +134,9 @@ After all diffs processed, return:
     ...
   ],
   "total_processed": <N>,
-  "commits_made": <count of applied>
+  "commits_made": <count of applied>,
+  "autosquash_result": "SKIPPED|SUCCESS|FAILED",
+  "consolidated_commit_sha": "<short SHA if autosquash SUCCESS, else null>"
 }
 ```
 

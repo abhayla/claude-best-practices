@@ -1,0 +1,39 @@
+# Test Track Overrides — example template
+#
+# Per-project escape hatch for the three-lane test pipeline's scout
+# (test-scout-agent in classify mode). Use this when the auto-detection rules
+# (path globs + import scanning + annotations) misclassify a test that you
+# want to explicitly include in or exclude from a specific track.
+#
+# COPY this file to `core/.claude/config/test-track-overrides.yml` (drop the
+# `.example` extension) and edit. The scout reads it automatically when
+# present per `core/.claude/config/test-pipeline.yml` `track_detection.override_file`.
+#
+# RULES:
+# - Path matches use the same glob syntax as `track_detection.api_path_globs`
+#   (e.g., `tests/legacy/test_*.py`)
+# - Tracks must be a non-empty subset of {functional, api, ui}
+# - "functional" is implicit (every test runs functional); listing it is OK but redundant
+# - Override entries take PRECEDENCE over auto-detection rules
+#
+# Spec reference: docs/specs/test-pipeline-three-lane-spec.md v1.6 §3.1 + REQ-S003
+
+overrides:
+  # Example: a test in tests/api/ that despite the path is NOT API-related
+  # (e.g., it's a UI test that happens to live there for legacy reasons).
+  # Auto-detection would put it in api_queue; this override removes API track.
+  - path: "tests/api/test_legacy_ui_widget.py"
+    tracks: ["functional", "ui"]
+    note: "Legacy UI test misplaced in tests/api/ — does not exercise the API"
+
+  # Example: a unit test that DOES exercise the API but lives in tests/unit/.
+  # Auto-detection would only assign functional; this override adds API track.
+  - path: "tests/unit/test_billing_calculator.py"
+    tracks: ["functional", "api"]
+    note: "Calls /api/billing/quote internally; needs contract validation"
+
+  # Example: explicitly exclude a test from UI track even though it imports Playwright
+  # (e.g., it uses Playwright's request API, not browser).
+  - path: "tests/api/test_request_only.spec.ts"
+    tracks: ["functional", "api"]
+    note: "Uses page.request only; no browser interaction; skip UI lane"

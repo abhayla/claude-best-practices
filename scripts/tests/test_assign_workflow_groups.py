@@ -234,8 +234,11 @@ class TestWorkflowGroupBalance:
     """Tests for workflow group size balance in current config."""
 
     def test_no_group_exceeds_max_seeds(self):
-        """No single workflow group should have >65 seeds in the config.
-        Testing-pipeline is naturally the largest (many test frameworks + agents)."""
+        """No single workflow group should have >80 seeds in the config.
+        Testing-pipeline is naturally the largest (many test frameworks + agents +
+        the three-lane spec added 6 new patterns: failure-triage-agent,
+        github-issue-manager-agent, agent-evaluator, create-github-issue,
+        serialize-fixes, escalation-report)."""
         from scripts.generate_workflow_docs import load_workflow_definitions
 
         definitions = load_workflow_definitions()
@@ -243,5 +246,5 @@ class TestWorkflowGroupBalance:
         for wf_name, wf_def in definitions.items():
             seeds = wf_def.get("seeds", {})
             total = sum(len(seeds.get(cat, [])) for cat in ("skills", "agents", "rules"))
-            assert total <= 65, \
-                f"{wf_name} has {total} seeds (max 65)"
+            assert total <= 80, \
+                f"{wf_name} has {total} seeds (max 80)"

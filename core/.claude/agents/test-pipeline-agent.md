@@ -11,7 +11,7 @@ description: >
 tools: "Agent Bash Read Write Edit Grep Glob Skill"
 model: inherit
 color: blue
-version: "4.1.0"
+version: "4.2.0"
 ---
 
 ## NON-NEGOTIABLE
@@ -73,6 +73,16 @@ else:
   remaining_budget = config.retry.global_budget (default 15)
   owns_t1_cleanup = true
 ```
+
+### Optional flags (parsed from $ARGUMENTS or dispatch context)
+
+| Flag | Behavior | Spec ref |
+|---|---|---|
+| `--only-issues N,M,P` | Re-run pipeline against ONLY the tests linked to the given GitHub Issue numbers. T2A fetches each Issue title (per `/create-github-issue` template format `{category}: {test_id}`), extracts the `test_id`, and passes the filtered set to scout's classify mode. Useful for re-running after manual triage or local fixes. | REQ-S001 |
+| `--update-baselines` | Allow healer to auto-regen visual baselines for `BASELINE_DRIFT_INTENTIONAL` category (per spec §3.6 auto-fix matrix). Without this flag, BASELINE_DRIFT_INTENTIONAL stays ISSUE_ONLY. | REQ-S002 |
+| `--autosquash` | After successful pipeline run with multiple fix commits, invoke `/serialize-fixes --autosquash` to consolidate fix commits via `git rebase -i --autosquash`. Useful for keeping PR diffs clean. | REQ-S005 |
+
+When `--only-issues` is present, STEP 2 (SCOUT) receives an additional `--filter-test-ids=<comma-separated>` parameter; scout discovers ALL tests but only populates queues for the filtered set. Per-test gate logic and JOIN unchanged.
 
 ## 7-Step Lifecycle
 
@@ -179,6 +189,8 @@ Both lanes return structured contracts. Collect both before proceeding to Wave 2
 ### STEP 4 — WAVE 2 (UI/Visual lane)
 
 Read `queues.ui` from sub-state. Skip if empty.
+
+**Optional checkpoint optimization (REQ-S006):** if the functional lane writes `test-results/functional.ui-tests-complete.flag` partway through its execution (signaling all UI tests have finished and screenshots exist in `test-evidence/{run_id}/screenshots/`), T2A MAY dispatch the UI lane immediately upon detecting this flag, in parallel with the still-running functional lane finishing its non-UI tests. This reduces wall-clock time on projects with many slow non-UI tests after fast UI tests. The functional lane writes the flag via `tester-agent`'s lane mode after all UI-classified tests in its queue have completed. Disabled by default — enable via `lanes.ui.use_checkpoint: true` in `core/.claude/config/test-pipeline.yml`.
 
 Dispatch the UI lane (`visual-inspector-agent` is universal across all stacks):
 
