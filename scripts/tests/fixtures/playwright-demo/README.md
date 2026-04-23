@@ -66,3 +66,27 @@ playwright-demo/
 
 Everything under `test-results/`, `test-evidence/`, `node_modules/`,
 `.pipeline/`, `__snapshots__/` (except committed baselines) is gitignored.
+
+## Scenario reset between runs
+
+**Important:** the healer mutates spec files as part of its normal workflow
+(that's the `SELECTOR` and `TIMING` fix paths applying real edits). In real
+downstream projects these mutations are a feature — the UI changed, the test
+is brought back into sync. In this fixture the same mutations are a problem:
+running `broken-locator` after `timing` means the test files no longer
+represent the `broken-locator` scenario, because the previous run rewrote
+them.
+
+The driver in `scripts/tests/test_pipeline_e2e.py` MUST reset the fixture
+between scenarios. Two equivalent approaches:
+
+1. **Git-checkout reset (preferred for CI):** before each parametrized
+   scenario, run `git checkout -- scripts/tests/fixtures/playwright-demo/tests`
+   to restore the spec files to HEAD. Fast and self-cleaning.
+2. **Copy-to-tmp reset:** copy the fixture to a fresh `tmp_path` per
+   scenario and run the pipeline from the copy. Slower but fully isolated.
+
+Running the fixture by hand (outside the driver) has the same caveat — if
+you run `broken-locator` and then `timing` without resetting, the second
+run starts from a mutated baseline. This is expected behavior; the fixture
+is a regression harness, not a multi-scenario dev sandbox.
