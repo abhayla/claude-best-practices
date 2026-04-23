@@ -1,0 +1,26 @@
+{
+  "scenario_name": "backward-compat-no-commit-mode-defaults-direct",
+  "description": "Existing /fix-loop and e2e-conductor-agent callsites continue to work without specifying commit_mode.",
+  "input": {
+    "dispatch_context": {
+      "fix_queue_item": {
+        "test_id": "tests/e2e/test_login.spec.ts::login",
+        "classification": "TIMING"
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "fix_applied": true,
+    "commit_sha": "*",
+    "commit_mode_resolved": "direct"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Healer detects e2e-conductor dispatch shape (no commit_mode key) → direct",
+    "output_structure": "Same as commit-mode-direct-default-commits scenario; redundant verification",
+    "non_negotiable_adherence": "Spec §3.14 backward compat: e2e-conductor-agent callsite unchanged",
+    "side_effect_correctness": "Healer commits via /post-fix-pipeline as before",
+    "error_propagation": "Default behavior preserved"
+  }
+}

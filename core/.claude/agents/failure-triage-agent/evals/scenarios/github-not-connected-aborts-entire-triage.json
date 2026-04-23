@@ -1,0 +1,44 @@
+{
+  "scenario_name": "github-not-connected-aborts-entire-triage",
+  "description": "First issue-manager preflight fails → T2B aborts entire triage immediately (partial_failure_policy: abort_on_first_blocked).",
+  "input": {
+    "dispatch_context": {
+      "pipeline_id": "test-pipeline-RUN003",
+      "run_id": "RUN003",
+      "failures": [
+        {
+          "test_id": "tests/test_a.py::ta",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_b.py::tb",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "ASSERTION_ERROR"
+        }
+      ],
+      "remaining_budget": 15
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_AUTH_FAIL": "true"
+    }
+  },
+  "expected_contract": {
+    "result": "BLOCKED",
+    "blocker": "GITHUB_NOT_CONNECTED",
+    "failed_at_test": "*",
+    "remediation": "*gh auth login*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "T2B receives BLOCKED from first issue-manager → aborts before processing remaining failures",
+    "output_structure": "BLOCKED contract bubbled up to T2A → T1 (chained propagation per spec §3.7.1)",
+    "non_negotiable_adherence": "NN#4 hard-fail propagation; partial_failure_policy: abort_on_first_blocked enforced",
+    "side_effect_correctness": "No fixers dispatched; no diffs serialized; no escalation report (because abort is not exhaustion)",
+    "error_propagation": "BLOCKED contract is the canonical pipeline-blocker shape"
+  }
+}

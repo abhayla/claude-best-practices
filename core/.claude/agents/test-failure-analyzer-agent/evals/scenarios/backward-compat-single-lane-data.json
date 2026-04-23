@@ -1,0 +1,33 @@
+{
+  "scenario_name": "backward-compat-single-lane-data",
+  "description": "Legacy callsite passes only one lane's data → analyzer produces same classification as before.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/test_y.py::ty",
+      "failed_lanes": [
+        "functional"
+      ],
+      "evidence": {
+        "functional": {
+          "error": "TimeoutError"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "category": "TIMEOUT_TIMING",
+    "failed_lanes": [
+      "functional"
+    ]
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Single-lane data is treated as the only signal; no multi-lane consolidation attempted",
+    "output_structure": "Same shape as PR1 single-signal contract (no cross_lane_root_cause field needed)",
+    "non_negotiable_adherence": "Spec §3.14 backward compat: single-lane callsites unchanged",
+    "side_effect_correctness": "TIMEOUT_TIMING is correctly classified per existing 18-rule regex",
+    "error_propagation": "Backward compat is normal flow"
+  }
+}

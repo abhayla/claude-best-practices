@@ -1,0 +1,26 @@
+{
+  "scenario_name": "commit-mode-direct-default-commits",
+  "description": "Legacy callsite: no commit_mode in dispatch context → defaults to direct (commits via /post-fix-pipeline).",
+  "input": {
+    "dispatch_context": {
+      "fix_queue_item": {
+        "test_id": "tests/test_a.py::ta",
+        "classification": "BROKEN_LOCATOR"
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "fix_applied": true,
+    "commit_sha": "*",
+    "commit_mode_resolved": "direct"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Healer detects commit_mode is absent → falls back to direct (legacy /fix-loop / e2e-conductor pathway)",
+    "output_structure": "Return contract includes commit_sha (because commit happened)",
+    "non_negotiable_adherence": "Backward compat preserved per spec §3.14",
+    "side_effect_correctness": "Healer invokes /fix-issue without --diff-only flag; /post-fix-pipeline commits",
+    "error_propagation": "Backward compat is not an error condition"
+  }
+}

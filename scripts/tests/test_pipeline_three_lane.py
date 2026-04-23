@@ -172,27 +172,19 @@ def test_responsibility_count_function_handles_missing_section():
 
 def test_t1_handles_four_new_api_categories():
     """T1's body MUST mention the 4 new API categories (PR1 extension)."""
-    t1_body = (AGENTS_DIR / "testing-pipeline-master-agent.md").read_text(encoding="utf-8")
-    for category in [
-        "SCHEMA_MISMATCH",
-        "STATUS_CODE_DRIFT",
-        "CONTRACT_BROKEN",
-        "NEEDS_CONTRACT_VALIDATION",
-    ]:
-        assert category in t1_body, (
-            f"T1 missing handler for {category} (REQ-M034 — PR1 extension). "
-            "Without this, PR1 silently drops Issues for this category."
-        )
+    # SUPERSEDED in PR2: PR1 introduced 4 new API categories handled by T1's
+    # inline step. PR2's atomic switchover DELETES T1's inline step entirely;
+    # T2B (failure-triage-agent) + github-issue-manager-agent now handle all
+    # categories via /create-github-issue. See test_pipeline_three_lane_pr2.py
+    # for PR2 verification of the deletion + delegation.
+    pytest.skip("Superseded by PR2 atomic switchover; T1 inline step deleted")
 
 
 def test_t1_extension_marked_pr1_temporary():
-    """T1's PR1 extension must include the PR1-TEMPORARY marker comment so PR2
-    implementer knows to delete it during atomic switchover."""
-    t1_body = (AGENTS_DIR / "testing-pipeline-master-agent.md").read_text(encoding="utf-8")
-    assert "PR1-TEMPORARY" in t1_body, (
-        "T1 extension missing PR1-TEMPORARY marker; PR2 implementer needs this "
-        "to know which code to delete in the atomic switchover."
-    )
+    """SUPERSEDED in PR2: PR1 marker was a hint for the PR2 implementer.
+    PR2 atomic switchover deleted T1's inline step entirely; the marker is
+    no longer present (its purpose served). See test_pipeline_three_lane_pr2.py."""
+    pytest.skip("Superseded by PR2 atomic switchover; PR1-TEMPORARY marker removed with the deleted step")
 
 
 # ── Spec §3.2 + REQ-M027/M029: tool grants ───────────────────────────────────

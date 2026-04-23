@@ -1,0 +1,44 @@
+{
+  "scenario_name": "preflight-gh-not-installed-blocked",
+  "description": "command -v gh fails → BLOCKED contract returned, no Issue created.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/test_x.py::test_y",
+      "run_id": "2026-04-23T14-30-00Z_abc1234",
+      "failing_commit_sha_short": "abc1234",
+      "category": "LOGIC_BUG",
+      "confidence": 0.95,
+      "evidence_summary": "test failed",
+      "recommended_action": "ISSUE_ONLY",
+      "failure_profile": {
+        "functional": {
+          "result": "FAILED"
+        },
+        "api": {
+          "result": "n/a"
+        },
+        "ui": {
+          "result": "n/a"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "PATH_NO_GH": "true"
+    }
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "result": "BLOCKED",
+    "blocker": "GITHUB_NOT_CONNECTED",
+    "failed_check": "gh installed",
+    "remediation": "*Install from https://cli.github.com/*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent runs preflight, detects missing gh CLI immediately, returns BLOCKED",
+    "output_structure": "BLOCKED contract has all 4 fields: result, blocker, failed_check, remediation",
+    "non_negotiable_adherence": "NN#1: hard-fail propagated to parent (T2B will abort entire triage)",
+    "side_effect_correctness": "Did NOT invoke gh issue create; did NOT write any state",
+    "error_propagation": "Structured BLOCKED contract, NOT freeform error prose"
+  }
+}

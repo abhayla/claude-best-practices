@@ -32,6 +32,7 @@ mcp-servers:
 2. **NEVER modify application source code for SELECTOR / TIMING / DATA fixes.** Only modify test code. Changing app code to make a test pass is the #1 way to hide real regressions.
 3. **NEVER apply the same fix twice.** Track attempt history; each retry MUST try a different strategy. Repeating a failed approach wastes the shared retry budget.
 4. **NEVER exceed the retry budget passed by the parent.** In dispatched mode, use the shared budget from the conductor's context, not the hardcoded 15. Standalone mode falls back to 15.
+5. **`commit_mode` parameter gating (NEW in PR2 of test-pipeline-three-lane spec).** Read `commit_mode` from dispatch context: `direct` (default) preserves existing commit-via-`/post-fix-pipeline` behavior; `diff_only` invokes `/fix-issue --diff-only` with the provided `issue_number` and writes the proposed change as a unified diff to `test-results/fixes/{issue_number}.diff` instead of committing. Backward compat: ABSENT `commit_mode` defaults to `direct` for legacy `/fix-loop` and `e2e-conductor-agent` callsites per spec §3.14.
 
 > See `core/.claude/rules/agent-orchestration.md` and `core/.claude/rules/testing.md` for full normative rules.
 
@@ -138,8 +139,8 @@ then apply the specific treatment.
 ## Healing Flow
 
 ```
-For each item in fix_queue:
-  1. Read classification hint + failure metadata + remaining_budget
+For each item in fix_queue (or per-Issue dispatch from T2B):
+  1. Read classification hint + failure metadata + remaining_budget + commit_mode (PR2) + issue_number (PR2)
   2. If hint is VISUAL_REGRESSION or LOGIC_BUG:
      → move to known_issues (human review)
      → continue (do not decrement budget)
@@ -153,16 +154,31 @@ For each item in fix_queue:
      - browser_snapshot → current ARIA tree
      - browser_evaluate → probe element state
      - browser_console_messages → app errors
-  6. Dispatch Skill("fix-loop") with inspection context
-  7. Read fix-loop return: {classification, confidence, fix_description, fix_applied}
-  8. Apply confidence gate:
-     HIGH → accept; MEDIUM → accept + flag; LOW → revert, known_issues
-  9. If fix applied, run quality checks (syntax, imports, related tests)
-  10. Run test_run via MCP to verify fix; if green, re-enter fix as successful
-  11. Update state: item back to test_queue for re-verification OR to known_issues
-  12. Increment attempt, decrement remaining_budget
-  13. Write state incrementally, move to next item
+  6. Branch on commit_mode (PR2):
+     IF commit_mode == "diff_only" AND issue_number provided:
+       → Skill("fix-issue", args="${issue_number} --diff-only")
+       → /fix-issue writes test-results/fixes/${issue_number}.diff and resets working tree
+       → record diff_path; do NOT proceed to /post-fix-pipeline
+     ELSE (commit_mode default = direct, legacy callsite):
+       → Dispatch Skill("fix-loop") with inspection context
+       → Read fix-loop return: {classification, confidence, fix_description, fix_applied}
+       → Apply confidence gate: HIGH accept; MEDIUM accept+flag; LOW revert+known_issues
+       → If fix applied, run quality checks (syntax, imports, related tests)
+       → Run test_run via MCP to verify fix; if green, /post-fix-pipeline commits
+  7. Update state: item back to test_queue for re-verification OR to known_issues
+  8. Increment attempt, decrement remaining_budget
+  9. Write state incrementally, move to next item
 ```
+
+### `commit_mode` resolution (PR2)
+
+| Dispatch context | Resolved `commit_mode` | Source |
+|---|---|---|
+| `commit_mode: "diff_only"` + `issue_number: <N>` | `diff_only` | T2B (`failure-triage-agent`) PR2 callsite |
+| `commit_mode: "direct"` (explicit) | `direct` | Explicit caller |
+| (no `commit_mode` key) | `direct` | Backward compat — legacy `/fix-loop`, `e2e-conductor-agent` |
+
+In `diff_only` mode, return contract MUST include `diff_path` and `commit_sha: null`. In `direct` mode, return MUST include `commit_sha` (or `null` if commit failed). The `commit_mode_resolved` field SHOULD echo back which mode was selected for caller verification.
 
 ## Quality Checks (Before Requeuing)
 

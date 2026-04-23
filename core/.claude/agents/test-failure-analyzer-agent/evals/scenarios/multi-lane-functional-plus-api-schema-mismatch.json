@@ -1,0 +1,40 @@
+{
+  "scenario_name": "multi-lane-functional-plus-api-schema-mismatch",
+  "description": "Same test fails in functional + API with schema-related errors → consolidated SCHEMA_MISMATCH category.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/api/test_users.py::tu",
+      "failed_lanes": [
+        "functional",
+        "api"
+      ],
+      "evidence": {
+        "functional": {
+          "error": "AssertionError: 422 != 201"
+        },
+        "api": {
+          "error": "Expected field 'full_name' missing in request"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "category": "SCHEMA_MISMATCH",
+    "confidence": "*",
+    "failed_lanes": [
+      "functional",
+      "api"
+    ],
+    "cross_lane_root_cause": true
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Multi-lane evidence is BOTH passed to analyzer; analyzer recognizes schema-related errors as one root cause",
+    "output_structure": "cross_lane_root_cause=True flag; failed_lanes reflects all 2",
+    "non_negotiable_adherence": "Spec §3.5 cross-lane root-cause detection works",
+    "side_effect_correctness": "Single category emitted (NOT one per lane)",
+    "error_propagation": "Multi-lane consolidation is normal flow"
+  }
+}

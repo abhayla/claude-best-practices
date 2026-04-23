@@ -1,0 +1,26 @@
+{
+  "scenario_name": "issue-number-propagated-to-fix-issue",
+  "description": "When commit_mode=diff_only AND issue_number provided, healer invokes /fix-issue --diff-only with the issue_number.",
+  "input": {
+    "dispatch_context": {
+      "issue_number": 5678,
+      "test_id": "tests/api/test_users.py::tu",
+      "category": "SCHEMA_MISMATCH",
+      "commit_mode": "diff_only"
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "fix_applied": true,
+    "diff_path": "test-results/fixes/5678.diff",
+    "fix_issue_invoked_with": "*5678*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "issue_number is read from dispatch context, not derived",
+    "output_structure": "fix_issue_invoked_with contains the exact issue_number",
+    "non_negotiable_adherence": "Spec §3.9 chain: T2B → healer (issue_number) → /fix-issue --diff-only (issue_number) → diff file",
+    "side_effect_correctness": "Diff filename matches issue_number (test-results/fixes/5678.diff)",
+    "error_propagation": "Issue number must be valid integer; healer rejects malformed values"
+  }
+}

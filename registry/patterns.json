@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-04-23",
-    "total_patterns": 232
+    "total_patterns": 236
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -1026,6 +1026,26 @@
     "changelog": "v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
+  "create-github-issue": {
+    "hash": "e77f72effe0a696722b5e120bc4b07988cd2f7356e307628447fc60670bc1cb0",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-23",
+    "last_updated": "2026-04-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal skill to create GitHub Issues from a structured failure profile. Use when an agent needs to surface a failure as a tracked work item. Hard-fails on missing GitHub (no silent skip). 4 preflight checks + 3-field sha256 dedup.",
+    "tags": [
+      "github",
+      "issues",
+      "testing-pipeline",
+      "failure-tracking"
+    ],
+    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M008)",
+    "tier": "must-have"
+  },
   "cross-platform-visual": {
     "hash": "73fe2db07973462a23f60e68801f04b0f8c11db9835f2e91539de55f05217c03",
     "type": "skill",
@@ -1595,6 +1615,25 @@
     "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
     "tier": "must-have"
   },
+  "escalation-report": {
+    "hash": "df515b51027d3b0f0ee8a1fdf5836e34b467ccc53168bcb02b36d663b390fb90",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-23",
+    "last_updated": "2026-04-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Generate test-results/escalation-report.md when the test pipeline hits its retry/dispatch/wall-clock budget with failures still unresolved. Use to surface what is resolved vs open for the next session.",
+    "tags": [
+      "testing-pipeline",
+      "escalation",
+      "reporting"
+    ],
+    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M020, REQ-M023)",
+    "tier": "must-have"
+  },
   "executing-plans": {
     "hash": "98c6393239714ba2a4f215e4bd140c93fba8196b0d70610fbf7a7bb3e0999acf",
     "type": "skill",
@@ -1630,10 +1669,10 @@
     "tier": "nice-to-have"
   },
   "failure-triage-agent": {
-    "hash": "b1bbe4d80ec82660b8d8e8a872293fac5066f941e9ad4e6fedac5468a78743bb",
+    "hash": "2d0597cdef6571e7e4a82e1d94f455f4164ccd8a0f3c2c74e6a73aa6d9cd3925",
     "type": "agent",
     "category": "core",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
     "last_updated": "2026-04-23",
@@ -1645,7 +1684,7 @@
       "orchestration",
       "triage"
     ],
-    "changelog": "v0.1.0: PR1 skeleton per spec test-pipeline-three-lane REQ-M006",
+    "changelog": "v1.0.0: PR2 body activation (full triage subgraph); was v0.1.0 PR1 skeleton",
     "tier": "must-have"
   },
   "fastapi-api-tester-agent": {
@@ -1884,13 +1923,13 @@
     "tier": "must-have"
   },
   "fix-issue": {
-    "hash": "857744758dae1c0d748a11d84a2ba1a525fa2cabc332fe5bbb40d60c392c724a",
+    "hash": "cfea87bd24ca88bfbab4a56d388b1879bc79522b6156a486e6204845cf83f51e",
     "type": "skill",
     "category": "core",
-    "version": "2.4.0",
+    "version": "2.6.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-03",
+    "last_updated": "2026-04-23",
     "dependencies": [
       "fix-loop",
       "post-fix-pipeline"
@@ -2072,6 +2111,28 @@
     ],
     "changelog": "v1.0.0: Initial release â€” repo search, code search, deep inspect modes",
     "tier": "skip"
+  },
+  "github-issue-manager-agent": {
+    "hash": "231f249202ee8b009f0b0625ee77f49a5d9003d0775dd2caeb903e8a459a37d4",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-23",
+    "last_updated": "2026-04-23",
+    "dependencies": [
+      "create-github-issue"
+    ],
+    "visibility": "public",
+    "description": "T3 worker agent that wraps /create-github-issue for the three-lane test pipeline. Spawned by failure-triage-agent (T2B) per failed test. Hard-fails the pipeline on missing GitHub.",
+    "tags": [
+      "testing-pipeline",
+      "github",
+      "orchestration",
+      "t3"
+    ],
+    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M008)",
+    "tier": "must-have"
   },
   "handover": {
     "hash": "8ff8d75dd828aa6e217b09ba11329b618c816d044f2ce3425799ff2ca1028d13",
@@ -3429,6 +3490,26 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have"
   },
+  "serialize-fixes": {
+    "hash": "450692d5df0501acd0dc7853c4c268aa55c87bb3eefe08ff04c4f796b8c55688",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-23",
+    "last_updated": "2026-04-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Apply unified-diff files sequentially to the working tree using atomic three-phase protocol (git apply --check then git apply then git commit). Use when multiple parallel fixers produced diffs that need to land on a shared branch without conflicts. Discards stale diffs on conflict; resets working tree on partial failure.",
+    "tags": [
+      "testing-pipeline",
+      "git",
+      "diff",
+      "serialization"
+    ],
+    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M015, REQ-M018)",
+    "tier": "must-have"
+  },
   "session-continuity": {
     "hash": "cf41114386b729057f8c7b667611d7d303a21b821f3311e6ba40db5ffc2fc2ea",
     "type": "skill",
@@ -3867,10 +3948,10 @@
     "tier": "nice-to-have"
   },
   "test-failure-analyzer-agent": {
-    "hash": "51416fdcc1f83ed887d51db44f110ea09a858106499233829a8a5d564020d7cc",
+    "hash": "8a980c327706bc4f0047f068a6f29e0ba1dc15a5fcef378f0d2c9fe1f385255d",
     "type": "agent",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-04-23",
@@ -3882,10 +3963,10 @@
     "tier": "must-have"
   },
   "test-healer-agent": {
-    "hash": "5a379dbdb7c639ced194687a61a3e8bb8cbf00148c309781ae1a5423467296b6",
+    "hash": "524518af1430bb2b5ff72da794124809c95a476f898c86bfec0e44d526aa7faa",
     "type": "agent",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
     "last_updated": "2026-04-23",
@@ -3967,10 +4048,10 @@
     "tier": "must-have"
   },
   "test-pipeline-agent": {
-    "hash": "20188b5abaaeeb5e86b3638949dc803621c756793dd14fec8aa482b3d5f5da4c",
+    "hash": "8bb42caf2f3c88249f7164a71c8bea6059730b84d7b982a9f9cde196bb342047",
     "type": "agent",
     "category": "core",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-04-23",
@@ -4030,10 +4111,10 @@
     "tier": "must-have"
   },
   "testing-pipeline-master-agent": {
-    "hash": "2d750641ff6df46adf59e5f802aaeb6ce8067fada0031c95de7d5927fffea398",
+    "hash": "99feb8bac8c42b9945562b0813437b3828e10d96028daee9e844589e58abd7f9",
     "type": "agent",
     "category": "core",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-04-23",

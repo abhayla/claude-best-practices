@@ -1,0 +1,49 @@
+{
+  "scenario_name": "successful-create-new-issue",
+  "description": "Clean preflight + new failure (no dedup hit) → new GitHub Issue created.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/api/test_users.py::test_create_user",
+      "run_id": "2026-04-23T14-30-00Z_abc1234",
+      "failing_commit_sha_short": "abc1234",
+      "category": "SCHEMA_MISMATCH",
+      "confidence": 0.91,
+      "evidence_summary": "Pydantic UserCreate model expects 'full_name' but POST sends 'name'",
+      "recommended_action": "AUTO_HEAL",
+      "failure_profile": {
+        "functional": {
+          "result": "FAILED",
+          "error": "AssertionError: 422",
+          "stack": "..."
+        },
+        "api": {
+          "result": "FAILED",
+          "error": "schema mismatch",
+          "stack": "..."
+        },
+        "ui": {
+          "result": "n/a"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_AUTH_OK": "true",
+      "GH_REMOTE_OK": "github.com",
+      "GH_PERMISSION": "WRITE"
+    }
+  },
+  "expected_contract": {
+    "test_id": "tests/api/test_users.py::test_create_user",
+    "result": "CREATED",
+    "issue_number": "*",
+    "issue_url": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent runs preflight, finds it clean, then writes profile JSON and invokes /create-github-issue",
+    "output_structure": "Return contract has exactly result/issue_number/issue_url + test_id (no extra noise)",
+    "non_negotiable_adherence": "NN#1 propagation works for non-blocked path too; NN#2 single Issue per test (not per lane); NN#3 dedup result honored (deduped=false here)",
+    "side_effect_correctness": "Wrote profile JSON to test-results/issue-profiles/; invoked Skill(/create-github-issue) exactly once; gh issue create runs",
+    "error_propagation": "Success path returns structured CREATED contract, not freeform prose"
+  }
+}

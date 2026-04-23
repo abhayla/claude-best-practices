@@ -285,64 +285,28 @@ else:
 so CI can run the same logic headlessly. When that script exists, this agent
 invokes it via `Bash` instead of reimplementing inline.
 
-## STEP: GitHub Issue Creation
+## STEP: GitHub Issue Creation (Delegated to T2B in PR2)
 
-<!--
-PR1-TEMPORARY EXTENSION: The 4 new API-lane categories (SCHEMA_MISMATCH,
-STATUS_CODE_DRIFT, CONTRACT_BROKEN, NEEDS_CONTRACT_VALIDATION) added below are
-PR1-only handlers. In PR2, this entire STEP is DELETED and Issue creation
-moves to `github-issue-manager-agent` invoked via `failure-triage-agent` (T2B).
-The PR2 atomic switchover removes this section in the same commit that
-activates the T2B body. See spec §8 PR2 implementation order.
--->
+> **PR2 atomic switchover (this commit):** the inline GitHub Issue-creation
+> step that lived here in PR1 has been **DELETED**. Issue creation now flows
+> through the three-lane subgraph: T2A (`test-pipeline-agent`) → T2B
+> (`failure-triage-agent`) → `github-issue-manager-agent` (T3) →
+> `/create-github-issue` skill. T1 receives the triage outcome from T2A's
+> bubble-up return contract; it MUST NOT create Issues directly.
+>
+> **Pre-merge migration (PR2 deployment):** before this PR2 ships, run
+> `python scripts/pr2_premerge_migration.py` to close all open
+> `pipeline-failure` Issues from the PR1 window with explanatory comment.
+> This prevents cross-PR-boundary dedup misses (PR1 used 2-field hash;
+> PR2 uses 3-field hash including `failing_commit_sha_short`).
+>
+> Spec reference: `docs/specs/test-pipeline-three-lane-spec.md` v1.6 §8 PR2
+> atomic switchover; §3.7 Issue creation chain; success criterion #11 + #26.
 
-For each entry in aggregated `known_issues` with classification in the
-**handled-categories set**:
-- Original (pre-PR1): `LOGIC_BUG`, `VISUAL_REGRESSION`
-- **NEW in PR1**: `SCHEMA_MISMATCH`, `STATUS_CODE_DRIFT`, `CONTRACT_BROKEN`, `NEEDS_CONTRACT_VALIDATION`
-
-The 4 new categories are emitted by the API lane (per `tester-agent` and
-`fastapi-api-tester-agent` extensions in PR1). T1 must handle them so PR1
-deployments don't silently drop API-lane Issues during the PR1→PR2 window.
-
-1. Compute signature (PR1 keeps the existing 2-field hash for backward compat):
-   ```python
-   sig = hashlib.sha256(
-       f"{entry['test']}|{entry['final_classification']}|{entry.get('top_stack_frame','')}".encode()
-   ).hexdigest()[:12]
-   ```
-   (PR2 will replace this with the 3-field hash including `failing_commit_sha_short`
-   when the new system activates. PR2's pre-merge migration script closes all
-   PR1-format Issues to prevent cross-PR-boundary dedup misses.)
-
-2. Check existing open issues:
-   ```bash
-   gh issue list --search "in:body {sig}" --state open --json number --jq '.[0].number'
-   ```
-
-3. **If no match:** create with full diagnosis + signature + (for VISUAL_REGRESSION) screenshot link:
-   ```bash
-   gh issue create \
-     --title "{classification}: {test_name}" \
-     --body "<<full diagnosis>> \n\nsignature: {sig}" \
-     --label "pipeline-auto,{classification.lower()}"
-   ```
-
-   For the 4 new API categories, use a category-tailored body section:
-   - `SCHEMA_MISMATCH`: include the failing request payload + expected Pydantic schema diff
-   - `STATUS_CODE_DRIFT`: include observed status code + expected status code per endpoint contract
-   - `CONTRACT_BROKEN`: include Pact / OpenAPI contract diff (reference `/contract-test` skill output)
-   - `NEEDS_CONTRACT_VALIDATION`: explain that no contract files were detected; recommend adding `pact/` directory or `openapi.yaml` to enable contract validation
-
-4. **If match exists:** comment on the existing issue with the new run_id
-   and updated diagnosis (do NOT create a new issue within
-   `issue_creation.dedup_window_days` of last comment).
-
-5. **Guards:**
-   - Config-gated: skip if `issue_creation.enabled: false`
-   - Auth-gated: if `require_gh_auth: true` and `gh auth status` fails, ABORT
-     pipeline with a fail-closed error
-   - Screenshots are attached via the GitHub REST API for VISUAL_REGRESSION
+T1's role in PR2: read T2A's structured return contract (which includes T2B's
+triage outcome — `issues_created`, `fixes_applied`, `fixes_pending`, etc.),
+incorporate the verdict into the aggregated `pipeline-verdict.json`, and
+proceed to the commit step. T1 does NOT call `gh issue create` directly.
 
 ## Return Contract (dispatched mode)
 

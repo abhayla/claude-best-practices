@@ -1,0 +1,44 @@
+{
+  "scenario_name": "dedup-hit-comments-existing",
+  "description": "Same sha256 signature as existing open Issue → comment on existing instead of creating new.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/api/test_users.py::test_create_user",
+      "run_id": "2026-04-24T09-15-00Z_abc1234",
+      "failing_commit_sha_short": "abc1234",
+      "category": "SCHEMA_MISMATCH",
+      "confidence": 0.91,
+      "evidence_summary": "Same root cause as previous run",
+      "recommended_action": "AUTO_HEAL",
+      "failure_profile": {
+        "functional": {
+          "result": "FAILED"
+        },
+        "api": {
+          "result": "FAILED"
+        },
+        "ui": {
+          "result": "n/a"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_AUTH_OK": "true",
+      "GH_EXISTING_ISSUE": "847"
+    }
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "result": "DEDUPED",
+    "issue_number": 847,
+    "issue_url": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent invokes /create-github-issue; skill detects sha256 match in open pipeline-failure Issues from past 30 days",
+    "output_structure": "result=DEDUPED (NOT CREATED); issue_number is the EXISTING #847",
+    "non_negotiable_adherence": "NN#3: agent propagates deduped result; T2B treats deduped Issue identically for fixer dispatch",
+    "side_effect_correctness": "gh issue comment runs against #847; no new Issue created (gh issue list count unchanged)",
+    "error_propagation": "Dedup hit is not an error condition — returns DEDUPED, not BLOCKED"
+  }
+}
