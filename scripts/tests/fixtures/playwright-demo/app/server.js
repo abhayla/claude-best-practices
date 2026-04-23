@@ -57,10 +57,20 @@ app.get('/api/users', (_req, res) => {
   });
 });
 
-app.get('/api/orders', (_req, res) => {
+app.get('/api/orders', async (_req, res) => {
   if (SCENARIO === 'infra') {
     // INFRASTRUCTURE: simulate upstream unavailable.
     return res.status(503).json({ error: 'upstream unavailable' });
+  }
+  // TIMING: simulate a slow upstream that exceeds Playwright's default
+  // expect auto-retry timeout (5000ms). At 3000ms the auto-retry absorbed
+  // the delay and tests passed when they should fail — runtime verification
+  // (2026-04-22) caught this as Bug 13. 8000ms puts the delay firmly
+  // outside the auto-retry window so the test deterministically fails,
+  // letting the healer exercise its TIMING classification path.
+  if (SCENARIO === 'timing') {
+    const TIMING_DELAY_MS = 8000;  // MUST stay > Playwright's expect timeout
+    await new Promise((r) => setTimeout(r, TIMING_DELAY_MS));
   }
   res.json({
     orders: [
@@ -70,12 +80,25 @@ app.get('/api/orders', (_req, res) => {
   });
 });
 
-// Flaky counter — every other request returns a failure for the flaky scenario.
+// Flaky handler — simulates a genuinely intermittent failure so the
+// pipeline's quarantine + flakiness_score + probe-run logic gets exercised.
+//
+// Earlier design used `counter % 2 === 0` (fail on EVEN requests). A single
+// test run makes one /api/metric request per fresh-server lifetime, which
+// always gives counter=1 (odd) → no failure ever fires. The test therefore
+// silently passed despite being named "flaky". Runtime verification
+// (2026-04-22) caught this — Bug 14 in the runtime report.
+//
+// New design: Math.random() < 0.5 — each request has an independent 50%
+// chance of failing. Single-request runs can fail on the first try, and
+// repeated runs across multiple pipeline invocations accumulate a real
+// flakiness_score that crosses the quarantine threshold (0.7 by default).
 let flakyCounter = 0;
 app.get('/api/metric', (_req, res) => {
   if (SCENARIO === 'flaky') {
     flakyCounter += 1;
-    if (flakyCounter % 2 === 0) {
+    // 50% chance on each request — genuinely intermittent.
+    if (Math.random() < 0.5) {
       return res.status(500).json({ error: 'transient metric compute failure' });
     }
   }
