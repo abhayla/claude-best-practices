@@ -11,7 +11,7 @@ description: >
 tools: "Agent Bash Read Write Edit Grep Glob Skill"
 model: inherit
 color: blue
-version: "4.2.0"
+version: "4.3.0"
 ---
 
 ## NON-NEGOTIABLE
@@ -81,8 +81,11 @@ else:
 | `--only-issues N,M,P` | Re-run pipeline against ONLY the tests linked to the given GitHub Issue numbers. T2A fetches each Issue title (per `/create-github-issue` template format `{category}: {test_id}`), extracts the `test_id`, and passes the filtered set to scout's classify mode. Useful for re-running after manual triage or local fixes. | REQ-S001 |
 | `--update-baselines` | Allow healer to auto-regen visual baselines for `BASELINE_DRIFT_INTENTIONAL` category (per spec §3.6 auto-fix matrix). Without this flag, BASELINE_DRIFT_INTENTIONAL stays ISSUE_ONLY. | REQ-S002 |
 | `--autosquash` | After successful pipeline run with multiple fix commits, invoke `/serialize-fixes --autosquash` to consolidate fix commits via `git rebase -i --autosquash`. Useful for keeping PR diffs clean. | REQ-S005 |
+| `--fix-pr-mode` | Land all fixer-produced diffs on a NEW branch `pipeline-fixes/{run_id}` and open ONE PR (instead of N commits on the working branch). T2B routes diff application through `/pipeline-fix-pr` instead of `/serialize-fixes`. Honors `git-collaboration.md` § "Review Before Merge" — never auto-merges. | REQ-C003 |
 
 When `--only-issues` is present, STEP 2 (SCOUT) receives an additional `--filter-test-ids=<comma-separated>` parameter; scout discovers ALL tests but only populates queues for the filtered set. Per-test gate logic and JOIN unchanged.
+
+When `--fix-pr-mode` is present, T2B's STEP 4 invokes `Skill("/pipeline-fix-pr", ...)` instead of `Skill("/serialize-fixes", ...)`. The PR-creation skill internally calls `/serialize-fixes` for the atomic diff apply, then handles branch creation + push + `gh pr create`. Result: single reviewable PR per pipeline run, leaving the working branch clean.
 
 ## 7-Step Lifecycle
 

@@ -118,6 +118,10 @@ cli_flags:
     description: "After successful run with multiple fix commits, consolidate via git rebase -i --autosquash."
     example: "/test-pipeline --autosquash"
     spec_ref: "REQ-S005"
+  fix_pr_mode:
+    description: "Land all fixer diffs on a new branch pipeline-fixes/{run_id} and open ONE PR (vs N commits on working branch). Never auto-merges."
+    example: "/test-pipeline --fix-pr-mode"
+    spec_ref: "REQ-C003"
 
 # GitHub Issue creation config (active in PR2 — declared here for forward-compat)
 issue_creation:
