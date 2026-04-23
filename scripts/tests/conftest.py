@@ -10,6 +10,17 @@ import yaml
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
+def pytest_configure(config):
+    """Register custom marks used by fixture files for the three-lane test pipeline.
+
+    The `@pytest.mark.api` marker is applied in fixture files (e.g.,
+    scripts/tests/fixtures/playwright-demo/tests/api/test_users.py) as semantic
+    metadata that the test-scout-agent's classify mode reads. Without this
+    registration, pytest emits PytestUnknownMarkWarning on every collection.
+    """
+    config.addinivalue_line("markers", "api: mark test as an API-track test (read by test-scout-agent classify mode)")
+
+
 @pytest.fixture
 def fixtures_dir():
     return FIXTURES_DIR

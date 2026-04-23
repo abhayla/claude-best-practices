@@ -13,7 +13,7 @@ def load_url_config(config_path: Path) -> list[dict]:
     """Load URLs from config/urls.yml."""
     if not config_path.exists():
         return []
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     return data.get("urls", [])
 

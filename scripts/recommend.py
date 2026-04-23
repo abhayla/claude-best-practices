@@ -555,7 +555,7 @@ def get_stacks_from_config(repo: str, config_path: Path) -> Optional[list[str]]:
     """Get stacks from repos.yml config if the repo is registered."""
     if not config_path.exists():
         return None
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     for entry in data.get("repos", []):
         if entry.get("repo") == repo:

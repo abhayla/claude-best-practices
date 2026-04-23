@@ -407,7 +407,7 @@ if __name__ == "__main__":
     docs_dir.mkdir(exist_ok=True)
 
     registry_path = root / "registry" / "patterns.json"
-    with open(registry_path) as f:
+    with open(registry_path, encoding="utf-8") as f:
         registry = json.load(f)
 
     claude_dir = root / "core" / ".claude"
