@@ -248,14 +248,14 @@ if __name__ == "__main__":
     if args.repo:
         repos = [{"repo": args.repo}]
     elif args.all and config_path.exists():
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             repos = yaml.safe_load(f).get("repos", [])
     else:
         print("Usage: collate.py --repo owner/repo OR --all")
         sys.exit(1)
 
     registry_path = root / "registry" / "patterns.json"
-    with open(registry_path) as f:
+    with open(registry_path, encoding="utf-8") as f:
         registry = json.load(f)
 
     for repo_config in repos:
