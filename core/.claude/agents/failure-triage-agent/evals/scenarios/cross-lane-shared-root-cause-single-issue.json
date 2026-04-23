@@ -1,0 +1,40 @@
+{
+  "scenario_name": "cross-lane-shared-root-cause-single-issue",
+  "description": "Same test fails in functional + API → analyzer returns single SCHEMA_MISMATCH category → ONE consolidated Issue created.",
+  "input": {
+    "dispatch_context": {
+      "pipeline_id": "test-pipeline-RUN004",
+      "run_id": "RUN004",
+      "failures": [
+        {
+          "test_id": "tests/api/test_users.py::tu",
+          "failed_lanes": [
+            "functional",
+            "api"
+          ],
+          "evidence": {
+            "functional": "...",
+            "api": "..."
+          }
+        }
+      ],
+      "remaining_budget": 15
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_AUTH_OK": "true"
+    }
+  },
+  "expected_contract": {
+    "result": "TRIAGE_COMPLETE",
+    "issues_created": 1,
+    "cross_lane_root_causes_detected": 1
+  },
+  "rubric_hints": {
+    "trigger_reliability": "T2B dispatches analyzer with multi-lane data; analyzer collapses to single category",
+    "output_structure": "issues_created=1 (NOT 2 even though 2 lanes failed) — consolidation works",
+    "non_negotiable_adherence": "NN#2 batched fan-out preserved; NN#3 dispatch budget tracked correctly",
+    "side_effect_correctness": "Single GitHub Issue with both lanes' findings in body (per /create-github-issue template)",
+    "error_propagation": "Cross-lane consolidation is normal flow; TRIAGE_COMPLETE result"
+  }
+}

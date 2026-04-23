@@ -1,0 +1,114 @@
+{
+  "scenario_name": "batch-of-12-fans-out-as-3-batches-of-5",
+  "description": "12 failures with max_concurrent_fixers=5 → fan-out chunks into 3 batches (5+5+2).",
+  "input": {
+    "dispatch_context": {
+      "pipeline_id": "test-pipeline-BATCH",
+      "run_id": "BATCH",
+      "failures": [
+        {
+          "test_id": "tests/test_0.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_1.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_2.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_3.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_4.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_5.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_6.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_7.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_8.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_9.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_10.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_11.py::t",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        }
+      ],
+      "remaining_budget": 15
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_AUTH_OK": "true"
+    }
+  },
+  "expected_contract": {
+    "result": "TRIAGE_COMPLETE",
+    "issues_created": 12,
+    "fixes_applied": "*",
+    "batch_count": 3
+  },
+  "rubric_hints": {
+    "trigger_reliability": "T2B chunks failures into batches of size max_concurrent_fixers (5)",
+    "output_structure": "batch_count=3 (12/5 ceil); confirms cap enforcement",
+    "non_negotiable_adherence": "NN#2 batched fan-out works; per-batch dispatch budget check happens before each batch",
+    "side_effect_correctness": "Exactly 3 parallel-dispatch waves observed (not 12 simultaneous)",
+    "error_propagation": "Large batch is normal; TRIAGE_COMPLETE result"
+  }
+}

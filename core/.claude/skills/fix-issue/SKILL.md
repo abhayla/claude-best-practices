@@ -16,8 +16,8 @@ triggers:
   - investigate issue #
   - gh issue fix
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
-argument-hint: "<issue-number or issue-url>"
-version: "2.5.0"
+argument-hint: "<issue-number or issue-url> [--diff-only]"
+version: "2.6.0"
 ---
 
 # Fix GitHub Issue
@@ -90,6 +90,10 @@ Search the codebase for root cause (bugs) or implementation location (features):
 
 ## STEP 4: Finalize
 
+**Mode detection:** check `$ARGUMENTS` for `--diff-only` flag.
+
+### Default mode (no flag)
+
 Run the post-fix pipeline to commit, document, and capture learnings:
 
 ```
@@ -100,6 +104,35 @@ If `post-fix-pipeline` is not available, manually:
 1. Commit with conventional message: `fix: resolve #N — <description>`
 2. Update docs if behavior changed
 3. Capture learnings via `Skill("learn-n-improve", args="session")`
+
+### `--diff-only` mode (NEW in PR2 of test-pipeline-three-lane spec)
+
+When `--diff-only` is present in `$ARGUMENTS`, **skip `/post-fix-pipeline` entirely**. Instead:
+
+1. Capture the proposed changes as a unified diff:
+   ```bash
+   git diff --staged > test-results/fixes/${ISSUE_NUMBER}.diff
+   # If nothing staged but working-tree has changes:
+   git diff > test-results/fixes/${ISSUE_NUMBER}.diff
+   ```
+2. Reset the working tree to clean state:
+   ```bash
+   git stash push -u -m "fix-issue-diff-only-${ISSUE_NUMBER}" || git reset --hard HEAD
+   ```
+3. Return contract:
+   ```json
+   {
+     "result": "DIFF_WRITTEN",
+     "issue_number": ${ISSUE_NUMBER},
+     "diff_path": "test-results/fixes/${ISSUE_NUMBER}.diff",
+     "no_commit": true,
+     "reason": "Caller (test-healer-agent in commit_mode=diff_only) will batch-apply via /serialize-fixes"
+   }
+   ```
+
+**Why diff-only mode exists:** the three-lane test pipeline's T2B (`failure-triage-agent`) dispatches multiple parallel fixers. Each fixer must NOT commit independently (parallel commits race on the working tree). T2B collects all diffs, then invokes `/serialize-fixes` to apply them sequentially with `git apply --check` first. See spec §3.9.1.
+
+**Backward compat:** Default mode (no flag) is unchanged — existing `/fix-loop`, development-loop, and direct user invocations continue to work as before. Spec §3.14.
 
 ## STEP 5: Summarize
 

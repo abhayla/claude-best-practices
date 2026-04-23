@@ -1,0 +1,22 @@
+{
+  "scenario_name": "skill-tool-grant-not-silently-collapsed",
+  "description": "Verify Skill tool is in tools field — without it, Skill('fix-issue') would silently collapse.",
+  "input": {
+    "dispatch_context": {
+      "static_check": true
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "tools_field_includes_skill": true,
+    "tools_field_excludes_agent": true
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Static check on agent frontmatter — tools field includes Skill (PR1 fix)",
+    "output_structure": "Boolean flags reflect frontmatter contents",
+    "non_negotiable_adherence": "T3 tier rule: tools must NOT include Agent (per agent-orchestration.md rule 3)",
+    "side_effect_correctness": "PR1 fix preserved into PR2 (test-healer-agent didn't lose Skill grant)",
+    "error_propagation": "If Skill tool missing, Skill('fix-issue') silently does nothing — caught by this scenario"
+  }
+}

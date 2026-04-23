@@ -1,0 +1,44 @@
+{
+  "scenario_name": "non-github-remote-blocked",
+  "description": "origin remote is not github.com (e.g., GitLab) → BLOCKED contract.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/test_x.py::test_y",
+      "run_id": "2026-04-23T14-30-00Z_abc1234",
+      "failing_commit_sha_short": "abc1234",
+      "category": "LOGIC_BUG",
+      "confidence": 0.95,
+      "evidence_summary": "test failed",
+      "recommended_action": "ISSUE_ONLY",
+      "failure_profile": {
+        "functional": {
+          "result": "FAILED"
+        },
+        "api": {
+          "result": "n/a"
+        },
+        "ui": {
+          "result": "n/a"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_REMOTE_GITLAB": "true"
+    }
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "result": "BLOCKED",
+    "blocker": "GITHUB_NOT_CONNECTED",
+    "failed_check": "*github.com*",
+    "remediation": "*GitHub remote*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Preflight check 3 (origin contains github.com) fails → BLOCKED",
+    "output_structure": "remediation specifies adding GitHub remote (not generic 'remote missing')",
+    "non_negotiable_adherence": "NN#1: never assume gh push to a non-github remote will work",
+    "side_effect_correctness": "Did not attempt to create Issue against non-GitHub provider",
+    "error_propagation": "Cross-provider config issue surfaces clearly"
+  }
+}

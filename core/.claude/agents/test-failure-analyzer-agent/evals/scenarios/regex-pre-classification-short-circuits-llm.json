@@ -1,0 +1,32 @@
+{
+  "scenario_name": "regex-pre-classification-short-circuits-llm",
+  "description": "Locator error matches the 18-rule regex set → BROKEN_LOCATOR with confidence 0.93, no LLM call.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/test_x.py::tx",
+      "failed_lanes": [
+        "functional"
+      ],
+      "evidence": {
+        "functional": {
+          "error": "Locator: getByRole('button', {name: 'Submit'}).click() not found"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "category": "BROKEN_LOCATOR",
+    "confidence": 0.93,
+    "classification_source": "regex_rule_*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Regex pattern Locator: matches → short-circuits LLM",
+    "output_structure": "classification_source explicitly states regex (not 'llm')",
+    "non_negotiable_adherence": "Existing 18 regex rules from 2026-04-22 overhaul preserved",
+    "side_effect_correctness": "No LLM token consumption (faster, deterministic)",
+    "error_propagation": "Regex hit is normal flow"
+  }
+}

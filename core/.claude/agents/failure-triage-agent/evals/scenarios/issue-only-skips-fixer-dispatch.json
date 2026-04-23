@@ -1,0 +1,52 @@
+{
+  "scenario_name": "issue-only-skips-fixer-dispatch",
+  "description": "Mixed batch: 2 AUTO_HEAL + 1 LOGIC_BUG (ISSUE_ONLY) → only 2 fixers dispatched; LOGIC_BUG Issue stays open with no fix attempt.",
+  "input": {
+    "dispatch_context": {
+      "pipeline_id": "test-pipeline-RUN002",
+      "run_id": "RUN002",
+      "failures": [
+        {
+          "test_id": "tests/test_a.py::ta",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/unit/test_logic.py::tl",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "LOGIC_BUG"
+        },
+        {
+          "test_id": "tests/test_b.py::tb",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "ASSERTION_ERROR"
+        }
+      ],
+      "remaining_budget": 15
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_AUTH_OK": "true"
+    }
+  },
+  "expected_contract": {
+    "result": "TRIAGE_COMPLETE",
+    "issues_created": 3,
+    "fixes_applied": 2,
+    "fixes_pending": 0,
+    "issue_only_count": 1
+  },
+  "rubric_hints": {
+    "trigger_reliability": "T2B reads recommended_action from analyzer; ISSUE_ONLY → no fixer dispatch",
+    "output_structure": "fixes_applied=2 NOT 3; issue_only_count=1 reflects the LOGIC_BUG that stayed unfixed",
+    "non_negotiable_adherence": "Auto-fix matrix per spec §3.6 honored: LOGIC_BUG never auto-heals",
+    "side_effect_correctness": "LOGIC_BUG Issue created but no fixer commit lands; Issue stays open",
+    "error_propagation": "Mixed batch is normal (not error); TRIAGE_COMPLETE result"
+  }
+}

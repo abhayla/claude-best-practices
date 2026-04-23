@@ -11,7 +11,7 @@ description: >
 tools: "Agent Bash Read Write Edit Grep Glob Skill"
 model: inherit
 color: blue
-version: "4.0.0"
+version: "4.1.0"
 ---
 
 ## NON-NEGOTIABLE
@@ -253,20 +253,24 @@ Agent(subagent_type=failure-triage-agent,
       ## Remaining budget: <remaining_budget>
       ## Sub-state: .workflows/testing-pipeline/sub/test-pipeline.json
 
-      Process the failure set. PR1: skeleton returns NO_OP_PR1_SKELETON contract
-      immediately (full triage activates in PR2). T2A bubbles failures up to T1
-      regardless.
+      Process the failure set per PR2 full triage subgraph (analyzer → issue-manager
+      → fixer → serialize → escalation if needed). Return structured triage outcome
+      including issues_created, fixes_applied, fixes_pending counts.
       """)
 ```
 
-In PR1, T2B returns `{"result": "NO_OP_PR1_SKELETON", ...}`. T2A acknowledges
-the no-op and proceeds.
+**PR2 (current):** T2B returns one of:
+- `{"result": "TRIAGE_COMPLETE", "issues_created": N, "fixes_applied": M, "fixes_pending": K, ...}` — normal completion
+- `{"result": "BLOCKED", "blocker": "GITHUB_NOT_CONNECTED|DISPATCH_BUDGET_EXCEEDED|WALL_CLOCK_BUDGET_EXCEEDED", "remediation": "..."}` — abort
+- `{"result": "TRIAGE_INCOMPLETE", "abort_reason": "RETRY_BUDGET_EXHAUSTED", "escalation_report": "test-results/escalation-report.md", ...}` — partial completion with escalation
+
+T2A reads the result; on BLOCKED, propagates immediately to T1 (skip STEP 7's normal flow). On TRIAGE_COMPLETE or TRIAGE_INCOMPLETE, includes the triage outcome in STEP 7's bubble-up contract so T1 can incorporate into pipeline-verdict.json.
 
 ### STEP 7 — BUBBLE-UP / RETURN
 
 **Standalone mode:** print summary to console, return human-readable report.
 
-**Dispatched mode:** return structured contract to T1:
+**Dispatched mode:** return structured contract to T1 (PR2: includes T2B triage outcome):
 
 ```json
 {
@@ -276,23 +280,32 @@ the no-op and proceeds.
     "api": "test-results/api.json",
     "ui": "test-results/ui.json",
     "per_test_report": "test-results/per-test-report.md",
-    "sub_state": ".workflows/testing-pipeline/sub/test-pipeline.json"
+    "sub_state": ".workflows/testing-pipeline/sub/test-pipeline.json",
+    "triage_state": ".workflows/testing-pipeline/sub/failure-triage.json",
+    "escalation_report": "test-results/escalation-report.md (if triage incomplete)"
   },
   "lane_summaries": {
     "functional": {"passed": 98, "failed": 2},
     "api": {"passed": 48, "failed": 2, "skipped": 50},
     "ui": {"passed": 7, "failed": 1, "skipped": 92}
   },
-  "failures_for_t1": [
-    {"test_id": "...", "failed_lanes": ["functional", "api"], "category_hint": "SCHEMA_MISMATCH", "evidence": {...}}
-  ],
-  "decisions": ["Wave 1 ran functional + API in parallel", "T2B returned NO_OP_PR1_SKELETON"],
+  "triage_outcome": {
+    "result": "TRIAGE_COMPLETE | TRIAGE_INCOMPLETE | BLOCKED",
+    "issues_created": 5,
+    "fixes_applied": 3,
+    "fixes_pending": 2,
+    "issue_only_count": 2,
+    "cross_lane_root_causes_detected": 1
+  },
+  "decisions": ["Wave 1 ran functional + API in parallel", "T2B triaged 5 failures: 3 healed, 2 ISSUE_ONLY"],
   "blockers": [],
-  "summary": "100 tests, 95 PASSED, 5 FAILED — failures bubbled to T1 for Issue creation",
-  "retry_budget_consumed": 0,
-  "duration_seconds": 134
+  "summary": "100 tests, 95 PASSED, 5 FAILED — 3 auto-healed, 2 Issues await human review",
+  "retry_budget_consumed": 3,
+  "duration_seconds": 234
 }
 ```
+
+T1 reads `triage_outcome` directly from this contract. T1 does NOT create Issues itself in PR2 — that's T2B's responsibility now (atomic switchover deleted T1's inline step).
 
 T1 reads `failures_for_t1` and creates GitHub Issues using its inline step (extended in PR1 to handle 4 new API categories).
 

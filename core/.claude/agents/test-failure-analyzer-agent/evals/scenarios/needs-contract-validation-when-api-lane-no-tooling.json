@@ -1,0 +1,32 @@
+{
+  "scenario_name": "needs-contract-validation-when-api-lane-no-tooling",
+  "description": "API lane reported NEEDS_CONTRACT_VALIDATION (no contract files) → analyzer preserves and routes to ISSUE_ONLY.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/api/test_x.py::tx",
+      "failed_lanes": [
+        "api"
+      ],
+      "evidence": {
+        "api": {
+          "category": "NEEDS_CONTRACT_VALIDATION",
+          "details": "no openapi.yaml, no pact/"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "category": "NEEDS_CONTRACT_VALIDATION",
+    "recommended_action": "ISSUE_ONLY"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Pre-classified category from lane worker is preserved (analyzer doesn't override)",
+    "output_structure": "category passed through; recommended_action correctly mapped per spec §3.6 matrix",
+    "non_negotiable_adherence": "NEEDS_CONTRACT_VALIDATION is a NEW PR1 category; analyzer recognizes it",
+    "side_effect_correctness": "Issue created surfaces 'add contract tooling' recommendation",
+    "error_propagation": "Tooling absence is not an error in analyzer; surfaces actionable Issue"
+  }
+}

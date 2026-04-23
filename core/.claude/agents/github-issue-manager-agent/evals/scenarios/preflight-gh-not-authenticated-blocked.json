@@ -1,0 +1,44 @@
+{
+  "scenario_name": "preflight-gh-not-authenticated-blocked",
+  "description": "gh auth status fails → BLOCKED contract returned.",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/test_x.py::test_y",
+      "run_id": "2026-04-23T14-30-00Z_abc1234",
+      "failing_commit_sha_short": "abc1234",
+      "category": "LOGIC_BUG",
+      "confidence": 0.95,
+      "evidence_summary": "test failed",
+      "recommended_action": "ISSUE_ONLY",
+      "failure_profile": {
+        "functional": {
+          "result": "FAILED"
+        },
+        "api": {
+          "result": "n/a"
+        },
+        "ui": {
+          "result": "n/a"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_AUTH_FAIL": "true"
+    }
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "result": "BLOCKED",
+    "blocker": "GITHUB_NOT_CONNECTED",
+    "failed_check": "*authenticated*",
+    "remediation": "*gh auth login*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Preflight check 2 (gh auth status) fails → BLOCKED",
+    "output_structure": "remediation field has actionable `gh auth login` command",
+    "non_negotiable_adherence": "NN#1: never silently skip; surfaces auth issue to caller",
+    "side_effect_correctness": "Did not attempt gh issue create after preflight failure",
+    "error_propagation": "Auth failure surfaces with actionable remediation, not generic 'gh failed' message"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "scenario_name": "confidence-threshold-gating-issue-only",
+  "description": "Confidence below 0.85 → recommended_action=ISSUE_ONLY (don't auto-heal under-confident classifications).",
+  "input": {
+    "dispatch_context": {
+      "test_id": "tests/test_unclear.py::tu",
+      "failed_lanes": [
+        "functional"
+      ],
+      "evidence": {
+        "functional": {
+          "error": "AssertionError: ambiguous"
+        }
+      }
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "FORCE_LOW_CONFIDENCE": "0.4"
+    }
+  },
+  "expected_contract": {
+    "test_id": "*",
+    "confidence": "<0.85",
+    "recommended_action": "ISSUE_ONLY"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Confidence threshold check fires when LLM is uncertain",
+    "output_structure": "recommended_action explicitly ISSUE_ONLY (NOT AUTO_HEAL)",
+    "non_negotiable_adherence": "Spec §3.6 confidence threshold (0.85) honored",
+    "side_effect_correctness": "Healer downstream MUST NOT attempt auto-fix on this test",
+    "error_propagation": "Low confidence is not an error; routes to safer ISSUE_ONLY"
+  }
+}

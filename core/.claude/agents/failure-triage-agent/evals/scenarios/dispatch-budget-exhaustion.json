@@ -1,6 +1,6 @@
 {
-  "scenario_name": "no-op-skeleton-large-failure-batch",
-  "description": "Large failure set (50) -- skeleton must not attempt batched fan-out in PR1.",
+  "scenario_name": "dispatch-budget-exhaustion",
+  "description": "Synthetic 30 failures cascade × 3 fix iterations would trip dispatch budget at >100 → BLOCKED.",
   "input": {
     "dispatch_context": {
       "pipeline_id": "test-pipeline-BIG",
@@ -10,318 +10,302 @@
           "test_id": "tests/test_0.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_1.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_2.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_3.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_4.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_5.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_6.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_7.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_8.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_9.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_10.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_11.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_12.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_13.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_14.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_15.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_16.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_17.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_18.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_19.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_20.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_21.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_22.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_23.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_24.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_25.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_26.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_27.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_28.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_29.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_30.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_31.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_32.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_33.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_34.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_35.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_36.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_37.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_38.py::t",
           "failed_lanes": [
             "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         },
         {
           "test_id": "tests/test_39.py::t",
           "failed_lanes": [
             "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_40.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_41.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_42.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_43.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_44.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_45.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_46.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_47.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_48.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
-        },
-        {
-          "test_id": "tests/test_49.py::t",
-          "failed_lanes": [
-            "functional"
-          ]
+          ],
+          "category_hint": "BROKEN_LOCATOR"
         }
       ],
       "remaining_budget": 15
     },
     "filesystem_setup": {},
-    "env_setup": {}
+    "env_setup": {
+      "GH_AUTH_OK": "true",
+      "MAX_DISPATCHES_LOW": "100"
+    }
   },
   "expected_contract": {
-    "result": "NO_OP_PR1_SKELETON",
-    "failures_received": 50,
-    "next_action": "T2A bubble-up to T1 inline Issue creation"
+    "result": "BLOCKED",
+    "blocker": "DISPATCH_BUDGET_EXCEEDED",
+    "dispatch_count": "*",
+    "remediation": "*max_total_dispatches*"
   },
   "rubric_hints": {
-    "trigger_reliability": "Agent does NOT trip dispatch budget by trying to fan out 50 fixers in PR1",
-    "output_structure": "failures_received: 50 documented honestly even though no triage happened",
-    "non_negotiable_adherence": "PR2 batch fan-out logic stays inactive in PR1",
-    "side_effect_correctness": "Zero state files written, zero subagent dispatches at scale",
-    "error_propagation": "Large input is not an error -- handled identically to small input"
+    "trigger_reliability": "T2B counter increments on every Agent() dispatch; trips at 100 cap",
+    "output_structure": "Includes dispatch_count for diagnostic visibility",
+    "non_negotiable_adherence": "NN#3 budget enforcement: aborts BEFORE next batch dispatch (not mid-batch)",
+    "side_effect_correctness": "Some Issues may be created/fixed before abort; partial state is acknowledged",
+    "error_propagation": "Distinct from GITHUB_NOT_CONNECTED — different blocker code"
   }
 }

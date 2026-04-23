@@ -1,0 +1,52 @@
+{
+  "scenario_name": "all-auto-heal-batch-succeeds-end-to-end",
+  "description": "3 failed tests all classified AUTO_HEAL → analyzer → issue-manager → fixer → serialize → Issues closed.",
+  "input": {
+    "dispatch_context": {
+      "pipeline_id": "test-pipeline-RUN001",
+      "run_id": "RUN001",
+      "failures": [
+        {
+          "test_id": "tests/test_a.py::ta",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "BROKEN_LOCATOR"
+        },
+        {
+          "test_id": "tests/test_b.py::tb",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "TIMEOUT_TIMING"
+        },
+        {
+          "test_id": "tests/test_c.py::tc",
+          "failed_lanes": [
+            "functional"
+          ],
+          "category_hint": "ASSERTION_ERROR"
+        }
+      ],
+      "remaining_budget": 15
+    },
+    "filesystem_setup": {},
+    "env_setup": {
+      "GH_AUTH_OK": "true"
+    }
+  },
+  "expected_contract": {
+    "result": "TRIAGE_COMPLETE",
+    "issues_created": 3,
+    "fixes_applied": 3,
+    "fixes_pending": 0,
+    "remaining_budget": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "T2B dispatches 3 analyzers → 3 issue-managers → 3 fixers in batches; all confirmation paths fire",
+    "output_structure": "TRIAGE_COMPLETE result with counts; remaining_budget propagated for parent T2A",
+    "non_negotiable_adherence": "NN#1 single triage owner; NN#2 batched fan-out; NN#3 dispatch budget enforcement; NN#4 hard-fail propagation",
+    "side_effect_correctness": "3 Issues created (or deduped), 3 commits land, Issues closed with commit SHA",
+    "error_propagation": "Success path returns TRIAGE_COMPLETE, not BLOCKED"
+  }
+}
