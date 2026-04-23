@@ -3385,15 +3385,15 @@
     "hash": "51416fdcc1f83ed887d51db44f110ea09a858106499233829a8a5d564020d7cc",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-22",
+    "last_updated": "2026-04-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Use proactively to diagnose test failures — reads test output, classifies by root cause, and suggests targeted fixes. Spawn automatically whenever tests fail to provide immediate",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured; promoted to must-have — invoked by /fix-loop (must-have) for every test failure",
+    "changelog": "v2.1.0: Add optional enriched_context input schema (console_messages, network_failures, dom_snapshot). Callers with MCP access pre-capture live browser signals; analyzer stays T3 leaf. New classification_source value: enriched-context-regex. Backward compatible — enrichment is opt-in.",
     "tier": "must-have"
   },
   "test-healer-agent": {
