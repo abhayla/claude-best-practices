@@ -460,7 +460,7 @@ class TestVersionConsistency:
 
     @pytest.fixture(autouse=True)
     def load_registry(self):
-        with open(ROOT / "registry" / "patterns.json") as f:
+        with open(ROOT / "registry" / "patterns.json", encoding="utf-8") as f:
             self.registry = json.load(f)
 
     def _registry_version(self, name: str) -> str | None:

@@ -39,12 +39,12 @@ SUBAGENT_REFS = CORE_CLAUDE / "skills" / "subagent-driven-dev" / "references"
 
 
 def _load_pipeline_config() -> dict:
-    with open(PIPELINE_CONFIG) as f:
+    with open(PIPELINE_CONFIG, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def _load_registry() -> dict:
-    with open(REGISTRY_PATH) as f:
+    with open(REGISTRY_PATH, encoding="utf-8") as f:
         return json.load(f)
 
 

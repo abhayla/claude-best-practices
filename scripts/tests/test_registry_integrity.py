@@ -23,7 +23,7 @@ REGISTRY_PATH = ROOT / "registry" / "patterns.json"
 
 
 def _load_registry() -> dict:
-    with open(REGISTRY_PATH) as f:
+    with open(REGISTRY_PATH, encoding="utf-8") as f:
         return json.load(f)
 
 

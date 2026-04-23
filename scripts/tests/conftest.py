@@ -17,7 +17,7 @@ def fixtures_dir():
 
 @pytest.fixture
 def sample_registry():
-    with open(FIXTURES_DIR / "sample_registry.json") as f:
+    with open(FIXTURES_DIR / "sample_registry.json", encoding="utf-8") as f:
         return json.load(f)
 
 
