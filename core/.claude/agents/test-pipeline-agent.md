@@ -7,9 +7,10 @@ description: >
   for teams that only want the iteration-focused subchain without the full
   tdd_red → e2e → quality_gate workflow. Invoked by `/test-pipeline` slash
   command. Reads pipeline config from `config/test-pipeline.yml`.
+tools: "Agent Bash Read Write Edit Grep Glob Skill"
 model: inherit
 color: blue
-version: "3.0.0"
+version: "3.1.0"
 ---
 
 ## NON-NEGOTIABLE

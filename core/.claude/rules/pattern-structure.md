@@ -44,10 +44,35 @@ Every agent in `core/.claude/agents/*.md` MUST have:
 ---
 name: agent-name
 description: When and why to use this agent.
+tools: "Agent Bash Read Write Edit Grep Glob Skill"   # required for orchestrators — see Tool Grants below
 model: inherit                   # inherit | sonnet | haiku | opus
 color: blue                      # red | orange | yellow | blue | green
 ---
 ```
+
+### Tool Grants (MUST for Orchestrators)
+
+Claude Code subagents receive a default limited tool set when dispatched via
+`Agent(subagent_type=...)`. That default set **excludes `Agent`**, which
+silently collapses the 4-tier dispatch model defined in
+`agent-orchestration.md` rule #2 — a T1/T2 orchestrator dispatched as a
+subagent cannot reach its T2/T3 workers unless `Agent` is explicitly granted.
+
+**Invariant:**
+
+| Agent role | Must declare `tools:` including `Agent`? |
+|---|---|
+| T0 pipeline orchestrator | **Yes** — dispatches T1 workflow masters |
+| T1 workflow master | **Yes** — dispatches T2 sub-orchestrators + skills |
+| T2 sub-orchestrator | **Yes** — dispatches T3 worker agents + skills |
+| T3 worker agent | **No** — MUST NOT dispatch further subagents (rule #3) |
+
+The standard orchestrator tool set is `"Agent Bash Read Write Edit Grep Glob Skill"`.
+T3 leaves may declare a narrower set (e.g., omit `Write`/`Edit` if read-only)
+but MUST omit `Agent` to enforce the tier-depth cap.
+
+Runtime-verified pinning: `scripts/tests/test_orchestrator_tool_grants.py`
+asserts this invariant on every orchestrator and T3 leaf in the registry.
 
 ### Color Field (Severity/Importance)
 
