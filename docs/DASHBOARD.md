@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-22 17:43 UTC (auto-generated)
+> Last updated: 2026-04-23 02:45 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -91,7 +91,7 @@
 | documentation-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | drizzle-orm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-best-practices | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| e2e-conductor-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | test-scout-agent, visual-inspector-agent, test-healer-agent |
+| e2e-conductor-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | test-scout-agent, visual-inspector-agent, test-healer-agent |
 | e2e-pipeline | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
 | e2e-visual-run | skill | 4.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
@@ -218,11 +218,11 @@
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-pipeline | skill | 1.0.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
-| test-pipeline-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
+| test-pipeline-agent | agent | 3.1.0 | hub:abhayla/claude-best-practices | — |
 | test-scout-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
-| testing-pipeline-master-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| testing-pipeline-master-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | testing-pipeline-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | trace-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | twitter-x | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
