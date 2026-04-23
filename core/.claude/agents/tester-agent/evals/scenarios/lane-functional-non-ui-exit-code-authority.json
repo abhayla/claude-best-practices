@@ -1,0 +1,37 @@
+{
+  "scenario_name": "lane-functional-non-ui-exit-code-authority",
+  "description": "Functional lane, non-UI test (pytest unit) -- exit code is authoritative.",
+  "input": {
+    "dispatch_context": {
+      "lane": "functional",
+      "run_id": "2026-04-23T14-30-00Z_abc1234",
+      "queue": [
+        "tests/unit/test_logic_bug.py::test_add_two_plus_three_equals_five"
+      ],
+      "capture_proof": true
+    },
+    "filesystem_setup": {
+      "tests/unit/test_logic_bug.py": "fixture-content-from-playwright-demo"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "lane": "functional",
+    "tests_processed": 1,
+    "passed": 0,
+    "failed": 1,
+    "failures": [
+      {
+        "test_id": "*",
+        "category_hint": "LOGIC_BUG"
+      }
+    ]
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent runs pytest with --capture-proof and detects exit code = failure",
+    "output_structure": "Lane contract includes lane/tests_processed/passed/failed/failures per spec",
+    "non_negotiable_adherence": "NN#2: exit code is authoritative for non-UI functional; NN#4: writes test-results/functional.jsonl",
+    "side_effect_correctness": "Writes test-results/functional.json + .jsonl; no screenshots for non-UI by default",
+    "error_propagation": "Test failure surfaces in failures[] with category_hint, not BLOCKED"
+  }
+}

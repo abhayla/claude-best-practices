@@ -121,17 +121,26 @@ and `Read` (multimodal) only — MUST NOT call `Agent()`.
    - **Single-signal cap:** missing screenshot OR missing a11y snapshot caps
      confidence at 0.7 (MEDIUM). Flag as `low_confidence: true`.
 
-## State File (Dual-Mode)
+## State File (Tri-Mode)
 
-Same dual-mode detection as `test-scout-agent`:
+| Mode | State Path | Schema | Queue Field |
+|------|------------|--------|-------------|
+| **E2E-Conductor Dispatched** (legacy) | `.workflows/testing-pipeline/e2e-state.json` | `"1.0.0"` | `verify_queue` |
+| **E2E-Conductor Standalone** (legacy) | `.pipeline/e2e-state.json` | `"1.0.0"` | `verify_queue` |
+| **Three-Lane T2A Dispatched** (NEW in PR1) | `.workflows/testing-pipeline/sub/test-pipeline.json` | `"2.0.0"` | `queues.ui` |
 
-| Mode | State Path |
-|------|------------|
-| **Dispatched** | `.workflows/testing-pipeline/e2e-state.json` |
-| **Standalone** | `.pipeline/e2e-state.json` |
+**Mode detection:** check dispatch context for `lane: "ui"` parameter. If present → Three-Lane mode (read `queues.ui` + `tracks_required_per_test` from sub-state file). If absent → legacy E2E-Conductor mode (read `verify_queue` from old state file).
 
-State schema MUST include `"schema_version": "1.0.0"`. Refuse mismatched
-major version; log and exit.
+**Three-Lane mode behavior (NEW):**
+- Read `queues.ui` from `.workflows/testing-pipeline/sub/test-pipeline.json` (T2A's sub-state)
+- Filter to tests where `tracks_required_per_test[test_id]` includes `"ui"` (skip tests not requiring UI track)
+- Read screenshots from `test-evidence/{run_id}/screenshots/` produced by the functional lane
+- Write final verdict to `test-results/ui.json` (lane convention) per testing.md structured output schema
+- Append per-test progress to `test-results/ui.jsonl` for live tail
+- Refuse mismatched major schema version; emit `STATE_SCHEMA_INCOMPATIBLE` and exit
+
+State schema MUST include `"schema_version"` matching the mode (1.0.0 for legacy, 2.0.0 for Three-Lane).
+Refuse mismatched major version; log and exit.
 
 ## Verification Flow
 

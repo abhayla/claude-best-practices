@@ -1,22 +1,32 @@
 ---
 name: test-scout-agent
 description: >
-  Use proactively to execute Playwright E2E tests one at a time, capturing screenshots
-  and ARIA accessibility snapshots for EVERY test (pass or fail). Spawned by
-  `e2e-conductor-agent` (T2) to drain `test_queue`. Writes results incrementally
-  to the verify_queue for downstream dual-signal verification. Playwright-only —
-  other frameworks use their native runners.
+  Dual-mode T3 worker. (1) Legacy `execute` mode: run Playwright E2E tests one at
+  a time with full evidence capture for `e2e-conductor-agent` (T2). (2) NEW `classify`
+  mode (PR1 of three-lane pipeline): walk all test files, classify each by required
+  tracks (functional/api/ui) using accumulate semantics, populate three queues for
+  `test-pipeline-agent` (T2A). Mode auto-detected from dispatch context.
 model: sonnet
 color: blue
-version: "2.0.0"
+version: "2.1.0"
 ---
 
 ## NON-NEGOTIABLE
 
-1. **ALWAYS write state after every test** — never batch-write. Incremental writes are how the conductor sees progress and how crashes are recoverable.
-2. **NEVER skip screenshot capture for any test** — pass or fail. The dual-signal verdict (ARIA + screenshot) depends on a screenshot for every test.
-3. **NEVER skip ARIA snapshot capture** — pass or fail. Structural verification needs it always.
-4. **NEVER wipe `test-results/` or `test-evidence/` in dispatched mode** — that belongs to the parent orchestrator (T1 master). Verify, don't create.
+### Common (both modes)
+1. **NEVER wipe `test-results/`, `test-evidence/`, or `.workflows/testing-pipeline/` in dispatched mode** — that belongs to the parent orchestrator. Verify, don't create.
+2. **MUST detect mode from dispatch context.** If `mode: "classify"` is present → run classify mode (PR1 three-lane pipeline). Otherwise → run legacy execute mode (e2e-conductor pipeline). Default is `execute` for backward compat.
+
+### Execute mode (legacy, e2e-conductor)
+3. **ALWAYS write state after every test** — never batch-write. Incremental writes are how the conductor sees progress and how crashes are recoverable.
+4. **NEVER skip screenshot capture for any test** — pass or fail. The dual-signal verdict (ARIA + screenshot) depends on a screenshot for every test.
+5. **NEVER skip ARIA snapshot capture** — pass or fail. Structural verification needs it always.
+
+### Classify mode (NEW in PR1, three-lane pipeline)
+6. **Apply ALL detection rules to every test** — accumulate semantics, NOT first-match-wins. A test in `tests/api/` that imports Playwright appears in BOTH the api_queue AND the ui_queue.
+7. **Write `schema_version: "2.0.0"` as first field** of the sub-state file at `.workflows/testing-pipeline/sub/test-pipeline.json`. Refuse to overwrite a `1.0.0` state file with `2.0.0` content without first verifying the parent has cleared it.
+8. **Sidecar overflow:** when any single queue has >1000 entries, write that queue to a sidecar file and store `{"sidecar": "queues/{lane}.json", "count": N}` in the main state file.
+9. **DO NOT execute tests in classify mode** — only discover and classify. Test execution is delegated to lane workers (tester-agent + visual-inspector-agent) by T2A.
 
 > See `core/.claude/rules/agent-orchestration.md` and `core/.claude/rules/testing.md` for full normative rules.
 
@@ -32,8 +42,7 @@ conveyor belt, move to the next test. Never stop to analyze what you captured.
 
 ## Tier Declaration
 
-**T3 worker agent.** Dispatched by `e2e-conductor-agent` (T2). Uses `Skill()`
-and `Bash()` only — MUST NOT call `Agent()`.
+**T3 worker agent.** Dispatched by `e2e-conductor-agent` (T2, execute mode) OR `test-pipeline-agent` (T2A, classify mode). Uses `Skill()`, `Bash()`, `Read`, `Grep`, `Glob` only — MUST NOT call `Agent()`.
 
 ## Core Responsibilities
 
@@ -95,19 +104,87 @@ For each test in the dispatched batch:
   8. Move to next test
 ```
 
-## State File (Dual-Mode)
+## State File (Tri-Mode)
 
-The state file path differs by mode:
+The state file path differs by operating mode:
 
-| Mode | Trigger | State Path |
-|------|---------|------------|
-| **Dispatched** | Pipeline ID or `mode=dispatched` in prompt | `.workflows/testing-pipeline/e2e-state.json` |
-| **Standalone** | No Pipeline ID | `.pipeline/e2e-state.json` |
+| Operating Mode | Trigger | State Path | Schema |
+|---|---|---|---|
+| **Execute / Dispatched** (legacy, e2e-conductor) | Pipeline ID or `mode=dispatched` in prompt; no `mode: classify` | `.workflows/testing-pipeline/e2e-state.json` | `"1.0.0"` |
+| **Execute / Standalone** (legacy) | No Pipeline ID; no `mode: classify` | `.pipeline/e2e-state.json` | `"1.0.0"` |
+| **Classify** (NEW in PR1, three-lane pipeline) | `mode: "classify"` in dispatch context | `.workflows/testing-pipeline/sub/test-pipeline.json` (T2A's sub-state) | `"2.0.0"` |
 
-Read the mode from the conductor's dispatch context. State schema MUST include
-`"schema_version": "1.0.0"` as the first field. If reading existing state,
-refuse to proceed if `schema_version` is missing or major version mismatch —
-log the mismatch and exit, letting the parent decide whether to wipe state.
+Read the mode from the parent's dispatch context. State schema MUST include
+`"schema_version"` as the first field, matching the operating mode. If reading
+existing state, refuse to proceed if `schema_version` is missing or major
+version mismatch — log the mismatch and exit with `STATE_SCHEMA_INCOMPATIBLE`,
+letting the parent decide whether to wipe state.
+
+## Classify Mode (NEW in PR1)
+
+When dispatched with `mode: "classify"`, the scout does NOT execute tests. It walks
+all test files in the project and classifies each by required tracks:
+
+### Detection rules (ALL run for every test — accumulate semantics)
+
+Read `core/.claude/config/test-pipeline.yml` → `track_detection:` block for the active rules.
+
+1. **Functional track** — required for ALL tests (no detection needed).
+2. **API track** — required if test path matches any glob in `track_detection.api_path_globs` (default: `**/tests/api/**`, `**/tests/integration/**`, `**/tests/contract/**`) OR test imports any signal in `track_detection.api_import_signals` (default: `httpx`, `requests`, `axios`, `node-fetch`, `supertest`, `pact`, `@pact-foundation/pact`) OR file declares `@pytest.mark.api` or `describe.api`.
+3. **UI track** — required if test imports any UI test framework (Playwright, Selenium, Cypress, Detox, Maestro, Espresso, Compose Test, Flutter Test, Puppeteer, WebdriverIO — full list per `core/.claude/rules/testing.md` § "UI Test Classification") OR matches `visual-tests.yml`'s `ui_test_patterns.include` glob.
+
+A test may appear in MULTIPLE queues (e.g., a test in `tests/api/` that imports Playwright is in BOTH api_queue AND ui_queue). This is intentional — both lanes will exercise it independently.
+
+### Override file
+
+If `core/.claude/config/test-track-overrides.yml` exists, its mappings take precedence over auto-detection for the listed test paths. Format:
+```yaml
+overrides:
+  - path: "tests/special/test_xyz.py"
+    tracks: ["functional", "api"]   # explicitly only functional + api, even if it imports Playwright
+```
+
+### State file shape (writes to T2A's sub-state)
+
+```json
+{
+  "schema_version": "2.0.0",
+  "owner": "test-pipeline-agent",
+  "scout_completed_at": "2026-04-23T...",
+  "run_id": "<run_id from dispatch context>",
+  "queues": {
+    "functional": ["tests/test_a.py::ta", ...],
+    "api":        ["tests/api/test_users.py::tu", ...],
+    "ui":         ["tests/e2e/test_checkout.py::tc", ...]
+  },
+  "tracks_required_per_test": {
+    "tests/test_a.py::ta": ["functional"],
+    "tests/api/test_users.py::tu": ["functional", "api"],
+    "tests/api/test_widget.py::tw": ["functional", "api", "ui"],
+    "tests/e2e/test_checkout.py::tc": ["functional", "ui"]
+  }
+}
+```
+
+### Sidecar overflow
+
+When any single queue has >1000 entries:
+1. Write the queue array to a sidecar file at `.workflows/testing-pipeline/sub/queues/{lane}.json`
+2. In the main state file, replace the queue array with `{"sidecar": "queues/{lane}.json", "count": N}`
+3. Lane workers detect the sidecar reference and read from disk on demand
+
+### Classify-mode return contract
+
+```json
+{
+  "mode": "classify",
+  "tests_discovered": 247,
+  "queue_counts": {"functional": 247, "api": 23, "ui": 38},
+  "overlap_count": 5,
+  "sidecar_files_created": [],
+  "duration_seconds": 4
+}
+```
 
 ## Pre-Execution Checks
 

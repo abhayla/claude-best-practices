@@ -29,6 +29,10 @@ AGENTS_DIR = CORE_CLAUDE / "agents"
 RULES_DIR = CORE_CLAUDE / "rules"
 REGISTRY_PATH = ROOT / "registry" / "patterns.json"
 WORKFLOW_CONTRACTS_PATH = ROOT / "config" / "workflow-contracts.yaml"
+RESPONSIBILITY_ALLOWLIST_PATH = CORE_CLAUDE / "config" / "orchestrator-responsibility-allowlist.yml"
+
+# Orchestrator responsibility cap per agent-orchestration.md rule 8
+RESPONSIBILITY_CAP = 4
 
 # Thresholds
 SIZE_WARN = 500
@@ -101,6 +105,61 @@ def get_body(file_path: Path) -> str:
     content = file_path.read_text(encoding="utf-8")
     match = re.match(r"^---\s*\n.*?\n---\s*\n?(.*)", content, re.DOTALL)
     return match.group(1) if match else content
+
+
+def load_responsibility_allowlist() -> dict:
+    """Load the orchestrator responsibility-count allowlist.
+
+    Returns a mapping of agent_name -> entry dict (with responsibility_count,
+    rule_8_cap, justification, etc.). Returns {} if the allowlist file is
+    missing (treated as empty allowlist — strict mode).
+    """
+    if not RESPONSIBILITY_ALLOWLIST_PATH.exists():
+        return {}
+    try:
+        data = yaml.safe_load(RESPONSIBILITY_ALLOWLIST_PATH.read_text(encoding="utf-8"))
+        if not data or "allowlist" not in data:
+            return {}
+        return {entry["agent"]: entry for entry in data["allowlist"]}
+    except (yaml.YAMLError, KeyError, TypeError):
+        return {}
+
+
+def count_responsibilities(agent_path: Path) -> int:
+    """Count top-level numbered items under '## Core Responsibilities' in an agent body.
+
+    Looks for the ## Core Responsibilities section (case-sensitive heading), then
+    counts lines matching ^\\d+\\.\\s within that section (stops at next ## heading).
+    Returns 0 if the section is absent.
+
+    Example matching content:
+        ## Core Responsibilities
+
+        1. **First responsibility** - description
+        2. **Second responsibility** - description
+
+        Some prose between items is fine.
+
+        3. **Third** - description
+
+    Returns 3 for the above.
+    """
+    body = get_body(agent_path)
+    lines = body.splitlines()
+
+    in_section = False
+    count = 0
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("## Core Responsibilities"):
+            in_section = True
+            continue
+        if in_section and stripped.startswith("## "):
+            # Reached the next top-level section
+            break
+        if in_section and re.match(r"^\d+\.\s", stripped):
+            count += 1
+    return count
 
 
 def count_content_lines(file_path: Path) -> int:
@@ -279,6 +338,32 @@ def score_agent(agent_path: Path) -> tuple[int, list[str]]:
     if "## Output Format" not in body:
         score -= 10
         breakdown.append(f"Missing '## Output Format' section (-10)")
+
+    # Responsibility-count check (agent-orchestration.md rule 8)
+    # Only enforce on orchestrators (agents whose tools include 'Agent' — i.e., they can dispatch subagents)
+    tools = fm.get("tools", "")
+    is_orchestrator = "Agent" in (tools if isinstance(tools, str) else " ".join(tools or []))
+    if is_orchestrator and "## Core Responsibilities" in body:
+        resp_count = count_responsibilities(agent_path)
+        if resp_count > RESPONSIBILITY_CAP:
+            allowlist = load_responsibility_allowlist()
+            agent_name = fm.get("name", agent_path.stem)
+            entry = allowlist.get(agent_name)
+            if entry is None:
+                score -= 20
+                breakdown.append(
+                    f"Orchestrator '{agent_name}' has {resp_count} responsibilities "
+                    f"(rule-8 cap is {RESPONSIBILITY_CAP}); add allowlist entry to "
+                    f"{RESPONSIBILITY_ALLOWLIST_PATH.relative_to(ROOT)} with justification (-20)"
+                )
+            elif entry.get("responsibility_count", -1) < resp_count:
+                # Allowlist entry exists but count grew beyond what was allowlisted
+                score -= 15
+                breakdown.append(
+                    f"Orchestrator '{agent_name}' has {resp_count} responsibilities "
+                    f"(allowlist documents {entry['responsibility_count']}); "
+                    f"either split the agent or update the allowlist entry (-15)"
+                )
 
     desc = str(fm.get("description", "")).lower()
     if "when" not in desc and "use " not in desc:

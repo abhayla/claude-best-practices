@@ -1,0 +1,32 @@
+{
+  "scenario_name": "classify-mode-api-track-from-path",
+  "description": "Test in tests/api/ → classified as functional + api.",
+  "input": {
+    "dispatch_context": {
+      "mode": "classify",
+      "pipeline_id": "test-pipeline-RUN002",
+      "run_id": "RUN002"
+    },
+    "filesystem_setup": {
+      "tests/api/test_users.py": "import httpx\ndef test_x(): pass"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "mode": "classify",
+    "tests_discovered": 1,
+    "queue_counts": {
+      "functional": 1,
+      "api": 1,
+      "ui": 0
+    },
+    "overlap_count": 0
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Path glob (**/tests/api/**) matches → API track required",
+    "output_structure": "tracks_required_per_test entry includes both functional and api",
+    "non_negotiable_adherence": "NN#6: ALL detection rules run; path match adds API track",
+    "side_effect_correctness": "queues.api array contains test_id; queues.ui is empty",
+    "error_propagation": "No errors"
+  }
+}

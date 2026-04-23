@@ -37,21 +37,27 @@ def test_default_test_pipeline_config_is_valid_yaml():
     assert isinstance(data, dict), "config must be a YAML mapping"
 
 
-def test_config_declares_pipeline_stages():
-    """The agent reads stage definitions from this file; at minimum
-    fix-loop → auto-verify → post-fix-pipeline must be declared."""
-    data = yaml.safe_load(TEST_PIPELINE_CONFIG.read_text(encoding="utf-8"))
-    pipeline = data.get("pipeline", {})
-    stages = pipeline.get("stages", [])
-    assert stages, "config must declare pipeline.stages"
+def test_config_declares_pipeline_lanes():
+    """PR1 (test-pipeline-three-lane): the agent reads lane definitions from this file.
+    Three lanes (functional/api/ui) MUST be declared.
 
-    stage_skills = {s.get("skill") for s in stages}
-    required = {"fix-loop", "auto-verify", "post-fix-pipeline"}
-    missing = required - stage_skills
+    NOTE: pre-PR1 this test checked for `pipeline.stages` (fix-loop/auto-verify/post-fix-pipeline).
+    PR1 replaces sequential stages with parallel lanes; the underlying skills are still
+    invoked but as lane workers, not as a sequential DAG. See spec §3.3.
+    """
+    data = yaml.safe_load(TEST_PIPELINE_CONFIG.read_text(encoding="utf-8"))
+    lanes = data.get("lanes", {})
+    required_lanes = {"functional", "api", "ui"}
+    missing = required_lanes - set(lanes.keys())
     assert not missing, (
-        f"Default stage list missing: {sorted(missing)}. "
-        "test-pipeline-agent's fix-verify-commit sub-chain requires these "
-        "three stages by default."
+        f"config must declare three lanes (functional/api/ui); missing: {sorted(missing)}. "
+        "test-pipeline-agent (T2A) dispatches Wave 1 (functional+api parallel) and "
+        "Wave 2 (ui post-functional) per spec §3.3."
+    )
+    # UI lane must declare its dependency on functional (per Wave 2 = post-Wave 1)
+    assert lanes["ui"].get("runs_after") == "functional", (
+        "lanes.ui.runs_after must be 'functional' — UI lane reviews screenshots "
+        "produced by the functional lane."
     )
 
 

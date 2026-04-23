@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.0.0",
-    "last_updated": "2026-04-21",
-    "total_patterns": 229
+    "last_updated": "2026-04-23",
+    "total_patterns": 231
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -63,6 +63,26 @@
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have"
+  },
+  "agent-evaluator": {
+    "hash": "10ccc88b83e0cc0109c6d5d86fb53c1b0ead9b9896e26204ce352d9525071262",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-23",
+    "last_updated": "2026-04-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Evaluate Claude Code agents against scenario files using LLM-as-judge with 5-criterion rubric (trigger reliability, output structure, NON-NEGOTIABLE adherence, side-effect correctness, error propagation). Distinct from /skill-evaluator.",
+    "tags": [
+      "testing",
+      "evaluation",
+      "agents",
+      "rubric"
+    ],
+    "changelog": "v1.0.0: Initial release per spec test-pipeline-three-lane PR1 REQ-M036",
+    "tier": "must-have"
   },
   "agent-orchestration": {
     "hash": "e1df26e1cf1769ebe7c9685362a4fb403a2747dd7b36363ebc31d0ab761d12e9",
@@ -738,6 +758,69 @@
     "changelog": "v1.0.0: Initial release â€” complexity, duplication, SOLID, logging, refactor, layer checks",
     "tier": "must-have"
   },
+  "code-readability": {
+    "hash": "81f236c7f2b47e86e4f0bb0983399cf0beed57b3bbbd109d8d691c67c526d965",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal readability standards: meaningful names, small functions, single level of abstraction, Boy Scout Rule. Global scope.",
+    "tags": [
+      "readability",
+      "maintainability",
+      "naming"
+    ],
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
+  },
+  "code-review-master-agent": {
+    "hash": "ce3510a3a31b309fa0de154e8f8530cd398cdacd7ed5b04f5e8ef58587089cfd",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate pre-merge quality gates, security audit, risk scoring, PR creation, and review feedback handling with deferred item TTL.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "review",
+      "quality"
+    ],
+    "changelog": "v1.0.0: Initial release — code review orchestration with defense-in-depth model",
+    "tier": "nice-to-have"
+  },
+  "code-review-workflow": {
+    "hash": "c7b8f9ffb3f536c30241c2ab3f3817370ffb47c5a53f685469f8699b1a1b969d",
+    "type": "skill",
+    "category": "core",
+    "version": "1.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "code-review-master-agent",
+      "review-gate",
+      "request-code-review",
+      "receive-code-review"
+    ],
+    "visibility": "public",
+    "description": "Slash-command wrapper for code-review-master-agent. Pre-merge quality gates, PR creation, and review feedback handling.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "review"
+    ],
+    "changelog": "v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release",
+    "tier": "nice-to-have"
+  },
   "code-reviewer-agent": {
     "hash": "9a09a7da7e4b1d82b034be9ad9e18ca5320b35eef5c7943cfc4c1c1b618861cb",
     "type": "agent",
@@ -1072,6 +1155,51 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have"
   },
+  "debugging-loop": {
+    "hash": "709d525856ecdf20e45caf081d7bcfe88a5165f8346652f556e7eec9e4622692",
+    "type": "skill",
+    "category": "core",
+    "version": "1.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "debugging-loop-master-agent",
+      "systematic-debugging",
+      "fix-loop",
+      "auto-verify",
+      "learn-n-improve"
+    ],
+    "visibility": "public",
+    "description": "Full-cycle bug resolution orchestrator: chains systematic-debugging, fix-loop, auto-verify, and learn-n-improve via debugging-loop-master-agent.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "debugging"
+    ],
+    "changelog": "v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release",
+    "tier": "nice-to-have"
+  },
+  "debugging-loop-master-agent": {
+    "hash": "4c790c3e2075beaad30b664b45229027bf81472fa1c61bff3b5db1657baf5913",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate structured bug diagnosis and resolution with mandatory learning capture. Root cause classification guides fix strategy.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "debugging",
+      "diagnosis"
+    ],
+    "changelog": "v1.0.0: Initial release — debugging loop with scientific method approach",
+    "tier": "nice-to-have"
+  },
   "deploy-strategy": {
     "hash": "2477d9b5a168f70b0896b462dc6131cec3206e7791c187545dd6176ff7ae440e",
     "type": "skill",
@@ -1095,6 +1223,72 @@
       "PRR"
     ],
     "changelog": "v1.0.0: Initial release â€” GitOps, canary, blue-green, DB migration ordering, PRR",
+    "tier": "nice-to-have"
+  },
+  "design-principles": {
+    "hash": "555feb71136a5bc1cfaf2315e77c56ac261efa21570e923e915e5f5afbd9eed5",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal design principles: SOLID, DRY, Law of Demeter, Composition over Inheritance, Separation of Concerns, no magic values. Global scope.",
+    "tags": [
+      "design",
+      "solid",
+      "dry",
+      "architecture"
+    ],
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
+  },
+  "development-loop": {
+    "hash": "37c954a7f8f86fbed9ec037ca1b06f5600ff270dd397cf0f56b0ff56f3a7f057",
+    "type": "skill",
+    "category": "core",
+    "version": "1.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "development-loop-master-agent",
+      "brainstorm",
+      "writing-plans",
+      "executing-plans",
+      "auto-verify",
+      "post-fix-pipeline"
+    ],
+    "visibility": "public",
+    "description": "Full development cycle orchestrator: chains brainstorm, writing-plans, executing-plans, auto-verify, post-fix-pipeline via development-loop-master-agent.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "development"
+    ],
+    "changelog": "v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release",
+    "tier": "nice-to-have"
+  },
+  "development-loop-master-agent": {
+    "hash": "be230dbbf9af233a423f823c1cc307bd2c4ad82d668ea39f94b5cd05eea49c1a",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate the full development cycle: ideate, plan, implement, verify, commit. Complexity-adaptive routing skips unnecessary steps for simple tasks.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "development",
+      "planning"
+    ],
+    "changelog": "v1.0.0: Initial release — development loop orchestration with complexity detection",
     "tier": "nice-to-have"
   },
   "diataxis-docs": {
@@ -1216,6 +1410,44 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "nice-to-have"
   },
+  "documentation-master-agent": {
+    "hash": "bba7a2ed5239379aa563a57b378d9bf72df8a67b1ca9a89b380e3369d9d12f36",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate documentation generation: ADRs, API docs, structure enforcement, staleness audits. Parallel step execution for independent doc types.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "documentation"
+    ],
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
+  },
+  "documentation-workflow": {
+    "hash": "47fb2fbdc490700854dc3481385f7bde06213a20ed84cec37fdeccda784a076f",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Slash-command wrapper for documentation-master-agent. Full doc generation and maintenance orchestration.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "documentation"
+    ],
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
+  },
   "drizzle-orm": {
     "hash": "5dea43da91d7cf098782ea5cf73939b05cf88ec979fc81b61056e98d951dc486",
     "type": "skill",
@@ -1234,31 +1466,6 @@
     ],
     "changelog": "v1.0.0: Initial creation",
     "tier": "nice-to-have"
-  },
-  "e2e-visual-run": {
-    "hash": "7e61241a60468c9e248d8adcc09fca59fccff222c0d7dfd9a300f0ad819de164",
-    "type": "skill",
-    "category": "core",
-    "version": "4.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-27",
-    "last_updated": "2026-04-22",
-    "dependencies": [
-      "fix-loop",
-      "verify-screenshots"
-    ],
-    "visibility": "public",
-    "description": "Playwright-only: run full E2E suite with queue-based orchestration, dual-signal visual verification, and classification-driven auto-healing",
-    "tags": [
-      "e2e",
-      "testing",
-      "visual-regression",
-      "self-healing",
-      "accessibility",
-      "playwright"
-    ],
-    "changelog": "v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing.",
-    "tier": "must-have"
   },
   "e2e-best-practices": {
     "hash": "2e4989ba4ab2f6381c5b5528b9f28d7cf83f8252012892c997ab37db6571741c",
@@ -1279,6 +1486,30 @@
     ],
     "changelog": "v1.0.0: Initial release â€” 10 sections covering gaps across existing E2E skills",
     "tier": "nice-to-have"
+  },
+  "e2e-conductor-agent": {
+    "hash": "2e95def12b5b3af32082430077b71706a7221a4fb59360e2d93bff0cd2b38a23",
+    "type": "agent",
+    "category": "core",
+    "version": "2.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-27",
+    "last_updated": "2026-04-23",
+    "dependencies": [
+      "test-scout-agent",
+      "visual-inspector-agent",
+      "test-healer-agent"
+    ],
+    "visibility": "public",
+    "description": "Queue-based E2E test orchestrator: dispatches test-scout, visual-inspector, and test-healer as async worker agents",
+    "tags": [
+      "e2e",
+      "orchestration",
+      "testing",
+      "queue"
+    ],
+    "changelog": "v1.0.0: Initial release - async queue-based E2E orchestration pipeline. v2.0.0: absorbed user-facing modes from e2e-visual-run. Promoted to must-have 2026-04-23 so `testing-pipeline-master-agent` (must-have) does not have a dangling Agent() dispatch under default provisioning.",
+    "tier": "must-have"
   },
   "e2e-pipeline": {
     "hash": "3f99d9af1414c3b663537b9ba88a955da23db69adf920ef230f8d5b2c7e97d97",
@@ -1320,28 +1551,48 @@
     "changelog": "v1.0.0: Initial release â€” globs-scoped pointer to e2e-best-practices",
     "tier": "nice-to-have"
   },
-  "e2e-conductor-agent": {
-    "hash": "2e95def12b5b3af32082430077b71706a7221a4fb59360e2d93bff0cd2b38a23",
-    "type": "agent",
+  "e2e-visual-run": {
+    "hash": "7e61241a60468c9e248d8adcc09fca59fccff222c0d7dfd9a300f0ad819de164",
+    "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "4.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-22",
     "dependencies": [
-      "test-scout-agent",
-      "visual-inspector-agent",
-      "test-healer-agent"
+      "fix-loop",
+      "verify-screenshots"
     ],
     "visibility": "public",
-    "description": "Queue-based E2E test orchestrator: dispatches test-scout, visual-inspector, and test-healer as async worker agents",
+    "description": "Playwright-only: run full E2E suite with queue-based orchestration, dual-signal visual verification, and classification-driven auto-healing",
     "tags": [
       "e2e",
-      "orchestration",
       "testing",
-      "queue"
+      "visual-regression",
+      "self-healing",
+      "accessibility",
+      "playwright"
     ],
-    "changelog": "v1.0.0: Initial release - async queue-based E2E orchestration pipeline. v2.0.0: absorbed user-facing modes from e2e-visual-run. Promoted to must-have 2026-04-23 so `testing-pipeline-master-agent` (must-have) does not have a dangling Agent() dispatch under default provisioning.",
+    "changelog": "v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing.",
+    "tier": "must-have"
+  },
+  "error-handling": {
+    "hash": "be8fc6427420d12d592c1037400ff1b7ec57babcc57e9fd2f066e87129bcf181",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal error handling constraints: fail fast, no silent failures, explicit over implicit, validate at boundaries, resource cleanup. Global scope.",
+    "tags": [
+      "error-handling",
+      "defensive-coding",
+      "baseline"
+    ],
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
     "tier": "must-have"
   },
   "executing-plans": {
@@ -1378,14 +1629,33 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have"
   },
+  "failure-triage-agent": {
+    "hash": "b1bbe4d80ec82660b8d8e8a872293fac5066f941e9ad4e6fedac5468a78743bb",
+    "type": "agent",
+    "category": "core",
+    "version": "0.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-23",
+    "last_updated": "2026-04-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "T2B sub-orchestrator skeleton for the three-lane test pipeline (PR1). Returns no-op contract; full triage subgraph (analyzer fan-out → issue-manager → fixer → serialize → escalation) activates in PR2.",
+    "tags": [
+      "testing",
+      "orchestration",
+      "triage"
+    ],
+    "changelog": "v0.1.0: PR1 skeleton per spec test-pipeline-three-lane REQ-M006",
+    "tier": "must-have"
+  },
   "fastapi-api-tester-agent": {
     "hash": "a0e12184bd1db349f0b56c3f113620ea82e76ecccce104be1b463f720b35505e",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Use this agent when you need to test FastAPI backend endpoints, validate API responses, check authentication flows, or run targeted backend test suites.",
@@ -1732,6 +2002,26 @@
     "changelog": "v1.2.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have"
   },
+  "git-collaboration": {
+    "hash": "0257afb4c4326dc74c97b04aa672c1627ca9d71e36f21d9ccec10ad44beb5da4",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.1",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal Git collaboration: Conventional Commits, small focused PRs, trunk-based development, review before merge, protected branches. Global scope.",
+    "tags": [
+      "git",
+      "commits",
+      "pull-requests",
+      "collaboration"
+    ],
+    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
+  },
   "git-manager-agent": {
     "hash": "29075be5827ef8ebbb4a4cf1dc94bee0739e46d07c795dc5bbedafa8da4adf81",
     "type": "agent",
@@ -1969,6 +2259,44 @@
       "patterns"
     ],
     "changelog": "v2.3.0: Add triggers, preamble constraints, strengthen RULES to CRITICAL RULES with MUST/MUST NOT, registry sync | v2.1.0: Enhanced with community patterns",
+    "tier": "nice-to-have"
+  },
+  "learning-self-improvement": {
+    "hash": "cb67d5ff6626c8cabf4c2a4fc15f57dc939623fb10698624cbf6e47de2b9acf7",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Slash-command wrapper for learning-self-improvement-master-agent. Knowledge accumulation and skill proposal generation.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "learning"
+    ],
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
+  },
+  "learning-self-improvement-master-agent": {
+    "hash": "7b9ffa144b0fccd042e38751a49b42a54be9f9b4dc21cc1ef24c6a10942fc85b",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate learning capture, pattern detection, and skill generation. Enforces 3+ occurrence threshold for proposals.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "learning"
+    ],
+    "changelog": "v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
   "mcp-server-builder": {
@@ -2781,26 +3109,6 @@
     "changelog": "v1.0.0: Initial release",
     "tier": "must-have"
   },
-  "research-mode": {
-    "hash": "7a5edaa08c01236711283fbd43013dcd71fa1e00caf87dcbbaf1bc10e6df1978",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-24",
-    "last_updated": "2026-03-24",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Citation-backed research with anti-hallucination constraints: direct quotes, source verification, and explicit knowledge gaps",
-    "tags": [
-      "research",
-      "anti-hallucination",
-      "citations",
-      "fact-checking"
-    ],
-    "changelog": "v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output",
-    "tier": "nice-to-have"
-  },
   "remotion-video": {
     "hash": "8ea52a70ade89e4389d68dbbe1c9a9ff2abcc8fd81a4b1a72ef20b26fb319134",
     "type": "skill",
@@ -2834,6 +3142,26 @@
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have"
+  },
+  "research-mode": {
+    "hash": "7a5edaa08c01236711283fbd43013dcd71fa1e00caf87dcbbaf1bc10e6df1978",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-24",
+    "last_updated": "2026-03-24",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Citation-backed research with anti-hallucination constraints: direct quotes, source verification, and explicit knowledge gaps",
+    "tags": [
+      "research",
+      "anti-hallucination",
+      "citations",
+      "fact-checking"
+    ],
+    "changelog": "v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output",
+    "tier": "nice-to-have"
   },
   "review-gate": {
     "hash": "81b8f001474218b9654f10458c5dda1b4c9323dcff1f4e7ac105b866855db122",
@@ -3045,6 +3373,25 @@
     "changelog": "v1.0.0: Initial registration",
     "tier": "must-have"
   },
+  "security-baseline": {
+    "hash": "c410e31b70b74c30be00989660ff9a66626f14e84648f756ecf98756ccabe0c9",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.1",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-21",
+    "last_updated": "2026-04-21",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Universal security baseline: input validation, secret management, least privilege, dependency hygiene, defense in depth, output encoding. Global scope.",
+    "tags": [
+      "security",
+      "baseline",
+      "owasp"
+    ],
+    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "tier": "must-have"
+  },
   "semgrep-rules": {
     "hash": "ee61ab0dd484064060ee434582a8be71869c89ececa8445239662556c06e8b4a",
     "type": "skill",
@@ -3060,6 +3407,44 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
+  },
+  "session-continuity": {
+    "hash": "cf41114386b729057f8c7b667611d7d303a21b821f3311e6ba40db5ffc2fc2ea",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Slash-command wrapper for session-continuity-master-agent. Session save, restore, and handover.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "session"
+    ],
+    "changelog": "v1.0.0: Add triggers, registry sync",
+    "tier": "nice-to-have"
+  },
+  "session-continuity-master-agent": {
+    "hash": "64f1459473ccef0eaf0a5193a809d7a934fe2014cf3240ed2726d83c8cea3ea7",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate session save, restore, and handover. Mode-aware (save vs restore) with freshness validation.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "session"
+    ],
+    "changelog": "v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
   "session-reminder": {
@@ -3117,6 +3502,44 @@
       "patterns"
     ],
     "changelog": "v1.0.0: Initial release â€” routes pattern creation to appropriate authoring workflows with quality validation",
+    "tier": "nice-to-have"
+  },
+  "skill-authoring-master-agent": {
+    "hash": "9d49df98e12037127dd3f3d49493e53819223518ab523cb971c846bec82fb9f3",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate skill creation, validation, and registration. Enforces overlap detection and mandatory quality gates.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "skill-authoring"
+    ],
+    "changelog": "v1.0.0: Initial release",
+    "tier": "nice-to-have"
+  },
+  "skill-authoring-workflow": {
+    "hash": "d019798c5370dba841371e56b46a2e1de31d5ce836bac0affff4df906ea4d9e3",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Slash-command wrapper for skill-authoring-master-agent. Pattern creation with overlap detection and quality gates.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "skill-authoring"
+    ],
+    "changelog": "v1.0.0: Initial release",
     "tier": "nice-to-have"
   },
   "skill-evaluator": {
@@ -3361,6 +3784,48 @@
     "changelog": "v1.0.1: Registry sync — hash, version, description, tags | v1.0.0: Initial release",
     "tier": "must-have"
   },
+  "tdd-failing-test-generator": {
+    "hash": "e9c306a70e2a0cce22a4ba55454005d3e2a50fb55d120fca58c8754ed30f6b02",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-13",
+    "last_updated": "2026-04-02",
+    "dependencies": [
+      "tdd",
+      "playwright"
+    ],
+    "visibility": "public",
+    "description": "Auto-generate test suites from PRD requirements, schema, or API specs with BDD/Gherkin, property-based testing, coverage thresholds, mutation testing, and a11y stubs",
+    "tags": [
+      "testing",
+      "TDD",
+      "BDD",
+      "coverage",
+      "mutation-testing"
+    ],
+    "changelog": "v2.0.0: Renamed from test-generator to tdd-failing-test-generator for clarity",
+    "tier": "nice-to-have"
+  },
+  "tdd-rule": {
+    "hash": "02d34f7acee017241a2117ed8fb47b269ee8acb2b82e52e3df45174aaa3fd3f6",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-21",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "TDD red-green-refactor cycle rules scoped to test and source files.",
+    "tags": [
+      "tdd",
+      "testing"
+    ],
+    "changelog": "v1.0.0: Initial registration of existing tdd.md rule",
+    "tier": "must-have"
+  },
   "test-data-management": {
     "hash": "546563b62fa2f43fb584331cab16c012f4bba2126b4f1e9aba161078df2e9f7f",
     "type": "skill",
@@ -3400,10 +3865,10 @@
     "hash": "5a379dbdb7c639ced194687a61a3e8bb8cbf00148c309781ae1a5423467296b6",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
-    "last_updated": "2026-04-22",
+    "last_updated": "2026-04-23",
     "dependencies": [
       "fix-loop",
       "test-failure-analyzer-agent"
@@ -3418,30 +3883,6 @@
     ],
     "changelog": "v1.0.0: Initial release - 8-classification targeted healing with 3-attempt cap. v2.0.0: Playwright MCP hard dep, Constitution at top. Promoted to must-have 2026-04-23 so `e2e-conductor-agent` (now must-have) has its T3 worker available by default.",
     "tier": "must-have"
-  },
-  "tdd-failing-test-generator": {
-    "hash": "e9c306a70e2a0cce22a4ba55454005d3e2a50fb55d120fca58c8754ed30f6b02",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
-    "dependencies": [
-      "tdd",
-      "playwright"
-    ],
-    "visibility": "public",
-    "description": "Auto-generate test suites from PRD requirements, schema, or API specs with BDD/Gherkin, property-based testing, coverage thresholds, mutation testing, and a11y stubs",
-    "tags": [
-      "testing",
-      "TDD",
-      "BDD",
-      "coverage",
-      "mutation-testing"
-    ],
-    "changelog": "v2.0.0: Renamed from test-generator to tdd-failing-test-generator for clarity",
-    "tier": "nice-to-have"
   },
   "test-knowledge": {
     "hash": "abf204929e2d442a8830ba346efaa12467a9644334b383b1230e7bb34f8a0752",
@@ -3509,7 +3950,7 @@
     "hash": "20188b5abaaeeb5e86b3638949dc803621c756793dd14fec8aa482b3d5f5da4c",
     "type": "agent",
     "category": "core",
-    "version": "3.1.0",
+    "version": "4.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-04-23",
@@ -3522,10 +3963,10 @@
     "hash": "73f6b814a1294d2ddf093df857b90f5226173efef0560443898781406fe43f36",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
-    "last_updated": "2026-04-22",
+    "last_updated": "2026-04-23",
     "dependencies": [],
     "visibility": "public",
     "description": "E2E test runner: executes tests, captures failure screenshots and accessibility tree snapshots, queues results for async verification",
@@ -3542,10 +3983,10 @@
     "hash": "859b0e7fd3ca94eabf5d60a7d8efa3794c9d91cd4f689222f98b543feada0927",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Senior QA engineer specializing in comprehensive testing and quality assurance. For UI tests, orchestrates per-test screenshot verification where the screenshot",
@@ -3568,23 +4009,44 @@
     "changelog": "v2.2.0: Add FIRST principles mnemonic section at top | v2.0.0: Genericized and restructured",
     "tier": "must-have"
   },
-  "tdd-rule": {
-    "hash": "02d34f7acee017241a2117ed8fb47b269ee8acb2b82e52e3df45174aaa3fd3f6",
-    "type": "rule",
+  "testing-pipeline-master-agent": {
+    "hash": "2d750641ff6df46adf59e5f802aaeb6ce8067fada0031c95de7d5927fffea398",
+    "type": "agent",
+    "category": "core",
+    "version": "2.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Orchestrate the full testing workflow: TDD, fix-loop, auto-verify, E2E, quality gates. Screenshot verdict authority for UI tests.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "testing",
+      "verification"
+    ],
+    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority. v2.0.0 (2026-04-22): promoted to must-have — T1 orchestrator must match its must-have T2 child test-pipeline-agent for the full workflow to be provisioned coherently. E2E sub-step auto-skips when no_ui_tests so non-Playwright projects absorb zero overhead.",
+    "tier": "must-have"
+  },
+  "testing-pipeline-workflow": {
+    "hash": "b4b9d71424003186f118dd308f4ac3924fee450f3d8b54cf079d153508b5afb6",
+    "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-21",
+    "discovered": "2026-03-30",
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "TDD red-green-refactor cycle rules scoped to test and source files.",
+    "description": "Slash-command wrapper for testing-pipeline-master-agent. Full test verification chain from TDD through quality gates.",
     "tags": [
-      "tdd",
+      "orchestration",
+      "workflow",
       "testing"
     ],
-    "changelog": "v1.0.0: Initial registration of existing tdd.md rule",
-    "tier": "must-have"
+    "changelog": "v1.0.0: Initial release — testing pipeline skill wrapper",
+    "tier": "nice-to-have"
   },
   "trace-test": {
     "hash": "09c85c349215c4bba21dcf329b86fa290144480cc045effa812d3e4db173d3ea",
@@ -3673,25 +4135,6 @@
     "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
     "tier": "must-have"
   },
-  "vitest-dev": {
-    "hash": "65fbf78ba10d067dae834cc2ebe57320739aefe46a858ebd4777e38f013fb6bc",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Vitest testing: config, mocking, coverage, workspace, React/Vue integration",
-    "tags": [
-      "vitest",
-      "testing",
-      "vite"
-    ],
-    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya + IPODhan patterns",
-    "tier": "nice-to-have"
-  },
   "visual-inspector-agent": {
     "hash": "d3f167823272906d0bf2f273fd97d817fd4077d2f14757c2e1df8ce94aa0b029",
     "type": "agent",
@@ -3714,6 +4157,25 @@
     ],
     "changelog": "v1.0.0: Initial release - dual-signal (a11y + screenshot) async verification. v2.0.0: EXPECTED_CHANGE lane, confidence caps, Constitution at top. Promoted to must-have 2026-04-23 so `e2e-conductor-agent` (now must-have) has its T3 worker available by default.",
     "tier": "must-have"
+  },
+  "vitest-dev": {
+    "hash": "65fbf78ba10d067dae834cc2ebe57320739aefe46a858ebd4777e38f013fb6bc",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-14",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Vitest testing: config, mocking, coverage, workspace, React/Vue integration",
+    "tags": [
+      "vitest",
+      "testing",
+      "vite"
+    ],
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya + IPODhan patterns",
+    "tier": "nice-to-have"
   },
   "vue": {
     "hash": "fb50e74191257a8a83f1a87d92dae7a4316159525e0673e7fdc04dca9c2822a9",
@@ -3860,6 +4322,25 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have"
   },
+  "workflow-master-template": {
+    "hash": "9b260906561cd5d19799315273f409ce2956b0f554ac6f9a8358db649e084cf1",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-30",
+    "last_updated": "2026-04-02",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Shared orchestration protocol reference for all workflow-master agents. Defines dual-mode operation, config-driven execution, state management, context passing, cross-workflow interface, and progress reporting.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "template"
+    ],
+    "changelog": "v1.0.0: Initial release — 6 shared protocols for workflow masters",
+    "tier": "nice-to-have"
+  },
   "writing-plans": {
     "hash": "cf2334df921d2c847f09df6fb677c191534da88d7e28db59f253468ab10a0fa4",
     "type": "skill",
@@ -3916,447 +4397,5 @@
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have"
-  },
-  "workflow-master-template": {
-    "hash": "9b260906561cd5d19799315273f409ce2956b0f554ac6f9a8358db649e084cf1",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Shared orchestration protocol reference for all workflow-master agents. Defines dual-mode operation, config-driven execution, state management, context passing, cross-workflow interface, and progress reporting.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "template"
-    ],
-    "changelog": "v1.0.0: Initial release — 6 shared protocols for workflow masters",
-    "tier": "nice-to-have"
-  },
-  "development-loop-master-agent": {
-    "hash": "be230dbbf9af233a423f823c1cc307bd2c4ad82d668ea39f94b5cd05eea49c1a",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate the full development cycle: ideate, plan, implement, verify, commit. Complexity-adaptive routing skips unnecessary steps for simple tasks.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "development",
-      "planning"
-    ],
-    "changelog": "v1.0.0: Initial release — development loop orchestration with complexity detection",
-    "tier": "nice-to-have"
-  },
-  "testing-pipeline-master-agent": {
-    "hash": "2d750641ff6df46adf59e5f802aaeb6ce8067fada0031c95de7d5927fffea398",
-    "type": "agent",
-    "category": "core",
-    "version": "2.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-23",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate the full testing workflow: TDD, fix-loop, auto-verify, E2E, quality gates. Screenshot verdict authority for UI tests.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "testing",
-      "verification"
-    ],
-    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority. v2.0.0 (2026-04-22): promoted to must-have — T1 orchestrator must match its must-have T2 child test-pipeline-agent for the full workflow to be provisioned coherently. E2E sub-step auto-skips when no_ui_tests so non-Playwright projects absorb zero overhead.",
-    "tier": "must-have"
-  },
-  "debugging-loop-master-agent": {
-    "hash": "4c790c3e2075beaad30b664b45229027bf81472fa1c61bff3b5db1657baf5913",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate structured bug diagnosis and resolution with mandatory learning capture. Root cause classification guides fix strategy.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "debugging",
-      "diagnosis"
-    ],
-    "changelog": "v1.0.0: Initial release — debugging loop with scientific method approach",
-    "tier": "nice-to-have"
-  },
-  "code-review-master-agent": {
-    "hash": "ce3510a3a31b309fa0de154e8f8530cd398cdacd7ed5b04f5e8ef58587089cfd",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate pre-merge quality gates, security audit, risk scoring, PR creation, and review feedback handling with deferred item TTL.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "review",
-      "quality"
-    ],
-    "changelog": "v1.0.0: Initial release — code review orchestration with defense-in-depth model",
-    "tier": "nice-to-have"
-  },
-  "development-loop": {
-    "hash": "37c954a7f8f86fbed9ec037ca1b06f5600ff270dd397cf0f56b0ff56f3a7f057",
-    "type": "skill",
-    "category": "core",
-    "version": "1.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [
-      "development-loop-master-agent",
-      "brainstorm",
-      "writing-plans",
-      "executing-plans",
-      "auto-verify",
-      "post-fix-pipeline"
-    ],
-    "visibility": "public",
-    "description": "Full development cycle orchestrator: chains brainstorm, writing-plans, executing-plans, auto-verify, post-fix-pipeline via development-loop-master-agent.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "development"
-    ],
-    "changelog": "v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "testing-pipeline-workflow": {
-    "hash": "b4b9d71424003186f118dd308f4ac3924fee450f3d8b54cf079d153508b5afb6",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Slash-command wrapper for testing-pipeline-master-agent. Full test verification chain from TDD through quality gates.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "testing"
-    ],
-    "changelog": "v1.0.0: Initial release — testing pipeline skill wrapper",
-    "tier": "nice-to-have"
-  },
-  "debugging-loop": {
-    "hash": "709d525856ecdf20e45caf081d7bcfe88a5165f8346652f556e7eec9e4622692",
-    "type": "skill",
-    "category": "core",
-    "version": "1.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [
-      "debugging-loop-master-agent",
-      "systematic-debugging",
-      "fix-loop",
-      "auto-verify",
-      "learn-n-improve"
-    ],
-    "visibility": "public",
-    "description": "Full-cycle bug resolution orchestrator: chains systematic-debugging, fix-loop, auto-verify, and learn-n-improve via debugging-loop-master-agent.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "debugging"
-    ],
-    "changelog": "v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "code-review-workflow": {
-    "hash": "c7b8f9ffb3f536c30241c2ab3f3817370ffb47c5a53f685469f8699b1a1b969d",
-    "type": "skill",
-    "category": "core",
-    "version": "1.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [
-      "code-review-master-agent",
-      "review-gate",
-      "request-code-review",
-      "receive-code-review"
-    ],
-    "visibility": "public",
-    "description": "Slash-command wrapper for code-review-master-agent. Pre-merge quality gates, PR creation, and review feedback handling.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "review"
-    ],
-    "changelog": "v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "documentation-master-agent": {
-    "hash": "bba7a2ed5239379aa563a57b378d9bf72df8a67b1ca9a89b380e3369d9d12f36",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate documentation generation: ADRs, API docs, structure enforcement, staleness audits. Parallel step execution for independent doc types.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "documentation"
-    ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "session-continuity-master-agent": {
-    "hash": "64f1459473ccef0eaf0a5193a809d7a934fe2014cf3240ed2726d83c8cea3ea7",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate session save, restore, and handover. Mode-aware (save vs restore) with freshness validation.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "session"
-    ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "learning-self-improvement-master-agent": {
-    "hash": "7b9ffa144b0fccd042e38751a49b42a54be9f9b4dc21cc1ef24c6a10942fc85b",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate learning capture, pattern detection, and skill generation. Enforces 3+ occurrence threshold for proposals.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "learning"
-    ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "skill-authoring-master-agent": {
-    "hash": "9d49df98e12037127dd3f3d49493e53819223518ab523cb971c846bec82fb9f3",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate skill creation, validation, and registration. Enforces overlap detection and mandatory quality gates.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "skill-authoring"
-    ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "documentation-workflow": {
-    "hash": "47fb2fbdc490700854dc3481385f7bde06213a20ed84cec37fdeccda784a076f",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Slash-command wrapper for documentation-master-agent. Full doc generation and maintenance orchestration.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "documentation"
-    ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "session-continuity": {
-    "hash": "cf41114386b729057f8c7b667611d7d303a21b821f3311e6ba40db5ffc2fc2ea",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Slash-command wrapper for session-continuity-master-agent. Session save, restore, and handover.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "session"
-    ],
-    "changelog": "v1.0.0: Add triggers, registry sync",
-    "tier": "nice-to-have"
-  },
-  "learning-self-improvement": {
-    "hash": "cb67d5ff6626c8cabf4c2a4fc15f57dc939623fb10698624cbf6e47de2b9acf7",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Slash-command wrapper for learning-self-improvement-master-agent. Knowledge accumulation and skill proposal generation.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "learning"
-    ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "skill-authoring-workflow": {
-    "hash": "d019798c5370dba841371e56b46a2e1de31d5ce836bac0affff4df906ea4d9e3",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Slash-command wrapper for skill-authoring-master-agent. Pattern creation with overlap detection and quality gates.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "skill-authoring"
-    ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
-  },
-  "security-baseline": {
-    "hash": "c410e31b70b74c30be00989660ff9a66626f14e84648f756ecf98756ccabe0c9",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-04-21",
-    "last_updated": "2026-04-21",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Universal security baseline: input validation, secret management, least privilege, dependency hygiene, defense in depth, output encoding. Global scope.",
-    "tags": [
-      "security",
-      "baseline",
-      "owasp"
-    ],
-    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
-    "tier": "must-have"
-  },
-  "error-handling": {
-    "hash": "be8fc6427420d12d592c1037400ff1b7ec57babcc57e9fd2f066e87129bcf181",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-04-21",
-    "last_updated": "2026-04-21",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Universal error handling constraints: fail fast, no silent failures, explicit over implicit, validate at boundaries, resource cleanup. Global scope.",
-    "tags": [
-      "error-handling",
-      "defensive-coding",
-      "baseline"
-    ],
-    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
-    "tier": "must-have"
-  },
-  "design-principles": {
-    "hash": "555feb71136a5bc1cfaf2315e77c56ac261efa21570e923e915e5f5afbd9eed5",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-04-21",
-    "last_updated": "2026-04-21",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Universal design principles: SOLID, DRY, Law of Demeter, Composition over Inheritance, Separation of Concerns, no magic values. Global scope.",
-    "tags": [
-      "design",
-      "solid",
-      "dry",
-      "architecture"
-    ],
-    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
-    "tier": "must-have"
-  },
-  "code-readability": {
-    "hash": "81f236c7f2b47e86e4f0bb0983399cf0beed57b3bbbd109d8d691c67c526d965",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-04-21",
-    "last_updated": "2026-04-21",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Universal readability standards: meaningful names, small functions, single level of abstraction, Boy Scout Rule. Global scope.",
-    "tags": [
-      "readability",
-      "maintainability",
-      "naming"
-    ],
-    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
-    "tier": "must-have"
-  },
-  "git-collaboration": {
-    "hash": "0257afb4c4326dc74c97b04aa672c1627ca9d71e36f21d9ccec10ad44beb5da4",
-    "type": "rule",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-04-21",
-    "last_updated": "2026-04-21",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Universal Git collaboration: Conventional Commits, small focused PRs, trunk-based development, review before merge, protected branches. Global scope.",
-    "tags": [
-      "git",
-      "commits",
-      "pull-requests",
-      "collaboration"
-    ],
-    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
-    "tier": "must-have"
   }
 }

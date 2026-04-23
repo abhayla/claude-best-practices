@@ -1,0 +1,25 @@
+{
+  "scenario_name": "execute-mode-legacy-e2e-conductor",
+  "description": "Backward compat: dispatched without mode: classify → defaults to legacy execute mode.",
+  "input": {
+    "dispatch_context": {
+      "pipeline_id": "test-pipeline-RUN006",
+      "run_id": "RUN006"
+    },
+    "filesystem_setup": {
+      "tests/checkout.spec.ts": "import { test } from \"@playwright/test\";\ntest(\"checkout\", async ({ page }) => {});"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "tests_executed": "*",
+    "screenshots_captured": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent recognizes absence of mode: classify → enters legacy execute mode",
+    "output_structure": "Legacy contract shape (per existing test-scout body for e2e-conductor)",
+    "non_negotiable_adherence": "NN#2: mode auto-detection works; NN#3-5: execute mode rules respected",
+    "side_effect_correctness": "Tests executed via npx playwright; screenshots captured to test-evidence/",
+    "error_propagation": "Backward compat is not an error condition"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "scenario_name": "no-op-skeleton-pr2-categories-deferred",
+  "description": "Failures with PR2 categories (SCHEMA_MISMATCH/CONTRACT_BROKEN) -- skeleton MUST NOT branch on them in PR1.",
+  "input": {
+    "dispatch_context": {
+      "pipeline_id": "test-pipeline-RUN_Y",
+      "run_id": "RUN_Y",
+      "failures": [
+        {
+          "test_id": "tests/api/test_users.py::tu",
+          "failed_lanes": [
+            "functional",
+            "api"
+          ],
+          "category_hint": "SCHEMA_MISMATCH"
+        }
+      ],
+      "remaining_budget": 15
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "result": "NO_OP_PR1_SKELETON",
+    "failures_received": 1,
+    "next_action": "T2A bubble-up to T1 inline Issue creation"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent does NOT branch on category_hint in PR1 -- skeleton is category-agnostic",
+    "output_structure": "Same NO_OP contract regardless of input categories",
+    "non_negotiable_adherence": "T1 handles SCHEMA_MISMATCH per its PR1 extension",
+    "side_effect_correctness": "Does not invoke github-issue-manager-agent (does not exist in PR1)",
+    "error_propagation": "Unknown category is not an error in PR1 -- pass through"
+  }
+}

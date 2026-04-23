@@ -1,0 +1,35 @@
+{
+  "scenario_name": "lane-api-no-contract-tooling-NEEDS_CONTRACT_VALIDATION",
+  "description": "API lane with NO contract files -- emits NEEDS_CONTRACT_VALIDATION (treated as FAILED).",
+  "input": {
+    "dispatch_context": {
+      "lane": "api",
+      "run_id": "2026-04-23T14-30-00Z_abc1234",
+      "queue": [
+        "tests/api/test_users.py::test_request_uses_httpx_client"
+      ]
+    },
+    "filesystem_setup": {
+      "tests/api/test_users.py": "fixture-no-contracts"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "lane": "api",
+    "tests_processed": 1,
+    "failed": 1,
+    "failures": [
+      {
+        "test_id": "*",
+        "category_hint": "NEEDS_CONTRACT_VALIDATION"
+      }
+    ]
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent detects absence of openapi.yaml + pact/ + .pact/ → emits NEEDS_CONTRACT_VALIDATION",
+    "output_structure": "category_hint = NEEDS_CONTRACT_VALIDATION (NEW PR1 category)",
+    "non_negotiable_adherence": "NN#2: lane=api WITHOUT contract tooling MUST emit NEEDS_CONTRACT_VALIDATION",
+    "side_effect_correctness": "Does NOT invoke /contract-test; does NOT silently skip",
+    "error_propagation": "NEEDS_CONTRACT_VALIDATION surfaces in failures[] with INFRASTRUCTURE-level severity"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "scenario_name": "lane-functional-ui-screenshot-authority",
+  "description": "Functional lane, UI test (Playwright) -- screenshot is authoritative even if exit code is 0.",
+  "input": {
+    "dispatch_context": {
+      "lane": "functional",
+      "run_id": "2026-04-23T14-30-00Z_abc1234",
+      "queue": [
+        "tests/checkout.spec.ts::checkout flow"
+      ],
+      "capture_proof": true
+    },
+    "filesystem_setup": {
+      "tests/checkout.spec.ts": "fixture-from-playwright-demo"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "lane": "functional",
+    "tests_processed": 1,
+    "passed": "*",
+    "failed": "*",
+    "failures": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent detects Playwright test, captures screenshot to test-evidence/{run_id}/screenshots/",
+    "output_structure": "manifest.json updated with verdict_source: screenshot for UI tests",
+    "non_negotiable_adherence": "NN#2 lane=functional UI: screenshot is authoritative; NN#3: never bypass screenshot capture",
+    "side_effect_correctness": "Screenshots land in test-evidence/{run_id}/screenshots/{test}.{pass|fail}.png",
+    "error_propagation": "Visual divergence surfaces with category_hint VISUAL_REGRESSION"
+  }
+}

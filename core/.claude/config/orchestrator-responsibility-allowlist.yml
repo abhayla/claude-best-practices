@@ -1,0 +1,29 @@
+# Orchestrator Responsibility-Count Allowlist
+#
+# Per agent-orchestration.md rule 8 (max 3-4 responsibilities per orchestrator),
+# the validator (workflow_quality_gate_validate_patterns.py) counts top-level
+# items under `## Core Responsibilities` for each orchestrator agent and
+# fails the build if count > 4 AND the agent is not allowlisted here.
+#
+# Entries here are explicit, justified deviations re-reviewed quarterly.
+# Adding an entry MUST include:
+#   - agent: agent name (matches frontmatter `name:`)
+#   - responsibility_count: actual count
+#   - rule_8_cap: 4
+#   - deviation: count - cap
+#   - justification: why splitting further is worse than the violation
+#   - spec_reference: pointer to design doc / PR
+#   - review_quarter: when to re-review (YYYY-Qn)
+#
+# If the deviation grows (count increases by 1+), the agent MUST be split
+# rather than re-allowlisted. The allowlist is for known, stable deviations
+# only — not for hiding ongoing growth.
+
+allowlist:
+  - agent: failure-triage-agent
+    responsibility_count: 5
+    rule_8_cap: 4
+    deviation: 1
+    justification: "Triage chain (analyzer → issue-manager → fixer → serialize → escalation) is one logical pipeline; further split would fragment context-sharing across the chain. Each step needs the previous step's full output to make decisions, defeating the cohesion benefit of having a single triage owner."
+    spec_reference: "docs/specs/test-pipeline-three-lane-spec.md#35-failure-triage-new-t2b-failure-triage-agent"
+    review_quarter: "2026-Q3"
