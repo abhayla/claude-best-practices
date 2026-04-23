@@ -57,7 +57,10 @@ T2A in STEP 6 of T2A's lifecycle. Dispatches T3 worker agents
 
 3. **Fixer fan-out (batched)** — for each Issue with `recommended_action == AUTO_HEAL`, dispatch `test-healer-agent` with `commit_mode=diff_only` and the issue_number. Healer invokes `/fix-issue --diff-only` and writes diff to `test-results/fixes/{issue_number}.diff`. Batched at `max_concurrent_fixers` (default 5). `ISSUE_ONLY` / `QUARANTINE` / `RETRY_INFRA` recommended_actions MUST skip fixer dispatch.
 
-4. **`/serialize-fixes` invocation** — after all fixer batches complete, invoke `/serialize-fixes test-results/fixes/*.diff`. The skill applies diffs sequentially with `git apply --check` first, `git reset --hard HEAD` cleanup on partial failure, and discards stale diffs on conflict (per spec §3.9.3). Receive aggregate `applied/conflicted/failed` counts.
+4. **`/serialize-fixes` invocation (or `/pipeline-fix-pr` if `--fix-pr-mode` was passed via T2A dispatch context, REQ-C003)** — after all fixer batches complete, invoke the appropriate skill:
+   - **Default:** `Skill("/serialize-fixes", args="test-results/fixes/*.diff")` — applies diffs sequentially to current branch; commits land in working-branch history.
+   - **`--fix-pr-mode`:** `Skill("/pipeline-fix-pr", args="test-results/fixes/*.diff")` — creates `pipeline-fixes/{run_id}` branch, applies diffs there, pushes branch, opens single PR. Never auto-merges (per `git-collaboration.md`).
+   Both wrap the same atomic 3-phase protocol (`git apply --check` first, `git reset --hard HEAD` cleanup on partial failure, discard stale diffs on conflict per spec §3.9.3). Receive aggregate `applied/conflicted/failed` counts plus (in PR mode) the PR URL/number.
 
 5. **`/escalation-report` invocation on budget exhaustion** — when global retry budget OR dispatch budget OR wall-clock budget is exhausted with failures still unresolved, invoke `/escalation-report` to write `test-results/escalation-report.md`. Apply `pipeline-fix-failed` label to remaining open Issues. Per spec §3.11.
 

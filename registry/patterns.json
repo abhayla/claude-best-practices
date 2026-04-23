@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.0.0",
     "last_updated": "2026-04-23",
-    "total_patterns": 236
+    "total_patterns": 237
   },
   "a11y-audit": {
     "hash": "da2d022d18fcc2316c357c513d1c4ac2921e7099d1a8f7538261e0076f259b21",
@@ -1669,10 +1669,10 @@
     "tier": "nice-to-have"
   },
   "failure-triage-agent": {
-    "hash": "2d0597cdef6571e7e4a82e1d94f455f4164ccd8a0f3c2c74e6a73aa6d9cd3925",
+    "hash": "9082ef0fa7f9c1ac8a74b379ddfacfa2aba3adeeefe71e1115270428df4abe58",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
     "last_updated": "2026-04-23",
@@ -2702,6 +2702,28 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "tier": "nice-to-have"
+  },
+  "pipeline-fix-pr": {
+    "hash": "d2ca55c8050c8d036ee211932f5fba6869eb24e312acc9d25cfde642c5d00ffd",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-23",
+    "last_updated": "2026-04-23",
+    "dependencies": [
+      "serialize-fixes"
+    ],
+    "visibility": "public",
+    "description": "Land pipeline fixer diffs on a new branch pipeline-fixes/{run_id} and open one PR (vs N commits on working branch). Wraps /serialize-fixes for atomic diff apply; adds branch creation + push + gh pr create. Never auto-merges. REQ-C003 of test-pipeline-three-lane spec.",
+    "tags": [
+      "testing-pipeline",
+      "git",
+      "pull-requests",
+      "automation"
+    ],
+    "changelog": "v1.0.0: Initial release per REQ-C003",
     "tier": "nice-to-have"
   },
   "pipeline-orchestrator": {
@@ -4048,10 +4070,10 @@
     "tier": "must-have"
   },
   "test-pipeline-agent": {
-    "hash": "fcfbc74c933f527ac03c3c28f76968c7977b5cf6b8577e9a18872090310e6928",
+    "hash": "acdef73ee0782bbcff1a16a9a6787d2278f8646748540f587de2ec6352166e94",
     "type": "agent",
     "category": "core",
-    "version": "4.2.0",
+    "version": "4.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-04-23",

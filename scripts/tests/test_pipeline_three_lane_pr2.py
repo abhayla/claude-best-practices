@@ -307,9 +307,10 @@ def test_escalation_report_in_registry():
 
 
 def test_failure_triage_agent_version_in_registry_is_1_0_0():
-    """Registry MUST be updated to reflect T2B's PR2 activation."""
+    """Registry MUST reflect T2B's PR2 activation (1.0.0+); minor bumps acceptable
+    for additive changes like REQ-C003 conditional /pipeline-fix-pr routing."""
     with open(REPO_ROOT / "registry" / "patterns.json", encoding="utf-8") as f:
         registry = json.load(f)
-    assert registry["failure-triage-agent"]["version"] == "1.0.0", (
-        "PR1 was 0.1.0; PR2 activation bumps to 1.0.0"
-    )
+    version = registry["failure-triage-agent"]["version"]
+    major = int(version.split(".")[0])
+    assert major >= 1, f"PR2 activation requires major >= 1, got {version}"
