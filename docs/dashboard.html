@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-04-23 02:45 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-04-23 14:03 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">229</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">224</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">236</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">231</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">5</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">37</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">1</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">8</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">29</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">154</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">39</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">2</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">8</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">29</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">158</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -102,6 +102,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>workflow</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>agent-evaluator</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>testing, evaluation, agents, rubric</td>
             </tr>
             <tr data-type="rule" data-category="core">
                 <td>agent-orchestration</td>
@@ -554,6 +563,15 @@ tr:hover { background: var(--primary-light); }
                 <td>testing, coverage, quality</td>
             </tr>
             <tr data-type="skill" data-category="core">
+                <td>create-github-issue</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>github, issues, testing-pipeline, failure-tracking</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
                 <td>cross-platform-visual</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
@@ -806,6 +824,15 @@ tr:hover { background: var(--primary-light); }
                 <td>error-handling, defensive-coding, baseline</td>
             </tr>
             <tr data-type="skill" data-category="core">
+                <td>escalation-report</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>testing-pipeline, escalation, reporting</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
                 <td>executing-plans</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
@@ -824,10 +851,19 @@ tr:hover { background: var(--primary-light); }
                 <td>workflow</td>
             </tr>
             <tr data-type="agent" data-category="core">
+                <td>failure-triage-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>testing, orchestration, triage</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
                 <td>fastapi-api-tester-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>2.0.0</td>
+                <td>1.2.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
@@ -944,7 +980,7 @@ tr:hover { background: var(--primary-light); }
                 <td>fix-issue</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>2.4.0</td>
+                <td>2.6.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>fix-loop, post-fix-pipeline</td>
                 <td>github, bug-fix, workflow</td>
@@ -1029,6 +1065,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>github, search, discovery</td>
+            </tr>
+            <tr data-type="agent" data-category="core">
+                <td>github-issue-manager-agent</td>
+                <td><span class="badge badge-agent">agent</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>create-github-issue</td>
+                <td>testing-pipeline, github, orchestration, t3</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>handover</td>
@@ -1236,6 +1281,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>workflow</td>
+            </tr>
+            <tr data-type="config" data-category="core">
+                <td>orchestrator-responsibility-allowlist</td>
+                <td><span class="badge badge-config">config</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, validation, allowlist, rule-8</td>
             </tr>
             <tr data-type="agent" data-category="core">
                 <td>parallel-worktree-orchestrator-agent</td>
@@ -1661,6 +1715,15 @@ tr:hover { background: var(--primary-light); }
                 <td>workflow</td>
             </tr>
             <tr data-type="skill" data-category="core">
+                <td>serialize-fixes</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>testing-pipeline, git, diff, serialization</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
                 <td>session-continuity</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
@@ -1871,7 +1934,7 @@ tr:hover { background: var(--primary-light); }
                 <td>test-failure-analyzer-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>2.0.0</td>
+                <td>2.2.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
@@ -1880,7 +1943,7 @@ tr:hover { background: var(--primary-light); }
                 <td>test-healer-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>2.0.0</td>
+                <td>2.2.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>fix-loop, test-failure-analyzer-agent</td>
                 <td>e2e, testing, healing, auto-fix</td>
@@ -1916,7 +1979,7 @@ tr:hover { background: var(--primary-light); }
                 <td>test-pipeline-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>3.1.0</td>
+                <td>4.1.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
@@ -1925,7 +1988,7 @@ tr:hover { background: var(--primary-light); }
                 <td>test-scout-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>2.0.0</td>
+                <td>2.1.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>e2e, testing, runner, screenshots</td>
@@ -1934,7 +1997,7 @@ tr:hover { background: var(--primary-light); }
                 <td>tester-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>2.0.0</td>
+                <td>2.1.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
@@ -1952,7 +2015,7 @@ tr:hover { background: var(--primary-light); }
                 <td>testing-pipeline-master-agent</td>
                 <td><span class="badge badge-agent">agent</span></td>
                 <td>core</td>
-                <td>2.1.0</td>
+                <td>3.0.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>orchestration, workflow, testing, verification</td>

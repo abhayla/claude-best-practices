@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-23 02:45 UTC (auto-generated)
+> Last updated: 2026-04-23 14:03 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 229 |
-| Core (universal) | 224 |
+| Total Patterns | 236 |
+| Core (universal) | 231 |
 | Stack-specific | 5 |
-| Agents | 37 |
-| Configs | 1 |
+| Agents | 39 |
+| Configs | 2 |
 | Hooks | 8 |
 | Rules | 29 |
-| Skills | 154 |
+| Skills | 158 |
 
 ## Pattern Inventory
 
@@ -22,6 +22,7 @@
 | a11y-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | playwright |
 | adr | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| agent-evaluator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | agent-orchestration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ai-gemini-api | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -68,6 +69,7 @@
 | contract-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | contribute-practice | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | coverage-analysis | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| create-github-issue | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | cross-platform-visual | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | d3-viz | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | dangerous-command-blocker | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -96,9 +98,11 @@
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
 | e2e-visual-run | skill | 4.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
 | error-handling | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| escalation-report | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | executing-plans | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | expo-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| fastapi-api-tester-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| failure-triage-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| fastapi-api-tester-agent | agent | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-backend | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-database | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | fastapi-database-admin-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -111,7 +115,7 @@
 | firebase-data-connect | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-dev | skill | 1.0.2 | hub:abhayla/claude-best-practices | — |
 | firebase-test | skill | 1.1.1 | hub:abhayla/claude-best-practices | — |
-| fix-issue | skill | 2.4.0 | hub:abhayla/claude-best-practices | fix-loop, post-fix-pipeline |
+| fix-issue | skill | 2.6.0 | hub:abhayla/claude-best-practices | fix-loop, post-fix-pipeline |
 | fix-loop | skill | 1.4.0 | hub:abhayla/claude-best-practices | test-failure-analyzer-agent |
 | flutter | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-dart-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -121,6 +125,7 @@
 | git-manager-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | git-worktrees | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | github | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| github-issue-manager-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | create-github-issue |
 | handover | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | hono-backend | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | html-prototype | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -144,6 +149,7 @@
 | node-backend-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | nuxt-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | obsidian | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | parallel-worktree-orchestrator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pattern-portability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pattern-self-containment | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -190,6 +196,7 @@
 | security-auditor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | security-baseline | rule | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| serialize-fixes | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -213,16 +220,16 @@
 | tdd-failing-test-generator | skill | 2.0.0 | hub:abhayla/claude-best-practices | tdd, playwright |
 | tdd-rule | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-data-management | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| test-failure-analyzer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| test-healer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
+| test-failure-analyzer-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | — |
+| test-healer-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-pipeline | skill | 1.0.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
-| test-pipeline-agent | agent | 3.1.0 | hub:abhayla/claude-best-practices | — |
-| test-scout-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| tester-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| test-pipeline-agent | agent | 4.1.0 | hub:abhayla/claude-best-practices | — |
+| test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| tester-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
-| testing-pipeline-master-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| testing-pipeline-master-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | testing-pipeline-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | trace-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | twitter-x | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
