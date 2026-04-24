@@ -1,10 +1,14 @@
 ---
 name: testing-pipeline-workflow
 description: >
-  Run the complete test verification chain from TDD through quality gates.
-  Use when running the full testing workflow end-to-end rather than
-  individual test skills.
-  NOT for running specific test frameworks (use /pytest-dev, /jest-dev, /vitest-dev) or the fix-verify-commit chain (use /test-pipeline).
+  DEPRECATED 2026-04-24 — use /test-pipeline instead. This skill dispatches
+  testing-pipeline-master-agent, whose design assumes nested subagent
+  dispatch; Anthropic's platform does not support that (subagents cannot
+  spawn subagents). See agent-orchestration.md §2 for the platform-constraint
+  note. Will be removed after Phase 3 of the 2026-04-24 remediation completes
+  the collapse of the tiered test pipeline into a single T0 orchestrator.
+deprecated: true
+deprecated_by: test-pipeline
 triggers:
   - full testing pipeline
   - tdd through quality gates
@@ -15,10 +19,25 @@ triggers:
 type: workflow
 allowed-tools: "Agent Read Grep Glob"
 argument-hint: "<test target, failure output, or 'full-suite'>"
-version: "1.2.0"
+version: "1.3.0"
 ---
 
-# Testing Pipeline Workflow — Full Verification Orchestration
+# Testing Pipeline Workflow — DEPRECATED
+
+> **Deprecated 2026-04-24.** This skill dispatches `testing-pipeline-master-agent`,
+> which was designed as a T1 workflow master that further dispatches T2 sub-orchestrators
+> via `Agent()`. Anthropic's platform does not forward the `Agent` tool to dispatched
+> subagents ([official docs](https://code.claude.com/docs/en/sub-agents):
+> *"subagents cannot spawn other subagents"*), so the nested-dispatch design cannot
+> execute as intended — the agent silently inlines its downstream work. Use
+> `/test-pipeline` as the canonical entry point; Phase 3 of the 2026-04-24 remediation
+> will restructure `/test-pipeline` to inject its orchestration logic directly into
+> the user's T0 session, where `Agent()` actually works, so parallel Wave 1 lanes
+> (functional + API) can be dispatched from T0.
+>
+> This skill file remains in place for the deprecation window defined in
+> `pattern-structure.md` ("Deprecation Lifecycle" — 2 version cycles). Do not
+> invoke it in new workflows.
 
 Dispatch the testing-pipeline-master-agent to coordinate the complete
 test verification chain from TDD through quality gates to commit. Routes to

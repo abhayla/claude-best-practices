@@ -23,7 +23,7 @@ version: "1.1.0"
 Run the complete test verification pipeline with enforced gates, artifact
 cleanup, and optional screenshot-as-proof capture.
 
-**Critical:** This skill delegates entirely to test-pipeline-agent. Do not inline orchestration. For the broader TDD-through-quality-gates chain, use `/testing-pipeline-workflow` instead. For just verification without fix, use `/auto-verify`.
+**Critical:** This skill delegates entirely to test-pipeline-agent. Do not inline orchestration. For just verification without fix, use `/auto-verify`. For TDD red-phase generation, use `/tdd`. (The legacy `/testing-pipeline-workflow` slash command is deprecated as of 2026-04-24 — see its SKILL.md for the deprecation note.)
 
 **Arguments:** $ARGUMENTS
 

@@ -4176,20 +4176,24 @@
     "hash": "e42f757fefcec3f482ded518eceecb168be6f95b051674e72cafea160c409e80",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
-    "description": "Slash-command wrapper for testing-pipeline-master-agent. Full test verification chain from TDD through quality gates.",
+    "description": "DEPRECATED 2026-04-24. Dispatches testing-pipeline-master-agent whose tiered design is platform-incompatible (Anthropic docs: subagents cannot spawn other subagents). Use /test-pipeline instead.",
     "tags": [
       "orchestration",
       "workflow",
-      "testing"
+      "testing",
+      "deprecated"
     ],
-    "changelog": "v1.0.0: Initial release — testing pipeline skill wrapper",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release. v1.3.0 (2026-04-24): deprecated — replaced by /test-pipeline per subagent-dispatch-platform-limit remediation Phase 1.",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "trace-test": {
     "hash": "dbf4a700c41c687c1317c6272f93e728cc31992b1ed724fed9b0216301218516",
