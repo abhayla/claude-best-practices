@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-24 19:12 UTC (auto-generated)
+> Last updated: 2026-04-24 19:26 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -55,8 +55,8 @@
 | claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | code-quality-gate | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-readability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| code-review-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| code-review-workflow | skill | 1.1.0 | hub:abhayla/claude-best-practices | code-review-master-agent, review-gate, request-code-review, receive-code-review |
+| code-review-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
+| code-review-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | code-review-master-agent, review-gate, request-code-review, receive-code-review |
 | code-reviewer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | compose-ui | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | configuration-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
