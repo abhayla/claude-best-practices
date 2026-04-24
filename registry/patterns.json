@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "3.0.0",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-04-25",
     "total_patterns": 238
   },
   "a11y-audit": {
@@ -1176,13 +1176,13 @@
     "tier": "must-have"
   },
   "debugging-loop": {
-    "hash": "c7f29012fee0ca6a96a539c9336b40aeeb08a4d291061323f53cf43e7767ec0a",
+    "hash": "4c8c4d49e68318cc3532f492e37504736d6905d8d94fd7c80fdf4b8788e2d3f1",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [
       "debugging-loop-master-agent",
       "systematic-debugging",
@@ -1197,17 +1197,17 @@
       "workflow",
       "debugging"
     ],
-    "changelog": "v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release",
+    "changelog": "v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR \u2014 skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
     "tier": "nice-to-have"
   },
   "debugging-loop-master-agent": {
-    "hash": "d4aa4fed5dfbae2d6b649e6bbfcfe07d8401fb6e03a54b92881ea7e7f3f65134",
+    "hash": "f3004536c55d2ed29305d8ab0a3c05501f93f2cd852c6ece1f7995a1fa367938",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Orchestrate structured bug diagnosis and resolution with mandatory learning capture. Root cause classification guides fix strategy.",
@@ -1217,8 +1217,10 @@
       "debugging",
       "diagnosis"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 debugging loop with scientific method approach",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release \u2014 debugging loop with scientific method approach | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.3) \u2014 superseded by /debugging-loop skill-at-T0",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "debugging-loop"
   },
   "deploy-strategy": {
     "hash": "21023ec63f543eef2938e490e3863455ad52dd0571367f12df61b78262f3ccae",

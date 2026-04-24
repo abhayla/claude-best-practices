@@ -134,11 +134,11 @@ class TestContractFilesExist:
         )
 
 
-# Workflows still using the legacy master-agent pattern (Phase 3.1+3.2 have
-# retired testing-pipeline + development-loop to skill-at-T0; Phases 3.3-3.8
-# will retire these 6 too).
+# Workflows still using the legacy master-agent pattern (Phases 3.1-3.3 have
+# retired testing-pipeline + development-loop + debugging-loop to skill-at-T0;
+# Phases 3.4-3.8 will retire these 5 too).
 MASTER_AGENT_WORKFLOWS = [
-    "debugging-loop", "code-review", "documentation",
+    "code-review", "documentation",
     "session-continuity", "learning-self-improvement", "skill-authoring",
 ]
 
@@ -146,7 +146,8 @@ MASTER_AGENT_WORKFLOWS = [
 # master_agent is null; entry_skill names the skill-at-T0 orchestrator.
 SKILL_AT_T0_WORKFLOWS = [
     "testing-pipeline",   # Phase 3.1 (PR #25)
-    "development-loop",   # Phase 3.2 (this PR)
+    "development-loop",   # Phase 3.2 (PR #28)
+    "debugging-loop",     # Phase 3.3 (this PR)
 ]
 
 
