@@ -78,8 +78,24 @@ def test_core_seed_exists_and_is_header_only():
 
 
 def test_hub_live_log_exists_with_header():
+    """Verify the hub's live prompt log has the correct header when present.
+
+    The live log at `.claude/tasks/prompts.md` is gitignored (may contain
+    secrets per the UserPromptSubmit hook contract) and is created by the
+    `prompt-logger.sh` hook at runtime. It exists on any machine where
+    Claude Code has run at least one prompt, but does NOT exist in CI
+    runners (no Claude Code session → hook never fires → file never
+    created). Skip in that case — the absence is expected and not a
+    regression.
+    """
     log = REPO_ROOT / ".claude" / "tasks" / "prompts.md"
-    assert log.exists(), f"missing {log}"
+    if not log.exists():
+        import pytest
+        pytest.skip(
+            f"Live prompt log not present at {log} — expected in CI "
+            "(no Claude Code session runs there). Locally, run Claude "
+            "Code once to populate it; then this test asserts the header."
+        )
     assert "# Prompt Log" in log.read_text()
 
 
