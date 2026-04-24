@@ -122,6 +122,32 @@ UserPromptSubmit hook that injects a deterministic reminder so Claude never skip
 }
 ```
 
+### Prompt Logger (`prompt-logger.sh`)
+
+UserPromptSubmit hook that appends every user prompt to `.claude/tasks/prompts.md` in the repo root as Markdown entries — one `## <iso-ts> — branch@sha` heading per prompt, followed by `- session:` / `- cwd:` metadata and the raw prompt wrapped in a `~~~text` fence (triple-tilde survives prompts that contain triple-backtick code blocks).
+
+Non-blocking under every failure mode: missing `jq`, missing git, malformed stdin, empty prompt — exit 0, log unchanged. Writes nothing to stdout (UserPromptSubmit stdout is injected into the conversation, which would double every prompt's token cost).
+
+**Gitignore the live log** — `.claude/tasks/prompts.md` contains raw prompts and may include secrets. Add `/.claude/tasks/prompts.md` to your project's `.gitignore`. The seed file at `core/.claude/tasks/prompts.md` is shipped via provisioning so downstream projects get the header-only file ready to use.
+
+Runs alongside `prompt-enhance-reminder.sh`: list both commands under the same `UserPromptSubmit` matcher so reminder injection and logging both run on every prompt.
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/prompt-enhance-reminder.sh" },
+          { "type": "command", "command": ".claude/hooks/prompt-logger.sh" }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ### Auto-Format on File Write (`auto-format.sh`)
 
 PostToolUse hook on `Write|Edit` that auto-formats files after Claude writes them. Supports Python (black/ruff), JS/TS/JSON/YAML/CSS/HTML (prettier), Kotlin (ktfmt), Go (gofmt), Rust (rustfmt), Swift (swift-format), and Shell (shfmt). Only runs formatters that are installed — missing ones are silently skipped. Always non-blocking (exit 0). Customize the formatters to match your project tooling.

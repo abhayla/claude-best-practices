@@ -20,3 +20,8 @@ test-evidence/
 .claude/config/
 .claude/sync-manifest.json
 CLAUDE.local.md
+
+# Prompt log — contains raw user prompts captured by prompt-logger.sh hook,
+# may include secrets/PII. The seed at core/.claude/tasks/prompts.md stays
+# tracked so provisioning can copy it into downstream projects.
+/.claude/tasks/prompts.md

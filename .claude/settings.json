@@ -49,6 +49,10 @@
           {
             "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/prompt-enhance-reminder.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/prompt-logger.sh\""
           }
         ]
       }
