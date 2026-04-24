@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-24 19:26 UTC (auto-generated)
+> Last updated: 2026-04-24 19:36 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -89,8 +89,8 @@
 | doc-structure-enforcer | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | docker-optimize | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | docs-manager-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| documentation-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| documentation-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| documentation-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
+| documentation-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | drizzle-orm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-best-practices | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-conductor-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | test-scout-agent, visual-inspector-agent, test-healer-agent |
