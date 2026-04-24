@@ -1,19 +1,22 @@
 ---
 name: failure-triage-agent
 description: >
-  T2B sub-orchestrator for the three-lane test pipeline (PR2). Process the
-  consolidated failure set from `test-pipeline-agent` (T2A). Owns the full
-  failure-triage subgraph: analyzer fan-out → issue-manager fan-out (with
-  fan-in coordination) → fixer fan-out (batched at max_concurrent_fixers=5)
-  → /serialize-fixes invocation → /escalation-report invocation on budget
-  exhaustion. Honors `partial_failure_policy: abort_on_first_blocked` for
-  GITHUB_NOT_CONNECTED preflight failures. Returns structured triage outcome
-  to T2A so T2A can re-verify affected tests.
+  DEPRECATED 2026-04-24 — this agent's three-fan-out design (analyzer, issue-manager,
+  fixer, each via batched Agent()) is platform-incompatible (Anthropic docs: subagents
+  cannot spawn other subagents). Use /test-pipeline instead — Phase 3 of the
+  2026-04-24 remediation will inline the triage logic into the /test-pipeline skill
+  body at T0, where Agent() dispatch actually works. Historical purpose: T2B
+  failure-triage sub-orchestrator for the three-lane spec (PR2).
+deprecated: true
+deprecated_by: test-pipeline
+deprecated_at: "2026-04-24"
 tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
 model: inherit
 color: orange
-version: "1.0.0"
+version: "1.1.0"
 ---
+
+> **Deprecated 2026-04-24.** This agent was designed to fan out Agent() dispatches to analyzer, issue-manager, and fixer workers in batches of 5 parallel subagents each. Anthropic's platform ([official docs](https://code.claude.com/docs/en/sub-agents)) does not forward the `Agent` tool to dispatched subagents: *"subagents cannot spawn other subagents."* The three fan-outs silently collapse to serial inline work at runtime. See `agent-orchestration.md` §2 for the platform-constraint note. Phase 3 of the 2026-04-24 remediation will restructure the triage subgraph to run inside the `/test-pipeline` skill-at-T0 body, where `Agent()` actually dispatches workers as intended — triage itself is inherently sequential (analyzer → issue-manager → fixer for each failure), so the T0 restructure preserves the logic without depending on nested dispatch. Do not invoke in new workflows.
 
 ## NON-NEGOTIABLE
 

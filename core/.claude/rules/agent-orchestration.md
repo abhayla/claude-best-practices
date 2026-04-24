@@ -5,32 +5,52 @@ globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 
 # Agent Orchestration Constraints
 
-## 1. Orchestrators MUST Be Agents
+> **Platform constraint (verified 2026-04-24):** Claude Code does not forward the `Agent` tool to dispatched subagents, regardless of what their frontmatter `tools:` field declares. [Anthropic's official documentation](https://code.claude.com/docs/en/sub-agents) states this directly: *"subagents cannot spawn other subagents."* Corroborated by open GitHub issues [#19077](https://github.com/anthropics/claude-code/issues/19077) and [#4182](https://github.com/anthropics/claude-code/issues/4182) and by three independent runtime probes. All rules below reflect this constraint — orchestration is single-level by platform design, not by preference. See §2 for the normative model.
 
-Multi-stage coordination that dispatches subagents or sequences skills MUST be implemented as an agent (in `.claude/agents/`), not as a skill. Skills are single-purpose workflows; orchestration is a coordination concern. If a skill grows to dispatch 3+ subagents or manage cross-stage state, convert it to an agent with a thin skill wrapper that preserves the slash command.
+## 1. Orchestrators MUST Run at T0
 
-## 2. Tiered Nesting with Visibility
+Multi-stage coordination that dispatches worker subagents MUST execute in the user's T0 session. Two patterns are valid:
 
-Orchestration hierarchies follow a 4-tier model. Each tier has clear ownership and dispatch rights:
+| Pattern | Shape | When to use |
+|---------|-------|-------------|
+| **Agent-at-T0** | Agent invoked directly by the user (not dispatched from another agent) | Orchestrator needs a persistent persona, reusable state, or rich context management |
+| **Skill-at-T0** | Slash command whose body is injected into the user's T0 session; the session executes the orchestration logic with `Agent` available | Orchestrator is stateless prompt logic; simpler to maintain as a skill |
 
-| Tier | Role | Can Dispatch | Example |
-|------|------|-------------|---------|
-| **T0** | Pipeline orchestrator | T1 workflow-masters via `Agent()` | `project-manager-agent` |
-| **T1** | Workflow master | T2 sub-orchestrators via `Agent()` + skills via `Skill()` | `testing-pipeline-master-agent` |
-| **T2** | Sub-orchestrator | T3 worker agents via `Agent()` + skills via `Skill()` | `e2e-conductor-agent`, `test-pipeline-agent` |
-| **T3** | Worker agent | `Skill()` calls ONLY — no further `Agent()` dispatch | `test-scout-agent`, `tester-agent` |
+Both patterns are valid because both run at T0 where `Agent()` is actually available. A skill that merely dispatches an agent (a "thin wrapper skill") is also valid, but the resulting agent MUST be one whose own design assumes it runs at T0 — not one whose design assumes it is an intermediate-tier orchestrator.
 
-**Maximum depth: 4 tiers (T0 → T1 → T2 → T3).** T3 agents MUST NOT call `Agent()`. Any deeper nesting indicates a design problem — flatten by moving coordination up a tier.
+MUST NOT write an agent that dispatches worker subagents AND is itself intended to be dispatched as a subagent. Such an agent would declare `Agent` in `tools:` but never receive it at runtime, silently producing inline work instead of dispatched parallelism — the exact failure mode observed in the 2026-04-24 testbed run.
 
-**Visibility rule:** Every tier MUST report completion status to its parent via a structured return contract (JSON with `gate`, `artifacts`, `summary` fields). A parent MUST NOT proceed until it has read the child's return. No fire-and-forget dispatches within orchestration chains.
+## 2. Single-Level Dispatch Model
 
-## 3. Controlled Nesting — Tier Enforcement
+All orchestration obeys the platform's single-dispatch-level constraint:
 
-Each agent MUST declare its tier (T0–T3) in its description or operational context. An agent at tier N may dispatch agents at tier N+1, but MUST NOT dispatch agents at its own tier or above. T3 agents MUST NOT call `Agent()` — they are leaf workers that execute via `Skill()` only.
+| Role | Where it runs | What it can dispatch |
+|------|---------------|----------------------|
+| **Orchestrator** | T0 (user session or skill injected into T0) | Worker subagents via `Agent()`, utility skills via `Skill()` |
+| **Worker** | Subagent session dispatched by the T0 orchestrator | Skills via `Skill()`. MUST NOT attempt `Agent()` — it is absent at runtime regardless of frontmatter. |
 
-**Why tiers instead of a flat ban:** Workflow-master agents (T1) need to dispatch specialized sub-orchestrators (T2) like `e2e-conductor-agent` which in turn dispatch worker agents (T3). A flat "no subagent-spawning subagents" rule would force all coordination into a single overloaded orchestrator, violating Rule 8 (max 3-4 responsibilities).
+**One dispatch level is the hard limit.** A T0 orchestrator → worker dispatch chain is 1 level deep. No worker can spawn another subagent. If a task decomposition needs work that looks multi-level, flatten it:
 
-**Failure attribution:** Every tier MUST propagate failure details upward — not just "FAILED" but the specific step, error, and retry count. The parent at each tier is responsible for deciding whether to retry, skip, or escalate.
+- The T0 orchestrator dispatches a first wave of workers
+- Workers return structured contracts to T0
+- T0 reads the contracts and dispatches a second wave based on the results
+
+Parallelism is preserved at the T0 dispatch point: multiple `Agent()` calls in a single T0 message run concurrently. Parallelism inside a worker session is NOT reliably available — empirical probes confirm `Bash`, `Skill`, and other tool calls in one message execute serially in subagent sessions.
+
+**Tier labels (T0/T1/T2/T3) are retained for responsibility-ownership documentation only.** They describe *who owns what* in a design, not a runtime dispatch chain. Existing references to "T1 dispatches T2 via `Agent()`" are legacy — treat them as describing design intent, not a runtime behavior. Phase-refactored patterns will collapse the tier labels into "orchestrator" and "worker".
+
+**Visibility rule:** Every worker MUST return a structured contract (JSON with `gate`, `artifacts`, `summary` fields) to the T0 orchestrator. The orchestrator MUST NOT proceed to the next wave until it has read the return. No fire-and-forget dispatches.
+
+## 3. Worker Agent Constraints
+
+Workers (agents dispatched from a T0 orchestrator) MUST conform to:
+
+1. **No `Agent` in `tools:` declarations.** Declaring `Agent` is misleading — the runtime will not expose it. Validator `scripts/tests/test_orchestrator_tool_grants.py` flags this.
+2. **No nested dispatch in the body.** Worker prompts MUST NOT instruct the worker to "dispatch agent X" — that instruction will be silently ignored, producing inline work. If multi-step coordination is needed, return to the T0 orchestrator with a structured contract so T0 can dispatch the next wave.
+3. **Skills-only for in-session workflows.** Workers MAY invoke skills via `Skill()` for inline workflow steps, but skill invocations do not create a new session — they run inline in the worker's own context. Parallel `Skill()` calls in one worker message are serialized by the runtime (empirically verified 2026-04-24); design for serial execution inside workers.
+4. **One focused responsibility per worker.** Because workers cannot subdivide work further, each worker MUST be scoped to a single-responsibility task. Multi-responsibility work belongs at the T0 orchestrator, which can dispatch multiple focused workers.
+
+**Failure attribution:** The T0 orchestrator is responsible for aggregating worker return contracts, retrying failed workers (within the global retry budget — see Rule 5), and escalating unresolvable failures to the user. Workers propagate structured failure details (specific step, error, retry count) but do NOT decide whether to retry.
 
 ## 4. Externalize DAGs to Config
 
@@ -50,14 +70,15 @@ Each orchestration scope MUST have exactly one canonical state file:
 
 | Scope | State File | Owner |
 |-------|-----------|-------|
-| Full pipeline | `.pipeline/state.json` | `project-manager-agent` (T0) |
-| Per workflow | `.workflows/{workflow-id}/state.json` | Workflow master-agent (T1) |
-| Per sub-orchestrator | Embedded in parent workflow state OR own sub-file | Sub-orchestrator (T2) |
+| Full pipeline | `.pipeline/state.json` | T0 pipeline orchestrator |
+| Per workflow | `.workflows/{workflow-id}/state.json` | T0 workflow orchestrator |
+| Per worker | Embedded in parent state OR per-worker sub-file written by the worker and read by the T0 orchestrator | Worker (writes) + T0 orchestrator (reads, aggregates) |
 
 **Ownership rules:**
 - A state file is owned by exactly ONE agent — the agent named in `master_agent` field of the workflow contract
-- Parent agents MAY read child state files (for progress monitoring) but MUST NOT write to them
-- Child agents MUST NOT read or write sibling workflow state files — cross-workflow coordination flows through the parent (T0)
+- The T0 orchestrator reads worker return contracts + worker-owned sub-files to aggregate state
+- Workers MUST NOT read or write the T0 orchestrator's state file directly; they communicate results via their return contract
+- Cross-workflow coordination flows through the T0 orchestrator (legacy "parent-child" language assumed nested orchestration that the platform does not support — see §2)
 
 Every state mutation MUST be written to the state file before the next action. This ensures resume, rollback, and observability all read from one source of truth per scope.
 
@@ -82,18 +103,18 @@ The contract config defines:
 
 Changes to workflow behavior MUST be made in the config file, not in agent bodies. Agent bodies contain orchestration *protocol* (how to execute); config contains orchestration *topology* (what to execute in what order).
 
-## 10. Dual-Mode Operation for Workflow Masters
+## 10. Dual-Mode Operation
 
-Every workflow-master agent (T1) MUST support two operational modes:
+An agent's file MAY describe two operational modes. Because of the single-dispatch-level constraint (§2), mode semantics differ from the legacy "standalone vs dispatched master" model:
 
-| Mode | Trigger | Behavior |
-|------|---------|----------|
-| **Standalone** | User invokes directly (no Pipeline ID in prompt) | Full lifecycle: init → execute → commit → report |
-| **Dispatched** | Parent orchestrator invokes (Pipeline ID present) | Worker lifecycle: execute step subset → return contract to parent |
+| Mode | When | Available tools | Constraints |
+|------|------|-----------------|-------------|
+| **T0 orchestrator** | User invokes directly OR a skill injects the agent's logic into T0 | Full tool set including `Agent` | MAY dispatch workers via `Agent()`; owns full lifecycle (init → dispatch → aggregate → commit → report) |
+| **Worker** | Dispatched as a subagent via `Agent()` from the T0 orchestrator | Full tool set EXCEPT `Agent` | MUST NOT attempt further subagent dispatch — `Agent` is absent at runtime per §2. MUST return a structured contract (`gate`, `artifacts`, `decisions`, `blockers`, `summary`) to the T0 orchestrator. Skip steps marked `skip_when: "mode == 'worker'"` — typically commit/PR steps and anything requiring further dispatch. |
 
-In dispatched mode, skip steps marked `skip_when: "mode == 'dispatched'"` (typically commit/PR steps). Return results using the standard stage return contract (`gate`, `artifacts`, `decisions`, `blockers`, `summary`).
+**Dual-mode viability:** An agent whose design requires dispatching workers can only run in T0 mode. If such an agent is dispatched as a worker, the `Agent` tool is absent and every dispatch instruction in its body is silently ignored — producing inline serial work instead of the intended parallelism (the exact failure mode observed in the 2026-04-24 testbed). Agents that support both modes MUST be designed so the worker-mode code path does not assume `Agent` is available.
 
-In standalone mode, the workflow-master IS the top-level orchestrator and handles all lifecycle concerns including state creation, cleanup, and final reporting.
+In T0 mode, the agent IS the orchestrator and handles all lifecycle concerns including state creation, cleanup, worker dispatch, and final reporting.
 
 ## 11. Mandatory Context Passing
 

@@ -5,6 +5,198 @@
 
 ## Current Task
 
+### Subagent Dispatch Platform Limit Remediation (2026-04-24 session 2)
+
+Context: three independent probes and Anthropic's official docs confirm
+subagents cannot dispatch further subagents. Current 4-tier dispatch model
+in `core/.claude/rules/agent-orchestration.md` is platform-incompatible.
+Plan refined through anthropic-multi-agent-reviewer-agent audit (grade C);
+Phase 0 empirical probe further narrowed the architectural options.
+
+## Phase 0 — Empirical parallelism probe — ✅ COMPLETE
+
+- [x] 0.1 Dispatched general-purpose subagent probe → findings captured
+- [x] 0.2 T0 self-test (same Bash timing test) → findings captured
+- [x] 0.3 Lessons entry appended — `.claude/tasks/lessons.md`
+- [x] Verdict recorded:
+  - `Bash` ×N in one message → **serial** (10s gap at T0, 7s gap in subagent)
+  - `Skill` ×N in one message → **blocked from concurrent execution** (queues as next-turn prompt injection)
+  - `Agent` ×N at T0 → parallel (documented + confirmed)
+  - `Agent` from subagent → blocked (Anthropic platform constraint)
+
+## Strategy decision — RESOLVED (2026-04-24)
+
+User confirmed **Option A** (T0-only orchestrator). Every workflow becomes
+a skill-at-T0 pattern: slash command injects the orchestration logic into
+the user's T0 session, where `Agent()` actually works, so the session can
+dispatch flat worker subagents via `Agent()`.
+
+## Phase 1 — Docs + deprecation markers — ✅ COMPLETE (branch: fix/subagent-dispatch-platform-limit-phase1)
+
+- [x] 1.1 Rewrite `agent-orchestration.md` §1, §2, §3, §6, §10 for single-level dispatch reality — commit `2b00b3d`
+- [x] 1.2 Rewrite `pattern-structure.md` Tool Grants for platform reality — commit `932c6de`
+- [x] 1.3 Deprecate `/testing-pipeline-workflow` skill; update registry; update `/test-pipeline` cross-ref — commit `ff58452`
+- [x] 1.4 Deprecate the 3 tiered agents (testing-pipeline-master-agent, test-pipeline-agent, failure-triage-agent) in bodies + registry — commit `a26d0c4`
+- [x] 1.5 Migrate pinned-content tests; align registry hashes; fix description to pass validator — commit `84ac305`
+
+All 4 CI gates green:
+- dedup_check --validate-all PASSED
+- dedup_check --secret-scan PASSED
+- workflow_quality_gate_validate_patterns PASSED (0 warnings)
+- pytest 1295 passed, 60 skipped, 1 xfailed
+
+### Phase 1 Review (2026-04-24)
+
+**Outcome:** 5 commits on feature branch, 0 CI warnings, 0 test regressions.
+Approach chosen: Option A (T0-only orchestrator). Per user-approved
+architecture review by anthropic-multi-agent-reviewer-agent + Phase 0
+empirical finding that only T0 Agent() dispatch is reliably parallel
+(Skill and Bash in one message both serialized at runtime).
+
+Key changes on disk:
+- `agent-orchestration.md` rules rewritten: §2 is now "Single-Level
+  Dispatch Model" citing Anthropic docs + GH #19077 + GH #4182. Tier
+  labels retained as responsibility-ownership documentation only.
+- `pattern-structure.md` Tool Grants section: `Agent` in `tools:` is
+  only functional at T0; workers MUST NOT declare it; dual-mode agents
+  declare it but worker path must not rely on it.
+- Three agents marked deprecated with banners + registry fields:
+  `testing-pipeline-master-agent` (T1), `test-pipeline-agent` (T2A),
+  `failure-triage-agent` (T2B). Their files stay in place for the
+  2-version-cycle deprecation window per pattern-structure.md.
+- `/testing-pipeline-workflow` skill deprecated in favor of
+  `/test-pipeline`; legacy slash command still resolvable but marked
+  in both frontmatter and registry.
+
+**What could break:**
+- Downstream projects with `/testing-pipeline-workflow` in muscle
+  memory will see a deprecation banner but the skill still works
+  (just dispatches a deprecated agent that silently inlines its work —
+  same runtime behavior as before, now documented).
+- Auto-generated docs (`docs/workflows/*`, `docs/dashboard.*`) still
+  reference the deprecated patterns. Will regenerate correctly next
+  `generate_docs.py` / `generate_workflow_docs.py` run. Manual docs
+  (`README.md`, `docs/specs/*`, `docs/plans/*`) still reference the
+  old names and will be pruned in Phase 3 when the test pipeline is
+  re-architected.
+- The `agent-orchestration.md` rewrite is a big semantic change —
+  every sentence that talked about "T1 dispatches T2 via Agent()" is
+  now "orchestrator dispatches worker at T0 only". Any code or agent
+  body that silently assumed the tiered runtime behavior will now
+  fail the validator in Phase 2 (by design — that's the gate we're
+  building).
+
+**Pushed.** Branch `fix/subagent-dispatch-platform-limit-phase1` up on
+origin; PR #20 open at https://github.com/abhayla/claude-best-practices/pull/20
+awaiting review/merge.
+
+## Phase 1.5 — Blast-radius audit — ✅ COMPLETE (2026-04-24)
+
+Before Phase 2, audited the hub for all other patterns assuming nested
+`Agent()` dispatch. Finding: the broken pattern is not confined to the
+test pipeline. It's the entire **workflow-master** idiom. Every workflow
+in `config/workflow-contracts.yaml` declares `sub_orchestrators:`; every
+`/<workflow>-workflow` skill dispatches a `<workflow>-master-agent` whose
+body assumes it can further dispatch those sub-orchestrators. All 8
+master-agents (7 non-deprecated + 1 deprecated in Phase 1) and 8 skill
+wrappers are affected.
+
+Findings (see `.claude/tasks/lessons.md` 2026-04-24 audit entry for details):
+- **7 non-deprecated master-agents** with broken design:
+  `code-review-master-agent`, `debugging-loop-master-agent`,
+  `development-loop-master-agent`, `documentation-master-agent`,
+  `learning-self-improvement-master-agent`,
+  `session-continuity-master-agent`, `skill-authoring-master-agent`.
+- **3 standalone orchestrators** declaring `Agent` in tools:
+  `project-manager-agent` (T0-only — needs explicit enforcement),
+  `parallel-worktree-orchestrator-agent` (T0-only — needs enforcement),
+  `e2e-conductor-agent` (sub-orchestrator of test pipeline — broken).
+- **1 template**: `core/.claude/agents/workflow-master-template.md`
+  seeds the broken pattern for future copy-paste. **Highest-leverage fix.**
+- **8 `workflow-contracts.yaml` entries** with `sub_orchestrators:` lists
+  (testing-pipeline, development-loop, debugging-loop, code-review,
+  documentation, session-save, session-learn, skill-authoring).
+- **Manual docs** (README.md, docs/specs/*, docs/plans/*) still describe
+  the tier model — to be pruned per-workflow in each Phase 3 sub-PR.
+
+Phase 3 rescoped from "dissolve test-pipeline tier" to "retire entire
+workflow-master pattern across hub" — ~9 PRs, ~3000-4000 lines net.
+
+## Phase 2 — Validator (prerequisite for machine-verifying Phase 3 deprecations)
+
+- [ ] 2.1 Add `dispatched_from:` frontmatter field to every agent in
+      `core/.claude/agents/` (enum: `T0` | `worker` | `dual-mode`)
+- [ ] 2.2 Invert `scripts/tests/test_orchestrator_tool_grants.py` —
+      context-aware based on `dispatched_from`: T0 MUST declare Agent;
+      worker MUST NOT; dual-mode MAY with body-scan warning
+- [ ] 2.3 Runtime-probe integration test with `@pytest.mark.integration`;
+      dispatches a throwaway subagent and asserts Agent is absent from
+      its tool list; wire into `validate-pr.yml` required checks
+- [ ] 2.4 Update `core/.claude/rules/pattern-structure.md` to document
+      the new `dispatched_from:` field in Agent Structure section
+
+Estimated: 1 PR, ~300 lines, after PR #20 merges.
+
+## Phase 3 — Workflow-master pattern retirement (template-first sequence)
+
+**Key principle:** template-first (highest leverage) then per-workflow PRs
+in priority order (test pipeline, then by impact). Each PR ≤ 400 lines
+per git-collaboration.md. Eval gate between PR 3.1 and PR 3.2 (test
+pipeline as canary).
+
+- [ ] 3.0 TEMPLATE-FIRST — rewrite `workflow-master-template.md` to
+      document the skill-at-T0 pattern; update `pattern-structure.md`'s
+      workflow-master section; ~150 lines
+- [ ] 3.1 TEST PIPELINE — `/test-pipeline` body becomes the orchestration;
+      deprecate `e2e-conductor-agent`; rewrite `/e2e-visual-run`; update
+      `config/workflow-contracts.yaml` testing-pipeline entry; rewrite
+      spec §3.3/3.5/3.8 with executable Skill() + Agent() examples; ~800 lines
+- [ ] 3.1-gate EVAL GATE — run current vs post-3.1 on representative
+      50-test suite; 5-criterion rubric (lane-dispatch correctness, budget
+      enforcement, gate evaluation, return-contract fidelity, wall-clock);
+      human review checkpoint
+- [ ] 3.2 DEVELOPMENT LOOP — deprecate `development-loop-master-agent`;
+      rewrite `/development-loop` skill body; ~250 lines
+- [ ] 3.3 DEBUGGING LOOP — deprecate `debugging-loop-master-agent`;
+      rewrite `/debugging-loop`; ~250 lines
+- [ ] 3.4 CODE REVIEW — deprecate `code-review-master-agent`;
+      rewrite `/code-review-workflow`; ~250 lines
+- [ ] 3.5 DOCUMENTATION — deprecate `documentation-master-agent` (also
+      has inline Agent(subagent_type=...) calls to clean up);
+      rewrite `/documentation-workflow`; ~250 lines. **Halfway eval
+      checkpoint — is the pattern holding?**
+- [ ] 3.6 SESSION CONTINUITY — deprecate `session-continuity-master-agent`;
+      rewrite `/session-continuity`; update session-save + session-learn
+      workflow contracts; ~200 lines
+- [ ] 3.7 LEARNING — deprecate `learning-self-improvement-master-agent`;
+      rewrite `/learning-self-improvement`; ~200 lines
+- [ ] 3.8 SKILL AUTHORING — deprecate `skill-authoring-master-agent`;
+      rewrite `/skill-authoring-workflow`; ~200 lines
+- [ ] 3.9 STANDALONES — `project-manager-agent` +
+      `parallel-worktree-orchestrator-agent` get `dispatched_from: T0`
+      frontmatter enforcement; verify `/pipeline-orchestrator` is already
+      skill-at-T0; final grep for any remaining nested `Agent()` patterns
+      in the hub. ~100 lines
+
+## Cross-cutting (throughout Phase 3)
+
+- [ ] Cutover guard: every Phase 3 PR checks `.workflows/<workflow-id>/`
+      for in-progress runs and fails fast if any exist
+- [ ] Intermediate-state contract: between PRs, the system must still
+      produce valid per-workflow return contracts (workflows don't
+      depend on each other, so single-workflow refactors stay isolated)
+- [ ] Principle 2 (Anthropic skill) boundary preservation:
+      NON-NEGOTIABLE block contents from each deprecated master-agent
+      re-encoded in the replacement skill's dispatch prompts — no
+      behavioral regression, just relocation
+- [ ] Auto-generated doc regen: after each Phase 3 PR merges, trigger
+      `generate_docs.py` + `generate_workflow_docs.py` to refresh
+      `docs/workflows/*`, `docs/DASHBOARD.md`, `docs/dashboard.html`
+- [ ] Manual doc prune: each Phase 3 PR removes its workflow's
+      references from `README.md`, `docs/specs/*`, `docs/plans/*`
+
+## Completed sections below (preserved for reference)
+
 ### Prompt Logger Hook (2026-04-24)
 
 Goal: persist every `UserPromptSubmit` prompt to `.claude/tasks/prompts.md` as append-only Markdown. Distributable via `core/.claude/hooks/` so downstream projects get the hook on provision.
@@ -42,111 +234,3 @@ What could break:
 - `core/.claude/tasks/prompts.md` seed ships via provisioning; downstream projects need to add `/.claude/tasks/prompts.md` to their own `.gitignore` — this is documented in the hooks README section but NOT enforced. A `synthesize-project` hook could auto-append the gitignore line, but that widens scope beyond this task.
 
 Nothing pushed. No commit created — awaiting user approval per default policy.
-
-## Completed
-
-### REQ-S004 — Make auto-heal matrix config-driven (2026-04-24)
-
-Spec: `docs/specs/test-pipeline-three-lane-spec.md` §3.6 + §5 SHOULD-HAVE S004.
-Problem: `test-pipeline.yml:90-106` declares `auto_heal:` but nothing reads it; `test-failure-analyzer-agent` NN#6 defers "per spec §3.6" to LLM recall. S004 wires the config through.
-
-- [x] Update `test-failure-analyzer-agent.md`: NN#6 references config path; new "Recommended Action Matrix (Config-Driven)" section describes read procedure + fallback-to-ISSUE_ONLY on missing/invalid config; JSON output example adds `recommended_action`; bump v2.2.0 → v2.3.0
-- [x] Update `core/.claude/config/test-pipeline.yml` comment on `auto_heal:` block to mark it load-bearing (not forward-compat) + spec_ref: REQ-S004
-- [x] Add `scripts/tests/test_pipeline_auto_heal_req_s004.py` with 11 tests: config enum validation, §3.6 drift check, agent-body references config path, fallback policy declared, ALLOWED values enumerated — all pass
-- [x] Update `registry/patterns.json` analyzer version 2.2.0 → 2.3.0 + changelog entry
-- [x] Run 4 CI gates: dedup_check --validate-all ✅, dedup_check --secret-scan ✅, workflow_quality_gate_validate_patterns ✅, pytest (1257 passed, 60 skipped, 1 xfailed) ✅
-- [x] Commit REQ-S004 implementation — `8b0cd24`
-- [x] Scaffold REQ-S007 + REQ-S008 (null-default config knobs, new tests) — `c13b745`
-- [x] Annotate spec §5 with ship status + deferral re-confirmation for S009/S010/C001 — `7b3c2d6`
-
-### Review (REQ-S004)
-
-3 commits on main, all CI gates green across each step:
-- `8b0cd24` — REQ-S004: analyzer v2.3.0, `auto_heal:` config now load-bearing with fail-safe fallback to ISSUE_ONLY, 11 new tests
-- `c13b745` — REQ-S007/S008 scaffolds: null-default config keys + 10 new tests pinning "scaffold doesn't change behavior"
-- `7b3c2d6` — spec v1.7: ship-status + deferral audit trail for all §5 requirements
-
-Deferred (not implemented, with documented triggers):
-- REQ-S009 (merge-aware dedup) — needs ≥30 days prod use or triage-time evidence
-- REQ-S010 (feature-flag PR2 switchover) — window past; only revisit on generalization opportunity
-- REQ-C001 (worktree-per-fixer) — spec §2 rejected this design; needs ≥3 same-file-conflict runs/week before reopening
-
-What could break:
-- A downstream project that relied on the analyzer emitting `recommended_action` from LLM recall will now get config-driven values. If their `.claude/config/test-pipeline.yml` lacks an `auto_heal:` block, they'll see WARN logs and ISSUE_ONLY defaults — intentional fail-safe, but worth flagging in next update-practices pass.
-- `registry/patterns.json` hash for analyzer is stale (file changed, hash not regenerated). `dedup_check.py --validate-all` passed, so not currently enforced — but if hash-drift gating lands later, this will surface.
-
-Nothing pushed. `main` is 3 commits ahead of `origin/main`.
-
-### Testing Pipeline Overhaul (2026-04-22)
-Branch: `feat/testing-pipeline-overhaul` — 9 commits, 40 files, +2237 net lines.
-
-All 8 phases delivered against plan `C:\Users\itsab\.claude\plans\first-of-all-don-t-sparkling-treehouse.md`.
-
-**Phase A — e2e consolidation (skill wraps agent)**
-- [x] `e2e-conductor-agent.md` v1.0.0 → v2.0.0 — absorbed section filter, baseline-update mode, first-run artifacts, dev-server discovery, commit guards; dual-mode state path; cleanup guard
-- [x] `test-scout-agent.md` v1.0.0 → v2.0.0 — absorbed scout-phase.md; screenshot EVERY test (was fail-only); Constitution at top
-- [x] `visual-inspector-agent.md` v1.0.0 → v2.0.0 — absorbed inspection-phase.md; EXPECTED_CHANGE lane; Constitution at top
-- [x] `test-healer-agent.md` v1.0.0 → v2.0.0 — absorbed healing-phase.md; Constitution at top
-- [x] `e2e-visual-run/SKILL.md` v3.0.0 → v4.0.0 — shrunk to <100 lines, dispatches conductor
-- [x] `core/.claude/skills/e2e-visual-run/references/*` — deleted (content in agents)
-
-**Phase B — Healer upgrade (MCP + deterministic classification)**
-- [x] `test-healer-agent.md` — Playwright MCP hard dep (browser_snapshot, browser_evaluate, console_messages, network_requests, test_run)
-- [x] `test-failure-analyzer-agent.md` v1.1.1 → v2.0.0 — 18 regex rules with `classification_source` provenance
-- [x] `core/.claude/config/e2e-pipeline.yml` — `classification_rules[]` array exposed for per-project extension
-
-**Phase C — Architectural gap fixes**
-- [x] Dual-mode state-file paths (standalone: `.pipeline/`, dispatched: `.workflows/testing-pipeline/`)
-- [x] `schema_version: "1.0.0"` required first field of every state file
-- [x] Cleanup-at-init mode-gated (standalone only)
-- [x] Retry budget composition (`remaining_budget` in dispatch context)
-- [x] Aggregation consolidated at T1
-- [x] `contradictions.action: warn | block` config
-- [x] `auto-verify` silent-degradation gate with `--allow-degraded-ui` opt-out
-- [x] Registry/workflow-contracts paths verified consistent
-
-**Phase D — Issue tracking**
-- [x] GitHub Issue creation spec in `testing-pipeline-master-agent.md` — sha256 signature dedup, 30-day window
-- [x] `issue_creation.enabled` + `require_gh_auth` config flags in `e2e-pipeline.yml`
-
-**Phase E — Constitution pointer pattern**
-- [x] `## NON-NEGOTIABLE` block at top of every rewritten agent (scout, inspector, healer, analyzer, conductor, master, pipeline-agent) — SSOT-respecting pointer to `agent-orchestration.md` / `testing.md`
-
-**Phase F — Standalone CI aggregator**
-- [x] `scripts/pipeline_aggregator.py` (290 LOC, pure, typed)
-- [x] `scripts/tests/test_pipeline_aggregator.py` — 14 tests
-- [~] GitHub Actions job wiring — deferred per plan scope
-
-**Phase G — Synthetic Playwright fixture**
-- [x] `scripts/tests/fixtures/playwright-demo/` — package.json + playwright.config.ts + .gitignore + README.md
-- [x] `app/server.js` + 3 HTML pages with DEMO_SCENARIO-aware behavior
-- [x] 7 spec files (home, dashboard, checkout, visual, logic, flaky, infra)
-
-**Phase H — Verification**
-- [x] `scripts/tests/test_pipeline_e2e.py` — 20 tests in 3 classes (structural, aggregator scenarios, optional Node smoke)
-- [x] Aggregator regression: stage-FAILED with empty failures[] now correctly fails pipeline (bug found during Phase H)
-
-**Cross-cutting**
-- [x] `registry/patterns.json` — 9 version bumps, all `last_updated: 2026-04-22`
-- [x] `docs/QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md` — Applied section maps recommendations + gaps to commits
-- [x] `generate_docs.py` re-run — DASHBOARD.md, STACK-CATALOG.md, GETTING-STARTED.md, dashboard.html regenerated
-- [x] Local CI replication — 1081 pytest passed, 58 skipped; validator PASSED; dedup PASSED
-- [x] `.claude/tasks/lessons.md` updated — 2 entries (aggregator bug, pinned-content test migration)
-
-## Deferred (documented in plan's Non-goals)
-
-- Full Claude-Code-free headless runner (user narrowed Phase F to aggregation-only)
-- `.github/workflows/*.yml` CI wiring for the standalone aggregator
-- Headless live-pipeline verification (requires Node + Playwright + Claude Code in CI); currently covered by the aggregator-scenario simulation in `test_pipeline_e2e.py` and the opt-in `TestPlaywrightSmoke` test
-
-## Review
-
-**Outcome:** All 5 research recommendations (docs/QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md) and all 10 architectural gaps surfaced during the orchestration review landed in `feat/testing-pipeline-overhaul`. No new skill/agent names — every change updates an existing pattern in-place so downstream projects replace via the same filenames.
-
-**Verification**
-- `pytest scripts/tests/` → 1081 passed, 58 skipped (up from 1047; +34 new across Phases F/G/H)
-- `workflow_quality_gate_validate_patterns.py` → PASSED (1 informational warning: `auto-verify` 506 lines, within the 500–1000 "warning zone" per pattern-self-containment.md)
-- `dedup_check.py --validate-all` → Registry validation passed
-- `generate_docs.py` idempotency → diff reduces to a timestamp-only change (pre-existing behavior; generator uses `datetime.now()` not git HEAD commit time)
-
-**Lessons captured** → `.claude/tasks/lessons.md`

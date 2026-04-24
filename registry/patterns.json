@@ -85,7 +85,7 @@
     "tier": "must-have"
   },
   "agent-orchestration": {
-    "hash": "0a1e2db5eea5a35b7f5ba27f59761e54c0222d5fc8de278132ee8f826dea8150",
+    "hash": "01fd7bc1aa9e8fd2f51d1dbfcdb78378b9366133a8637425efafc6f4c5d69c93",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -1669,23 +1669,27 @@
     "tier": "nice-to-have"
   },
   "failure-triage-agent": {
-    "hash": "038ca8859efd84d936f9056dace90aea63ba843d59dd6b539ee69f77e25773b7",
+    "hash": "6ef83710399a30d3c537be60e111a57376f3875e02ef7823657e50be7e3768a7",
     "type": "agent",
     "category": "core",
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
-    "description": "T2B sub-orchestrator skeleton for the three-lane test pipeline (PR1). Returns no-op contract; full triage subgraph (analyzer fan-out → issue-manager → fixer → serialize → escalation) activates in PR2.",
+    "description": "DEPRECATED 2026-04-24. Three-fan-out design (analyzer/issue-manager/fixer via batched Agent()) is platform-incompatible (Anthropic docs: subagents cannot spawn other subagents). Use /test-pipeline instead; Phase 3 will inline triage logic into skill-at-T0.",
     "tags": [
       "testing",
       "orchestration",
-      "triage"
+      "triage",
+      "deprecated"
     ],
-    "changelog": "v1.0.0: PR2 body activation (full triage subgraph); was v0.1.0 PR1 skeleton",
-    "tier": "must-have"
+    "changelog": "v1.0.0: PR2 body activation (full triage subgraph); was v0.1.0 PR1 skeleton. v1.1.0 (2026-04-24): deprecated — platform does not support nested Agent() dispatch; Phase 3 will dissolve into /test-pipeline skill body.",
+    "tier": "must-have",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "fastapi-api-tester-agent": {
     "hash": "f3d83c674aabc2f0dd45956a870b0962de39ac4e41ed00a1e4043de45510a75a",
@@ -2646,7 +2650,7 @@
     "tier": "nice-to-have"
   },
   "pattern-structure": {
-    "hash": "c5622c8cc099f2dd2c88603b884b9bf835e08ca5154048a2fe72dd1eae7e2a50",
+    "hash": "2704f85cd7f124fb00a0c0140c1fa7faf4018c89f8104297b67485f921fec41d",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -4066,7 +4070,7 @@
     "tier": "nice-to-have"
   },
   "test-pipeline": {
-    "hash": "a74f2324a950e93dc92955e151f31d5d170fb072167fbe04f298f9c05aebdcb3",
+    "hash": "472b23dfd5e65bfb068b707b7e9094943e1bee35100c912f37940e9eb520037c",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -4090,17 +4094,20 @@
     "tier": "must-have"
   },
   "test-pipeline-agent": {
-    "hash": "2829c984adf2da033b40c6a53b3658f335dbbd8b5a35071d104666486df9dad3",
+    "hash": "76efcf131f66aa4b77427c63d47b120a9c0f1424d3f00c824a2d9aa65773cd0c",
     "type": "agent",
     "category": "core",
-    "version": "4.3.0",
+    "version": "4.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
     "tier": "must-have",
-    "description": "Orchestrates the full test verification pipeline: cleanup, stage dispatch, gate enforcement, and result aggregation. Use when you need to run the"
+    "description": "DEPRECATED 2026-04-24. Three-lane design (scout + Wave 1 functional+API parallel + Wave 2 UI + T2B triage, all via nested Agent()) is platform-incompatible (Anthropic docs: subagents cannot spawn other subagents). Use /test-pipeline instead; Phase 3 will dissolve into skill-at-T0.",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "test-scout-agent": {
     "hash": "63bca56ea25b68b8533812d601fa81aa77173dcf16ec1d50db90eb15cb523841",
@@ -4153,43 +4160,51 @@
     "tier": "must-have"
   },
   "testing-pipeline-master-agent": {
-    "hash": "2bdd42d43fccdbd766ba432dd72056e50815ca412983f018afcb729e9872329a",
+    "hash": "0eb00257632efa122e8d9d4c7a81b4df7ee6cd5fcaf4b0894938be7b2799dfb1",
     "type": "agent",
     "category": "core",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
-    "description": "Orchestrate the full testing workflow: TDD, fix-loop, auto-verify, E2E, quality gates. Screenshot verdict authority for UI tests.",
+    "description": "DEPRECATED 2026-04-24. T1 workflow master design that dispatches T2 sub-orchestrators via Agent() is platform-incompatible (Anthropic docs: subagents cannot spawn other subagents). Use /test-pipeline instead; Phase 3 will dissolve into skill-at-T0 body.",
     "tags": [
       "orchestration",
       "workflow",
       "testing",
-      "verification"
+      "verification",
+      "deprecated"
     ],
-    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority. v2.0.0 (2026-04-22): promoted to must-have — T1 orchestrator must match its must-have T2 child test-pipeline-agent for the full workflow to be provisioned coherently. E2E sub-step auto-skips when no_ui_tests so non-Playwright projects absorb zero overhead.",
-    "tier": "must-have"
+    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority. v2.0.0 (2026-04-22): promoted to must-have — T1 orchestrator must match its must-have T2 child test-pipeline-agent for the full workflow to be provisioned coherently. E2E sub-step auto-skips when no_ui_tests so non-Playwright projects absorb zero overhead. v3.1.0 (2026-04-24): deprecated — platform does not support nested Agent() dispatch; Phase 3 will dissolve into /test-pipeline skill body at T0.",
+    "tier": "must-have",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "testing-pipeline-workflow": {
-    "hash": "e42f757fefcec3f482ded518eceecb168be6f95b051674e72cafea160c409e80",
+    "hash": "eee314489377a657072a959204d8c1c6e6df0b29536d8e6c474e5c9f0c7d432c",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
-    "description": "Slash-command wrapper for testing-pipeline-master-agent. Full test verification chain from TDD through quality gates.",
+    "description": "Run the legacy full-verification chain via testing-pipeline-master-agent. DEPRECATED 2026-04-24 — use /test-pipeline instead; this wrapper's dispatched agent has a tiered design that cannot execute on current Claude Code (subagents cannot spawn other subagents, per Anthropic docs).",
     "tags": [
       "orchestration",
       "workflow",
-      "testing"
+      "testing",
+      "deprecated"
     ],
-    "changelog": "v1.0.0: Initial release — testing pipeline skill wrapper",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release. v1.3.0 (2026-04-24): deprecated — replaced by /test-pipeline per subagent-dispatch-platform-limit remediation Phase 1.",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "trace-test": {
     "hash": "dbf4a700c41c687c1317c6272f93e728cc31992b1ed724fed9b0216301218516",

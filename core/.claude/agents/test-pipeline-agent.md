@@ -1,18 +1,22 @@
 ---
 name: test-pipeline-agent
 description: >
-  T2A sub-orchestrator for the three-lane test pipeline (PR1 of test-pipeline-three-lane-spec).
-  Dispatches `test-scout-agent` (classify mode) → Wave 1 (functional + API lanes in parallel)
-  → Wave 2 (UI/Visual lane) → JOIN per-test gate → dispatches `failure-triage-agent` (T2B)
-  with consolidated failure set → bubbles up to T1 (`testing-pipeline-master-agent`).
-  Owns sub-state file `.workflows/testing-pipeline/sub/test-pipeline.json` (schema 2.0.0).
-  Reads pipeline config from `.claude/config/test-pipeline.yml`.
-  PR1 scope: lanes + JOIN; T2B is no-op skeleton (full triage activates in PR2).
+  DEPRECATED 2026-04-24 — this agent's nested-dispatch design (scout + three lanes
+  + T2B triage, all via Agent()) is platform-incompatible (Anthropic docs: subagents
+  cannot spawn other subagents). Use /test-pipeline instead. Phase 3 of the 2026-04-24
+  remediation will dissolve this agent into the /test-pipeline skill body running
+  at T0. Historical purpose: T2A three-lane orchestrator for the test-pipeline-three-lane
+  spec (scout → Wave 1 functional+API parallel → Wave 2 UI → JOIN → T2B triage).
+deprecated: true
+deprecated_by: test-pipeline
+deprecated_at: "2026-04-24"
 tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
 model: inherit
 color: blue
-version: "4.3.0"
+version: "4.4.0"
 ---
+
+> **Deprecated 2026-04-24.** This agent's design depends on nested `Agent()` dispatch — it calls `test-scout-agent`, two Wave 1 lane workers in parallel, a Wave 2 UI worker, and `failure-triage-agent`, all via `Agent(subagent_type=…)` from inside a subagent session. Anthropic's platform ([official docs](https://code.claude.com/docs/en/sub-agents)) explicitly forbids this: *"subagents cannot spawn other subagents."* Every nested dispatch in this file silently inlines at runtime, collapsing the three-lane parallelism into a single serial subagent session — the exact failure mode observed in the 2026-04-24 testbed run. See `agent-orchestration.md` §2 for the platform-constraint note. Phase 3 of the 2026-04-24 remediation will restructure `/test-pipeline` as a skill whose body is injected into the user's T0 session, where `Agent()` is actually available, so Wave 1 can truly dispatch functional + API workers in parallel. Do not invoke in new workflows. The agent file remains for the 2-version-cycle deprecation window defined in `pattern-structure.md`.
 
 ## NON-NEGOTIABLE
 

@@ -45,6 +45,57 @@ consolidation, pinned-content tests are valuable regression nets — migrate
 the assertions to the new authoritative location. Deleting them loses the
 regression surface; skipping them masks drift.
 
+## 2026-04-24 — Platform constraints cascade: one broken primitive can invalidate an entire architectural pattern
+
+**Surfaced during:** Blast-radius audit after Phase 1 of the subagent-dispatch-platform-limit remediation. Expected scope was 3 agents + 2 skills (test pipeline). Actual scope is ~30 files across the entire hub.
+
+**What I expected:** The nested-`Agent()`-dispatch bug was confined to the testing pipeline, because that's where I first saw it surface in the 2026-04-24 testbed run. Phase 1 deprecated 3 agents and 1 skill; Phase 3 would dissolve them into a single T0 skill. Bounded and tractable.
+
+**What actually happened:** The bug is the entire **workflow-master pattern** used by 8 workflows in `config/workflow-contracts.yaml`. Every `<workflow>-master-agent` declares `sub_orchestrators:` in the workflow contract and assumes it can dispatch them via `Agent()` at runtime — but every one of those masters is itself dispatched by a slash-command skill, making them subagents without `Agent` tool access. The test pipeline was just the first failure mode to surface, not the only one.
+
+Concrete blast radius:
+- 7 non-deprecated master-agents (`code-review`, `debugging-loop`, `development-loop`, `documentation`, `learning-self-improvement`, `session-continuity`, `skill-authoring`) all silently inlining their "sub-orchestrator" dispatches
+- 8 slash-command skills wrapping them
+- 8 `workflow-contracts.yaml` entries with stale `sub_orchestrators:` lists
+- 3 standalone orchestrators (`project-manager-agent`, `parallel-worktree-orchestrator-agent`, `e2e-conductor-agent`) with similar assumptions
+- 1 template (`workflow-master-template.md`) that seeds the broken pattern for future copy-paste
+- Manual docs (`README.md`, `docs/specs/*`, `docs/plans/*`) describing the tier model
+
+Total ~30 files, ~9 PRs, ~3000-4000 lines net to retire the pattern cleanly.
+
+**Generalizable rule:** When a finding invalidates a foundational primitive (here: nested subagent dispatch), scope the remediation by the **pattern that depends on the primitive**, not by the specific instance where the failure first surfaced. Run a blast-radius grep BEFORE planning fix scope — especially grep for the primitive's signatures (`Agent(subagent_type=…)`, `Agent` in `tools:`, pattern-specific config keys like `sub_orchestrators:`). The first failure mode is rarely the only failure mode.
+
+**How to apply next time:**
+1. After a platform/foundation finding, immediately audit for all consumers of the broken primitive — don't wait to "stumble into" the rest
+2. Prefer a template-first remediation (fix the pattern in one template, then propagate per-consumer) over a flat instance-by-instance rewrite — template-first prevents re-introduction via future copy-paste
+3. Expand the plan document (not the original PR) when scope grows — keep individual PRs small even if the overall plan is large; use the todo.md expansion to track the whole
+4. Run an eval gate after the first full consumer migration (canary) to validate the pattern holds before committing to migrating the rest
+
+**Evidence on disk:**
+- Audit findings: `.claude/tasks/todo.md` § "Phase 1.5 — Blast-radius audit"
+- Primary-probe lesson (the foundation finding): earlier entry in this file (2026-04-24, Parallel tool dispatch restrictions)
+- Workflow-contracts.yaml: 8 workflows declaring `sub_orchestrators:` as of this session
+
+## 2026-04-24 — Parallel tool dispatch in Claude Code is more restricted than prompt-engineering guidance suggests
+
+**Surfaced during:** Phase 0 empirical probe for the subagent-dispatch-platform-limit remediation, session 2026-04-24.
+
+**What I expected:** Multiple tool calls issued in a single assistant message would execute in parallel, per the common Claude Code prompt directive ("make all independent tool calls in parallel"). A reviewer (anthropic-multi-agent-reviewer-agent) specifically claimed that parallel `Skill()` calls in one orchestrator message would preserve the testing-pipeline Wave 1 (functional+API lanes concurrent) — and that this was the cheap alternative to an external script wrapper.
+
+**What actually happened:** Empirical probes in both a dispatched `general-purpose` subagent session AND my own T0 session measured:
+- Two `Bash` calls with 3-second sleeps issued in one message → **serial** (7s and 10s gaps respectively between end-of-A and start-of-B)
+- Two `Skill` calls in one message → **blocked from concurrent execution**; `Skill` appears to inject the target SKILL.md into the caller's next user-turn context, creating a serial prompt queue in the same session (no new subagent context, no concurrency)
+- Two `Read` calls → returned in the same turn, but Read is fast enough that parallelism vs serialism is unobservable from timing
+- Two `Agent` calls in one message at T0 → confirmed parallel (documented + standard), but unavailable in subagent sessions per Anthropic's official docs (https://code.claude.com/docs/en/sub-agents — "subagents cannot spawn other subagents")
+
+**Generalizable rule:** In Claude Code, "parallel tool calls in one message" is only reliably parallel for `Agent()` dispatched from the T0 user session. `Bash`, `Skill`, and most other tools appear to be serialized by the runtime regardless of session level, at least on Windows/Opus 4.7 at the hub's current version. Any architecture that assumes parallel `Bash`/`Skill` from a dispatched subagent WILL run serially at runtime. Verify parallelism empirically with nanosecond timestamps before designing around it — don't trust the "issue in one message → parallel" folklore.
+
+**Downstream implication:** For the testing-pipeline refactor, Wave 1 (functional + API in parallel) requires one of three non-obvious paths: (1) move the orchestrator to T0 so the user's session dispatches lane subagents via `Agent()`, (2) externalize via a shell-script wrapper running `claude -p` twice, or (3) accept serial Wave 1. Parallel `Skill()` from the orchestrator is NOT a viable option. The reviewer's premise was wrong.
+
+**Evidence on disk:**
+- Subagent probe transcript: returned inline in session 2026-04-24 (T2 of session 2)
+- T0 timings: A=1777025367927028600→1777025371086561100, B=1777025381209802100→1777025384403795200 (10.12s gap)
+
 ## 2026-04-24 — Registry hash field was dead data; wire enforcement or drop the field
 
 **Surfaced during:** Tech-debt cleanup after REQ-S004 (analyzer v2.3.0). A

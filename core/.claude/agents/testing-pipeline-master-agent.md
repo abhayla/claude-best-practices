@@ -1,17 +1,23 @@
 ---
 name: testing-pipeline-master-agent
 description: >
-  Orchestrate the full testing workflow: TDD red phase, fix-loop iterations,
-  auto-verification with screenshot proofs, E2E queue-based testing with
-  dual-signal verdicts, quality gates, and post-fix commit. Use when running
-  the complete test verification chain, or when dispatched by
-  `project-manager-agent` for Stages 6-8. Works standalone or as a pipeline
-  worker. Owns cleanup, aggregation, and GitHub Issue creation for known_issues.
+  DEPRECATED 2026-04-24 — this agent's tiered-dispatch design is platform-incompatible
+  (Anthropic docs: subagents cannot spawn other subagents). Use /test-pipeline
+  instead. Phase 3 of the 2026-04-24 remediation will dissolve this agent into
+  the /test-pipeline skill-at-T0 body. Historical purpose: orchestrate the full
+  testing workflow (TDD → fix → verify → E2E → quality → commit) by dispatching
+  T2 sub-orchestrators; the dispatches never worked at runtime because Agent is
+  not forwarded to subagents.
+deprecated: true
+deprecated_by: test-pipeline
+deprecated_at: "2026-04-24"
 tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
 model: inherit
 color: blue
-version: "2.1.0"
+version: "2.2.0"
 ---
+
+> **Deprecated 2026-04-24.** This agent was designed as a T1 workflow master that dispatches T2 sub-orchestrators (`test-pipeline-agent`, `e2e-conductor-agent`) via `Agent()`. Anthropic's platform does not forward `Agent` to dispatched subagents ([official docs](https://code.claude.com/docs/en/sub-agents): *"subagents cannot spawn other subagents"*) — see `agent-orchestration.md` §2 for the full platform-constraint note. Every nested dispatch in this file's body silently inlined at runtime, producing serial work in place of the intended parallel orchestration. Phase 3 of the 2026-04-24 remediation will dissolve this agent's logic into the `/test-pipeline` skill body, which runs at T0 where `Agent()` is actually available. Do not invoke in new workflows. The agent file remains for the 2-version-cycle deprecation window defined in `pattern-structure.md`.
 
 ## NON-NEGOTIABLE
 
