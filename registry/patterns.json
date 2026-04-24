@@ -3668,13 +3668,13 @@
     "tier": "nice-to-have"
   },
   "skill-authoring-master-agent": {
-    "hash": "133bd16cf03237e002c06b44fee62ca9accc48d2026216098fd51d55ffa6c548",
+    "hash": "7cb975dc8da3502c6aab92ee721b543e652612b252fc446111f7fbee02fd1a9a",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Orchestrate skill creation, validation, and registration. Enforces overlap detection and mandatory quality gates.",
@@ -3683,17 +3683,19 @@
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.8 \u2014 final workflow-master retirement)",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "skill-authoring-workflow"
   },
   "skill-authoring-workflow": {
-    "hash": "6595046d19c6bb827e88deedced22a1fa347ebcca5da35e4b121202f31183c4f",
+    "hash": "2818c83d8ca018860d79b6ea06d2b0f84ddc2f0c7580fbc7fa970be2d3c2d39f",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Slash-command wrapper for skill-authoring-master-agent. Pattern creation with overlap detection and quality gates.",
@@ -3702,7 +3704,7 @@
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 \u2014 final workflow-master retirement)",
     "tier": "nice-to-have"
   },
   "skill-evaluator": {

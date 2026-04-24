@@ -327,12 +327,13 @@ workflows:
         reason: "New skill proposals detected — author and validate them"
 
   skill-authoring:
-    description: "Author → validate → place → register new skills, agents, and rules"
-    master_agent: skill-authoring-master-agent
+    description: "Overlap-check → author → validate → register — skill-at-T0 orchestrator (Phase 3.8, spec v2.2). Final workflow-master retirement."
+    master_agent: null
+    entry_skill: skill-authoring-workflow
     state_file: ".workflows/skill-authoring/state.json"
-    sub_orchestrators:
-      - agent: skill-author-agent
-        role: "Skill creation and maintenance"
+    # skill-author-agent dispatched directly from T0 by the skill body
+    # (optional, STEP 2a for richer drafts). Worker only.
+    sub_orchestrators: []
     steps:
       - id: author
         skill: writing-skills

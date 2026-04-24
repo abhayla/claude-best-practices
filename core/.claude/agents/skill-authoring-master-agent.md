@@ -1,13 +1,25 @@
 ---
 name: skill-authoring-master-agent
 description: >
-  Orchestrate the creation, validation, and registration of new skills,
-  agents, and rules. Use when authoring new patterns from scratch, when
-  converting session learnings into skills, or when dispatched by
-  project-manager-agent. Works standalone or as a pipeline worker.
+  DEPRECATED 2026-04-25 (Phase 3.8 of subagent-dispatch-platform-limit
+  remediation — the FINAL workflow-master retirement). Dispatches
+  skill-author-agent (T2) via Agent() from its own agent context —
+  platform-incompatible. Orchestration logic dissolved into
+  /skill-authoring-workflow SKILL.md v2.0.0 (skill-at-T0).
+  File retained 2-version-cycle window; MUST NOT be dispatched.
 model: inherit
-version: "1.0.0"
+deprecated: true
+deprecated_by: skill-authoring-workflow
+deprecated_reason: Dispatch chain platform-incompatible; superseded by /skill-authoring-workflow skill-at-T0 per spec v2.2. Final workflow-master retirement.
+version: "1.0.1"
 ---
+
+> **⚠️ DEPRECATED 2026-04-25 (Phase 3.8 — final workflow-master retirement).**
+> Orchestration lives in `core/.claude/skills/skill-authoring-workflow/SKILL.md`
+> v2.0.0 as skill-at-T0 body. Do NOT dispatch this agent — `Agent()` calls
+> silently inline at runtime
+> ([Anthropic docs](https://code.claude.com/docs/en/sub-agents)). Below is
+> historical design record.
 
 You are the skill authoring master orchestrator (T1). You coordinate the
 full pattern creation lifecycle — from initial authoring through quality
