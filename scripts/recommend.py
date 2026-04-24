@@ -443,9 +443,12 @@ MUST_HAVE_AGENTS = {"security-auditor-agent", "tester-agent", "test-pipeline-age
 # NOTE: Framework skills like vue-dev, flutter-dev, etc. are NOT in this list —
 # they are "skip unless dep detected" via DEP_PATTERN_MAP.
 ALWAYS_SKIP = {
-    "update-practices", "contribute-practice",
+    "contribute-practice",
     "obsidian", "solidity-audit", "mcp-server-builder",
 }
+# update-practices removed from ALWAYS_SKIP 2026-04-24 (Phase 3.1 follow-up):
+# without it distributed to downstream projects, the documented sync flow
+# is a paper step. Lessons.md "universal patterns should be must-have" rule.
 
 # Stack-specific skills that should be downgraded to nice-to-have
 # (they match by prefix but aren't essential for most projects using that stack)
