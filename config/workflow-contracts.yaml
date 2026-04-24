@@ -144,14 +144,14 @@ workflows:
         reason: "Tests passing, quality verified — ready for review"
 
   debugging-loop:
-    description: "Bug diagnosis → structured debugging → fix → verify → learn"
-    master_agent: debugging-loop-master-agent
+    description: "Bug diagnosis → fix → verify → learn — skill-at-T0 orchestrator (Phase 3.3, spec v2.2)."
+    master_agent: null
+    entry_skill: debugging-loop
     state_file: ".workflows/debugging-loop/state.json"
-    sub_orchestrators:
-      - agent: debugger-agent
-        role: "Targeted bug diagnosis"
-      - agent: test-failure-analyzer-agent
-        role: "Failure classification"
+    # debugger-agent and test-failure-analyzer-agent dispatched directly from
+    # T0 by the skill body (STEP 2a + 2c). Not sub-orchestrators — they don't
+    # dispatch further (platform constraint; see agent-orchestration.md §2).
+    sub_orchestrators: []
     steps:
       - id: diagnose
         skill: systematic-debugging

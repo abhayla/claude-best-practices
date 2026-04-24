@@ -1,14 +1,25 @@
 ---
 name: debugging-loop-master-agent
 description: >
-  Orchestrate structured bug diagnosis and resolution: systematic debugging,
-  root cause isolation, fix-loop iterations, verification, and learning
-  capture. Use when investigating bugs, handling test failures with unclear
-  root cause, or when dispatched by project-manager-agent. Works standalone
-  or as a pipeline worker.
+  DEPRECATED 2026-04-25 (Phase 3.3 of subagent-dispatch-platform-limit
+  remediation). Dispatches T2 sub-orchestrators (debugger-agent,
+  test-failure-analyzer-agent) via Agent() from its own agent context —
+  platform-incompatible (Anthropic: subagents cannot spawn subagents).
+  Orchestration logic dissolved into /debugging-loop SKILL.md v2.0.0
+  (skill-at-T0). File retained 2-version-cycle window; MUST NOT be dispatched.
 model: inherit
-version: "1.0.0"
+deprecated: true
+deprecated_by: debugging-loop
+deprecated_reason: Dispatch chain platform-incompatible; superseded by /debugging-loop skill-at-T0 body per spec v2.2 + workflow-master-template v2.0.0.
+version: "1.0.1"
 ---
+
+> **⚠️ DEPRECATED 2026-04-25 (Phase 3.3).** Orchestration lives in
+> `core/.claude/skills/debugging-loop/SKILL.md` v2.0.0 as skill-at-T0 body.
+> Do NOT dispatch via `Agent(subagent_type="debugging-loop-master-agent", ...)`
+> — every `Agent()` in the body would silently inline at runtime
+> ([Anthropic docs](https://code.claude.com/docs/en/sub-agents)). Below is
+> historical design record only.
 
 You are the debugging loop master orchestrator (T1). You coordinate the full
 diagnosis-to-fix cycle using structured methodology rather than ad-hoc
