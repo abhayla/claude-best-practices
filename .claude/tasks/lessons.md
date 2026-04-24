@@ -78,3 +78,71 @@ projects whose `.claude/config/test-pipeline.yml` lacks an `auto_heal:`
 block will now hit the REQ-S004 fail-safe fallback — WARN logs +
 `ISSUE_ONLY` defaults. Pick this up in the next `sync-to-projects` pass
 so downstream maintainers add the block.
+
+## 2026-04-24 — Agent `tools:` frontmatter MUST be a YAML list, not scalar
+
+**Surfaced during:** v2-pipeline-testbed autonomous run Phase 5a finding —
+`failure-triage-agent` and `github-issue-manager-agent` were NOT
+discoverable as `subagent_type` despite being present on disk post-
+provisioning. Pipeline dispatch silently collapsed to inline execution
+at T1; outputs looked right but the 4-tier architectural invariant
+(REQ-M006 / M009 / M013) was broken.
+
+**Root cause:** 6 agents declared `tools: "Agent Bash Read Write Edit
+Grep Glob Skill"` — a space-separated scalar. Claude Code's agent
+discovery requires the YAML list form `tools: ["Agent", "Bash", ...]`.
+The scalar parses as a single string and the agent is not exposed as a
+valid `subagent_type`.
+
+**What was wrong about the existing test:** `test_orchestrator_tool_grants.py`'s
+`_tools_set()` accepted BOTH forms as equivalent (split the string on
+whitespace). So the test would pass for agents with the broken scalar
+form, never catching the discovery failure.
+
+**Generalizable rule:** When a test pins an invariant by reading a
+normalized view of the data, the normalization step can silently accept
+the broken form. Reviewing the test's failure cases (what SHOULD make
+it fail) is as important as reviewing the assertion.
+
+**Resolution:** `_tools_set()` now raises TypeError on scalar input;
+`pattern-structure.md` rule shows list form as canonical; all 6
+affected agents fixed; pins expanded to cover failure-triage-agent and
+github-issue-manager-agent. Committed `f5036c6`.
+
+## 2026-04-24 — Runtime is the arbiter when docs and runtime disagree
+
+**Surfaced during:** Phase 2b finding "Config naming mismatch (TIMEOUT
+vs TIMING)" — widened grep revealed: analyzer `category` output
+(SELECTOR, TIMEOUT, ASSERTION_FAILURE...), spec §3.6 matrix
+(BROKEN_LOCATOR, TIMEOUT_TIMING...), and config `auto_heal:` keys all
+used slightly-different names for overlapping concepts. Three
+taxonomies, none aligned.
+
+**What I got wrong initially:** treated as a 1-pair naming fix. Broader
+grep exposed 6 mismatched pairs + 60 eval scenario files with old names.
+
+**What to do instead:** when documentation and runtime disagree, the
+runtime is the source of truth. Align docs to what actually runs, not
+the reverse. But be honest about scope — updating 60 eval fixtures in
+the same pass as a runtime fix is scope creep. Commit runtime
+alignment; call out the deferred fixture cleanup explicitly.
+
+**Resolution:** Config + spec §3.6 + §3.13 aligned to analyzer
+categories. Eval scenarios + `_gen_pr2_evals.py` + research docs
+DEFERRED (still reference old names but don't affect runtime —
+they're evaluated via /agent-evaluator, not pytest). Committed `c6dac7d`.
+
+## 2026-04-24 — Provisioning tier gap: must-have-only default hides upgrades
+
+**Surfaced during:** Phase 0 P0c FAIL — `recommend.py --provision` default
+(`--tier must-have`) "listed but did not apply" prompt-logger hook
+(nice-to-have) and the updated test-pipeline.yml config.
+
+**What to do instead:** When a pattern benefits every Claude Code
+session regardless of project type, tier it `must-have` so downstream
+projects get it on default provision. Universal hooks and ubiquitous
+configs should not wait for a user to opt into `--tier nice-to-have`.
+
+**Resolution:** prompt-logger promoted to must-have; `test-pipeline`
+added to CONFIG_SKILL_MAP so its config inherits must-have tier.
+Committed `2e71a6e`.
