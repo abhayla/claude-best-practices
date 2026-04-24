@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-24 19:36 UTC (auto-generated)
+> Last updated: 2026-04-24 19:47 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -199,8 +199,8 @@
 | security-baseline | rule | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | serialize-fixes | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
-| session-continuity | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| session-continuity-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| session-continuity | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| session-continuity-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | session-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-summarizer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-author-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | writing-skills, pattern-structure |
