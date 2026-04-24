@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-24 16:50 UTC (auto-generated)
+> Last updated: 2026-04-24 17:20 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -226,7 +226,7 @@
 | test-healer-agent | agent | 2.3.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| test-pipeline | skill | 2.1.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
+| test-pipeline | skill | 2.1.1 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
 | test-pipeline-agent | agent | 4.4.0 | hub:abhayla/claude-best-practices | — |
 | test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | — |
