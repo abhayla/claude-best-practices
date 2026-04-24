@@ -134,11 +134,9 @@ class TestContractFilesExist:
         )
 
 
-# Workflows still using the legacy master-agent pattern (Phases 3.1-3.7 have
-# retired 7 workflows to skill-at-T0; Phase 3.8 retires the last one).
-MASTER_AGENT_WORKFLOWS = [
-    "skill-authoring",
-]
+# All 8 workflows have now migrated to the skill-at-T0 pattern
+# (Phases 3.1-3.8 completed 2026-04-25). Legacy master-agent pattern retired.
+MASTER_AGENT_WORKFLOWS = []
 
 # Workflows that have migrated to the skill-at-T0 pattern (spec v2.2).
 # master_agent is null; entry_skill names the skill-at-T0 orchestrator.
@@ -149,7 +147,8 @@ SKILL_AT_T0_WORKFLOWS = [
     "code-review",              # Phase 3.4 (PR #30)
     "documentation",            # Phase 3.5 (PR #31)
     "session-continuity",       # Phase 3.6 (PR #32)
-    "learning-self-improvement",# Phase 3.7 (this PR)
+    "learning-self-improvement",# Phase 3.7 (PR #33)
+    "skill-authoring",          # Phase 3.8 (this PR) — final workflow-master retirement
 ]
 
 
