@@ -447,10 +447,13 @@ class TestOrchestrationRule:
     def test_rule_mentions_key_constraints(self):
         content = _read_file(ORCHESTRATION_RULE)
         constraints = [
-            "Tiered Nesting",      # tiered nesting model
-            "Externalize",         # externalize DAGs
-            "retry budget",        # global retry budget
-            "Single State",        # single state location
+            "Single-Level Dispatch",  # §2 — retired the 4-tier nesting model
+                                      # after 2026-04-24 platform finding
+                                      # (subagents cannot spawn other subagents);
+                                      # see lessons.md 2026-04-24 entry
+            "Externalize",            # §4 — externalize DAGs
+            "retry budget",           # §5 — global retry budget
+            "Single State",           # §6 — single state location
         ]
         for c in constraints:
             assert c.lower() in content.lower(), (

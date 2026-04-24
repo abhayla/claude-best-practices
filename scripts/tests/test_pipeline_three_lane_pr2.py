@@ -186,10 +186,22 @@ def test_failure_triage_agent_full_body_replaces_skeleton():
 
 
 def test_failure_triage_agent_version_bumped_to_1_0_0():
+    # Historical sentinel: PR1 was 0.1.0; PR2 activation bumps to 1.0.0.
+    # Bumped to 1.1.0 on 2026-04-24 for deprecation marker — the agent's
+    # nested-dispatch design is platform-incompatible (see lessons.md
+    # 2026-04-24 entry). Assertion relaxed to "major >= 1" — retains the
+    # regression surface that PR2 activation shipped, without re-pinning
+    # every subsequent patch.
     body = (AGENTS_DIR / "failure-triage-agent.md").read_text(encoding="utf-8")
     fm = body.split("---")[1]
     version_line = next(line for line in fm.splitlines() if line.startswith("version:"))
-    assert "1.0.0" in version_line, "PR1 was 0.1.0; PR2 activation bumps to 1.0.0"
+    # Parse out the "X.Y.Z" value, accepting optional quotes
+    version_value = version_line.split(":", 1)[1].strip().strip('"').strip("'")
+    major = int(version_value.split(".")[0])
+    assert major >= 1, (
+        f"PR2 activation required major >= 1 (found {version_value}); "
+        f"PR1 was 0.1.0"
+    )
 
 
 # ── T1 atomic switchover (REQ-M011, success criteria #20, #26) ────────────────

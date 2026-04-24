@@ -1,6 +1,7 @@
 ---
 name: testing-pipeline-workflow
 description: >
+  Run the legacy full-verification chain via testing-pipeline-master-agent.
   DEPRECATED 2026-04-24 — use /test-pipeline instead. This skill dispatches
   testing-pipeline-master-agent, whose design assumes nested subagent
   dispatch; Anthropic's platform does not support that (subagents cannot
