@@ -5,7 +5,10 @@
 - Author: Claude Code (Opus 4.7)
 - Date: 2026-04-24
 - Status: **PROPOSED** — planning spec for Phase 3.1 of the subagent-dispatch-platform-limit remediation. Implementation will land in a subsequent PR; this doc is the design that PR encodes.
-- Version: 2.0 (draft)
+- Version: 2.1 (draft)
+- Revision history:
+  - 2.0 (2026-04-24) — initial draft; encodes skill-at-T0 design from Phase 3.0 template
+  - 2.1 (2026-04-24) — traceability audit against v1 found 2 concrete gaps + 5 unclear-ownership items; this revision addresses all of them. Specifically: REQ-S002 `--update-baselines` flag added to CLI signature; REQ-S006 UI-lane early-start checkpoint preserved with T0 polling logic; REQ-M015 + §3.5 NN-3 dispatch-budget ownership explicitly assigned to T0; REQ-M035 validator allowlist disposition specified; §3.3 lane-skip rule restated.
 - Supersedes: `docs/specs/test-pipeline-three-lane-spec.md` (v1.7) — v1's **functional contract is preserved**; only the **dispatch architecture** changes. All v1 requirements (REQ-M001 through REQ-C001) remain in force unless explicitly amended here.
 - Triggered by:
   - `.claude/tasks/lessons.md` 2026-04-24 entry: "Parallel tool dispatch in Claude Code is more restricted than prompt-engineering guidance suggests"
@@ -67,7 +70,7 @@ The orchestrator MUST run at T0 (the user's session). Concretely:
 ```
 /test-pipeline [failure_output] [--capture-proof | --no-capture-proof]
                [--skip-fix] [--only-issues N,M] [--fix-pr-mode]
-               [--full-suite-before-success]
+               [--full-suite-before-success] [--update-baselines]
       ↓
       (skill body injected into T0 session)
       ↓
@@ -95,17 +98,32 @@ The orchestrator MUST run at T0 (the user's session). Concretely:
 │     • Parse return contract; sub-state file now populated       │
 │                                                                 │
 │  STEP 3  WAVE 1 (Functional + API in true parallel)             │
-│     • In a SINGLE T0 message, two Agent() calls:                │
+│     • Skip lane if its queue is empty (REQ-M001 lane skip rule) │
+│       — record synthetic SKIP result, do NOT dispatch            │
+│     • Otherwise, in a SINGLE T0 message, Agent() per lane:      │
 │         Agent(subagent_type=<functional-lane-owner>, prompt="...│
 │         Agent(subagent_type=<api-lane-owner>, prompt="...       │
 │     • Wait for both; read lane JSON artifacts                   │
 │                                                                 │
 │  STEP 4  WAVE 2 (UI/Visual lane)                                │
+│     • Skip if UI queue empty (record SKIP, do NOT dispatch)     │
+│     • Checkpoint-early-start (REQ-S006): if the functional     │
+│       lane writes test-results/functional.ui-tests-complete.    │
+│       flag partway through its run AND lanes.ui.use_checkpoint  │
+│       is true in test-pipeline.yml, T0 polls for the flag       │
+│       (short sleep loop, max 30s) and dispatches visual-        │
+│       inspector-agent as soon as the flag appears — in parallel │
+│       with the still-running functional lane's non-UI tests.   │
+│       Else: wait for Wave 1 to fully return, then dispatch.     │
 │     • Agent(subagent_type=visual-inspector-agent, prompt="      │
 │         ## Lane: ui                                             │
 │         Read screenshots from Wave 1; filter to UI-required     │
 │         tests; dual-signal verdict per spec §3.2")              │
 │     • Read ui.jsonl + ui.json                                   │
+│     • If --update-baselines flag set: visual-inspector-agent    │
+│       overwrites baselines for the captured run instead of      │
+│       comparing — per v1 REQ-S002 semantics. Triage and          │
+│       verify-affected steps SKIP in baseline-update mode.       │
 │                                                                 │
 │  STEP 5  JOIN + per-test report                                 │
 │     • Per-test verdict = AND of applicable lane results         │
@@ -213,6 +231,13 @@ if global_retries_remaining == 0 or failures_unresolved:
 
 Chunking of fan-outs: each chunk is one T0 message with up-to-5 `Agent()` calls. The orchestrator waits for all 5 in a chunk to return, aggregates, then starts the next chunk. Preserves v1's `max_concurrent_*` semantics; honors the `partial_failure_policy: abort_on_first_blocked` rule from v1 §3.7.1 (a single `GITHUB_NOT_CONNECTED` from any issue-manager aborts the entire triage).
 
+**Budget ownership (REQ-M015 + §3.5 NN-3 at T0).** v1 assigned `max_total_dispatches` (default 100) and `max_wall_clock_minutes` (default 90) tracking to `failure-triage-agent` (T2B). With T2B dissolved, the T0 orchestrator assumes these responsibilities:
+
+- `dispatches_used` and `wall_clock_elapsed_minutes` counters live in `.workflows/testing-pipeline/state.json` (the single consolidated state file per §3.4).
+- The T0 orchestrator increments `dispatches_used` by N at each fan-out chunk dispatch (N = chunk size).
+- Before dispatching each chunk, the T0 orchestrator checks `dispatches_used < max_total_dispatches` AND `wall_clock_elapsed_minutes < max_wall_clock_minutes`. If either is exceeded, the chunk is NOT dispatched — instead the pipeline emits a `BLOCKED` contract: `{"result": "BLOCKED", "blocker": "BUDGET_EXHAUSTED", "dispatches_used": N, "wall_clock_elapsed": M}` into `test-results/pipeline-verdict.json`, invokes `/escalation-report`, and returns exit-code-2-equivalent (i.e., a non-zero terminal return to the user's T0 session).
+- Exit-code-2 semantics at T0: since T0 is the user's interactive session, there is no process exit code. Instead the verdict JSON's `result: "BLOCKED"` field IS the signal. The session prints a visible `BLOCKED` banner + the escalation-report path so the user sees the failure before any handoff suggestions.
+
 ### 3.4 State ownership (rewrites v1 §3.4)
 
 v1 had three state files with tiered parent/child ownership: T1 owned `state.json`, T2A owned `sub/test-pipeline.json`, T2B owned a sub-sub-file. Runtime-broken because the children couldn't dispatch; also unnecessary because there's only one orchestrator now.
@@ -245,6 +270,11 @@ Per §2, every v1 requirement remains in force. Selected high-impact pins:
 | REQ-M033 (pre-merge evals gate) | v1 §4 | Preserved — applies to every worker touched in this refactor |
 | Global retry budget (default 15) | v1 §3.4 | Preserved — T0 owns the budget, workers decrement via return contract |
 | `max_concurrent_*` caps | v1 §3.5 | Preserved — enforced as T0 chunk size |
+| REQ-M015 dispatch / wall-clock budget | v1 §3.5 | Preserved — T0 owns `dispatches_used` + `wall_clock_elapsed_minutes` counters in state.json; BLOCKED verdict emitted when exceeded (see §3.3 end) |
+| REQ-M035 orchestrator-responsibility-count validator | v1 §4 | Validator **remains**; allowlist entry for `failure-triage-agent` **removed** when that agent's deprecated file is finally deleted (post-deprecation-window, not in Phase 3.1). Until then the allowlist entry stays pointing at the deprecated file — the validator skips `deprecated: true` agents per Phase 2 design |
+| REQ-S002 `--update-baselines` flag | v1 §3.3 baseline-update mode | Preserved — flag added to §3.1 CLI signature; STEP 4 describes baseline-update semantics; triage + verify-affected SKIP in baseline-update mode |
+| REQ-S006 UI-lane checkpoint early-start | v1 §3.3 REQ-S006 | Preserved — STEP 4 polls for `test-results/functional.ui-tests-complete.flag` when `lanes.ui.use_checkpoint: true` in `test-pipeline.yml` (default false, matching v1); falls back to serial Wave-1-then-Wave-2 otherwise |
+| §3.3 Lane skip rule (empty queue ⇒ no dispatch) | v1 §3.3 NN-4 | Preserved — STEP 3 + STEP 4 explicitly record synthetic SKIP result for empty queues |
 
 ---
 
