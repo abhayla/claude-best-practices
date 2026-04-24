@@ -15,7 +15,27 @@ Problem: `test-pipeline.yml:90-106` declares `auto_heal:` but nothing reads it; 
 - [x] Add `scripts/tests/test_pipeline_auto_heal_req_s004.py` with 11 tests: config enum validation, §3.6 drift check, agent-body references config path, fallback policy declared, ALLOWED values enumerated — all pass
 - [x] Update `registry/patterns.json` analyzer version 2.2.0 → 2.3.0 + changelog entry
 - [x] Run 4 CI gates: dedup_check --validate-all ✅, dedup_check --secret-scan ✅, workflow_quality_gate_validate_patterns ✅, pytest (1257 passed, 60 skipped, 1 xfailed) ✅
-- [ ] Commit as `feat(testing-pipeline): REQ-S004 wire auto-heal matrix through config`
+- [x] Commit REQ-S004 implementation — `8b0cd24`
+- [x] Scaffold REQ-S007 + REQ-S008 (null-default config knobs, new tests) — `c13b745`
+- [x] Annotate spec §5 with ship status + deferral re-confirmation for S009/S010/C001 — `7b3c2d6`
+
+### Review
+
+3 commits on main, all CI gates green across each step:
+- `8b0cd24` — REQ-S004: analyzer v2.3.0, `auto_heal:` config now load-bearing with fail-safe fallback to ISSUE_ONLY, 11 new tests
+- `c13b745` — REQ-S007/S008 scaffolds: null-default config keys + 10 new tests pinning "scaffold doesn't change behavior"
+- `7b3c2d6` — spec v1.7: ship-status + deferral audit trail for all §5 requirements
+
+Deferred (not implemented, with documented triggers):
+- REQ-S009 (merge-aware dedup) — needs ≥30 days prod use or triage-time evidence
+- REQ-S010 (feature-flag PR2 switchover) — window past; only revisit on generalization opportunity
+- REQ-C001 (worktree-per-fixer) — spec §2 rejected this design; needs ≥3 same-file-conflict runs/week before reopening
+
+What could break:
+- A downstream project that relied on the analyzer emitting `recommended_action` from LLM recall will now get config-driven values. If their `.claude/config/test-pipeline.yml` lacks an `auto_heal:` block, they'll see WARN logs and ISSUE_ONLY defaults — intentional fail-safe, but worth flagging in next update-practices pass.
+- `registry/patterns.json` hash for analyzer is stale (file changed, hash not regenerated). `dedup_check.py --validate-all` passed, so not currently enforced — but if hash-drift gating lands later, this will surface.
+
+Nothing pushed. `main` is 3 commits ahead of `origin/main`.
 
 ## Completed
 
