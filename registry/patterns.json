@@ -2339,13 +2339,13 @@
     "tier": "nice-to-have"
   },
   "learning-self-improvement": {
-    "hash": "c9ebc6f34bf654defe0f4aef31ad18961673d5bfd5180523bf6d6a24cc4f4625",
+    "hash": "11f7ee88c29b8dc09dd7d779a4ede6066bc97e9694b7926ea95eabe8a30ca2e4",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Slash-command wrapper for learning-self-improvement-master-agent. Knowledge accumulation and skill proposal generation.",
@@ -2354,17 +2354,17 @@
       "workflow",
       "learning"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7)",
     "tier": "nice-to-have"
   },
   "learning-self-improvement-master-agent": {
-    "hash": "a7303e522f421d40b8069ca7e01fa11fd0f8b894241ac6e77b26f83312bfdda1",
+    "hash": "d9024fe6b606d15b816d31d89359a9727ae5dffb1ebce2628af0d73fddbdef55",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Orchestrate learning capture, pattern detection, and skill generation. Enforces 3+ occurrence threshold for proposals.",
@@ -2373,8 +2373,10 @@
       "workflow",
       "learning"
     ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.7)",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "learning-self-improvement"
   },
   "mcp-server-builder": {
     "hash": "151b891925204bc3a51e083d34395962bf3abaa62339b9103dc8d6c0da74f224",
