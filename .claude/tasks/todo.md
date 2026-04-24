@@ -5,6 +5,72 @@
 
 ## Current Task
 
+### Subagent Dispatch Platform Limit Remediation (2026-04-24 session 2)
+
+Context: three independent probes and Anthropic's official docs confirm
+subagents cannot dispatch further subagents. Current 4-tier dispatch model
+in `core/.claude/rules/agent-orchestration.md` is platform-incompatible.
+Plan refined through anthropic-multi-agent-reviewer-agent audit (grade C);
+Phase 0 empirical probe further narrowed the architectural options.
+
+## Phase 0 — Empirical parallelism probe — ✅ COMPLETE
+
+- [x] 0.1 Dispatched general-purpose subagent probe → findings captured
+- [x] 0.2 T0 self-test (same Bash timing test) → findings captured
+- [x] 0.3 Lessons entry appended — `.claude/tasks/lessons.md`
+- [x] Verdict recorded:
+  - `Bash` ×N in one message → **serial** (10s gap at T0, 7s gap in subagent)
+  - `Skill` ×N in one message → **blocked from concurrent execution** (queues as next-turn prompt injection)
+  - `Agent` ×N at T0 → parallel (documented + confirmed)
+  - `Agent` from subagent → blocked (Anthropic platform constraint)
+
+## BLOCKED ON USER — Wave 1 parallelism strategy decision
+
+Three options:
+- **A — T0-only orchestrator.** `/test-pipeline` becomes a prompt-injection skill; user's T0 session IS the orchestrator; it dispatches two lane subagents via `Agent()` for Wave 1.
+- **B — External script wrapper.** `scripts/run-test-pipeline.sh` spawns two `claude -p` processes for Wave 1; reads JSON artefacts; continues.
+- **C — Accept serial Wave 1.** Simplest. Loses ~2× wall-clock on balanced suites.
+
+Phase 1 streams 1.1 and 1.4 depend on this choice (they make architectural claims in docs). Phase 1 streams 1.2 and 1.3 are strategy-independent and may start immediately.
+
+## Phase 1 — Docs + rename (single PR)
+
+### Strategy-independent streams (may start now)
+
+- [ ] 1.2 Fix T1 contradiction in `testing-pipeline-master-agent.md` — line 44 wins; align `workflow-contracts.yaml`
+- [ ] 1.3 Delete `/testing-pipeline-workflow`; rename `testing-pipeline-master-agent` → `test-orchestrator-agent`; update `registry/patterns.json` + grep all cross-references
+
+### Strategy-dependent streams (wait for user decision)
+
+- [ ] 1.1 Rewrite `agent-orchestration.md` §2 AND Rule 3 — content depends on chosen strategy for Wave 1
+- [ ] 1.4 Amend `pattern-structure.md` Tool Grants — content depends on chosen strategy
+
+### Cross-cutting for Phase 1
+
+- [ ] 1.5 Ship Phase 1 as a single PR (1.1+1.2 MUST be one commit per reviewer's ordering finding)
+
+## Phase 2 — Validator
+
+- [ ] 2.1 Add `dispatched_from:` frontmatter field across all agents
+- [ ] 2.2 Invert `test_orchestrator_tool_grants.py` — context-aware based on `dispatched_from`
+- [ ] 2.3 Runtime-probe integration test with `@pytest.mark.integration`; wire into `validate-pr.yml`
+
+## Phase 3 — Architectural refactor
+
+- [ ] 3.0 Micro-spec: merged `test-orchestrator-agent` responsibilities (exactly 4 per Rule 8), state ownership (Rule 6), Wave 1 dispatch shape (depends on strategy A/B/C)
+- [ ] 3.1 PR 3.1 — merge T2B into orchestrator
+- [ ] 3.2 EVAL GATE — before/after on 50-test representative suite; 5-criterion rubric
+- [ ] 3.3 PR 3.2 — merge T2A three-lane + complexity classifier
+- [ ] 3.4 PR 3.3 — three-lane spec rewrite with executable Skill() examples
+
+## Cross-cutting (throughout all phases)
+
+- [ ] Cutover guard: every Phase 3 PR checks `.workflows/testing-pipeline/` for in-progress runs
+- [ ] Intermediate-state contract: valid `pipeline-verdict.json` between Phase 3 PRs
+- [ ] Principle 2 preservation: NON-NEGOTIABLE contents re-encoded in each `Skill()` dispatch prompt
+
+## Completed sections below (preserved for reference)
+
 ### Prompt Logger Hook (2026-04-24)
 
 Goal: persist every `UserPromptSubmit` prompt to `.claude/tasks/prompts.md` as append-only Markdown. Distributable via `core/.claude/hooks/` so downstream projects get the hook on provision.
@@ -42,111 +108,3 @@ What could break:
 - `core/.claude/tasks/prompts.md` seed ships via provisioning; downstream projects need to add `/.claude/tasks/prompts.md` to their own `.gitignore` — this is documented in the hooks README section but NOT enforced. A `synthesize-project` hook could auto-append the gitignore line, but that widens scope beyond this task.
 
 Nothing pushed. No commit created — awaiting user approval per default policy.
-
-## Completed
-
-### REQ-S004 — Make auto-heal matrix config-driven (2026-04-24)
-
-Spec: `docs/specs/test-pipeline-three-lane-spec.md` §3.6 + §5 SHOULD-HAVE S004.
-Problem: `test-pipeline.yml:90-106` declares `auto_heal:` but nothing reads it; `test-failure-analyzer-agent` NN#6 defers "per spec §3.6" to LLM recall. S004 wires the config through.
-
-- [x] Update `test-failure-analyzer-agent.md`: NN#6 references config path; new "Recommended Action Matrix (Config-Driven)" section describes read procedure + fallback-to-ISSUE_ONLY on missing/invalid config; JSON output example adds `recommended_action`; bump v2.2.0 → v2.3.0
-- [x] Update `core/.claude/config/test-pipeline.yml` comment on `auto_heal:` block to mark it load-bearing (not forward-compat) + spec_ref: REQ-S004
-- [x] Add `scripts/tests/test_pipeline_auto_heal_req_s004.py` with 11 tests: config enum validation, §3.6 drift check, agent-body references config path, fallback policy declared, ALLOWED values enumerated — all pass
-- [x] Update `registry/patterns.json` analyzer version 2.2.0 → 2.3.0 + changelog entry
-- [x] Run 4 CI gates: dedup_check --validate-all ✅, dedup_check --secret-scan ✅, workflow_quality_gate_validate_patterns ✅, pytest (1257 passed, 60 skipped, 1 xfailed) ✅
-- [x] Commit REQ-S004 implementation — `8b0cd24`
-- [x] Scaffold REQ-S007 + REQ-S008 (null-default config knobs, new tests) — `c13b745`
-- [x] Annotate spec §5 with ship status + deferral re-confirmation for S009/S010/C001 — `7b3c2d6`
-
-### Review (REQ-S004)
-
-3 commits on main, all CI gates green across each step:
-- `8b0cd24` — REQ-S004: analyzer v2.3.0, `auto_heal:` config now load-bearing with fail-safe fallback to ISSUE_ONLY, 11 new tests
-- `c13b745` — REQ-S007/S008 scaffolds: null-default config keys + 10 new tests pinning "scaffold doesn't change behavior"
-- `7b3c2d6` — spec v1.7: ship-status + deferral audit trail for all §5 requirements
-
-Deferred (not implemented, with documented triggers):
-- REQ-S009 (merge-aware dedup) — needs ≥30 days prod use or triage-time evidence
-- REQ-S010 (feature-flag PR2 switchover) — window past; only revisit on generalization opportunity
-- REQ-C001 (worktree-per-fixer) — spec §2 rejected this design; needs ≥3 same-file-conflict runs/week before reopening
-
-What could break:
-- A downstream project that relied on the analyzer emitting `recommended_action` from LLM recall will now get config-driven values. If their `.claude/config/test-pipeline.yml` lacks an `auto_heal:` block, they'll see WARN logs and ISSUE_ONLY defaults — intentional fail-safe, but worth flagging in next update-practices pass.
-- `registry/patterns.json` hash for analyzer is stale (file changed, hash not regenerated). `dedup_check.py --validate-all` passed, so not currently enforced — but if hash-drift gating lands later, this will surface.
-
-Nothing pushed. `main` is 3 commits ahead of `origin/main`.
-
-### Testing Pipeline Overhaul (2026-04-22)
-Branch: `feat/testing-pipeline-overhaul` — 9 commits, 40 files, +2237 net lines.
-
-All 8 phases delivered against plan `C:\Users\itsab\.claude\plans\first-of-all-don-t-sparkling-treehouse.md`.
-
-**Phase A — e2e consolidation (skill wraps agent)**
-- [x] `e2e-conductor-agent.md` v1.0.0 → v2.0.0 — absorbed section filter, baseline-update mode, first-run artifacts, dev-server discovery, commit guards; dual-mode state path; cleanup guard
-- [x] `test-scout-agent.md` v1.0.0 → v2.0.0 — absorbed scout-phase.md; screenshot EVERY test (was fail-only); Constitution at top
-- [x] `visual-inspector-agent.md` v1.0.0 → v2.0.0 — absorbed inspection-phase.md; EXPECTED_CHANGE lane; Constitution at top
-- [x] `test-healer-agent.md` v1.0.0 → v2.0.0 — absorbed healing-phase.md; Constitution at top
-- [x] `e2e-visual-run/SKILL.md` v3.0.0 → v4.0.0 — shrunk to <100 lines, dispatches conductor
-- [x] `core/.claude/skills/e2e-visual-run/references/*` — deleted (content in agents)
-
-**Phase B — Healer upgrade (MCP + deterministic classification)**
-- [x] `test-healer-agent.md` — Playwright MCP hard dep (browser_snapshot, browser_evaluate, console_messages, network_requests, test_run)
-- [x] `test-failure-analyzer-agent.md` v1.1.1 → v2.0.0 — 18 regex rules with `classification_source` provenance
-- [x] `core/.claude/config/e2e-pipeline.yml` — `classification_rules[]` array exposed for per-project extension
-
-**Phase C — Architectural gap fixes**
-- [x] Dual-mode state-file paths (standalone: `.pipeline/`, dispatched: `.workflows/testing-pipeline/`)
-- [x] `schema_version: "1.0.0"` required first field of every state file
-- [x] Cleanup-at-init mode-gated (standalone only)
-- [x] Retry budget composition (`remaining_budget` in dispatch context)
-- [x] Aggregation consolidated at T1
-- [x] `contradictions.action: warn | block` config
-- [x] `auto-verify` silent-degradation gate with `--allow-degraded-ui` opt-out
-- [x] Registry/workflow-contracts paths verified consistent
-
-**Phase D — Issue tracking**
-- [x] GitHub Issue creation spec in `testing-pipeline-master-agent.md` — sha256 signature dedup, 30-day window
-- [x] `issue_creation.enabled` + `require_gh_auth` config flags in `e2e-pipeline.yml`
-
-**Phase E — Constitution pointer pattern**
-- [x] `## NON-NEGOTIABLE` block at top of every rewritten agent (scout, inspector, healer, analyzer, conductor, master, pipeline-agent) — SSOT-respecting pointer to `agent-orchestration.md` / `testing.md`
-
-**Phase F — Standalone CI aggregator**
-- [x] `scripts/pipeline_aggregator.py` (290 LOC, pure, typed)
-- [x] `scripts/tests/test_pipeline_aggregator.py` — 14 tests
-- [~] GitHub Actions job wiring — deferred per plan scope
-
-**Phase G — Synthetic Playwright fixture**
-- [x] `scripts/tests/fixtures/playwright-demo/` — package.json + playwright.config.ts + .gitignore + README.md
-- [x] `app/server.js` + 3 HTML pages with DEMO_SCENARIO-aware behavior
-- [x] 7 spec files (home, dashboard, checkout, visual, logic, flaky, infra)
-
-**Phase H — Verification**
-- [x] `scripts/tests/test_pipeline_e2e.py` — 20 tests in 3 classes (structural, aggregator scenarios, optional Node smoke)
-- [x] Aggregator regression: stage-FAILED with empty failures[] now correctly fails pipeline (bug found during Phase H)
-
-**Cross-cutting**
-- [x] `registry/patterns.json` — 9 version bumps, all `last_updated: 2026-04-22`
-- [x] `docs/QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md` — Applied section maps recommendations + gaps to commits
-- [x] `generate_docs.py` re-run — DASHBOARD.md, STACK-CATALOG.md, GETTING-STARTED.md, dashboard.html regenerated
-- [x] Local CI replication — 1081 pytest passed, 58 skipped; validator PASSED; dedup PASSED
-- [x] `.claude/tasks/lessons.md` updated — 2 entries (aggregator bug, pinned-content test migration)
-
-## Deferred (documented in plan's Non-goals)
-
-- Full Claude-Code-free headless runner (user narrowed Phase F to aggregation-only)
-- `.github/workflows/*.yml` CI wiring for the standalone aggregator
-- Headless live-pipeline verification (requires Node + Playwright + Claude Code in CI); currently covered by the aggregator-scenario simulation in `test_pipeline_e2e.py` and the opt-in `TestPlaywrightSmoke` test
-
-## Review
-
-**Outcome:** All 5 research recommendations (docs/QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md) and all 10 architectural gaps surfaced during the orchestration review landed in `feat/testing-pipeline-overhaul`. No new skill/agent names — every change updates an existing pattern in-place so downstream projects replace via the same filenames.
-
-**Verification**
-- `pytest scripts/tests/` → 1081 passed, 58 skipped (up from 1047; +34 new across Phases F/G/H)
-- `workflow_quality_gate_validate_patterns.py` → PASSED (1 informational warning: `auto-verify` 506 lines, within the 500–1000 "warning zone" per pattern-self-containment.md)
-- `dedup_check.py --validate-all` → Registry validation passed
-- `generate_docs.py` idempotency → diff reduces to a timestamp-only change (pre-existing behavior; generator uses `datetime.now()` not git HEAD commit time)
-
-**Lessons captured** → `.claude/tasks/lessons.md`

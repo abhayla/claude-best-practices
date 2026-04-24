@@ -45,6 +45,26 @@ consolidation, pinned-content tests are valuable regression nets — migrate
 the assertions to the new authoritative location. Deleting them loses the
 regression surface; skipping them masks drift.
 
+## 2026-04-24 — Parallel tool dispatch in Claude Code is more restricted than prompt-engineering guidance suggests
+
+**Surfaced during:** Phase 0 empirical probe for the subagent-dispatch-platform-limit remediation, session 2026-04-24.
+
+**What I expected:** Multiple tool calls issued in a single assistant message would execute in parallel, per the common Claude Code prompt directive ("make all independent tool calls in parallel"). A reviewer (anthropic-multi-agent-reviewer-agent) specifically claimed that parallel `Skill()` calls in one orchestrator message would preserve the testing-pipeline Wave 1 (functional+API lanes concurrent) — and that this was the cheap alternative to an external script wrapper.
+
+**What actually happened:** Empirical probes in both a dispatched `general-purpose` subagent session AND my own T0 session measured:
+- Two `Bash` calls with 3-second sleeps issued in one message → **serial** (7s and 10s gaps respectively between end-of-A and start-of-B)
+- Two `Skill` calls in one message → **blocked from concurrent execution**; `Skill` appears to inject the target SKILL.md into the caller's next user-turn context, creating a serial prompt queue in the same session (no new subagent context, no concurrency)
+- Two `Read` calls → returned in the same turn, but Read is fast enough that parallelism vs serialism is unobservable from timing
+- Two `Agent` calls in one message at T0 → confirmed parallel (documented + standard), but unavailable in subagent sessions per Anthropic's official docs (https://code.claude.com/docs/en/sub-agents — "subagents cannot spawn other subagents")
+
+**Generalizable rule:** In Claude Code, "parallel tool calls in one message" is only reliably parallel for `Agent()` dispatched from the T0 user session. `Bash`, `Skill`, and most other tools appear to be serialized by the runtime regardless of session level, at least on Windows/Opus 4.7 at the hub's current version. Any architecture that assumes parallel `Bash`/`Skill` from a dispatched subagent WILL run serially at runtime. Verify parallelism empirically with nanosecond timestamps before designing around it — don't trust the "issue in one message → parallel" folklore.
+
+**Downstream implication:** For the testing-pipeline refactor, Wave 1 (functional + API in parallel) requires one of three non-obvious paths: (1) move the orchestrator to T0 so the user's session dispatches lane subagents via `Agent()`, (2) externalize via a shell-script wrapper running `claude -p` twice, or (3) accept serial Wave 1. Parallel `Skill()` from the orchestrator is NOT a viable option. The reviewer's premise was wrong.
+
+**Evidence on disk:**
+- Subagent probe transcript: returned inline in session 2026-04-24 (T2 of session 2)
+- T0 timings: A=1777025367927028600→1777025371086561100, B=1777025381209802100→1777025384403795200 (10.12s gap)
+
 ## 2026-04-24 — Registry hash field was dead data; wire enforcement or drop the field
 
 **Surfaced during:** Tech-debt cleanup after REQ-S004 (analyzer v2.3.0). A
