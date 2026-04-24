@@ -176,6 +176,16 @@ The workflow-master returns the standard stage return contract:
 - MUST validate artifact contracts before dispatching downstream stages
 - MUST NOT dispatch a stage before all `depends_on` have passed
 - MUST NOT retry more than 3 times per stage or 15 times globally
-- Dispatched workflow-masters follow the tiered nesting model (see agent-orchestration.md Rule #2). They MAY dispatch sub-orchestrators (T2) which MAY dispatch workers (T3).
+- **T0-only guardrail (Phase 3.9, 2026-04-25):** This agent is `dispatched_from: T0`.
+  It MUST NOT be dispatched via `Agent(subagent_type="project-manager-agent", ...)`
+  from any other agent or skill — when dispatched as a worker, the `Agent` tool
+  is stripped at runtime and its own `Agent()` dispatches silently inline
+  (Anthropic platform constraint; see `agent-orchestration.md` §2). Instead,
+  invoke this agent only directly from the user's T0 session. All 8 workflow-
+  masters have been retired to skill-at-T0 pattern (Phases 3.1–3.8); stages
+  now invoke `Skill("/<workflow-name>", ...)` instead of
+  `Agent(subagent_type="<workflow>-master-agent", ...)`. The previous
+  "tiered nesting model" text here is retired — workflow-masters no longer
+  exist as sub-orchestrators.
 - MUST tag git before each stage for clean rollback
 - MUST use `/test-pipeline` for test verification in Stages 7-8 (not raw `/fix-loop` + `/auto-verify`)
