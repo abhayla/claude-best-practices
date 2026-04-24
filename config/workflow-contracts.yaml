@@ -293,14 +293,13 @@ workflows:
     handoff_suggestions: []
 
   learning-self-improvement:
-    description: "Capture learnings → detect patterns → generate skills → accumulate knowledge"
-    master_agent: learning-self-improvement-master-agent
+    description: "Capture → detect patterns → propose skills → validate knowledge — skill-at-T0 orchestrator (Phase 3.7, spec v2.2)."
+    master_agent: null
+    entry_skill: learning-self-improvement
     state_file: ".workflows/learning-self-improvement/state.json"
-    sub_orchestrators:
-      - agent: session-summarizer-agent
-        role: "Session analysis for pattern detection"
-      - agent: context-reducer-agent
-        role: "Context compression for knowledge distillation"
+    # session-summarizer-agent + context-reducer-agent dispatched directly
+    # from T0 by the skill body (optional, --deep-analysis flag). Workers only.
+    sub_orchestrators: []
     steps:
       - id: capture
         skill: learn-n-improve

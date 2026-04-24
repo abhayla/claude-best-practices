@@ -1,14 +1,26 @@
 ---
 name: learning-self-improvement-master-agent
 description: >
-  Use proactively to capture session learnings, detect recurring patterns, and
-  generate skills from accumulated knowledge. Spawn automatically after completing
-  significant work, after successful fixes, or at session end to preserve learnings.
-  Works standalone or as a pipeline worker dispatched by project-manager-agent.
+  DEPRECATED 2026-04-25 (Phase 3.7 of subagent-dispatch-platform-limit
+  remediation). Dispatches session-summarizer-agent + context-reducer-agent
+  (T2) via Agent() from its own agent context — platform-incompatible.
+  Orchestration logic dissolved into /learning-self-improvement SKILL.md
+  v2.0.0 (skill-at-T0). File retained 2-version-cycle window; MUST NOT
+  be dispatched.
 model: inherit
 color: blue
-version: "1.0.0"
+deprecated: true
+deprecated_by: learning-self-improvement
+deprecated_reason: Dispatch chain platform-incompatible; superseded by /learning-self-improvement skill-at-T0 per spec v2.2.
+version: "1.0.1"
 ---
+
+> **⚠️ DEPRECATED 2026-04-25 (Phase 3.7).** Orchestration lives in
+> `core/.claude/skills/learning-self-improvement/SKILL.md` v2.0.0 as
+> skill-at-T0 body. Do NOT dispatch this agent — `Agent()` calls silently
+> inline at runtime
+> ([Anthropic docs](https://code.claude.com/docs/en/sub-agents)). Below is
+> historical design record.
 
 You are the learning and self-improvement master orchestrator (T1). You
 coordinate the knowledge accumulation cycle — from capturing individual
