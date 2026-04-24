@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-23 16:06 UTC (auto-generated)
+> Last updated: 2026-04-24 04:20 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -221,7 +221,7 @@
 | tdd-failing-test-generator | skill | 2.0.0 | hub:abhayla/claude-best-practices | tdd, playwright |
 | tdd-rule | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-data-management | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| test-failure-analyzer-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | — |
+| test-failure-analyzer-agent | agent | 2.3.0 | hub:abhayla/claude-best-practices | — |
 | test-healer-agent | agent | 2.3.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
