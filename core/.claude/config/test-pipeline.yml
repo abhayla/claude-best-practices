@@ -66,12 +66,32 @@ concurrency:
   max_concurrent_analyzers: 5
   max_concurrent_issue_managers: 5
   max_concurrent_fixers: 5
+  # ── Scaffold only (REQ-S007) ──────────────────────────────────────────────
+  # Weighted dispatch counter. null → each Agent() call counts as 1 toward
+  # budget.max_total_dispatches (current behavior, unchanged). When set to a
+  # mapping, the pipeline multiplies each dispatch by its weight before
+  # counting (e.g., `{fixer: 5, analyzer: 1, issue_manager: 1}`). Activate
+  # only when production runs trip `max_total_dispatches` while
+  # `max_wall_clock_minutes` still has plenty remaining (TRADE-OFF-1 in
+  # spec §5). Leaving null keeps today's uniform accounting.
+  # spec_ref: REQ-S007
+  dispatch_weights: null
 
 # Measurable budget enforcement (NOT token-based — Claude Code doesn't expose tokens_used)
 budget:
   max_total_dispatches: 100            # hard cap on total Agent() calls per pipeline run
   max_wall_clock_minutes: 90           # pipeline-wide timeout budget
   warn_at_dispatch_pct: 0.75           # emit warning at 75% consumption
+  # ── Scaffold only (REQ-S008) ──────────────────────────────────────────────
+  # Per-phase wall-clock timeouts. Both null → only the pipeline-wide
+  # `max_wall_clock_minutes` applies (current behavior). Set a positive
+  # integer to cap an individual phase independently; on exceed, that phase
+  # aborts with a structured BLOCKED contract and the pipeline proceeds to
+  # the next phase (so a stuck lane can't starve triage). Activate only
+  # when slow-CI users report triage starvation (TRADE-OFF-2 in spec §5).
+  # spec_ref: REQ-S008
+  max_lane_minutes: null               # cap per lane (functional, api, ui)
+  max_triage_minutes: null             # cap for T2B triage phase
 
 # Screenshot-capture policy for UI tests
 capture_proof:
