@@ -54,31 +54,46 @@ color: blue                      # red | orange | yellow | blue | green
 scalar (`"Agent Bash Read ..."`) parses as a single string and Claude Code
 will NOT expose the agent as a `subagent_type` — verified in the downstream
 test run 2026-04-24, where 6 pipeline agents with the scalar form were
-silently inlined at T1 instead of dispatched as subagents.
+silently inlined at their dispatch site instead of being dispatched as subagents.
 
-### Tool Grants (MUST for Orchestrators)
+### Tool Grants (Platform-Constrained)
 
-Claude Code subagents receive a default limited tool set when dispatched via
-`Agent(subagent_type=...)`. That default set **excludes `Agent`**, which
-silently collapses the 4-tier dispatch model defined in
-`agent-orchestration.md` rule #2 — a T1/T2 orchestrator dispatched as a
-subagent cannot reach its T2/T3 workers unless `Agent` is explicitly granted.
+Claude Code does NOT forward the `Agent` tool to dispatched subagents,
+regardless of what the subagent's frontmatter `tools:` field declares.
+[Anthropic's official docs](https://code.claude.com/docs/en/sub-agents)
+state this explicitly: *"subagents cannot spawn other subagents."*
+Corroborated by [GH #19077](https://github.com/anthropics/claude-code/issues/19077),
+[GH #4182](https://github.com/anthropics/claude-code/issues/4182), and three
+independent 2026-04-24 runtime probes. See `agent-orchestration.md` §2 for
+the full platform-constraint note.
 
-**Invariant:**
+**What this means for `tools:` frontmatter:**
 
-| Agent role | Must declare `tools:` including `Agent`? |
-|---|---|
-| T0 pipeline orchestrator | **Yes** — dispatches T1 workflow masters |
-| T1 workflow master | **Yes** — dispatches T2 sub-orchestrators + skills |
-| T2 sub-orchestrator | **Yes** — dispatches T3 worker agents + skills |
-| T3 worker agent | **No** — MUST NOT dispatch further subagents (rule #3) |
+| Dispatch context | `Agent` in `tools:` | Runtime behavior |
+|---|---|---|
+| **T0 (user's session directly)** | Allowed, functional | `Agent()` dispatches workers as declared |
+| **Dispatched as a worker** (via `Agent(subagent_type=...)` from any caller) | **Misleading — do NOT declare** | `Agent` is stripped at runtime; any dispatch instruction in the agent body silently produces inline serial work instead |
 
-The standard orchestrator tool set is `["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]`.
-T3 leaves may declare a narrower set (e.g., omit `Write`/`Edit` if read-only)
-but MUST omit `Agent` to enforce the tier-depth cap.
+**Invariant (revised 2026-04-24 to reflect the platform finding):**
+
+| Agent role | `Agent` in `tools:`? | Rationale |
+|---|---|---|
+| **T0 orchestrator** (user invokes directly; never dispatched) | **Yes** — required for worker dispatch | Runs in user's session where `Agent` is available |
+| **Dual-mode agent** (supports both T0 and worker modes — see `agent-orchestration.md` §10) | **Yes, for T0 mode only.** Worker-mode code path MUST NOT depend on `Agent` | An agent that lists `Agent` in `tools:` but is dispatched as a worker will have `Agent` stripped — dispatch instructions in its body become silent inline work |
+| **Worker** (only ever dispatched as a subagent) | **No** — runtime strips it; declaring it is misleading | See worker constraints in `agent-orchestration.md` §3 |
+
+**Standard T0-orchestrator tool set:**
+`["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]`.
+
+**Standard worker tool set:** same minus `Agent`. Workers MAY further narrow
+the set (e.g., omit `Write`/`Edit` if read-only).
 
 Runtime-verified pinning: `scripts/tests/test_orchestrator_tool_grants.py`
-asserts this invariant on every orchestrator and T3 leaf in the registry.
+asserts this invariant. A Phase 2 refactor (planned 2026-04-24) will add a
+`dispatched_from:` frontmatter field to every agent so the validator can
+decide context-aware whether `Agent` is required (T0 orchestrators) or
+forbidden (workers), plus a runtime-probe integration test that dispatches a
+throwaway subagent and asserts `Agent` is absent from its tool list.
 
 ### Color Field (Severity/Importance)
 
