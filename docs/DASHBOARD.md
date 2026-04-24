@@ -1,15 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-24 04:20 UTC (auto-generated)
+> Last updated: 2026-04-24 04:49 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 237 |
-| Core (universal) | 232 |
+| Total Patterns | 238 |
+| Core (universal) | 233 |
 | Stack-specific | 5 |
 | Agents | 39 |
 | Configs | 2 |
-| Hooks | 8 |
+| Hooks | 9 |
 | Rules | 29 |
 | Skills | 159 |
 
@@ -172,6 +172,7 @@
 | prompt-auto-enhance | skill | 2.0.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
 | prompt-auto-enhance-rule | rule | 2.0.0 | hub:abhayla/claude-best-practices | prompt-auto-enhance |
 | prompt-enhance-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| prompt-logger | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pytest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | quality-gate-evaluator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | react-native-dev | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
