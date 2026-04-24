@@ -1,78 +1,188 @@
 ---
 name: documentation-workflow
 description: >
-  Generate and maintain project documentation end-to-end: ADRs, API docs,
-  structure enforcement, and staleness audits. Use when updating documentation
-  after architecture decisions or code changes.
+  Orchestrate project documentation maintenance end-to-end as a skill-at-T0
+  orchestrator (Phase 3.5 of subagent-dispatch-platform-limit remediation).
+  The skill body IS the orchestrator — runs in the user's T0 session and
+  drives: ADR creation → API docs generation → structure enforcement →
+  staleness audit. Invokes sub-skills (/adr, /api-docs-generator,
+  /doc-structure-enforcer, /doc-staleness) via Skill(); optionally
+  dispatches the docs-drafting worker via Agent() at T0 for bulk content
+  generation when the structure audit reveals substantial missing content.
+  Use after architecture decisions, PR merges, or on a scheduled cadence.
 type: workflow
-allowed-tools: "Agent Read Grep Glob"
-argument-hint: "<scope: 'full', 'adr', 'api-docs', or specific doc path>"
-version: "1.0.0"
+triggers:
+  - update documentation
+  - documentation workflow
+  - generate docs
+  - doc maintenance
+  - docs pipeline
+allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
+argument-hint: "[scope: 'all' | 'adr' | 'api' | 'structure' | 'staleness']"
+version: "2.0.0"
 ---
 
-# Documentation Workflow — Full Doc Generation Orchestration
+# /documentation-workflow — Skill-at-T0 Orchestrator
 
-Dispatch the documentation-master-agent to coordinate documentation
-generation and maintenance. Routes to the agent which handles parallel
-doc generation, structure enforcement, and staleness detection.
+This skill's body is injected into the user's T0 session and executed there.
+The retired `documentation-master-agent` is NOT dispatched (deprecated
+Phase 3.5, 2026-04-25); its orchestration lives here.
 
-**Critical:** All documentation orchestration is owned by the agent. Do not
-implement steps inline — this skill is a dispatch wrapper only.
+**Why skill-at-T0:** Platform constraint documented in Phases 3.1–3.4 —
+dispatched subagents don't receive the `Agent` tool
+([Anthropic docs](https://code.claude.com/docs/en/sub-agents)).
 
-**Input:** $ARGUMENTS
+**Input:** `$ARGUMENTS` — optional scope. Default is `all`.
 
 ---
 
-## STEP 1: Dispatch Workflow Master
-
-Launch the documentation-master-agent in standalone mode:
+## CLI Signature
 
 ```
-Agent(subagent_type="documentation-master-agent", prompt="
-  ## Workflow: documentation
-  ## Mode: standalone
-  ## User Request: $ARGUMENTS
-")
+/documentation-workflow [scope] [--dry-run] [--skip-staleness]
 ```
 
-The agent will:
-1. Read `config/workflow-contracts.yaml` for step definitions
-2. Detect documentation framework (MkDocs, Docusaurus, plain markdown)
-3. Execute ADR + API docs in parallel, then structure enforcement, then staleness check
-4. Skip ADR/API steps based on project characteristics
-5. Manage state in `.workflows/documentation/state.json`
-
-### Expected Workflow Steps
-The agent executes these steps from the workflow contract config:
-- **adr** → `adr` → produces architecture decision records (skipped if no decisions)
-- **api_docs** → `api-docs-generator` → produces API documentation (skipped if no API)
-- **structure** → `doc-structure-enforcer` → produces structure compliance report
-- **staleness** → `doc-staleness` → produces staleness report with per-doc scores
-
-### If Agent Is Not Available
-If `documentation-master-agent` is not provisioned in the project, run the
-constituent skills manually: `/adr` (if needed), then `/api-docs-generator`
-(if needed), then `/doc-structure-enforcer`, then `/doc-staleness`.
-
-## STEP 2: Report Results
-
-After the agent completes, relay the documentation summary to the user:
-
-- Documentation coverage (sections present vs missing)
-- Staleness report (docs requiring immediate attention)
-- ADR index (if generated)
-- API doc coverage (endpoints documented vs total)
+| Argument / Flag | Default | Meaning |
+|-----------------|---------|---------|
+| `scope` | `all` | `all` \| `adr` \| `api` \| `structure` \| `staleness` |
+| `--dry-run` | off | Produce proposed changes without writing them |
+| `--skip-staleness` | off | Skip the staleness audit (STEP 5) |
 
 ---
 
-## MUST DO
+## STEP 1: INIT
 
-- Always dispatch via documentation-master-agent — do not inline orchestration
-- Always relay staleness scores for documents requiring attention
-- Always report which steps were skipped and why (no architecture decisions, no API)
+1. **Parse args.** Normalize `scope` to one of the 5 values.
+2. **Read config** `config/workflow-contracts.yaml` → `workflows.documentation`.
+   `master_agent` should be null; `sub_orchestrators` empty.
+3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
+4. **Initialize state** at `.workflows/documentation/state.json` (schema
+   2.0.0) with step_status for all steps, `dispatches_used: 0`,
+   `scope: "<arg>"`, `dry_run: <bool>`.
+5. **Detect context.** Git log for architecture-relevant commits since last
+   doc update; presence of `openapi.yaml`/`openapi.json` signals API lane.
+6. Append INIT event.
 
-## MUST NOT DO
+---
 
-- MUST NOT implement documentation logic in this skill — delegate to the agent
-- MUST NOT generate ADRs for projects without architecture decisions
-- MUST NOT generate API docs for non-API projects
+## STEP 2: ADR (skip if scope ∉ {all, adr} OR no architecture decisions detected)
+
+```
+Skill("/adr", args="create-from-recent-commits")
+```
+
+Scans recent commits for ADR-worthy changes (new dependencies, schema
+migrations, API contract changes, architectural patterns). Writes to
+`docs/adr/`. Honors `--dry-run`. If no candidates: mark SKIPPED.
+
+Capture paths into `state.artifacts.adrs`.
+
+---
+
+## STEP 3: API_DOCS (skip if scope ∉ {all, api} OR no OpenAPI spec)
+
+```
+Skill("/api-docs-generator", args="<project root>")
+```
+
+Extracts API annotations, regenerates OpenAPI spec + Redoc/Swagger UI
+under `docs/api/`. Validates against API tests.
+
+---
+
+## STEP 4: STRUCTURE (skip if scope ∉ {all, structure})
+
+```
+Skill("/doc-structure-enforcer", args="audit")
+```
+
+Verifies docs follow Diataxis or project layout (`docs/.structure.yml`).
+`audit` reports without moves; `enforce` mode does `git mv`. If
+`--dry-run`, always `audit`. Otherwise, prompt user before transitioning
+to `enforce`. Never auto-mv without confirmation.
+
+### Optional: docs-manager-agent dispatch (bulk content drafting)
+
+If audit reveals substantial missing content:
+
+```
+Agent(subagent_type="docs-manager-agent", prompt="""
+## Workflow: documentation
+## Run ID: <run_id>
+## Audit report: <structure audit path>
+## Scope: <list of missing doc targets>
+## Dry-run: <bool>
+
+Generate draft content for each missing target following the project's
+doc structure. Return a contract listing produced drafts for user review.
+""")
+```
+
+Increment `dispatches_used` by 1. Drafts go to `docs-drafts/`; nothing
+is promoted to `docs/` without user review.
+
+---
+
+## STEP 5: STALENESS (skip if scope ∉ {all, staleness} OR --skip-staleness)
+
+```
+Skill("/doc-staleness", args="audit --since-last-sync")
+```
+
+Diffs code vs docs, flags references to removed/renamed symbols, broken
+links, stale examples. Severity-ranked report to
+`test-results/doc-staleness.json`.
+
+Gate: if `critical_stale_count > 0`, transition to `step_status.STALENESS
+= warned` (NOT blocked — docs lag is common; surface but don't halt).
+
+---
+
+## STEP 6: REPORT
+
+1. **Finalize state.** Write `test-results/documentation-verdict.json`:
+   ```json
+   {
+     "schema_version": "2.0.0",
+     "run_id": "<run_id>",
+     "result": "COMPLETED | WARNED",
+     "scope": "<...>",
+     "steps_executed": [...],
+     "steps_skipped": [...],
+     "artifacts": { "adrs": [...], "api_docs": [...],
+                    "structure_moves": [...], "staleness_report": "<path>" },
+     "staleness": { "critical": <n>, "moderate": <n>, "minor": <n> },
+     "budget_used": { "dispatches_used": <n> },
+     "finalized_at": "<iso>"
+   }
+   ```
+2. **Dashboard:**
+   ```
+   ============================================================
+   Documentation Workflow: <COMPLETED | WARNED>
+     Run ID: <run_id>
+     Scope: <scope>
+     ADRs created: <N>
+     API docs regenerated: <YES | SKIPPED>
+     Structure moves: <N>
+     Staleness: <critical>/<moderate>/<minor>
+   ============================================================
+   ```
+3. **Handoff:** critical staleness → suggest `/fix-issue` for each;
+   structure moves → suggest `/code-review-workflow` to surface the
+   rename diff in a PR.
+
+---
+
+## CRITICAL RULES
+
+- MUST run at T0 — dispatching this as a worker strips `Agent` at runtime
+  and the optional STEP 4 docs-manager-agent dispatch silently inlines.
+- MUST NOT dispatch `documentation-master-agent` (deprecated 2026-04-25,
+  2-cycle window).
+- MUST NOT auto-execute `doc-structure-enforcer` in enforce mode without
+  user confirmation — file moves are disruptive.
+- MUST NOT treat staleness as hard block — it's warning-only.
+- MUST respect `--dry-run` across all steps — no file writes.
+- MUST write `.workflows/documentation/state.json` + `events.jsonl`
+  after every step transition.
