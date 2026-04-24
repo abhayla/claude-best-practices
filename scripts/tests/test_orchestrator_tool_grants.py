@@ -1,17 +1,26 @@
-"""Tests for orchestrator agent tool grants.
+"""Tests for agent tool grants under the single-level dispatch model.
 
-Per `core/.claude/rules/agent-orchestration.md` rule #2 (tiered nesting) and
-rule #3 (controlled nesting), orchestrator agents (T0/T1/T2) MUST be able to
-dispatch further subagents via `Agent()`. Claude Code subagents get a default
-limited tool set that EXCLUDES `Agent` unless the frontmatter explicitly lists
-it under `tools:`. Runtime verification against v2-pipeline-testbed
-(2026-04-23) confirmed that `e2e-conductor-agent` fell back to inline
-execution because `Agent` wasn't declared in its tools — the entire 4-tier
-dispatch contract silently collapses.
+Per `core/.claude/rules/agent-orchestration.md` §2 (Single-Level Dispatch
+Model), Claude Code does NOT forward the `Agent` tool to dispatched
+subagents regardless of frontmatter (Anthropic docs: "subagents cannot
+spawn other subagents"; GH #19077 + #4182; 2026-04-24 runtime probes).
 
-These tests pin the invariant: every orchestrator declares `tools` including
-`Agent`; every T3 leaf worker declares `tools` WITHOUT `Agent` (per rule #3
-"T3 agents MUST NOT call Agent()").
+The context-aware invariant checked here, keyed off the `dispatched_from:`
+frontmatter field declared by each agent:
+
+- `dispatched_from: T0` — agent is invoked directly by the user; MUST
+  declare `Agent` in `tools:` to dispatch worker subagents.
+- `dispatched_from: worker` — agent is only ever dispatched as a
+  subagent; MUST NOT declare `Agent` in `tools:` (declaring it is
+  misleading — runtime strips it).
+- `dispatched_from: dual-mode` — agent supports both contexts; MAY
+  declare `Agent`, but the worker-mode code path must not depend on it.
+  This test does not body-scan for that; it is left to reviewers.
+- Field absent — defaults to `worker` (safer assumption; forces
+  explicit declaration for T0 agents).
+
+Agents marked `deprecated: true` are skipped — they are on the
+deprecation lifecycle and will be removed.
 """
 
 from __future__ import annotations
@@ -24,29 +33,6 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENTS_DIR = REPO_ROOT / "core" / ".claude" / "agents"
-
-# Testing-pipeline orchestrators that MUST be able to dispatch subagents.
-# Identified by runtime verification and agent-orchestration.md tier table.
-ORCHESTRATORS = [
-    "testing-pipeline-master-agent",  # T1
-    "test-pipeline-agent",             # T2A (lane sub-orchestrator)
-    "failure-triage-agent",            # T2B (triage sub-orchestrator — per three-lane spec)
-    "e2e-conductor-agent",             # T2 (E2E sub-orchestrator)
-]
-
-# T3 leaf workers that MUST NOT have Agent in their tool grants
-# (per agent-orchestration.md rule #3).
-T3_LEAVES = [
-    "test-scout-agent",
-    "visual-inspector-agent",
-    "test-healer-agent",
-    "github-issue-manager-agent",      # T3 leaf — invokes /create-github-issue skill only
-]
-
-# Tools an orchestrator needs at minimum. Bash for shell, Read/Write/Edit
-# for file ops, Grep/Glob for search, Skill for skill invocation, Agent
-# for subagent dispatch.
-REQUIRED_ORCHESTRATOR_TOOLS = {"Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"}
 
 
 def _parse_frontmatter(agent_path: Path) -> dict:
@@ -64,7 +50,7 @@ def _tools_set(frontmatter: dict) -> set[str]:
     single string and Claude Code does NOT expose the agent as a
     `subagent_type` — verified in the downstream test run 2026-04-24,
     where 6 pipeline agents with the scalar form were silently inlined
-    at T1 instead of being dispatched as subagents.
+    at their dispatch site instead of being dispatched as subagents.
     """
     raw = frontmatter.get("tools")
     if raw is None:
@@ -76,77 +62,152 @@ def _tools_set(frontmatter: dict) -> set[str]:
             "tools: must be a YAML list (e.g. [\"Agent\", \"Bash\", \"Read\"]), "
             "not a space-separated string. Claude Code does not expose agents "
             "with scalar `tools:` as subagent_type — they fall back to inline "
-            "execution at the parent tier, silently breaking the 4-tier "
-            "dispatch contract. Observed 2026-04-24 in v2-pipeline-testbed."
+            "execution at the parent, silently breaking dispatch. Observed "
+            "2026-04-24 in v2-pipeline-testbed."
         )
     raise TypeError(f"unexpected tools type: {type(raw).__name__}")
 
 
-# ── Orchestrator invariants ────────────────────────────────────────────────
+def _dispatch_context(frontmatter: dict) -> str:
+    """Return the declared dispatch context, defaulting to 'worker' if absent."""
+    value = frontmatter.get("dispatched_from", "worker")
+    if value not in {"T0", "worker", "dual-mode"}:
+        raise ValueError(
+            f"invalid dispatched_from value {value!r}; "
+            f"must be one of T0, worker, dual-mode"
+        )
+    return value
 
 
-@pytest.mark.parametrize("name", ORCHESTRATORS)
-def test_orchestrator_declares_tools_field(name):
-    """Every orchestrator MUST declare a tools field — otherwise Claude Code
-    grants a limited default set that excludes Agent."""
-    fm = _parse_frontmatter(AGENTS_DIR / f"{name}.md")
-    assert "tools" in fm, (
-        f"{name} frontmatter missing `tools` field — Claude Code will apply "
-        "a default limited tool set that excludes Agent, breaking the "
-        "4-tier dispatch contract (agent-orchestration.md rules #2, #3)"
-    )
+def _is_template_doc(frontmatter: dict, agent_name: str) -> bool:
+    """Identify reference-doc files in the agents dir that are not actually
+    invokable agents (e.g., workflow-master-template). Such files have no
+    `tools:` field, no body that would be dispatched, and carry no runtime
+    contract — exclude them from the invariant."""
+    return agent_name.endswith("-template") and frontmatter.get("tools") is None
 
 
-@pytest.mark.parametrize("name", ORCHESTRATORS)
-def test_orchestrator_includes_agent_tool(name):
-    """Every orchestrator MUST include Agent in its tools — they exist
-    specifically to dispatch further subagents."""
-    fm = _parse_frontmatter(AGENTS_DIR / f"{name}.md")
+def _all_agent_files() -> list[Path]:
+    """Return all agent files in core/.claude/agents/."""
+    return sorted(AGENTS_DIR.glob("*.md"))
+
+
+def _is_deprecated(frontmatter: dict) -> bool:
+    """True if the agent is on the deprecation lifecycle."""
+    return bool(frontmatter.get("deprecated"))
+
+
+# Collect agent fixtures once at module load so parametrize can use names.
+_AGENT_PATHS = _all_agent_files()
+_AGENT_NAMES = [p.stem for p in _AGENT_PATHS]
+
+
+@pytest.fixture(params=_AGENT_PATHS, ids=_AGENT_NAMES)
+def agent_file(request) -> Path:
+    return request.param
+
+
+# ── Invariant: tools: is YAML list, not scalar ─────────────────────────────
+
+
+def test_tools_is_yaml_list_not_scalar(agent_file):
+    """tools: must be a YAML list. Scalar form silently breaks dispatch."""
+    fm = _parse_frontmatter(agent_file)
+    if _is_template_doc(fm, agent_file.stem):
+        pytest.skip("reference-doc file without tools declaration")
+    if "tools" not in fm:
+        pytest.skip(
+            "agent does not declare tools (default tool set applies); "
+            "out of scope for this invariant"
+        )
+    # _tools_set raises TypeError on scalar form; call to trigger.
+    _tools_set(fm)
+
+
+# ── Invariant: dispatched_from: is declared and valid (T0 and dual-mode) ───
+
+
+def test_dispatched_from_field_is_valid(agent_file):
+    """If declared, dispatched_from: must be one of T0/worker/dual-mode."""
+    fm = _parse_frontmatter(agent_file)
+    if _is_template_doc(fm, agent_file.stem):
+        pytest.skip("reference-doc file")
+    # _dispatch_context raises on invalid value; call to trigger.
+    _dispatch_context(fm)
+
+
+# ── Invariant: T0 orchestrators declare Agent in tools ─────────────────────
+
+
+def test_t0_orchestrator_declares_agent_in_tools(agent_file):
+    """Agents marked `dispatched_from: T0` MUST include Agent in tools:
+    — they dispatch worker subagents from the user's session.
+    """
+    fm = _parse_frontmatter(agent_file)
+    if _is_template_doc(fm, agent_file.stem):
+        pytest.skip("reference-doc file")
+    if _is_deprecated(fm):
+        pytest.skip("deprecated — on deprecation lifecycle")
+    if _dispatch_context(fm) != "T0":
+        pytest.skip("not a T0 orchestrator")
+
     tools = _tools_set(fm)
     assert "Agent" in tools, (
-        f"{name} tools set {sorted(tools)} must include `Agent` — without it, "
-        "T1/T2 orchestrators cannot dispatch their subagents. Runtime "
-        "verification (2026-04-23) confirmed this collapses the 4-tier "
-        "dispatch model to inline execution."
+        f"{agent_file.stem} declares dispatched_from: T0 but does not "
+        f"include Agent in tools: {sorted(tools)}. T0 orchestrators MUST "
+        f"declare Agent to dispatch worker subagents (pattern-structure.md "
+        f"Tool Grants table). Either add Agent to tools: or change "
+        f"dispatched_from to worker/dual-mode."
     )
 
 
-@pytest.mark.parametrize("name", ORCHESTRATORS)
-def test_orchestrator_has_all_minimum_tools(name):
-    """Beyond Agent, orchestrators need the standard file/shell/skill tools."""
-    fm = _parse_frontmatter(AGENTS_DIR / f"{name}.md")
-    tools = _tools_set(fm)
-    missing = REQUIRED_ORCHESTRATOR_TOOLS - tools
-    assert not missing, (
-        f"{name} tools set missing required: {sorted(missing)}. "
-        f"Orchestrators need {sorted(REQUIRED_ORCHESTRATOR_TOOLS)} at minimum."
-    )
+# ── Invariant: workers do NOT declare Agent in tools ───────────────────────
 
 
-# ── T3 leaf invariants ─────────────────────────────────────────────────────
+def test_worker_does_not_declare_agent_in_tools(agent_file):
+    """Agents marked `dispatched_from: worker` (explicit or default) MUST
+    NOT include Agent in tools: — runtime strips it, and declaring it is
+    misleading (inline dispatch instructions produce silent serial work).
+    """
+    fm = _parse_frontmatter(agent_file)
+    if _is_template_doc(fm, agent_file.stem):
+        pytest.skip("reference-doc file")
+    if _is_deprecated(fm):
+        pytest.skip("deprecated — on deprecation lifecycle")
+    if _dispatch_context(fm) != "worker":
+        pytest.skip("not a worker (T0 or dual-mode)")
 
-
-@pytest.mark.parametrize("name", T3_LEAVES)
-def test_t3_leaf_declares_tools_field(name):
-    """T3 leaves should declare tools explicitly — defaults vary."""
-    fm = _parse_frontmatter(AGENTS_DIR / f"{name}.md")
-    # Note: T3 leaves have `mcp-servers` for Playwright MCP separately;
-    # tools field is for the general Claude Code tool set.
-    # We don't require a tools declaration here yet because test-healer-agent
-    # uses mcp-servers instead, but we DO require that if declared, it
-    # excludes Agent.
-
-
-@pytest.mark.parametrize("name", T3_LEAVES)
-def test_t3_leaf_excludes_agent_tool(name):
-    """T3 leaves MUST NOT declare Agent in their tools — per
-    agent-orchestration.md rule #3, they are leaf workers that use Skill()
-    only. If Agent is granted, they could spawn a 4th tier, violating the
-    depth cap."""
-    fm = _parse_frontmatter(AGENTS_DIR / f"{name}.md")
     tools = _tools_set(fm)
     assert "Agent" not in tools, (
-        f"{name} declares Agent in tools — T3 leaves must NOT dispatch "
-        "further subagents (agent-orchestration.md rule #3). Remove `Agent` "
-        "from the tools list."
+        f"{agent_file.stem} declares dispatched_from: worker (or defaults "
+        f"to it) but includes Agent in tools: {sorted(tools)}. Workers "
+        f"MUST NOT declare Agent — runtime strips it regardless. Any "
+        f"nested Agent() dispatch in the body will silently inline. If "
+        f"this agent genuinely dispatches subagents, it must run at T0: "
+        f"change dispatched_from to T0, and ensure no caller dispatches "
+        f"it via Agent()."
+    )
+
+
+# ── Invariant: no Agent in tools for dispatched-from-absent agents ────────
+
+
+def test_field_absent_defaults_to_worker_invariant(agent_file):
+    """When dispatched_from: is absent, the default is 'worker', so the
+    worker invariant (no Agent in tools) applies by default. This catches
+    new agents that forgot to declare the field."""
+    fm = _parse_frontmatter(agent_file)
+    if _is_template_doc(fm, agent_file.stem):
+        pytest.skip("reference-doc file")
+    if _is_deprecated(fm):
+        pytest.skip("deprecated")
+    if "dispatched_from" in fm:
+        pytest.skip("field declared explicitly; checked by the other tests")
+
+    tools = _tools_set(fm)
+    assert "Agent" not in tools, (
+        f"{agent_file.stem} has no dispatched_from: field (defaults to "
+        f"worker) but includes Agent in tools: {sorted(tools)}. Either "
+        f"remove Agent from tools, or add `dispatched_from: T0` to the "
+        f"frontmatter to declare this agent as a top-level orchestrator."
     )

@@ -2,6 +2,7 @@
 name: parallel-worktree-orchestrator-agent
 description: Use this agent to coordinate parallel workstreams using git worktrees. Splits a multi-part task into independent subtasks, delegates each to a specialist agent in an isolated worktree, and merges results. Use when a task has 2+ independent parts that can be worked on simultaneously.
 tools: ["Read", "Grep", "Glob", "Bash", "Agent"]
+dispatched_from: T0
 model: sonnet
 ---
 

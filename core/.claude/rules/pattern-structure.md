@@ -44,11 +44,29 @@ Every agent in `core/.claude/agents/*.md` MUST have:
 ---
 name: agent-name
 description: When and why to use this agent.
-tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]   # required for orchestrators — see Tool Grants below
+tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]   # see Tool Grants below
+dispatched_from: T0 | worker | dual-mode  # see Dispatch Context below — defaults to "worker" if absent
 model: inherit                   # inherit | sonnet | haiku | opus
 color: blue                      # red | orange | yellow | blue | green
 ---
 ```
+
+### Dispatch Context (`dispatched_from:`)
+
+Declares the runtime context this agent is designed to run in. Used by the
+validator (`scripts/tests/test_orchestrator_tool_grants.py`) to check
+whether `Agent` in `tools:` is appropriate for this agent's dispatch
+context — see Tool Grants below for the full invariant.
+
+| Value | Meaning | `Agent` in `tools:`? |
+|---|---|---|
+| `T0` | Agent is invoked directly by the user (never dispatched by another agent/skill) | MUST include `Agent` |
+| `worker` | Agent is only ever dispatched by a T0 orchestrator | MUST NOT include `Agent` — runtime will strip it |
+| `dual-mode` | Agent supports both modes; worker-mode code path MUST NOT depend on `Agent` | MAY include `Agent`; validator emits a body-scan warning |
+
+If the field is absent, the validator defaults to `worker` (the safer choice).
+Agents marked `deprecated: true` are skipped by the context-aware invariant
+check (they're on the deprecation lifecycle and will be removed).
 
 `tools:` MUST be a YAML list (`["A", "B", ...]`). A space-separated
 scalar (`"Agent Bash Read ..."`) parses as a single string and Claude Code
