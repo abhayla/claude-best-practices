@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-24 18:41 UTC (auto-generated)
+> Last updated: 2026-04-24 19:12 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -77,8 +77,8 @@
 | db-migrate | skill | 1.0.0 | hub:abhayla/claude-best-practices | schema-designer |
 | db-migrate-verify | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | debugger-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| debugging-loop | skill | 1.1.0 | hub:abhayla/claude-best-practices | debugging-loop-master-agent, systematic-debugging, fix-loop, auto-verify, learn-n-improve |
-| debugging-loop-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| debugging-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | debugging-loop-master-agent, systematic-debugging, fix-loop, auto-verify, learn-n-improve |
+| debugging-loop-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | deploy-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup, k8s-deploy |
 | design-principles | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | development-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | development-loop-master-agent, brainstorm, writing-plans, executing-plans, auto-verify, post-fix-pipeline |
