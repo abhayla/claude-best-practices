@@ -3,11 +3,11 @@ name: test-pipeline
 description: >
   Run the full three-lane test verification pipeline as a skill-at-T0
   orchestrator. The skill body IS the orchestrator — it runs in the user's T0
-  session and dispatches worker subagents (scout, functional/API testers,
-  visual-inspector, analyzer, issue-manager, fixers) via Agent() at T0 where
-  subagent dispatch actually works. Enforces the JOIN gate, triage subgraph,
-  verify-affected loop, and final commit per spec v2.2. Use for the full
-  fix→verify→commit chain; for verification only, use /auto-verify.
+  session and dispatches flat worker subagents (scout, functional/API testers,
+  visual-inspector, analyzer, github-issue worker, fixer) via Agent() at T0
+  where subagent dispatch actually works. Enforces the JOIN gate, triage
+  subgraph, verify-affected loop, and final commit per spec v2.2. Use for the
+  full fix→verify→commit chain; for verification only, use /auto-verify.
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "[failure_output] [--capture-proof | --no-capture-proof] [--skip-fix] [--only-issues N,M] [--fix-pr-mode] [--full-suite-before-success] [--update-baselines]"

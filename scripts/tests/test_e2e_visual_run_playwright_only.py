@@ -1,13 +1,19 @@
 """Content assertions for the Playwright-only scope of /e2e-visual-run.
 
-These tests encode the acceptance criteria for the v4.0.0 consolidation:
-- /e2e-visual-run is a thin skill wrapper that dispatches e2e-conductor-agent.
-- e2e-conductor-agent absorbs all queue + healing behaviors previously in
-  the skill and its references/ directory.
-- The skill must still be Playwright-scoped, and the conductor must still
-  encode the dual-signal verdict lanes (including expected_changes), section
-  filter semantics, git-status pre-check on commit, and flakiness decay /
-  probe-run recovery.
+These tests encode the acceptance criteria for the v5.0.0 rewrite (Phase 3.1
+of the subagent-dispatch-platform-limit remediation, spec v2.2):
+- /e2e-visual-run is a skill-at-T0 orchestrator, NOT a thin wrapper. Its body
+  IS the orchestration — it runs in the user's T0 session and dispatches
+  queue workers (test-scout-agent, tester-agent, visual-inspector-agent,
+  test-healer-agent) directly via Agent() at T0.
+- The deprecated e2e-conductor-agent is NOT dispatched by the skill — its
+  orchestration responsibilities are now inline in the skill body per spec
+  v2.2 §3.0 (Execution Model Constraint).
+- The skill must still be Playwright-scoped. Other frameworks must not appear
+  in support/capture/fallback instructions.
+- Pinned behavior on the deprecated e2e-conductor-agent still validates
+  (during 2-cycle deprecation window) that non-Playwright frameworks are
+  excluded; the conductor file remains untouched in Phase 3.1.
 """
 
 import json
@@ -38,34 +44,63 @@ def _parse_frontmatter_version(text: str) -> str | None:
 # ── SKILL.md (thin wrapper) content assertions ──────────────────────────────
 
 
-def test_skill_md_version_is_4_0_0():
+def test_skill_md_version_is_5_0_0():
+    """v5.0.0 (Phase 3.1): MAJOR rewrite as skill-at-T0 orchestrator."""
     version = _parse_frontmatter_version(_read(SKILL_MD))
-    assert version == "4.0.0", f"expected 4.0.0, got {version!r}"
+    assert version == "5.0.0", f"expected 5.0.0, got {version!r}"
 
 
-def test_skill_md_is_thin_wrapper():
-    """v4.0.0 consolidation: skill must be under 100 lines of wrapper logic."""
+def test_skill_md_is_skill_at_t0_orchestrator():
+    """v5.0.0: skill body IS the orchestrator (inline STEP 1..STEP 8).
+
+    Size budget: the body is a full orchestrator, so it is necessarily longer
+    than the old thin-wrapper form. Size cap is the self-containment warning
+    zone (500 lines) per pattern-self-containment.md — over that, reference
+    material must split into a references/ subdir.
+    """
     content = _read(SKILL_MD)
     lines = content.count("\n")
-    assert lines <= 150, (
-        f"SKILL.md has {lines} lines — expected thin wrapper (<=150). "
-        "Queue/healing logic should live in e2e-conductor-agent, not the skill."
+    assert lines <= 500, (
+        f"SKILL.md has {lines} lines — over the 500-line self-containment "
+        "warning zone. Split reference material into references/ subdir."
+    )
+    # Must have explicit STEP numbering — this is a skill-at-T0 orchestrator.
+    assert "## STEP 1: INIT" in content, (
+        "SKILL.md must declare STEP 1: INIT (skill-at-T0 orchestrator lifecycle)"
+    )
+    assert "## STEP 8: Report" in content, (
+        "SKILL.md must declare STEP 8: Report (skill-at-T0 final step)"
     )
 
 
-def test_skill_md_dispatches_conductor_agent():
-    """The skill's sole job is to dispatch e2e-conductor-agent."""
+def test_skill_md_dispatches_queue_workers_directly():
+    """v5.0.0: skill dispatches queue workers from T0, NOT e2e-conductor-agent.
+
+    Per spec v2.2 §3.0 the deprecated conductor's orchestration is inlined.
+    The skill body must name the direct worker dispatches for grep-ability.
+    """
     content = _read(SKILL_MD)
-    assert "e2e-conductor-agent" in content, (
-        "SKILL.md must dispatch e2e-conductor-agent for the queue/healing work"
+    for worker in (
+        "test-scout-agent",
+        "tester-agent",
+        "visual-inspector-agent",
+        "test-healer-agent",
+    ):
+        assert worker in content, (
+            f"SKILL.md must dispatch {worker} directly from T0; missing name"
+        )
+    # The deprecated conductor may appear ONLY in MUST-NOT / deprecation prose.
+    # Any positive "dispatch e2e-conductor-agent" instruction is a regression.
+    assert "Agent(subagent_type=\"e2e-conductor-agent\"" not in content, (
+        "SKILL.md must NOT dispatch the deprecated e2e-conductor-agent"
     )
 
 
-def test_skill_md_references_directory_is_removed():
-    """references/ content was migrated into the agents in v4.0.0."""
+def test_skill_md_references_directory_absent():
+    """No references/ subdir — orchestrator body stays self-contained under 500 lines."""
     references_dir = SKILL_DIR / "references"
     assert not references_dir.exists(), (
-        f"{references_dir} should be removed; content migrated into agents"
+        f"{references_dir} should be absent; orchestrator body is self-contained"
     )
 
 
