@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-24 19:47 UTC (auto-generated)
+> Last updated: 2026-04-24 19:52 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -136,8 +136,8 @@
 | jest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | k8s-deploy | skill | 1.0.2 | hub:abhayla/claude-best-practices | — |
 | learn-n-improve | skill | 2.3.0 | hub:abhayla/claude-best-practices | — |
-| learning-self-improvement | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| learning-self-improvement-master-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| learning-self-improvement | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| learning-self-improvement-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | mcp-server-builder | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | middleware-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
