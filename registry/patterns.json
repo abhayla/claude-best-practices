@@ -1675,17 +1675,21 @@
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
-    "description": "T2B sub-orchestrator skeleton for the three-lane test pipeline (PR1). Returns no-op contract; full triage subgraph (analyzer fan-out → issue-manager → fixer → serialize → escalation) activates in PR2.",
+    "description": "DEPRECATED 2026-04-24. Three-fan-out design (analyzer/issue-manager/fixer via batched Agent()) is platform-incompatible (Anthropic docs: subagents cannot spawn other subagents). Use /test-pipeline instead; Phase 3 will inline triage logic into skill-at-T0.",
     "tags": [
       "testing",
       "orchestration",
-      "triage"
+      "triage",
+      "deprecated"
     ],
-    "changelog": "v1.0.0: PR2 body activation (full triage subgraph); was v0.1.0 PR1 skeleton",
-    "tier": "must-have"
+    "changelog": "v1.0.0: PR2 body activation (full triage subgraph); was v0.1.0 PR1 skeleton. v1.1.0 (2026-04-24): deprecated — platform does not support nested Agent() dispatch; Phase 3 will dissolve into /test-pipeline skill body.",
+    "tier": "must-have",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "fastapi-api-tester-agent": {
     "hash": "f3d83c674aabc2f0dd45956a870b0962de39ac4e41ed00a1e4043de45510a75a",
@@ -4093,14 +4097,17 @@
     "hash": "2829c984adf2da033b40c6a53b3658f335dbbd8b5a35071d104666486df9dad3",
     "type": "agent",
     "category": "core",
-    "version": "4.3.0",
+    "version": "4.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
     "tier": "must-have",
-    "description": "Orchestrates the full test verification pipeline: cleanup, stage dispatch, gate enforcement, and result aggregation. Use when you need to run the"
+    "description": "DEPRECATED 2026-04-24. Three-lane design (scout + Wave 1 functional+API parallel + Wave 2 UI + T2B triage, all via nested Agent()) is platform-incompatible (Anthropic docs: subagents cannot spawn other subagents). Use /test-pipeline instead; Phase 3 will dissolve into skill-at-T0.",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "test-scout-agent": {
     "hash": "63bca56ea25b68b8533812d601fa81aa77173dcf16ec1d50db90eb15cb523841",
@@ -4156,21 +4163,25 @@
     "hash": "2bdd42d43fccdbd766ba432dd72056e50815ca412983f018afcb729e9872329a",
     "type": "agent",
     "category": "core",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
-    "description": "Orchestrate the full testing workflow: TDD, fix-loop, auto-verify, E2E, quality gates. Screenshot verdict authority for UI tests.",
+    "description": "DEPRECATED 2026-04-24. T1 workflow master design that dispatches T2 sub-orchestrators via Agent() is platform-incompatible (Anthropic docs: subagents cannot spawn other subagents). Use /test-pipeline instead; Phase 3 will dissolve into skill-at-T0 body.",
     "tags": [
       "orchestration",
       "workflow",
       "testing",
-      "verification"
+      "verification",
+      "deprecated"
     ],
-    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority. v2.0.0 (2026-04-22): promoted to must-have — T1 orchestrator must match its must-have T2 child test-pipeline-agent for the full workflow to be provisioned coherently. E2E sub-step auto-skips when no_ui_tests so non-Playwright projects absorb zero overhead.",
-    "tier": "must-have"
+    "changelog": "v1.0.0: Initial release — testing pipeline orchestration with screenshot authority. v2.0.0 (2026-04-22): promoted to must-have — T1 orchestrator must match its must-have T2 child test-pipeline-agent for the full workflow to be provisioned coherently. E2E sub-step auto-skips when no_ui_tests so non-Playwright projects absorb zero overhead. v3.1.0 (2026-04-24): deprecated — platform does not support nested Agent() dispatch; Phase 3 will dissolve into /test-pipeline skill body at T0.",
+    "tier": "must-have",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "testing-pipeline-workflow": {
     "hash": "e42f757fefcec3f482ded518eceecb168be6f95b051674e72cafea160c409e80",
