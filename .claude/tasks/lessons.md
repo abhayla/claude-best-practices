@@ -45,6 +45,37 @@ consolidation, pinned-content tests are valuable regression nets — migrate
 the assertions to the new authoritative location. Deleting them loses the
 regression surface; skipping them masks drift.
 
+## 2026-04-24 — Platform constraints cascade: one broken primitive can invalidate an entire architectural pattern
+
+**Surfaced during:** Blast-radius audit after Phase 1 of the subagent-dispatch-platform-limit remediation. Expected scope was 3 agents + 2 skills (test pipeline). Actual scope is ~30 files across the entire hub.
+
+**What I expected:** The nested-`Agent()`-dispatch bug was confined to the testing pipeline, because that's where I first saw it surface in the 2026-04-24 testbed run. Phase 1 deprecated 3 agents and 1 skill; Phase 3 would dissolve them into a single T0 skill. Bounded and tractable.
+
+**What actually happened:** The bug is the entire **workflow-master pattern** used by 8 workflows in `config/workflow-contracts.yaml`. Every `<workflow>-master-agent` declares `sub_orchestrators:` in the workflow contract and assumes it can dispatch them via `Agent()` at runtime — but every one of those masters is itself dispatched by a slash-command skill, making them subagents without `Agent` tool access. The test pipeline was just the first failure mode to surface, not the only one.
+
+Concrete blast radius:
+- 7 non-deprecated master-agents (`code-review`, `debugging-loop`, `development-loop`, `documentation`, `learning-self-improvement`, `session-continuity`, `skill-authoring`) all silently inlining their "sub-orchestrator" dispatches
+- 8 slash-command skills wrapping them
+- 8 `workflow-contracts.yaml` entries with stale `sub_orchestrators:` lists
+- 3 standalone orchestrators (`project-manager-agent`, `parallel-worktree-orchestrator-agent`, `e2e-conductor-agent`) with similar assumptions
+- 1 template (`workflow-master-template.md`) that seeds the broken pattern for future copy-paste
+- Manual docs (`README.md`, `docs/specs/*`, `docs/plans/*`) describing the tier model
+
+Total ~30 files, ~9 PRs, ~3000-4000 lines net to retire the pattern cleanly.
+
+**Generalizable rule:** When a finding invalidates a foundational primitive (here: nested subagent dispatch), scope the remediation by the **pattern that depends on the primitive**, not by the specific instance where the failure first surfaced. Run a blast-radius grep BEFORE planning fix scope — especially grep for the primitive's signatures (`Agent(subagent_type=…)`, `Agent` in `tools:`, pattern-specific config keys like `sub_orchestrators:`). The first failure mode is rarely the only failure mode.
+
+**How to apply next time:**
+1. After a platform/foundation finding, immediately audit for all consumers of the broken primitive — don't wait to "stumble into" the rest
+2. Prefer a template-first remediation (fix the pattern in one template, then propagate per-consumer) over a flat instance-by-instance rewrite — template-first prevents re-introduction via future copy-paste
+3. Expand the plan document (not the original PR) when scope grows — keep individual PRs small even if the overall plan is large; use the todo.md expansion to track the whole
+4. Run an eval gate after the first full consumer migration (canary) to validate the pattern holds before committing to migrating the rest
+
+**Evidence on disk:**
+- Audit findings: `.claude/tasks/todo.md` § "Phase 1.5 — Blast-radius audit"
+- Primary-probe lesson (the foundation finding): earlier entry in this file (2026-04-24, Parallel tool dispatch restrictions)
+- Workflow-contracts.yaml: 8 workflows declaring `sub_orchestrators:` as of this session
+
 ## 2026-04-24 — Parallel tool dispatch in Claude Code is more restricted than prompt-engineering guidance suggests
 
 **Surfaced during:** Phase 0 empirical probe for the subagent-dispatch-platform-limit remediation, session 2026-04-24.

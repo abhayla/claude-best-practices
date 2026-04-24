@@ -24,14 +24,12 @@ Phase 0 empirical probe further narrowed the architectural options.
   - `Agent` ×N at T0 → parallel (documented + confirmed)
   - `Agent` from subagent → blocked (Anthropic platform constraint)
 
-## BLOCKED ON USER — Wave 1 parallelism strategy decision
+## Strategy decision — RESOLVED (2026-04-24)
 
-Three options:
-- **A — T0-only orchestrator.** `/test-pipeline` becomes a prompt-injection skill; user's T0 session IS the orchestrator; it dispatches two lane subagents via `Agent()` for Wave 1.
-- **B — External script wrapper.** `scripts/run-test-pipeline.sh` spawns two `claude -p` processes for Wave 1; reads JSON artefacts; continues.
-- **C — Accept serial Wave 1.** Simplest. Loses ~2× wall-clock on balanced suites.
-
-Phase 1 streams 1.1 and 1.4 depend on this choice (they make architectural claims in docs). Phase 1 streams 1.2 and 1.3 are strategy-independent and may start immediately.
+User confirmed **Option A** (T0-only orchestrator). Every workflow becomes
+a skill-at-T0 pattern: slash command injects the orchestration logic into
+the user's T0 session, where `Agent()` actually works, so the session can
+dispatch flat worker subagents via `Agent()`.
 
 ## Phase 1 — Docs + deprecation markers — ✅ COMPLETE (branch: fix/subagent-dispatch-platform-limit-phase1)
 
@@ -88,29 +86,114 @@ Key changes on disk:
   fail the validator in Phase 2 (by design — that's the gate we're
   building).
 
-**Not pushed.** Branch held locally awaiting user direction on push +
-PR creation. The 4 pre-existing unpushed commits on main are also
-included in this branch's history.
+**Pushed.** Branch `fix/subagent-dispatch-platform-limit-phase1` up on
+origin; PR #20 open at https://github.com/abhayla/claude-best-practices/pull/20
+awaiting review/merge.
 
-## Phase 2 — Validator
+## Phase 1.5 — Blast-radius audit — ✅ COMPLETE (2026-04-24)
 
-- [ ] 2.1 Add `dispatched_from:` frontmatter field across all agents
-- [ ] 2.2 Invert `test_orchestrator_tool_grants.py` — context-aware based on `dispatched_from`
-- [ ] 2.3 Runtime-probe integration test with `@pytest.mark.integration`; wire into `validate-pr.yml`
+Before Phase 2, audited the hub for all other patterns assuming nested
+`Agent()` dispatch. Finding: the broken pattern is not confined to the
+test pipeline. It's the entire **workflow-master** idiom. Every workflow
+in `config/workflow-contracts.yaml` declares `sub_orchestrators:`; every
+`/<workflow>-workflow` skill dispatches a `<workflow>-master-agent` whose
+body assumes it can further dispatch those sub-orchestrators. All 8
+master-agents (7 non-deprecated + 1 deprecated in Phase 1) and 8 skill
+wrappers are affected.
 
-## Phase 3 — Architectural refactor
+Findings (see `.claude/tasks/lessons.md` 2026-04-24 audit entry for details):
+- **7 non-deprecated master-agents** with broken design:
+  `code-review-master-agent`, `debugging-loop-master-agent`,
+  `development-loop-master-agent`, `documentation-master-agent`,
+  `learning-self-improvement-master-agent`,
+  `session-continuity-master-agent`, `skill-authoring-master-agent`.
+- **3 standalone orchestrators** declaring `Agent` in tools:
+  `project-manager-agent` (T0-only — needs explicit enforcement),
+  `parallel-worktree-orchestrator-agent` (T0-only — needs enforcement),
+  `e2e-conductor-agent` (sub-orchestrator of test pipeline — broken).
+- **1 template**: `core/.claude/agents/workflow-master-template.md`
+  seeds the broken pattern for future copy-paste. **Highest-leverage fix.**
+- **8 `workflow-contracts.yaml` entries** with `sub_orchestrators:` lists
+  (testing-pipeline, development-loop, debugging-loop, code-review,
+  documentation, session-save, session-learn, skill-authoring).
+- **Manual docs** (README.md, docs/specs/*, docs/plans/*) still describe
+  the tier model — to be pruned per-workflow in each Phase 3 sub-PR.
 
-- [ ] 3.0 Micro-spec: merged `test-orchestrator-agent` responsibilities (exactly 4 per Rule 8), state ownership (Rule 6), Wave 1 dispatch shape (depends on strategy A/B/C)
-- [ ] 3.1 PR 3.1 — merge T2B into orchestrator
-- [ ] 3.2 EVAL GATE — before/after on 50-test representative suite; 5-criterion rubric
-- [ ] 3.3 PR 3.2 — merge T2A three-lane + complexity classifier
-- [ ] 3.4 PR 3.3 — three-lane spec rewrite with executable Skill() examples
+Phase 3 rescoped from "dissolve test-pipeline tier" to "retire entire
+workflow-master pattern across hub" — ~9 PRs, ~3000-4000 lines net.
 
-## Cross-cutting (throughout all phases)
+## Phase 2 — Validator (prerequisite for machine-verifying Phase 3 deprecations)
 
-- [ ] Cutover guard: every Phase 3 PR checks `.workflows/testing-pipeline/` for in-progress runs
-- [ ] Intermediate-state contract: valid `pipeline-verdict.json` between Phase 3 PRs
-- [ ] Principle 2 preservation: NON-NEGOTIABLE contents re-encoded in each `Skill()` dispatch prompt
+- [ ] 2.1 Add `dispatched_from:` frontmatter field to every agent in
+      `core/.claude/agents/` (enum: `T0` | `worker` | `dual-mode`)
+- [ ] 2.2 Invert `scripts/tests/test_orchestrator_tool_grants.py` —
+      context-aware based on `dispatched_from`: T0 MUST declare Agent;
+      worker MUST NOT; dual-mode MAY with body-scan warning
+- [ ] 2.3 Runtime-probe integration test with `@pytest.mark.integration`;
+      dispatches a throwaway subagent and asserts Agent is absent from
+      its tool list; wire into `validate-pr.yml` required checks
+- [ ] 2.4 Update `core/.claude/rules/pattern-structure.md` to document
+      the new `dispatched_from:` field in Agent Structure section
+
+Estimated: 1 PR, ~300 lines, after PR #20 merges.
+
+## Phase 3 — Workflow-master pattern retirement (template-first sequence)
+
+**Key principle:** template-first (highest leverage) then per-workflow PRs
+in priority order (test pipeline, then by impact). Each PR ≤ 400 lines
+per git-collaboration.md. Eval gate between PR 3.1 and PR 3.2 (test
+pipeline as canary).
+
+- [ ] 3.0 TEMPLATE-FIRST — rewrite `workflow-master-template.md` to
+      document the skill-at-T0 pattern; update `pattern-structure.md`'s
+      workflow-master section; ~150 lines
+- [ ] 3.1 TEST PIPELINE — `/test-pipeline` body becomes the orchestration;
+      deprecate `e2e-conductor-agent`; rewrite `/e2e-visual-run`; update
+      `config/workflow-contracts.yaml` testing-pipeline entry; rewrite
+      spec §3.3/3.5/3.8 with executable Skill() + Agent() examples; ~800 lines
+- [ ] 3.1-gate EVAL GATE — run current vs post-3.1 on representative
+      50-test suite; 5-criterion rubric (lane-dispatch correctness, budget
+      enforcement, gate evaluation, return-contract fidelity, wall-clock);
+      human review checkpoint
+- [ ] 3.2 DEVELOPMENT LOOP — deprecate `development-loop-master-agent`;
+      rewrite `/development-loop` skill body; ~250 lines
+- [ ] 3.3 DEBUGGING LOOP — deprecate `debugging-loop-master-agent`;
+      rewrite `/debugging-loop`; ~250 lines
+- [ ] 3.4 CODE REVIEW — deprecate `code-review-master-agent`;
+      rewrite `/code-review-workflow`; ~250 lines
+- [ ] 3.5 DOCUMENTATION — deprecate `documentation-master-agent` (also
+      has inline Agent(subagent_type=...) calls to clean up);
+      rewrite `/documentation-workflow`; ~250 lines. **Halfway eval
+      checkpoint — is the pattern holding?**
+- [ ] 3.6 SESSION CONTINUITY — deprecate `session-continuity-master-agent`;
+      rewrite `/session-continuity`; update session-save + session-learn
+      workflow contracts; ~200 lines
+- [ ] 3.7 LEARNING — deprecate `learning-self-improvement-master-agent`;
+      rewrite `/learning-self-improvement`; ~200 lines
+- [ ] 3.8 SKILL AUTHORING — deprecate `skill-authoring-master-agent`;
+      rewrite `/skill-authoring-workflow`; ~200 lines
+- [ ] 3.9 STANDALONES — `project-manager-agent` +
+      `parallel-worktree-orchestrator-agent` get `dispatched_from: T0`
+      frontmatter enforcement; verify `/pipeline-orchestrator` is already
+      skill-at-T0; final grep for any remaining nested `Agent()` patterns
+      in the hub. ~100 lines
+
+## Cross-cutting (throughout Phase 3)
+
+- [ ] Cutover guard: every Phase 3 PR checks `.workflows/<workflow-id>/`
+      for in-progress runs and fails fast if any exist
+- [ ] Intermediate-state contract: between PRs, the system must still
+      produce valid per-workflow return contracts (workflows don't
+      depend on each other, so single-workflow refactors stay isolated)
+- [ ] Principle 2 (Anthropic skill) boundary preservation:
+      NON-NEGOTIABLE block contents from each deprecated master-agent
+      re-encoded in the replacement skill's dispatch prompts — no
+      behavioral regression, just relocation
+- [ ] Auto-generated doc regen: after each Phase 3 PR merges, trigger
+      `generate_docs.py` + `generate_workflow_docs.py` to refresh
+      `docs/workflows/*`, `docs/DASHBOARD.md`, `docs/dashboard.html`
+- [ ] Manual doc prune: each Phase 3 PR removes its workflow's
+      references from `README.md`, `docs/specs/*`, `docs/plans/*`
 
 ## Completed sections below (preserved for reference)
 
