@@ -18,7 +18,7 @@ triggers:
   - full test pipeline
   - test verification pipeline
   - run test pipeline
-version: "2.1.0"
+version: "2.1.1"
 ---
 
 # /test-pipeline — Skill-at-T0 Orchestrator
@@ -76,19 +76,20 @@ Mutually exclusive: `--skip-fix` and `--update-baselines` MUST NOT both be set.
 2. **Read config.** `Read .claude/config/test-pipeline.yml`. Required keys
    (schema 2.0.0): `capture_proof.enabled`, `lanes.ui.use_checkpoint`,
    `lanes.parallel_classifier.enabled`, `lanes.parallel_classifier.min_test_count`,
-   `budgets.max_total_dispatches` (default 100), `budgets.max_wall_clock_minutes`
-   (default 90), `budgets.global_retries_remaining` (default 15),
+   `budget.max_total_dispatches` (default 100), `budget.max_wall_clock_minutes`
+   (default 90), `retry.global_budget` (default 15),
    `concurrency.max_concurrent_analyzers` (default 5),
    `concurrency.max_concurrent_issue_managers` (default 5),
    `concurrency.max_concurrent_fixers` (default 5), `auto_heal.*`.
 2a. **Config schema gate.** If `schema_version != "2.0.0"` OR any of
-    `lanes.parallel_classifier`, `budgets.max_total_dispatches`,
-    `budgets.max_wall_clock_minutes` is missing → fail-fast: write BLOCKED
-    verdict `{"result": "BLOCKED", "blocker": "CONFIG_SCHEMA_INCOMPATIBLE",
-    "observed_schema": <or null>, "missing_keys": [...], "remediation":
-    "Run /update-practices"}` to `test-results/pipeline-verdict.json`, emit
-    event, print remediation, exit. Prevents silent key-shape mismatches
-    (the 2026-04-24 downstream gap).
+    `lanes.parallel_classifier`, `budget.max_total_dispatches`,
+    `budget.max_wall_clock_minutes`, `retry.global_budget` is missing →
+    fail-fast: write BLOCKED verdict `{"result": "BLOCKED", "blocker":
+    "CONFIG_SCHEMA_INCOMPATIBLE", "observed_schema": <or null>,
+    "missing_keys": [...], "remediation": "Run /update-practices"}` to
+    `test-results/pipeline-verdict.json`, emit event, print remediation,
+    exit. Prevents silent key-shape mismatches (the 2026-04-24 downstream
+    gap).
 3. **Generate `run_id`.** Format: `{UTC ISO-8601}_{7-char git sha}` with `:`
    replaced by `-`. Bash: `run_id="$(date -u +%Y-%m-%dT%H-%M-%SZ)_$(git rev-parse --short=7 HEAD)"`.
 4. **Clean prior artifacts.** Remove `test-results/`, `test-evidence/`, and
@@ -290,9 +291,9 @@ that wave).
 Before every chunk dispatch:
 
 ```
-if state.dispatches_used >= config.budgets.max_total_dispatches:
+if state.dispatches_used >= config.budget.max_total_dispatches:
     emit BLOCKED verdict "BUDGET_EXHAUSTED_DISPATCHES", go to STEP 9
-if wall_clock_elapsed_minutes(state) >= config.budgets.max_wall_clock_minutes:
+if wall_clock_elapsed_minutes(state) >= config.budget.max_wall_clock_minutes:
     emit BLOCKED verdict "BUDGET_EXHAUSTED_WALL_CLOCK", go to STEP 9
 ```
 

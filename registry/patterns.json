@@ -4074,10 +4074,10 @@
     "tier": "nice-to-have"
   },
   "test-pipeline": {
-    "hash": "e3325246410df6b68dae523f2564c5b11171a4356caa50a8bb24ed3bab1b0ddf",
+    "hash": "24b83f6b390e763f4d698ec5fcf7e732ab62c541ddf95c17b87894adc60323e0",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-04-24",
@@ -4094,7 +4094,7 @@
       "pipeline",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a \u2014 CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap",
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a \u2014 CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap | v2.1.1 (2026-04-24): PATCH \u2014 budget key names aligned with actual config (budgets.* \u2192 budget.*; added retry.global_budget). PR #26 schema gate correctly detected the mismatch at run-time on the testbed.",
     "tier": "must-have"
   },
   "test-pipeline-agent": {
