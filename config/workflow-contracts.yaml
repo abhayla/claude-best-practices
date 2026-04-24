@@ -268,12 +268,13 @@ workflows:
     handoff_suggestions: []
 
   session-continuity:
-    description: "Save → restore → handover between sessions"
-    master_agent: session-continuity-master-agent
+    description: "Save → restore → handover — skill-at-T0 orchestrator (Phase 3.6, spec v2.2)."
+    master_agent: null
+    entry_skill: session-continuity
     state_file: ".workflows/session-continuity/state.json"
-    sub_orchestrators:
-      - agent: session-summarizer-agent
-        role: "Session analysis and summary generation"
+    # session-summarizer-agent dispatched directly from T0 by the skill body
+    # (optional, via --deep-summary flag). Worker only.
+    sub_orchestrators: []
     steps:
       - id: save
         skill: save-session

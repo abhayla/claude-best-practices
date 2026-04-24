@@ -3569,13 +3569,13 @@
     "tier": "must-have"
   },
   "session-continuity": {
-    "hash": "c4a03dfa2a5cf32c56b1042e015419ecfc75f015fc72bc51a3cc13b05dbd0f4f",
+    "hash": "128c9fd539b4efa17f1d0a0cf42057bc6e89b8eb5c4943ffe950031c83a8f6b6",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Slash-command wrapper for session-continuity-master-agent. Session save, restore, and handover.",
@@ -3584,17 +3584,17 @@
       "workflow",
       "session"
     ],
-    "changelog": "v1.0.0: Add triggers, registry sync",
+    "changelog": "v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
     "tier": "nice-to-have"
   },
   "session-continuity-master-agent": {
-    "hash": "826ff7840453485ad4c7116c393054ffedf44594174469a2a297d1bda5c5097a",
+    "hash": "52f3aa877a1f51b32f9674468cf8a7d28abd3ac2943aa04dd9d6f6e7038ded99",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Orchestrate session save, restore, and handover. Mode-aware (save vs restore) with freshness validation.",
@@ -3603,8 +3603,10 @@
       "workflow",
       "session"
     ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.6)",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "session-continuity"
   },
   "session-reminder": {
     "hash": "97dc8ffa553ff1b0f08234549c4d8bad107a31bdc643beec637dc82738ff3cde",

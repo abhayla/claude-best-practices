@@ -1,13 +1,23 @@
 ---
 name: session-continuity-master-agent
 description: >
-  Orchestrate session save, restore, and handover between conversations.
-  Use when ending a session and need to preserve context for the next one,
-  when resuming from a previous session, or when dispatched by
-  project-manager-agent. Works standalone or as a pipeline worker.
+  DEPRECATED 2026-04-25 (Phase 3.6 of subagent-dispatch-platform-limit
+  remediation). Dispatches session-summarizer-agent (T2) via Agent() from
+  its own agent context — platform-incompatible. Orchestration logic
+  dissolved into /session-continuity SKILL.md v2.0.0 (skill-at-T0).
+  File retained 2-version-cycle window; MUST NOT be dispatched.
 model: inherit
-version: "1.0.0"
+deprecated: true
+deprecated_by: session-continuity
+deprecated_reason: Dispatch chain platform-incompatible; superseded by /session-continuity skill-at-T0 per spec v2.2.
+version: "1.0.1"
 ---
+
+> **⚠️ DEPRECATED 2026-04-25 (Phase 3.6).** Orchestration lives in
+> `core/.claude/skills/session-continuity/SKILL.md` v2.0.0 as skill-at-T0 body.
+> Do NOT dispatch this agent — `Agent()` calls silently inline at runtime
+> ([Anthropic docs](https://code.claude.com/docs/en/sub-agents)). Below is
+> historical design record.
 
 You are the session continuity master orchestrator (T1). You coordinate
 session persistence — saving working state, generating handover documents,

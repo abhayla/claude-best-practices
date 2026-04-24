@@ -134,10 +134,10 @@ class TestContractFilesExist:
         )
 
 
-# Workflows still using the legacy master-agent pattern (Phases 3.1-3.5 have
-# retired 5 workflows to skill-at-T0; Phases 3.6-3.8 retire these 3 too).
+# Workflows still using the legacy master-agent pattern (Phases 3.1-3.6 have
+# retired 6 workflows to skill-at-T0; Phases 3.7-3.8 retire these 2 too).
 MASTER_AGENT_WORKFLOWS = [
-    "session-continuity", "learning-self-improvement", "skill-authoring",
+    "learning-self-improvement", "skill-authoring",
 ]
 
 # Workflows that have migrated to the skill-at-T0 pattern (spec v2.2).
@@ -147,7 +147,8 @@ SKILL_AT_T0_WORKFLOWS = [
     "development-loop",   # Phase 3.2 (PR #28)
     "debugging-loop",     # Phase 3.3 (PR #29)
     "code-review",        # Phase 3.4 (PR #30)
-    "documentation",      # Phase 3.5 (this PR)
+    "documentation",      # Phase 3.5 (PR #31)
+    "session-continuity", # Phase 3.6 (this PR)
 ]
 
 
