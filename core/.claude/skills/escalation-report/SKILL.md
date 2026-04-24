@@ -1,11 +1,11 @@
 ---
 name: escalation-report
 description: >
-  Generate `test-results/escalation-report.md` when the three-lane test pipeline's
-  T2B (`failure-triage-agent`) hits the global retry budget (default 15) or
-  dispatch budget (default 100) with failures still unresolved. Use when budget
-  exhaustion has stopped further fix attempts and you need to surface what's
-  resolved vs what's open for the next session.
+  Generate `test-results/escalation-report.md` when `/test-pipeline` (skill-at-T0,
+  spec v2.2) hits the global retry budget (default 15), dispatch budget (default
+  100), or wall-clock budget (default 90 min) with failures still unresolved.
+  Use when budget exhaustion has stopped further fix attempts and you need to
+  surface what's resolved vs what's open for the next session.
 type: workflow
 allowed-tools: "Bash Read Write"
 argument-hint: "<run-id> <state-json-path>"
@@ -16,13 +16,18 @@ version: "1.1.0"
 
 Writes a human-readable escalation report covering resolved Issues, unresolved
 Issues with `pipeline-fix-failed` label, and recommended next actions.
-Invoked by T2B (`failure-triage-agent`) on budget exhaustion per spec §3.11.
+Invoked by `/test-pipeline` (skill-at-T0) on budget exhaustion at STEP 6
+TRIAGE (before Fan-out dispatch if budget guard trips) or STEP 7
+VERIFY-AFFECTED (if retry budget exhausts).
 
 **Request:** $ARGUMENTS — `<run-id> <state-json-path>`
 - `<run-id>`: pipeline run ID (e.g., `2026-04-23T14-30-00Z_abc1234`)
-- `<state-json-path>`: path to T2B's triage state file containing per-Issue outcomes
+- `<state-json-path>`: path to the single consolidated state file at
+  `.workflows/testing-pipeline/state.json` containing per-Issue outcomes
+  (single state file per spec v2.2 §3.4)
 
-> Spec reference: `docs/specs/test-pipeline-three-lane-spec.md` v1.6 §3.11
+> Spec reference: `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2 §3.3
+> (budget ownership at T0, BLOCKED verdict emission)
 
 ---
 

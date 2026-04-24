@@ -134,36 +134,45 @@ class TestContractFilesExist:
         )
 
 
+# Workflows still using the legacy master-agent pattern (Phase 3.1 has retired
+# testing-pipeline to skill-at-T0; Phases 3.2-3.8 will retire these 7 too).
+MASTER_AGENT_WORKFLOWS = [
+    "development-loop", "debugging-loop", "code-review", "documentation",
+    "session-continuity", "learning-self-improvement", "skill-authoring",
+]
+
+# Workflows that have migrated to the skill-at-T0 pattern (spec v2.2).
+# master_agent is null; entry_skill names the skill-at-T0 orchestrator.
+SKILL_AT_T0_WORKFLOWS = [
+    "testing-pipeline",
+]
+
+
 class TestMasterAgentsExist:
-    """Every workflow contract must have a master agent that exists on disk."""
+    """Every legacy workflow contract must have a master agent that exists on disk."""
 
     @pytest.fixture
     def workflow_ids(self, workflows):
         return list(workflows.keys())
 
     def test_all_contracts_have_master_agent_field(self, workflows):
+        """Every workflow (legacy or skill-at-T0) MUST declare master_agent
+        explicitly — either an agent name (legacy) or null (skill-at-T0).
+        Absent field is an error."""
         missing = [
             wf_id for wf_id, wf in workflows.items()
             if "master_agent" not in wf
         ]
         assert missing == [], f"Workflows missing master_agent: {missing}"
 
-    @pytest.mark.parametrize("wf_id", [
-        "development-loop", "testing-pipeline", "debugging-loop",
-        "code-review", "documentation", "session-continuity",
-        "learning-self-improvement", "skill-authoring",
-    ])
+    @pytest.mark.parametrize("wf_id", MASTER_AGENT_WORKFLOWS)
     def test_master_agent_exists_on_disk(self, wf_id, workflows, existing_agents):
         master = workflows[wf_id]["master_agent"]
         assert master in existing_agents, (
             f"Workflow '{wf_id}' master agent '{master}' not found on disk"
         )
 
-    @pytest.mark.parametrize("wf_id", [
-        "development-loop", "testing-pipeline", "debugging-loop",
-        "code-review", "documentation", "session-continuity",
-        "learning-self-improvement", "skill-authoring",
-    ])
+    @pytest.mark.parametrize("wf_id", MASTER_AGENT_WORKFLOWS)
     def test_master_agent_naming_convention(self, wf_id, workflows):
         """Master agent should follow {workflow-id}-master-agent convention."""
         master = workflows[wf_id]["master_agent"]
@@ -175,13 +184,9 @@ class TestMasterAgentsExist:
 
 
 class TestMasterAgentContent:
-    """Master agents must have the right structure for autonomous operation."""
+    """Master agents (legacy pattern) must have the right structure."""
 
-    @pytest.mark.parametrize("wf_id", [
-        "development-loop", "testing-pipeline", "debugging-loop",
-        "code-review", "documentation", "session-continuity",
-        "learning-self-improvement", "skill-authoring",
-    ])
+    @pytest.mark.parametrize("wf_id", MASTER_AGENT_WORKFLOWS)
     def test_master_agent_has_frontmatter(self, wf_id, workflows):
         master = workflows[wf_id]["master_agent"]
         path = AGENTS_DIR / f"{master}.md"
@@ -190,11 +195,7 @@ class TestMasterAgentContent:
         assert "name" in fm, f"Master agent '{master}' missing 'name'"
         assert "model" in fm, f"Master agent '{master}' missing 'model'"
 
-    @pytest.mark.parametrize("wf_id", [
-        "development-loop", "testing-pipeline", "debugging-loop",
-        "code-review", "documentation", "session-continuity",
-        "learning-self-improvement", "skill-authoring",
-    ])
+    @pytest.mark.parametrize("wf_id", MASTER_AGENT_WORKFLOWS)
     def test_master_agent_references_config(self, wf_id, workflows):
         """Master agent body must reference workflow-contracts.yaml."""
         master = workflows[wf_id]["master_agent"]
@@ -204,11 +205,7 @@ class TestMasterAgentContent:
             f"Master agent '{master}' doesn't reference workflow-contracts config"
         )
 
-    @pytest.mark.parametrize("wf_id", [
-        "development-loop", "testing-pipeline", "debugging-loop",
-        "code-review", "documentation", "session-continuity",
-        "learning-self-improvement", "skill-authoring",
-    ])
+    @pytest.mark.parametrize("wf_id", MASTER_AGENT_WORKFLOWS)
     def test_master_agent_has_dual_mode(self, wf_id, workflows):
         """Master agent must document standalone and dispatched modes."""
         master = workflows[wf_id]["master_agent"]
@@ -219,6 +216,44 @@ class TestMasterAgentContent:
         )
         assert "dispatched" in content or "dispatch" in content, (
             f"Master agent '{master}' doesn't document dispatched mode"
+        )
+
+
+class TestSkillAtT0Workflows:
+    """Workflows migrated to the skill-at-T0 pattern (spec v2.2, Phase 3.1+).
+
+    A skill-at-T0 workflow has:
+    - master_agent: null (dissolved into the T0 skill body)
+    - entry_skill: <slug> (names the skill that injects into T0)
+    - sub_orchestrators: [] (empty list — no intermediate orchestrators)
+    - The named entry_skill exists on disk with a SKILL.md
+    """
+
+    @pytest.mark.parametrize("wf_id", SKILL_AT_T0_WORKFLOWS)
+    def test_master_agent_is_null(self, wf_id, workflows):
+        assert workflows[wf_id]["master_agent"] is None, (
+            f"Workflow '{wf_id}' should have master_agent: null (skill-at-T0 pattern)"
+        )
+
+    @pytest.mark.parametrize("wf_id", SKILL_AT_T0_WORKFLOWS)
+    def test_entry_skill_declared(self, wf_id, workflows):
+        assert "entry_skill" in workflows[wf_id], (
+            f"Workflow '{wf_id}' must declare entry_skill (skill-at-T0 pattern)"
+        )
+
+    @pytest.mark.parametrize("wf_id", SKILL_AT_T0_WORKFLOWS)
+    def test_entry_skill_exists_on_disk(self, wf_id, workflows, existing_skills):
+        entry = workflows[wf_id]["entry_skill"]
+        assert entry in existing_skills, (
+            f"Workflow '{wf_id}' entry_skill '{entry}' not found as a skill"
+        )
+
+    @pytest.mark.parametrize("wf_id", SKILL_AT_T0_WORKFLOWS)
+    def test_sub_orchestrators_is_empty_list(self, wf_id, workflows):
+        subs = workflows[wf_id].get("sub_orchestrators")
+        assert subs == [], (
+            f"Workflow '{wf_id}' should have empty sub_orchestrators list "
+            f"(skill-at-T0 pattern); got: {subs!r}"
         )
 
 

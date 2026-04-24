@@ -144,13 +144,102 @@ in priority order (test pipeline, then by impact). Each PR ≤ 400 lines
 per git-collaboration.md. Eval gate between PR 3.1 and PR 3.2 (test
 pipeline as canary).
 
-- [ ] 3.0 TEMPLATE-FIRST — rewrite `workflow-master-template.md` to
+- [x] 3.0 TEMPLATE-FIRST — rewrite `workflow-master-template.md` to
       document the skill-at-T0 pattern; update `pattern-structure.md`'s
-      workflow-master section; ~150 lines
-- [ ] 3.1 TEST PIPELINE — `/test-pipeline` body becomes the orchestration;
-      deprecate `e2e-conductor-agent`; rewrite `/e2e-visual-run`; update
-      `config/workflow-contracts.yaml` testing-pipeline entry; rewrite
-      spec §3.3/3.5/3.8 with executable Skill() + Agent() examples; ~800 lines
+      workflow-master section; ~150 lines — PR #22
+
+### Phase 3.1 — IN PROGRESS (branch `feat/phase3-1-test-pipeline-skill-at-t0`)
+
+**Open questions resolved 2026-04-24 session 3:** all 4 questions answered
+with the "lean" option per spec v2.1 §7:
+- Q1 Inline orchestration (no sub-skill delegation for orchestration logic)
+- Q2 Preserve empty `sub_orchestrators: []` in workflow-contracts.yaml
+- Q3 `/e2e-visual-run` stays independent from `/test-pipeline`
+- Q4 Complexity classifier ships in 3.1 behind `lanes.parallel_classifier.enabled`
+   (default on for suites ≥50 tests, off otherwise)
+
+Sub-commit plan:
+- [x] 3.1.1 Spec lock — §7 RESOLVED, status PROPOSED → ACCEPTED, v2.2
+      revision note; SUPERSEDED banner on v1.7 spec — commit `39679be`
+- [x] 3.1.2 Skill rewrites — `/test-pipeline` SKILL.md inline 9-step
+      orchestrator per v2 §3.1 (480 lines, 1.1.0→2.0.0 MAJOR);
+      `/e2e-visual-run` SKILL.md independent queue-worker dispatcher
+      (330 lines, 4.0.0→5.0.0 MAJOR) — commit `7039cd1`
+- [x] 3.1.3 Worker-body + skill prune — 8 agent bodies + 7 skill bodies +
+      rules/testing.md updated to drop tier-dispatch / deprecated-agent
+      refs; left deprecated files + 7 other workflow-masters untouched
+      (Phase 3.2–3.9 scope) — commit `091e47e`
+- [x] 3.1.4 Config + classifier — `config/workflow-contracts.yaml`
+      testing-pipeline gets `master_agent: null`, `entry_skill: test-pipeline`,
+      `sub_orchestrators: []`; `config/test-pipeline.yml` gets
+      `lanes.parallel_classifier` block (default enabled, min_test_count 50);
+      registry/patterns.json refreshed 17 hashes + 2 MAJOR version bumps;
+      test_workflow_autonomy split into legacy vs skill-at-T0 parametrize
+      lists; test_e2e_visual_run_playwright_only pinned tests updated for
+      v5.0.0 orchestrator shape — commit `83dfbfd`
+- [x] 3.1.5 Docs prune + regen — README test-pipeline row + slash command
+      inventory + 4-tier architecture diagram updated for skill-at-T0;
+      post-scripts on `docs/plans/test-pipeline-overhaul-*.md`;
+      SUPERSEDED banners on `docs/plans/test-pipeline-three-lane-pr2-plan.md`
+      and `docs/sequence diagram testing-pipeline-workflow.md`; footnote on
+      `docs/QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md`;
+      `docs/stages/STAGE-7-IMPLEMENTATION.md` invocation description updated;
+      `generate_docs.py` + `generate_workflow_docs.py` regenerated
+      dashboard, STACK-CATALOG, GETTING-STARTED, workflows/*, config/workflow-groups.yml
+
+- [x] 3.1 TEST PIPELINE — `/test-pipeline` body is now the orchestration
+      at T0; `e2e-conductor-agent` left deprecated (2-cycle window);
+      `/e2e-visual-run` rewritten as independent skill-at-T0;
+      `config/workflow-contracts.yaml` testing-pipeline entry cleaned;
+      v2 spec §3.3/3.5/3.8 inlined as /test-pipeline STEPs 3/6/4 with
+      executable Agent() + Skill() examples. Total: 5 commits,
+      ~1340 insertions, ~230 deletions across 28 files.
+
+### Phase 3.1 — ✅ COMPLETE (branch `feat/phase3-1-test-pipeline-skill-at-t0`)
+
+**Outcome:** 5 commits on feature branch; all 4 CI gates green
+(dedup --validate-all ✅, dedup --secret-scan ✅,
+workflow_quality_gate_validate_patterns ✅ 0 warnings,
+pytest 1406 passed / 125 skipped / 1 xfailed).
+
+**Acceptance criteria status:**
+- AC-001 end-to-end run on ≥50-test suite: REQUIRES MANUAL RUN in a real
+  target project. Spec-verified via /test-pipeline STEP 1..9 lifecycle
+  matching spec v2.2 §3.1 by construction.
+- AC-002 no nested Agent() in workers: VERIFIED — grep for
+  `Agent(subagent_type=` in non-deprecated worker bodies returns zero
+  hits against the Phase 3.1 scope (test-pipeline workers). The remaining
+  hits are in the Phase 3.0 workflow-master-template.md (pedagogical,
+  `dispatched_from: T0`) and the other 7 workflow-master agents still
+  queued for Phase 3.2–3.8 migration.
+- AC-003 5-criterion eval gate: DEFERRED to manual run — the eval runs
+  outside the PR diff against a representative 50-test suite.
+- AC-004 CI gates green: VERIFIED — all 4 pass with 0 warnings after
+  commit 5's doc regeneration.
+- AC-005 cutover safety (PIPELINE_IN_PROGRESS): ENCODED in /test-pipeline
+  SKILL.md STEP 1 INIT bullet 4 (cleanup prior artifacts). Full cutover
+  gate (pre-merge check for in-progress runs) is a runtime check in the
+  deploy script, not a file change — present as a MUST rule at the skill
+  body bottom.
+
+**What could break:**
+- Downstream projects running `/test-pipeline` against a stale provisioned
+  copy will see v1 wrapper behavior (dispatches `test-pipeline-agent`
+  which is now deprecated and silently inlines). Mitigation: next
+  `/update-practices` on the downstream side pulls v2.0.0 body;
+  `sync-to-projects.yml` scheduled run will push automatically.
+- The `/testing-pipeline-workflow` slash command is still in deprecated
+  state (Phase 1); it will continue to "work" by dispatching the
+  deprecated T1 master agent whose body now lives in spec v1.7 SUPERSEDED
+  form. Users see deprecation banner and are directed to `/test-pipeline`.
+- `state.json` schema v2.0.0 is incompatible with any mid-run v1 state
+  file on disk — the skill body's STEP 1 INIT explicitly cleans the
+  legacy sub-state dir (`.workflows/testing-pipeline/sub/`) as part of
+  the v1→v2 cutover.
+- Manual docs (`docs/plans/*`, `docs/QA-*`) carry post-script banners
+  pointing at spec v2.2 but still describe the old tier model in the
+  body. Low risk (banners block confusion) and Phase 3.9 will do the
+  deeper cleanup sweep.
 - [ ] 3.1-gate EVAL GATE — run current vs post-3.1 on representative
       50-test suite; 5-criterion rubric (lane-dispatch correctness, budget
       enforcement, gate evaluation, return-contract fidelity, wall-clock);

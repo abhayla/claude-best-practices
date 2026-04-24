@@ -154,10 +154,11 @@ Skills don't just run independently — they coordinate as teams. Each of the 8 
 │   implement → verify →    │   planner-researcher-agent                     │                                  │
 │   commit                  │                                                │                                  │
 ├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Testing Pipeline          │ testing-pipeline-master-agent                  │ /testing-pipeline-workflow        │
-│   TDD → fix-loop →        │   dispatches: test-pipeline-agent,             │                                  │
-│   auto-verify → E2E →     │   e2e-conductor-agent, tester-agent,           │                                  │
-│   quality gates           │   test-failure-analyzer-agent                  │                                  │
+│ Testing Pipeline          │ (skill-at-T0 — no master agent)                │ /test-pipeline                   │
+│   scout → Wave 1 lanes →  │   dispatches at T0: test-scout-agent,          │  (/testing-pipeline-workflow      │
+│   Wave 2 UI → JOIN →      │   tester-agent, fastapi-api-tester-agent,      │   DEPRECATED 2026-04-24)         │
+│   triage → verify-        │   visual-inspector-agent, test-failure-        │                                  │
+│   affected → commit       │   analyzer-agent, github-issue-manager-agent   │                                  │
 ├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
 │ Debugging Loop            │ debugging-loop-master-agent                    │ /debugging-loop                  │
 │   diagnose → fix →        │   dispatches: debugger-agent,                  │                                  │
@@ -185,31 +186,54 @@ Skills don't just run independently — they coordinate as teams. Each of the 8 
 └───────────────────────────┴────────────────────────────────────────────────┴──────────────────────────────────┘
 ```
 
-Each master-agent works **standalone** (invoke directly) or **dispatched** by `project-manager-agent` as part of the full PRD-to-Production pipeline. The orchestration hierarchy follows a 4-tier model:
+Each workflow runs from the user's T0 session via its slash command. The
+testing-pipeline has migrated to the **skill-at-T0** pattern (2026-04-24,
+Phase 3.1) — its orchestrator body is injected into T0 rather than dispatched
+as a worker subagent. The 7 other workflows are still on the legacy
+workflow-master pattern and will migrate in Phase 3.2–3.8.
+
+**Why the migration:** Anthropic's Claude Code does not forward the `Agent`
+tool to dispatched subagents
+([docs](https://code.claude.com/docs/en/sub-agents),
+[GH #19077](https://github.com/anthropics/claude-code/issues/19077)).
+A dispatched agent cannot dispatch further agents — every `Agent()` call
+in its body silently inlines as serial work at runtime. The skill-at-T0
+pattern relocates orchestration into the user's T0 session, where `Agent()`
+actually works; flat worker subagents can then be dispatched in parallel
+via a single T0 assistant message. The legacy 4-tier model is retained
+below as historical context:
 
 ```
-T0  project-manager-agent          ← full pipeline orchestrator
+T0  project-manager-agent          ← full pipeline orchestrator (still T0)
+     │
+     ├── /test-pipeline (skill-at-T0, spec v2.2)   ← CANONICAL shape (Phase 3.1 migration)
+     │    └── dispatches flat workers at T0 in one assistant message:
+     │         test-scout-agent, tester-agent, fastapi-api-tester-agent,
+     │         visual-inspector-agent, test-failure-analyzer-agent,
+     │         github-issue-manager-agent, stack-specific fixer agents
+     │
+     │    ── LEGACY 4-tier for the remaining 7 workflows (Phase 3.2-3.8 queued) ──
      │
 T1  ├── development-loop-master    ← workflow master (standalone or dispatched)
      │    │
-T2  │    ├── plan-executor-agent   ← sub-orchestrator
+T2  │    ├── plan-executor-agent   ← sub-orchestrator (platform-incompatible —
+     │    │                           dispatched sub-orchestrators cannot
+     │    │                           dispatch further; see docs/specs/
+     │    │                           test-pipeline-three-lane-spec-v2.md
+     │    │                           §1 for the platform-constraint note)
      │    │
 T3  │    └── (worker agents)       ← leaf workers (Skill() only)
-     │
-T1  ├── testing-pipeline-master
-     │    │
-T2  │    ├── e2e-conductor-agent
-     │    │    │
-T3  │    │    ├── test-scout-agent
-     │    │    ├── visual-inspector-agent
-     │    │    └── test-healer-agent
-     │    │
-T2  │    └── test-pipeline-agent
      │
 T1  └���─ ... (6 more workflow masters)
 ```
 
-Context passes between steps automatically — no skill starts from scratch. See [`docs/specs/workflow-master-agents-spec.md`](docs/specs/workflow-master-agents-spec.md) for the full architecture.
+Context passes between steps via structured return contracts — no skill starts
+from scratch. For the canonical skill-at-T0 design (test pipeline + queued
+migrations), see
+[`docs/specs/test-pipeline-three-lane-spec-v2.md`](docs/specs/test-pipeline-three-lane-spec-v2.md)
+v2.2. For the legacy workflow-master pattern still in use by 7 workflows, see
+[`docs/specs/workflow-master-agents-spec.md`](docs/specs/workflow-master-agents-spec.md)
+(partially superseded — test-pipeline scope replaced by spec v2.2).
 
 ---
 
@@ -310,7 +334,8 @@ Universal patterns (no prefix) are included for all stacks.
 | `/contribute-practice` | Submit a local pattern to the hub |
 | `/skill-master` | Find the right skill for any task |
 | `/development-loop` | Full build cycle: ideate → plan → implement → verify → commit |
-| `/testing-pipeline-workflow` | Full test chain: TDD → fix → verify → quality gates |
+| `/test-pipeline` | Three-lane test chain (skill-at-T0, spec v2.2): scout → Wave 1 (functional+api) → Wave 2 (UI) → JOIN → triage → verify → commit |
+| `/e2e-visual-run` | Playwright E2E with dual-signal verification + confidence-gated auto-heal (skill-at-T0) |
 | `/debugging-loop` | Structured diagnosis → fix → verify → learn |
 | `/code-review-workflow` | Quality gates → PR → review feedback |
 

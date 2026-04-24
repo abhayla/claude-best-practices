@@ -66,18 +66,25 @@ workflows:
         reason: "Code committed — ready for review"
 
   testing-pipeline:
-    description: "TDD → test execution → verification → quality gates → fix-verify-commit"
-    master_agent: testing-pipeline-master-agent
+    description: "Three-lane test pipeline — skill-at-T0 orchestrator (spec v2.2). /test-pipeline body runs at T0 and dispatches workers directly."
+    # master_agent is null as of Phase 3.1 (2026-04-24): the T0-only orchestrator
+    # model dissolves the intermediate testing-pipeline-master-agent. The
+    # /test-pipeline skill's body IS the orchestrator; it runs in the user's T0
+    # session. Retained as a key (null-valued) per spec v2.2 §7 Q2 decision to
+    # keep schema uniform across workflows for Phase 3.2–3.8's matching surgery.
+    master_agent: null
+    # entry_skill names the skill-at-T0 that is now the canonical invocation
+    # surface for this workflow. Projects invoke this via the slash command.
+    entry_skill: test-pipeline
     state_file: ".workflows/testing-pipeline/state.json"
-    sub_orchestrators:
-      - agent: test-pipeline-agent
-        role: "Sequential fix→verify→commit chain"
-      - agent: e2e-conductor-agent
-        role: "Queue-based E2E test orchestration"
-      - agent: tester-agent
-        role: "Test suite execution with screenshot capture"
-      - agent: test-failure-analyzer-agent
-        role: "Root cause classification for test failures"
+    # sub_orchestrators is intentionally empty per spec v2.2 §7 Q2. The flat
+    # worker agents (test-scout-agent, tester-agent, fastapi-api-tester-agent,
+    # visual-inspector-agent, test-failure-analyzer-agent,
+    # github-issue-manager-agent, fixer agents) are dispatched directly from
+    # T0 by the /test-pipeline skill — they are NOT sub-orchestrators because
+    # they do not orchestrate further work (workers cannot dispatch subagents
+    # per the platform constraint; see agent-orchestration.md §2).
+    sub_orchestrators: []
     steps:
       - id: tdd_red
         skill: tdd-failing-test-generator
@@ -102,12 +109,18 @@ workflows:
         gate: "verification.result == PASSED"
         timeout_minutes: 30
       - id: e2e
-        dispatch: e2e-conductor-agent
+        # Phase 3.1: e2e step is now absorbed into the /test-pipeline skill
+        # body (STEP 4 WAVE 2 UI lane). The separate e2e-conductor-agent
+        # dispatch is removed — /test-pipeline dispatches visual-inspector-agent
+        # directly from T0 at STEP 4. For standalone E2E pipeline invocation,
+        # use /e2e-visual-run (which is also a skill-at-T0 orchestrator).
+        skill: test-pipeline
+        inline_step: WAVE_2_UI
         depends_on: [fix_loop]
         skip_when: "no_ui_tests == true"
         artifacts_out:
-          e2e_state: { path: ".workflows/testing-pipeline/e2e-state.json", schema: e2e_v1 }
-        gate: "e2e_state.status == completed"
+          e2e_state: { path: ".workflows/testing-pipeline/state.json", schema: testing_pipeline_state_v2 }
+        gate: "e2e_state.step_status.WAVE2 == done"
         timeout_minutes: 45
       - id: quality_gate
         skill: code-quality-gate

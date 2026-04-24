@@ -3,11 +3,11 @@ name: serialize-fixes
 description: >
   Apply a list of unified-diff files sequentially to the working tree using the
   three-phase atomic protocol (git apply --check → git apply → git commit).
-  Use when an orchestrator (T2B failure-triage-agent) has collected per-test
-  diffs from parallel fixer agents and needs to land them on a shared branch
-  without conflicts. On `git apply --check` conflict: discard the stale diff
-  and label the Issue. On any failure between apply and commit: `git reset
-  --hard HEAD` to clean the working tree (mandatory).
+  Use when `/test-pipeline` (skill-at-T0, spec v2.2) has collected per-test
+  diffs from parallel fixer agents at STEP 6 TRIAGE Fan-out 3 and needs to land
+  them on a shared branch without conflicts. On `git apply --check` conflict:
+  discard the stale diff and label the Issue. On any failure between apply
+  and commit: `git reset --hard HEAD` to clean the working tree (mandatory).
 type: workflow
 allowed-tools: "Bash Read"
 argument-hint: "<diffs-glob-or-list> [--autosquash]"
@@ -18,7 +18,7 @@ version: "1.1.0"
 
 Applies a batch of fixer-produced diffs to the working tree, one at a time,
 with `git apply --check` as a safety dry-run before each real apply. Used by
-the three-lane test pipeline's T2B (`failure-triage-agent`) to land parallel
+`/test-pipeline` (skill-at-T0) at STEP 6 TRIAGE Fan-out 3 to land parallel
 fix attempts on a shared branch without race conditions.
 
 **Request:** $ARGUMENTS — one of:

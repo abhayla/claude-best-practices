@@ -1,18 +1,23 @@
-# Test pipeline configuration — three-lane model (PR1 of test-pipeline-three-lane-spec)
+# Test pipeline configuration — three-lane model, skill-at-T0 orchestrator
 #
 # Read by:
-#   - test-pipeline-agent (T2A, lane orchestration)
-#   - failure-triage-agent (T2B, skeleton in PR1; full body in PR2)
-#   - testing-pipeline-master-agent (T1, cleanup + global retry budget)
+#   - /test-pipeline (skill-at-T0, spec v2.2) — full orchestrator lifecycle
+#   - /e2e-visual-run (skill-at-T0) — lanes.ui.* keys only (baselines, use_checkpoint)
+#   - test-scout-agent / tester-agent / fastapi-api-tester-agent /
+#     visual-inspector-agent / test-failure-analyzer-agent /
+#     github-issue-manager-agent — per-worker config lookups (auto_heal,
+#     track_detection, capture_proof, concurrency caps)
 #
 # Ships as a default with hub provisioning so downstream projects can
 # run /test-pipeline out of the box. Provisioned to
 # .claude/config/test-pipeline.yml in target projects. Override any
 # value locally without modifying the hub template.
 #
-# Spec reference: docs/specs/test-pipeline-three-lane-spec.md v1.6 §3.13
+# Spec reference: docs/specs/test-pipeline-three-lane-spec-v2.md v2.2 §3.1
+# (skill-at-T0 orchestration) — v1.7 spec is SUPERSEDED; v2.2 preserves all
+# v1 REQ IDs including the keys used below.
 
-schema_version: "2.0.0"   # bumped from 1.0.0 for three-lane refactor
+schema_version: "2.0.0"
 
 pipeline:
   name: three-lane-test-pipeline
@@ -36,6 +41,24 @@ lanes:
     intra_lane_parallelism: 1          # multimodal review is sequential per agent
     use_checkpoint: false              # REQ-S006: when true, UI lane starts on functional.ui-tests-complete.flag instead of full functional return (reduces wall-clock on projects with many slow non-UI tests after UI tests)
 
+  # Complexity classifier for Wave 1 parallelism — spec v2.2 §7 Q4 RESOLVED.
+  # When enabled, the /test-pipeline skill (at STEP 2 SCOUT) reads
+  # scout.test_count and picks Wave 1 topology accordingly:
+  #   - test_count >= min_test_count → parallel Wave 1 (functional + api
+  #     dispatched in one T0 message; ~2x throughput)
+  #   - test_count < min_test_count → serial Wave 1 (functional fully,
+  #     then api; avoids fan-out overhead for small suites)
+  # Disabling the flag forces parallel Wave 1 regardless of size
+  # (pre-spec-v2.2 default behavior).
+  #
+  # Rationale: fan-out overhead (dispatch setup, contract parsing, state
+  # merge) is not worth the wall-clock savings when the suite has fewer
+  # tests than the savings threshold. Empirically, 50 tests is the
+  # breakeven on typical projects.
+  parallel_classifier:
+    enabled: true
+    min_test_count: 50
+
 # Scout track-detection rules (closes spec §3.1 + reviewer Gap 9)
 track_detection:
   api_path_globs:
@@ -58,8 +81,10 @@ retry:
   global_budget: 15
   per_stage_max_attempts: 3
   per_test_cap: 3                      # max retries per single test
-  # In dispatched mode the T1 parent passes `remaining_budget` via context and this
-  # default is ignored. Standalone mode uses this as the starting budget.
+  # The /test-pipeline skill (skill-at-T0) reads `global_budget` at STEP 1 INIT
+  # and tracks `global_retries_remaining` in the consolidated state.json
+  # (spec v2.2 §3.4, owned by T0). Spec v2.2 dissolves the multi-agent
+  # budget-hand-off that existed in v1 — T0 owns the budget directly now.
 
 # Parallel fan-out caps (closes Reviewer Gap 5 / spec §3.8.1)
 concurrency:
@@ -161,29 +186,38 @@ issue_creation:
   labels_default:
     - pipeline-failure
   comment_on_dedup: true               # if dedup hits, append comment with new run_id
-  partial_failure_policy: abort_on_first_blocked   # T2B fan-in policy
+  partial_failure_policy: abort_on_first_blocked   # /test-pipeline STEP 6 TRIAGE Fan-out 2 fan-in policy (spec v2.2 §3.3)
 
 # Re-verification policy (active in PR2)
 reverify:
   affected_tests_only: true            # iteration loop runs only affected tests
   final_full_suite_check: true         # after green, run full suite once for collateral regression check
 
-# State file conventions
+# State file conventions — spec v2.2 §3.4: single consolidated state file at T0
 state:
-  master_file: ".workflows/testing-pipeline/state.json"               # owned by T1
-  sub_file: ".workflows/testing-pipeline/sub/test-pipeline.json"      # owned by T2A (NEW in PR1)
-  triage_file: ".workflows/testing-pipeline/sub/failure-triage.json"  # owned by T2B (NEW for PR2 activation)
+  # master_file is the SINGLE source of truth. Spec v2.2 dissolves v1's
+  # three-file layout (master/sub/triage) — workers read their scope via
+  # paths in dispatch context and never write directly to state.json; they
+  # return structured contracts that T0 merges.
+  master_file: ".workflows/testing-pipeline/state.json"
+  events_file: ".workflows/testing-pipeline/events.jsonl"    # append-only event log for audit + resume
   results_dir: "test-results"
   evidence_dir: "test-evidence"
-  fixes_dir: "test-results/fixes"      # diff staging dir (active in PR2)
+  fixes_dir: "test-results/fixes"      # diff staging dir for /serialize-fixes
   schema_compatibility:
     minimum_required: "2.0.0"
     on_mismatch: "abort_with_STATE_SCHEMA_INCOMPATIBLE"
+  # Legacy paths — RETAINED here for downstream projects still reading v1
+  # state via older workers. /test-pipeline STEP 1 INIT cleans these too
+  # (see cleanup list below) so no stale data survives a v1 → v2 cutover.
+  legacy_sub_file: ".workflows/testing-pipeline/sub/test-pipeline.json"
+  legacy_triage_file: ".workflows/testing-pipeline/sub/failure-triage.json"
 
-# Ephemeral directories wiped at standalone-mode INIT.
-# In dispatched mode, the T1 parent owns cleanup and this list is ignored.
-cleanup_standalone_only:
+# Ephemeral directories wiped at /test-pipeline STEP 1 INIT. The skill-at-T0
+# orchestrator owns cleanup (spec v2.2 §3.1 STEP 1 bullet 4) — there is no
+# distinct "dispatched mode" in v2.2, only T0.
+cleanup_at_init:
   - "test-results/"
-  - "test-evidence/"
+  - "test-evidence/"                  # retention: keep the 3 most recent {run_id} subdirs
   - ".pipeline/test-pipeline-state.json"
-  - ".workflows/testing-pipeline/sub/"   # NEW for T2A sub-state
+  - ".workflows/testing-pipeline/sub/"  # v1 sub-state layout — pruned during v1→v2 cutover

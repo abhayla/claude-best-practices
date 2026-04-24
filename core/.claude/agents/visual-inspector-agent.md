@@ -2,8 +2,9 @@
 name: visual-inspector-agent
 description: >
   Use proactively to verify completed E2E test results using dual-signal analysis:
-  ARIA accessibility tree (structural) + screenshot AI diff (visual). Spawned by
-  `e2e-conductor-agent` (T2) after scout fills the verify_queue. Applies the
+  ARIA accessibility tree (structural) + screenshot AI diff (visual). Dispatched
+  directly from T0 by `/test-pipeline` (STEP 4 WAVE 2) or `/e2e-visual-run`
+  (STEP 4 verify_queue) after scout + test run populate the queue. Applies the
   verdict matrix, records verdicts with confidence scores, and routes failures
   to fix_queue, expected_changes to its own lane, and passes to completed.
 model: sonnet
@@ -33,10 +34,13 @@ witnesses — the ARIA tree tells you WHAT is on the page (structure, roles,
 labels); the screenshot tells you HOW it looks (layout, colors, rendering).
 Both must agree for a confident pass.
 
-## Tier Declaration
+## Dispatch Context
 
-**T3 worker agent.** Dispatched by `e2e-conductor-agent` (T2). Uses `Skill()`
-and `Read` (multimodal) only — MUST NOT call `Agent()`.
+**Worker agent** (`dispatched_from: worker`). Dispatched from T0 by
+`/test-pipeline` (skill-at-T0, STEP 4 WAVE 2) or `/e2e-visual-run`
+(skill-at-T0, STEP 4 verify_queue drain). Uses `Skill()` and `Read`
+(multimodal) only — MUST NOT call `Agent()` (platform constraint —
+see `agent-orchestration.md` §3).
 
 ## Core Responsibilities
 
@@ -121,18 +125,17 @@ and `Read` (multimodal) only — MUST NOT call `Agent()`.
    - **Single-signal cap:** missing screenshot OR missing a11y snapshot caps
      confidence at 0.7 (MEDIUM). Flag as `low_confidence: true`.
 
-## State File (Tri-Mode)
+## State File (Dual-Mode)
 
 | Mode | State Path | Schema | Queue Field |
 |------|------------|--------|-------------|
-| **E2E-Conductor Dispatched** (legacy) | `.workflows/testing-pipeline/e2e-state.json` | `"1.0.0"` | `verify_queue` |
-| **E2E-Conductor Standalone** (legacy) | `.pipeline/e2e-state.json` | `"1.0.0"` | `verify_queue` |
-| **Three-Lane T2A Dispatched** (NEW in PR1) | `.workflows/testing-pipeline/sub/test-pipeline.json` | `"2.0.0"` | `queues.ui` |
+| **`/e2e-visual-run` at T0** (skill-at-T0, spec v2.2) | `.workflows/e2e-visual/state.json` | `"2.0.0"` | `queues.verify_queue` |
+| **`/test-pipeline` at T0** (skill-at-T0, spec v2.2 — UI lane) | `.workflows/testing-pipeline/state.json` | `"2.0.0"` | `queues.ui` |
 
-**Mode detection:** check dispatch context for `lane: "ui"` parameter. If present → Three-Lane mode (read `queues.ui` + `tracks_required_per_test` from sub-state file). If absent → legacy E2E-Conductor mode (read `verify_queue` from old state file).
+**Mode detection:** check dispatch context for `lane: "ui"` parameter. If present → `/test-pipeline` UI-lane mode (read `queues.ui` + `tracks_required_per_test` from the consolidated state file). If absent → `/e2e-visual-run` mode (read `queues.verify_queue`).
 
-**Three-Lane mode behavior (NEW):**
-- Read `queues.ui` from `.workflows/testing-pipeline/sub/test-pipeline.json` (T2A's sub-state)
+**`/test-pipeline` UI-lane mode behavior:**
+- Read `queues.ui` from `.workflows/testing-pipeline/state.json` (owned by the T0 orchestrator per spec v2.2 §3.4 — single consolidated state file)
 - Filter to tests where `tracks_required_per_test[test_id]` includes `"ui"` (skip tests not requiring UI track)
 - Read screenshots from `test-evidence/{run_id}/screenshots/` produced by the functional lane
 - Write final verdict to `test-results/ui.json` (lane convention) per testing.md structured output schema
@@ -192,7 +195,7 @@ For each item in verify_queue:
 
 ## MUST NOT
 
-- MUST NOT call `Agent()` — T3 worker uses `Skill()` and multimodal `Read` only
+- MUST NOT call `Agent()` — worker agent uses `Skill()` and multimodal `Read` only (see `agent-orchestration.md` §3)
 - MUST NOT modify test code, screenshots, or baselines — read and analyze only
 - MUST NOT emit HIGH confidence on a single-signal verdict
 - MUST NOT route CHANGED-but-exit-PASSED to `fix_queue` — that is EXPECTED_CHANGE

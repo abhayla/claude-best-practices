@@ -1,15 +1,25 @@
-# Sequence Diagram — /testing-pipeline-workflow
+# Sequence Diagram — /testing-pipeline-workflow (SUPERSEDED)
+
+> **⚠️ SUPERSEDED (2026-04-24, Phase 3.1).** This diagram depicts the 4-tier
+> dispatch model that Anthropic's platform cannot execute: subagents do not
+> forward the `Agent` tool, so every tier below T0 silently inlines its work
+> ([docs](https://code.claude.com/docs/en/sub-agents)). The canonical
+> execution topology is now the `/test-pipeline` skill-at-T0 orchestrator
+> described in `core/.claude/skills/test-pipeline/SKILL.md` (spec v2.2).
+> This diagram is kept as a historical reference for the old dispatch
+> expectations; do NOT use it to reason about current runtime behavior.
 
 Synthesized from:
-- `core/.claude/skills/testing-pipeline-workflow/SKILL.md` (dispatch wrapper)
-- `config/workflow-contracts.yaml` → `workflows.testing-pipeline` (step DAG, gates, artifacts)
-- `core/.claude/agents/testing-pipeline-master-agent.md` (T1 orchestration protocol)
-- `core/.claude/agents/test-pipeline-agent.md` (T2 sub-orchestrator)
-- `core/.claude/agents/e2e-conductor-agent.md` (T2 sub-orchestrator, post PR #10)
-- `core/.claude/agents/test-failure-analyzer-agent.md` (T3 leaf, post PR #9)
-- `core/.claude/rules/agent-orchestration.md` (tier model, context passing)
+- `core/.claude/skills/testing-pipeline-workflow/SKILL.md` (DEPRECATED 2026-04-24 — superseded by `/test-pipeline`)
+- `config/workflow-contracts.yaml` → `workflows.testing-pipeline` (step DAG; `master_agent` is now null, `sub_orchestrators` is empty — v2.2)
+- `core/.claude/agents/testing-pipeline-master-agent.md` (DEPRECATED — dissolved into `/test-pipeline` body)
+- `core/.claude/agents/test-pipeline-agent.md` (DEPRECATED — dissolved)
+- `core/.claude/agents/e2e-conductor-agent.md` (DEPRECATED — dissolved into `/e2e-visual-run` body)
+- `core/.claude/agents/test-failure-analyzer-agent.md` (worker, still active — dispatched from T0 by `/test-pipeline` STEP 6)
+- `core/.claude/rules/agent-orchestration.md` (rewritten Phase 1 — single-level dispatch model; tier labels retained only as responsibility-ownership documentation, not runtime chain)
 
-Last verified against merged PRs #3–#11.
+Last verified against merged PRs #3–#11 — for the current runtime shape, see
+`core/.claude/skills/test-pipeline/SKILL.md` STEPs 1–9.
 
 ---
 

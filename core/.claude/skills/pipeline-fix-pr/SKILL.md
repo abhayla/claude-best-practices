@@ -16,11 +16,11 @@ version: "1.0.0"
 
 # Pipeline Fix PR — Single-PR Fixer Batching (REQ-C003)
 
-When the test-pipeline's T2B (`failure-triage-agent`) finishes producing fix
-diffs and the user has opted into `--fix-pr-mode`, this skill takes over
-from `/serialize-fixes` to land the fixes on a separate branch + open ONE PR
-covering all fixes from the run. Cleaner PR diff than N commits on the
-working branch; honors team's PR-required workflow.
+When `/test-pipeline` (skill-at-T0, spec v2.2) finishes producing fix diffs
+at STEP 6 TRIAGE Fan-out 3 and the user has opted into `--fix-pr-mode`, this
+skill takes over from `/serialize-fixes` to land the fixes on a separate
+branch + open ONE PR covering all fixes from the run. Cleaner PR diff than
+N commits on the working branch; honors team's PR-required workflow.
 
 **Request:** $ARGUMENTS — `<diffs-glob-or-list> [--base <branch>] [--no-push]`
 

@@ -39,9 +39,9 @@ You are a test failure diagnosis specialist. Your role is to analyze test
 failures and provide targeted fix suggestions through a two-stage pipeline:
 deterministic regex match first, LLM classification second.
 
-## Multi-Lane Input Schema (PR2)
+## Multi-Lane Input Schema
 
-When dispatched by `failure-triage-agent` (T2B) for the three-lane test pipeline, the dispatch context includes per-lane failure evidence:
+When dispatched from T0 by `/test-pipeline` at STEP 6 TRIAGE Fan-out 1 for the three-lane test pipeline (spec v2.2), the dispatch context includes per-lane failure evidence:
 
 ```json
 {
@@ -71,21 +71,24 @@ If lane errors are unrelated despite both failing, classify each independently a
 
 ### Backward compat (single-lane callsites)
 
-Legacy callers (`/fix-loop`, `e2e-conductor-agent`) pass evidence in the older single-lane shape (no `failed_lanes` array, no `evidence` map). Detect absence of `failed_lanes` → fall back to single-lane behavior (same as PR1). Output schema is identical except `cross_lane_root_cause` is absent and `recommended_action` is mapped from the single category per spec §3.6 matrix.
+Standalone callers (`/fix-loop`, direct user invocations) pass evidence in the single-lane shape (no `failed_lanes` array, no `evidence` map). Detect absence of `failed_lanes` → fall back to single-lane behavior. Output schema is identical except `cross_lane_root_cause` is absent and `recommended_action` is mapped from the single category per spec §3.6 matrix.
 
 ## Scope
 
 ONLY: Read test output, read source code, classify failures, suggest fixes.
-NOT: Modify files, run tests, apply fixes, OR call MCP browser tools. A T3
-worker agent MUST NOT invoke `Agent()` or `mcp__playwright__*` tools — live
-browser signals arrive pre-captured via `enriched_context` (see Stage 0).
+NOT: Modify files, run tests, apply fixes, OR call MCP browser tools. A
+worker agent (`dispatched_from: worker`) MUST NOT invoke `Agent()` or
+`mcp__playwright__*` tools — live browser signals arrive pre-captured via
+`enriched_context` (see Stage 0). See `agent-orchestration.md` §3 for
+worker constraints.
 
 ---
 
 ## Stage 0 — Input Schema (enriched error context)
 
-The dispatcher (typically `e2e-conductor-agent` or `test-healer-agent`) MAY
-include an `enriched_context` block in the dispatch prompt. When present,
+The dispatcher (typically `/test-pipeline` / `/e2e-visual-run` at T0 with
+pre-captured evidence, or `test-healer-agent` forwarding enriched context)
+MAY include an `enriched_context` block in the dispatch prompt. When present,
 regex rules match against enriched fields in addition to `test_output`.
 
 ```json
@@ -93,7 +96,7 @@ regex rules match against enriched fields in addition to `test_output`.
   "test_output": "<raw stderr/stdout from the test runner — required>",
   "enriched_context": {
     "schema_version": "1.0.0",
-    "captured_by": "e2e-conductor-agent-v2.1.0",
+    "captured_by": "/test-pipeline@T0 or /e2e-visual-run@T0 (spec v2.2)",
     "console_messages": ["[ERROR] Refused to connect to ..."],
     "network_failures": [
       {"url": "https://api/x", "status": 503, "method": "GET"}
@@ -275,7 +278,7 @@ After mapping from config, apply the confidence override: if `confidence < 0.85`
 
 ### Backward compatibility
 
-Legacy callers (`/fix-loop`, `e2e-conductor-agent`) that don't dispatch the three-lane pipeline still receive a `recommended_action` field in the return — single-lane failures map the same way via the same config read.
+Standalone callers (`/fix-loop`, direct user invocations) that don't dispatch the three-lane pipeline still receive a `recommended_action` field in the return — single-lane failures map the same way via the same config read.
 
 ---
 

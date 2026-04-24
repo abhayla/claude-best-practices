@@ -408,7 +408,7 @@ Add `test-evidence/` and `test-results/` to `.gitignore`.
 **Screenshot format:** PNG, max resolution 1440x900 (for optimal multimodal
 token cost ~1,728 tokens/image). Downscale larger screenshots before archiving.
 
-**Retention:** `test-pipeline-agent` cleans `test-evidence/` at pipeline start.
+**Retention:** `/test-pipeline` (skill-at-T0) cleans `test-evidence/` at pipeline start.
 For manual runs, only the most recent 3 `{run_id}` directories are kept —
 older runs are deleted automatically when a new run starts.
 

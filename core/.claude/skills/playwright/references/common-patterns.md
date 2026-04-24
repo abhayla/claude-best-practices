@@ -348,7 +348,7 @@ test('checkout flow adapts to user type', async ({ page }) => {
 
 ## CAPTURE PROOF MODE
 
-When invoked with `--capture-proof` (from `/auto-verify` or `test-pipeline-agent`),
+When invoked with `--capture-proof` (from `/auto-verify` or `/test-pipeline`),
 override the default screenshot behavior to capture on every test:
 
 ### Configuration Override

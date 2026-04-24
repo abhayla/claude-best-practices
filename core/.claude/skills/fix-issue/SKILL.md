@@ -130,7 +130,7 @@ When `--diff-only` is present in `$ARGUMENTS`, **skip `/post-fix-pipeline` entir
    }
    ```
 
-**Why diff-only mode exists:** the three-lane test pipeline's T2B (`failure-triage-agent`) dispatches multiple parallel fixers. Each fixer must NOT commit independently (parallel commits race on the working tree). T2B collects all diffs, then invokes `/serialize-fixes` to apply them sequentially with `git apply --check` first. See spec §3.9.1.
+**Why diff-only mode exists:** the three-lane test pipeline's `/test-pipeline` skill (spec v2.2, skill-at-T0) dispatches multiple parallel fixers in one T0 message at STEP 6 TRIAGE Fan-out 3. Each fixer must NOT commit independently (parallel commits race on the working tree). T0 collects all diffs, then invokes `/serialize-fixes` to apply them sequentially with `git apply --check` first. See spec v2.2 §3.3.
 
 **Backward compat:** Default mode (no flag) is unchanged — existing `/fix-loop`, development-loop, and direct user invocations continue to work as before. Spec §3.14.
 

@@ -4,11 +4,12 @@
 
 - Author: Claude Code (Opus 4.7)
 - Date: 2026-04-24
-- Status: **PROPOSED** — planning spec for Phase 3.1 of the subagent-dispatch-platform-limit remediation. Implementation will land in a subsequent PR; this doc is the design that PR encodes.
-- Version: 2.1 (draft)
+- Status: **ACCEPTED** — approved design for Phase 3.1 of the subagent-dispatch-platform-limit remediation. Implementation in progress on branch `feat/phase3-1-test-pipeline-skill-at-t0`; this doc is the design that branch encodes.
+- Version: 2.2
 - Revision history:
   - 2.0 (2026-04-24) — initial draft; encodes skill-at-T0 design from Phase 3.0 template
   - 2.1 (2026-04-24) — traceability audit against v1 found 2 concrete gaps + 5 unclear-ownership items; this revision addresses all of them. Specifically: REQ-S002 `--update-baselines` flag added to CLI signature; REQ-S006 UI-lane early-start checkpoint preserved with T0 polling logic; REQ-M015 + §3.5 NN-3 dispatch-budget ownership explicitly assigned to T0; REQ-M035 validator allowlist disposition specified; §3.3 lane-skip rule restated.
+  - 2.2 (2026-04-24) — §7 open questions resolved with user-approved "lean" answers: Q1 inline orchestration, Q2 preserve empty `sub_orchestrators:`, Q3 `/e2e-visual-run` independent, Q4 complexity classifier in 3.1 behind feature flag. Status promoted DRAFT/PROPOSED → ACCEPTED. Branch `feat/phase3-1-test-pipeline-skill-at-t0` cut.
 - Supersedes: `docs/specs/test-pipeline-three-lane-spec.md` (v1.7) — v1's **functional contract is preserved**; only the **dispatch architecture** changes. All v1 requirements (REQ-M001 through REQ-C001) remain in force unless explicitly amended here.
 - Triggered by:
   - `.claude/tasks/lessons.md` 2026-04-24 entry: "Parallel tool dispatch in Claude Code is more restricted than prompt-engineering guidance suggests"
@@ -345,12 +346,14 @@ Phase 3.1 PR is acceptance-complete when all of the following hold:
 
 ---
 
-## 7. Open questions (must resolve before Phase 3.1 PR is merged)
+## 7. Resolved design decisions (2026-04-24)
 
-- **Q1:** Does the `/test-pipeline` skill body carry all orchestration logic inline, or does it delegate chunks to sub-skills? **Lean toward inline** — each sub-skill would be another injection layer, adding complexity without benefit. Reviewer to confirm.
-- **Q2:** Do we preserve `config/workflow-contracts.yaml` → `testing-pipeline` entry, or remove it entirely? **Lean toward preserve, empty `sub_orchestrators:`** — keeps the contract mechanism uniform across workflows for Phase 3.2–3.8 (they will follow the same surgery).
-- **Q3:** Should `/e2e-visual-run` re-use `/test-pipeline` as a sub-skill (injecting its body) or stay independent? **Lean toward independent** — they have different argument contracts and different primary callers. Sharing code later is fine once both are stable.
-- **Q4:** Complexity classifier for Wave 1 parallelism — do we implement the size-based switch (parallel for >50 tests, serial for ≤50) in Phase 3.1, or defer to Phase 3.1.1? **Lean toward Phase 3.1 with a feature flag** — small suites don't need parallelism, and fan-out overhead for 5-test suites is wasteful. Flag default-on for medium+ suites.
+All four questions resolved with user-approved "lean" answers. These are binding for the Phase 3.1 implementation PR.
+
+- **Q1 RESOLVED — Inline orchestration.** The `/test-pipeline` skill body carries all 9 STEPS (§3.1 lifecycle) inline. No sub-skill delegation for orchestration *control flow*. Utility skills (`/serialize-fixes`, `/escalation-report`, `/pipeline-fix-pr`, `/post-fix-pipeline`) remain callees invoked via `Skill()` from the orchestrator — they execute concrete work, not orchestration.
+- **Q2 RESOLVED — Preserve with empty list.** `config/workflow-contracts.yaml` → `testing-pipeline` keeps its entry; `sub_orchestrators:` is set to `[]`. Uniformity across workflows matters for Phase 3.2–3.8, which will follow the same shape. `master_agent:` is set to `null` (was `testing-pipeline-master-agent`, now dissolved).
+- **Q3 RESOLVED — Independent.** `/e2e-visual-run` stays a standalone skill with its own body. No shared injection with `/test-pipeline`. The two skills have different argument contracts and different primary callers; coupling them now would mean a breaking change every time either evolves. Future code-sharing MAY happen after both stabilize.
+- **Q4 RESOLVED — Ship in Phase 3.1 behind a feature flag.** The complexity classifier (size-based switch between parallel and serial Wave 1 execution) ships in the Phase 3.1 PR. Config key: `lanes.parallel_classifier` in `test-pipeline.yml`, with sub-keys `enabled: bool` (default `true`), `min_test_count: int` (default `50`). When `enabled: true` and `scout.test_count >= min_test_count`, Wave 1 runs in parallel per §3.2; otherwise Wave 1 runs serially (functional lane fully, then API lane). Scout contract extended by one field (`test_count: int`) — non-breaking addition per §2 (v1 requirements preserved unless explicitly amended).
 
 ---
 

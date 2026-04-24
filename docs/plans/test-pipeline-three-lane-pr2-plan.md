@@ -1,7 +1,18 @@
 # PR2 Implementation Plan: Three-Lane Test Pipeline (Issue Creation + Auto-Fix Loop)
 
-**Source spec:** `docs/specs/test-pipeline-three-lane-spec.md` v1.6
-**Scope:** PR2 only — Issue creation system + T2B body activation + auto-fix loop + T1 atomic switchover
+> **⚠️ SUPERSEDED (2026-04-24).** This plan implemented the T2B
+> (`failure-triage-agent`) subgraph under the 4-tier dispatch model.
+> Phase 3.1 of the subagent-dispatch-platform-limit remediation has
+> dissolved T2B into the `/test-pipeline` skill-at-T0 body (spec v2.2
+> STEP 6 TRIAGE). The PR2 design is preserved only as a historical
+> record of the issue-creation + auto-fix semantics; those semantics
+> carry forward into spec v2.2 by REQ ID. Do NOT execute this plan
+> against the current agent set — the dispatch topology will silently
+> inline instead of fanning out.
+
+**Source spec:** `docs/specs/test-pipeline-three-lane-spec.md` v1.6 (SUPERSEDED
+— see `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2 for the canonical design)
+**Scope:** PR2 only — Issue creation system + T2B body activation + auto-fix loop + T1 atomic switchover (retired in Phase 3.1; see v2.2 STEP 6 TRIAGE)
 **Depends on:** PR1 (`feat/test-pipeline-three-lane-pr1`) merged to main
 
 ---
