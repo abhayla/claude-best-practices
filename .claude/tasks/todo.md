@@ -33,21 +33,64 @@ Three options:
 
 Phase 1 streams 1.1 and 1.4 depend on this choice (they make architectural claims in docs). Phase 1 streams 1.2 and 1.3 are strategy-independent and may start immediately.
 
-## Phase 1 — Docs + rename (single PR)
+## Phase 1 — Docs + deprecation markers — ✅ COMPLETE (branch: fix/subagent-dispatch-platform-limit-phase1)
 
-### Strategy-independent streams (may start now)
+- [x] 1.1 Rewrite `agent-orchestration.md` §1, §2, §3, §6, §10 for single-level dispatch reality — commit `2b00b3d`
+- [x] 1.2 Rewrite `pattern-structure.md` Tool Grants for platform reality — commit `932c6de`
+- [x] 1.3 Deprecate `/testing-pipeline-workflow` skill; update registry; update `/test-pipeline` cross-ref — commit `ff58452`
+- [x] 1.4 Deprecate the 3 tiered agents (testing-pipeline-master-agent, test-pipeline-agent, failure-triage-agent) in bodies + registry — commit `a26d0c4`
+- [x] 1.5 Migrate pinned-content tests; align registry hashes; fix description to pass validator — commit `84ac305`
 
-- [ ] 1.2 Fix T1 contradiction in `testing-pipeline-master-agent.md` — line 44 wins; align `workflow-contracts.yaml`
-- [ ] 1.3 Delete `/testing-pipeline-workflow`; rename `testing-pipeline-master-agent` → `test-orchestrator-agent`; update `registry/patterns.json` + grep all cross-references
+All 4 CI gates green:
+- dedup_check --validate-all PASSED
+- dedup_check --secret-scan PASSED
+- workflow_quality_gate_validate_patterns PASSED (0 warnings)
+- pytest 1295 passed, 60 skipped, 1 xfailed
 
-### Strategy-dependent streams (wait for user decision)
+### Phase 1 Review (2026-04-24)
 
-- [ ] 1.1 Rewrite `agent-orchestration.md` §2 AND Rule 3 — content depends on chosen strategy for Wave 1
-- [ ] 1.4 Amend `pattern-structure.md` Tool Grants — content depends on chosen strategy
+**Outcome:** 5 commits on feature branch, 0 CI warnings, 0 test regressions.
+Approach chosen: Option A (T0-only orchestrator). Per user-approved
+architecture review by anthropic-multi-agent-reviewer-agent + Phase 0
+empirical finding that only T0 Agent() dispatch is reliably parallel
+(Skill and Bash in one message both serialized at runtime).
 
-### Cross-cutting for Phase 1
+Key changes on disk:
+- `agent-orchestration.md` rules rewritten: §2 is now "Single-Level
+  Dispatch Model" citing Anthropic docs + GH #19077 + GH #4182. Tier
+  labels retained as responsibility-ownership documentation only.
+- `pattern-structure.md` Tool Grants section: `Agent` in `tools:` is
+  only functional at T0; workers MUST NOT declare it; dual-mode agents
+  declare it but worker path must not rely on it.
+- Three agents marked deprecated with banners + registry fields:
+  `testing-pipeline-master-agent` (T1), `test-pipeline-agent` (T2A),
+  `failure-triage-agent` (T2B). Their files stay in place for the
+  2-version-cycle deprecation window per pattern-structure.md.
+- `/testing-pipeline-workflow` skill deprecated in favor of
+  `/test-pipeline`; legacy slash command still resolvable but marked
+  in both frontmatter and registry.
 
-- [ ] 1.5 Ship Phase 1 as a single PR (1.1+1.2 MUST be one commit per reviewer's ordering finding)
+**What could break:**
+- Downstream projects with `/testing-pipeline-workflow` in muscle
+  memory will see a deprecation banner but the skill still works
+  (just dispatches a deprecated agent that silently inlines its work —
+  same runtime behavior as before, now documented).
+- Auto-generated docs (`docs/workflows/*`, `docs/dashboard.*`) still
+  reference the deprecated patterns. Will regenerate correctly next
+  `generate_docs.py` / `generate_workflow_docs.py` run. Manual docs
+  (`README.md`, `docs/specs/*`, `docs/plans/*`) still reference the
+  old names and will be pruned in Phase 3 when the test pipeline is
+  re-architected.
+- The `agent-orchestration.md` rewrite is a big semantic change —
+  every sentence that talked about "T1 dispatches T2 via Agent()" is
+  now "orchestrator dispatches worker at T0 only". Any code or agent
+  body that silently assumed the tiered runtime behavior will now
+  fail the validator in Phase 2 (by design — that's the gate we're
+  building).
+
+**Not pushed.** Branch held locally awaiting user direction on push +
+PR creation. The 4 pre-existing unpushed commits on main are also
+included in this branch's history.
 
 ## Phase 2 — Validator
 
