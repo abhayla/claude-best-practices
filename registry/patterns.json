@@ -4088,13 +4088,13 @@
     "tier": "nice-to-have"
   },
   "test-pipeline": {
-    "hash": "24b83f6b390e763f4d698ec5fcf7e732ab62c541ddf95c17b87894adc60323e0",
+    "hash": "8198a1c7608fbef880049ad471f5eb850f98fc58827b47bfabea55ba585624fa",
     "type": "skill",
     "category": "core",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-04-25",
     "dependencies": [
       "test-pipeline-agent",
       "fix-loop",
@@ -4108,7 +4108,7 @@
       "pipeline",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a \u2014 CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap | v2.1.1 (2026-04-24): PATCH \u2014 budget key names aligned with actual config (budgets.* \u2192 budget.*; added retry.global_budget). PR #26 schema gate correctly detected the mismatch at run-time on the testbed.",
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a \u2014 CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap | v2.1.1 (2026-04-24): PATCH \u2014 budget key names aligned with actual config (budgets.* \u2192 budget.*; added retry.global_budget). PR #26 schema gate correctly detected the mismatch at run-time on the testbed. | v2.2.0 (2026-04-25): MINOR \u2014 auto-injection fixes (user-goal description + 20 triggers); STEP 1 CONFIG_MISSING + PIPELINE_IN_PROGRESS + arg-validation gates; STEP 2 empty-suite early exit + stack runner fallback; STEP 3 partial-execution check + granular dispatch events; STEP 4 checkpoint flag ownership contract + single-signal cap doc link; STEP 6 budget pre-check (dispatches_used+chunk_size) + recommended-action dispatch matrix (all 6 action types); STEP 7 deterministic affected-subset algorithm + max_verify_affected_tests cap; STEP 8 regression re-entry with counter continuation; STEP 9 error handling + always-write finalized_at + lock release; dispatch counter accounting docs (explains the 4-vs-5 observation); artifact path conventions; --only-issues flag expansion; 8 new CRITICAL RULES",
     "tier": "must-have"
   },
   "test-pipeline-agent": {
