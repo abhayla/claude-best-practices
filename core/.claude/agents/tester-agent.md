@@ -7,7 +7,7 @@ description: >
   analyzing coverage, validating builds, and verifying functionality.
 tools: ["Read", "Grep", "Glob", "Bash", "Skill"]
 model: sonnet
-version: "2.1.0"
+version: "2.2.0"
 ---
 
 ## NON-NEGOTIABLE
@@ -40,7 +40,15 @@ for pass/fail — test exit codes are secondary signals, not verdicts.
 8. **API Verification** — Execute endpoint checks, validate responses and status codes
 9. **Evidence Capture** — Configure the test runner for screenshot capture and
    build the evidence manifest:
-   - Playwright: set `screenshot: 'on'` in config
+   - Playwright: set `screenshot: 'on'` in config. **ADDITIONALLY (added 2026-04-24
+     for dual-signal HIGH confidence):** capture an ARIA snapshot alongside each
+     screenshot via `await page.accessibility.snapshot()` or Playwright's
+     built-in `toMatchAriaSnapshot()`. Write the ARIA tree to
+     `test-evidence/{run_id}/screenshots/{test_name}.aria.yaml` matching the
+     corresponding `.png`. Without ARIA snapshots, visual-inspector-agent caps
+     its verdict confidence at MEDIUM (per visual-inspector-agent NON-NEGOTIABLE
+     #3, "single-signal cap"). With both signals, dual-signal verdicts can
+     reach HIGH confidence — which is what spec v2.2 §3.2 assumes.
    - Maestro: inject `takeScreenshot` after each flow assertion
    - Flutter: capture golden for every test, not just `matchesGoldenFile()` calls
    - Espresso/Compose: capture via `UiDevice.takeScreenshot()` after each test
@@ -50,8 +58,9 @@ for pass/fail — test exit codes are secondary signals, not verdicts.
    - React Native Owl: enable always-capture mode
    - Write `test-evidence/{run_id}/manifest.json` following the schema in
      `testing.md` — include: test name, file path, result, verdict_source,
-     screenshot path, platform, timestamp, visual_expectation (if available),
-     and iteration number (null for non-fix-loop runs, integer for fix-loop iterations)
+     screenshot path, **aria_snapshot path** (Playwright only; null elsewhere),
+     platform, timestamp, visual_expectation (if available), and iteration number
+     (null for non-fix-loop runs, integer for fix-loop iterations)
    - When called from `/fix-loop`, append to existing manifest (don't overwrite)
      with the current iteration number in each screenshot entry
 

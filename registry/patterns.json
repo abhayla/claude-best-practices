@@ -4074,10 +4074,10 @@
     "tier": "nice-to-have"
   },
   "test-pipeline": {
-    "hash": "e3368c02518f4dd93bc41f21b38fee2f70e0e2e6a4ec572b3fa69c14ad681c16",
+    "hash": "e3325246410df6b68dae523f2564c5b11171a4356caa50a8bb24ed3bab1b0ddf",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-04-24",
@@ -4094,7 +4094,7 @@
       "pipeline",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model",
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a \u2014 CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap",
     "tier": "must-have"
   },
   "test-pipeline-agent": {
@@ -4134,10 +4134,10 @@
     "tier": "must-have"
   },
   "tester-agent": {
-    "hash": "0cbc7760d6dda1b4e2cf80b3648e0d4dc2bfa2cda8678c82554a606bf179b979",
+    "hash": "cc6ff9b8b6cf3b7a1ca7c208331bfec00855ed33ae40553b1141132caa97ce11",
     "type": "agent",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-04-24",
@@ -4145,7 +4145,7 @@
     "visibility": "public",
     "description": "Senior QA engineer specializing in comprehensive testing and quality assurance. For UI tests, orchestrates per-test screenshot verification where the screenshot",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.0.0: Genericized and restructured | v2.2.0 (2026-04-24): Playwright ARIA snapshot capture alongside screenshot \u2014 lifts visual-inspector-agent confidence MEDIUM\u2192HIGH (dual-signal per spec v2.2 \u00a73.2)",
     "tier": "must-have"
   },
   "testing": {
@@ -4264,21 +4264,21 @@
     "tier": "nice-to-have"
   },
   "update-practices": {
-    "hash": "58eccf6ddb52ef329d765e36382b646fc65b629b3cad1098958f8bc619598a86",
+    "hash": "b77ff6147b6ed4d48c05b656a2a4698de12645bd3d368a081f0bd788d7735925",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
     "description": "Pull latest best practices from the hub into your project's .claude/ directory. Compares local files against hub registry, shows diffs, and copies updates.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "skip"
+    "changelog": "v2.0.0: Genericized and restructured | v1.1.0 (2026-04-24): sync shipped configs from core/.claude/config/; promoted tier=must-have to fix Phase 3.1 downstream sync gap",
+    "tier": "must-have"
   },
   "verify-screenshots": {
     "hash": "8ab20f3da5ed2e6fbb0c56e4ce9a4d2cf0812f937566a6e2efcf492d62b7440f",

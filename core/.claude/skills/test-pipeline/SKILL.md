@@ -18,7 +18,7 @@ triggers:
   - full test pipeline
   - test verification pipeline
   - run test pipeline
-version: "2.0.0"
+version: "2.1.0"
 ---
 
 # /test-pipeline — Skill-at-T0 Orchestrator
@@ -81,6 +81,14 @@ Mutually exclusive: `--skip-fix` and `--update-baselines` MUST NOT both be set.
    `concurrency.max_concurrent_analyzers` (default 5),
    `concurrency.max_concurrent_issue_managers` (default 5),
    `concurrency.max_concurrent_fixers` (default 5), `auto_heal.*`.
+2a. **Config schema gate.** If `schema_version != "2.0.0"` OR any of
+    `lanes.parallel_classifier`, `budgets.max_total_dispatches`,
+    `budgets.max_wall_clock_minutes` is missing → fail-fast: write BLOCKED
+    verdict `{"result": "BLOCKED", "blocker": "CONFIG_SCHEMA_INCOMPATIBLE",
+    "observed_schema": <or null>, "missing_keys": [...], "remediation":
+    "Run /update-practices"}` to `test-results/pipeline-verdict.json`, emit
+    event, print remediation, exit. Prevents silent key-shape mismatches
+    (the 2026-04-24 downstream gap).
 3. **Generate `run_id`.** Format: `{UTC ISO-8601}_{7-char git sha}` with `:`
    replaced by `-`. Bash: `run_id="$(date -u +%Y-%m-%dT%H-%M-%SZ)_$(git rev-parse --short=7 HEAD)"`.
 4. **Clean prior artifacts.** Remove `test-results/`, `test-evidence/`, and
@@ -478,3 +486,8 @@ Structured Test Output).
   inspector compares; it does not overwrite, unless the mode flag says so.
 - MUST NOT proceed past STEP 5 if `--update-baselines` is set — STEPS 6 and 7
   are unconditionally skipped in baseline-update mode per REQ-S002.
+- MUST fail-fast with `CONFIG_SCHEMA_INCOMPATIBLE` BLOCKED verdict at STEP 1
+  sub-step 2a if the local `test-pipeline.yml` schema_version is missing or
+  not "2.0.0", OR if required v2.2 keys (e.g., `lanes.parallel_classifier`)
+  are absent. Silent inlining against mismatched config produces unpredictable
+  behavior — the actual 2026-04-24 downstream gap. Remediation: `/update-practices`.
