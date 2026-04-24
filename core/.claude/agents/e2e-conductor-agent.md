@@ -9,7 +9,7 @@ description: >
   — NOT for Cypress/Selenium/Detox/Flutter (use their native runners), one-off
   screenshot comparison (use /verify-screenshots), post-change targeted
   verification (use /auto-verify), or E2E reference (use /e2e-best-practices).
-tools: "Agent Bash Read Write Edit Grep Glob Skill"
+tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
 model: inherit
 color: blue
 version: "2.1.0"

@@ -7,7 +7,7 @@ description: >
   profile + analyzer classification. Hard-fails the pipeline if GitHub is not
   connected — never silently skips Issue creation. Returns the issue_number to
   the parent for downstream fixer dispatch.
-tools: "Bash Read Skill"
+tools: ["Bash", "Read", "Skill"]
 model: sonnet
 color: orange
 version: "1.0.0"

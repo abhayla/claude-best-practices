@@ -1508,7 +1508,7 @@
     "tier": "nice-to-have"
   },
   "e2e-conductor-agent": {
-    "hash": "4bc49463b260f5de1028c11df592ba5db8d8dfc7efffac88db1938ed1ce32c38",
+    "hash": "e7e137568d4c67107b64d32d4cadfa5e0cc50b61181f694916fe7320b653e5b9",
     "type": "agent",
     "category": "core",
     "version": "2.1.0",
@@ -1669,7 +1669,7 @@
     "tier": "nice-to-have"
   },
   "failure-triage-agent": {
-    "hash": "2950cb4cdd220b4bd5b186ccf13b0408b52a9d7c4afb8d4790610760955e6dda",
+    "hash": "038ca8859efd84d936f9056dace90aea63ba843d59dd6b539ee69f77e25773b7",
     "type": "agent",
     "category": "core",
     "version": "1.1.0",
@@ -2113,7 +2113,7 @@
     "tier": "skip"
   },
   "github-issue-manager-agent": {
-    "hash": "74cea61ec552559c9228984fb785fc492162a816cac0eaa7e54b442cab21a1c4",
+    "hash": "ba907f70fd0700562b9abb822402531f812a1e72dabd37d2e1b1b39cbf9261dd",
     "type": "agent",
     "category": "core",
     "version": "1.0.0",
@@ -2646,7 +2646,7 @@
     "tier": "nice-to-have"
   },
   "pattern-structure": {
-    "hash": "10a1220f4202b50ea0c4044c2ba9eeccfa5fcd10d1044a3a6132c8179c6145d2",
+    "hash": "c5622c8cc099f2dd2c88603b884b9bf835e08ca5154048a2fe72dd1eae7e2a50",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -3044,7 +3044,7 @@
       "audit"
     ],
     "changelog": "v1.0.0: Initial release — append-only Markdown log via UserPromptSubmit hook. Gitignored live log; seed template ships via provisioning.",
-    "tier": "nice-to-have"
+    "tier": "must-have"
   },
   "pytest-dev": {
     "hash": "69d8586655534f5dbd093e1fa4699206ba817d3e874f66a3269539c245ca21c3",
@@ -4005,7 +4005,7 @@
     "tier": "must-have"
   },
   "test-healer-agent": {
-    "hash": "f65426925195a6a3d66da85326c509d9b5961e08e302077911e4c6ed943af21e",
+    "hash": "4b97930f4387da760f678cc19401c3dc7acfdfc0356f485da1c704005630b77b",
     "type": "agent",
     "category": "core",
     "version": "2.3.0",
@@ -4090,7 +4090,7 @@
     "tier": "must-have"
   },
   "test-pipeline-agent": {
-    "hash": "4a07ba2b63c2ec5646077d0bbc269132b62cf88eafe8b831bbbfce8b3c97a7b8",
+    "hash": "2829c984adf2da033b40c6a53b3658f335dbbd8b5a35071d104666486df9dad3",
     "type": "agent",
     "category": "core",
     "version": "4.3.0",
@@ -4153,7 +4153,7 @@
     "tier": "must-have"
   },
   "testing-pipeline-master-agent": {
-    "hash": "742981ff3bc090960f4d89af8e5ca4458a49bb8501ab736eb0853e480e90b3fa",
+    "hash": "2bdd42d43fccdbd766ba432dd72056e50815ca412983f018afcb729e9872329a",
     "type": "agent",
     "category": "core",
     "version": "3.0.0",

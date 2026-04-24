@@ -10,7 +10,7 @@ description: >
 model: sonnet
 color: orange
 version: "2.3.0"
-tools: "Bash Read Write Edit Grep Glob Skill"
+tools: ["Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
 mcp-servers:
   playwright-test:
     type: stdio

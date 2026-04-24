@@ -7,7 +7,7 @@ description: >
   the complete test verification chain, or when dispatched by
   `project-manager-agent` for Stages 6-8. Works standalone or as a pipeline
   worker. Owns cleanup, aggregation, and GitHub Issue creation for known_issues.
-tools: "Agent Bash Read Write Edit Grep Glob Skill"
+tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
 model: inherit
 color: blue
 version: "2.1.0"

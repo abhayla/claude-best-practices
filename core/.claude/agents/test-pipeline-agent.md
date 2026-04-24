@@ -8,7 +8,7 @@ description: >
   Owns sub-state file `.workflows/testing-pipeline/sub/test-pipeline.json` (schema 2.0.0).
   Reads pipeline config from `.claude/config/test-pipeline.yml`.
   PR1 scope: lanes + JOIN; T2B is no-op skeleton (full triage activates in PR2).
-tools: "Agent Bash Read Write Edit Grep Glob Skill"
+tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
 model: inherit
 color: blue
 version: "4.3.0"

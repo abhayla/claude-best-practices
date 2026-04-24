@@ -29,7 +29,8 @@ AGENTS_DIR = REPO_ROOT / "core" / ".claude" / "agents"
 # Identified by runtime verification and agent-orchestration.md tier table.
 ORCHESTRATORS = [
     "testing-pipeline-master-agent",  # T1
-    "test-pipeline-agent",             # T2 (alternative entry)
+    "test-pipeline-agent",             # T2A (lane sub-orchestrator)
+    "failure-triage-agent",            # T2B (triage sub-orchestrator — per three-lane spec)
     "e2e-conductor-agent",             # T2 (E2E sub-orchestrator)
 ]
 
@@ -39,6 +40,7 @@ T3_LEAVES = [
     "test-scout-agent",
     "visual-inspector-agent",
     "test-healer-agent",
+    "github-issue-manager-agent",      # T3 leaf — invokes /create-github-issue skill only
 ]
 
 # Tools an orchestrator needs at minimum. Bash for shell, Read/Write/Edit
@@ -56,10 +58,13 @@ def _parse_frontmatter(agent_path: Path) -> dict:
 
 
 def _tools_set(frontmatter: dict) -> set[str]:
-    """Normalize the tools declaration into a set.
+    """Return the tools declaration as a set.
 
-    Accepts either a list (`tools: [Agent, Bash]`) or a space-separated
-    string (`tools: "Agent Bash"`). Both forms appear in the registry.
+    `tools:` MUST be a YAML list. A space-separated scalar parses as a
+    single string and Claude Code does NOT expose the agent as a
+    `subagent_type` — verified in the downstream test run 2026-04-24,
+    where 6 pipeline agents with the scalar form were silently inlined
+    at T1 instead of being dispatched as subagents.
     """
     raw = frontmatter.get("tools")
     if raw is None:
@@ -67,7 +72,13 @@ def _tools_set(frontmatter: dict) -> set[str]:
     if isinstance(raw, list):
         return set(raw)
     if isinstance(raw, str):
-        return set(raw.split())
+        raise TypeError(
+            "tools: must be a YAML list (e.g. [\"Agent\", \"Bash\", \"Read\"]), "
+            "not a space-separated string. Claude Code does not expose agents "
+            "with scalar `tools:` as subagent_type — they fall back to inline "
+            "execution at the parent tier, silently breaking the 4-tier "
+            "dispatch contract. Observed 2026-04-24 in v2-pipeline-testbed."
+        )
     raise TypeError(f"unexpected tools type: {type(raw).__name__}")
 
 

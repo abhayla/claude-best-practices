@@ -9,7 +9,7 @@ description: >
   exhaustion. Honors `partial_failure_policy: abort_on_first_blocked` for
   GITHUB_NOT_CONNECTED preflight failures. Returns structured triage outcome
   to T2A so T2A can re-verify affected tests.
-tools: "Agent Bash Read Write Edit Grep Glob Skill"
+tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
 model: inherit
 color: orange
 version: "1.0.0"

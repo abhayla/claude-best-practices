@@ -44,11 +44,17 @@ Every agent in `core/.claude/agents/*.md` MUST have:
 ---
 name: agent-name
 description: When and why to use this agent.
-tools: "Agent Bash Read Write Edit Grep Glob Skill"   # required for orchestrators — see Tool Grants below
+tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]   # required for orchestrators — see Tool Grants below
 model: inherit                   # inherit | sonnet | haiku | opus
 color: blue                      # red | orange | yellow | blue | green
 ---
 ```
+
+`tools:` MUST be a YAML list (`["A", "B", ...]`). A space-separated
+scalar (`"Agent Bash Read ..."`) parses as a single string and Claude Code
+will NOT expose the agent as a `subagent_type` — verified in the downstream
+test run 2026-04-24, where 6 pipeline agents with the scalar form were
+silently inlined at T1 instead of dispatched as subagents.
 
 ### Tool Grants (MUST for Orchestrators)
 
@@ -67,7 +73,7 @@ subagent cannot reach its T2/T3 workers unless `Agent` is explicitly granted.
 | T2 sub-orchestrator | **Yes** — dispatches T3 worker agents + skills |
 | T3 worker agent | **No** — MUST NOT dispatch further subagents (rule #3) |
 
-The standard orchestrator tool set is `"Agent Bash Read Write Edit Grep Glob Skill"`.
+The standard orchestrator tool set is `["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]`.
 T3 leaves may declare a narrower set (e.g., omit `Write`/`Edit` if read-only)
 but MUST omit `Agent` to enforce the tier-depth cap.
 
