@@ -3973,15 +3973,15 @@
     "hash": "8a980c327706bc4f0047f068a6f29e0ba1dc15a5fcef378f0d2c9fe1f385255d",
     "type": "agent",
     "category": "core",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
     "description": "Use proactively to diagnose test failures — reads test output, classifies by root cause, and suggests targeted fixes. Spawn automatically whenever tests fail to provide immediate",
     "tags": [],
-    "changelog": "v2.1.0: Add optional enriched_context input schema (console_messages, network_failures, dom_snapshot). Callers with MCP access pre-capture live browser signals; analyzer stays T3 leaf. New classification_source value: enriched-context-regex. Backward compatible — enrichment is opt-in.",
+    "changelog": "v2.3.0: REQ-S004 — recommended_action now config-driven via auto_heal: block in test-pipeline.yml (was LLM-recalled from spec). Adds explicit read procedure, ALLOWED enum (AUTO_HEAL/AUTO_HEAL_WITH_FLAG/ISSUE_ONLY/QUARANTINE/RETRY_INFRA), and fail-safe fallback to ISSUE_ONLY on missing/invalid config. Backward compatible for callers.",
     "tier": "must-have"
   },
   "test-healer-agent": {

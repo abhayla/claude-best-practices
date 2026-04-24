@@ -13,7 +13,7 @@ description: >
 tools: ["Read", "Grep", "Glob"]
 model: sonnet
 color: orange
-version: "2.2.0"
+version: "2.3.0"
 ---
 
 ## NON-NEGOTIABLE
@@ -23,7 +23,7 @@ version: "2.2.0"
 3. **NEVER emit confidence > 0.95 for LLM classifications** — calibration is poor. Deterministic-regex classifications may exceed 0.95 because they match unambiguous signatures.
 4. **NEVER modify files, run tests, or apply fixes** — read-only analysis. `/fix-loop` owns mutation.
 5. **Multi-lane awareness (NEW in PR2 of test-pipeline-three-lane spec).** When dispatch context contains `failed_lanes` (subset of `{functional, api, ui}`) AND `evidence` keyed by lane, the analyzer MUST classify considering ALL lanes' signals together. When the same test failed in multiple lanes with related error patterns (e.g., functional + API both report schema errors), emit a single consolidated category (e.g., `SCHEMA_MISMATCH`) and set `cross_lane_root_cause: true`. Backward compat: single-lane evidence (legacy callsites) produces same classification as before, with `cross_lane_root_cause` field absent or false. See spec §3.5.
-6. **`recommended_action` field (NEW in PR2).** Every output MUST include `recommended_action`: one of `AUTO_HEAL` (proceed to fix attempt), `ISSUE_ONLY` (create Issue, no fix attempt), `QUARANTINE` (tag flaky, continue), `RETRY_INFRA` (re-run once for infrastructure issues). Mapping per spec §3.6 auto-fix matrix. Confidence below 0.85 → MUST emit `ISSUE_ONLY` regardless of category.
+6. **`recommended_action` field (config-driven in v2.3.0 per REQ-S004).** Every output MUST include `recommended_action`: one of `AUTO_HEAL`, `AUTO_HEAL_WITH_FLAG`, `ISSUE_ONLY`, `QUARANTINE`, `RETRY_INFRA`. The analyzer MUST read the mapping from the `auto_heal:` block in `.claude/config/test-pipeline.yml` (downstream) or `core/.claude/config/test-pipeline.yml` (hub) at dispatch time — see "Recommended Action Matrix" section below for the read procedure and fallback policy. Confidence below 0.85 → MUST emit `ISSUE_ONLY` regardless of the configured mapping.
 
 > See `core/.claude/rules/agent-orchestration.md` and `core/.claude/rules/testing.md` for full normative rules.
 
@@ -226,6 +226,59 @@ Downstream `test-healer-agent` uses a smaller taxonomy. Emit
 
 ---
 
+## Recommended Action Matrix (Config-Driven, REQ-S004)
+
+The `recommended_action` field is mapped from `category` using the
+`auto_heal:` block in `test-pipeline.yml`. This makes the matrix configurable
+per downstream project without editing this agent.
+
+### Read procedure
+
+At dispatch start, resolve the config path in this order (first existing wins):
+
+1. `.claude/config/test-pipeline.yml` — downstream project override
+2. `core/.claude/config/test-pipeline.yml` — hub default (when running in the hub repo itself)
+
+Parse the `auto_heal:` block. Each entry maps a category name to one of the
+ALLOWED action values:
+
+| Action | Meaning |
+|---|---|
+| `AUTO_HEAL` | Proceed to fixer dispatch |
+| `AUTO_HEAL_WITH_FLAG` | Only auto-fix if caller passed the relevant flag (e.g., `--update-baselines` for `BASELINE_DRIFT_INTENTIONAL`); otherwise behave as `ISSUE_ONLY` |
+| `ISSUE_ONLY` | Create GitHub Issue; do not dispatch a fixer |
+| `QUARANTINE` | Tag `@flaky` and continue; create Issue for tracking |
+| `RETRY_INFRA` | Re-run once; on persist, escalate |
+
+### Per-category mapping
+
+For each classified failure, look up `category` in the parsed `auto_heal:`
+block and emit that value as `recommended_action`.
+
+### Fallback policy (fail-safe, not fail-fast)
+
+Any read/parse error or missing category entry MUST NOT block the pipeline.
+Instead, degrade deterministically:
+
+| Condition | Action | Log |
+|---|---|---|
+| Config file missing at both paths | Emit `recommended_action: "ISSUE_ONLY"` for every failure | WARN: `REQ-S004: test-pipeline.yml not found at either path — defaulting all recommended_action to ISSUE_ONLY` |
+| Config parse error (invalid YAML) | Same as above | WARN: `REQ-S004: test-pipeline.yml parse error: {detail} — defaulting all recommended_action to ISSUE_ONLY` |
+| Category present in classification but missing from `auto_heal:` | Emit `recommended_action: "ISSUE_ONLY"` for that failure only | WARN: `REQ-S004: category {name} has no auto_heal entry — defaulting to ISSUE_ONLY` |
+| Category value is not in the ALLOWED enum | Same as above | WARN: `REQ-S004: category {name} has invalid action {value} — defaulting to ISSUE_ONLY` |
+
+Rationale: `ISSUE_ONLY` is the safest default — it preserves visibility (Issue is created) without risking an unsafe auto-fix. Fail-open on config would bypass the gate; fail-closed without Issue creation would hide failures. `ISSUE_ONLY` is neither.
+
+### Confidence override (NN#6)
+
+After mapping from config, apply the confidence override: if `confidence < 0.85` for any failure, force `recommended_action = "ISSUE_ONLY"` regardless of the configured mapping. This guards against acting on uncertain classifications.
+
+### Backward compatibility
+
+Legacy callers (`/fix-loop`, `e2e-conductor-agent`) that don't dispatch the three-lane pipeline still receive a `recommended_action` field in the return — single-lane failures map the same way via the same config read.
+
+---
+
 ## Analysis Process
 
 1. Read test output carefully — identify ALL failures
@@ -234,8 +287,9 @@ Downstream `test-healer-agent` uses a smaller taxonomy. Emit
    b. If matched: emit directly with `classification_source: "deterministic-regex"`
    c. If unmatched: read relevant source code, classify via Stage 2 LLM path with `classification_source: "llm"`
 3. Apply the healer-taxonomy mapping to emit `healer_category`
-4. Group failures that share a root cause
-5. Suggest targeted fixes ordered by impact
+4. Load `auto_heal:` from `test-pipeline.yml` (see read procedure above) and map each category → `recommended_action`, applying the confidence-< 0.85 → `ISSUE_ONLY` override
+5. Group failures that share a root cause
+6. Suggest targeted fixes ordered by impact
 
 ## Output Format
 
@@ -255,6 +309,7 @@ Downstream `test-healer-agent` uses a smaller taxonomy. Emit
       "healer_category": "SELECTOR",
       "classification_source": "deterministic-regex",
       "confidence": 0.93,
+      "recommended_action": "AUTO_HEAL",
       "reason": "Playwright locator-resolution failure: getByRole('button', {name: 'Submit'}) resolved to 0 elements",
       "suggested_fix": "Regenerate locator from current ARIA tree; prefer getByRole > getByLabel > getByTestId",
       "delegate_to": null
@@ -266,6 +321,7 @@ Downstream `test-healer-agent` uses a smaller taxonomy. Emit
       "healer_category": "LOGIC_BUG",
       "classification_source": "llm",
       "confidence": 0.85,
+      "recommended_action": "ISSUE_ONLY",
       "reason": "Response shape doesn't match Pydantic model — missing required field 'created_at'",
       "suggested_fix": "Add created_at to UserResponse model OR populate it in the service layer",
       "delegate_to": "/contract-test"

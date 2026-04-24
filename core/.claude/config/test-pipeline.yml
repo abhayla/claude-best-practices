@@ -87,7 +87,12 @@ capture_proof:
 contradictions:
   action: warn
 
-# Per-category auto-heal matrix (active in PR2 — declared here for forward-compat)
+# Per-category auto-heal matrix — read by test-failure-analyzer-agent at dispatch
+# time to map each classified category to a recommended_action. Override any
+# entry in the downstream project's .claude/config/test-pipeline.yml to tune
+# auto-heal behavior per codebase. Allowed values: AUTO_HEAL,
+# AUTO_HEAL_WITH_FLAG, ISSUE_ONLY, QUARANTINE, RETRY_INFRA.
+# spec_ref: REQ-S004 (config-driven matrix)
 auto_heal:
   BROKEN_LOCATOR: AUTO_HEAL
   TIMEOUT_TIMING: AUTO_HEAL

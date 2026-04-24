@@ -5,7 +5,17 @@
 
 ## Current Task
 
-_No active task. Completed: testing-pipeline overhaul (see Completed section)._
+### REQ-S004 — Make auto-heal matrix config-driven (2026-04-24)
+
+Spec: `docs/specs/test-pipeline-three-lane-spec.md` §3.6 + §5 SHOULD-HAVE S004.
+Problem: `test-pipeline.yml:90-106` declares `auto_heal:` but nothing reads it; `test-failure-analyzer-agent` NN#6 defers "per spec §3.6" to LLM recall. S004 wires the config through.
+
+- [x] Update `test-failure-analyzer-agent.md`: NN#6 references config path; new "Recommended Action Matrix (Config-Driven)" section describes read procedure + fallback-to-ISSUE_ONLY on missing/invalid config; JSON output example adds `recommended_action`; bump v2.2.0 → v2.3.0
+- [x] Update `core/.claude/config/test-pipeline.yml` comment on `auto_heal:` block to mark it load-bearing (not forward-compat) + spec_ref: REQ-S004
+- [x] Add `scripts/tests/test_pipeline_auto_heal_req_s004.py` with 11 tests: config enum validation, §3.6 drift check, agent-body references config path, fallback policy declared, ALLOWED values enumerated — all pass
+- [x] Update `registry/patterns.json` analyzer version 2.2.0 → 2.3.0 + changelog entry
+- [x] Run 4 CI gates: dedup_check --validate-all ✅, dedup_check --secret-scan ✅, workflow_quality_gate_validate_patterns ✅, pytest (1257 passed, 60 skipped, 1 xfailed) ✅
+- [ ] Commit as `feat(testing-pipeline): REQ-S004 wire auto-heal matrix through config`
 
 ## Completed
 
