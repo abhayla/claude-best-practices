@@ -19,6 +19,13 @@ def pytest_configure(config):
     registration, pytest emits PytestUnknownMarkWarning on every collection.
     """
     config.addinivalue_line("markers", "api: mark test as an API-track test (read by test-scout-agent classify mode)")
+    config.addinivalue_line(
+        "markers",
+        "integration: marks tests that require live external services "
+        "(e.g., the `claude` CLI for runtime platform probes). "
+        "Skipped by default; opt in via CLAUDE_CODE_INTEGRATION=1 and/or "
+        "the corresponding resource being available.",
+    )
 
 
 @pytest.fixture

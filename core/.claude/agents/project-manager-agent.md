@@ -7,6 +7,7 @@ description: >
   persistence, conditional branching, idempotent execution, and compensating
   rollback across the full 11-stage pipeline.
 tools: ["Read", "Grep", "Glob", "Bash", "Agent", "Skill"]
+dispatched_from: T0
 model: inherit
 ---
 

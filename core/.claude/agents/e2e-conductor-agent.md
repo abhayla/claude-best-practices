@@ -1,19 +1,24 @@
 ---
 name: e2e-conductor-agent
 description: >
-  Orchestrate Playwright E2E test execution using queue-based dispatch of
-  `test-scout-agent`, `visual-inspector-agent`, and `test-healer-agent` with
-  dual-signal verdicts (ARIA YAML + screenshot), confidence-gated auto-healing,
-  and first-run artifact discovery. Dual-mode: standalone via `/e2e-visual-run`
-  slash command OR dispatched by `testing-pipeline-master-agent` (T1). Playwright-only
-  — NOT for Cypress/Selenium/Detox/Flutter (use their native runners), one-off
-  screenshot comparison (use /verify-screenshots), post-change targeted
-  verification (use /auto-verify), or E2E reference (use /e2e-best-practices).
+  DEPRECATED 2026-04-24 — this agent's queue-based design dispatches
+  test-scout-agent, visual-inspector-agent, and test-healer-agent via
+  Agent() from what is at runtime a subagent session. The platform
+  does not forward Agent to dispatched subagents (Anthropic docs:
+  "subagents cannot spawn other subagents"), so every dispatch
+  silently inlines. Use /test-pipeline or /e2e-visual-run instead;
+  Phase 3.1 will dissolve this agent into /e2e-visual-run's body at T0.
+deprecated: true
+deprecated_by: test-pipeline
+deprecated_at: "2026-04-24"
 tools: ["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]
+dispatched_from: worker
 model: inherit
 color: blue
-version: "2.1.0"
+version: "2.2.0"
 ---
+
+> **Deprecated 2026-04-24.** This agent was designed as a T2 sub-orchestrator dispatched by `/e2e-visual-run` OR by `testing-pipeline-master-agent`. In both invocation paths the agent runs as a subagent; Anthropic's platform does not forward `Agent` to dispatched subagents ([official docs](https://code.claude.com/docs/en/sub-agents)), so the queue-based `Agent(subagent_type=…)` calls to scout/inspector/healer silently collapse to inline serial work. Phase 3.1 of the 2026-04-24 remediation will restructure `/e2e-visual-run` as a skill-at-T0 that dispatches the queue workers directly from the user's session. Do not invoke in new workflows. The agent file remains for the 2-version-cycle deprecation window defined in `pattern-structure.md`.
 
 ## NON-NEGOTIABLE
 

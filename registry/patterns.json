@@ -1508,28 +1508,32 @@
     "tier": "nice-to-have"
   },
   "e2e-conductor-agent": {
-    "hash": "e7e137568d4c67107b64d32d4cadfa5e0cc50b61181f694916fe7320b653e5b9",
+    "hash": "cbc9f56d522bb4c249b7fd8571019d02095b8ba6447179bc79e7b40323049802",
     "type": "agent",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-04-24",
     "dependencies": [
       "test-scout-agent",
       "visual-inspector-agent",
       "test-healer-agent"
     ],
     "visibility": "public",
-    "description": "Queue-based E2E test orchestrator: dispatches test-scout, visual-inspector, and test-healer as async worker agents",
+    "description": "DEPRECATED 2026-04-24. Queue-based dispatch design is platform-incompatible (subagents cannot spawn other subagents, per Anthropic docs). Use /test-pipeline or /e2e-visual-run; Phase 3.1 will dissolve this agent into /e2e-visual-run body at T0.",
     "tags": [
       "e2e",
       "orchestration",
       "testing",
-      "queue"
+      "queue",
+      "deprecated"
     ],
-    "changelog": "v1.0.0: Initial release - async queue-based E2E orchestration pipeline. v2.0.0: absorbed user-facing modes from e2e-visual-run. Promoted to must-have 2026-04-23 so `testing-pipeline-master-agent` (must-have) does not have a dangling Agent() dispatch under default provisioning.",
-    "tier": "must-have"
+    "changelog": "v1.0.0: Initial release - async queue-based E2E orchestration pipeline. v2.0.0: absorbed user-facing modes from e2e-visual-run. Promoted to must-have 2026-04-23 so `testing-pipeline-master-agent` (must-have) does not have a dangling Agent() dispatch under default provisioning. v2.2.0 (2026-04-24): deprecated — platform does not forward Agent to dispatched subagents; Phase 3.1 will restructure /e2e-visual-run as skill-at-T0.",
+    "tier": "must-have",
+    "deprecated": true,
+    "deprecated_by": "test-pipeline",
+    "deprecated_at": "2026-04-24"
   },
   "e2e-pipeline": {
     "hash": "3f99d9af1414c3b663537b9ba88a955da23db69adf920ef230f8d5b2c7e97d97",
@@ -2593,7 +2597,7 @@
     "tier": "must-have"
   },
   "parallel-worktree-orchestrator-agent": {
-    "hash": "399ef69456f8cfe223d48c0dee77d2dbba1c588a60d13484b4c90d055653ec1a",
+    "hash": "b0660e4e14bc8e1eaf6f14a156a0e37c6866fe53fe1b1ea5c3675de732d301ca",
     "type": "agent",
     "category": "core",
     "version": "1.0.0",
@@ -2650,7 +2654,7 @@
     "tier": "nice-to-have"
   },
   "pattern-structure": {
-    "hash": "2704f85cd7f124fb00a0c0140c1fa7faf4018c89f8104297b67485f921fec41d",
+    "hash": "bfbb2c6c37d7770a3869f5360aab74b64abc62d6007342cc134f66e89053bf17",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -2916,7 +2920,7 @@
     "tier": "nice-to-have"
   },
   "project-manager-agent": {
-    "hash": "60508ca9af9d57094ccd250d362f80bdbba5cb382e687345fd76e09150fcb4a8",
+    "hash": "fdde88ac68b228d5814a894745bd52f3b06c34a1539c58c4147deb6ce2ec0774",
     "type": "agent",
     "category": "core",
     "version": "1.0.0",
