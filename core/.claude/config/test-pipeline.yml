@@ -114,20 +114,24 @@ contradictions:
 # AUTO_HEAL_WITH_FLAG, ISSUE_ONLY, QUARANTINE, RETRY_INFRA.
 # spec_ref: REQ-S004 (config-driven matrix)
 auto_heal:
-  BROKEN_LOCATOR: AUTO_HEAL
-  TIMEOUT_TIMING: AUTO_HEAL
-  ASSERTION_ERROR: AUTO_HEAL
-  IMPORT_ERROR: AUTO_HEAL
-  MISSING_FIXTURE: AUTO_HEAL
-  SCHEMA_MISMATCH: AUTO_HEAL
+  # Keys MUST match analyzer's `category` output field exactly — the analyzer
+  # looks up auto_heal[category] at dispatch time (see test-failure-analyzer-
+  # agent.md §Stage 3). Mismatch → fallback to ISSUE_ONLY (verified 2026-04-24
+  # in v2-pipeline-testbed: TIMEOUT_TIMING key did not match TIMEOUT category).
+  SELECTOR: AUTO_HEAL
+  TIMEOUT: AUTO_HEAL
+  ASSERTION_FAILURE: AUTO_HEAL
+  MISSING_IMPORT: AUTO_HEAL
+  FIXTURE_MISMATCH: AUTO_HEAL
+  SCHEMA_MISMATCH: AUTO_HEAL                        # API category (PR1 REQ-M034)
   BASELINE_DRIFT_INTENTIONAL: AUTO_HEAL_WITH_FLAG   # only when /test-pipeline --update-baselines is passed (REQ-S002)
-  FLAKY: QUARANTINE
+  FLAKY_TEST: QUARANTINE
   INFRASTRUCTURE: RETRY_INFRA
   LOGIC_BUG: ISSUE_ONLY
-  STATUS_CODE_DRIFT: ISSUE_ONLY
-  CONTRACT_BROKEN: ISSUE_ONLY
+  STATUS_CODE_DRIFT: ISSUE_ONLY                     # API category (PR1 REQ-M034)
+  CONTRACT_BROKEN: ISSUE_ONLY                       # API category (PR1 REQ-M034)
   VISUAL_REGRESSION: ISSUE_ONLY
-  NEEDS_CONTRACT_VALIDATION: ISSUE_ONLY
+  NEEDS_CONTRACT_VALIDATION: ISSUE_ONLY             # API category (PR1 REQ-M034)
 
 # Optional CLI flags supported by /test-pipeline (REQ-S001, S002, S005)
 cli_flags:

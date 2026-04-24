@@ -279,18 +279,25 @@ For each failed test, T2B dispatches `test-failure-analyzer-agent` (extended) wi
 }
 ```
 
-### 3.6 Auto-Fix Authority Matrix (Unchanged from v1.1)
+### 3.6 Auto-Fix Authority Matrix (v1.8 — aligned to analyzer category output)
+
+Category names MUST match the analyzer's `category` output field (see
+`test-failure-analyzer-agent.md` §Failure Categories). v1.8 renames the
+legacy descriptive names (BROKEN_LOCATOR, TIMEOUT_TIMING, ASSERTION_ERROR,
+IMPORT_ERROR, MISSING_FIXTURE, FLAKY) to the analyzer's actual output names
+after the 2026-04-24 downstream test run found config-lookup misses on the
+descriptive names. See `.claude/tasks/lessons.md` for the SSOT rationale.
 
 | Category | Lane(s) typical | Default action | Healer touches |
 |---|---|---|---|
-| `BROKEN_LOCATOR` | Functional, UI | AUTO_HEAL | test code (selector) |
-| `TIMEOUT_TIMING` | Functional, UI | AUTO_HEAL | test code (waits) |
-| `ASSERTION_ERROR` | Functional | AUTO_HEAL (conf > 0.85) | test code (assertion) |
-| `IMPORT_ERROR` | Functional | AUTO_HEAL | test code (imports) |
-| `MISSING_FIXTURE` | Functional | AUTO_HEAL | conftest |
+| `SELECTOR` | Functional, UI | AUTO_HEAL | test code (selector) |
+| `TIMEOUT` | Functional, UI | AUTO_HEAL | test code (waits) |
+| `ASSERTION_FAILURE` | Functional | AUTO_HEAL (conf > 0.85) | test code (assertion) |
+| `MISSING_IMPORT` | Functional | AUTO_HEAL | test code (imports) |
+| `FIXTURE_MISMATCH` | Functional | AUTO_HEAL | conftest |
 | `SCHEMA_MISMATCH` | API | AUTO_HEAL (conf > 0.85) | Pydantic model / schema file |
 | `BASELINE_DRIFT_INTENTIONAL` | UI | AUTO_HEAL (with `--update-baselines` flag) | baseline files |
-| `FLAKY` | Any | QUARANTINE | tag with `@flaky`, log Issue, continue |
+| `FLAKY_TEST` | Any | QUARANTINE | tag with `@flaky`, log Issue, continue |
 | `INFRASTRUCTURE` | Any | RETRY_INFRA (once) | nothing — re-run; on persist, escalate |
 | `LOGIC_BUG` | Functional | ISSUE_ONLY | nothing — Issue created |
 | `STATUS_CODE_DRIFT` | API | ISSUE_ONLY | nothing — Issue created |
@@ -609,14 +616,15 @@ contradictions:
   action: warn
 
 auto_heal:
-  BROKEN_LOCATOR: AUTO_HEAL
-  TIMEOUT_TIMING: AUTO_HEAL
-  ASSERTION_ERROR: AUTO_HEAL
-  IMPORT_ERROR: AUTO_HEAL
-  MISSING_FIXTURE: AUTO_HEAL
+  # Keys MUST match analyzer's `category` output (v1.8, 2026-04-24)
+  SELECTOR: AUTO_HEAL
+  TIMEOUT: AUTO_HEAL
+  ASSERTION_FAILURE: AUTO_HEAL
+  MISSING_IMPORT: AUTO_HEAL
+  FIXTURE_MISMATCH: AUTO_HEAL
   SCHEMA_MISMATCH: AUTO_HEAL
   BASELINE_DRIFT_INTENTIONAL: AUTO_HEAL_WITH_FLAG
-  FLAKY: QUARANTINE
+  FLAKY_TEST: QUARANTINE
   INFRASTRUCTURE: RETRY_INFRA
   LOGIC_BUG: ISSUE_ONLY
   STATUS_CODE_DRIFT: ISSUE_ONLY
