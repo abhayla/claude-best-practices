@@ -4481,22 +4481,23 @@
     "tier": "must-have"
   },
   "workflow-master-template": {
-    "hash": "6e388a80fca39a31f91d3300c4a4c94524744a3ecada2c8f6eb88ac4337fba5e",
+    "hash": "7188dbbf5b71f84047d12e339bcf470ba16981e9e6ff709dc9d5cc4fe0050d45",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
-    "description": "Shared orchestration protocol reference for all workflow-master agents. Defines dual-mode operation, config-driven execution, state management, context passing, cross-workflow interface, and progress reporting.",
+    "description": "Reference doc for the skill-at-T0 workflow orchestrator pattern. Defines 7 protocols: skill-at-T0 structure, config-driven step execution, retry/failure handling, state management, worker dispatch context, progress reporting, cross-workflow handoffs. Plus migration guide from the legacy workflow-master-agent pattern.",
     "tags": [
       "orchestration",
       "workflow",
-      "template"
+      "template",
+      "skill-at-t0"
     ],
-    "changelog": "v1.0.0: Initial release — 6 shared protocols for workflow masters",
+    "changelog": "v1.0.0 (2026-03-30): initial release — 6 protocols for the legacy workflow-master agent pattern. v2.0.0 (2026-04-24): complete rewrite for skill-at-T0 pattern after 2026-04-24 platform finding that subagents cannot dispatch further subagents; 7 protocols including a migration appendix for legacy workflow-master agents.",
     "tier": "nice-to-have"
   },
   "writing-plans": {
