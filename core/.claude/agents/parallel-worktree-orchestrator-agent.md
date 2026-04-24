@@ -1,10 +1,18 @@
 ---
 name: parallel-worktree-orchestrator-agent
-description: Use this agent to coordinate parallel workstreams using git worktrees. Splits a multi-part task into independent subtasks, delegates each to a specialist agent in an isolated worktree, and merges results. Use when a task has 2+ independent parts that can be worked on simultaneously.
+description: Use this agent to coordinate parallel workstreams using git worktrees. Splits a multi-part task into independent subtasks, delegates each to a specialist agent in an isolated worktree, and merges results. Use when a task has 2+ independent parts that can be worked on simultaneously. T0-only — MUST be invoked directly from the user's session, never dispatched as a worker (platform constraint — see below).
 tools: ["Read", "Grep", "Glob", "Bash", "Agent"]
 dispatched_from: T0
 model: sonnet
 ---
+
+> **T0-only guardrail (Phase 3.9, 2026-04-25):** This agent is `dispatched_from: T0`.
+> It MUST NOT be dispatched via `Agent(subagent_type="parallel-worktree-orchestrator-agent", ...)`
+> from any other agent or skill. When dispatched as a worker, the `Agent` tool is
+> stripped at runtime by Claude Code's platform
+> ([Anthropic docs](https://code.claude.com/docs/en/sub-agents)) and this agent's
+> subtask-delegation `Agent()` calls would silently inline instead of fanning out.
+> Invoke only directly from the user's T0 session.
 
 You are a parallel execution coordinator specializing in git worktree-based task decomposition and multi-agent orchestration.
 

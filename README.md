@@ -143,97 +143,91 @@ See [`core/.claude/README.md`](core/.claude/README.md) for the full catalog with
 
 ### Workflow Master Orchestration
 
-Skills don't just run independently — they coordinate as teams. Each of the 8 workflow groups has a **master-agent** that orchestrates its skills end-to-end with shared context, artifact contracts, and verification gates:
+Skills don't just run independently — they coordinate as teams. Each of the 8 workflow groups runs via a **skill-at-T0 orchestrator** (migration complete as of Phase 3, 2026-04-25). The skill body is injected into the user's T0 session and dispatches flat worker subagents via `Agent()` at T0 — the only reliably-parallel dispatch point in Claude Code per Anthropic's platform docs:
 
 ```
-┌───────────────────────────┬────────────────────────────────────────────────┬──────────────────────────────────┐
-│         Workflow          │                     Agent                      │         Slash Command            │
-├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Development Loop          │ development-loop-master-agent                  │ /development-loop                │
-│   ideate → plan →         │   dispatches: plan-executor-agent,             │                                  │
-│   implement → verify →    │   planner-researcher-agent                     │                                  │
-│   commit                  │                                                │                                  │
-├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Testing Pipeline          │ (skill-at-T0 — no master agent)                │ /test-pipeline                   │
-│   scout → Wave 1 lanes →  │   dispatches at T0: test-scout-agent,          │  (/testing-pipeline-workflow      │
-│   Wave 2 UI → JOIN →      │   tester-agent, fastapi-api-tester-agent,      │   DEPRECATED 2026-04-24)         │
-│   triage → verify-        │   visual-inspector-agent, test-failure-        │                                  │
-│   affected → commit       │   analyzer-agent, github-issue-manager-agent   │                                  │
-├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Debugging Loop            │ debugging-loop-master-agent                    │ /debugging-loop                  │
-│   diagnose → fix →        │   dispatches: debugger-agent,                  │                                  │
-│   verify → learn          │   test-failure-analyzer-agent                  │                                  │
-├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Code Review               │ code-review-master-agent                       │ /code-review-workflow            │
-│   quality gates → PR →    │   dispatches: code-reviewer-agent,             │                                  │
-│   feedback resolution     │   security-auditor-agent                       │                                  │
-├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Documentation             │ documentation-master-agent                     │ /documentation-workflow           │
-│   ADR → API docs →        │   dispatches: docs-manager-agent               │                                  │
-│   structure → staleness   │                                                │                                  │
-├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Session Continuity        │ session-continuity-master-agent                │ /session-continuity              │
-│   save → handover         │   dispatches: session-summarizer-agent         │                                  │
-│   (or restore → briefing) │                                                │                                  │
-├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Learning                  │ learning-self-improvement-master-agent         │ /learning-self-improvement       │
-│   capture → detect        │   dispatches: session-summarizer-agent,        │                                  │
-│   patterns → validate     │   context-reducer-agent                        │                                  │
-├───────────────────────────┼────────────────────────────────────────────────┼──────────────────────────────────┤
-│ Skill Authoring           │ skill-authoring-master-agent                   │ /skill-authoring-workflow        │
-│   author → validate →     │   dispatches: skill-author-agent               │                                  │
-│   register                │                                                │                                  │
-└───────────────────────────┴────────────────────────────────────────────────┴──────────────────────────────────┘
+┌───────────────────────────┬──────────────────────────────┬──────────────────────────────────┐
+│         Workflow          │      Slash Command (T0)      │    Worker subagents at T0        │
+├───────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Testing Pipeline          │ /test-pipeline               │ test-scout, tester,              │
+│   scout → Wave 1+2 →      │   (spec v2.2, Phase 3.1)     │ fastapi-api-tester,              │
+│   JOIN → triage →         │                              │ visual-inspector,                │
+│   verify-affected →       │                              │ test-failure-analyzer,           │
+│   commit                  │                              │ github-issue-manager, fixers     │
+├───────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Development Loop          │ /development-loop            │ plan-executor,                   │
+│   ideate → plan →         │   (Phase 3.2)                │ planner-researcher               │
+│   execute → verify →      │                              │                                  │
+│   commit                  │                              │                                  │
+├───────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Debugging Loop            │ /debugging-loop              │ debugger,                        │
+│   diagnose → fix →        │   (Phase 3.3)                │ test-failure-analyzer            │
+│   verify → learn          │                              │                                  │
+├───────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Code Review               │ /code-review-workflow        │ code-reviewer,                   │
+│   gates → (deep audit) →  │   (Phase 3.4)                │ security-auditor                 │
+│   PR → feedback           │                              │                                  │
+├───────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Documentation             │ /documentation-workflow      │ docs-manager (optional,          │
+│   ADR → API docs →        │   (Phase 3.5)                │   bulk content drafting)         │
+│   structure → staleness   │                              │                                  │
+├───────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Session Continuity        │ /session-continuity          │ session-summarizer               │
+│   save | restore |        │   (Phase 3.6)                │   (optional, deep summary)       │
+│   handover                │                              │                                  │
+├───────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Learning                  │ /learning-self-improvement   │ session-summarizer,              │
+│   capture → detect        │   (Phase 3.7)                │ context-reducer                  │
+│   patterns → propose →    │                              │   (both optional)                │
+│   validate                │                              │                                  │
+├───────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Skill Authoring           │ /skill-authoring-workflow    │ skill-author                     │
+│   overlap-check →         │   (Phase 3.8)                │   (optional, richer drafts)      │
+│   author → validate →     │                              │                                  │
+│   register                │                              │                                  │
+└───────────────────────────┴──────────────────────────────┴──────────────────────────────────┘
 ```
 
-Each workflow runs from the user's T0 session via its slash command. The
-testing-pipeline has migrated to the **skill-at-T0** pattern (2026-04-24,
-Phase 3.1) — its orchestrator body is injected into T0 rather than dispatched
-as a worker subagent. The 7 other workflows are still on the legacy
-workflow-master pattern and will migrate in Phase 3.2–3.8.
-
-**Why the migration:** Anthropic's Claude Code does not forward the `Agent`
+**Platform rationale:** Anthropic's Claude Code does not forward the `Agent`
 tool to dispatched subagents
 ([docs](https://code.claude.com/docs/en/sub-agents),
-[GH #19077](https://github.com/anthropics/claude-code/issues/19077)).
-A dispatched agent cannot dispatch further agents — every `Agent()` call
-in its body silently inlines as serial work at runtime. The skill-at-T0
-pattern relocates orchestration into the user's T0 session, where `Agent()`
-actually works; flat worker subagents can then be dispatched in parallel
-via a single T0 assistant message. The legacy 4-tier model is retained
-below as historical context:
+[GH #19077](https://github.com/anthropics/claude-code/issues/19077),
+[GH #4182](https://github.com/anthropics/claude-code/issues/4182)).
+A dispatched subagent cannot dispatch further subagents — any `Agent()`
+call in its body silently inlines at runtime. The skill-at-T0 pattern
+relocates orchestration into the user's T0 session, where `Agent()` is
+actually available; flat worker subagents can then be dispatched in
+parallel via a single T0 assistant message.
 
 ```
-T0  project-manager-agent          ← full pipeline orchestrator (still T0)
-     │
-     ├── /test-pipeline (skill-at-T0, spec v2.2)   ← CANONICAL shape (Phase 3.1 migration)
-     │    └── dispatches flat workers at T0 in one assistant message:
-     │         test-scout-agent, tester-agent, fastapi-api-tester-agent,
-     │         visual-inspector-agent, test-failure-analyzer-agent,
-     │         github-issue-manager-agent, stack-specific fixer agents
-     │
-     │    ── LEGACY 4-tier for the remaining 7 workflows (Phase 3.2-3.8 queued) ──
-     │
-T1  ├── development-loop-master    ← workflow master (standalone or dispatched)
-     │    │
-T2  │    ├── plan-executor-agent   ← sub-orchestrator (platform-incompatible —
-     │    │                           dispatched sub-orchestrators cannot
-     │    │                           dispatch further; see docs/specs/
-     │    │                           test-pipeline-three-lane-spec-v2.md
-     │    │                           §1 for the platform-constraint note)
-     │    │
-T3  │    └── (worker agents)       ← leaf workers (Skill() only)
-     │
-T1  └���─ ... (6 more workflow masters)
+T0 (user session)
+ │
+ ├── project-manager-agent  (full PRD-to-Production pipeline — T0-only)
+ │    │
+ │    └── invokes one of the 8 workflow skills below via Skill("/<workflow>")
+ │
+ ├── /test-pipeline (skill-at-T0)
+ │    └── dispatches workers in ONE T0 message:
+ │         test-scout, tester, fastapi-api-tester, visual-inspector,
+ │         test-failure-analyzer, github-issue-manager, fixers
+ │
+ ├── /development-loop (skill-at-T0)           ├── /session-continuity (skill-at-T0)
+ ├── /debugging-loop (skill-at-T0)              ├── /learning-self-improvement (skill-at-T0)
+ ├── /code-review-workflow (skill-at-T0)        ├── /skill-authoring-workflow (skill-at-T0)
+ └── /documentation-workflow (skill-at-T0)
 ```
+
+The 8 legacy `<workflow>-master-agent` files are `deprecated: true`
+(Phase 3.1–3.8, 2-version-cycle window) and MUST NOT be dispatched.
 
 Context passes between steps via structured return contracts — no skill starts
-from scratch. For the canonical skill-at-T0 design (test pipeline + queued
-migrations), see
+from scratch. For the canonical skill-at-T0 design, see
 [`docs/specs/test-pipeline-three-lane-spec-v2.md`](docs/specs/test-pipeline-three-lane-spec-v2.md)
-v2.2. For the legacy workflow-master pattern still in use by 7 workflows, see
+v2.2 (reference implementation) and
+[`core/.claude/agents/workflow-master-template.md`](core/.claude/agents/workflow-master-template.md)
+v2.0.0 (canonical template).
 [`docs/specs/workflow-master-agents-spec.md`](docs/specs/workflow-master-agents-spec.md)
-(partially superseded — test-pipeline scope replaced by spec v2.2).
+is SUPERSEDED (Phase 3, 2026-04-25) and kept as historical record only.
 
 ---
 

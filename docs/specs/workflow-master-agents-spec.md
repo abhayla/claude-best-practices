@@ -1,9 +1,29 @@
 # Spec: Workflow Master Agents — Federated Orchestration Architecture
 
+> **⚠️ SUPERSEDED 2026-04-25 (Phase 3 of subagent-dispatch-platform-limit remediation).**
+> The federated orchestration pattern described below — `project-manager-agent` (T0)
+> dispatching workflow-master agents (T1) which dispatch sub-orchestrators (T2)
+> which dispatch workers (T3) — is platform-incompatible. Anthropic's Claude Code
+> does not forward the `Agent` tool to dispatched subagents
+> ([docs](https://code.claude.com/docs/en/sub-agents)). All 8 workflow-masters
+> described here have been retired to the **skill-at-T0** pattern across
+> Phases 3.1–3.8 (PRs #25, #28, #29, #30, #31, #32, #33, #34).
+>
+> **Canonical replacements:**
+> - Overall pattern: `core/.claude/agents/workflow-master-template.md` v2.0.0 (Phase 3.0)
+> - Reference implementation: `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2
+>   (skill-at-T0 orchestrator for the test pipeline)
+> - For each of the 8 workflows, see the `/<workflow>-*` skill bodies under
+>   `core/.claude/skills/` — each is now a skill-at-T0 orchestrator body.
+>
+> This spec is kept as a historical record of the architectural intent. Do NOT
+> execute its tiered dispatch topology against the current agent set — the
+> dispatches would silently inline instead of fanning out.
+
 ## Meta
 - Author: Claude Code
 - Date: 2026-03-30
-- Status: DRAFT
+- Status: **SUPERSEDED** — functional requirements preserved by REQ-ID in skill-at-T0 implementations per Phase 3 (2026-04-25). Dispatch topology retired.
 - Version: 1.0
 
 ---

@@ -2607,13 +2607,13 @@
     "tier": "must-have"
   },
   "parallel-worktree-orchestrator-agent": {
-    "hash": "b0660e4e14bc8e1eaf6f14a156a0e37c6866fe53fe1b1ea5c3675de732d301ca",
+    "hash": "009f4a5e962b9fef84eedbccde498c119ea65486c15b154da19f651438bc5837",
     "type": "agent",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Coordinate parallel workstreams using git worktrees with multi-agent delegation",
@@ -2622,7 +2622,7 @@
       "parallel",
       "worktree"
     ],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.0.0: Initial registration | 2026-04-25 (Phase 3.9): add explicit T0-only guardrail banner",
     "tier": "nice-to-have"
   },
   "pattern-portability": {
@@ -2930,13 +2930,13 @@
     "tier": "nice-to-have"
   },
   "project-manager-agent": {
-    "hash": "839b020894c35139c3740dcf8cece3ec467fc34a72db44cd034e5c8a4be6cacb",
+    "hash": "e3d4196a0a2ea96a0442e9fc4cba6edfd4aae647a9f52dad5347bf59da259697",
     "type": "agent",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-04-25",
     "dependencies": [
       "agent-orchestration"
     ],
@@ -2948,7 +2948,7 @@
       "DAG",
       "agent"
     ],
-    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent",
+    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent | 2026-04-25 (Phase 3.9): add explicit T0-only guardrail; retire tiered-nesting rule text",
     "tier": "nice-to-have"
   },
   "project-scaffold": {

@@ -1,5 +1,17 @@
 # Implementation Plan: Workflow Master Agents
 
+> **⚠️ SUPERSEDED 2026-04-25 (Phase 3).** This plan's goal — build 8 workflow-
+> master agents + sub-orchestrators under a federated T0→T1→T2→T3 dispatch
+> model — was fully executed originally, then RETIRED across Phases 3.1–3.8
+> after the 2026-04-24 platform finding (subagents cannot spawn subagents;
+> [Anthropic docs](https://code.claude.com/docs/en/sub-agents)). All 8
+> workflow-masters are now deprecated; orchestration lives in skill-at-T0
+> bodies under `core/.claude/skills/<workflow>-*/SKILL.md`. For the current
+> Phase 3 migration tracker, see `.claude/tasks/todo.md` § "Phase 3 —
+> Workflow-master pattern retirement". For the current design, see
+> `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2 (reference
+> implementation) and `core/.claude/agents/workflow-master-template.md` v2.0.0.
+
 **Created:** 2026-03-30
 **Estimated total time:** ~51m expected | ~61m with buffer
 **Critical path:** Task 1 → 4 → 6 → 9 → 11 → 13
