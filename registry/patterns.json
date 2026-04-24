@@ -1437,13 +1437,13 @@
     "tier": "nice-to-have"
   },
   "documentation-master-agent": {
-    "hash": "184aa059785551491e2f35879ea2a964f53872f516ce4b79554229721b006e94",
+    "hash": "5d632c3ac6a18418bbbcf16a879b32cf6c60b3436bb1527450df3a5432d0a017",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Orchestrate documentation generation: ADRs, API docs, structure enforcement, staleness audits. Parallel step execution for independent doc types.",
@@ -1452,17 +1452,19 @@
       "workflow",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.5)",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "documentation-workflow"
   },
   "documentation-workflow": {
-    "hash": "1b022b68d2f71f676045f1a331f72e8827b9f8cfdc4aff03b7999b142bd11ffa",
+    "hash": "ce9c2ae2ab24301d1f6dfdc0115a851f6b6014b55dae48c29e4aaae16a50cf38",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Slash-command wrapper for documentation-master-agent. Full doc generation and maintenance orchestration.",
@@ -1471,7 +1473,7 @@
       "workflow",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5)",
     "tier": "nice-to-have"
   },
   "drizzle-orm": {

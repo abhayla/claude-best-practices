@@ -231,12 +231,13 @@ workflows:
         reason: "PR approved — update documentation"
 
   documentation:
-    description: "ADR → API docs → structure enforcement → staleness check"
-    master_agent: documentation-master-agent
+    description: "ADR → API docs → structure → staleness — skill-at-T0 orchestrator (Phase 3.5, spec v2.2)."
+    master_agent: null
+    entry_skill: documentation-workflow
     state_file: ".workflows/documentation/state.json"
-    sub_orchestrators:
-      - agent: docs-manager-agent
-        role: "Documentation generation and maintenance"
+    # docs-manager-agent dispatched directly from T0 by the skill body
+    # STEP 4 (optional, for bulk content drafting). Worker only.
+    sub_orchestrators: []
     steps:
       - id: adr
         skill: adr
