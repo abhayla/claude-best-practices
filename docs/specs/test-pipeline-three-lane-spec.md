@@ -3,8 +3,8 @@
 ## Meta
 - Author: Claude Code (Opus 4.7)
 - Date: 2026-04-23
-- Status: READY FOR /writing-plans (after 5 independent reviewer passes; reviewer-pass-5 declared "READY, high confidence" after v1.6 cleanup)
-- Version: 1.6
+- Status: IMPLEMENTED — MUST-HAVE + most SHOULD/COULD-HAVE shipped across PR #12, #15, #17, #18 (2026-04-22 → 2026-04-23). REQ-S004 shipped 2026-04-24. Remaining S009/S010/C001 deferrals re-confirmed 2026-04-24 (audit trail in §5).
+- Version: 1.7
 - Source brainstorm: `/brainstorm` session 2026-04-23 with user
 - Revision history:
   - 1.0 (2026-04-23) — initial spec from brainstorm
@@ -14,6 +14,7 @@
   - 1.4 (2026-04-23) — closed reviewer-pass-3 findings (N5 inline schema, Gap 6 validator extension, NEW-4 PR1 T1 extension, trade-offs documented)
   - 1.5 (2026-04-23) — closed reviewer-pass-4 findings (split off /agent-evaluator skill, hash migration, rollback rm fix, NN block update)
   - 1.6 (2026-04-23) — closed reviewer-pass-5 cleanup findings: (a) PR1 task list still said "Extend /skill-evaluator" — corrected to "NEW /agent-evaluator skill" matching §4 EVALS body text; (b) added `agent-evaluator` to REGISTRY task list (was missing); (c) `/agent-evaluator` confirmed in PR1 (not PR2) so it's available for evals gate that runs in PR2 per REQ-M033
+  - 1.7 (2026-04-24) — §5 requirements annotated with ship status + deferral re-confirmations. REQ-S004 implemented (commit `8b0cd24`). REQ-S007/S008 scaffolded with null-default config keys (commit `c13b745`). REQ-S009, S010, C001 deferrals re-confirmed with explicit next-review criteria. No behavior changes to spec content — audit trail only.
 - References:
   - `docs/QA-AGENT-ECOSYSTEM-RESEARCH-2026-04-22.md` (peer architectures: nirarad, fugazi)
   - `docs/specs/workflow-master-agents-spec.md` (T0/T1/T2 conventions)
@@ -835,22 +836,22 @@ Therefore v1.5 corrects this: **a NEW `/agent-evaluator` skill is created** inst
 - **REQ-M036:** NEW skill `/agent-evaluator` (separate from `/skill-evaluator` — reviewer-pass-4 confirmed extension surface is too large for dual-mode). Discovers `core/.claude/agents/*/evals/scenarios/*.json`, runs LLM-as-judge with the 5-criterion rubric defined in §4 EVALS, scoring threshold avg ≥4. Scenario schema defined inline in §4 EVALS (NOT in EVAL-WORKFLOW.md as v1.3 incorrectly claimed) [§4 EVALS]
 
 ### Should Have (v1.1+)
-- **REQ-S001:** `--only-issues N,M,...` flag to re-run pipeline against specific Issues
-- **REQ-S002:** `--update-baselines` flag for `BASELINE_DRIFT_INTENTIONAL` auto-heal
-- **REQ-S003:** Per-project `core/.claude/config/test-track-overrides.yml`
-- **REQ-S004:** Configurable per-category auto-heal matrix in `test-pipeline.yml`
-- **REQ-S005:** Post-pipeline `git rebase -i --autosquash` to consolidate fix commits
-- **REQ-S006:** UI lane starts on `functional.ui-tests-complete.flag` checkpoint instead of full functional return
-- **REQ-S007:** Weighted dispatch counter (fixer=5, analyzer=1, issue-manager=1) — revisit if production runs trip dispatch budget while wall-clock budget has plenty remaining (TRADE-OFF-1)
-- **REQ-S008:** Per-phase wall-clock timeouts (`max_lane_minutes` + `max_triage_minutes`) — revisit if slow-CI users report triage starvation (TRADE-OFF-2)
-- **REQ-S009:** Merge-aware dedup hash that follows squashed commit's parent chain — revisit if squash-merge Issue churn dominates manual triage (TRADE-OFF-3)
-- **REQ-S010:** Feature-flag-based switchover for PR2 to make rollback a one-config-change rather than a code revert — revisit if PR2 rollback needed within first month (TRADE-OFF-4)
+- **REQ-S001:** `--only-issues N,M,...` flag to re-run pipeline against specific Issues — **SHIPPED** PR #17 (2026-04-23)
+- **REQ-S002:** `--update-baselines` flag for `BASELINE_DRIFT_INTENTIONAL` auto-heal — **SHIPPED** PR #17 (2026-04-23)
+- **REQ-S003:** Per-project `core/.claude/config/test-track-overrides.yml` — **SHIPPED** PR #17 (2026-04-23)
+- **REQ-S004:** Configurable per-category auto-heal matrix in `test-pipeline.yml` — **SHIPPED** 2026-04-24 (commit `8b0cd24`): analyzer v2.3.0 reads `auto_heal:` at dispatch time with fail-safe fallback to `ISSUE_ONLY`
+- **REQ-S005:** Post-pipeline `git rebase -i --autosquash` to consolidate fix commits — **SHIPPED** PR #17 (2026-04-23)
+- **REQ-S006:** UI lane starts on `functional.ui-tests-complete.flag` checkpoint instead of full functional return — **SHIPPED** PR #17 (2026-04-23)
+- **REQ-S007:** Weighted dispatch counter (fixer=5, analyzer=1, issue-manager=1) — revisit if production runs trip dispatch budget while wall-clock budget has plenty remaining (TRADE-OFF-1) — **SCAFFOLD SHIPPED** 2026-04-24 (commit `c13b745`): `concurrency.dispatch_weights` key declared with `null` default; activation deferred until TRADE-OFF-1 trigger fires
+- **REQ-S008:** Per-phase wall-clock timeouts (`max_lane_minutes` + `max_triage_minutes`) — revisit if slow-CI users report triage starvation (TRADE-OFF-2) — **SCAFFOLD SHIPPED** 2026-04-24 (commit `c13b745`): both keys declared in `budget:` with `null` defaults; activation deferred until TRADE-OFF-2 trigger fires
+- **REQ-S009:** Merge-aware dedup hash that follows squashed commit's parent chain — revisit if squash-merge Issue churn dominates manual triage (TRADE-OFF-3) — **DEFERRAL RE-CONFIRMED** 2026-04-24: no squash-merge churn evidence in 0 pipeline production runs; speculative implementation would rewrite the existing dedup algorithm without a measured problem, violating YAGNI + rule-curation "reactive, not speculative". Next review: when pipeline has ≥30 days of production use OR triage-time metrics show ≥20% of manual-triage time spent deduping cross-commit duplicates.
+- **REQ-S010:** Feature-flag-based switchover for PR2 to make rollback a one-config-change rather than a code revert — revisit if PR2 rollback needed within first month (TRADE-OFF-4) — **DEFERRAL RE-CONFIRMED** 2026-04-24: PR2 atomic switchover shipped 2026-04-23 (PR #15); the "first month" trigger window is now open regardless of whether we add the flag, and a retroactive flag would not accelerate an in-progress rollback. Value is decorative at this point. Next review: only if a different workflow-master adopts a similar atomic switchover pattern (generalization opportunity).
 
 ### Could Have (future)
-- **REQ-C001:** Worktree-per-fixer (escape hatch for frequent same-file conflicts)
-- **REQ-C002:** Slack notification on `pipeline-fix-failed` Issue creation
-- **REQ-C003:** Fixer batches into a single PR (vs one commit per fix)
-- **REQ-C004:** Auto-assign reviewer on `pipeline-fix-failed` Issues based on CODEOWNERS
+- **REQ-C001:** Worktree-per-fixer (escape hatch for frequent same-file conflicts) — **DEFERRAL RE-CONFIRMED** 2026-04-24: spec §2 rejected worktree-per-fixer as more expensive than commit serialization; no same-file-conflict evidence from the few production runs to date. Implementing now would create a competing code path to a design the spec explicitly chose against. Next review: if ≥3 pipeline runs in the same week hit the same-file-conflict branch in `/serialize-fixes`, OR if a downstream project reports fixer conflicts as a recurring blocker.
+- **REQ-C002:** Slack notification on `pipeline-fix-failed` Issue creation — **SHIPPED** PR #17 (2026-04-23)
+- **REQ-C003:** Fixer batches into a single PR (vs one commit per fix) — **SHIPPED** PR #18 (2026-04-23)
+- **REQ-C004:** Auto-assign reviewer on `pipeline-fix-failed` Issues based on CODEOWNERS — **SHIPPED** PR #17 (2026-04-23)
 
 ### Won't Have (out of scope)
 - **REQ-W001:** Mid-flight per-test fixer trigger before lanes return — not feasible in Claude Code dispatch model
