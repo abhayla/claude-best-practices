@@ -1,5 +1,17 @@
 # Implementation Plan: Test Pipeline Overhaul + Screenshot-as-Proof
 
+> **Post-script (2026-04-24, Phase 3.1 of subagent-dispatch-platform-limit remediation):**
+> This plan's dispatch topology relies on the 4-tier model
+> (`testing-pipeline-master-agent` → `test-pipeline-agent` → lane workers →
+> `failure-triage-agent`). Anthropic's platform does not forward `Agent` to
+> dispatched subagents ([docs](https://code.claude.com/docs/en/sub-agents)) —
+> that topology has been retired. Canonical design is now
+> `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2 (ACCEPTED), which
+> preserves every functional requirement (REQ-M001–REQ-C003) by ID and
+> relocates orchestration to the `/test-pipeline` skill-at-T0 body. Keep
+> this plan as a historical record of the overhaul's intent; do NOT execute
+> its tiered dispatch chain against the current agent set.
+
 **Created:** 2026-03-17
 **Estimated total time:** ~126m (buffered)
 **Critical path:** Plan 1 → Plan 2 → Plan 3 (T12) → Plan 4 (T15-16) → Plan 5 (T24-25)

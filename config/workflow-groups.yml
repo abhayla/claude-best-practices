@@ -52,6 +52,7 @@ workflows:
     description: "Test execution, verification, quality enforcement, and the fix-verify-commit chain."
     seeds:
       skills:
+        - agent-evaluator
         - android-adb-test
         - android-run-e2e
         - android-test-patterns
@@ -65,10 +66,12 @@ workflows:
         - code-quality-gate
         - contract-test
         - coverage-analysis
+        - create-github-issue
         - db-migrate
         - db-migrate-verify
         - e2e-best-practices
         - e2e-visual-run
+        - escalation-report
         - fastapi-run-backend-tests
         - fix-loop
         - flutter-e2e-test
@@ -76,6 +79,7 @@ workflows:
         - merge-strategy
         - mock-server
         - perf-test
+        - pipeline-fix-pr
         - pipeline-orchestrator
         - playwright
         - post-fix-pipeline
@@ -84,6 +88,7 @@ workflows:
         - regression-test
         - research-mode
         - semgrep-rules
+        - serialize-fixes
         - solidity-audit
         - supply-chain-audit
         - tdd
@@ -100,9 +105,11 @@ workflows:
         - android-compose-agent
         - anthropic-multi-agent-reviewer-agent
         - e2e-conductor-agent
+        - failure-triage-agent
         - fastapi-api-tester-agent
         - flutter-dart-agent
         - git-manager-agent
+        - github-issue-manager-agent
         - project-manager-agent
         - quality-gate-evaluator-agent
         - test-failure-analyzer-agent
@@ -117,6 +124,7 @@ workflows:
         - agent-orchestration
         - configuration-ssot
         - e2e-test-writing
+        - security-baseline
         - tdd-rule
         - testing
 
@@ -184,11 +192,13 @@ workflows:
     description: "Creating, validating, and maintaining skills, agents, and rules."
     seeds:
       skills:
+        - agent-evaluator
         - claude-guardian
         - mcp-server-builder
         - prompt-auto-enhance
         - semgrep-rules
         - skill-authoring-workflow
+        - skill-evaluator
         - skill-factory
         - skill-master
         - writing-skills
@@ -223,7 +233,8 @@ workflows:
         - code-reviewer-agent
         - security-auditor-agent
         - workflow-master-template
-      rules: []
+      rules:
+        - git-collaboration
 
   documentation:
     description: "Documentation generation, structure enforcement, and maintenance."
@@ -305,6 +316,9 @@ workflows:
         - android-compose-ui
         - android-kotlin
         - bun-elysia
+        - code-readability
+        - design-principles
+        - error-handling
         - fastapi-backend
         - fastapi-database
         - firebase

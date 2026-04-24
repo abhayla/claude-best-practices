@@ -1,5 +1,19 @@
 # QA Agent Ecosystem — GitHub Research
 
+> **Post-script (2026-04-24, Phase 3.1):** findings comparing our 4-tier
+> orchestration against peer architectures (`fugazi/test-automation-skills-agents`,
+> `nirarad/...`) were written assuming Claude Code forwards the `Agent` tool
+> to dispatched subagents. Anthropic's docs confirm it does not
+> ([link](https://code.claude.com/docs/en/sub-agents)) — subagents cannot
+> spawn subagents. Every peer architecture that assumes tiered dispatch has
+> the same platform-incompatibility problem as the v1 design; the comparative
+> observations below (which tier has which responsibility, how tier boundaries
+> are drawn) are invalidated as runtime facts but remain interesting as design
+> intent. Our canonical design has moved to the skill-at-T0 pattern
+> (`docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2). A full peer
+> re-research pass is deferred — see `.claude/tasks/phase3-doc-pruning-checklist.md`
+> § Known residual debt.
+
 **Date:** 2026-04-22
 **Researcher:** Claude Code (Opus 4.7)
 **Trigger:** Audit of `claude-best-practices` hub QA architecture (4-tier orchestration, dual-signal verdict, confidence-gated auto-healing) against comparable public repos.

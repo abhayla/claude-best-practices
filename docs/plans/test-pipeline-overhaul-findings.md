@@ -1,5 +1,15 @@
 # Findings: Test Pipeline Overhaul + Screenshot-as-Proof
 
+> **Post-script (2026-04-24, Phase 3.1):** findings on nested `Agent()` dispatch
+> and tiered orchestration (T1/T2A/T2B/T3) reflect the pre-platform-constraint
+> understanding. Anthropic's docs ([link](https://code.claude.com/docs/en/sub-agents))
+> confirm subagents cannot spawn subagents, so the industry-research observations
+> that informed the 4-tier plan no longer apply to Claude Code's execution model.
+> The current canonical design is `docs/specs/test-pipeline-three-lane-spec-v2.md`
+> v2.2 (skill-at-T0). Observations about fail-closed gates, file-based artifacts,
+> separation of diagnosis from remediation, and single-mapper principles remain
+> valid — only the multi-agent orchestration assumption is retired.
+
 ## Discoveries
 
 ### Industry Research (validated against best practices)

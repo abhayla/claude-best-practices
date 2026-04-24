@@ -233,7 +233,7 @@ Run the full test verification pipeline with screenshot proof and strict gates:
 Skill("test-pipeline", args="--skip-fix")
 ```
 
-This invokes the `test-pipeline-agent` orchestrator which:
+This runs the `/test-pipeline` skill-at-T0 orchestrator (spec v2.2) which:
 1. Cleans `test-results/` and `test-evidence/`
 2. Runs `/auto-verify` with strict gates and screenshot capture
 3. Runs quality gate, contract tests, and perf tests as sub-gates
