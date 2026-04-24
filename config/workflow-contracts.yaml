@@ -11,14 +11,17 @@ defaults:
 workflows:
 
   development-loop:
-    description: "Ideate → plan → implement → verify → commit"
-    master_agent: development-loop-master-agent
+    description: "Ideate → plan → execute → verify → commit — skill-at-T0 orchestrator (Phase 3.2, spec v2.2). /development-loop body runs at T0 and dispatches workers directly."
+    # master_agent null since Phase 3.2 (2026-04-24) — development-loop-master-agent
+    # deprecated; orchestration lives in /development-loop SKILL.md v2.0.0 body.
+    master_agent: null
+    entry_skill: development-loop
     state_file: ".workflows/development-loop/state.json"
-    sub_orchestrators:
-      - agent: plan-executor-agent
-        role: "Executes approved plans with task-level granularity"
-      - agent: planner-researcher-agent
-        role: "Deep research before planning decisions"
+    # sub_orchestrators intentionally empty — plan-executor-agent and
+    # planner-researcher-agent are dispatched directly from T0 by the skill
+    # body, they are NOT intermediate orchestrators (they can't dispatch
+    # further per platform constraint; see agent-orchestration.md §2).
+    sub_orchestrators: []
     steps:
       - id: ideate
         skill: brainstorm

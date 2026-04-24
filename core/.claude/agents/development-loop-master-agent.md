@@ -1,14 +1,27 @@
 ---
 name: development-loop-master-agent
 description: >
-  Orchestrate the full development cycle: ideate, plan, implement, verify,
-  and commit. Use when building a feature end-to-end or when the task requires
-  coordinated planning and implementation with verification gates. Works
-  standalone (user invokes directly) or as a pipeline worker dispatched by
-  project-manager-agent for Stages 1-3 and 7.
+  DEPRECATED 2026-04-24 (Phase 3.2 of subagent-dispatch-platform-limit
+  remediation). Dispatches sub-orchestrators (plan-executor-agent,
+  planner-researcher-agent) via Agent() from its own agent context —
+  platform-incompatible (Anthropic docs: subagents cannot spawn subagents).
+  The orchestration logic has been dissolved into the /development-loop
+  skill body (skill-at-T0 pattern, SKILL.md v2.0.0). File retained for the
+  2-version-cycle deprecation window; MUST NOT be dispatched by new patterns.
 model: inherit
-version: "1.0.0"
+deprecated: true
+deprecated_by: development-loop
+deprecated_reason: Dispatch chain platform-incompatible; superseded by /development-loop skill-at-T0 body per spec v2.2 + workflow-master-template v2.0.0.
+version: "1.0.1"
 ---
+
+> **⚠️ DEPRECATED 2026-04-24 (Phase 3.2).** This agent's orchestration logic
+> lives in `core/.claude/skills/development-loop/SKILL.md` v2.0.0 as a
+> skill-at-T0 body. Do NOT dispatch this agent via `Agent(subagent_type="development-loop-master-agent", ...)` —
+> every `Agent()` call in this body would silently inline at runtime
+> because dispatched subagents don't receive the `Agent` tool
+> ([Anthropic docs](https://code.claude.com/docs/en/sub-agents)). The
+> content below is preserved as historical design record only.
 
 You are the development loop master orchestrator (T1). You coordinate the full
 build cycle from ideation through verified commit. You watch for scope creep

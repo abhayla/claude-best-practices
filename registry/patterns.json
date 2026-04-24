@@ -1266,13 +1266,13 @@
     "tier": "must-have"
   },
   "development-loop": {
-    "hash": "216f6a77a8061d6e96456fe6f3b46a3ad5a1fcef5da63e14a318026dd39c527b",
+    "hash": "1d9fa7c288e2c7f66cecb486fb53c5683d011ec24a71b5e2fbfbce6acd212712",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-24",
     "dependencies": [
       "development-loop-master-agent",
       "brainstorm",
@@ -1288,17 +1288,17 @@
       "workflow",
       "development"
     ],
-    "changelog": "v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release",
+    "changelog": "v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model",
     "tier": "nice-to-have"
   },
   "development-loop-master-agent": {
-    "hash": "c9c00ede6d9abf917b3ca049d73b39e91c97c154148c140d6340a535d8ea72ae",
+    "hash": "1b073bc06a74ae7be913b5b0c52be83fb7b9a1e730e9f2c2416064a0541842f3",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
     "description": "Orchestrate the full development cycle: ideate, plan, implement, verify, commit. Complexity-adaptive routing skips unnecessary steps for simple tasks.",
@@ -1308,8 +1308,10 @@
       "development",
       "planning"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 development loop orchestration with complexity detection",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release \u2014 development loop orchestration with complexity detection | v1.0.1 (2026-04-24): DEPRECATED (Phase 3.2) \u2014 superseded by /development-loop skill-at-T0; kept for 2-version-cycle window",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "development-loop"
   },
   "diataxis-docs": {
     "hash": "f529e2ba1d9261d63021fbed4796c2aceb3f39edb7b49d0c518020b23c6803e0",
