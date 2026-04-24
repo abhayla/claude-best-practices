@@ -1,9 +1,11 @@
 # Spec: Three-Lane Test Pipeline with Per-Test GitHub Issues + Parallel Auto-Fix
 
+> **⚠️ SUPERSEDED (2026-04-24) by `test-pipeline-three-lane-spec-v2.md` (v2.2, ACCEPTED).** v2 preserves every v1 functional requirement by ID (REQ-M001–REQ-C003 unchanged) but replaces the dispatch topology in §3.3, §3.5, and §3.8. The 4-tier nested-`Agent()` model described below is platform-incompatible — Claude Code does not forward the `Agent` tool to dispatched subagents ([Anthropic docs](https://code.claude.com/docs/en/sub-agents), [GH #19077](https://github.com/anthropics/claude-code/issues/19077), [GH #4182](https://github.com/anthropics/claude-code/issues/4182)). v2 relocates orchestration to the user's T0 session via the skill-at-T0 pattern. This v1.7 file is kept as the canonical reference for v1 REQ IDs that v2 preserves; do not edit further.
+
 ## Meta
 - Author: Claude Code (Opus 4.7)
 - Date: 2026-04-23
-- Status: IMPLEMENTED — MUST-HAVE + most SHOULD/COULD-HAVE shipped across PR #12, #15, #17, #18 (2026-04-22 → 2026-04-23). REQ-S004 shipped 2026-04-24. Remaining S009/S010/C001 deferrals re-confirmed 2026-04-24 (audit trail in §5).
+- Status: **SUPERSEDED** — functional contract preserved in v2.2 (2026-04-24); dispatch topology in §3.3, §3.5, §3.8 is invalidated. Do not rely on v1 topology descriptions; v2 is the implementation target. Keep this file as the canonical v1 REQ-ID reference.
 - Version: 1.7
 - Source brainstorm: `/brainstorm` session 2026-04-23 with user
 - Revision history:

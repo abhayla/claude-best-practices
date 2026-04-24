@@ -144,9 +144,37 @@ in priority order (test pipeline, then by impact). Each PR ≤ 400 lines
 per git-collaboration.md. Eval gate between PR 3.1 and PR 3.2 (test
 pipeline as canary).
 
-- [ ] 3.0 TEMPLATE-FIRST — rewrite `workflow-master-template.md` to
+- [x] 3.0 TEMPLATE-FIRST — rewrite `workflow-master-template.md` to
       document the skill-at-T0 pattern; update `pattern-structure.md`'s
-      workflow-master section; ~150 lines
+      workflow-master section; ~150 lines — PR #22
+
+### Phase 3.1 — IN PROGRESS (branch `feat/phase3-1-test-pipeline-skill-at-t0`)
+
+**Open questions resolved 2026-04-24 session 3:** all 4 questions answered
+with the "lean" option per spec v2.1 §7:
+- Q1 Inline orchestration (no sub-skill delegation for orchestration logic)
+- Q2 Preserve empty `sub_orchestrators: []` in workflow-contracts.yaml
+- Q3 `/e2e-visual-run` stays independent from `/test-pipeline`
+- Q4 Complexity classifier ships in 3.1 behind `lanes.parallel_classifier.enabled`
+   (default on for suites ≥50 tests, off otherwise)
+
+Sub-commit plan:
+- [ ] 3.1.1 Spec lock — §7 RESOLVED, status PROPOSED → ACCEPTED, v2.2
+      revision note; SUPERSEDED banner on v1.7 spec
+- [ ] 3.1.2 Skill rewrites — `/test-pipeline` SKILL.md inline 9-step
+      orchestrator per v2 §3.1; `/e2e-visual-run` SKILL.md independent
+      queue-worker dispatcher; SemVer MAJOR bump on both
+- [ ] 3.1.3 Worker-body + skill prune — 8 agent bodies drop tier-dispatch
+      language; 9 skill bodies drop deprecated-agent refs per checklist
+- [ ] 3.1.4 Config + classifier — `config/workflow-contracts.yaml`
+      testing-pipeline empty `sub_orchestrators:`; add
+      `lanes.parallel_classifier` block to `config/test-pipeline.yml`;
+      registry hashes refreshed
+- [ ] 3.1.5 Docs prune + regen — README + `docs/plans/*` +
+      `docs/stages/STAGE-7-IMPLEMENTATION.md` + QA research post-script
+      per checklist; `generate_docs.py` + `generate_workflow_docs.py`
+      regenerate; AC-001–AC-005 verification
+
 - [ ] 3.1 TEST PIPELINE — `/test-pipeline` body becomes the orchestration;
       deprecate `e2e-conductor-agent`; rewrite `/e2e-visual-run`; update
       `config/workflow-contracts.yaml` testing-pipeline entry; rewrite
