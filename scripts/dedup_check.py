@@ -24,6 +24,23 @@ def hash_pattern(file_path: str) -> str:
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 
+_PATTERN_LOCATORS = {
+    "agent": ["core/.claude/agents/{}.md"],
+    "skill": ["core/.claude/skills/{}/SKILL.md", ".claude/skills/{}/SKILL.md"],
+    "rule":  ["core/.claude/rules/{}.md"],
+    "hook":  ["core/.claude/hooks/{}.sh"],
+}
+
+
+def resolve_pattern_file(name: str, pattern_type: str, repo_root: Path) -> Optional[Path]:
+    """Map a registry (name, type) pair to its on-disk file, or None if not found / not file-backed."""
+    for template in _PATTERN_LOCATORS.get(pattern_type, []):
+        candidate = repo_root / template.format(name)
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def check_exact_duplicate(new_hash: str, registry: dict) -> Optional[str]:
     """Returns existing pattern name if exact hash match found."""
     for name, entry in registry.items():
@@ -114,6 +131,17 @@ def validate_registry(registry_path: Path, patterns_root: Path) -> list[str]:
         for field in required:
             if field not in entry:
                 errors.append(f"Pattern '{name}' missing field: {field}")
+
+        if "hash" in entry and "type" in entry:
+            file_path = resolve_pattern_file(name, entry["type"], patterns_root)
+            if file_path is not None:
+                actual = hash_pattern(str(file_path))
+                if actual != entry["hash"]:
+                    errors.append(
+                        f"Pattern '{name}': hash drift — "
+                        f"registry={entry['hash'][:12]}... file={actual[:12]}... "
+                        f"({file_path.as_posix()})"
+                    )
 
     return errors
 

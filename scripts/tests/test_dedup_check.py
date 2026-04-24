@@ -11,8 +11,10 @@ from scripts.dedup_check import (
     check_exact_duplicate,
     check_structural_duplicate,
     parse_frontmatter,
+    resolve_pattern_file,
     scan_for_secrets,
     validate_pattern_integrity,
+    validate_registry,
 )
 
 
@@ -125,3 +127,85 @@ class TestCheckFile:
         f.write_text("---\nname: clean\n---\n# No secrets here\n")
         findings = scan_for_secrets(f)
         assert findings == []
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+
+
+class TestRegistryHashDrift:
+    """Guard against the hash field in registry/patterns.json diverging from
+    the actual on-disk pattern files. Drift makes the hash column useless
+    for exact-duplicate detection and future hash-based gating."""
+
+    def test_no_drift_in_shipped_registry(self):
+        registry_path = REPO_ROOT / "registry" / "patterns.json"
+        errors = validate_registry(registry_path, REPO_ROOT)
+        drift = [e for e in errors if "hash drift" in e]
+        assert not drift, "Registry hash drift:\n" + "\n".join(drift)
+
+    def test_detects_drift_when_file_changes(self, tmp_path):
+        skill_dir = tmp_path / "core" / ".claude" / "skills" / "drift-demo"
+        skill_dir.mkdir(parents=True)
+        skill_file = skill_dir / "SKILL.md"
+        skill_file.write_text("original content", encoding="utf-8")
+        original_hash = hash_pattern(str(skill_file))
+
+        skill_file.write_text("content has changed - hash should no longer match", encoding="utf-8")
+
+        registry = tmp_path / "registry" / "patterns.json"
+        registry.parent.mkdir()
+        registry.write_text(json.dumps({
+            "drift-demo": {
+                "hash": original_hash,
+                "type": "skill",
+                "category": "core",
+                "version": "1.0.0",
+                "source": "hub:test",
+            }
+        }))
+
+        errors = validate_registry(registry, tmp_path)
+        assert any("drift-demo" in e and "hash drift" in e for e in errors)
+
+    def test_passes_when_hash_matches_file(self, tmp_path):
+        agent_dir = tmp_path / "core" / ".claude" / "agents"
+        agent_dir.mkdir(parents=True)
+        agent_file = agent_dir / "match-demo.md"
+        agent_file.write_text("stable content", encoding="utf-8")
+
+        registry = tmp_path / "registry" / "patterns.json"
+        registry.parent.mkdir()
+        registry.write_text(json.dumps({
+            "match-demo": {
+                "hash": hash_pattern(str(agent_file)),
+                "type": "agent",
+                "category": "core",
+                "version": "1.0.0",
+                "source": "hub:test",
+            }
+        }))
+
+        errors = validate_registry(registry, tmp_path)
+        assert not [e for e in errors if "hash drift" in e]
+
+
+class TestResolvePatternFile:
+    def test_resolves_skill_in_core(self, tmp_path):
+        target = tmp_path / "core" / ".claude" / "skills" / "demo" / "SKILL.md"
+        target.parent.mkdir(parents=True)
+        target.write_text("x", encoding="utf-8")
+        resolved = resolve_pattern_file("demo", "skill", tmp_path)
+        assert resolved == target
+
+    def test_falls_back_to_hub_only_skill_path(self, tmp_path):
+        target = tmp_path / ".claude" / "skills" / "hub-only" / "SKILL.md"
+        target.parent.mkdir(parents=True)
+        target.write_text("x", encoding="utf-8")
+        resolved = resolve_pattern_file("hub-only", "skill", tmp_path)
+        assert resolved == target
+
+    def test_returns_none_for_config_type(self, tmp_path):
+        assert resolve_pattern_file("some-config", "config", tmp_path) is None
+
+    def test_returns_none_when_file_absent(self, tmp_path):
+        assert resolve_pattern_file("ghost", "agent", tmp_path) is None
