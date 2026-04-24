@@ -16,8 +16,10 @@ version: "1.0.0"
 
 # Create GitHub Issue — Universal Skill
 
-Single source of truth for GitHub Issue creation in the three-lane test pipeline. Replaces
-the inline step that lived in `testing-pipeline-master-agent` (T1) pre-PR2.
+Single source of truth for GitHub Issue creation in the three-lane test pipeline. Invoked
+by `/test-pipeline` (skill-at-T0, spec v2.2) at STEP 6 TRIAGE Fan-out 2. Historically
+(pre-2026-04-24) the inline Issue-creation step lived in `testing-pipeline-master-agent` (T1);
+that agent is deprecated and the responsibility moved to this skill + T0 orchestration.
 
 **Request:** $ARGUMENTS — path to a JSON file with the failure profile (see § Inputs below).
 

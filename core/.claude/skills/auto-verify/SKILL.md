@@ -50,7 +50,7 @@ Check if the upstream `fix-loop` stage passed:
 
 2. If `test-results/fix-loop.json` does NOT exist:
    - **With `--strict-gates`:** BLOCK. Report: "BLOCKED: fix-loop output missing — run fix-loop first or use orchestrator."
-   - **Without `--strict-gates`:** WARN: "No fix-loop results found — proceeding without gate check. Run via test-pipeline-agent for enforced gates."
+   - **Without `--strict-gates`:** WARN: "No fix-loop results found — proceeding without gate check. Run via /test-pipeline for enforced gates."
    - Proceed to STEP 1.
 
 ```bash

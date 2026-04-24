@@ -12,7 +12,7 @@ version: "2.1.0"
 
 ## NON-NEGOTIABLE
 
-1. **`lane` dispatch parameter is mandatory** when invoked by `test-pipeline-agent` (T2A) in the three-lane test pipeline. If `lane` is absent in the dispatch context, default to legacy single-lane mode (backward compat for direct invocations and `e2e-conductor-agent` callsite).
+1. **`lane` dispatch parameter is mandatory** when invoked by `/test-pipeline` (skill-at-T0) in the three-lane test pipeline. If `lane` is absent in the dispatch context, default to legacy single-lane mode (backward compat for direct invocations from `/fix-loop`, `/development-loop`, and similar callers).
 2. **Verdict authority by lane** (when `lane` is set):
    - `lane=functional` for non-UI tests: exit code is authoritative
    - `lane=functional` for UI tests: screenshot is authoritative (per testing.md UI verdict authority)

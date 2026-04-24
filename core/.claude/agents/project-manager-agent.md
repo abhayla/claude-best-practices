@@ -117,10 +117,14 @@ On completion (success or failure), generate `docs/stages/PIPELINE-SUMMARY.md` w
 
 ## Test Verification Integration
 
-For Stages 7 (Implementation) and 8 (Post-Impl Tests), use `/test-pipeline`
+For Stages 7 (Implementation) and 8 (Post-Impl Tests), invoke `/test-pipeline`
 as the preferred test invocation rather than calling `/fix-loop` and
-`/auto-verify` separately. `/test-pipeline` dispatches the `test-pipeline-agent`
-orchestrator which handles:
+`/auto-verify` separately. `/test-pipeline` is a skill-at-T0 orchestrator
+(spec v2.2) — its body is injected into the user's T0 session, which dispatches
+flat worker subagents (scout, testers, analyzer, issue-manager, fixers) via
+`Agent()` directly. Because `project-manager-agent` also runs at T0 (per its
+`dispatched_from: T0` frontmatter), invoking `/test-pipeline` works naturally
+via `Skill("/test-pipeline", ...)`. The skill handles:
 
 - Artifact cleanup (`test-results/`, `test-evidence/`) before each run
 - Strict gate enforcement between fix→verify→commit stages

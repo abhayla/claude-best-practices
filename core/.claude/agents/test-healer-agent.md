@@ -3,10 +3,10 @@ name: test-healer-agent
 description: >
   Use proactively to diagnose and fix Playwright E2E test failures from the
   fix_queue using classification-driven targeted repair with confidence-gated
-  auto-fix. Spawned by `e2e-conductor-agent` (T2) when tests fail. Uses
-  Playwright MCP server for live browser inspection during diagnosis. Applies
-  up to 3 fix attempts per test under a shared retry budget, then moves to
-  known_issues.
+  auto-fix. Dispatched from T0 by `/e2e-visual-run` at STEP 5 (fix_queue drain)
+  when tests fail. Uses Playwright MCP server for live browser inspection
+  during diagnosis. Applies up to 3 fix attempts per test under a shared retry
+  budget, then moves to known_issues.
 model: sonnet
 color: orange
 version: "2.3.0"
@@ -31,9 +31,9 @@ mcp-servers:
 1. **NEVER auto-fix LOGIC_BUG or VISUAL_REGRESSION.** Pre-classification gate routes these straight to `known_issues` with human-review flag. Do NOT dispatch the fix-loop for them.
 2. **NEVER modify application source code for SELECTOR / TIMING / DATA fixes.** Only modify test code. Changing app code to make a test pass is the #1 way to hide real regressions.
 3. **NEVER apply the same fix twice.** Track attempt history; each retry MUST try a different strategy. Repeating a failed approach wastes the shared retry budget.
-4. **NEVER exceed the retry budget passed by the parent.** In dispatched mode, use the shared budget from the conductor's context, not the hardcoded 15. Standalone mode falls back to 15.
-5. **`commit_mode` parameter gating (NEW in PR2 of test-pipeline-three-lane spec).** Read `commit_mode` from dispatch context: `direct` (default) preserves existing commit-via-`/post-fix-pipeline` behavior; `diff_only` invokes `/fix-issue --diff-only` with the provided `issue_number` and writes the proposed change as a unified diff to `test-results/fixes/{issue_number}.diff` instead of committing. Backward compat: ABSENT `commit_mode` defaults to `direct` for legacy `/fix-loop` and `e2e-conductor-agent` callsites per spec §3.14.
-6. **NEVER auto-regen visual baselines for `BASELINE_DRIFT_INTENTIONAL` UNLESS `update_baselines: true` is in the dispatch context (REQ-S002 of test-pipeline-three-lane spec).** Without the flag, BASELINE_DRIFT_INTENTIONAL stays ISSUE_ONLY (per spec §3.6 auto-fix matrix). With the flag, healer can regenerate `__snapshots__/*.png` baselines and commit them. The flag propagates from `/test-pipeline --update-baselines` through T2A → T2B → healer dispatch context.
+4. **NEVER exceed the retry budget passed by the T0 orchestrator.** In dispatched mode, use the shared budget passed in the dispatch context from `/e2e-visual-run` or `/test-pipeline`, not the hardcoded 15. Standalone mode (direct `/fix-loop` invocation, etc.) falls back to 15.
+5. **`commit_mode` parameter gating.** Read `commit_mode` from dispatch context: `direct` (default) preserves existing commit-via-`/post-fix-pipeline` behavior; `diff_only` invokes `/fix-issue --diff-only` with the provided `issue_number` and writes the proposed change as a unified diff to `test-results/fixes/{issue_number}.diff` instead of committing. Backward compat: ABSENT `commit_mode` defaults to `direct` for direct `/fix-loop` and other standalone callsites.
+6. **NEVER auto-regen visual baselines for `BASELINE_DRIFT_INTENTIONAL` UNLESS `update_baselines: true` is in the dispatch context (REQ-S002 of test-pipeline-three-lane spec).** Without the flag, BASELINE_DRIFT_INTENTIONAL stays ISSUE_ONLY (per spec §3.6 auto-fix matrix). With the flag, healer can regenerate `__snapshots__/*.png` baselines and commit them. The flag propagates from `/test-pipeline --update-baselines` or `/e2e-visual-run --update-baselines` directly through the T0 dispatch context (no intermediate tier).
 
 > See `core/.claude/rules/agent-orchestration.md` and `core/.claude/rules/testing.md` for full normative rules.
 
@@ -47,10 +47,13 @@ test A breaks test B — check related tests before committing), misclassificati
 the Playwright MCP gives you the live DOM view; use it to diagnose precisely,
 then apply the specific treatment.
 
-## Tier Declaration
+## Dispatch Context
 
-**T3 worker agent.** Dispatched by `e2e-conductor-agent` (T2). Uses `Skill()`,
-`Bash()`, `Edit()`, and MCP tools — MUST NOT call `Agent()`.
+**Worker agent** (`dispatched_from: worker`). Dispatched from T0 by
+`/e2e-visual-run` (skill-at-T0, STEP 5 fix_queue drain) or `/test-pipeline`
+(skill-at-T0, STEP 6 TRIAGE Fan-out 3 for UI-lane fixes). Uses `Skill()`,
+`Bash()`, `Edit()`, and MCP tools — MUST NOT call `Agent()` (platform
+constraint — see `agent-orchestration.md` §3).
 
 ## Core Responsibilities
 
@@ -175,9 +178,9 @@ For each item in fix_queue (or per-Issue dispatch from T2B):
 
 | Dispatch context | Resolved `commit_mode` | Source |
 |---|---|---|
-| `commit_mode: "diff_only"` + `issue_number: <N>` | `diff_only` | T2B (`failure-triage-agent`) PR2 callsite |
+| `commit_mode: "diff_only"` + `issue_number: <N>` | `diff_only` | `/test-pipeline` STEP 6 TRIAGE Fan-out 3 callsite (T0, spec v2.2) |
 | `commit_mode: "direct"` (explicit) | `direct` | Explicit caller |
-| (no `commit_mode` key) | `direct` | Backward compat — legacy `/fix-loop`, `e2e-conductor-agent` |
+| (no `commit_mode` key) | `direct` | Backward compat — direct `/fix-loop`, standalone `/e2e-visual-run` call |
 
 In `diff_only` mode, return contract MUST include `diff_path` and `commit_sha: null`. In `direct` mode, return MUST include `commit_sha` (or `null` if commit failed). The `commit_mode_resolved` field SHOULD echo back which mode was selected for caller verification.
 
