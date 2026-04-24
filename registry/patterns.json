@@ -25,7 +25,13 @@
       "Lighthouse"
     ],
     "changelog": "v1.0.0: Initial release â€” axe-core, Lighthouse a11y, WCAG checklist",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "adr": {
     "hash": "0e30f106c824787afae6a8f9945e4773963f42f572bfae10e8e28c9fe0f2cb1a",
@@ -45,7 +51,13 @@
       "decisions"
     ],
     "changelog": "v1.0.0: Initial release â€” Michael Nygard template, lifecycle management, index generation",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "adversarial-review": {
     "hash": "0778a0bd401e39b14fab8de42ffd6fb1ef26eb173c6df5144826f66aff6dd2c5",
@@ -62,7 +74,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "agent-evaluator": {
     "hash": "521bd9df9d493357a4263ca904556a73960d0a2595479eab038e5689d1f47bcb",
@@ -101,7 +119,13 @@
       "constraints"
     ],
     "changelog": "v1.0.0: Initial creation â€” Anthropic-aligned orchestration constraints",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "ai-gemini-api": {
     "hash": "cecec051a4655c1a2e62bafd61c6469bea44a2de8bbd599d9de743c9738ee8ed",
@@ -118,7 +142,13 @@
       "reference"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "android": {
     "hash": "082f7d56ff67e5cedf84dc9bd349ea7b05ebfb326f8114089ec62957047cb389",
@@ -133,7 +163,13 @@
     "description": "Android development rules for Kotlin + Jetpack Compose projects.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "android-adb-test": {
     "hash": "71f5bdd0eed6435cc3b98502d23bdcc5722c3becd5e153823f68fe56b4a5855c",
@@ -176,7 +212,13 @@
       "gradle"
     ],
     "changelog": "v2.0.0: Merged with claude-android-ninja references and templates",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "android-build-fixer-agent": {
     "hash": "1802316019f0b757144c9e8fe4b5a21c1a96b5e722bf35c9cda3c3551f9e2597",
@@ -247,7 +289,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "android-kotlin": {
     "hash": "1c40f0bfca4faacc2b1fe20a2177773f4b0724ef193bce56e724460086e84388",
@@ -268,7 +316,13 @@
       "testing"
     ],
     "changelog": "v1.0.1: Add pointer to error-handling.md for CancellationException rule | v1.0.0: Initial â€” consolidated from 4 kotlin rule files in everything-claude-code",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "android-kotlin-reviewer-agent": {
     "hash": "37e316fc3c2a398b7fb8ddb80fe7d7f1ea891cbbd677a31dd227b88ae7e13a82",
@@ -312,7 +366,13 @@
       "architecture"
     ],
     "changelog": "v1.0.0: Initial â€” consolidated from ChrisWW + TaeseongYun repos",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "android-run-e2e": {
     "hash": "4532522d50158ad5e12a9e91c84437233e6386fc99b4728bdb17a55103175cd9",
@@ -396,7 +456,13 @@
       "agents"
     ],
     "changelog": "v1.0.0: Initial creation â€” comprehensive orchestration reference",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "anthropic-multi-agent-research-system-skill": {
     "hash": "c00b8affa9182d8604a6d950a6e546302086a3f418a4a80f9880ccb1c4b84283",
@@ -463,7 +529,13 @@
       "documentation"
     ],
     "changelog": "v1.0.0: Initial release â€” multi-framework OpenAPI generation, validation, CI integration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "apply-selections": {
     "hash": "d3d4b6eda987c0fb42111c3edc81d7fd93a6e1c952ac751452da31cbe6a9fc7e",
@@ -483,7 +555,13 @@
       "pattern-selection"
     ],
     "changelog": "v1.0.0: Initial release â€” checkbox parsing, file removal via GitHub API",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "architecture-fitness": {
     "hash": "a36604fc1be8158ab84273bf9aa9c2085c37e320a76dfcf6247289dcd72e24d6",
@@ -503,7 +581,13 @@
       "dependencies"
     ],
     "changelog": "v1.0.0: Initial release â€” dependency direction, circular deps, coupling, ADR review",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "auto-format": {
     "hash": "38eada51305fc1fdc36c605654561bc16fc6669f4f4111226ddeeadd5887ad19",
@@ -536,7 +620,13 @@
     "description": "Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces structured results for pipeline consumption.",
     "tags": [],
     "changelog": "v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured | v2.1.0: split STEP 2.5 sub-content to references/visual-proof-review.md (412 lines, under 500 cap)",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "batch": {
     "hash": "a5abebc995484db64eed0c2ab8776c795e0d6570e8b102e3edae016bc22521c1",
@@ -553,7 +643,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "brainstorm": {
     "hash": "10031c3d1e10c93a9aca5c4f37ebfe58cb42ec21bd5a643c3174e302de48def4",
@@ -570,7 +666,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "branching": {
     "hash": "666d32dad58a08e07cd04fdbc67645e36d78346a3da95bdad633db690fa99749",
@@ -587,7 +689,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "bun-elysia": {
     "hash": "c10026f0b1e2b98296770dde2abceb6a54e0a260459967000c92d6e3c5388f57",
@@ -645,7 +753,13 @@
       "metrics"
     ],
     "changelog": "v1.0.0: Initial release â€” composite risk scoring, hotspot analysis",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "changelog-contributing": {
     "hash": "934fc57b04efb346df539615d135c382c00aba21ab6e108092f0fa2aa524b170",
@@ -665,7 +779,13 @@
       "documentation"
     ],
     "changelog": "v1.0.0: Initial release â€” CHANGELOG + CONTRIBUTING generation",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "chaos-resilience": {
     "hash": "c725e895fa93dc5c1da90b2eaa0be2eb932add91ea7cd11b42cf9ef7729612d1",
@@ -685,7 +805,13 @@
       "circuit-breaker"
     ],
     "changelog": "v1.0.0: Initial release â€” failure injection, degradation verification, gameday",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "ci-cd-setup": {
     "hash": "8f08ff9470e6743c1f27d12792426293ecd086eabb1e0663c7341fae6f24cdaa",
@@ -703,7 +829,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "claude-behavior": {
     "hash": "1c7ade0e1c6fc3edf90ca7d759e0aded1b55a5794017346af2b3417f7cffa14c",
@@ -718,7 +850,13 @@
     "description": "Universal behavioral rules for Claude including mandatory failure response pipeline",
     "tags": [],
     "changelog": "v1.2.0: Add rule 21 (YAGNI) + rule 22 (Measure Before You Optimize); label rule 16 with KISS | v1.1.0: Rule 15 strengthened to MANDATORY with /learn-n-improve chaining",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "claude-guardian": {
     "hash": "b563e718b08644d845d2fcc24a732910cab247cb26fb106f92502d5d6212acdf",
@@ -735,7 +873,13 @@
       "workflow"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "code-quality-gate": {
     "hash": "fd881794cc1f54f3fc86cd7d430cc9cfa296b5c1a9e5c0a82fd804a51256d2d2",
@@ -756,7 +900,13 @@
       "logging"
     ],
     "changelog": "v1.0.0: Initial release â€” complexity, duplication, SOLID, logging, refactor, layer checks",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "code-readability": {
     "hash": "81f236c7f2b47e86e4f0bb0983399cf0beed57b3bbbd109d8d691c67c526d965",
@@ -834,7 +984,13 @@
     "description": "Use proactively to review recently changed files for code quality, type safety, build issues, performance, and security. Spawn after any non-trivial code change, before committing or",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "compose-ui": {
     "hash": "e41b7978d0926404a5dc3674fb7991b6673791868b51b0f464af98b6acf99be4",
@@ -852,7 +1008,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "configuration-ssot": {
     "hash": "2836d182e7206906a7454026dba5255d7517033d6e5dd7e6367b83b4fc372759",
@@ -873,7 +1035,13 @@
       "architecture"
     ],
     "changelog": "v1.0.0: Initial release â€” four-layer model, anti-duplication rules, pointer pattern, migration guide",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "context-management": {
     "hash": "dec59cad8ecc1381fc7b7c3468a655031fdbd4b78d4f5caabaa8c36a484165b0",
@@ -888,7 +1056,13 @@
     "description": "",
     "tags": [],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "context-reducer-agent": {
     "hash": "7aec493ed04530091188afd14cc021d89c2b4fc11f54bdb9a641aac3d9a83932",
@@ -967,7 +1141,13 @@
       "continuity"
     ],
     "changelog": "v1.1.0: Add triggers, preamble, strengthen RULES to CRITICAL RULES, differentiate from /start-session and /handover | v1.0.0: Initial release",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "contract-test": {
     "hash": "c7e2a7df3828e08d001b27f4911fa8fc5f31482c81203bab64566c54af8c3a76",
@@ -988,7 +1168,13 @@
       "consumer-driven"
     ],
     "changelog": "v1.0.0: Initial release â€” Pact consumer/provider, broker, CI integration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "contribute-practice": {
     "hash": "846f08afd6a5ffe90d2aa80a4f24c3f2cf6faa452d9fc16ea199b880f8655113",
@@ -1024,7 +1210,13 @@
       "quality"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "create-github-issue": {
     "hash": "9dbff8f9fc94aa49fc4be047ea7bf8d104a657906a8b56ca1da27436ce2c28b9",
@@ -1061,7 +1253,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "d3-viz": {
     "hash": "108d4cd7bef1a442883e63bba5cc592dc4b230f67dc14d77e7ec98f4098852f3",
@@ -1117,7 +1315,13 @@
       "fuzzing"
     ],
     "changelog": "v1.0.0: Initial release â€” ZAP, Nuclei, headers, sessions, fuzzing, CI",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "db-migrate": {
     "hash": "ea68c8aa074b059c61fae3cdb2451a1c7d31121b7d926c1362d469c5ae272087",
@@ -1141,7 +1345,13 @@
       "TypeORM"
     ],
     "changelog": "v1.0.0: Initial release â€” multi-ORM migration with safety rules",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "db-migrate-verify": {
     "hash": "c2cde662e6525b33ea2872b3218c15006d7ad95f364b116e178567df59f2fe3c",
@@ -1158,7 +1368,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "debugger-agent": {
     "hash": "bca16d31495c0d380979b0508ea0c43cc22dc1a886891afe00175218f893f8d9",
@@ -1173,7 +1389,13 @@
     "description": "Use proactively to diagnose failures, analyze logs, investigate performance issues, and trace complex system interactions. Spawn automatically when encountering runtime errors,",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "debugging-loop": {
     "hash": "c7f29012fee0ca6a96a539c9336b40aeeb08a4d291061323f53cf43e7767ec0a",
@@ -1243,7 +1465,13 @@
       "PRR"
     ],
     "changelog": "v1.0.0: Initial release â€” GitOps, canary, blue-green, DB migration ordering, PRR",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "design-principles": {
     "hash": "555feb71136a5bc1cfaf2315e77c56ac261efa21570e923e915e5f5afbd9eed5",
@@ -1329,7 +1557,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release â€” DiÃƒÂ¡taxis categorization, templates, migration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "disaster-recovery": {
     "hash": "e27314a8c4d64310049662f1720ec0c503e883c280cdbe9da5fe466614526a2a",
@@ -1354,7 +1588,13 @@
       "RPO"
     ],
     "changelog": "v1.0.0: Initial release â€” RTO/RPO, backup, restore, failover, DR drills",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "doc-staleness": {
     "hash": "0b278635a9fb5f0d695c96e47793343f3018f6aecb92ff21b59e9b6ef2475666",
@@ -1374,7 +1614,13 @@
       "quality"
     ],
     "changelog": "v1.0.0: Initial release â€” file/symbol/command/link staleness detection, severity-prioritized report",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "doc-structure-enforcer": {
     "hash": "3beb753346639ef6ff892592c53c6aec2238c57708587a71fec48934e05d2f91",
@@ -1395,7 +1641,13 @@
       "folder-management"
     ],
     "changelog": "v1.0.0: Initial release â€” stage-based folder structure, pattern + content classification, git mv + ref updates",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "docker-optimize": {
     "hash": "dddfb491b02ea13a13e91a2c1adf01cb78b6903145275326241d302c35bcb41f",
@@ -1413,7 +1665,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "docs-manager-agent": {
     "hash": "8e03be4d7c9f7629de93308363c9149b280db85ac027caaadec2aa88b5f56b53",
@@ -1649,7 +1907,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "expo-dev": {
     "hash": "6607ae97f5cf98834524078f676b4598289fd2e2257beb52695fa5db2484008f",
@@ -1700,7 +1964,13 @@
     "description": "Use this agent when you need to test FastAPI backend endpoints, validate API responses, check authentication flows, or run targeted backend test suites.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "fastapi-backend": {
     "hash": "6880f6de4c52914106f93d259cab26b16bcf54f92319fdd48c6e55923544989b",
@@ -1745,7 +2015,13 @@
     "description": "Use this agent for database tasks — PostgreSQL queries, Alembic migrations, schema questions, model import rules, or diagnosing query issues.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "fastapi-db-migrate": {
     "hash": "fe589281be5c9bab2cf0b4d84991cd9292544c330a3159242619679045ceb88d",
@@ -1765,7 +2041,13 @@
       "workflow"
     ],
     "changelog": "v1.1.0: Add triggers, boundary clarification with db-migrate/db-migrate-verify, flesh out check mode, add output format, expand CRITICAL RULES | v1.0.1: Initial release",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "fastapi-deploy": {
     "hash": "921db636dc9b466a2d430d4749086a16f4413421bb2a3810bf6423ab81dfb848",
@@ -1787,7 +2069,13 @@
       "workflow"
     ],
     "changelog": "v1.1.0: Add triggers, fix blocking uvicorn (background+no-reload), flesh out seed loop, add CRITICAL RULES, cross-refs, rollback guidance | v1.0.0: Initial release",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "fastapi-run-backend-tests": {
     "hash": "327f7ec9fdf9e279f18ef8a462173cb481fb5c777926922535aa56de1d721fa2",
@@ -1808,7 +2096,13 @@
       "workflow"
     ],
     "changelog": "v2.2.0: Add triggers, fix monorepo detection (collect all dirs), add failure-count guard (>10 asks user), optional dependency skip | v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "feature-flag": {
     "hash": "91605c6d99d5172eff2e8b481ddff097d3ad8e92fa04d5f17e54ecba65917c15",
@@ -1827,7 +2121,13 @@
       "gradual-rollout"
     ],
     "changelog": "v1.0.0: Initial release â€” flag types, implementation patterns, cleanup",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "firebase": {
     "hash": "571d4b5a9de3f82a11b8771e0065c583b0395a328bd1e2a09cca52a6da110955",
@@ -1846,7 +2146,13 @@
       "rule"
     ],
     "changelog": "v1.0.0: Initial release â€” grounded in KKB + cric patterns",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "firebase-ai": {
     "hash": "d447ce34e7d3437caf82477ad8f925adda38c6ef3978900b63505d316408b1e7",
@@ -1864,7 +2170,13 @@
       "reference"
     ],
     "changelog": "v1.0.2: Add TOC, version caveat, remove internal nickname, fix Node.js version | v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "firebase-data-connect": {
     "hash": "e784aba821e1dd4d2f642ef128fc64791ab7e84c0ce63c0f71449d41b46a9dc0",
@@ -1882,7 +2194,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "firebase-dev": {
     "hash": "e7caa42829b54dc495669d9ea3dd6e137de78cefd476d8d320252c696d791b49",
@@ -1900,7 +2218,13 @@
       "reference"
     ],
     "changelog": "v1.0.2: Add TOC, add deleteDoc to Write Operations (complete CRUD) | v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "firebase-test": {
     "hash": "7c91fa95906356fe35ade63c6431ee0ad11b13217bb9bc605d7dec1e1995954b",
@@ -1920,7 +2244,13 @@
       "firestore"
     ],
     "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "fix-issue": {
     "hash": "7038c7a0858c6515e11b8d62700f6745d8c47a453663602299b9cafc067fa835",
@@ -1942,7 +2272,13 @@
       "workflow"
     ],
     "changelog": "v2.4.0: Tighten triggers (require # for broad phrases), add issue extraction + error handling, lock summary format, always run post-fix-pipeline | v2.1.0: Add triggers, preamble constraints, MUST/MUST NOT rules, dependencies, registry sync | v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "fix-loop": {
     "hash": "f5c8399879ebc3d90871f55071e7d71ced185f8e4bb12b012e9b13552cd6f966",
@@ -1964,7 +2300,13 @@
       "debugging"
     ],
     "changelog": "v1.3.0: Add triggers list, add Agent to allowed-tools (required for test-failure-analyzer-agent delegation), add test-failure-analyzer-agent dependency",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "flutter": {
     "hash": "feb4b3812142ecbdcbe4de317a609f50c3e0d81d24d6adad44acdfe2556b6ac9",
@@ -2002,7 +2344,13 @@
       "mobile"
     ],
     "changelog": "v1.0.0: Initial release â€” grounded in cric repo patterns",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "flutter-dev": {
     "hash": "900e8f4dbf4ac2e056aec45a3d498b2f2ca36d790a70985de86218dd74912706",
@@ -2091,7 +2439,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "github": {
     "hash": "b7ebc3a39b0334afce9a55f1faa3af9a76c173c407c017f3208e9b2b95088be2",
@@ -2149,7 +2503,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "hono-backend": {
     "hash": "b68e588a62aed476db95a79b4c2b221d46f447c6c5d03f10d7b33b0621662edb",
@@ -2189,7 +2549,13 @@
       "Nielsen"
     ],
     "changelog": "v1.0.0: Initial release â€” single-file prototypes with heuristic validation",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "iac-deploy": {
     "hash": "68ee18a7db5f14bba3d697bd538e12765264d1a5ed7f74b743cfba9285f00388",
@@ -2207,7 +2573,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "implement": {
     "hash": "1e9470229be30d633eb005fcb67f592961399552248a2e340daf48a36a30714d",
@@ -2226,7 +2598,13 @@
     "description": "Implement a feature or fix following a structured workflow: requirements analysis, test creation, implementation, test execution, fix-loop delegation, and verification.",
     "tags": [],
     "changelog": "v2.2.0: Added triggers, empty-args guard, test-framework fallback, fixed orphaned lines, strengthened CRITICAL RULES; v2.1.0: Enhanced with community patterns; v2.0.0: Initial structured workflow",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "incident-response": {
     "hash": "557880deaeb72684dc51b52f804270d7c4033d5e61a05085134c2b7edaed7d24",
@@ -2243,7 +2621,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "integration-test": {
     "hash": "f4f46b20a8c7c07e06295d31f88a99891cbbb9205a8e65708c73bfb3abed638e",
@@ -2262,7 +2646,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "jest-dev": {
     "hash": "4842479b7a9203a8c2244c6d50fa015cf7ce14e6d0ee68bb73ebc8a9b74e3864",
@@ -2300,7 +2690,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "learn-n-improve": {
     "hash": "3d9ccf5a56cbcdc4cb6499173f7765f0a7e1724aff9c38efa117722f9446c6eb",
@@ -2320,7 +2716,13 @@
       "patterns"
     ],
     "changelog": "v2.3.0: Add triggers, preamble constraints, strengthen RULES to CRITICAL RULES with MUST/MUST NOT, registry sync | v2.1.0: Enhanced with community patterns",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "learning-self-improvement": {
     "hash": "c9ebc6f34bf654defe0f4aef31ad18961673d5bfd5180523bf6d6a24cc4f4625",
@@ -2397,7 +2799,13 @@
       "post-merge"
     ],
     "changelog": "v1.0.0: Initial release â€” strategy matrix, pre/post-merge checklists",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "middleware-test": {
     "hash": "ba3f587d07a10aeff74c6606836160db1836297d97c3b9b84b57a2df734c4724",
@@ -2415,7 +2823,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "mobile-a11y-test": {
     "hash": "f0b9cc5d9aa7d519739e0537a55f5866053764c71ab4ed921ef2f2d35be591a1",
@@ -2436,7 +2850,13 @@
       "flutter"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "mock-server": {
     "hash": "6660051f763120e6dc8957c4fd64f4afc544a730ca085bbecbe8cbf455e536c8",
@@ -2456,7 +2876,13 @@
       "development"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "monitoring-setup": {
     "hash": "3df218890c163f09c1d799df8d9820de8c4b4c19a4ce4c1a867a8076339acb0f",
@@ -2473,7 +2899,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "monorepo": {
     "hash": "0ece2a4193372c0b6f9ee69920b6a8ff8b1faf82894911345a99dabb8bdee2e9",
@@ -2605,7 +3037,13 @@
       "worktree"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "pattern-portability": {
     "hash": "052a3192d0ccb8c3aeb3c01dec2b54f24401b47a61b5e8cb74706b072fdc18f9",
@@ -2685,7 +3123,13 @@
       "bundle"
     ],
     "changelog": "v1.2.0: Add test-results/perf-test.json structured output for stage gate aggregator",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "pg-query": {
     "hash": "271b09ff3373b6985bbe59e82b6096dc14fc2984269e3a2d5a1c3d7105fe5d2d",
@@ -2702,7 +3146,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "pipeline-fix-pr": {
     "hash": "7cf3600f8810c6a7908313a93179b2ec5a3654fdbbb85f48de48d8f72f28cc36",
@@ -2745,7 +3195,13 @@
       "DAG"
     ],
     "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "plan-executor-agent": {
     "hash": "8a2ef741e19db8bc95b5976bd813d91f94f9addd5a74d106cb67229e48699970",
@@ -2777,7 +3233,13 @@
       "workflow"
     ],
     "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "planner-researcher-agent": {
     "hash": "be5041fdd1b72a2b493c2bd9a314794e065f887bbe07cc87aa4bf1625c634920",
@@ -2792,7 +3254,13 @@
     "description": "Senior technical lead specializing in software architecture, system design, and technical research. Use for planning implementations, researching solutions, analyzing codebases, and creating detailed technical plans.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "playwright": {
     "hash": "5938c4e03ddd0a80527d8797e058a1614297609f3f25d0dde4ba1bcafcee8ad7",
@@ -2809,7 +3277,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "pm2-deploy": {
     "hash": "d43372a9d6417346559c4c5fd8472bdd17afc98887401fd4469e7b728f55ff8f",
@@ -2850,7 +3324,13 @@
       "verification"
     ],
     "changelog": "v3.0.0: Add triggers, preamble constraints, CRITICAL RULES, dependencies, registry sync | v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "pr-standards": {
     "hash": "676c9131243cbdbf8ab9a0b5407eb1f1c538304bc22cda253c76ccc30b9a2f37",
@@ -2867,7 +3347,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "prd-parser": {
     "hash": "a31b1c858e1eab8c956c9bd4f44fb184320b72fa49f24ee54342c15c589bdbb6",
@@ -2889,7 +3375,13 @@
       "parser"
     ],
     "changelog": "v1.0.0: Initial release â€” multi-format PRD parsing and normalization",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "prisma-orm": {
     "hash": "6cb871452e04228bae25ee149598b87a68e5d1f85b3aca6911555b3b549dc1c8",
@@ -2931,7 +3423,13 @@
       "agent"
     ],
     "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill â€” orchestration logic now lives in the agent",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "project-scaffold": {
     "hash": "5b7d030cb7194cda8b556035916f7215cd04c6c76326eacfa506abb971c6f636",
@@ -2953,7 +3451,13 @@
       "security-baseline"
     ],
     "changelog": "v1.0.0: Initial release â€” covers Python, Node/TS, Android, Go, Rust",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "prompt-auto-enhance": {
     "hash": "ed4602912b86dda087f11e7ef49346ccc59718b4c52a8f7c35c95f6b734f7f4f",
@@ -2982,7 +3486,13 @@
       "format-locking"
     ],
     "changelog": "v2.0.0: Add Step 0 prompt grading (6 weighted dimensions), expand to 11 failure categories, add 3 guardrails, expand weakening language to 3 categories including Claude 4.x anti-patterns",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "prompt-auto-enhance-rule": {
     "hash": "ceb287947f263dd833bf23a4f4fdaae77dd8a347c405914c8003ac02c1989ebe",
@@ -3005,7 +3515,13 @@
       "automation"
     ],
     "changelog": "v2.0.0: Slim from 97 to 48 lines. Removed duplicated procedural content. Now a lean trigger delegating to /prompt-auto-enhance skill. Fixes SSOT violation.",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "prompt-enhance-reminder": {
     "hash": "7cbbcfc2c8e368599a1c2d7f9ec902520ce419e227004a459ce2e42f9327b7d1",
@@ -3064,7 +3580,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "quality-gate-evaluator-agent": {
     "hash": "edb2e4c8a470da866663b8eeec7560ac884b0272bd06ada53dee6cba4c532f3f",
@@ -3083,7 +3605,13 @@
       "gate"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "react-native-dev": {
     "hash": "d4f3bf8c474b7cf2c77bb14b62f67b1e84d958c74fffcdf60869e1cc01292b9b",
@@ -3176,7 +3704,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "reddit": {
     "hash": "ec26b2c49a8c9132ad5158032d4388585044b20877b1543cf8c32920d6a03997",
@@ -3211,7 +3745,13 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "regression-test": {
     "hash": "e8cd80048dea92d0d4914338fb9b96d1c08fba6cf4abe26e4b44d60fae6c66b8",
@@ -3230,7 +3770,13 @@
       "git"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "remotion-video": {
     "hash": "d5da8a983c2f852bc671739258f73de7a0db7f8ecb8f0a2f8c7d6a2c548ee605",
@@ -3264,7 +3810,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "research-mode": {
     "hash": "909004f127a2a5560d1f7e5a70f494630a26119079a82def89af383b498a99e1",
@@ -3310,7 +3862,13 @@
       "quality-gate"
     ],
     "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "rule-curation": {
     "hash": "df857bb4afb3fd7531fc1d393848c53010bc6ab11d2c5f0ae4c2b12886d1fcb2",
@@ -3352,7 +3910,13 @@
       "pattern-governance"
     ],
     "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "save-session": {
     "hash": "84968a24254301d21b202d8ce0816c2e96f5424737cf1c895876f70fa8f207ce",
@@ -3371,7 +3935,13 @@
       "continuity"
     ],
     "changelog": "v1.2.0: Add triggers for natural language discoverability | v1.1.0: Add triggers, registry version sync | v1.0.0: Initial release",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "scan-discovery-report": {
     "hash": "57d962a7c6b648b88427a3c7949580f4b5d7f6e6106703e61aef96f0cc72ee1e",
@@ -3393,7 +3963,13 @@
       "twitter"
     ],
     "changelog": "v1.0.0: Initial creation",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "scan-repo": {
     "hash": "91b7fe12112e9797692004616c296206dc7be24800be67ffeeed6c9bf992bad1",
@@ -3446,7 +4022,13 @@
       "data-modeling"
     ],
     "changelog": "v1.0.0: Initial release â€” ER design, PII, evolution, API alignment",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "secret-scanner": {
     "hash": "c1fb0666ca8c5942ff391cd0bf1120ac223ce6d18575e43d3fda8566087701af",
@@ -3479,7 +4061,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "security-auditor-agent": {
     "hash": "941d6631abf86b1f56f4bf4c9f04f2b2a86fe0f4975d08a1e6db4beea76129c3",
@@ -3494,7 +4082,13 @@
     "description": "Use proactively for security assessments — OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Spawn automatically when changes",
     "tags": [],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "security-baseline": {
     "hash": "c410e31b70b74c30be00989660ff9a66626f14e84648f756ecf98756ccabe0c9",
@@ -3530,7 +4124,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "serialize-fixes": {
     "hash": "d19722edfc0b8b121d9bf01f2697e0aa31abb500496e5d51f7134fca552a3aff",
@@ -3622,7 +4222,13 @@
     "description": "Use proactively to auto-generate session summary updates at session end. Spawn automatically before ending a session, when continuation docs are stale, or after",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "skill-author-agent": {
     "hash": "6468fceb82f958c9efd58beaf59f160f15b98263b97e65105eeeed067a7c3218",
@@ -3645,7 +4251,13 @@
       "patterns"
     ],
     "changelog": "v1.0.0: Initial release â€” routes pattern creation to appropriate authoring workflows with quality validation",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "skill-authoring-master-agent": {
     "hash": "133bd16cf03237e002c06b44fee62ca9accc48d2026216098fd51d55ffa6c548",
@@ -3720,7 +4332,13 @@
       "workflow"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "skill-master": {
     "hash": "ed870df0772c812b4772c2f06dfe7e7a62a86d1f6b70e9e96e033453caf012d3",
@@ -3737,7 +4355,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "solidity-audit": {
     "hash": "95f1932d817939e4d9dd9f3d66b0197f1d2590b50b84e946059475500d9b0bb3",
@@ -3778,7 +4402,13 @@
       "quality"
     ],
     "changelog": "v1.0.0: Initial release â€” 6-step audit workflow, cross-layer duplication detection, health scoring",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "start-session": {
     "hash": "6671b604f5d244122080be82c6b5cfb9a41e16477a2980ba605a3e09b8e3480e",
@@ -3799,7 +4429,13 @@
       "continuity"
     ],
     "changelog": "v1.1.0: Add triggers for natural language discoverability | v1.0.0: Initial release â€” session restoration with priority-ordered file loading",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "status": {
     "hash": "2ff7318f8e2c2c2e74b24b565ff40f31d26e86278c1faef669a7b8559452eda4",
@@ -3816,7 +4452,13 @@
       "reference"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "strategic-architect": {
     "hash": "f2d7c1ccc997dfae9cb1d7b6916b05e0a6cacd0b0b109ebf1a814afcf2aaa87e",
@@ -3833,7 +4475,13 @@
       "workflow"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "subagent-driven-dev": {
     "hash": "807a1ddf15ea70a53d3108b26345c3b61dc4cf475a94d2e7abe1c913cc5f32b9",
@@ -3852,7 +4500,13 @@
       "parallel"
     ],
     "changelog": "v1.1.0: Extracted Steps 8-10 to references/orchestration-patterns.md, trimmed to ~400 lines",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "supply-chain-audit": {
     "hash": "d4cd17e7624c1b82638156e0283b4337a744692d9c7ad79e495a15168cbc168b",
@@ -3870,7 +4524,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "systematic-debugging": {
     "hash": "937d25537aa4932215fdbf2ac4b85dc95794e0eeecb9a333d622514d1ca3c19f",
@@ -3887,7 +4547,13 @@
     "description": "Debug failures methodically using a structured diagnosis workflow: reproduce, isolate, hypothesize, gather evidence, find root cause, apply targeted fix, verify, and prevent recurrence.",
     "tags": [],
     "changelog": "v1.1.0: Fix orphaned code blocks, add inline step summaries, improve triggers, add preamble constraints, fix step reference, sync registry description",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "tailwind-dev": {
     "hash": "a0ad693a26df2ec4db5d224aec9c2e0824933e065a14e59b3bd65b30e851ce1e",
@@ -3925,7 +4591,13 @@
       "workflow"
     ],
     "changelog": "v1.0.1: Registry sync — hash, version, description, tags | v1.0.0: Initial release",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "tdd-failing-test-generator": {
     "hash": "40ab98da1f8f4cfe1d93e03e566802a19a9a78e5715d0eebd2106b4b8c094269",
@@ -3967,7 +4639,13 @@
       "testing"
     ],
     "changelog": "v1.0.0: Initial registration of existing tdd.md rule",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "test-data-management": {
     "hash": "2ce78eb94d30afca07a90946e7ab446d90b40b98ecdcec3e51e9b8907b82479d",
@@ -3987,7 +4665,13 @@
       "factories"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "test-failure-analyzer-agent": {
     "hash": "1acc49c51450bfbcdee7a278ce384aa835896278d8c07a6643cf77347b7fa921",
@@ -4043,7 +4727,13 @@
       "workflow"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "test-maintenance": {
     "hash": "3a8b53daeb3231a94e32ce3b3193c3c6165d226429112cf6bde09b49073bbabb",
@@ -4063,7 +4753,13 @@
       "optimization"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "test-pipeline": {
     "hash": "a74f2324a950e93dc92955e151f31d5d170fb072167fbe04f298f9c05aebdcb3",
@@ -4087,7 +4783,13 @@
       "verification"
     ],
     "changelog": "v1.0.0: Initial release â€” preamble added, registry sync, dependencies declared",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "test-pipeline-agent": {
     "hash": "2829c984adf2da033b40c6a53b3658f335dbbd8b5a35071d104666486df9dad3",
@@ -4100,7 +4802,13 @@
     "dependencies": [],
     "visibility": "public",
     "tier": "must-have",
-    "description": "Orchestrates the full test verification pipeline: cleanup, stage dispatch, gate enforcement, and result aggregation. Use when you need to run the"
+    "description": "Orchestrates the full test verification pipeline: cleanup, stage dispatch, gate enforcement, and result aggregation. Use when you need to run the",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "test-scout-agent": {
     "hash": "63bca56ea25b68b8533812d601fa81aa77173dcf16ec1d50db90eb15cb523841",
@@ -4135,7 +4843,13 @@
     "description": "Senior QA engineer specializing in comprehensive testing and quality assurance. For UI tests, orchestrates per-test screenshot verification where the screenshot",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "testing": {
     "hash": "1e18efaca843dca8fd7a539b15851bdde9680cdcb2d15a6441ba8a5077ae7e12",
@@ -4150,7 +4864,13 @@
     "description": "Testing conventions and best practices.",
     "tags": [],
     "changelog": "v2.2.0: Add FIRST principles mnemonic section at top | v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "testing-pipeline-master-agent": {
     "hash": "2bdd42d43fccdbd766ba432dd72056e50815ca412983f018afcb729e9872329a",
@@ -4207,7 +4927,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "twitter-x": {
     "hash": "b6e63e1484238a3dd0c28f73dd5608035d1e4c1441d5a3a2309ad8934651e4d2",
@@ -4242,7 +4968,13 @@
       "workflow"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "update-practices": {
     "hash": "58eccf6ddb52ef329d765e36382b646fc65b629b3cad1098958f8bc619598a86",
@@ -4276,7 +5008,13 @@
       "workflow"
     ],
     "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "visual-inspector-agent": {
     "hash": "96c2fce8285898e0a087e939e6ecc8348ec92439f6d0b90be504aa5c8b957579",
@@ -4392,7 +5130,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "web-research-specialist-agent": {
     "hash": "8b6df4fa5107cdd13f84c5a2d87e173af3e38c8c564be6c407e5fabcfc3076b6",
@@ -4411,7 +5155,13 @@
       "documentation"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "web-scraper": {
     "hash": "d3abd173cb3be1bd8b75283a84faea99becd25e3310cc70474a40ac6a95a1022",
@@ -4448,7 +5198,13 @@
       "realtime"
     ],
     "changelog": "v1.0.0: Initial creation",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "workflow": {
     "hash": "ff80a950e0d9d23cb723ffde736e104871091d5c33eab386ba702e08448852f4",
@@ -4463,7 +5219,13 @@
     "description": "",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "workflow-master-template": {
     "hash": "6e388a80fca39a31f91d3300c4a4c94524744a3ecada2c8f6eb88ac4337fba5e",
@@ -4499,7 +5261,13 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   },
   "writing-skills": {
     "hash": "9a74fdc785df99886576a9a40985e80e9c5fe45e9f193a8bea3d50d311f6d546",
@@ -4539,6 +5307,12 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-04-24"
+    }
   }
 }
