@@ -851,6 +851,7 @@ def tier_resource_with_reason(
     if resource_type == "config":
         CONFIG_SKILL_MAP = {
             "e2e-pipeline": "e2e-visual-run",
+            "test-pipeline": "test-pipeline",
         }
         associated_skill = CONFIG_SKILL_MAP.get(name)
         if associated_skill:
