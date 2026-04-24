@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-24 10:02 UTC (auto-generated)
+> Last updated: 2026-04-24 12:25 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -227,12 +227,12 @@
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | test-pipeline | skill | 1.0.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
-| test-pipeline-agent | agent | 4.3.0 | hub:abhayla/claude-best-practices | — |
+| test-pipeline-agent | agent | 4.4.0 | hub:abhayla/claude-best-practices | — |
 | test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
-| testing-pipeline-master-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
-| testing-pipeline-workflow | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| testing-pipeline-master-agent | agent | 3.1.0 | hub:abhayla/claude-best-practices | — |
+| testing-pipeline-workflow | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | trace-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | twitter-x | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
