@@ -1,13 +1,18 @@
 ---
 name: test-pipeline
 description: >
-  Run the full three-lane test verification pipeline as a skill-at-T0
-  orchestrator. The skill body IS the orchestrator — it runs in the user's T0
-  session and dispatches flat worker subagents (scout, functional/API testers,
-  visual-inspector, analyzer, github-issue worker, fixer) via Agent() at T0
-  where subagent dispatch actually works. Enforces the JOIN gate, triage
-  subgraph, verify-affected loop, and final commit per spec v2.2. Use for the
-  full fix→verify→commit chain; for verification only, use /auto-verify.
+  Run your full test suite end-to-end: find broken tests, diagnose root causes,
+  open GitHub issues, apply targeted auto-fixes, re-verify, and commit. The
+  three-lane pipeline runs functional + API + UI tests with dual-signal visual
+  verification, then fans out failure triage (analyze → file issues → fix →
+  serialize). Use when you want the complete test→fix→verify→commit chain.
+  For verification without fixes, use /auto-verify. For a single fix iteration,
+  use /fix-loop. For unclear root cause, use /systematic-debugging. For the
+  bug-resolution full cycle with mandatory learning capture, use /debugging-loop.
+  Under the hood: this skill's body runs at T0 as a skill-at-T0 orchestrator
+  (spec v2.2) and dispatches flat worker subagents via Agent() at T0 —
+  required because Anthropic's platform does not forward Agent to dispatched
+  subagents.
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "[failure_output] [--capture-proof | --no-capture-proof] [--skip-fix] [--only-issues N,M] [--fix-pr-mode] [--full-suite-before-success] [--update-baselines]"
@@ -18,7 +23,23 @@ triggers:
   - full test pipeline
   - test verification pipeline
   - run test pipeline
-version: "2.1.1"
+  - run my tests
+  - run all tests end to end
+  - run the test suite
+  - fix failing tests
+  - fix broken tests
+  - fix the tests
+  - test and fix
+  - test everything
+  - verify my changes
+  - verify the fix
+  - verify and ship
+  - debug test failures
+  - find broken tests
+  - check if tests pass
+  - make the tests pass
+  - test fix commit cycle
+version: "2.2.0"
 ---
 
 # /test-pipeline — Skill-at-T0 Orchestrator
@@ -69,18 +90,37 @@ Mutually exclusive: `--skip-fix` and `--update-baselines` MUST NOT both be set.
 
 ## STEP 1: INIT
 
-1. **Validate args + resolve mode.** Parse `$ARGUMENTS`. If `failure_output` is
-   non-empty OR `--skip-fix` is absent, the pipeline runs all 9 steps (Full
-   mode). If `--skip-fix` is set, skip to STEP 5 (Verify mode). If
-   `--update-baselines` is set, skip STEPS 6–7 entirely (Baseline-update mode).
-2. **Read config.** `Read .claude/config/test-pipeline.yml`. Required keys
-   (schema 2.0.0): `capture_proof.enabled`, `lanes.ui.use_checkpoint`,
-   `lanes.parallel_classifier.enabled`, `lanes.parallel_classifier.min_test_count`,
-   `budget.max_total_dispatches` (default 100), `budget.max_wall_clock_minutes`
-   (default 90), `retry.global_budget` (default 15),
-   `concurrency.max_concurrent_analyzers` (default 5),
-   `concurrency.max_concurrent_issue_managers` (default 5),
-   `concurrency.max_concurrent_fixers` (default 5), `auto_heal.*`.
+1. **Validate args + resolve mode.** Parse `$ARGUMENTS`. Mutually-exclusive
+   flag combos MUST be rejected with an actionable error before any state is
+   touched:
+   - `--skip-fix` + `--update-baselines` → BLOCKED with `blocker: INVALID_FLAG_COMBO`
+   - `--fix-pr-mode` + `--update-baselines` → BLOCKED (baselines mode skips triage)
+   If valid: `failure_output` non-empty OR `--skip-fix` absent → Full mode
+   (all 9 steps). `--skip-fix` set → Verify mode (skip to STEP 5).
+   `--update-baselines` set → Baseline-update mode (skip STEPS 6–7).
+1a. **Cutover guard: PIPELINE_IN_PROGRESS.** Check
+    `.workflows/testing-pipeline/.lock`. If file exists AND its timestamp is
+    less than `budget.max_wall_clock_minutes` old → another pipeline is
+    in flight. Refuse to proceed unless `--force` was passed. Write BLOCKED
+    verdict `{"blocker": "PIPELINE_IN_PROGRESS", "existing_run_id": "<from lock>",
+    "remediation": "wait for existing run OR pass --force to override"}` and
+    exit. If lock is older than the budget window (stale crash recovery) or
+    `--force` set → proceed. Always write a fresh lock file containing
+    `{"pid": <current>, "run_id": "<new>", "started_at": "<iso>"}` at this point.
+2. **Read config.** `Read .claude/config/test-pipeline.yml`. If the file does
+    not exist at all → BLOCKED with `{"blocker": "CONFIG_MISSING",
+    "expected_path": ".claude/config/test-pipeline.yml",
+    "remediation": "Run /update-practices to sync the hub config template,
+    or copy core/.claude/config/test-pipeline.yml from the hub"}`.
+    Required keys (schema 2.0.0): `capture_proof.enabled`,
+    `lanes.ui.use_checkpoint`, `lanes.parallel_classifier.enabled`,
+    `lanes.parallel_classifier.min_test_count`,
+    `budget.max_total_dispatches` (default 100),
+    `budget.max_wall_clock_minutes` (default 90),
+    `retry.global_budget` (default 15),
+    `concurrency.max_concurrent_analyzers` (default 5),
+    `concurrency.max_concurrent_issue_managers` (default 5),
+    `concurrency.max_concurrent_fixers` (default 5), `auto_heal.*`.
 2a. **Config schema gate.** If `schema_version != "2.0.0"` OR any of
     `lanes.parallel_classifier`, `budget.max_total_dispatches`,
     `budget.max_wall_clock_minutes`, `retry.global_budget` is missing →
@@ -149,12 +189,27 @@ After the contract returns:
 2. Increment `dispatches_used` by 1.
 3. If `gate: FAILED`, abort pipeline with `BLOCKED` verdict; skip to STEP 9 with
    failure reason `SCOUT_FAILED`.
+3a. **Empty-suite early exit:** If `test_count == 0` (all queues empty) →
+    write `pipeline-verdict.json` with `{"result": "PASSED",
+    "reason": "NO_TESTS_IN_SUITE", "test_count": 0}`, emit PIPELINE_DONE event,
+    release the lock file, and exit cleanly. No Wave 1, Wave 2, or triage
+    fires. (A project with zero tests trivially passes the pipeline.)
 4. Decide Wave 1 topology using the classifier flag (Q4 decision):
    - If `lanes.parallel_classifier.enabled: true` AND
      `test_count >= lanes.parallel_classifier.min_test_count`: **parallel Wave 1**.
    - Otherwise: **serial Wave 1** (functional fully, then api).
 
 Record `wave1_topology` in `state.json` for resume/debug.
+
+**Stack runner resolution (for STEP 3 Wave 1 functional lane).** Scout reports
+the detected stack. If absent, the orchestrator falls back in this order:
+`pyproject.toml` → `package.json` → `go.mod` → `Cargo.toml` → `Gemfile` →
+`pom.xml`/`build.gradle`. Maps to stack-runner skill:
+`pytest` → `/pytest-dev` OR `/fastapi-run-backend-tests`; `jest` →
+`/jest-dev`; `vitest` → `/vitest-dev`; etc. If NONE detected → BLOCKED
+with `{"blocker": "UNKNOWN_STACK", "checked_markers": [...],
+"remediation": "Add a stack-marker file (pyproject.toml, package.json, etc.)
+or override by setting stack=<runner> in test-pipeline.yml"}`.
 
 ---
 
@@ -206,8 +261,19 @@ Dispatch functional first; wait for contract; then dispatch api. Same prompts.
 ### After both lane contracts return
 
 1. Read `test-results/functional.json` and `test-results/api.json`.
-2. Merge lane gates into `state.json` → `step_status.WAVE1 = done`.
-3. Increment `dispatches_used` by the number of `Agent()` calls issued.
+2. **Contract completeness check (prevents partial-execution pass).** For each
+   lane that ran, assert `lane.summary.total == len(queues[lane])`. If the
+   tester's summary count is less than the scouted queue size, the worker
+   crashed mid-run or returned an incomplete contract. Transition
+   `step_status.WAVE1 = failed` with reason `PARTIAL_EXECUTION`, emit event
+   `WAVE1_PARTIAL_EXECUTION`, and treat the run as FAILED (do NOT proceed
+   to JOIN as if all tests ran).
+3. Merge lane gates into `state.json` → `step_status.WAVE1 = done`.
+4. Increment `dispatches_used` by the number of `Agent()` calls issued.
+5. **Emit granular events** — `WAVE1_DISPATCH_FUNCTIONAL` and
+   `WAVE1_DISPATCH_API` at dispatch time (not just `WAVE1_DONE` at return).
+   Dispatch-start events capture `dispatched_at: <iso>` so timeouts and
+   stalls are observable from events.jsonl alone.
 
 ---
 
@@ -218,16 +284,34 @@ Dispatch functional first; wait for contract; then dispatch api. Same prompts.
 
 ### Checkpoint early-start (REQ-S006)
 
+**Flag-file ownership contract (NEW in v2.2.0):**
+- `test-results/functional.ui-tests-complete.flag` is written by **tester-agent**
+  when ALL UI-requiring tests in the functional lane have completed (even if
+  other non-UI functional tests are still running). The flag's content is
+  `{"written_at": "<iso>", "ui_tests_complete": <n>}` so freshness is checkable.
+- The flag file is **wiped by STEP 1 INIT** (step 4 cleanup) so stale flags
+  from prior runs cannot trigger a false early-start.
+- The flag path lives under `test-results/`, not `.workflows/`, so it's
+  ephemeral and run-scoped.
+
 If `lanes.ui.use_checkpoint: true` in `test-pipeline.yml`:
 
 1. While the functional lane is still running (STEP 3 in parallel topology),
    T0 polls `test-results/functional.ui-tests-complete.flag` every 3 seconds
    (max 30s wait).
-2. If the flag appears before Wave 1 fully returns: dispatch `visual-inspector-agent`
+2. If the flag appears before Wave 1 fully returns AND the flag's `written_at`
+   is within the last 30 seconds (not stale): dispatch `visual-inspector-agent`
    immediately (in parallel with the still-running functional lane's non-UI tests).
 3. Else: wait for Wave 1 to fully return, then dispatch.
 
 If `lanes.ui.use_checkpoint: false` (default): always wait for Wave 1 full return.
+
+**Single-signal confidence cap.** When screenshots are present but ARIA
+snapshots are absent (or vice-versa), `visual-inspector-agent` caps its
+per-test verdict confidence at MEDIUM per its NON-NEGOTIABLE #3
+("single-signal cap"). For HIGH confidence, tester-agent must have captured
+BOTH `.png` and `.aria.yaml` (Playwright only — see tester-agent.md v2.2.0
+Evidence Capture step). Non-Playwright UI frameworks cap at MEDIUM by design.
 
 ### Dispatch
 
@@ -288,16 +372,26 @@ that wave).
 
 ### Budget guard (REQ-M015, v2 §3.3 end)
 
-Before every chunk dispatch:
+Before every chunk dispatch — **pre-check accounts for the chunk-add**, not
+just the current used-count:
 
 ```
-if state.dispatches_used >= config.budget.max_total_dispatches:
-    emit BLOCKED verdict "BUDGET_EXHAUSTED_DISPATCHES", go to STEP 9
+chunk_size = min(failures_remaining, config.concurrency.max_concurrent_<wave>)
+if state.dispatches_used + chunk_size > config.budget.max_total_dispatches:
+    emit BLOCKED verdict "BUDGET_EXHAUSTED_DISPATCHES" with
+      {"would_use": state.dispatches_used + chunk_size, "cap": max},
+    go to STEP 9
 if wall_clock_elapsed_minutes(state) >= config.budget.max_wall_clock_minutes:
     emit BLOCKED verdict "BUDGET_EXHAUSTED_WALL_CLOCK", go to STEP 9
 ```
 
 Track `wall_clock_elapsed_minutes` as `(now - state.wall_clock_started_at).total_seconds() / 60`.
+
+Emit granular events: `TRIAGE_ANALYZER_CHUNK_<i>_DISPATCH`,
+`TRIAGE_ANALYZER_CHUNK_<i>_DONE` (same shape for issue-manager and fixer
+fan-outs). This lets events.jsonl reconstruct the dispatch timeline without
+reading state.json. Also emit `TRIAGE_BUDGET_CHECK` events at each guard
+evaluation, with `{used: N, would_use: M, cap: X, verdict: PROCEED|BLOCKED}`.
 
 ### Fan-out 1: Analyzers
 
@@ -352,6 +446,16 @@ stack: `fastapi-fixer-agent`, `android-fixer-agent`, `react-fixer-agent`, etc.
 Per chunk, one T0 message with up-to-5 calls; each returns a unified diff.
 Workers MUST NOT apply diffs directly — they return diff text for T0 to apply.
 
+### Recommended-action dispatch matrix
+
+For each analyzed failure, Fan-outs 2+3 are gated by the analyzer's
+`recommended_action`. Summary: `AUTO_HEAL` fires both; `ISSUE_ONLY` /
+`QUARANTINE` / `ESCALATE` fire issue-manager only; `RETRY_INFRA` fires
+neither (re-dispatches in STEP 7).
+
+Full decision table (all 6 action types, edge cases, dispatch rules):
+see `references/dispatch-reference.md` § "Recommended-action dispatch matrix".
+
 ### Apply fixes
 
 If `--fix-pr-mode` is set:
@@ -383,19 +487,38 @@ Update state: `step_status.TRIAGE = done`. Record `triage.analyses`,
 
 If no fixes applied in STEP 6, skip to STEP 8. Otherwise:
 
-1. **Derive affected test subset.** Union of tests touched by applied fixes
-   (from diff file paths + import graph). Keep the subset small — ideally
-   only the originally-failing tests plus their direct importers.
+1. **Derive affected test subset (deterministic algorithm).**
+   a. Start set = originally-failing test IDs from STEP 5 JOIN's `failures[]`.
+   b. For each applied diff file in `test-results/fixes/*.diff`, parse
+      changed source paths. For each changed path, add to set:
+      - The test file itself if it IS a test (matches
+        `tests/**`, `**/*.spec.*`, `**/*.test.*`, `**/test_*.py`, etc.)
+      - Test files that import the changed file (via grep — no import graph
+        library required; filename-based `grep -rl "from X" tests/` works
+        for most stacks)
+   c. Cap subset size at `retry.max_verify_affected_tests` (default 25,
+      new config key). If the set exceeds the cap → log WARNING event,
+      truncate to the N highest-priority originally-failing tests.
+   d. Filter subset to tests in `queues.*` — don't re-scout, but validate
+      each test_id is still in a queue (handles scout queue invalidation).
+
 2. **Re-dispatch Wave 1 + Wave 2 for the subset.** Same `Agent()` call
    shape as STEPS 3–4, but with `queues.*` narrowed to the affected subset.
-3. **Loop.** Up to `global_retries_remaining` retries per failure. Decrement
-   `global_retries_remaining` per retry.
+   Emit `VERIFY_AFFECTED_ITERATION_<n>_DISPATCH` event per iteration.
+
+3. **Loop.** Up to `retry.global_budget` (default 15) retries per failure;
+   decrement `global_retries_remaining` per re-dispatch. Re-dispatch counts
+   toward `dispatches_used` (not a separate bucket).
+
 4. **Termination:**
-   - All affected tests green → proceed to STEP 8
-   - Budget exhausted → BLOCKED, go to STEP 9 with reason `VERIFY_BUDGET_EXHAUSTED`
-   - Specific test flaps (passes/fails alternately) 3+ times → mark as `flaky_detected: true`
-     in the failure entry; treat as FAILED for verdict (per `testing.md` "FLAKY
-     tests are reported as FAILED with flaky_detected: true").
+   - All affected tests green → proceed to STEP 8, emit `VERIFY_AFFECTED_DONE`
+   - `global_retries_remaining <= 0` → BLOCKED, STEP 9 with reason
+     `VERIFY_BUDGET_EXHAUSTED`
+   - `dispatches_used + 2 > max_total_dispatches` (can't afford another
+     Wave 1+2 iteration) → BLOCKED with `VERIFY_DISPATCH_BUDGET_EXHAUSTED`
+   - Specific test flaps 3+ times (passes/fails alternately) → mark
+     `flaky_detected: true`; treat as FAILED per testing.md flakiness rule.
+     Stop retrying this specific test but continue others.
 
 ---
 
@@ -405,9 +528,23 @@ Run only when `--full-suite-before-success` is set OR configured. One more
 Wave 1 + Wave 2 over the complete suite to catch collateral regressions
 from applied fixes (REQ-S006 equivalent).
 
-Same dispatch pattern as STEPS 3–4. If final full-suite is green, proceed;
-if it regresses, re-enter STEP 6 triage for the new failures (subject to
-remaining budget).
+Same dispatch pattern as STEPS 3–4. Emit `FINAL_FULL_SUITE_DISPATCH` event
+at start; count dispatches toward `dispatches_used` (subject to budget guard
+pre-check — if we can't afford Wave 1+2, STEP 8 is SKIPPED with reason
+`BUDGET_INSUFFICIENT_FOR_FINAL_SUITE`, not BLOCKED, because triage+verify
+already succeeded).
+
+**Regression re-entry semantics:** If final full-suite finds failures that
+did NOT appear in the earlier Wave 1+2 runs (collateral regressions from
+STEP 6 fixes), re-enter STEP 6 triage with:
+- Budget counters **NOT reset** — `dispatches_used` and
+  `global_retries_remaining` continue from their STEP 7 values
+- New failures appended to the working failure set
+- `regression_source: STEP_8_FULL_SUITE` field added to each new failure
+  entry so analyzers know this is a regression (may inform fix strategy)
+- Maximum ONE re-entry pass — if STEP 6+7 after STEP 8 produce yet more
+  regressions, emit BLOCKED with reason `RECURRENT_REGRESSION` and escalate
+  to user
 
 Skip entirely if `--update-baselines` or `--skip-fix` mode.
 
@@ -415,14 +552,33 @@ Skip entirely if `--update-baselines` or `--skip-fix` mode.
 
 ## STEP 9: COMMIT + REPORT
 
+STEP 9 MUST always complete — even on failure of its own sub-skills — so that
+`pipeline-verdict.json` always has a `finalized_at` field and the lock file
+is always released. Wrap sub-skill invocations in "try → fall-through" so a
+/post-fix-pipeline failure degrades to `result: INCONCLUSIVE` rather than
+leaving an incomplete verdict file.
+
 1. **Invoke post-fix skill:**
    ```
    Skill("/post-fix-pipeline", args="<run_id>, <pipeline-verdict.json path>")
    ```
    This skill handles final documentation updates, commit message, and git
    commit (unless `--fix-pr-mode` already opened a PR in STEP 6).
-2. **Finalize `pipeline-verdict.json`:** set `result` to `PASSED | FAILED | BLOCKED`;
-   fill `triage`, `commit`, `artifacts`.
+
+   If `/post-fix-pipeline` ERRORS or returns non-PASSED: capture the error
+   message, set `commit.performed = false`, `commit.error = <message>`, and
+   CONTINUE to step 2 (do NOT exit without writing the verdict). Set
+   `result: INCONCLUSIVE` if no result was previously determined by STEPs 5–8,
+   else keep the earlier-determined result.
+
+2. **Finalize `pipeline-verdict.json`** (MUST happen even if step 1 errored):
+   set `result` to `PASSED | FAILED | BLOCKED | INCONCLUSIVE`; fill `triage`,
+   `commit`, `artifacts`; set `finalized_at` to current ISO timestamp.
+
+2a. **Release the lock file.** Delete `.workflows/testing-pipeline/.lock`
+    unconditionally. Emit `LOCK_RELEASED` event. A missing lock at this
+    point is not an error (some cleanup paths pre-delete).
+
 3. **Print user-facing dashboard:**
    ```
    ============================================================
@@ -460,6 +616,21 @@ process exit code. The `result` field in `pipeline-verdict.json` IS the
 signal; downstream aggregators read this exact field name (see `testing.md`
 Structured Test Output).
 
+### Dispatch counter, artifacts, --only-issues, event taxonomy
+
+For the detailed rules on:
+
+- What counts toward `dispatches_used` (and what doesn't, e.g., STEP 8
+  screenshot-reuse optimization)
+- Forward-slash path convention and filesystem-safe name sanitization
+- `run_id` timestamp/sha format + `:` → `-` rule for filenames
+- Lock file lifecycle (`LOCK_ACQUIRED`, `LOCK_RELEASED`)
+- `--only-issues N,M,P` resolution via `gh issue view`
+- Complete events.jsonl taxonomy (dispatch-start + completion + gate +
+  failure-signal event names)
+
+See **`references/dispatch-reference.md`** (loaded on-demand).
+
 ---
 
 ## CRITICAL RULES
@@ -492,3 +663,28 @@ Structured Test Output).
   not "2.0.0", OR if required v2.2 keys (e.g., `lanes.parallel_classifier`)
   are absent. Silent inlining against mismatched config produces unpredictable
   behavior — the actual 2026-04-24 downstream gap. Remediation: `/update-practices`.
+- MUST fail-fast with `CONFIG_MISSING` BLOCKED verdict at STEP 1 step 2 if
+  `.claude/config/test-pipeline.yml` does not exist. Remediation pointer
+  MUST name `/update-practices` as the fix path.
+- MUST fail-fast with `PIPELINE_IN_PROGRESS` BLOCKED verdict at STEP 1
+  sub-step 1a if a fresh `.workflows/testing-pipeline/.lock` file exists
+  (younger than `budget.max_wall_clock_minutes`). Protects against
+  concurrent-run state corruption. `--force` overrides; stale locks
+  (older than the budget window) are auto-ignored.
+- MUST reject mutually-exclusive flag combos before any state is touched:
+  `--skip-fix` + `--update-baselines` and `--fix-pr-mode` + `--update-baselines`
+  are invalid. BLOCKED with `INVALID_FLAG_COMBO` + specific flags named.
+- MUST treat partial-execution as FAILED in STEP 3 Wave 1: if any lane's
+  `summary.total < len(queues[lane])`, the worker crashed mid-run and its
+  contract is incomplete. Do NOT proceed to JOIN as if all tests ran.
+- MUST pre-check budget BEFORE chunk dispatch using `dispatches_used + chunk_size`,
+  not just `dispatches_used`. The simple post-check would allow one chunk
+  past the cap.
+- MUST always write `finalized_at` to pipeline-verdict.json in STEP 9, even
+  on `/post-fix-pipeline` error. Incomplete verdict files break downstream
+  aggregators and leave users guessing whether the run finished.
+- MUST release `.workflows/testing-pipeline/.lock` in STEP 9, even on error.
+  A stuck lock blocks every future invocation until manually cleared.
+- MUST emit granular dispatch-start events (`*_DISPATCH_*`), not only
+  completion events. Stalls between dispatch and return are undiagnosable
+  from events.jsonl otherwise.

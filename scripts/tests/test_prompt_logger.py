@@ -96,7 +96,7 @@ def test_hub_live_log_exists_with_header():
             "(no Claude Code session runs there). Locally, run Claude "
             "Code once to populate it; then this test asserts the header."
         )
-    assert "# Prompt Log" in log.read_text()
+    assert "# Prompt Log" in log.read_text(encoding="utf-8")
 
 
 def test_gitignore_excludes_live_log():
@@ -197,7 +197,7 @@ def test_creates_header_when_log_missing(tmp_repo):
     assert not log.exists()
     _run(CORE_HOOK, tmp_repo, {"prompt": "first ever", "session_id": "s", "cwd": str(tmp_repo)})
     assert log.exists()
-    assert "# Prompt Log" in log.read_text()
+    assert "# Prompt Log" in log.read_text(encoding="utf-8")
 
 
 @jq_required
