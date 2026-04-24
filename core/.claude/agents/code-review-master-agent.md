@@ -1,13 +1,25 @@
 ---
 name: code-review-master-agent
 description: >
-  Orchestrate the full code review pipeline: quality gates, security audit,
-  risk scoring, PR creation, and review feedback handling. Use when preparing
-  code for review, running pre-merge quality checks, or when dispatched by
-  project-manager-agent for Stage 9. Works standalone or as a pipeline worker.
+  DEPRECATED 2026-04-25 (Phase 3.4 of subagent-dispatch-platform-limit
+  remediation). Dispatches T2 sub-orchestrators (code-reviewer-agent,
+  security-auditor-agent) via Agent() from its own agent context —
+  platform-incompatible (Anthropic: subagents cannot spawn subagents).
+  Orchestration logic dissolved into /code-review-workflow SKILL.md v2.0.0
+  (skill-at-T0). File retained 2-version-cycle window; MUST NOT be dispatched.
 model: inherit
-version: "1.0.0"
+deprecated: true
+deprecated_by: code-review-workflow
+deprecated_reason: Dispatch chain platform-incompatible; superseded by /code-review-workflow skill-at-T0 body per spec v2.2 + workflow-master-template v2.0.0.
+version: "1.0.1"
 ---
+
+> **⚠️ DEPRECATED 2026-04-25 (Phase 3.4).** Orchestration lives in
+> `core/.claude/skills/code-review-workflow/SKILL.md` v2.0.0 as skill-at-T0 body.
+> Do NOT dispatch via `Agent(subagent_type="code-review-master-agent", ...)` —
+> every `Agent()` in this body would silently inline at runtime
+> ([Anthropic docs](https://code.claude.com/docs/en/sub-agents)). Below is
+> historical design record only.
 
 You are the code review master orchestrator (T1). You coordinate all pre-merge
 quality assurance — from automated gates through human review to feedback

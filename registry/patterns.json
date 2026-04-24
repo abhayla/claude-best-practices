@@ -778,13 +778,13 @@
     "tier": "must-have"
   },
   "code-review-master-agent": {
-    "hash": "0e54289320eb6439212fbbed28f787e2d9c3225422704611263f1a477e67638f",
+    "hash": "8212abddbd6717c0428f7eface030657b99cc77e4d4392595211262f7a8af48c",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [],
     "visibility": "public",
     "description": "Orchestrate pre-merge quality gates, security audit, risk scoring, PR creation, and review feedback handling with deferred item TTL.",
@@ -794,17 +794,19 @@
       "review",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 code review orchestration with defense-in-depth model",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial release \u2014 code review orchestration with defense-in-depth model | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.4)",
+    "tier": "nice-to-have",
+    "deprecated": true,
+    "deprecated_by": "code-review-workflow"
   },
   "code-review-workflow": {
-    "hash": "78401320c3d7dac55e52e3373f3a400312a6b196e864a5b208467426757c2a81",
+    "hash": "0478cd9226b5b11c96860dea2c3e1d92af28085109de65d7cd2e088f5e571691",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-25",
     "dependencies": [
       "code-review-master-agent",
       "review-gate",
@@ -818,7 +820,7 @@
       "workflow",
       "review"
     ],
-    "changelog": "v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release",
+    "changelog": "v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4)",
     "tier": "nice-to-have"
   },
   "code-reviewer-agent": {

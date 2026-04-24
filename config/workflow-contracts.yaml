@@ -190,14 +190,14 @@ workflows:
         reason: "Bug fixed — run full test pipeline to check for regressions"
 
   code-review:
-    description: "Quality gates → security audit → risk scoring → PR creation → review feedback"
-    master_agent: code-review-master-agent
+    description: "Quality gates → optional deep audit → PR → feedback — skill-at-T0 orchestrator (Phase 3.4, spec v2.2)."
+    master_agent: null
+    entry_skill: code-review-workflow
     state_file: ".workflows/code-review/state.json"
-    sub_orchestrators:
-      - agent: code-reviewer-agent
-        role: "Code quality and architecture review"
-      - agent: security-auditor-agent
-        role: "Security audit and threat modeling"
+    # code-reviewer-agent + security-auditor-agent dispatched directly from T0
+    # by /code-review-workflow STEP 2b --deep-audit (parallel, single-message).
+    # Not sub-orchestrators — workers only.
+    sub_orchestrators: []
     steps:
       - id: quality_gates
         skill: review-gate
