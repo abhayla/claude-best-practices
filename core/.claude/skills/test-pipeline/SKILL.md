@@ -39,7 +39,7 @@ triggers:
   - check if tests pass
   - make the tests pass
   - test fix commit cycle
-version: "2.2.0"
+version: "2.3.0"
 ---
 
 # /test-pipeline — Skill-at-T0 Orchestrator
@@ -130,6 +130,47 @@ Mutually exclusive: `--skip-fix` and `--update-baselines` MUST NOT both be set.
     `test-results/pipeline-verdict.json`, emit event, print remediation,
     exit. Prevents silent key-shape mismatches (the 2026-04-24 downstream
     gap).
+2b. **Worker registry probe (WORKER_REGISTRY_PROBE).** Before any heavy
+    work, probe the runtime registry for each worker the pipeline will
+    dispatch in STEPs 2–6. Claude Code pins its agent registry at session
+    start; file existence on disk does NOT equal runtime dispatchability.
+    The worker list is derived (NOT hardcoded) from config + flags, so
+    this gate is generic across stacks:
+    - Always probe: `test-scout-agent`, `tester-agent`
+    - If `lanes.api.enabled` AND project has FastAPI markers (Bash detect
+      `pyproject.toml` containing `fastapi`): probe `fastapi-api-tester-agent`.
+      Otherwise the api lane reuses `tester-agent` and no extra probe.
+    - If `lanes.ui.enabled`: probe `visual-inspector-agent`
+    - If `--skip-fix` is NOT set (triage path active): probe
+      `test-failure-analyzer-agent`, `github-issue-manager-agent`,
+      and any project-specific fixer matching `<stack>-fixer-agent` if
+      detectable from config
+
+    For each probed worker emit one minimal dispatch:
+    ```
+    Agent(subagent_type="<name>", description="probe",
+          prompt="probe — return {ack: true} immediately")
+    ```
+    These count toward `dispatches_used`.
+
+    If ANY probe returns "Agent type not found" / "unknown subagent_type"
+    / similar runtime registry-miss → fail-fast: write BLOCKED verdict
+    `{"result": "BLOCKED", "blocker": "WORKER_REGISTRY_NOT_LOADED",
+    "missing_agents": [<list>], "agents_on_disk": <count of matching
+    .claude/agents/*.md files that exist>, "remediation": "Newly synced
+    agents require Claude Code session restart. Exit this session
+    (Ctrl+D or /exit), run claude again from the project root, then
+    re-run /test-pipeline. The agent .md files are on disk but Claude
+    Code's runtime registry was loaded at session start and does not
+    pick them up live."}` to `test-results/pipeline-verdict.json`, emit
+    `WORKER_REGISTRY_PROBE_FAILED` event with the missing list, print
+    remediation banner prominently, release the lock file (per STEP 9
+    sub-step 2a), exit.
+
+    Cache successful probe results in state.json under
+    `registry_probe: {"ts": "<iso>", "verified": [<agent names>]}` so a
+    resume of the same `run_id` within the same session skips re-probing
+    on retry. `--force` invalidates the cache.
 3. **Generate `run_id`.** Format: `{UTC ISO-8601}_{7-char git sha}` with `:`
    replaced by `-`. Bash: `run_id="$(date -u +%Y-%m-%dT%H-%M-%SZ)_$(git rev-parse --short=7 HEAD)"`.
 4. **Clean prior artifacts.** Remove `test-results/`, `test-evidence/`, and
@@ -688,3 +729,10 @@ See **`references/dispatch-reference.md`** (loaded on-demand).
 - MUST emit granular dispatch-start events (`*_DISPATCH_*`), not only
   completion events. Stalls between dispatch and return are undiagnosable
   from events.jsonl otherwise.
+- MUST fail-fast with `WORKER_REGISTRY_NOT_LOADED` BLOCKED verdict at
+  STEP 1 sub-step 2b if any required worker subagent_type returns
+  "Agent type not found" at runtime probe. File existence on disk does
+  NOT equal runtime dispatchability — Claude Code pins the agent registry
+  at session start. Remediation MUST always point at session restart,
+  never at re-running /update-practices (which can't fix what the user's
+  prior /update-practices just caused).
