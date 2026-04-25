@@ -8,7 +8,7 @@ description: >
   Use when your local patterns are outdated or after hub registry changes.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--check-only] [--force]"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -94,8 +94,52 @@ For each approved update:
 2. Copy to local `.claude/` directory (creating `.claude/config/` if missing)
 3. Update `.claude/sync-manifest.json` with the new hub_hash + synced_at timestamp
 4. Update sync config timestamp
+5. **Track newly-added agents.** If the synced file is under
+   `.claude/agents/` AND did not exist locally before this run, append
+   its name to a session-scoped `agents_added[]` list. Updated existing
+   agents are tracked separately as `agents_updated[]` — only newly-added
+   agents require session restart for runtime registry refresh, not
+   modifications to existing agents.
 
 If `--force`, apply all without prompting.
+
+## STEP 5.5: Restart Warning (when agents_added is non-empty)
+
+If `agents_added[]` has entries after STEP 5, print this banner BEFORE
+the STEP 6 summary table:
+
+```
+================================================================
+⚠  RESTART REQUIRED — NEW AGENTS SYNCED THIS SESSION
+================================================================
+The following agent files were newly added under .claude/agents/:
+  - <agent-1>.md
+  - <agent-2>.md
+  ...
+
+Claude Code pins its agent registry at session start. These agents
+are NOT dispatchable in the current session even though their files
+exist on disk. To use them:
+
+  1. Exit this Claude Code session (Ctrl+D or type /exit)
+  2. Run `claude` again from this project root
+  3. The new agents will be loaded into the registry on session start
+
+Skills that dispatch these agents (e.g. /test-pipeline at STEP 2 SCOUT,
+/debugging-loop, /code-review-workflow) will BLOCK with verdict
+"WORKER_REGISTRY_NOT_LOADED" until you restart.
+
+This warning appears because of a Claude Code platform behavior, NOT
+a bug in /update-practices — see core/.claude/rules/pattern-structure.md
+"Agent registry session-pinning" for context.
+================================================================
+```
+
+The banner is informational — STEP 5 still wrote files to disk and
+sync-manifest.json. The user just needs to restart before running any
+pipeline that dispatches the new agents. Updated existing agents
+(`agents_updated[]`) generally do NOT require restart and are NOT
+included in this banner.
 
 ## STEP 6: Report
 
@@ -135,3 +179,11 @@ If any schema_version changed on a config, print after the table:
   starting points, not canonical hub state
 - MUST NOT silently overwrite a config with schema_version changes when
   `--force` is NOT set — the user SHOULD see the schema bump notice
+- MUST print a prominent RESTART REQUIRED banner before STEP 6 if any
+  newly-added agents were synced under `.claude/agents/`. The banner
+  names each new agent and provides explicit restart instructions.
+  Without this warning, downstream pipelines that depend on the new
+  agents fail cryptically mid-run instead of at the sync boundary —
+  Claude Code pins its agent registry at session start, so newly-synced
+  agents on disk are NOT runtime-dispatchable until restart. Updated
+  existing agents do NOT trigger this banner.

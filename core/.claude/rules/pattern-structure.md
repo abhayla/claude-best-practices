@@ -113,6 +113,36 @@ decide context-aware whether `Agent` is required (T0 orchestrators) or
 forbidden (workers), plus a runtime-probe integration test that dispatches a
 throwaway subagent and asserts `Agent` is absent from its tool list.
 
+### Agent registry session-pinning (Claude Code platform behavior)
+
+Claude Code loads the agent registry at **session start** by scanning
+`.claude/agents/*.md`, not on-demand at each `Agent()` call. Files added,
+modified, or removed mid-session are NOT reflected in the runtime registry
+until the next session is started.
+
+**Implications for skill authors:**
+
+- Skills that sync new agent files (e.g., `/update-practices`) MUST warn
+  users that a session restart is required to dispatch the new agents.
+  See `/update-practices` STEP 5.5 RESTART REQUIRED banner pattern.
+- Skills that dispatch agents by name (e.g., `/test-pipeline` STEP 2)
+  SHOULD probe the runtime registry early (STEP 1 sub-step) and BLOCK
+  with `WORKER_REGISTRY_NOT_LOADED` if any required agent is missing.
+  File-existence checks (`[ -f .claude/agents/<name>.md ]`) are NOT
+  sufficient — they can pass while runtime dispatch fails.
+- Updates to existing agent files (frontmatter changes, body edits)
+  generally do NOT require restart — only NEW agent files do.
+- The validator in `scripts/tests/test_orchestrator_tool_grants.py`
+  enforces frontmatter invariants but does NOT validate runtime
+  dispatchability. Runtime dispatchability is the responsibility of the
+  invoking skill via early probe.
+
+This finding was surfaced 2026-04-25 during FIREKaro-Vue downstream
+validation when `/update-practices` synced 5 worker agents and the same
+session's `/test-pipeline` call failed at SCOUT dispatch with
+"Agent type 'test-scout-agent' not found" despite the file being on
+disk and committed.
+
 ### Color Field (Severity/Importance)
 
 Every agent MUST declare a `color` indicating the severity and importance of its work:
