@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-25 21:35 UTC (auto-generated)
+> Last updated: 2026-04-26 08:30 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 238 |
-| Core (universal) | 233 |
+| Total Patterns | 236 |
+| Core (universal) | 231 |
 | Stack-specific | 5 |
 | Agents | 39 |
 | Configs | 2 |
 | Hooks | 9 |
 | Rules | 29 |
-| Skills | 159 |
+| Skills | 157 |
 
 ## Pattern Inventory
 
@@ -190,8 +190,6 @@
 | rule-writing-meta | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | save-session | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | scan-discovery-report | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| scan-repo | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| scan-url | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | schema-designer | skill | 1.0.0 | hub:abhayla/claude-best-practices | pg-query, fastapi-db-migrate |
 | secret-scanner | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | security-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -236,7 +234,7 @@
 | trace-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | twitter-x | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| update-practices | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
+| update-practices | skill | 1.2.1 | hub:abhayla/claude-best-practices | — |
 | verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | visual-inspector-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |
 | vitest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
