@@ -389,3 +389,131 @@ Phase 3.1 may start drafting on a branch stacked on the latest of those three, b
 ---
 
 **End of spec v2.0 (draft).** Ready for review; will be refined to v2.1 based on reviewer feedback before the Phase 3.1 implementation PR is opened.
+
+---
+
+## v3.0.0 Addendum — Strict Execution Contract + Independent UI Runner
+
+**Status:** ACTIVE (released 2026-04-26 in PR #39).
+**Driving findings:** FIREKaro-Vue Goal B/C/D validation 2026-04-26 surfaced two structural gaps:
+1. **UI lane silently skipped** (183 UI files in queue, 0 executed) when Wave 1 functional lane was downscoped to non-UI tests. Root cause: M1 architecture coupled UI verification to whatever screenshots Wave 1 functional lane happened to produce.
+2. **No queue-completeness contract.** `tester-agent` had no NON-NEGOTIABLE requiring it to execute every test in its queue, allowing autonomous downscoping under wall-clock pressure to produce false `result: PASSED`.
+
+### Decisions
+
+| Q | Answer | Rationale |
+|---|--------|-----------|
+| Q1 — `PASSED` semantics | (a) every classified test executed AND passed | Strict contract; existing (b) hides silent gaps |
+| Q2 — Why downscope? | Worker-autonomous (tester-agent had no queue-completeness contract) | Adding NON-NEGOTIABLE #5 closes the loophole |
+| Q3 — UI lane architecture | M2 — independent UI lane runner | M1 made UI verification a downstream of functional; gaps invisible. M2 makes UI a Wave 1 peer. Tradeoff: tests in functional ∩ ui overlap run twice (once per lane, different verdicts) — accepted |
+| Q4 — Per-test ledger location | L3 — JOIN reconciliation owns the cross-check | Lightest implementation; reuses existing JSONL infra |
+| Q5 — Verdict downgrade | C1 — strict default (`PASSED_WITH_GAPS` ⇒ `ci_gate: FAILED` unless `--allow-gaps`) | Breaking change; v3.0.0 MAJOR. Strict-by-default catches silent gaps in CI |
+
+### New artifact: `test-results/manifest.json`
+
+Written by `test-scout-agent` at SCOUT (STEP 2). Single source of truth for "what should run." Schema:
+
+```json
+{
+  "schema_version": "3.0.0",
+  "run_id": "<run_id>",
+  "scout_completed_at": "<iso>",
+  "tests": [
+    {
+      "test_id": "<file>::<name>",
+      "test_file": "<relative path>",
+      "test_name": "<test name>",
+      "lanes_required": ["functional"|"api"|"ui", ...],
+      "framework": "playwright|vitest|jest|pytest|...",
+      "classification_signals": ["imports:<lib>", "path:<dir>", ...],
+      "estimated_duration_ms": null
+    }
+  ],
+  "queue_counts_by_lane": {"functional": <n>, "api": <n>, "ui": <n>},
+  "overlap": {"functional_and_ui": <n>, "functional_and_api": <n>, "all_three": <n>}
+}
+```
+
+Each unique test appears ONCE in `tests[]`. `queue_counts_by_lane` sums where lane is in lanes_required (so a functional+ui test is counted in both bucket counts).
+
+### Lane verdict shape (v3.0.0)
+
+Every Wave 1 lane's `test-results/{lane}.json` MUST include:
+
+```json
+{
+  "lane": "functional|api|ui",
+  "result": "PASSED|FAILED|SKIP",
+  "manifest_total": <int — manifest.tests where lanes_required ⊃ lane>,
+  "executed_count": <int>,
+  "executed": [<test_ids actually run>],
+  "unexercised": [<test_ids in manifest the lane did NOT run>],
+  "passed": <int>,
+  "failed": <int>,
+  "skipped_by_test": <int — test.skip() encountered by runner>,
+  "blocker": "INCOMPLETE_QUEUE_EXECUTION|null",
+  "summary": "<line>",
+  "duration_ms": <int>,
+  "artifacts": {...},
+  "failures": [...]
+}
+```
+
+**Key change vs v2.x:** v2.x had a single `skipped` field that conflated `test.skip("reason")` (legitimate skip) with tests the runner never reached (silent gap). v3.0.0 splits these into `skipped_by_test` (legitimate, in JSONL) vs `unexercised` (gap, NOT in JSONL — derived by JOIN from manifest difference).
+
+### Pipeline verdict shape (v3.0.0)
+
+`test-results/pipeline-verdict.json` schema_version bumped to "3.0.0":
+
+```json
+{
+  "schema_version": "3.0.0",
+  "run_id": "<id>",
+  "result": "PASSED|PASSED_WITH_GAPS|FAILED|BLOCKED",
+  "ci_gate": "PASSED|FAILED",
+  "result_reasons": ["LANE_INCOMPLETE_EXECUTION:<lane>", ...],
+  "manifest_total_unique_tests": <int>,
+  "executed_unique_tests": <int>,
+  "unexercised_total": <int>,
+  "lane_summaries": {<lane>: {"manifest": N, "executed": M, "unexercised": K}},
+  "strict_mode": true,
+  "allow_gaps": <bool>,
+  "failures": [...],
+  "triage": null,
+  "commit": null
+}
+```
+
+**`ci_gate` is the single field downstream CI scripts SHOULD check.** Migration from v2.x: scripts that did `result == "PASSED"` should now do `ci_gate == "PASSED"`. The `result` field gains the new `PASSED_WITH_GAPS` state to preserve audit detail.
+
+### Wave 1 architecture change (M2)
+
+v3.0.0 dispatches **3 lane workers** at Wave 1 (was 2 in v2.x):
+
+```
+Agent(subagent_type="tester-agent",            prompt="lane=functional ...")
+Agent(subagent_type="fastapi-api-tester-agent", prompt="lane=api ...")    # or tester-agent for non-FastAPI
+Agent(subagent_type="tester-agent",            prompt="lane=ui ...")      # NEW in v3.0.0
+```
+
+All 3 in one T0 message → parallel dispatch. The ui-lane tester-agent runs UI tests independently (Playwright/Cypress/etc.) with mandatory capture-proof. Wave 2 becomes pure verification of those screenshots (no longer a runner).
+
+**Cost:** tests classified as both `functional` AND `ui` (overlap) run twice. FIREKaro-Vue had 16 such tests — accepted cost per Q3=M2.
+
+### JOIN reconciliation algorithm
+
+See SKILL.md STEP 5 for the full algorithm. Summary:
+1. Read manifest + per-lane verdicts + per-lane JSONLs
+2. Per-lane: assert `executed_count + len(unexercised) == manifest_total` (arithmetic gate)
+3. Per-lane: assert `set(executed) == set(test_ids in {lane}.jsonl)` (ledger gate, BLOCKED on mismatch)
+4. Cross-lane: a test_id is "exercised" if any required lane ran it
+5. Compute `result` (PASSED / PASSED_WITH_GAPS / FAILED / BLOCKED)
+6. Compute `ci_gate` based on `--allow-gaps`
+
+### Migration path (v2.x → v3.0.0)
+
+Breaking changes for downstream projects:
+1. **CI scripts checking `result == "PASSED"`** → switch to `ci_gate == "PASSED"`
+2. **Wave 1 cost increase** — UI tests run independently, doubling execution for functional+ui overlap. If wall-clock budget is tight, set `--allow-gaps` for the transition period and address coverage gaps in subsequent runs
+3. **`test-pipeline.yml` schema unchanged** — v3.0.0 reuses the v2.x config schema. No config migration required.
+4. **Worker agent versions** — `tester-agent` 2.2.0 → 3.0.0, `visual-inspector-agent` 2.0.0 → 3.0.0. Synced via `/update-practices`.

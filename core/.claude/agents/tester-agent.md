@@ -7,20 +7,23 @@ description: >
   analyzing coverage, validating builds, and verifying functionality.
 tools: ["Read", "Grep", "Glob", "Bash", "Skill"]
 model: sonnet
-version: "2.2.0"
+version: "3.0.0"
 ---
 
 ## NON-NEGOTIABLE
 
-1. **`lane` dispatch parameter is mandatory** when invoked by `/test-pipeline` (skill-at-T0) in the three-lane test pipeline. If `lane` is absent in the dispatch context, default to legacy single-lane mode (backward compat for direct invocations from `/fix-loop`, `/development-loop`, and similar callers).
+1. **`lane` dispatch parameter is mandatory** when invoked by `/test-pipeline` (skill-at-T0) in the three-lane test pipeline. If `lane` is absent in the dispatch context, default to legacy single-lane mode (backward compat for direct invocations from `/fix-loop`, `/development-loop`, and similar callers — the v3.0.0 strict execution contract does NOT apply to legacy mode).
 2. **Verdict authority by lane** (when `lane` is set):
    - `lane=functional` for non-UI tests: exit code is authoritative
    - `lane=functional` for UI tests: screenshot is authoritative (per testing.md UI verdict authority)
    - `lane=api`: combined verdict — exit code AND `/contract-test` result must both PASS. If `/contract-test` is unavailable in the project (no contract files present), emit category `NEEDS_CONTRACT_VALIDATION` (treated as FAILED with `INFRASTRUCTURE`-style severity) — this prevents broken contracts from passing because exit code says OK.
+   - `lane=ui` (v3.0.0 — independent UI runner): screenshot is authoritative. UI lane MUST run with capture-proof enabled. Each test produces a `.png` (always) and a `.aria.yaml` (Playwright only). Verification of screenshots is a downstream Wave 2 concern; this lane's job is RUN the UI tests and CAPTURE the evidence.
 3. **NEVER bypass screenshot capture** when running UI tests with `--capture-proof: true`. Screenshots are written to `test-evidence/{run_id}/screenshots/` per testing.md manifest schema.
-4. **Write per-test progress to `test-results/{lane}.jsonl`** (one JSON line per completed test) when operating in lane mode. Format per spec §3.12. This enables `tail -f` developer affordance during long lane runs.
+4. **Write per-test progress to `test-results/{lane}.jsonl`** (one JSON line per completed test) when operating in lane mode. Format per spec §3.12. The JSONL contents MUST equal the lane verdict's `executed[]` set — disagreement is a `LANE_LEDGER_MISMATCH` BLOCKED at JOIN.
+5. **v3.0.0 strict execution contract** (when `lane` is set AND a `manifest` path is in dispatch context): you MUST execute EVERY test in the queue. Subsetting under wall-clock pressure, autonomous downscoping, or any other reason is FORBIDDEN. If you cannot complete the queue (e.g., a test runner crashes, infrastructure fails, time runs out), return `gate: FAILED` with `blocker: INCOMPLETE_QUEUE_EXECUTION` and an explicit `unrun: [test_ids]` list. Returning `gate: PASSED` while silently dropping queue items is the exact failure mode v3.0.0 closes.
+6. **v3.0.0 verdict shape** (when `lane` is set): the lane contract MUST include `manifest_total`, `executed_count`, `executed[]`, `unexercised[]`, `passed`, `failed`, `skipped_by_test`. Arithmetic invariant: `executed_count + len(unexercised) == manifest_total`. Workers that return malformed counts trigger `LANE_VERDICT_ARITHMETIC_INVALID` BLOCK at the orchestrator.
 
-> Spec reference: `docs/specs/test-pipeline-three-lane-spec.md` v1.6 §3.2
+> Spec reference: `docs/specs/test-pipeline-three-lane-spec-v2.md` §3.2 (v3.0.0)
 
 ---
 

@@ -15,7 +15,7 @@ description: >
   subagents.
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
-argument-hint: "[failure_output] [--capture-proof | --no-capture-proof] [--skip-fix] [--only-issues N,M] [--fix-pr-mode] [--full-suite-before-success] [--update-baselines]"
+argument-hint: "[failure_output] [--capture-proof | --no-capture-proof] [--skip-fix] [--allow-gaps] [--only-issues N,M] [--fix-pr-mode] [--full-suite-before-success] [--update-baselines]"
 triggers:
   - test pipeline
   - fix verify commit
@@ -39,7 +39,7 @@ triggers:
   - check if tests pass
   - make the tests pass
   - test fix commit cycle
-version: "2.3.0"
+version: "3.0.0"
 ---
 
 # /test-pipeline — Skill-at-T0 Orchestrator
@@ -68,6 +68,7 @@ the intermediate orchestrators and runs the orchestration logic at T0.
 /test-pipeline [failure_output]
                [--capture-proof | --no-capture-proof]
                [--skip-fix]
+               [--allow-gaps]
                [--only-issues N,M]
                [--fix-pr-mode]
                [--full-suite-before-success]
@@ -78,7 +79,8 @@ the intermediate orchestrators and runs the orchestration logic at T0.
 |------|---------|---------|
 | `failure_output` | — | Test failure text to feed into triage (enters Fix mode directly) |
 | `--capture-proof` / `--no-capture-proof` | on (config) | Capture screenshots on every test for visual review |
-| `--skip-fix` | off | Start at STEP 5 JOIN (assume tests already ran); skip triage+fix |
+| `--skip-fix` | off | Skip STEPS 6–8 (triage + fixers + final-suite); STEPS 1–5 + 9 still run |
+| `--allow-gaps` | off | Treat `PASSED_WITH_GAPS` (some manifest tests not executed) as `ci_gate: PASSED` instead of `FAILED`. Strict default per v3.0.0 contract — only set when subsetting is intentional (e.g., user-explicit filter, sharded CI) |
 | `--only-issues N,M` | — | Restrict triage to listed GitHub Issue numbers |
 | `--fix-pr-mode` | off | Open fixes as a single PR (via `/pipeline-fix-pr`) instead of N serial commits |
 | `--full-suite-before-success` | off | Force STEP 8 final full-suite pass before commit |
@@ -208,16 +210,46 @@ Agent(subagent_type="test-scout-agent", prompt="""
 ## State: .workflows/testing-pipeline/state.json
 ## Config: .claude/config/test-pipeline.yml
 
-Walk every test file in the project. For each test, determine which tracks
-(functional, api, ui) it belongs to. Populate the queues + tracks_required_per_test
-map in the state file. For queues larger than 1000 entries, emit a sidecar
-(.workflows/testing-pipeline/queue-{lane}.jsonl) and record the sidecar path
-in state.json instead.
+Walk every test file in the project. For each individual test (file::name)
+in the project, classify the lanes it belongs to (functional, api, ui).
+
+**v3.0.0 — emit a manifest.** Write `test-results/manifest.json` per the
+schema below. The manifest is the SINGLE SOURCE OF TRUTH for "what should
+run" — every downstream lane verdict and the JOIN reconciliation step
+read from this file.
+
+Manifest schema:
+{
+  "schema_version": "3.0.0",
+  "run_id": "<run_id>",
+  "scout_completed_at": "<iso>",
+  "tests": [
+    {
+      "test_id": "<file>::<name>",
+      "test_file": "<relative path>",
+      "test_name": "<test name>",
+      "lanes_required": ["functional"|"api"|"ui", ...],
+      "framework": "playwright|vitest|jest|pytest|...",
+      "classification_signals": ["imports:<lib>", "path:<dir>", ...],
+      "estimated_duration_ms": <int|null>
+    }
+  ],
+  "queue_counts_by_lane": {"functional": <n>, "api": <n>, "ui": <n>},
+  "overlap": {"functional_and_ui": <n>, "functional_and_api": <n>, "all_three": <n>}
+}
+
+Each unique test appears ONCE in `tests[]` regardless of lanes_required
+length. `queue_counts_by_lane` sums tests where lane is in lanes_required.
+
+Also populate `queues` + `tracks_required_per_test` in state.json (legacy
+fields kept for STEP 7 verify-affected logic). For queues > 1000 entries,
+emit a sidecar at .workflows/testing-pipeline/queue-{lane}.jsonl.
 
 Return a contract: {
   "gate": "PASSED|FAILED",
-  "test_count": <int>,
+  "test_count": <int — unique test_ids in manifest>,
   "queues": { "functional": <count>, "api": <count>, "ui": <count> },
+  "manifest_path": "test-results/manifest.json",
   "sidecars": [<paths>],
   "summary": "<one line>"
 }
@@ -228,14 +260,17 @@ After the contract returns:
 
 1. Merge the returned counts into `state.json`.
 2. Increment `dispatches_used` by 1.
-3. If `gate: FAILED`, abort pipeline with `BLOCKED` verdict; skip to STEP 9 with
+3. **Verify manifest exists.** If `test-results/manifest.json` is missing or
+   malformed → BLOCKED with `{"blocker": "MANIFEST_MISSING_OR_MALFORMED",
+   "remediation": "scout failed to emit a valid manifest — re-run /test-pipeline"}`.
+4. If `gate: FAILED`, abort pipeline with `BLOCKED` verdict; skip to STEP 9 with
    failure reason `SCOUT_FAILED`.
-3a. **Empty-suite early exit:** If `test_count == 0` (all queues empty) →
-    write `pipeline-verdict.json` with `{"result": "PASSED",
-    "reason": "NO_TESTS_IN_SUITE", "test_count": 0}`, emit PIPELINE_DONE event,
-    release the lock file, and exit cleanly. No Wave 1, Wave 2, or triage
-    fires. (A project with zero tests trivially passes the pipeline.)
-4. Decide Wave 1 topology using the classifier flag (Q4 decision):
+5. **Empty-suite early exit:** If `test_count == 0` (all queues empty) →
+   write `pipeline-verdict.json` with `{"result": "PASSED",
+   "reason": "NO_TESTS_IN_SUITE", "test_count": 0}`, emit PIPELINE_DONE event,
+   release the lock file, and exit cleanly. No Wave 1, Wave 2, or triage
+   fires. (A project with zero tests trivially passes the pipeline.)
+6. Decide Wave 1 topology using the classifier flag:
    - If `lanes.parallel_classifier.enabled: true` AND
      `test_count >= lanes.parallel_classifier.min_test_count`: **parallel Wave 1**.
    - Otherwise: **serial Wave 1** (functional fully, then api).
@@ -254,7 +289,13 @@ or override by setting stack=<runner> in test-pipeline.yml"}`.
 
 ---
 
-## STEP 3: WAVE 1 — Functional + API
+## STEP 3: WAVE 1 — Functional + API + UI (parallel runners)
+
+**v3.0.0 architecture change (M2):** UI is now an independent Wave 1 runner
+with its own dedicated `tester-agent` dispatch (`lane=ui`). UI tests RUN in
+Wave 1 and produce screenshots. STEP 4 (formerly the UI lane runner) is now
+exclusively a screenshot verification stage that operates on Wave 1's UI
+lane outputs.
 
 **Lane skip rule (REQ-M001 / v1 §3.3 NN-4):** If a lane's queue is empty,
 record a synthetic `SKIP` result in `test-results/{lane}.json` with
@@ -263,112 +304,154 @@ is checked per-lane BEFORE any dispatch.
 
 ### Parallel topology (default for >= min_test_count tests)
 
-Emit both `Agent()` calls in **one T0 assistant message** (this is how
-parallel dispatch actually works — see agent-orchestration.md §2 final rule):
+Emit all 3 lane `Agent()` calls in **one T0 assistant message** (this is
+how parallel dispatch actually works — see agent-orchestration.md §2):
 
 ```
 Agent(subagent_type="tester-agent", prompt="""
 ## Lane: functional
 ## Capture proof: <bool>
 ## Run ID: <run_id>
+## Manifest: test-results/manifest.json
 ## Queue: <queues.functional or sidecar path>
 ## Output: test-results/functional.json + functional.jsonl
 ## Screenshots: test-evidence/<run_id>/screenshots/
 ## Stack runner: <detected — pytest-dev | jest-dev | vitest-dev | fastapi-run-backend-tests | etc.>
 
-Run every test in the queue with --capture-proof=<bool>. Return lane contract:
-{"gate": "PASSED|FAILED", "summary": "<line>", "artifacts": {...}, "failures": [...]}
+You MUST execute EVERY test in the queue. Subsetting under wall-clock or
+any other pressure is FORBIDDEN — if you cannot complete the queue,
+return gate=FAILED with blocker=INCOMPLETE_QUEUE_EXECUTION and an
+explicit `unrun: [test_ids]` list. The orchestrator's JOIN reconciles
+your `executed[]` against the manifest and treats unexercised tests as
+verdict gaps.
+
+Return v3.0.0 lane contract: {
+  "gate": "PASSED|FAILED",
+  "lane": "functional",
+  "manifest_total": <int — count of manifest tests where lanes_required includes functional>,
+  "executed_count": <int — len of executed[]>,
+  "executed": [<test_ids actually run>],
+  "unexercised": [<test_ids in manifest you did NOT run>],
+  "passed": <int>,
+  "failed": <int>,
+  "skipped_by_test": <int — test.skip() invocations the runner saw>,
+  "summary": "<line>",
+  "artifacts": {...},
+  "failures": [...]
+}
 """)
 
 Agent(subagent_type="fastapi-api-tester-agent", prompt="""
 ## Lane: api
 ## Run ID: <run_id>
+## Manifest: test-results/manifest.json
 ## Queue: <queues.api>
 ## Output: test-results/api.json + api.jsonl
 
-Run API tests in the queue. If contract files are present, invoke
+Run EVERY API test in the queue. Same v3.0.0 contract as functional —
+`executed[]` + `unexercised[]` + manifest reconciliation fields are
+mandatory. If contract files are present, invoke
 Skill(\"/contract-test\", ...). Combined verdict per spec §3.2.
-Return lane contract.
+""")
+
+Agent(subagent_type="tester-agent", prompt="""
+## Lane: ui
+## Capture proof: true (mandatory for ui lane)
+## Run ID: <run_id>
+## Manifest: test-results/manifest.json
+## Queue: <queues.ui>
+## Output: test-results/ui.json + ui.jsonl
+## Screenshots: test-evidence/<run_id>/screenshots/
+
+Run EVERY UI test in the queue with capture-proof MANDATORY. Each test
+MUST produce a `.png` screenshot AND a `.aria.yaml` (Playwright only).
+The screenshot capture is the test verdict per testing.md UI authority
+rule. Same v3.0.0 contract — `executed[]` + `unexercised[]` mandatory.
+
+Note: tests classified as both `functional` AND `ui` (overlap, see
+manifest.overlap.functional_and_ui) run independently in BOTH lanes per
+v3.0.0 M2 architecture. This is intentional — functional verdict checks
+exit codes; UI verdict checks visual rendering. Same test, two verdicts.
 """)
 ```
 
 For non-FastAPI projects, the api-lane owner is `tester-agent` + stack-
-appropriate runner skill (`/contract-test` + `/integration-test`).
+appropriate runner skill (`/contract-test` + `/integration-test`) — same
+v3.0.0 contract.
 
 ### Serial topology (for small suites or classifier disabled)
 
-Dispatch functional first; wait for contract; then dispatch api. Same prompts.
+Dispatch functional first; wait for contract; then dispatch api; then ui.
+Same prompts.
 
-### After both lane contracts return
+### After all lane contracts return
 
-1. Read `test-results/functional.json` and `test-results/api.json`.
-2. **Contract completeness check (prevents partial-execution pass).** For each
-   lane that ran, assert `lane.summary.total == len(queues[lane])`. If the
-   tester's summary count is less than the scouted queue size, the worker
-   crashed mid-run or returned an incomplete contract. Transition
-   `step_status.WAVE1 = failed` with reason `PARTIAL_EXECUTION`, emit event
-   `WAVE1_PARTIAL_EXECUTION`, and treat the run as FAILED (do NOT proceed
-   to JOIN as if all tests ran).
-3. Merge lane gates into `state.json` → `step_status.WAVE1 = done`.
+1. Read `test-results/functional.json`, `api.json`, and `ui.json`.
+2. **Per-lane manifest-completeness gate (replaces v2 contract completeness check).**
+   For each lane that ran, assert `lane.executed_count + len(lane.unexercised)
+   == lane.manifest_total`. If a worker returned numbers that don't
+   add up, transition `step_status.WAVE1 = failed` with reason
+   `LANE_VERDICT_ARITHMETIC_INVALID` and abort to STEP 9.
+3. Merge lane gates into `state.json` → `step_status.WAVE1 = done`. Lanes
+   with non-empty `unexercised[]` are NOT failed at WAVE1; they propagate
+   to STEP 5 JOIN reconciliation which decides the final verdict.
 4. Increment `dispatches_used` by the number of `Agent()` calls issued.
-5. **Emit granular events** — `WAVE1_DISPATCH_FUNCTIONAL` and
-   `WAVE1_DISPATCH_API` at dispatch time (not just `WAVE1_DONE` at return).
-   Dispatch-start events capture `dispatched_at: <iso>` so timeouts and
-   stalls are observable from events.jsonl alone.
+5. **Emit granular events** — `WAVE1_DISPATCH_FUNCTIONAL`,
+   `WAVE1_DISPATCH_API`, `WAVE1_DISPATCH_UI` at dispatch time (not just
+   `WAVE1_DONE` at return). Dispatch-start events capture
+   `dispatched_at: <iso>` so timeouts and stalls are observable from
+   events.jsonl alone.
 
 ---
 
-## STEP 4: WAVE 2 — UI/Visual Lane
+## STEP 4: WAVE 2 — UI Visual Verification
 
-**Lane skip rule:** If `queues.ui` is empty, record a synthetic `SKIP` in
-`test-results/ui.json` and proceed to STEP 5 without dispatching.
+**v3.0.0 architecture change (M2):** Wave 2 is now exclusively visual
+verification of Wave 1 UI-lane screenshots. The UI tests themselves RAN in
+Wave 1 (STEP 3, lane=ui dispatch). Wave 2 reads the screenshots that
+Wave 1's ui lane produced and applies the dual-signal verdict matrix.
 
-### Checkpoint early-start (REQ-S006)
-
-**Flag-file ownership contract (NEW in v2.2.0):**
-- `test-results/functional.ui-tests-complete.flag` is written by **tester-agent**
-  when ALL UI-requiring tests in the functional lane have completed (even if
-  other non-UI functional tests are still running). The flag's content is
-  `{"written_at": "<iso>", "ui_tests_complete": <n>}` so freshness is checkable.
-- The flag file is **wiped by STEP 1 INIT** (step 4 cleanup) so stale flags
-  from prior runs cannot trigger a false early-start.
-- The flag path lives under `test-results/`, not `.workflows/`, so it's
-  ephemeral and run-scoped.
-
-If `lanes.ui.use_checkpoint: true` in `test-pipeline.yml`:
-
-1. While the functional lane is still running (STEP 3 in parallel topology),
-   T0 polls `test-results/functional.ui-tests-complete.flag` every 3 seconds
-   (max 30s wait).
-2. If the flag appears before Wave 1 fully returns AND the flag's `written_at`
-   is within the last 30 seconds (not stale): dispatch `visual-inspector-agent`
-   immediately (in parallel with the still-running functional lane's non-UI tests).
-3. Else: wait for Wave 1 to fully return, then dispatch.
-
-If `lanes.ui.use_checkpoint: false` (default): always wait for Wave 1 full return.
+**Skip rule:** If Wave 1 ui lane was SKIP (empty queue) or BLOCKED (no
+screenshots produced), STEP 4 records `test-results/ui-verification.json`
+with `{"result": "SKIP", "reason": "NO_UI_LANE_SCREENSHOTS"}` and proceeds
+to STEP 5. The JOIN reconciliation will already have flagged the underlying
+gap from manifest reconciliation — STEP 4 SKIP is informational only.
 
 **Single-signal confidence cap.** When screenshots are present but ARIA
 snapshots are absent (or vice-versa), `visual-inspector-agent` caps its
 per-test verdict confidence at MEDIUM per its NON-NEGOTIABLE #3
 ("single-signal cap"). For HIGH confidence, tester-agent must have captured
-BOTH `.png` and `.aria.yaml` (Playwright only — see tester-agent.md v2.2.0
+BOTH `.png` and `.aria.yaml` (Playwright only — see tester-agent.md
 Evidence Capture step). Non-Playwright UI frameworks cap at MEDIUM by design.
 
 ### Dispatch
 
 ```
 Agent(subagent_type="visual-inspector-agent", prompt="""
-## Lane: ui
+## Lane: ui-verification
 ## Run ID: <run_id>
-## Queue: <queues.ui>
+## Source lane output: test-results/ui.json + ui.jsonl (from Wave 1 ui lane)
 ## Screenshots: test-evidence/<run_id>/screenshots/
 ## Mode: <verify | update-baselines>
 ## Baselines: <path from test-pipeline.yml>
 
-Read screenshots from Wave 1 for the UI test subset. Dual-signal verdict
-per spec §3.2 (ARIA snapshot + screenshot AI diff). If mode=update-baselines,
-overwrite baselines without comparison. Return lane contract with
-{verdict_per_test: {...}, expected_changes: [...], first_run_artifacts: [...]}.
+Read the ui lane's executed[] from test-results/ui.json. For each test_id
+that produced a screenshot, apply dual-signal verdict (ARIA + screenshot
+AI diff) per spec §3.2. If mode=update-baselines, overwrite baselines
+without comparison.
+
+Return verification contract:
+{
+  "gate": "PASSED|FAILED",
+  "verified_count": <int>,
+  "verdict_per_test": {<test_id>: {"verdict": "PASS|FAIL", "confidence": "..."}},
+  "expected_changes": [...],
+  "first_run_artifacts": [...]
+}
+
+Note: this verification lane does NOT report `executed[]`/`unexercised[]`
+fields — that contract belongs to Wave 1 lanes which actually run tests.
+Verification operates only on screenshots Wave 1 ui lane produced.
 """)
 ```
 
@@ -377,30 +460,121 @@ operation; STEPS 6 and 7 are unconditionally skipped after this step.
 
 After contract returns:
 
-1. Read `test-results/ui.json` and update state.
+1. Read `test-results/ui-verification.json` and update state.
 2. Increment `dispatches_used`.
 3. If any `expected_changes` or `first_run_artifacts`, hold them for STEP 9.
 
 ---
 
-## STEP 5: JOIN + Per-Test Report
+## STEP 5: JOIN + Manifest Reconciliation + Per-Test Report
 
-1. **Compute per-test verdict.** For each test `t` in `tracks_required_per_test`:
-   `verdict(t) = AND(result(t) for each track in tracks_required[t])`.
-   A test required in functional AND ui must pass BOTH to be green.
-2. **Write `test-results/per-test-report.md`** with one section per failing test:
-   test id, lanes that ran, per-lane verdict, screenshot paths.
-3. **Write `test-results/pipeline-verdict.json`** skeleton:
-   ```json
-   { "schema_version": "2.0.0", "run_id": "<id>", "result": "PENDING",
-     "lanes": { ... }, "failures": [...], "triage": null, "commit": null }
-   ```
-4. Update state: `step_status.JOIN = done`. Compute `failures[]` list.
-5. If `failures[]` is empty AND `--update-baselines` is NOT set:
+**v3.0.0 — strict execution contract reconciliation.** JOIN owns the
+authoritative pass/fail decision by comparing the SCOUT manifest against
+each lane's `executed[]` and the per-lane JSONL streams.
+
+### 1. Reconciliation algorithm
+
+Read `test-results/manifest.json` and every `test-results/{lane}.json`
+plus `test-results/{lane}.jsonl`. Compute:
+
+```
+manifest_test_ids        = {t.test_id for t in manifest.tests}
+manifest_total_unique    = len(manifest_test_ids)
+
+per_lane = {}
+for lane in ("functional", "api", "ui"):
+    expected_in_lane     = {t.test_id for t in manifest.tests if lane in t.lanes_required}
+    executed_in_lane     = set(verdict[lane].executed)
+    jsonl_test_ids       = {row.test_id for row in lane.jsonl}
+    unexercised_in_lane  = expected_in_lane - executed_in_lane
+
+    # Ledger consistency: lane verdict's executed[] MUST equal lane's JSONL contents
+    if executed_in_lane != jsonl_test_ids:
+        emit LANE_LEDGER_MISMATCH event with the diff
+        treat lane as gate=FAILED with blocker=LANE_LEDGER_MISMATCH
+
+    per_lane[lane] = {
+        "manifest": len(expected_in_lane),
+        "executed": len(executed_in_lane),
+        "unexercised": len(unexercised_in_lane),
+        "unexercised_test_ids": sorted(unexercised_in_lane),
+    }
+
+# Cross-lane: a test_id is "exercised" if at least one of its required lanes ran it
+all_executed = union of executed_in_lane for every lane
+unexercised_total = manifest_test_ids - all_executed
+```
+
+### 2. Determine `result`
+
+```
+if any lane.gate == FAILED with blocker in {SCOUT_FAILED, LANE_LEDGER_MISMATCH,
+   LANE_VERDICT_ARITHMETIC_INVALID, MANIFEST_MISSING_OR_MALFORMED}:
+    result = BLOCKED
+elif any test failed in any lane (executed but result=fail):
+    result = FAILED
+elif unexercised_total > 0:
+    result = PASSED_WITH_GAPS
+else:
+    result = PASSED
+```
+
+### 3. Determine `ci_gate` (Q5 strict default — breaking change)
+
+```
+if result == PASSED:
+    ci_gate = PASSED
+elif result == PASSED_WITH_GAPS:
+    ci_gate = PASSED if --allow-gaps else FAILED
+elif result in (FAILED, BLOCKED):
+    ci_gate = FAILED
+```
+
+### 4. Write `test-results/pipeline-verdict.json` (v3.0.0 schema)
+
+```json
+{
+  "schema_version": "3.0.0",
+  "run_id": "<id>",
+  "result": "PASSED|PASSED_WITH_GAPS|FAILED|BLOCKED",
+  "ci_gate": "PASSED|FAILED",
+  "result_reasons": ["LANE_INCOMPLETE_EXECUTION:functional", ...],
+  "manifest_total_unique_tests": <int>,
+  "executed_unique_tests": <int>,
+  "unexercised_total": <int>,
+  "lane_summaries": {
+    "functional": {"manifest": N, "executed": M, "unexercised": K},
+    "api":        {"manifest": N, "executed": M, "unexercised": K},
+    "ui":         {"manifest": N, "executed": M, "unexercised": K}
+  },
+  "strict_mode": true,
+  "allow_gaps": <bool>,
+  "failures": [...],
+  "triage": null,
+  "commit": null
+}
+```
+
+### 5. Per-test report
+
+Write `test-results/per-test-report.md` with sections for:
+- Failing tests (test_id, lanes that ran, per-lane verdict, screenshot paths)
+- Unexercised tests (test_id, lanes_required, why-not-run if known)
+- Lane-level summaries
+
+### 6. Routing
+
+1. Update state: `step_status.JOIN = done`. Compute `failures[]` list.
+2. If `result == BLOCKED`: jump to STEP 9 immediately (no triage useful).
+3. If `result == PASSED` AND `--update-baselines` is NOT set:
    jump to STEP 8 (or STEP 9 if `--full-suite-before-success` is off).
-6. If `--skip-fix` is set: jump to STEP 9 (report only, no triage).
-7. If `--update-baselines` is set: jump to STEP 9 (baseline-update complete).
-8. Otherwise: proceed to STEP 6 triage.
+4. If `result == PASSED_WITH_GAPS`: emit `JOIN_PASSED_WITH_GAPS` event.
+   Behavior depends on flags:
+   - `--allow-gaps` set → treat as PASSED for routing (jump to STEP 8/9)
+   - default (strict) → fall through to triage path; gaps become FAILED
+5. If `--skip-fix` is set: jump to STEP 9 (report only, no triage).
+6. If `--update-baselines` is set: jump to STEP 9 (baseline-update complete).
+7. Otherwise (FAILED OR strict-mode PASSED_WITH_GAPS): proceed to STEP 6 triage.
 
 ---
 
@@ -715,9 +889,22 @@ See **`references/dispatch-reference.md`** (loaded on-demand).
 - MUST reject mutually-exclusive flag combos before any state is touched:
   `--skip-fix` + `--update-baselines` and `--fix-pr-mode` + `--update-baselines`
   are invalid. BLOCKED with `INVALID_FLAG_COMBO` + specific flags named.
-- MUST treat partial-execution as FAILED in STEP 3 Wave 1: if any lane's
-  `summary.total < len(queues[lane])`, the worker crashed mid-run and its
-  contract is incomplete. Do NOT proceed to JOIN as if all tests ran.
+- MUST verify every lane's v3.0.0 contract arithmetic in STEP 3 Wave 1:
+  `executed_count + len(unexercised) == manifest_total` per lane. If a worker
+  returned numbers that don't add up, transition to BLOCKED with
+  `LANE_VERDICT_ARITHMETIC_INVALID` and abort to STEP 9.
+- MUST reconcile every lane's `executed[]` against `manifest.json` in STEP 5
+  JOIN (v3.0.0 strict execution contract). Tests in `manifest.tests` whose
+  `lanes_required` includes lane L but who are NOT in lane L's `executed[]`
+  are recorded as `unexercised` in JOIN's reconciliation. Any non-zero
+  `unexercised_total` produces `result: PASSED_WITH_GAPS` (downgraded to
+  `ci_gate: FAILED` unless `--allow-gaps` is set). The pre-v3.0.0
+  partial-execution gate is replaced by this reconciliation.
+- MUST reject manifest-vs-JSONL ledger mismatch as BLOCKED in STEP 5: if
+  any lane's `executed[]` set is not equal to the `test_id` set parsed
+  from `{lane}.jsonl`, emit `LANE_LEDGER_MISMATCH` and BLOCK the pipeline.
+  Lane verdict and per-test JSONL must agree by construction; disagreement
+  is a worker bug.
 - MUST pre-check budget BEFORE chunk dispatch using `dispatches_used + chunk_size`,
   not just `dispatches_used`. The simple post-check would allow one chunk
   past the cap.
