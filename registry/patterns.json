@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.0.0",
-    "last_updated": "2026-04-25",
-    "total_patterns": 238
+    "last_updated": "2026-04-26",
+    "total_patterns": 236
   },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
@@ -3413,36 +3413,6 @@
     "changelog": "v1.0.0: Initial creation",
     "tier": "nice-to-have"
   },
-  "scan-repo": {
-    "hash": "91b7fe12112e9797692004616c296206dc7be24800be67ffeeed6c9bf992bad1",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
-  },
-  "scan-url": {
-    "hash": "57539122dce387cf4b856d558eb02cb1190712adeabef6bee34abd0bae615e8f",
-    "type": "skill",
-    "category": "core",
-    "version": "2.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-10",
-    "last_updated": "2026-03-10",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "",
-    "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
-  },
   "schema-designer": {
     "hash": "9c1d65b7a56face0d0d8b39ff3d5f86b5033851f0ce20250c3689013d3b1eb0d",
     "type": "skill",
@@ -4278,10 +4248,10 @@
     "tier": "nice-to-have"
   },
   "update-practices": {
-    "hash": "f334a18c8affc47902226fe0012c68412aed6c763214a3c38162abec251df434",
+    "hash": "83fd93613050c9fb10ec89c8ef8c97f55e507a09e04a10e44acf0a5c2a9fecd0",
     "type": "skill",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-04-25",

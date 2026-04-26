@@ -8,7 +8,7 @@ description: >
   Use when your local patterns are outdated or after hub registry changes.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--check-only] [--force]"
-version: "1.2.0"
+version: "1.2.1"
 type: workflow
 ---
 
@@ -110,7 +110,7 @@ the STEP 6 summary table:
 
 ```
 ================================================================
-⚠  RESTART REQUIRED — NEW AGENTS SYNCED THIS SESSION
+[!] RESTART REQUIRED — NEW AGENTS SYNCED THIS SESSION
 ================================================================
 The following agent files were newly added under .claude/agents/:
   - <agent-1>.md
@@ -140,6 +140,20 @@ sync-manifest.json. The user just needs to restart before running any
 pipeline that dispatches the new agents. Updated existing agents
 (`agents_updated[]`) generally do NOT require restart and are NOT
 included in this banner.
+
+**Banner is best-effort, probe gate is authoritative.** This banner only
+fires when /update-practices itself adds new agent files in the current
+session. It does NOT fire when:
+- Agents are added by other means (manual curl, prior session sync that
+  was committed, /synthesize-project, etc.)
+- /update-practices runs a second time in the same session and finds the
+  agents already on disk (idempotent — `agents_added[]` is empty)
+
+The authoritative runtime-dispatchability check is /test-pipeline STEP 1
+sub-step 2b WORKER_REGISTRY_PROBE, which probes the runtime registry
+directly and BLOCKs with `WORKER_REGISTRY_NOT_LOADED` if any required
+agent is missing — regardless of how the agent file got onto disk. Skills
+that dispatch agents MUST rely on the probe gate, not on banner presence.
 
 ## STEP 6: Report
 

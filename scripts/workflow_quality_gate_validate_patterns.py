@@ -1023,6 +1023,44 @@ def validate_registry_tiers(registry_path: Path | None = None) -> list[str]:
     return errors
 
 
+def validate_registry_files_exist(registry_path: Path | None = None) -> list[str]:
+    """Validate that every non-_meta registry entry has its file on disk.
+
+    Prevents the drift surfaced by FIREKaro-Vue 2026-04-26: registry listed
+    scan-repo + scan-url at v2.0.0 but the directories were dropped in the
+    March 10 restructure (commit 94b47cc) without registry cleanup. Downstream
+    /update-practices syncs hit 404s.
+    """
+    if registry_path is None:
+        registry_path = REGISTRY_PATH
+    errors = []
+    if not registry_path.exists():
+        return errors
+
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    type_to_path = {
+        "skill": lambda n: ROOT / "core" / ".claude" / "skills" / n / "SKILL.md",
+        "agent": lambda n: ROOT / "core" / ".claude" / "agents" / f"{n}.md",
+        "rule":  lambda n: ROOT / "core" / ".claude" / "rules" / f"{n}.md",
+    }
+
+    for name, entry in registry.items():
+        if name == "_meta" or not isinstance(entry, dict):
+            continue
+        ptype = entry.get("type")
+        resolver = type_to_path.get(ptype)
+        if resolver is None:
+            continue
+        target = resolver(name)
+        if not target.exists():
+            errors.append(
+                f"{name}: registry lists {ptype} but file missing on disk: "
+                f"{target.relative_to(ROOT)}. Either restore the file or "
+                f"remove the registry entry."
+            )
+    return errors
+
+
 def validate_third_party_registry() -> list[str]:
     """Validate config/third-party-skills.yml if it exists."""
     import importlib.util
@@ -1088,6 +1126,9 @@ def validate_all() -> list[str]:
 
     # Registry tier SSOT validation
     all_errors.extend(validate_registry_tiers())
+
+    # Registry file-existence validation
+    all_errors.extend(validate_registry_files_exist())
 
     # Third-party skills registry validation
     all_errors.extend(validate_third_party_registry())
