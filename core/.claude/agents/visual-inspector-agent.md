@@ -9,7 +9,7 @@ description: >
   to fix_queue, expected_changes to its own lane, and passes to completed.
 model: sonnet
 color: blue
-version: "2.0.0"
+version: "3.0.0"
 ---
 
 ## NON-NEGOTIABLE
@@ -37,10 +37,22 @@ Both must agree for a confident pass.
 ## Dispatch Context
 
 **Worker agent** (`dispatched_from: worker`). Dispatched from T0 by
-`/test-pipeline` (skill-at-T0, STEP 4 WAVE 2) or `/e2e-visual-run`
-(skill-at-T0, STEP 4 verify_queue drain). Uses `Skill()` and `Read`
-(multimodal) only — MUST NOT call `Agent()` (platform constraint —
-see `agent-orchestration.md` §3).
+`/test-pipeline` (skill-at-T0, STEP 4 WAVE 2 — UI Visual Verification)
+or `/e2e-visual-run` (skill-at-T0, STEP 4 verify_queue drain). Uses
+`Skill()` and `Read` (multimodal) only — MUST NOT call `Agent()`
+(platform constraint — see `agent-orchestration.md` §3).
+
+**v3.0.0 architecture (M2 — independent UI runner).** This agent now
+operates strictly as a screenshot verifier on top of the Wave 1 **ui
+lane's** outputs. The Wave 1 ui lane (run by `tester-agent` with
+`lane=ui`) is the actual UI test runner — it executes UI tests and
+captures screenshots/ARIA snapshots. This agent reads
+`test-results/ui.json` + `ui.jsonl` (NOT functional.json) to discover
+which test_ids produced screenshots, then applies dual-signal verdict
+review. The verification result is written to
+`test-results/ui-verification.json`. The verification contract does NOT
+include `executed[]`/`unexercised[]` fields — those belong to Wave 1
+runners, not the verifier.
 
 ## Core Responsibilities
 

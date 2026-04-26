@@ -4058,10 +4058,10 @@
     "tier": "nice-to-have"
   },
   "test-pipeline": {
-    "hash": "608a427aac9d180e520aa9e950e7b13389b7707b83c3cee325a56eca69bce37b",
+    "hash": "303a287f590eb8561cc4011a194dc0913ebde90c5cd1442f3fce43d5b60868eb",
     "type": "skill",
     "category": "core",
-    "version": "2.3.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-04-25",
@@ -4118,10 +4118,10 @@
     "tier": "must-have"
   },
   "tester-agent": {
-    "hash": "cc6ff9b8b6cf3b7a1ca7c208331bfec00855ed33ae40553b1141132caa97ce11",
+    "hash": "efb0fa4bfad66f3043910155adf2d7e170c7c7e63f272e06c73f1d40e3e79571",
     "type": "agent",
     "category": "core",
-    "version": "2.2.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-04-24",
@@ -4282,10 +4282,10 @@
     "tier": "must-have"
   },
   "visual-inspector-agent": {
-    "hash": "88ece3c2ae2ee485c46af84e34736aa48b4a62f068f07f1e10a86eea1d2040dc",
+    "hash": "db8d9a819cb09692ce07980bb6547aacc3e850cf5de8089bce4029f581ccafe2",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
     "last_updated": "2026-04-24",
