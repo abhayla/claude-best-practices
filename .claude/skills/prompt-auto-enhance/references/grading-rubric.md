@@ -73,9 +73,13 @@ Is there a persona or domain frame that shapes the response?
 | 7-8   | Specific role with expertise area | "As a security-focused code reviewer, review this auth module" |
 | 9-10  | Explicit role with expertise, perspective, and failure modes | "As a security auditor focused on OWASP Top 10, review this auth module — flag injection, broken auth, and data exposure" |
 
-Note: For coding prompts where the model already has an implicit developer role,
-scores of 3-4 are acceptable and do not warrant strengthening unless the task
-requires specialized domain expertise.
+**Policy: never skip MISSING_ROLE.** When Role scores below 7, always add an
+explicit role frame appropriate to the task class — see SKILL.md "Role
+Selection Guide" for the task-class → role mapping. This replaces the
+prior 1-5 era carve-out that allowed scores of 3-4 to pass for code
+tasks; on the 1-10 scale, anything below 7 leaves measurable lift on the
+table, regardless of domain. The implicit "AI assistant" role is the
+weakest possible default — every prompt benefits from a sharper frame.
 
 ### 6. Example Grounding (Weight: 0.10)
 
@@ -90,8 +94,10 @@ Are input/output examples provided for complex tasks?
 | 9-10  | 3+ diverse examples covering edge cases | Multiple examples including happy path, error case, and edge case |
 
 Note: Simple, unambiguous tasks (rename, delete, run tests) do not need
-examples. Score 1-2 on this dimension is acceptable when the task is
-self-explanatory.
+examples. Scoring 5-6 on this dimension (the 1-10 equivalent of the prior
+1-5 era's "1-2 acceptable") is fine when the task is self-explanatory.
+Examples remain Low severity — only fixed if budget remains after
+Critical/High/Medium fills the 5-cap.
 
 ### 7. Tone Consistency (Conditional Weight)
 

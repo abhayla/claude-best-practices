@@ -19,7 +19,7 @@ triggers:
 allowed-tools: "Read Grep Glob Skill Agent"
 argument-hint: "[prompt text to enhance or 'score' to evaluate reliability]"
 type: workflow
-version: "3.0.1"
+version: "3.0.2"
 ---
 
 # Prompt Auto-Enhance — Strengthening, Step Transcript, Final Preview, Resource CRUD
@@ -118,7 +118,7 @@ weakness found — a prompt may have multiple.
 | **AMBIGUOUS_SCOPE** | Medium | Unclear which files, modules, or layers are in scope | Add explicit scope boundaries ("only in src/api/", "just the tests") |
 | **IMPLICIT_ASSUMPTIONS** | Low | Prompt relies on assumptions that may not hold (env setup, dependencies, prior steps) | Make assumptions explicit or add verification steps |
 | **MISSING_STRUCTURE** | Low | Multi-part prompt uses flat unstructured text where XML tags would improve clarity | Restructure with XML tags (see XML Tag Reference below) |
-| **MISSING_ROLE** | Low | No persona or domain frame | Add role with expertise and perspective |
+| **MISSING_ROLE** | Medium | No explicit persona or domain frame (Role dim < 7) | Always add a task-class-appropriate role using the "Role Selection Guide" below — never skip |
 | **MISSING_EXAMPLES** | Low | No input/output examples for complex tasks | Add 2-3 diverse examples in `<examples>` tags |
 | **MISSING_TONE_FRAME** | Medium (Tone-active prompts only) | No voice, register, or audience guidance for prose output | Add tone spec: register (formal/casual), audience, length bounds, voice attributes |
 
@@ -130,6 +130,69 @@ weakness found — a prompt may have multiple.
 | High | Included up to the max changes cap |
 | Medium | Included up to the max changes cap |
 | Low | Included only if budget remains |
+
+#### Role Selection Guide
+
+**Policy: never skip MISSING_ROLE.** When Role dim < 7, always add a
+task-class-appropriate role to the strengthened prompt. Position the
+role as the first line, before context. Use the imperative form
+(`Act as a …`) — Anthropic's prompting docs document this as the
+strongest persona pattern for Claude 4.x.
+
+Detect the task class from the prompt's main verb + nearest object,
+then pick the role from the table. If no row matches, fall back to
+the **template** at the bottom.
+
+| Task class | Detection signals | Default role |
+|---|---|---|
+| **Mechanical execution** | rename, move, run, delete, format, list (no specialty) | "Act as a careful engineer who executes mechanical changes without scope creep — no refactors, no comments, no surrounding cleanup." |
+| **Standard implementation** | implement, add, fix, update (clear scope, no specialty) | "Act as a senior software engineer who writes simple, idiomatic code in the surrounding style and avoids speculative abstraction." |
+| **Information retrieval** | what is, explain, describe, where is, how does | "Act as a senior engineer who explains code precisely, citing specific files and line numbers as evidence." |
+| **Specialized analysis — security** | review, audit, evaluate + (auth / token / session / SQL injection / XSS / OWASP / threat) | "Act as a security auditor focused on OWASP Top 10 — flag injection, broken auth, broken access control, and sensitive data exposure with specific code references." |
+| **Specialized analysis — perf** | review, audit, profile + (latency / p95 / p99 / slow / bottleneck / N+1 / cache) | "Act as a performance engineer specializing in p95/p99 latency analysis — identify N+1 queries, cache misses, allocation hot paths, and serialization overhead with measurements." |
+| **Specialized analysis — accessibility** | review, audit + (a11y / accessibility / WCAG / aria / contrast / screen reader / keyboard) | "Act as an accessibility auditor working from WCAG 2.2 AA — flag color contrast failures, keyboard nav gaps, ARIA misuse, and screen-reader hazards with line-level fixes." |
+| **Specialized synthesis — system design** | design, architect + (system / service / pipeline / scale / distributed) | "Act as a staff engineer designing for the stated scale and failure modes. Call out trade-offs, rejected alternatives, and the failure cases your design does NOT handle." |
+| **Specialized synthesis — API design** | design, define + (API / endpoint / schema / contract / interface) | "Act as an API designer optimizing for backwards compatibility, naming consistency, and a clean error surface. Surface every breaking change risk explicitly." |
+| **Specialized synthesis — data modeling** | design, model + (schema / table / DB / migration / index) | "Act as a database engineer who optimizes schemas for the stated query pattern, write throughput, and migration safety. Call out N+1 and lock contention risks up front." |
+| **Tone-sensitive — onboarding/UX** | write, draft + (onboarding / welcome / first-time / activation) | "Act as a B2B onboarding copywriter who writes for first-time non-technical users — warm + professional, second-person, no jargon, scannable structure." |
+| **Tone-sensitive — error/UX strings** | write, draft + (error / warning / banner / toast / empty state) | "Act as a UX writer specializing in error messages — clear about what went wrong, actionable about what to do next, never blames the user, max 1 sentence." |
+| **Tone-sensitive — marketing copy** | write, draft + (landing / hero / pitch / launch / announcement) | "Act as a B2B marketing copywriter focused on benefit-led messaging that respects technical readers' intelligence — no hype, no buzzwords." |
+| **Tone-sensitive — developer docs** | write, draft + (docs / README / guide / how-to / tutorial) | "Act as a technical writer specializing in developer documentation — accuracy first, scannable structure, copy-pasteable examples, every claim verified against current code." |
+| **Advisory / decision support** | should we, recommend, compare, trade-off, evaluate options | "Act as a senior engineer who gives opinionated, source-cited recommendations grounded in stated constraints. Name a default position with reasoning, not a multiple-choice menu." |
+| **Translation / adaptation** | rewrite for X audience, port from Y to Z, simplify, expand | "Act as a translator who preserves the source's intent and structure while replacing tone/idiom for the target audience. Flag every place where literal translation breaks meaning." |
+| **Bug investigation** | debug, why is, what's wrong, find root cause | "Act as a root-cause debugger who reproduces before hypothesizing — isolate the failure, gather evidence, name the smallest hypothesis that explains all observed symptoms." |
+
+**Template for novel task classes:**
+
+If no row matches, synthesize a role using this skeleton:
+
+```
+Act as a <senior|specialized> <profession> who <does the task verb> with
+attention to <1-2 specific failure modes>.
+```
+
+Worked example: prompt is "design the feature flag schema for a global
+rollout" — no exact row match, but it's a synthesis task with data
+modeling + reliability concerns. Synthesized role:
+
+```
+Act as a feature-flag platform engineer who designs schemas for global
+rollouts with attention to staleness, cache invalidation, and the
+delete-flag lifecycle.
+```
+
+**Rules for role selection:**
+
+- Always **one role**, not a list of options.
+- Always **task-class appropriate** — generic "AI assistant" framing
+  is never the answer when Role < 7.
+- Position the role as the **first line** of the strengthened prompt,
+  before context.
+- If the user's prompt already names a domain or seniority (e.g.,
+  "as a senior dev…"), preserve their wording and only add what's
+  missing (concerns, focus area).
+- If the user's prompt explicitly contradicts a default role (e.g.,
+  "be casual" against a formal-default class), the user wins.
 
 #### XML Tag Reference
 
