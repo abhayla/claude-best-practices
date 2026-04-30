@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-26 13:45 UTC (auto-generated)
+> Last updated: 2026-04-30 13:01 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 236 |
-| Core (universal) | 231 |
+| Total Patterns | 237 |
+| Core (universal) | 232 |
 | Stack-specific | 5 |
 | Agents | 39 |
 | Configs | 2 |
 | Hooks | 9 |
 | Rules | 29 |
-| Skills | 157 |
+| Skills | 158 |
 
 ## Pattern Inventory
 
@@ -51,7 +51,7 @@
 | changelog-contributing | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | chaos-resilience | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ci-cd-setup | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| claude-behavior | rule | 1.2.0 | hub:abhayla/claude-best-practices | — |
+| claude-behavior | rule | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | code-quality-gate | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-readability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -115,6 +115,7 @@
 | firebase-data-connect | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | firebase-dev | skill | 1.0.2 | hub:abhayla/claude-best-practices | — |
 | firebase-test | skill | 1.1.1 | hub:abhayla/claude-best-practices | — |
+| five-advisors | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | fix-issue | skill | 2.6.0 | hub:abhayla/claude-best-practices | fix-loop, post-fix-pipeline |
 | fix-loop | skill | 1.4.0 | hub:abhayla/claude-best-practices | test-failure-analyzer-agent |
 | flutter | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -169,9 +170,9 @@
 | prisma-orm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | project-manager-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | agent-orchestration |
 | project-scaffold | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup |
-| prompt-auto-enhance | skill | 2.0.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
-| prompt-auto-enhance-rule | rule | 2.0.0 | hub:abhayla/claude-best-practices | prompt-auto-enhance |
-| prompt-enhance-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| prompt-auto-enhance | skill | 3.2.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
+| prompt-auto-enhance-rule | rule | 3.0.0 | hub:abhayla/claude-best-practices | prompt-auto-enhance |
+| prompt-enhance-reminder | hook | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | prompt-logger | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pytest-dev | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | quality-gate-evaluator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
