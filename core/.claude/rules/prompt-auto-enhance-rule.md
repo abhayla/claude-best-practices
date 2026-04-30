@@ -2,12 +2,16 @@
 
 # Prompt Auto-Enhance
 
-Every response MUST start with `*Enhanced: <what was checked>*` (under 15 words).
+Every response starts with `*Enhanced: <what was checked>*` (under 15 words).
 Examples: *Enhanced: prompt graded (B, 2 fixes), git state, 3 rules*
 
-## Tier 1 — Always (every prompt)
+The hook (`prompt-enhance-reminder.sh`) gates triggering: prompts ≤15 chars
+and known continuation phrases skip injection at the deterministic layer,
+so the strengthening pipeline only runs on substantive prompts.
 
-1. Existing `.claude/` patterns — know what exists, MUST NOT duplicate
+## Tier 1 — Always (every prompt that reaches this rule)
+
+1. Existing `.claude/` patterns — know what exists, do not duplicate
 2. CLAUDE.md — already loaded, reference it
 3. Git state — branch, recent commits, uncommitted changes
 
@@ -18,25 +22,67 @@ Examples: *Enhanced: prompt graded (B, 2 fixes), git state, 3 rules*
 
 ## Prompt Grading & Strengthening
 
-For **non-trivial prompts** (ambiguous, multi-file, or multi-step):
-run the Grade → Diagnose → Fix pipeline from `/prompt-auto-enhance`.
-Skip for direct instructions, single-file changes, and pure knowledge questions.
+For non-trivial prompts (anything that reaches this skill — i.e., the hook
+did not filter it out), run the Grade → Diagnose → Fix pipeline from
+`/prompt-auto-enhance`. Skip strengthening only for Grade A or pure
+knowledge questions; the pipeline still produces the step transcript and
+final prompt preview in those cases.
 
-## Clarification Gate — Ask Before Acting
+After strengthening, render every time:
+- The grade card + before/after comparison (Step 4)
+- The pipeline step transcript (Step 4.5)
+- The final strengthened prompt that will execute (Step 4.6)
 
-Trigger when: prompt is vague/broad, key decisions unresolvable from code, or task touches 3+ files without specified approach.
-Skip when: direct unambiguous instruction, answer resolvable from Tier 1/2, pure knowledge question, or strengthening already resolved the ambiguity.
-How: one question at a time with count ("Question 2 of ~4") and recommendation. Read code before asking — MUST NOT ask what you can answer yourself. 3-5 questions max. Present plan section by section.
+The final prompt is shown for transparency, not approval — execution
+proceeds in the same response.
+
+## Clarification Gate — Ask Until Confident
+
+**Trigger:** the prompt is > 15 characters (the only floor — handled
+deterministically by the hook). Every prompt that reaches this skill is
+evaluated for residual ambiguity after strengthening.
+
+**Question budget:** no upper limit. Ask one question at a time and keep
+asking until you have full confidence in the user's intent. Stop when
+confidence is reached, not when a question count is hit.
+
+**How:** one question per turn with a count and a recommendation. Read
+the codebase before asking — do not ask what you can answer yourself.
+Each question must be unanswerable from Tier 1/2 context.
+
+**Sequencing:**
+1. Strengthening runs first (Steps 0-3)
+2. Grade card (Step 4)
+3. Clarification Gate runs here, if ambiguity remains
+4. Step transcript (Step 4.5) and final prompt preview (Step 4.6) reflect
+   the resolved intent
+5. Execution (Step 5)
 
 ## Resource CRUD Detection
 
-If prompt implies creating/updating/deleting a Claude Code resource,
+If the prompt implies creating/updating/deleting a Claude Code resource,
 follow the batch approval flow in `/prompt-auto-enhance`.
 
-## CRITICAL RULES
+## Pipeline Rules
 
-- NEVER skip the `*Enhanced:*` indicator
-- NEVER skip Tier 1 context gathering
-- NEVER skip the Clarification Gate for ambiguous prompts
-- NEVER create/update/delete resources without batch approval
-- NEVER ask questions answerable by reading the codebase
+These are the load-bearing contracts:
+
+- The `*Enhanced:*` indicator is on every response that reaches this rule
+- Tier 1 context is gathered before responding
+- Strengthening runs for any non-trivial prompt that the hook did not filter
+- The grade card, step transcript, and final prompt preview are shown for
+  every non-trivial prompt — even Grade A
+- The Clarification Gate runs until confidence is reached, not until a
+  question count is hit
+- Resource CRUD requires the batch approval table — no creates / updates
+  / deletes happen without explicit user approval
+- Code is read before asking a clarification question
+- Optional one-line skill hint at the end of STEP 4.6 in
+  `/prompt-auto-enhance`: when the strengthened prompt clearly fits a
+  workflow other than direct execution, append ONE italic line naming up
+  to 2 relevant skills, with a quoted fragment from the user's prompt for
+  each. Informational only — never gating, never numbered, never
+  selectable. The auto-enhance skill's job is **prompt enhancement, not
+  execution routing.** Skip the hint entirely on direct, mechanical,
+  bug-fix, factual-lookup, and documentation prompts, and on prompts that
+  already name a skill explicitly.

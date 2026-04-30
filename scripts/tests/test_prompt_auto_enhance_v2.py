@@ -25,6 +25,10 @@ HUB_RULE_PATH = HUB_CLAUDE / "rules" / "prompt-auto-enhance.md"
 HOOK_PATH = CORE_CLAUDE / "hooks" / "prompt-enhance-reminder.sh"
 HUB_HOOK_PATH = HUB_CLAUDE / "hooks" / "prompt-enhance-reminder.sh"
 REGISTRY_PATH = ROOT / "registry" / "patterns.json"
+HUB_SKILL_PATH = HUB_CLAUDE / "skills" / "prompt-auto-enhance" / "SKILL.md"
+HUB_RUBRIC_PATH = HUB_CLAUDE / "skills" / "prompt-auto-enhance" / "references" / "grading-rubric.md"
+RELIABILITY_PATH = CORE_CLAUDE / "skills" / "prompt-auto-enhance" / "references" / "prompt-reliability-scoring.md"
+HUB_RELIABILITY_PATH = HUB_CLAUDE / "skills" / "prompt-auto-enhance" / "references" / "prompt-reliability-scoring.md"
 
 
 def _read(path: Path) -> str:
@@ -67,14 +71,13 @@ class TestGradingRubric:
         assert missing == [], f"Rubric missing dimensions: {missing}"
 
     def test_rubric_has_scoring_anchors_for_all_levels(self):
-        """Each dimension must have anchors for scores 1 through 5."""
+        """v3.x rubric uses 1-10 scale with range anchors (1-2, 3-4, 5-6, 7-8, 9-10)."""
         if not RUBRIC_PATH.exists():
             pytest.skip("rubric file not yet created")
         content = _read(RUBRIC_PATH)
-        for level in range(1, 6):
-            assert f"| {level}" in content or f"|{level}" in content, (
-                f"Rubric missing scoring anchor for level {level}"
-            )
+        ranges = ["1-2", "3-4", "5-6", "7-8", "9-10"]
+        missing = [r for r in ranges if f"| {r}" not in content and f"|{r}" not in content]
+        assert missing == [], f"Rubric missing scoring anchor for ranges: {missing}"
 
     def test_rubric_has_weights(self):
         if not RUBRIC_PATH.exists():
@@ -165,10 +168,10 @@ class TestSkillV2Structure:
             "SKILL.md must have Category C weakening language (output-side)"
         )
 
-    def test_skill_version_is_2_0_0(self):
+    def test_skill_version_is_3_2_0(self):
         content = _read(SKILL_PATH)
-        assert 'version: "2.0.0"' in content, (
-            "SKILL.md version must be 2.0.0"
+        assert 'version: "3.2.0"' in content, (
+            "SKILL.md version must be 3.2.0"
         )
 
     def test_skill_references_grading_rubric(self):
@@ -198,11 +201,11 @@ class TestSkillV2Structure:
 class TestLeanRule:
     """Rule must be slim (~40 lines) with no duplicated skill content."""
 
-    def test_rule_line_count_under_50(self):
+    def test_rule_line_count_under_100(self):
         content = _read(RULE_PATH)
         line_count = len(content.strip().splitlines())
-        assert line_count <= 50, (
-            f"Rule has {line_count} lines — must be <= 50 (target ~40). "
+        assert line_count <= 100, (
+            f"Rule has {line_count} lines — must be <= 100 (target ~90 for v3.x). "
             "Move procedural content to the skill."
         )
 
@@ -263,11 +266,10 @@ class TestLeanRule:
             "core rule (core/.claude/rules/prompt-auto-enhance-rule.md)"
         )
 
-    def test_rule_version_is_2_0_0(self):
+    def test_rule_version_is_3_0_0(self):
         content = _read(RULE_PATH)
-        # Rule may not have version in frontmatter, check if present
         if "version:" in content:
-            assert "2.0.0" in content, "Rule version must be 2.0.0"
+            assert "3.0.0" in content, "Rule version must be 3.0.0"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -309,6 +311,53 @@ class TestHookGradingTrigger:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+#  4b. SKILL + REFERENCES HUB↔CORE PARITY (added 2026-04-30 — closes drift gap)
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+class TestSkillHubCoreParity:
+    """Hub-private SKILL.md and references/ MUST match the distributable core copies.
+
+    Without these tests, an author can update hub-private content (which the hub
+    repo itself uses) and forget to promote the same content to core/ (which is
+    what downstream projects receive via recommend.py / sync_to_projects.py /
+    /update-practices). This pattern of drift was the root cause of the v3.x
+    updates not reaching FIREKaro-Vue between 5a6ecff and 2026-04-30.
+    """
+
+    def test_skill_hub_copy_matches_core(self):
+        if not HUB_SKILL_PATH.exists():
+            pytest.skip("hub skill copy not found")
+        core_content = _read(SKILL_PATH)
+        hub_content = _read(HUB_SKILL_PATH)
+        assert core_content == hub_content, (
+            "Hub SKILL.md (.claude/skills/prompt-auto-enhance/SKILL.md) must match "
+            "core SKILL.md (core/.claude/skills/prompt-auto-enhance/SKILL.md). "
+            "If you updated one, sync the other."
+        )
+
+    def test_grading_rubric_hub_copy_matches_core(self):
+        if not HUB_RUBRIC_PATH.exists():
+            pytest.skip("hub rubric copy not found")
+        core_content = _read(RUBRIC_PATH)
+        hub_content = _read(HUB_RUBRIC_PATH)
+        assert core_content == hub_content, (
+            "Hub grading-rubric.md must match core grading-rubric.md"
+        )
+
+    def test_reliability_scoring_hub_copy_matches_core(self):
+        if not HUB_RELIABILITY_PATH.exists():
+            pytest.skip("hub reliability scoring copy not found")
+        if not RELIABILITY_PATH.exists():
+            pytest.skip("core reliability scoring copy not found")
+        core_content = _read(RELIABILITY_PATH)
+        hub_content = _read(HUB_RELIABILITY_PATH)
+        assert core_content == hub_content, (
+            "Hub prompt-reliability-scoring.md must match core copy"
+        )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 #  5. REGISTRY VERSION SYNC
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -316,20 +365,20 @@ class TestHookGradingTrigger:
 class TestRegistryVersionSync:
     """Registry versions must be bumped to 2.0.0 for both skill and rule."""
 
-    def test_skill_registry_version_is_2_0_0(self):
+    def test_skill_registry_version_is_3_2_0(self):
         reg = _load_registry()
         entry = reg.get("prompt-auto-enhance", {})
-        assert entry.get("version") == "2.0.0", (
+        assert entry.get("version") == "3.2.0", (
             f"Registry 'prompt-auto-enhance' version is {entry.get('version')}, "
-            "must be 2.0.0"
+            "must be 3.2.0"
         )
 
-    def test_rule_registry_version_is_2_0_0(self):
+    def test_rule_registry_version_is_3_0_0(self):
         reg = _load_registry()
         entry = reg.get("prompt-auto-enhance-rule", {})
-        assert entry.get("version") == "2.0.0", (
+        assert entry.get("version") == "3.0.0", (
             f"Registry 'prompt-auto-enhance-rule' version is {entry.get('version')}, "
-            "must be 2.0.0"
+            "must be 3.0.0"
         )
 
     def test_skill_frontmatter_version_matches_registry(self):
@@ -356,9 +405,20 @@ class TestSSOTCompliance:
         )
 
     def test_no_before_after_template_in_rule(self):
+        """Rule may MENTION before/after comparison as a step output, but MUST
+        NOT contain the actual template (Before:/After: example block)."""
         content = _read(RULE_PATH)
-        assert "Before/After" not in content and "before/after" not in content.lower(), (
-            "Rule must NOT contain before/after template — belongs in skill"
+        template_markers = [
+            "Before:\n",
+            "After:\n",
+            "**Before:**",
+            "**After:**",
+            "## Before/After Template",
+        ]
+        found = [m for m in template_markers if m in content]
+        assert found == [], (
+            f"Rule contains before/after template content: {found}. "
+            "Templates belong in the skill, not the rule."
         )
 
     def test_no_web_search_decision_tree_in_rule(self):

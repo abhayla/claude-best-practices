@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "version": "3.0.0",
-    "last_updated": "2026-04-26",
-    "total_patterns": 236
+    "version": "3.1.0",
+    "last_updated": "2026-04-30",
+    "total_patterns": 237
   },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
@@ -1845,6 +1845,27 @@
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d flag types, implementation patterns, cleanup",
     "tier": "nice-to-have"
   },
+  "five-advisors": {
+    "hash": "61a81205b7361b0a5caa16d67e4dd3f9020a8a3d26122fc0f885a98b5f8a1bbd",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-04-30",
+    "last_updated": "2026-04-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Run any question, idea, or decision through Five Advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict. Based on Karpathy's LLM Council methodology. Use when a decision has stakes, multiple options, and benefits from being pressure-tested from multiple angles.",
+    "tags": [
+      "decision-making",
+      "advisors",
+      "peer-review",
+      "multi-perspective",
+      "stress-test"
+    ],
+    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 5 advisor lenses (Contrarian, Strategist, Operator, Customer, Realist) with anonymous peer review and chairman synthesis. Adapted from Andrej Karpathy's LLM Council methodology.",
+    "tier": "nice-to-have"
+  },
   "firebase": {
     "hash": "571d4b5a9de3f82a11b8771e0065c583b0395a328bd1e2a09cca52a6da110955",
     "type": "rule",
@@ -2974,13 +2995,13 @@
     "tier": "nice-to-have"
   },
   "prompt-auto-enhance": {
-    "hash": "ed4602912b86dda087f11e7ef49346ccc59718b4c52a8f7c35c95f6b734f7f4f",
+    "hash": "a8a3ed306c1751387cba68dfc36ddac4ef395f312be0e7dbbca9a50c8c73c104",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "3.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-30",
     "dependencies": [
       "writing-skills",
       "claude-guardian",
@@ -2999,17 +3020,17 @@
       "workflow",
       "format-locking"
     ],
-    "changelog": "v2.0.0: Add Step 0 prompt grading (6 weighted dimensions), expand to 11 failure categories, add 3 guardrails, expand weakening language to 3 categories including Claude 4.x anti-patterns",
+    "changelog": "v3.2.0: Replace STEP 4.7 Execution Mode menu with one-line skill hint (lighter advisory, never gating). v3.1.1: Execution Mode Selection Gate. v3.0.0: Mandatory step transcript + final prompt preview rendering, no upper limit on Clarification Gate. v2.0.0: Step 0 prompt grading (6 weighted dimensions), 11 failure categories, 3 guardrails.",
     "tier": "nice-to-have"
   },
   "prompt-auto-enhance-rule": {
-    "hash": "ceb287947f263dd833bf23a4f4fdaae77dd8a347c405914c8003ac02c1989ebe",
+    "hash": "9dc0872c1c0c9def615946973777b9e7a64216de7a3c2176ec3dd5ccd6abe616",
     "type": "rule",
     "category": "core",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-30",
     "dependencies": [
       "prompt-auto-enhance"
     ],
@@ -3022,26 +3043,26 @@
       "context-gathering",
       "automation"
     ],
-    "changelog": "v2.0.0: Slim from 97 to 48 lines. Removed duplicated procedural content. Now a lean trigger delegating to /prompt-auto-enhance skill. Fixes SSOT violation.",
+    "changelog": "v3.0.0: Replaced CRITICAL RULES with Pipeline Rules listing load-bearing contracts. Clarification Gate now has no upper limit on questions (ask until confident). Mandatory step transcript + final prompt preview render every time. v2.0.0: Slim from 97 to 48 lines. Lean trigger delegating to /prompt-auto-enhance skill.",
     "tier": "must-have"
   },
   "prompt-enhance-reminder": {
-    "hash": "7cbbcfc2c8e368599a1c2d7f9ec902520ce419e227004a459ce2e42f9327b7d1",
+    "hash": "2d1c1e8a05c3c25cd01990094d4922843930b290457998f61a619923be69a5c2",
     "type": "hook",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-04-30",
     "dependencies": [],
     "visibility": "public",
-    "description": "UserPromptSubmit hook that injects a deterministic reminder for the Enhanced indicator on every user prompt",
+    "description": "UserPromptSubmit hook that injects a deterministic reminder for the Enhanced indicator on every user prompt. v2: deterministic trigger gate filters trivial prompts and known continuation phrases at the hook layer.",
     "tags": [
       "hook",
       "prompt-enhance",
       "deterministic"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d deterministic Enhanced indicator reminder",
+    "changelog": "v2.0.0: Add deterministic trigger gate \u2014 hook itself filters prompts \u226415 chars and known continuation phrases (yes/ok/proceed/continue/etc.) so the strengthening pipeline never runs on trivial prompts. Moves the skip-for-direct-instructions rule from the model layer to the deterministic hook layer. v1.0.0: Initial release \u2014 deterministic Enhanced indicator reminder.",
     "tier": "must-have"
   },
   "prompt-logger": {
