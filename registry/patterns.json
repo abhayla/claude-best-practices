@@ -1864,7 +1864,7 @@
       "stress-test"
     ],
     "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 5 advisor lenses (Contrarian, Strategist, Operator, Customer, Realist) with anonymous peer review and chairman synthesis. Adapted from Andrej Karpathy's LLM Council methodology.",
-    "tier": "nice-to-have"
+    "tier": "must-have"
   },
   "firebase": {
     "hash": "571d4b5a9de3f82a11b8771e0065c583b0395a328bd1e2a09cca52a6da110955",
