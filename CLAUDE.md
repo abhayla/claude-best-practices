@@ -94,6 +94,7 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 - **`aggregate_telemetry.py`** — Collects adoption signals + learnings from enrolled repos, writes effectiveness metrics to `registry/patterns.json`. Remote mode (default) vs local (`--local`). Runs weekly via `aggregate-telemetry.yml`
 - **`sync_to_local.py`** — Hub→local sync: pulls patterns into a local project directory
 - **`third_party_skills.py`** — Detects and includes third-party agent skills during provisioning (called by `recommend.py`)
+- **`pipeline_aggregator.py`** — Standalone aggregator for testing-pipeline results: reads `test-results/*.json` and applies the union-of-failures rule
 
 ### Key Config Files
 
