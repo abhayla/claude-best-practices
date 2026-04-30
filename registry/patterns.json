@@ -2848,7 +2848,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "nice-to-have"
+    "tier": "must-have"
   },
   "pm2-deploy": {
     "hash": "d43372a9d6417346559c4c5fd8472bdd17afc98887401fd4469e7b728f55ff8f",
@@ -2867,7 +2867,7 @@
       "nodejs"
     ],
     "changelog": "v1.0.0: Initial creation",
-    "tier": "nice-to-have"
+    "tier": "must-have"
   },
   "post-fix-pipeline": {
     "hash": "6db86dcc06444323d59f70565c6876989031f7e96b500ad9b9f67e09fe4a94dc",
@@ -4266,7 +4266,7 @@
       "workflow"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "nice-to-have"
+    "tier": "must-have"
   },
   "update-practices": {
     "hash": "83fd93613050c9fb10ec89c8ef8c97f55e507a09e04a10e44acf0a5c2a9fecd0",
