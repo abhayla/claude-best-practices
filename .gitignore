@@ -13,6 +13,7 @@ test-evidence/
 .workflows/
 .claude/sessions/
 .claude/settings.local.json
+.claude/*.lock
 
 # Prevent provisioned core/.claude/ patterns from polluting hub-only .claude/
 # Hub-only .claude/ files are tracked explicitly; everything else is ignored.

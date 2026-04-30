@@ -103,6 +103,7 @@ Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, 
 - **`sync_to_local.py`** — Hub→local sync: pulls patterns into a local project directory
 - **`third_party_skills.py`** — Detects and includes third-party agent skills during provisioning (called by `recommend.py`)
 - **`pipeline_aggregator.py`** — Standalone aggregator for testing-pipeline results: reads `test-results/*.json` and applies the union-of-failures rule
+- **`bootstrap.sh`** (repo root, not in `scripts/`) — Curl-pipe-bash installer for downstream users: `curl -sL .../bootstrap.sh | bash -s -- --stacks <list> [--target <dir>]`. Calls `bootstrap.py` after fetching the repo
 
 ### Key Config Files
 
@@ -154,4 +155,9 @@ Invoke via the `/skill-evaluator` skill: `/skill-evaluator full <skill-path>` (m
 
 ## Rules for Claude
 
-Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when editing matching files. See the rule files directly for behavioral guidance (task approach, git hygiene, context management, workflow, prompt auto-enhance).
+Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when editing matching files. Rule files:
+
+- `.claude/rules/claude-behavior.md` — task approach, self-improvement, git hygiene, code quality, scope discipline
+- `.claude/rules/context-management.md` — progressive disclosure, scratchpad usage, subagent delegation, compaction survival
+- `.claude/rules/prompt-auto-enhance.md` — Tier 1/2 context gathering, grade pipeline, clarification gate, resource CRUD detection
+- `.claude/rules/workflow.md` — 7-step development workflow (understand → test → implement → fix-loop → verify → commit)
