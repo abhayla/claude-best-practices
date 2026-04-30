@@ -77,10 +77,12 @@ These are the load-bearing contracts:
 - Resource CRUD requires the batch approval table — no creates / updates
   / deletes happen without explicit user approval
 - Code is read before asking a clarification question
-- The Execution Mode Selection menu (STEP 4.7 in `/prompt-auto-enhance`)
-  fires after STEP 4.6 when decision/planning/exploration shape signals
-  match AND a stakes signal is present AND no anti-signal fires. The menu
-  is a soft suggestion — citation-backed, ignorable, never gating. It is
-  suppressed entirely on direct/mechanical/bug-fix prompts to preserve
-  explicit user intent. Default selection is "Execute directly" — silence
-  or any non-numeric reply proceeds with the strengthened prompt.
+- Optional one-line skill hint at the end of STEP 4.6 in
+  `/prompt-auto-enhance`: when the strengthened prompt clearly fits a
+  workflow other than direct execution, append ONE italic line naming up
+  to 2 relevant skills, with a quoted fragment from the user's prompt for
+  each. Informational only — never gating, never numbered, never
+  selectable. The auto-enhance skill's job is **prompt enhancement, not
+  execution routing.** Skip the hint entirely on direct, mechanical,
+  bug-fix, factual-lookup, and documentation prompts, and on prompts that
+  already name a skill explicitly.

@@ -5,12 +5,11 @@ description: "Run any question, idea, or decision through Five Advisors who inde
 # Five Advisors
 You ask one AI a question, you get one answer. That answer might be great. It might be mid. You have no way to tell because you only saw one perspective.
 
-## Invocation Paths
+## Invocation
 
-Five Advisors can be invoked two ways:
+Five Advisors is invoked when the user types "five advisors" or any trigger phrase listed in the description. Run STEP 1 (frame the question) normally, including the workspace context-enrichment scan in STEP 1A.
 
-1. **Direct** — user types "five advisors" or any trigger phrase listed in the description. Run STEP 1 (frame the question) normally, including the workspace context-enrichment scan in STEP 1A.
-2. **Via prompt-auto-enhance Execution Mode Selection Gate** — when the user picks `/five-advisors` from the menu in `/prompt-auto-enhance` STEP 4.7, the strengthened prompt arrives already framed: Tier 1 context (existing patterns, CLAUDE.md, git state) was gathered by the rule, Tier 2 nearby files were read if the prompt named specific modules, and the Clarification Gate has already resolved any ambiguity. In this path, **STEP 1A (workspace context enrichment) MAY be skipped** — use the strengthened prompt directly as the framed question. STEP 1B (final neutral framing pass) still runs to ensure all 5 advisors get phrasing free of the user's lean. This path saves redundant work and tightens the framed question because Clarification has already happened.
+**Optimization** — if `/prompt-auto-enhance` ran earlier in the same session and already gathered Tier 1 context (CLAUDE.md, existing patterns, git state) and resolved a Clarification Gate, STEP 1A workspace context enrichment MAY be skipped. Use the strengthened prompt directly as the framed question. STEP 1B (final neutral framing pass) still runs to ensure all 5 advisors get phrasing free of the user's lean. (Note: `/prompt-auto-enhance` may have suggested `/five-advisors` via its optional one-line skill hint, but the invocation itself is always manual — there is no menu-based handoff.)
 
 
 Five Advisors fixes this. It runs your question through 5 independent advisors, each thinking from a fundamentally different angle. Then they review each other's work. Then a chairman synthesizes everything into a final recommendation that tells you where the advisors agree, where they clash, and what you should actually do.

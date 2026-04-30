@@ -3,12 +3,11 @@ name: prompt-auto-enhance
 description: >
   Diagnose and strengthen non-trivial prompts by mapping weak spots to fixes and
   rewriting before execution — with visible step transcript, final prompt preview,
-  before/after comparison, and an optional Execution Mode Selection menu (offers
-  /five-advisors, /brainstorm, /writing-plans, plan mode) when prompt shape +
-  stakes signals match. Also handles resource CRUD batch approval flow, delegation
-  routing, and web search decisions. Invoked by the prompt-auto-enhance rule when
-  resource changes are detected, or explicitly via /prompt-auto-enhance for manual
-  enhancement.
+  before/after comparison, and an optional one-line skill hint when the strengthened
+  prompt clearly fits a workflow other than direct execution. Also handles resource
+  CRUD batch approval flow, delegation routing, and web search decisions. Invoked
+  by the prompt-auto-enhance rule when resource changes are detected, or explicitly
+  via /prompt-auto-enhance for manual enhancement.
 triggers:
   - prompt-auto-enhance
   - auto-enhance
@@ -21,7 +20,7 @@ triggers:
 allowed-tools: "Read Grep Glob Skill Agent"
 argument-hint: "[prompt text to enhance or 'score' to evaluate reliability]"
 type: workflow
-version: "3.1.1"
+version: "3.2.0"
 ---
 
 # Prompt Auto-Enhance — Strengthening, Step Transcript, Final Preview, Resource CRUD
@@ -420,164 +419,65 @@ For Grade A (no changes — original IS the final prompt):
 ────────────────────────────────────────────
 ```
 
-The skill does not pause for approval here — execution proceeds to STEP 4.7
-(or directly to STEP 5 if the Execution Mode Selection Gate is suppressed).
-Showing the final prompt is for transparency, not gating. The Clarification
-Gate has already resolved before this step, so the strengthened block
-contains real values, not placeholders.
+The skill does not pause for approval here — execution proceeds to STEP 5
+in the same response. Showing the final prompt is for transparency, not
+gating. The Clarification Gate has already resolved before this step, so
+the strengthened block contains real values, not placeholders.
 
-## STEP 4.7: Execution Mode Selection Gate
+### Optional skill hint (advisory, not selection)
 
-After the final preview, optionally offer the user a menu of execution modes
-when the prompt's shape suggests a richer flow than direct execution would
-provide. The menu is shown only when relevant detection signals match (see
-"Execution Mode Detection" below) AND no anti-signal fires. The default —
-selectable as the highest numbered option or by ignoring the menu entirely
-— is to execute the strengthened prompt as-is. The menu is a soft
-suggestion: never gating, never re-prompting after a non-selection.
-
-**Format (locked template):**
+When the strengthened prompt clearly fits a workflow other than direct
+execution (e.g., a high-stakes decision benefits from `/five-advisors`,
+unclear requirements benefit from `/brainstorm`, a multi-step build benefits
+from `/writing-plans`), append ONE italic line after the final prompt block:
 
 ```
-─── Execution Mode Selection (optional, not gating) ───
-
-This prompt looks like a <decision|planning|exploration> with multiple
-defensible approaches. Pick an execution mode, or ignore to run the
-strengthened prompt directly.
-
-  [1] /five-advisors    — 5 thinking lenses + peer review + chairman synthesis
-                          Best for: high-stakes decisions, multi-option tradeoffs
-                          Cost:     ~11 sub-agent dispatches
-  [2] /brainstorm       — Socratic Q&A → approaches with tradeoffs → spec doc
-                          Best for: requirements unclear, compare paths first
-                          Cost:     1 interactive session
-  [3] /writing-plans    — detailed implementation plan with file paths + tasks
-                          Best for: clear feature, want step-by-step plan first
-                          Cost:     1 planning pass
-  [4] Plan mode         — built-in plan-first interactive execution
-                          Best for: confirm approach before any edits
-                          Cost:     0 extra dispatches (built-in)
-  [N] Execute directly  — run the strengthened prompt as-is (default)
-
-  Why suggested: <one line citing the matched detection signal>
-                  e.g., "Advisory task class + dollar amount in stakes
-                  ('$97 workshop or $497 course')"
-
-Reply with a number to select, or ignore to default to direct execution.
-
-──────────────────────────────────────────────────
+*Related skills for this kind of prompt: <skill-1> (<one-clause why, with
+quoted fragment from the user's prompt>), <skill-2> (<one-clause why>).
+Invoke manually in a follow-up turn if useful — proceeding with the
+strengthened prompt now.*
 ```
 
-**Adaptive option list:** show only options matching the detected prompt
-shape (table below). Numbering is contiguous across shown options;
-"Execute directly" always takes the highest number in the shown set.
-Each shown option states a one-line "Best for" + cost line so the user
-picks consciously.
+**Rules:**
+- One line. Italic. Maximum 2 skills.
+- Cite the strongest single matched fragment from the user's prompt for each
+  suggestion (same one-quote rule as the Clarification Gate's "Why" line).
+- Informational only — never gating, never numbered, never selectable.
+  STEP 5 still executes the strengthened prompt regardless.
+- The auto-enhance skill's primary job is **prompt enhancement, not
+  execution routing.** The hint is a hint, not a recommendation engine.
 
-**Note on `[N]` in templates:** in the format above and in the
-Execution Mode Detection tables below, `[N]` is a meta-placeholder
-meaning "the next sequential number after the last shown skill" —
-NOT a literal label to render. Compute it at render time. Example
-renderings:
+**When to skip the hint entirely** (no advisory text appended — this is
+the default; only append when there is clear, unambiguous signal):
 
-- 2 skills + execute → `[1] [2] [3]`
-- 3 skills + execute → `[1] [2] [3] [4]`
-- 4 skills + execute → `[1] [2] [3] [4] [5]`
+- Direct implementation, mechanical execution, bug-fix, factual lookup,
+  documentation request, or any prompt where the user clearly wants
+  direct action
+- Prompt already names a skill explicitly ("run /tdd on this", "use
+  /fix-loop")
+- Grade F prompt (original needs rethinking before any execution mode is
+  even relevant)
+- Resource CRUD batch approval already active in this turn
 
-Never render the literal string `[N]` to the user.
+**Example (decision-shape match):**
 
-**Cited signal requirement:** the "Why suggested" line MUST name the
-specific detection signal that fired (task class, signal phrase, stakes
-phrase, with a quoted fragment from the user's prompt). Generic framing
-("this looks important") is invalid — same evidence-citation principle as
-the Clarification Gate's "Why" line.
+```
+─── Final Strengthened Prompt (will execute next) ───
 
-**One quoted fragment per Why line.** Cite the strongest single match —
-do NOT enumerate every signal that fired. Specificity comes from picking
-the most load-bearing fragment, not from listing all of them. If multiple
-signals tie, pick the most concrete one (a dollar amount beats a generic
-verb; an explicit "X or Y" beats "should we").
+[strengthened prompt body]
 
-| Valid `Why suggested` | Invalid `Why suggested` |
-|---|---|
-| `Advisory task class + dollar amount in stakes ("$97 workshop or $497 course")` | `Advisory task class + dollar amounts ("$97", "$497"), 6-week deadline ("next 6 weeks"), revenue baseline ("$10k Q1 revenue")` |
-| `Explicit choice between alternatives ("torn between A and B")` | `Decision-shape signals matched (choice + stakes + timeline)` |
-| `Pivot framing ("thinking of pivoting from X to Y") + reversibility flag` | `This looks like an important strategic decision` |
+────────────────────────────────────────────────────
 
-**On user selection:**
+*Related skills for this kind of prompt: /five-advisors (high-stakes
+decision — "$97 workshop or $497 course"), /brainstorm (multi-option
+tradeoff exploration). Invoke manually in a follow-up turn if useful —
+proceeding now.*
+```
 
-| User reply | Behavior |
-|------------|----------|
-| Number matching a shown skill/mode | Invoke it with the strengthened prompt as input. Execution proceeds inside the chosen mode. For `/five-advisors`, pass the strengthened prompt as the framed question; that skill MAY skip its workspace context-enrichment step (the strengthened prompt already carries Tier 1 context). |
-| Highest number (= "Execute directly") | Proceed with STEP 5 directly. |
-| Anything else, or ignored | Treat as "Execute directly" — proceed with STEP 5. |
-
-**One-shot per session per prompt-hash:** if the user declined the menu on
-a given prompt, do not re-show it if they edit and re-submit a near-identical
-prompt in the same session. Track via the prompt's first-line hash in the
-session transcript.
-
-**No menu:** if no detection signal fires, or any anti-signal fires, skip
-this step silently and proceed to STEP 5. The user never sees the gate.
-
-### Execution Mode Detection
-
-**Decision-shape signals → show [1 advisors] [2 brainstorm] [N execute]:**
-
-| Signal | Examples |
-|--------|----------|
-| Task class = Advisory / decision support | "should we", "recommend", "compare", "evaluate options" |
-| Explicit choice between alternatives | "should I X or Y", "which of these N", "torn between A and B" |
-| Pivot / strategic-direction framing | "thinking of pivoting", "is this the right move", "validate this" |
-| Pressure-test ask | "what's weak about", "what am I missing", "stress-test this" |
-| Sequence/priority decision | "should I do X or Y first", "build vs buy", "hire vs automate" |
-| Tone-active high-stakes copy | pricing pages, positioning angles, launch announcements, naming |
-
-**Planning-shape signals → show [3 writing-plans] [4 plan mode] [N execute]:**
-
-| Signal | Examples |
-|--------|----------|
-| Task class = Specialized synthesis (system / API / data design) | "design X", "architect Y", "model Z schema" |
-| Multi-step build with dependencies | "implement feature touching N files", "migrate from X to Y" |
-| Explicit "plan first" intent | "before I start coding", "draft the plan", "step-by-step" |
-
-**Exploration-shape signals → show [2 brainstorm] [3 writing-plans] [N execute]:**
-
-| Signal | Examples |
-|--------|----------|
-| Open-ended exploration | "explore approaches", "compare ways to", "options for" |
-| Spec missing | "I want to build something for X but don't know how" |
-| Requirements unclear | "what should this even look like", "where do I even start" |
-
-**Stakes signals (must combine with at least one shape signal above —
-shape alone is necessary but not sufficient):**
-
-| Signal | Example |
-|--------|---------|
-| Money mentioned | dollar amounts, pricing, revenue, budget |
-| Time / sequence cost | "weeks of work", "before launching", "next quarter" |
-| Reputation / audience | "my audience", "first impression", "launch" |
-| Reversibility flag | "before I commit", "can't undo", "one-shot" |
-| Opportunity cost | "instead of", "could be doing X" |
-
-**Anti-signals (any one suppresses the menu — silent default-execute):**
-
-| Anti-signal | Why suppressed |
-|-------------|----------------|
-| Task class = Mechanical execution / Standard implementation / Bug investigation | Direct execution is the right mode — menu adds friction |
-| Pure information request (`what is`, `where is`, `how does`) | One right answer, no tradeoff |
-| Single-file change with clear scope | No multi-perspective value |
-| Casual "should I" without stakes ("should I use markdown?") | Per /five-advisors NOT-trigger list |
-| User invoked `/five-advisors` directly in this turn | Avoid recursion |
-| Prompt contains a mandatory advisors trigger phrase ("five advisors", "war room this") | They're already going there — strengthen and dispatch |
-| Resource CRUD batch approval active in this turn | Two gates = friction overload |
-| Grade F prompt | Original may need rethinking before any execution mode |
-
-**Selection rule:** decision-shape and exploration-shape can co-occur (a
-prompt can be both a decision and exploratory). When two shapes match,
-union the option sets and de-duplicate by skill name — never show more
-than one row per skill. Cap displayed options at 5 (4 modes + execute);
-if more match, prefer decision > planning > exploration order.
+**Example (implementation-shape — no hint appended):** the strengthened
+prompt block ends and STEP 5 runs. The user is not interrupted with a
+suggestion to use `/tdd` or `/development-loop` — those are direct-action
+intents the user already framed clearly.
 
 ## STEP 5: Execute
 
@@ -646,9 +546,8 @@ Rules for this format:
 2. STEP 4: show grade card + Changes Applied (metadata only — no prompt text)
 3. **Clarification Gate** (if ambiguity remains, ask until confident, locked format)
 4. STEP 4.5: show step transcript (counts and deltas only — no per-dim or per-fix lists)
-5. STEP 4.6: show original → final strengthened prompt (single source of truth for text)
-6. **STEP 4.7: Execution Mode Selection Gate** (if shape + stakes signals match and no anti-signal fires, show menu; else skip silently)
-7. STEP 5: execute (strengthened prompt directly, OR via the selected execution mode)
+5. STEP 4.6: show original → final strengthened prompt; OPTIONALLY append a one-line italic skill hint when the prompt clearly fits a non-direct-execution workflow (advisory only, never gating)
+6. STEP 5: execute the strengthened prompt directly
 
 ---
 
@@ -818,10 +717,7 @@ These are the load-bearing contracts. The rest of the skill is procedure.
 - Critical-severity fixes are never subject to the 5-fix cap
 - Present the batch table when resource CRUD is detected, and wait for explicit user approval before creating, updating, or deleting
 - Delegate resource creation to the existing authoring tools (`/writing-skills`, `/claude-guardian`, `skill-author` agent) rather than generating directly
-- Show the Execution Mode Selection menu (STEP 4.7) after STEP 4.6 when decision/planning/exploration shape signals match AND a stakes signal is present AND no anti-signal fires — single suggestion, ignorable, never gating
-- Cite the specific detection signal in the "Why suggested" line of the menu, with a quoted fragment from the user's prompt — generic framing is invalid (parallels the Clarification Gate's evidence-citation rule)
-- Suppress the menu entirely on direct/mechanical/bug-fix prompts to preserve "respect explicit user intent"
-- Track the prompt's first-line hash to avoid re-showing the menu after a non-selection in the same session
+- Optional one-line skill hint at the end of STEP 4.6: when the strengthened prompt clearly fits a workflow other than direct execution, append ONE italic line naming up to 2 relevant skills, with a quoted fragment from the user's prompt for each. Informational only — never gating, never numbered, never selectable. The auto-enhance skill's job is prompt enhancement, not execution routing. Skip the hint entirely on direct/mechanical/bug-fix/factual-lookup/documentation prompts and on prompts that already name a skill explicitly.
 
 ## Anti-Patterns
 
@@ -837,7 +733,7 @@ These are common ways the pipeline goes wrong.
 - Generating patterns directly instead of using `/writing-skills`, `/claude-guardian`, or `skill-author`
 - Suggesting resource changes when CRUD signals are ambiguous — default to no CRUD
 - Hiding the step transcript or final prompt preview to save tokens — these are non-optional
-- Showing the Execution Mode Selection menu (STEP 4.7) on direct implementation, mechanical execution, bug investigation, or pure information-retrieval prompts — these have a clear single right mode, the menu just adds friction
-- Re-showing the menu after the user declined for a near-identical prompt in the same session
-- Letting the menu gate execution — it must always be ignorable, with "Execute directly" as the silent default
-- Generic "Why suggested" lines without a quoted fragment from the user's prompt — invalidates the cited-signal contract
+- Turning the optional skill hint into a numbered menu, selection prompt, or routing decision — the hint is text, not UI. The auto-enhance skill enhances prompts; it does not route execution.
+- Generic skill hints without a quoted fragment from the user's prompt — every appended hint must cite the strongest single matched fragment, same as the Clarification Gate.
+- Appending a hint on direct/mechanical/bug-fix/factual-lookup/documentation prompts where the user clearly wants direct action — adds friction with no value.
+- Suggesting more than 2 skills in a single hint — past 2, it stops being a hint and starts being a menu.
