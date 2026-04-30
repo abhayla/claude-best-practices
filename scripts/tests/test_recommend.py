@@ -361,8 +361,9 @@ class TestTierResource:
         assert tier_resource("fastapi-db-migrate", "skill", ["fastapi-python"]) == "must-have"
 
     def test_nice_to_have_skill(self):
-        assert tier_resource("brainstorm", "skill", []) == "nice-to-have"
-        assert tier_resource("branching", "skill", []) == "nice-to-have"
+        # Stack-dependent skills stay nice-to-have until their stack is detected
+        assert tier_resource("playwright", "skill", []) == "nice-to-have"
+        assert tier_resource("vitest-dev", "skill", []) == "nice-to-have"
 
     def test_skip_always_skip_list(self):
         assert tier_resource("twitter-x", "skill", []) == "skip"
@@ -1541,7 +1542,7 @@ class TestTierResourceWithDeps:
     def test_no_deps_backward_compat(self):
         """Without dep_promoted, behavior is same as before."""
         assert tier_resource("tdd", "skill", []) == "must-have"
-        assert tier_resource("brainstorm", "skill", []) == "nice-to-have"
+        assert tier_resource("playwright", "skill", []) == "nice-to-have"
         assert tier_resource("twitter-x", "skill", []) == "skip"
 
     def test_dep_overrides_wrong_stack(self):
