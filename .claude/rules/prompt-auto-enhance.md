@@ -77,3 +77,10 @@ These are the load-bearing contracts:
 - Resource CRUD requires the batch approval table — no creates / updates
   / deletes happen without explicit user approval
 - Code is read before asking a clarification question
+- The Execution Mode Selection menu (STEP 4.7 in `/prompt-auto-enhance`)
+  fires after STEP 4.6 when decision/planning/exploration shape signals
+  match AND a stakes signal is present AND no anti-signal fires. The menu
+  is a soft suggestion — citation-backed, ignorable, never gating. It is
+  suppressed entirely on direct/mechanical/bug-fix prompts to preserve
+  explicit user intent. Default selection is "Execute directly" — silence
+  or any non-numeric reply proceeds with the strengthened prompt.
