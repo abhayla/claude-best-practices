@@ -2,10 +2,11 @@
 name: prompt-auto-enhance
 description: >
   Diagnose and strengthen non-trivial prompts by mapping weak spots to fixes and
-  rewriting before execution — with visible before/after comparison. Also handles
-  resource CRUD batch approval flow, delegation routing, and web search decisions.
-  Invoked by the prompt-auto-enhance rule when resource changes are detected,
-  or explicitly via /prompt-auto-enhance for manual enhancement.
+  rewriting before execution — with visible step transcript, final prompt preview,
+  and before/after comparison. Also handles resource CRUD batch approval flow,
+  delegation routing, and web search decisions. Invoked by the prompt-auto-enhance
+  rule when resource changes are detected, or explicitly via /prompt-auto-enhance
+  for manual enhancement.
 triggers:
   - prompt-auto-enhance
   - auto-enhance
@@ -18,58 +19,73 @@ triggers:
 allowed-tools: "Read Grep Glob Skill Agent"
 argument-hint: "[prompt text to enhance or 'score' to evaluate reliability]"
 type: workflow
-version: "2.0.0"
+version: "3.0.1"
 ---
 
-# Prompt Auto-Enhance — Strengthening & Resource CRUD Procedures
+# Prompt Auto-Enhance — Strengthening, Step Transcript, Final Preview, Resource CRUD
 
-This skill strengthens non-trivial prompts before execution (grade → diagnose → fix → rewrite
-→ show grade card + before/after) and handles the **visible mode** workflow when resource CRUD is
-detected. The `prompt-auto-enhance` global rule controls when this activates.
+This skill strengthens non-trivial prompts before execution and shows the full
+working — every step's output, the final strengthened prompt, and the
+before/after comparison — so the user can see exactly what was changed and why.
+The `prompt-auto-enhance` global rule controls when this activates; the
+`prompt-enhance-reminder.sh` hook gates triggering at the deterministic layer
+(prompts ≤15 chars and continuation phrases never reach this skill).
 
 **Arguments:** $ARGUMENTS
 
 ---
 
-Activates automatically for **non-trivial prompts** — same threshold as the
-Clarification Gate (ambiguous, multi-file, or multi-step). Skipped for direct
-unambiguous instructions (e.g., "run tests", "rename X to Y", "fix the typo on line 42").
+## Activation
+
+Activates for **non-trivial prompts** — anything the hook did not filter out.
+Skipped at the hook layer for:
+- Prompts ≤ 15 characters (after trimming whitespace)
+- Known continuation phrases ("yes", "ok", "continue", "now do …", "also …", etc.)
 
 Adapted from community pattern by @heyrimsha (source: x.com/heyrimsha/status/2035995286150234480).
 
 ## STEP 0: Quick Grade
 
-Score the prompt across 6 dimensions to determine pipeline depth.
+Score the prompt across 6 base dimensions (plus Tone if active) on a **1-10**
+scale. Only dimensions scoring below 7 are diagnosed.
 
-| Dimension | Weight | What It Measures |
-|-----------|--------|-----------------|
-| Intent Clarity | 0.25 | Is the action verb, target, and success criteria explicit? |
-| Context Sufficiency | 0.20 | Does the prompt provide all needed background (files, prior state, domain)? |
-| Constraint Precision | 0.20 | Are boundaries measurable and unambiguous? |
-| Output Specification | 0.15 | Is the expected result format defined? |
-| Role & Framing | 0.10 | Is there a persona, domain frame, or expertise level? |
-| Example Grounding | 0.10 | Are input/output examples provided for complex tasks? |
+| Dimension | Default Weight | Weight w/ Tone Active | Measures |
+|-----------|---------------|----------------------|----------|
+| Intent Clarity | 0.25 | 0.25 | Action verb + target + success criteria explicit |
+| Context Sufficiency | 0.20 | 0.20 | All needed background present |
+| Constraint Precision | 0.20 | 0.20 | Boundaries measurable and unambiguous |
+| Output Specification | 0.15 | 0.15 | Expected result format defined |
+| Role & Framing | 0.10 | 0.05 | Persona, domain, expertise level |
+| Example Grounding | 0.10 | 0.05 | Input/output examples for complex tasks |
+| Tone Consistency | 0.00 | 0.10 | Voice/register/audience (prose only) |
 
-**Score formula:** `Overall = Sum(weight_i x score_i)` — each dimension scored 1.0-5.0.
+**Tone activation signals:** prompt targets prose, creative writing, marketing
+copy, UX/UI text, email, blog post, tweet, landing page, error message text.
+Triggered by words like "write", "draft", "compose", "rewrite", "tone",
+"voice", "audience", "copy".
+
+**Score formula:** `Overall = Sum(weight_i x score_i)` — Range 1.0-10.0
 
 **Grade thresholds:**
 
 | Grade | Range | Action |
 |-------|-------|--------|
-| A | 4.0-5.0 | Skip strengthening — prompt is strong |
-| B | 3.0-3.9 | Targeted fix — compact mode (1-2 fixes only) |
-| C | 2.0-2.9 | Full pipeline — diagnose all weak dimensions |
-| D | 1.5-1.9 | Full pipeline with heavy warning to user |
-| F | 1.0-1.4 | Suggested rewrite with caveats — original may be unsalvageable |
+| A | 8.0-10.0 | Skip strengthening — prompt is strong |
+| B | 6.0-7.9 | Targeted fix — compact mode (1-2 fixes only) |
+| C | 4.0-5.9 | Full pipeline — diagnose all weak dimensions |
+| D | 3.0-3.9 | Full pipeline with heavy warning to user |
+| F | 1.0-2.9 | Suggested rewrite with caveats — original may be unsalvageable |
 
-**Floor rules:**
-- Any dimension scoring 1 caps the grade at B (regardless of overall score)
-- Intent Clarity OR Context Sufficiency scoring 1 forces Grade F
-- More than 5 Critical issues (from STEP 1) forces Grade F
+**Floor rules (precedence — first match wins):**
+
+1. Intent Clarity OR Context Sufficiency scoring 1-2 → **Grade F**
+2. More than 5 Critical issues diagnosed → **Grade F**
+3. Any other single dimension scoring 1-2 → cap at **Grade B (max 7.9)**
+4. Otherwise → use the threshold table above
 
 **Dimension-to-Category mapping:**
 
-| Dimension < 4 | Diagnose These Categories |
+| Dimension < 7 | Diagnose These Categories |
 |----------------|--------------------------|
 | Intent Clarity | VAGUE_INTENT, AMBIGUOUS_SCOPE |
 | Context Sufficiency | MISSING_CONTEXT, IMPLICIT_ASSUMPTIONS |
@@ -77,38 +93,40 @@ Score the prompt across 6 dimensions to determine pipeline depth.
 | Output Specification | MISSING_OUTPUT_SPEC, MISSING_STRUCTURE |
 | Role & Framing | MISSING_ROLE |
 | Example Grounding | MISSING_EXAMPLES |
+| Tone Consistency | MISSING_TONE_FRAME (when Tone active) |
 
 **Read:** `references/grading-rubric.md` for full scoring anchors per dimension.
 
-Only diagnose categories mapped from dimensions scoring < 4 — skip categories
-whose parent dimension already scores 4+.
+Diagnose only categories mapped from dimensions scoring < 7 — skip categories
+whose parent dimension already scores 7+.
 
 ## STEP 1: Diagnose Prompt Weaknesses
 
-Analyze the user's prompt against the failure category table. Classify every
+Analyze the prompt against the failure category table. Classify every
 weakness found — a prompt may have multiple.
 
 #### Failure Category Table
 
 | Category | Severity | Symptoms | Structural Fix |
 |----------|----------|----------|---------------|
-| **VAGUE_INTENT** | Critical | Unclear what the user wants done; could be interpreted multiple ways | Rewrite as a specific action verb + object + success criteria |
+| **VAGUE_INTENT** | Critical | Unclear what the user wants done; could be interpreted multiple ways | Rewrite as specific action verb + object + success criteria |
 | **MISSING_CONTEXT** | Critical | Prompt assumes knowledge not provided (file paths, prior decisions, domain terms) | Add explicit context: which files, which module, what prior state |
-| **CONFLICTING_CONSTRAINTS** | High | Prompt asks for contradictory things ("make it fast and thorough", "simple but handles all edge cases") | Identify the conflict, prioritize one, note the tradeoff |
-| **OVER_SCOPED** | High | Prompt asks for too many things at once; would require 5+ files changed | Break into sequential focused prompts, suggest ordering |
-| **UNDER_CONSTRAINED** | Medium | Prompt gives freedom where specificity is needed (output format, target files, approach). Apply the measurability test: "Can a reviewer objectively verify this constraint was followed?" (see `references/constraint-engineering.md`) | Add measurable constraints: format, scope boundaries, acceptance criteria. Replace vague terms ("be concise" -> "under 100 words", "be thorough" -> "cover all N checklist items") |
-| **MISSING_OUTPUT_SPEC** | Medium | No indication of what the result should look like | Add a locked output template with named sections, explicit order, and numeric length bounds (see `references/format-locking.md`) |
+| **CONFLICTING_CONSTRAINTS** | High | Prompt asks for contradictory things ("make it fast and thorough") | Identify the conflict, prioritize one, note the tradeoff |
+| **OVER_SCOPED** | High | Asks for too many things at once; would require 5+ files changed | Break into sequential focused prompts, suggest ordering |
+| **UNDER_CONSTRAINED** | Medium | Vague where specificity is needed. Apply the measurability test: "Can a reviewer objectively verify this constraint was followed?" (see `references/constraint-engineering.md`) | Add measurable constraints. Replace vague terms ("be concise" -> "under 100 words", "be thorough" -> "cover all N checklist items") |
+| **MISSING_OUTPUT_SPEC** | Medium | No indication of what the result should look like | Add a locked output template with named sections, explicit order, numeric length bounds (see `references/format-locking.md`) |
 | **AMBIGUOUS_SCOPE** | Medium | Unclear which files, modules, or layers are in scope | Add explicit scope boundaries ("only in src/api/", "just the tests") |
 | **IMPLICIT_ASSUMPTIONS** | Low | Prompt relies on assumptions that may not hold (env setup, dependencies, prior steps) | Make assumptions explicit or add verification steps |
-| **MISSING_STRUCTURE** | Low | Complex multi-part prompt uses flat unstructured text where XML tags would improve clarity and adherence | Restructure with XML tags (see XML Tag Reference below) |
+| **MISSING_STRUCTURE** | Low | Multi-part prompt uses flat unstructured text where XML tags would improve clarity | Restructure with XML tags (see XML Tag Reference below) |
 | **MISSING_ROLE** | Low | No persona or domain frame | Add role with expertise and perspective |
 | **MISSING_EXAMPLES** | Low | No input/output examples for complex tasks | Add 2-3 diverse examples in `<examples>` tags |
+| **MISSING_TONE_FRAME** | Medium (Tone-active prompts only) | No voice, register, or audience guidance for prose output | Add tone spec: register (formal/casual), audience, length bounds, voice attributes |
 
 **Severity handling:**
 
 | Severity | Behavior |
 |----------|----------|
-| Critical | Always included — Critical fixes are NEVER capped |
+| Critical | Always included — Critical fixes are never capped |
 | High | Included up to the max changes cap |
 | Medium | Included up to the max changes cap |
 | Low | Included only if budget remains |
@@ -124,7 +142,7 @@ Use 3-7 tags max — over-tagging adds noise.
 `<input>` (variable data), `<documents>` (multi-doc context), `<thinking>` (reasoning),
 `<answer>` (final output).
 
-**Rules:** Descriptive tag names (`<patient_records>` not `<data1>`), nest for hierarchy,
+**Rules:** descriptive tag names (`<patient_records>` not `<data1>`), nest for hierarchy,
 place long context ABOVE the query, do not wrap single sentences.
 
 **Reference:** See [references/constraint-engineering.md](references/constraint-engineering.md) for the
@@ -133,8 +151,8 @@ full constraint engineering methodology and measurability test table.
 #### Weakening Language Flags
 
 After category diagnosis, scan for words and phrases that weaken instruction
-clarity. These are automatic flags — every occurrence MUST be evaluated for
-removal or replacement (see `references/prompt-pruning.md` for the full source pattern):
+clarity. These are automatic flags — every occurrence is evaluated for removal
+or replacement (see `references/prompt-pruning.md` for the full source pattern):
 
 **Category A — Hedging & Filler:**
 
@@ -154,15 +172,13 @@ removal or replacement (see `references/prompt-pruning.md` for the full source p
 
 #### Category B — Aggressive Enforcement Anti-Patterns (Claude 4.x specific)
 
-Model condition: These flags apply to Claude 4.x and later.
-
 | Flag Pattern | Problem | Replace With |
 |---|---|---|
 | "CRITICAL:/IMPORTANT:/YOU MUST" | Aggressive emphasis degrades compliance in newer models | Normal directive |
 | "NEVER EVER/ABSOLUTELY MUST" | Over-emphatic phrasing triggers resistance | Standard MUST/NEVER |
 | "think step by step" (reasoning models) | Redundant for models with built-in reasoning | "evaluate"/"reason through" |
 
-#### Category C — Output-Side Anti-Patterns (Claude self-correction)
+#### Category C — Output-Side Anti-Patterns (model self-correction)
 
 | Flag Pattern | Problem | Replace With |
 |---|---|---|
@@ -170,17 +186,18 @@ Model condition: These flags apply to Claude 4.x and later.
 | "Based on the information provided..." | Filler preamble | Remove |
 | "I'd be happy to help with..." | Unnecessary pleasantry | Remove |
 
-**Pruning rule:** Every removal MUST improve precision — do not cut words just
-to reduce length. If a qualifier serves a genuine purpose (e.g., "if the file
-exists" is a real condition, not hedging), keep it.
+**Pruning rule:** every removal improves precision. Cutting words just to
+reduce length is not pruning. If a qualifier serves a real purpose
+("if the file exists" is a real condition, not hedging), keep it.
 
-If no weaknesses are found (prompt scores clean), skip to execution — do not
-force unnecessary rewrites.
+If no weaknesses are found (prompt scores clean), skip to STEP 4.5
+(transcript) and STEP 4.6 (final preview) — these run even for Grade A
+to maintain uniform transparency.
 
 ## STEP 2: Map Fixes
 
 For each diagnosed weakness, determine the minimal structural fix. Each fix
-MUST map to exactly one failure category — no fix without a diagnosis, no
+maps to exactly one failure category — no fix without a diagnosis, no
 diagnosis without a fix.
 
 Format:
@@ -197,42 +214,48 @@ Apply all fixes to produce a strengthened version.
 #### Guardrail 1: Max Changes Cap
 
 - Maximum **5 non-Critical fixes** per rewrite
-- Critical severity fixes are NEVER capped — always apply all of them
-- Grade D: full pipeline runs but show a heavy warning to the user
+- Critical severity fixes are never capped — apply all of them
+- Grade D: full pipeline runs but show a heavy warning
 - Grade F: present a suggested rewrite with caveats (original may need rethinking)
 
-#### Guardrail 2: Intent Preservation Check
+#### Guardrail 2: Intent Preservation Check (hard contract)
 
-Every rewrite MUST preserve: same action verb, same target, same output type,
-no new requirements added. Verify before presenting.
+Every rewrite preserves: same action verb, same target, same output type, no
+new requirements added beyond what the user implied. Verify before presenting.
 
 | | Original | Rewritten | Verdict |
 |---|---|---|---|
-| PASS | "fix the login bug" | "resolve auth failure in login.py:42" | Same intent, more specific |
+| PASS | "fix the login bug — error in screenshot attached" | "fix the login bug shown in the screenshot — restore expected behavior" | Same intent, sharpened wording |
 | FAIL | "review auth module" | "refactor auth module to use JWT" | Changed intent from review to refactor |
+| FAIL | "fix the login bug" | "resolve auth failure in login.py:42" | Invented file/line that user did not specify — move file-pinning into Clarification Gate, not the rewrite |
 
 #### Guardrail 3: Over-Constraint Detection
 
 - Soft warning if >3 constraints added in a single rewrite
-- Hard gate: intent preservation check (Guardrail 2) overrides constraint additions
+- Hard gate: intent preservation (Guardrail 2) overrides constraint additions
 - Check for contradictions between added constraints
 
 **General rewrite rules:**
-- Targeted changes only — do not rewrite parts that are already clear
+- Targeted changes only — leave clear parts alone
 - Preserve the user's original intent and voice
-- Do not add complexity unless it directly eliminates a diagnosed weakness
-- Do not change terminology the user chose unless it causes ambiguity
+- Add complexity only when it directly eliminates a diagnosed weakness
+- Keep terminology the user chose unless it causes ambiguity
 - Remove qualifiers and hedging language flagged in Step 1
-- When MISSING_STRUCTURE is diagnosed, wrap distinct prompt sections in XML tags
-- Place long context above the query, constraints near the task definition
+- For MISSING_STRUCTURE diagnoses, wrap distinct sections in XML tags
+- Long context above the query, constraints near the task definition
 
-## STEP 4: Show Grade Card + Before/After
+## STEP 4: Show Grade Card + Changes Applied
 
-MUST show the grade card and comparison to the user every time strengthening activates.
+Step 4 is **metadata only** — grade card with per-dimension scores and a
+one-line list of every fix the rewrite intends to apply. The full prompt
+text (original → strengthened) is rendered exactly once, in STEP 4.6,
+after the Clarification Gate has resolved any pending values. This avoids
+"pending" placeholders inside Step 4 and gives the prompt text a single
+source of truth.
 
-**Compact mode** (Grade B, 1-2 fixes):
+**Compact mode** (Grade A or B with 1-2 fixes):
 ```
-Grade: B (3.4) — 1 fix applied
+Grade: B (7.4 / 10) — 1 fix applied
   [1] UNDER_CONSTRAINED → added output format spec
 ```
 
@@ -240,88 +263,204 @@ Grade: B (3.4) — 1 fix applied
 ```
 Prompt Grade Card:
 ┌────────────────────────┬───────┬────────┬─────────────┐
-│ Dimension              │ Score │ Weight │ Action       │
+│ Dimension              │ Score │ Weight │ Action      │
 ├────────────────────────┼───────┼────────┼─────────────┤
-│ Intent Clarity         │  4.0  │  0.25  │ —            │
-│ Context Sufficiency    │  2.5  │  0.20  │ Fixed [1,2]  │
-│ Constraint Precision   │  3.0  │  0.20  │ Fixed [3]    │
-│ Output Specification   │  2.0  │  0.15  │ Fixed [4]    │
-│ Role & Framing         │  4.5  │  0.10  │ —            │
-│ Example Grounding      │  3.0  │  0.10  │ Skipped      │
+│ Intent Clarity         │  8.0  │  0.25  │ —           │
+│ Context Sufficiency    │  5.0  │  0.20  │ Fixed [1,2] │
+│ Constraint Precision   │  6.0  │  0.20  │ Fixed [3]   │
+│ Output Specification   │  4.0  │  0.15  │ Fixed [4]   │
+│ Role & Framing         │  9.0  │  0.10  │ —           │
+│ Example Grounding      │  6.0  │  0.10  │ Skipped     │
 ├────────────────────────┼───────┼────────┼─────────────┤
-│ Overall                │  3.15 │        │ Grade: C     │
+│ Overall                │  6.30 │        │ Grade: B    │
 └────────────────────────┴───────┴────────┴─────────────┘
 
-Prompt Strengthened (4 fixes, 12 words removed):
-┌─────────────────┬──────────────────────────────────────────────┐
-│ Original        │ [user's original prompt text]                │
-├─────────────────┼──────────────────────────────────────────────┤
-│ Strengthened    │ [rewritten prompt text]                      │
-├─────────────────┼──────────────────────────────────────────────┤
-│ Changes Applied │                                              │
-│  [1]            │ CATEGORY → what was changed and why          │
-│  [2]            │ CATEGORY → what was changed and why          │
-└─────────────────┴──────────────────────────────────────────────┘
-Proceeding with strengthened prompt...
+Changes Applied (4):
+  [1] MISSING_CONTEXT (Critical) → defer to Clarification Gate Q1
+  [2] IMPLICIT_ASSUMPTIONS (Low)  → pin precondition explicitly
+  [3] UNDER_CONSTRAINED (Medium)  → replace vague phrase with measurable target
+  [4] MISSING_OUTPUT_SPEC (Medium)→ add deliverable triple
+  Pruning: removed "please" (Cat A — politeness filler)
 ```
+
+Step 4 deliberately does NOT show the original or strengthened prompt
+text — that's STEP 4.6's job. Showing it here would either duplicate
+Step 4.6 (when no clarification is pending) or require a "[pending]"
+placeholder cell (when one is). Both were judged worse than splitting
+metadata from text.
 
 Update the `*Enhanced:*` indicator to include strengthening:
 `*Enhanced: prompt strengthened (N fixes, Grade X), git state, 2 rules*`
 
+## STEP 4.5: Show Step Transcript
+
+Render a compact transcript of pipeline **counts and deltas only** — no
+per-dimension scores, no per-category enumeration, no per-fix list. Those
+already live in Step 4's grade card and Changes Applied. The transcript is
+the audit trail (what ran, how many, how long), not a recap of the
+diagnosis.
+
+**Transcript format:**
+```
+Pipeline Transcript:
+  Step 0 — Quick Grade:    <Grade letter> (<overall score> / 10), Tone dim: <yes|no>
+  Step 1 — Diagnose:       <N> categories flagged (Critical: <X>, High: <Y>, Medium: <Z>, Low: <W>)
+  Step 1b — Pruning Flags: <N> weakening phrases found
+  Step 2 — Map Fixes:      <N> fixes mapped (<X> Critical applied uncapped, <Y> non-Critical within 5-cap)
+  Step 3 — Rewrite:        <N> changes applied; word count <before> → <after> (Δ <delta>)
+                           Guardrail 2 (Intent Preservation): PASS|FAIL[, reason]
+                           Guardrail 3 (Over-Constraint): clean | <N> constraints added
+  Clarification Gate:      <N> questions asked, <resolved|in-progress>
+```
+
+For Grade A:
+```
+Pipeline Transcript:
+  Step 0 — Quick Grade:    A (8.6 / 10) — strengthening skipped
+  Steps 1-4:               n/a (Grade A)
+```
+
+This block is informational only — the user does not need to act on it.
+If the user wants per-dimension scores, they're in Step 4. If they want
+the per-fix list, that's also in Step 4. If they want the actual prompt
+text, that's in Step 4.6. Transcript stays metadata.
+
+## STEP 4.6: Show Original → Final Strengthened Prompt
+
+The single source of truth for the actual prompt text. Render the original
+prompt and the final strengthened prompt in fenced blocks so the user can
+diff them visually. Step 4 owns the metadata (scores, change list);
+Step 4.6 owns the text. No other step renders the prompt — duplication
+is intentionally avoided.
+
+**Format (with strengthening applied):**
+```
+─── Original Prompt ───
+
+<the original prompt verbatim>
+
+─── Final Strengthened Prompt (will execute next) ───
+
+<the strengthened prompt verbatim — all Clarification Gate values filled in>
+
+────────────────────────────────────────────────────
+```
+
+For Grade A (no changes — original IS the final prompt):
+```
+─── Final Prompt (unchanged from original) ───
+
+<original prompt verbatim>
+
+────────────────────────────────────────────
+```
+
+The skill does not pause for approval here — execution proceeds to STEP 5
+in the same response. Showing the final prompt is for transparency, not
+gating. The Clarification Gate has already resolved before this step, so
+the strengthened block contains real values, not placeholders.
+
 ## STEP 5: Execute
 
 Proceed with the strengthened prompt as if the user had entered it directly.
-The rest of the auto-enhance pipeline (Tier 1/2 context, Clarification Gate,
-CRUD detection) applies to the strengthened version, not the original.
+The rest of the auto-enhance pipeline (Tier 1/2 context, CRUD detection)
+applies to the strengthened version, not the original.
 
 ### When NOT to Strengthen
 
+Most filtering happens at the hook layer. Within the skill, additional skips:
+
 | Condition | Action |
 |-----------|--------|
-| Direct unambiguous instruction | Skip — execute as-is |
-| Single-file simple change | Skip — no diagnosis needed |
-| User says "do exactly this" or quotes a specific command | Skip — respect explicit intent |
-| Pure knowledge question (not an action request) | Skip — just answer it |
-| Action-oriented question ("how should I test this?") | DO NOT skip — strengthen before answering |
-| Multi-turn continuation ("now do", "same for", "also", "next") | Skip grading — apply prior context |
-| All dimensions score >= 4 (Grade A) | Skip — prompt is already strong |
+| Grade A (8.0+) | Skip strengthening; still show transcript + final prompt |
+| User says "do exactly this" or quotes a specific command | Skip strengthening; still show transcript + final prompt |
+| Pure knowledge question (not an action request) | Skip strengthening; just answer |
+| Action-oriented question ("how should I test this?") | Strengthen before answering |
 
-## Clarification Gate Sequencing
+## Clarification Gate
 
-Strengthening runs FIRST, before the Clarification Gate is evaluated.
+The Clarification Gate runs AFTER strengthening and BEFORE STEP 4.6 (final
+prompt preview), so the previewed prompt reflects the resolved intent.
 
-After strengthening, re-evaluate against Clarification Gate triggers:
-- If all dimensions >= 4 post-fix: skip Clarification Gate entirely
-- If unresolved ambiguity remains (dimensions still < 3): trigger Clarification Gate on the **strengthened** version
-- NEVER show both full grade card AND clarification question in the same response without the grade card appearing first
+**Trigger:** the prompt is > 15 characters (the only floor — handled
+deterministically by the hook). For every prompt that reaches this skill,
+evaluate whether ambiguity remains after strengthening. If yes, ask
+clarifying questions.
+
+**Question budget:** no upper limit. Ask one question at a time and keep
+asking until you have full confidence in the user's intent. Stop when
+confidence is reached, not when a question count is hit.
+
+**How:**
+- One question per turn, with a count ("Question N of unbounded") and a
+  recommendation labeled clearly
+- Read the codebase before asking — do not ask what you can answer yourself
+- Each question must be unanswerable from Tier 1/2 context
+- Present any plan section by section after questions resolve, not all at once
+
+**Question format (locked template):**
+```
+Question N of unbounded — Clarification Gate
+
+<one specific question, unanswerable from Tier 1/2 context>
+
+Recommendation: <a single concrete value — file path, command, scope, etc. —
+                 not a list of options, not a hedge>.
+Why: <one sentence citing a specific source — file path with line number,
+      commit SHA, pattern name, or CLAUDE.md section — that informs the
+      guess. No hand-wave reasoning>.
+
+(Confirm, correct, or specify a different value.)
+```
+
+Rules for this format:
+- The Recommendation is a **single value**, not a multiple-choice list. The
+  user can override it, but the default position is opinionated.
+- The Why line cites a **specific source** (file:line, SHA, pattern name).
+  If you can't cite one, you don't have enough context to recommend yet —
+  read more code first instead of asking.
+- The question stem is one sentence, ending with a question mark. Multi-part
+  questions become multiple turns.
+
+**Sequencing summary:**
+1. STEP 0-3: grade, diagnose, rewrite (internal)
+2. STEP 4: show grade card + Changes Applied (metadata only — no prompt text)
+3. **Clarification Gate** (if ambiguity remains, ask until confident, locked format)
+4. STEP 4.5: show step transcript (counts and deltas only — no per-dim or per-fix lists)
+5. STEP 4.6: show original → final strengthened prompt (single source of truth for text)
+6. STEP 5: execute
 
 ---
 
-## Prompt Reliability Scoring
+## Verbose Grade Mode (replaces former Reliability Scoring)
 
-Activates when the user explicitly asks to **score**, **evaluate**, or **audit** a prompt's
-production readiness — not during automatic strengthening.
+Activates when the user explicitly asks to **score**, **evaluate**, or **audit**
+a prompt — not during automatic strengthening. Verbose mode runs the same
+6-7 dimension Quick Grade rubric, with three additions:
 
-Score the prompt across 5 dimensions (instruction clarity, output format, constraint strength,
-edge case handling, tone consistency) on a 1-10 scale. Every score requires a specific quote
-from the prompt as evidence. Dimensions below 7 are flagged as launch risks.
+1. **Quote-as-evidence**: every dimension score cites a specific phrase from
+   the prompt that justifies it. Score with no quote → invalid.
+2. **Use case input**: ask the user to describe the prompt's use case before
+   scoring. The same prompt scores differently for a CLI tool vs. a customer chatbot.
+3. **Launch-risk flagging**: dimensions scoring below 7 are labeled "launch
+   risks" with: the offending quote, the failure mode it will cause in
+   production, and the concrete fix that would raise the score to 7+.
 
-**Read:** `references/prompt-reliability-scoring.md` for the full scoring rubric with dimension
-definitions, output template, category mapping to the 9-category diagnosis, and anti-patterns.
+Verbose mode produces a report only — it does not auto-strengthen. If the
+user asks to fix afterwards, feed the launch risks into Steps 1-5 of the
+strengthening pipeline.
 
-**After scoring:** If the user asks to fix the prompt, use the category mapping table in the
-reference to feed launch risks directly into the strengthening workflow (Steps 0-5 above).
+**Read:** `references/grading-rubric.md` for the verbose-mode subsection
+with the report template and verdict thresholds.
 
 ---
 
 ## Batch Approval Flow
 
 When the global rule detects that a user's prompt implies creating, updating, or
-deleting Claude Code resources (skills, agents, rules, hooks), execute this flow:
+deleting Claude Code resources (skills, agents, rules, hooks), execute this flow.
 
 ### Step 1: Show Enhancement Summary
-
-Present the user with what was understood and gathered:
 
 ```
 Enhancement Summary:
@@ -358,8 +497,8 @@ The user responds with one of:
 - `all` — approve every item
 - `none` — reject everything, proceed with the original prompt normally
 - `1,3` — approve only items 1 and 3 (comma-separated numbers)
-- Clarification text — if they answer a `[NEEDS CLARIFICATION]` question,
-  update the batch table and re-present
+- Clarification text — answer to a `[NEEDS CLARIFICATION]` question; update
+  the batch table and re-present
 
 ### Step 4: Execute Approved Items
 
@@ -377,26 +516,27 @@ Execute items sequentially — each resource may depend on the previous one
 
 ### Step 5: Skip Rejected Items
 
-Items the user did not approve are dropped silently. MUST NOT re-prompt for
+Items the user did not approve are dropped silently. Do not re-prompt for
 rejected items later in the same session.
 
 ---
 
 ## Web Search Decision Tree
 
-DO NOT web search if: prompt is about existing code, answer is in CLAUDE.md/.claude/ patterns,
-or it is general programming knowledge. WEB SEARCH only for: external library/API docs (when
-no local code exists), version/compatibility/deprecation questions, official framework conventions.
-Read local code first when local config exists for the library.
+Skip web search when: prompt is about existing code, answer is in CLAUDE.md or
+`.claude/` patterns, or it is general programming knowledge. Search the web only
+for: external library/API docs (when no local code exists), version /
+compatibility / deprecation questions, official framework conventions. Read
+local code first when local config exists for the library.
 
-**CRUD Exception:** When creating/updating a resource targeting an external technology,
-ALWAYS web search for current docs — training data may be outdated.
+**CRUD Exception:** when creating/updating a resource targeting an external
+technology, search the web for current docs — training data may be outdated.
 
 ---
 
 ## Context Gathering Reference
 
-### Tier 1 — Always (every prompt)
+### Tier 1 — Always (every prompt that reaches this skill)
 
 | Source | What to Read | Why |
 |--------|-------------|-----|
@@ -410,15 +550,6 @@ ALWAYS web search for current docs — training data may be outdated.
 |--------|-------------|-------------|
 | Nearby files | Prompt mentions a specific file/feature/module | Imports, dependencies, tests, related modules |
 | `registry/patterns.json` | Prompt involves pattern creation or comparison | Check if pattern already exists, verify sync |
-
-### Clarification Gate (after Tier 1/2)
-
-After context gathering, if the prompt is ambiguous or multi-file, enter a
-clarification loop before acting. See the `prompt-auto-enhance` rule for full
-trigger/skip conditions. Key principles:
-- Read relevant code before each question — MUST NOT ask what you can answer yourself
-- One question at a time, with a recommendation and reasoning
-- 3-5 questions max, then present the plan section by section for approval
 
 ---
 
@@ -452,29 +583,33 @@ the signals are clear.
 
 ---
 
-## MUST DO
+## Pipeline Rules
 
-- ALWAYS run STEP 0 (Quick Grade) before diagnosing — skip diagnosis entirely for Grade A
-- ALWAYS gather Tier 1 context before responding to any prompt — Why: without it, you risk duplicating existing patterns or contradicting CLAUDE.md conventions
-- ALWAYS run Prompt Strengthening for non-trivial prompts before execution — Why: vague prompts produce inconsistent outputs that require rework
-- ALWAYS show the grade card + before/after comparison when strengthening activates — Why: silent changes erode user trust and prevent learning
-- ALWAYS include strengthening count in the `*Enhanced:*` indicator when fixes are applied — Why: signals to the user that enhancement ran, enabling feedback
-- ALWAYS run the Clarification Gate for ambiguous or multi-file prompts before acting — Why: acting on assumptions wastes effort when the guess is wrong
-- ALWAYS read relevant code before asking a clarification question — Why: asking answerable questions signals laziness and breaks flow
-- ALWAYS present the batch table when resource CRUD is detected — Why: resource changes without approval create unwanted artifacts
-- ALWAYS wait for explicit user approval before creating/updating/deleting — Why: unauthorized changes force manual cleanup and break trust
-- ALWAYS delegate to existing authoring tools — Why: ad-hoc generation bypasses quality gates and produces inconsistent patterns
-- ALWAYS apply the measurability test to constraints: "Can a reviewer objectively verify this was followed?" (see `references/constraint-engineering.md`) — Why: unmeasurable constraints produce inconsistent behavior across invocations
-- ALWAYS enforce Guardrail 2 (Intent Preservation) — rewrite MUST NOT change the user's action verb, target, or output type
+These are the load-bearing contracts. The rest of the skill is procedure.
 
-## MUST NOT DO
+- Run STEP 0 (Quick Grade) before any diagnosis, and skip diagnosis entirely for Grade A
+- Gather Tier 1 context before responding to any prompt — without it, responses risk duplicating existing patterns or contradicting CLAUDE.md
+- Show the grade card, step transcript, and final prompt every time strengthening activates — silent changes erode trust
+- Include the strengthening count in the `*Enhanced:*` indicator when fixes are applied
+- Run the Clarification Gate after strengthening when ambiguity remains — ask one question at a time, no upper limit
+- Read relevant code before asking a clarification question — asking answerable questions wastes the user's time
+- Apply the measurability test to every constraint added: "Can a reviewer objectively verify this was followed?"
+- Guardrail 2 (Intent Preservation) is a hard contract — a rewrite that changes the user's action verb, target, or output type is invalid
+- Critical-severity fixes are never subject to the 5-fix cap
+- Present the batch table when resource CRUD is detected, and wait for explicit user approval before creating, updating, or deleting
+- Delegate resource creation to the existing authoring tools (`/writing-skills`, `/claude-guardian`, `skill-author` agent) rather than generating directly
 
-- MUST NOT strengthen direct unambiguous instructions — respect explicit user intent instead — Why: over-strengthening adds latency and annoys the user
-- MUST NOT add complexity during strengthening that doesn't map to a diagnosed weakness — simplify instead — Why: unnecessary constraints degrade prompt quality
-- MUST NOT change the user's original intent during strengthening — only clarify and constrain — Why: intent drift causes the wrong task to be executed
-- MUST NOT exceed the max changes cap (5 non-Critical) without explicit user request — Why: over-fixing degrades the original voice and adds noise
-- MUST NOT create, update, or delete resources without batch approval — present the batch table first — Why: unauthorized resource changes create cleanup overhead
-- MUST NOT re-prompt for rejected items in the same session — drop them silently — Why: nagging after explicit rejection breaks the approval contract
-- MUST NOT web search when local context is sufficient — read code first — Why: web searches add latency and may return outdated information
-- MUST NOT generate patterns directly — use `/writing-skills`, `/claude-guardian`, or `skill-author` agent — Why: direct generation bypasses quality checklist validation
-- MUST NOT suggest resource changes when signals are ambiguous — default to no CRUD and proceed normally — Why: false positives train the user to ignore CRUD suggestions
+## Anti-Patterns
+
+These are common ways the pipeline goes wrong.
+
+- Strengthening direct unambiguous instructions — respect explicit user intent
+- Adding complexity during strengthening that doesn't map to a diagnosed weakness
+- Changing the user's original intent during strengthening — clarify and constrain only
+- Exceeding the max non-Critical changes cap (5) without explicit user request
+- Creating, updating, or deleting resources without batch approval
+- Re-prompting for items the user already rejected in the same session
+- Web searching when local context is sufficient — read code first
+- Generating patterns directly instead of using `/writing-skills`, `/claude-guardian`, or `skill-author`
+- Suggesting resource changes when CRUD signals are ambiguous — default to no CRUD
+- Hiding the step transcript or final prompt preview to save tokens — these are non-optional
