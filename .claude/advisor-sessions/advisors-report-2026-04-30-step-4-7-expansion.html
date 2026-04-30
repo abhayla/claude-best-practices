@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Five Advisors — STEP 4.7 Expansion (2026-04-30)</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #555;
+    --line: #e0e0e0;
+    --bg-soft: #fafafa;
+    --accent-agree: #2d6a4f;
+    --accent-clash: #b85c00;
+    --accent-blind: #7c2d92;
+    --accent-rec: #1d4ed8;
+    --accent-do: #b91c1c;
+    --contrarian: #c0392b;
+    --first-principles: #2980b9;
+    --expansionist: #27ae60;
+    --outsider: #8e44ad;
+    --executor: #d68910;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: white;
+    line-height: 1.55;
+    max-width: 820px;
+    margin: 40px auto;
+    padding: 0 28px;
+  }
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  header .tag {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-size: 24px;
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+  }
+  header .meta {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .question {
+    background: var(--bg-soft);
+    border-left: 3px solid var(--ink);
+    padding: 14px 18px;
+    margin-bottom: 32px;
+    font-size: 14.5px;
+  }
+  .question strong { display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  section.verdict {
+    margin-bottom: 32px;
+  }
+  section.verdict h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 10px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  section.verdict.agree h2 { color: var(--accent-agree); border-bottom-color: var(--accent-agree); }
+  section.verdict.clash h2 { color: var(--accent-clash); border-bottom-color: var(--accent-clash); }
+  section.verdict.blind h2 { color: var(--accent-blind); border-bottom-color: var(--accent-blind); }
+  section.verdict.rec h2 { color: var(--accent-rec); border-bottom-color: var(--accent-rec); }
+  section.verdict.do h2 { color: var(--accent-do); border-bottom-color: var(--accent-do); }
+  section.verdict ol, section.verdict ul { padding-left: 22px; margin: 8px 0; }
+  section.verdict li { margin-bottom: 8px; font-size: 14.5px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  table th, table td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table th {
+    background: var(--bg-soft);
+    font-weight: 600;
+  }
+  .one-thing {
+    background: #fff5f5;
+    border: 1px solid var(--accent-do);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin-top: 12px;
+  }
+  .one-thing strong { color: var(--accent-do); }
+  .grid-positions {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin: 12px 0 20px 0;
+  }
+  .pos-card {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px 8px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .pos-card .who {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .pos-card .stance {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .pos-card.contrarian { border-top: 3px solid var(--contrarian); }
+  .pos-card.first-principles { border-top: 3px solid var(--first-principles); }
+  .pos-card.expansionist { border-top: 3px solid var(--expansionist); }
+  .pos-card.outsider { border-top: 3px solid var(--outsider); }
+  .pos-card.executor { border-top: 3px solid var(--executor); }
+  details {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  details[open] summary {
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+  }
+  details .body {
+    font-size: 13.5px;
+    color: #2a2a2a;
+    line-height: 1.55;
+  }
+  details .body p { margin: 8px 0; }
+  details.contrarian summary { color: var(--contrarian); }
+  details.first-principles summary { color: var(--first-principles); }
+  details.expansionist summary { color: var(--expansionist); }
+  details.outsider summary { color: var(--outsider); }
+  details.executor summary { color: var(--executor); }
+  h3.section-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 32px 0 12px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  code, pre {
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 12.5px;
+  }
+  code {
+    background: var(--bg-soft);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Five Advisors Report</div>
+  <h1>Should we expand STEP 4.7 from 3 prompt shapes to 8?</h1>
+  <div class="meta">2026-04-30 &middot; /prompt-auto-enhance v3.1.1 &middot; /five-advisors invocation</div>
+</header>
+
+<div class="question">
+  <strong>The decision</strong>
+  Add 5 NEW shape categories (Implementation, Bug-fix, Review/Audit, Documentation, Authoring) to the Execution Mode Selection menu — each mapping to scenario-specific slash-commands. Trigger: conservative (complexity signal required). Constraint: must stay "rare and relevant."
+  <strong style="margin-top:10px;">The verdict</strong>
+  Pause. Don't proceed, don't reject — instrument the existing 3-shape menu first, then decide v3.2.0 from data.
+</div>
+
+<section class="verdict agree">
+  <h2>Where the Advisors Agree</h2>
+  <ol>
+    <li><strong>"Proceed as proposed" is wrong.</strong> 4 of 5 advisors (Contrarian, First Principles, Outsider, Executor) say reject or pause. Only Expansionist says proceed (and wants to go further).</li>
+    <li><strong>The expansion is premature.</strong> Their reasons differ but the verdict aligns: don't ship 5 shapes at once.</li>
+    <li><strong>Hick's-law-via-discriminability beats Hick's-law-via-count.</strong> The Outsider's "furniture catalog written by people who already own the furniture" reframe is sharper than the option-count debate.</li>
+  </ol>
+</section>
+
+<section class="verdict clash">
+  <h2>Where the Advisors Clash</h2>
+  <p>Three different "instead" positions emerged:</p>
+  <div class="grid-positions">
+    <div class="pos-card contrarian">
+      <div class="who">Contrarian</div>
+      <div class="stance">Shrink + telemetry</div>
+      Ship Implementation only behind a 30% acceptance threshold over 50 fires.
+    </div>
+    <div class="pos-card first-principles">
+      <div class="who">First Principles</div>
+      <div class="stance">Demote menu</div>
+      Wrong layer. Route directly when classifier confident; menu only for ties.
+    </div>
+    <div class="pos-card expansionist">
+      <div class="who">Expansionist</div>
+      <div class="stance">Grow bolder</div>
+      8 shapes + skill compositions (plan→/tdd→/fix-loop→/code-review-workflow).
+    </div>
+    <div class="pos-card outsider">
+      <div class="who">Outsider</div>
+      <div class="stance">Fix labels first</div>
+      Names are indistinguishable. Add one-line descriptions before any expansion.
+    </div>
+    <div class="pos-card executor">
+      <div class="who">Executor</div>
+      <div class="stance">Ship one, measure</div>
+      Bug-fix only this week. v3.1.2 in 2 hours. Validate before more.
+    </div>
+  </div>
+  <p>The clash resolves on a question none of them answered: <strong>what is current menu acceptance on the 3 existing shapes?</strong></p>
+</section>
+
+<section class="verdict blind">
+  <h2>Blind Spots the Advisors Caught (via peer review)</h2>
+  <ol>
+    <li><strong>No telemetry exists for v3.1.1's existing menu.</strong> Executor-reviewer + First-Principles-reviewer converged independently. Every advisor argued from assumed user behavior with no data.</li>
+    <li><strong>Downstream rollback cost.</strong> Contrarian-reviewer flagged that this skill replicates via <code>/synthesize-project</code> — a misfiring expansion ships, gets cached in downstream <code>.claude/</code> dirs, and survives the hub's revert. Need a kill-switch flag <em>before</em> any shape ships.</li>
+    <li><strong>Discriminability is a prerequisite for any architectural argument.</strong> Outsider-reviewer observed all 5 responses assume the reader can tell <code>/fix-loop</code> apart from <code>/debugging-loop</code> apart from <code>/systematic-debugging</code>. If a new user can't, the menu is broken regardless of how many shapes it has.</li>
+    <li><strong>Menu as pattern-discovery instrument.</strong> Expansionist-reviewer pushed bolder than the original Expansionist: every "Execute directly" override on a confident shape is a signal a new shape exists in the wild. The menu could be the hub's <em>sensory organ</em> for shape taxonomy. Nobody asked whether shapes should be authored or <strong>discovered</strong>.</li>
+  </ol>
+</section>
+
+<section class="verdict rec">
+  <h2>The Recommendation</h2>
+  <p><strong>Pause the expansion. Don't proceed, don't reject — instrument first, then decide.</strong></p>
+  <table>
+    <thead>
+      <tr><th>Version</th><th>Scope</th><th>Rationale</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>v3.1.2</strong><br>(this week)</td>
+        <td>Add menu-acceptance telemetry to existing 3-shape STEP 4.7. Hook into <code>aggregate_telemetry.py</code> weekly Friday cron. Record: prompt-hash, menu fired/skipped, option chosen.</td>
+        <td>Establish baseline before any expansion. Single file change.</td>
+      </tr>
+      <tr>
+        <td><strong>v3.1.3</strong><br>(parallel track)</td>
+        <td>Add one-line "what this is for" beside each menu option.</td>
+        <td>Outsider's discriminability fix. Prerequisite for telemetry to be meaningful — opaque options produce noise data.</td>
+      </tr>
+      <tr>
+        <td><strong>v3.2.0</strong><br>(after one cycle)</td>
+        <td>Decide based on data. ≥25% non-default acceptance → roll out <strong>one</strong> shape (Bug-fix, best signal-to-noise) + add kill-switch flag in <code>core/.claude/settings.json</code>. &lt;25% → demote to silent routing per First Principles.</td>
+        <td>Measured rollout. Honors rollback cost. Replaces "5 shapes at once" with data-gated expansion.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>Rejected outright:</strong> the "ship 5 shapes at once" path AND the "8 shapes plus compositions" path. Both expand surface area without measurement.</p>
+  <p style="font-size: 13px; color: var(--muted); font-style: italic;">The chairman intentionally does not follow the 4-of-5 reject majority literally — rejection without measurement is also opinion-based. Pause-and-measure honors what every advisor was correctly pointing at: we don't know enough to expand yet.</p>
+</section>
+
+<section class="verdict do">
+  <h2>The One Thing to Do First</h2>
+  <div class="one-thing">
+    <strong>Open one PR this week: add menu-acceptance telemetry to STEP 4.7's existing 3-shape menu.</strong>
+    <p>Single file change. Zero new shapes, zero UI changes. Wait one weekly <code>aggregate-telemetry.yml</code> cron cycle. Read the data. Then decide v3.2.0.</p>
+    <p style="margin-bottom: 0;">Until that PR exists, every version of this debate (including this verdict) is opinion-shaped, not data-shaped.</p>
+  </div>
+</section>
+
+<h3 class="section-title">Advisor Responses (full text)</h3>
+
+<details class="contrarian">
+  <summary>The Contrarian — Reject. Anti-pattern inversion is rationalization.</summary>
+  <div class="body">
+    <p>Reject as proposed. The expansion is rationalizing scope creep into a doctrine.</p>
+    <p><strong>The fatal flaw:</strong> you are inverting your own anti-pattern, not retiring it. The current SKILL.md says menus on direct implementation/bug-fix prompts add friction. The proposal's response is "make them shapes instead of suppressors." That is not new evidence — that is renaming the problem. Where is the data that users actually wanted a menu on "fix the failing test"?</p>
+    <p><strong>The load-bearing assumption that's shaky:</strong> "complexity signal" as a gate. Multi-file, framework-specific, and "stakes" are not orthogonal — almost every non-trivial prompt hits at least one. Your conservative gate will fire on most real work within a week.</p>
+    <p><strong>The hidden cost no one is pricing:</strong> five new shapes means five new ways the shape detector can misclassify. A prompt like "fix the architecture review doc for the auth bug" hits Bug-fix, Review, and Documentation. What wins?</p>
+    <p><strong>What you're avoiding:</strong> if <code>/skill-master</code> already routes, why does auto-enhance need a parallel menu? Two routers competing for the same decision is exactly how trust erodes.</p>
+    <p><strong>Counter-proposal:</strong> ship Implementation only, behind telemetry. If acceptance rate beats 30% over 50 fires, expand. Otherwise the menu dies and you've saved four shapes worth of replication damage downstream.</p>
+  </div>
+</details>
+
+<details class="first-principles">
+  <summary>The First Principles Thinker — Wrong layer entirely. Demote the menu, promote routing.</summary>
+  <div class="body">
+    <p>Strip the proposal down: you're adding a menu so users can pick an execution skill. But why does the user need to pick? The auto-enhance pipeline already knows the prompt's shape (it just graded and strengthened it), yet refuses to act on that knowledge. You've built a classifier and then handed the classification back to the human as a multiple-choice quiz.</p>
+    <p>That's the wrong question. The real question is: <strong>why doesn't the pipeline route directly to the right skill?</strong></p>
+    <p>A menu of 5 shapes × up to 5 options = 25 paths the user must learn. "Ignorable default" is a tax: every prompt now carries a visible decision the user must scan past.</p>
+    <p>Reframe:</p>
+    <ul>
+      <li>If shape detection is confident (&gt;80%), invoke the top skill silently with a one-line override footer.</li>
+      <li>If shape detection is ambiguous, ask ONE clarifying question (use the existing Clarification Gate).</li>
+      <li>Reserve the menu for the genuine tie case, capped at 3 options.</li>
+    </ul>
+    <p>The proposal optimizes the wrong layer. Don't expand the menu. Demote it. Make routing the default behavior and the menu the exception. <strong>Reject as proposed.</strong></p>
+  </div>
+</details>
+
+<details class="expansionist">
+  <summary>The Expansionist — Ship and go further. 8 shapes + skill compositions.</summary>
+  <div class="body">
+    <p>Ship the expansion, then push it further. Five shapes is good. <strong>Eight is the actual surface area.</strong></p>
+    <p>You're missing three high-leverage shapes hiding in plain sight:</p>
+    <ul>
+      <li><strong>Refactor</strong> ("refactor", "clean up", "restructure", "extract") → offer <code>/refactor-loop</code>, plan mode, <code>/code-review-workflow</code> as pre-flight.</li>
+      <li><strong>Migration/Upgrade</strong> ("upgrade to X", "migrate from Y", "port to") — multi-file by definition, stakes always high. Highest-ROI shape you're skipping.</li>
+      <li><strong>Investigation</strong> ("why does", "how does X work", "trace") — distinct from exploration. Offer <code>/systematic-debugging</code> in read-only mode, <code>/handover</code> to capture findings.</li>
+    </ul>
+    <p><strong>The 10x move:</strong> the menu shouldn't just route to skills — it should route to <em>skill compositions</em>. "Implementation" shouldn't offer four parallel options; it should offer pipelines: <code>plan → /tdd → /fix-loop → /code-review-workflow</code>. One click, full lifecycle.</p>
+    <p><strong>Adjacent surface being undervalued:</strong> telemetry. Every menu choice is a labeled signal of intent vs. shape detection. Feed that into <code>aggregate_telemetry.py</code> — the only real-world dataset on which Claude Code workflows users actually pick per prompt shape.</p>
+    <p>Bolder. <strong>Ship it.</strong></p>
+  </div>
+</details>
+
+<details class="outsider">
+  <summary>The Outsider — Fix the labels first. The menu fails the "can a stranger tell these apart?" test.</summary>
+  <div class="body">
+    <p>I have no idea what most of these names mean, and that's the point.</p>
+    <p>"Execution Mode Selection Gate" is four nouns stacked like a German compound word. As a new user, my eyes glaze over before I parse it. Call it "How should I run this?" — that's the actual question being asked.</p>
+    <p>The slash commands look like a furniture catalog written by people who already own the furniture. <code>/fix-loop</code> vs <code>/debugging-loop</code> vs <code>/systematic-debugging</code> — three things for "something is broken." From the outside these are indistinguishable. <code>/implement</code> vs <code>/tdd</code> vs <code>/development-loop</code> vs plan mode — four ways to "build the thing." I would pick whichever was shortest and assume the others were vestigial. <code>/claude-guardian</code> vs <code>/pattern-quality</code> vs <code>/writing-skills</code> — I literally cannot guess what "guardian" guards.</p>
+    <p>If your menu shows me five options whose names I can't differentiate, I don't experience "scenario-aware choice." I experience a <strong>pop quiz</strong>. Hick's law isn't just about <em>count</em> — it's about <em>discriminability</em>.</p>
+    <p>My vote: don't expand yet. First, add a one-line "what this is for" beside each existing option. Watch whether users pick non-defaults. If they don't even use the three-shape menu, a five-shape menu won't save it — it'll just multiply the confusion.</p>
+  </div>
+</details>
+
+<details class="executor">
+  <summary>The Executor — Ship one shape this week (Bug-fix). Validate. Then decide.</summary>
+  <div class="body">
+    <p><strong>Ship one shape this week: Bug-fix.</strong> That's it.</p>
+    <p><strong>Why bug-fix first:</strong> strongest signal-to-noise ratio. "fix", "broken", "error", failing test — unambiguous triggers. The payoff (<code>/fix-loop</code> vs <code>/systematic-debugging</code> vs <code>/fix-issue</code>) is genuinely different work, not stylistic.</p>
+    <p><strong>The 2-hour cut:</strong></p>
+    <ol>
+      <li>Add bug-fix shape to STEP 4.7 (one new branch in existing menu logic) — 45 min</li>
+      <li>Wire conservative trigger: keyword + (failing test OR error trace OR issue # OR 2+ files mentioned) — 30 min</li>
+      <li>Update SKILL.md anti-pattern wording — 15 min</li>
+      <li>Run <code>/skill-evaluator full prompt-auto-enhance</code> against 3 bug-fix prompts (trivial, medium, gnarly) — 30 min</li>
+    </ol>
+    <p>Ship that as v3.1.2. Don't touch the other four shapes yet.</p>
+    <p><strong>Validation step that decides the bigger rollout:</strong> instrument menu acceptance. After one week, check: when bug-fix menu fires, do users pick non-default &gt;25%? If yes, roll out Implementation next. If no, learn the menu is noise <em>before</em> spending 8 hours on four more shapes that all replicate downstream and become expensive to retract.</p>
+    <p><strong>Reject as proposed.</strong> Five shapes at once = five places trust can erode simultaneously, and you can't tell which broke it.</p>
+  </div>
+</details>
+
+<h3 class="section-title">Peer Review Highlights (anonymized inputs A–E; mapping below)</h3>
+
+<details>
+  <summary>Reviewer 1 (Contrarian's lens) — Strongest: C. Blind: E. All-missed: rollback cost.</summary>
+  <div class="body">
+    <p><strong>Strongest C:</strong> only response questioning the <em>layer</em> the proposal operates at. "Demote the menu, promote routing" attacks the unspecified collision with <code>/skill-master</code> that D only gestures at.</p>
+    <p><strong>Blind spot E:</strong> selling scope on top of an unvalidated foundation. "Telemetry as quiet asset" assumes the menu is used enough to generate signal — the exact unproven premise.</p>
+    <p><strong>All-missed:</strong> rollback cost. Skill replicates downstream via <code>/synthesize-project</code>, gets cached in downstream <code>.claude/</code> dirs, survives hub's revert. Need kill-switch flag <em>before</em> any shape ships.</p>
+  </div>
+</details>
+
+<details>
+  <summary>Reviewer 2 (First Principles' lens) — Strongest: C. Blind: E. All-missed: existing menu acceptance is unmeasured.</summary>
+  <div class="body">
+    <p><strong>Strongest C:</strong> strips the proposal to first principles. Every other response argues <em>how much</em> menu, C asks <em>why menu at all</em>. B is best execution plan, but ships a smaller version of the wrong thing.</p>
+    <p><strong>Blind spot E:</strong> confuses surface area with leverage. Adding 3 more shapes plus compositions on an unvalidated menu compounds the classifier-ambiguity problem D names.</p>
+    <p><strong>All-missed:</strong> base rate question. Of N fires of the current STEP 4.7 menu, how often does the user pick non-default? Without that number, every response is opinion. Instrument first, decide second.</p>
+  </div>
+</details>
+
+<details>
+  <summary>Reviewer 3 (Expansionist's lens) — Strongest: E. Blind: C. All-missed: menu as pattern-discovery sensor.</summary>
+  <div class="body">
+    <p><strong>Strongest E:</strong> only response that treats the menu as <em>infrastructure</em> rather than UI. Skill compositions + labeled telemetry = compounding returns.</p>
+    <p><strong>Blind spot C:</strong> "just route directly" eliminates the very surface that generates the labeled training signal. Auto-routing is locally optimal, globally impoverishing.</p>
+    <p><strong>All-missed:</strong> the menu is a <strong>pattern-discovery instrument</strong>. Every "Execute directly" override on a confident shape is a signal a new shape exists in the wild. Bolder than E: stop hand-curating shapes after v4; let menu telemetry + clustering propose new shapes monthly via PR.</p>
+  </div>
+</details>
+
+<details>
+  <summary>Reviewer 4 (Outsider's lens) — Strongest: A. Blind: E. All-missed: nobody tested against a literal new user.</summary>
+  <div class="body">
+    <p><strong>Strongest A:</strong> only response that notices the menu fails the "can a stranger tell these apart?" test. Hick's-law-via-discriminability is sharper than B/D's telemetry thresholds, which presume the labels work.</p>
+    <p><strong>Blind spot E:</strong> wants to add 3 more shapes and chain into compositions without ever asking whether a user can read the names. Mistakes surface area for value.</p>
+    <p><strong>All-missed:</strong> none tested against a literal new user. B, C, D, E debate routing logic, telemetry gates, and shape orthogonality — all assuming the reader knows what these slash-commands do. <strong>Fix the labels first; the architectural argument is premature.</strong></p>
+  </div>
+</details>
+
+<details>
+  <summary>Reviewer 5 (Executor's lens) — Strongest: B. Blind: E. All-missed: telemetry doesn't exist on v3.1.1 yet.</summary>
+  <div class="body">
+    <p><strong>Strongest B:</strong> cleanest Monday-morning move. Time-boxed, single shape, version bump, decision threshold. Uses existing <code>/skill-evaluator</code>. Ships, measures, decides — no theory tax.</p>
+    <p><strong>Blind spot E:</strong> 3→8 shapes plus compositions has zero validation pass. "Labeled dataset for hub effectiveness" is a research project bolted onto a UX gate.</p>
+    <p><strong>All-missed:</strong> v3.1.1 just shipped — there is <strong>no telemetry on the existing 3-shape menu yet</strong>. The aggregator (<code>aggregate_telemetry.py</code>, weekly Friday cron) and <code>/skill-evaluator</code> already exist. Correct Monday move: one PR adding menu-acceptance instrumentation. Wait one telemetry cycle. <em>Then</em> decide.</p>
+  </div>
+</details>
+
+<h3 class="section-title">Anonymization Mapping (revealed)</h3>
+<table>
+  <thead>
+    <tr><th>Letter</th><th>Advisor</th><th>Vote</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>A</td><td>The Outsider</td><td>Don't expand — fix labels first</td></tr>
+    <tr><td>B</td><td>The Executor</td><td>Reject as proposed — ship Bug-fix only</td></tr>
+    <tr><td>C</td><td>The First Principles Thinker</td><td>Reject — demote the menu, promote routing</td></tr>
+    <tr><td>D</td><td>The Contrarian</td><td>Reject — ship Implementation only behind telemetry</td></tr>
+    <tr><td>E</td><td>The Expansionist</td><td>Proceed and go further — 8 shapes + compositions</td></tr>
+  </tbody>
+</table>
+
+<footer>
+  Generated 2026-04-30 via /five-advisors. Five thinking lenses dispatched in parallel as sub-agents,
+  anonymized A-E for peer review (mapping above), chairman synthesis produced inline.
+  &middot; <a href="advisors-transcript-2026-04-30-step-4-7-expansion.md">Full transcript (.md)</a>
+</footer>
+
+</body>
+</html>
