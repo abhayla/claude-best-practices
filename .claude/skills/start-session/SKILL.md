@@ -5,9 +5,16 @@ description: >
   loads working files into context, and presents a structured briefing with task progress
   and resume notes. Use when starting a new conversation to pick up where you left off.
 type: workflow
+triggers:
+  - start session
+  - restore session
+  - load session
+  - resume saved session
+  - pick up where I left off
+  - list sessions
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[session-name | --list]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Start Session — Restore a Saved Checkpoint

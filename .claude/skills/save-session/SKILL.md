@@ -6,9 +6,16 @@ description: >
   /start-session can restore in a future conversation. Use when pausing work, before
   long breaks, or when the session-reminder hook fires.
 type: workflow
+triggers:
+  - save session
+  - checkpoint
+  - save progress
+  - pause work
+  - save my work
+  - session checkpoint
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "[session-name]"
-version: "1.1.0"
+version: "1.2.0"
 ---
 
 # Save Session — Checkpoint Your Progress

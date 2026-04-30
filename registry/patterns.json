@@ -706,18 +706,18 @@
     "tier": "nice-to-have"
   },
   "claude-behavior": {
-    "hash": "1c7ade0e1c6fc3edf90ca7d759e0aded1b55a5794017346af2b3417f7cffa14c",
+    "hash": "f15c54cfd7b7f734f33a1be18eaa9c7ea7904abc3204e7694dfdb3da2f6c2921",
     "type": "rule",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-21",
+    "last_updated": "2026-04-30",
     "dependencies": [],
     "visibility": "public",
     "description": "Universal behavioral rules for Claude including mandatory failure response pipeline",
     "tags": [],
-    "changelog": "v1.2.0: Add rule 21 (YAGNI) + rule 22 (Measure Before You Optimize); label rule 16 with KISS | v1.1.0: Rule 15 strengthened to MANDATORY with /learn-n-improve chaining",
+    "changelog": "v1.3.0: Add rule 23 (Standing Directives Override Scope Instinct) — preserve hub-private rule that was missing in core. Same class of bug as the prompt-auto-enhance hub→core drift. | v1.2.0: Add rule 21 (YAGNI) + rule 22 (Measure Before You Optimize); label rule 16 with KISS | v1.1.0: Rule 15 strengthened to MANDATORY with /learn-n-improve chaining",
     "tier": "must-have"
   },
   "claude-guardian": {

@@ -38,7 +38,8 @@ When implementing features or fixing bugs, follow this structured approach:
 
 ### Step 7: Commit & Document
 - Write clear commit messages (conventional format)
-- Update documentation if behavior changed
+- **Documentation pass**: Read every file you created or modified for this feature. Generate comprehensive documentation: what each function does, how they connect, what the expected inputs and outputs are, and any non-obvious design decisions. Documentation generated immediately after building is more accurate than documentation written later from memory.
+- Place documentation in the project's existing docs directory structure — never in a random or ad-hoc location. If no docs directory exists, co-locate with the code (e.g., README in the feature's directory).
 - Record learnings for future reference
 
 ## Key Principles

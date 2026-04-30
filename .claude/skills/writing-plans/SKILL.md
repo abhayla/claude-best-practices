@@ -3,22 +3,27 @@ name: writing-plans
 description: >
   Generate detailed implementation plans with bite-sized tasks, exact file paths,
   code snippets, and verification commands. Use after /brainstorm or when you have
-  a clear feature to implement.
+  a clear feature to implement. NOT for requirements exploration (use /brainstorm)
+  or direct implementation without planning (use /implement).
 triggers:
   - write plan
   - implementation plan
   - task breakdown
   - plan feature
   - detailed plan
-allowed-tools: "Bash Read Write Edit Grep Glob Agent"
+  - break down feature
+allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<feature description, spec file path, or brainstorm output>"
-version: "1.0.0"
+version: "1.2.0"
 type: workflow
 ---
 
 # Writing Plans — Detailed Implementation Planning
 
 Generate a step-by-step implementation plan with actionable, verifiable tasks.
+MUST NOT skip scope confirmation (Step 1). MUST NOT begin implementation — this
+skill produces a plan, not code. For simple tasks (single file, <3 files), suggest
+`/implement` directly.
 
 **Feature:** $ARGUMENTS
 
@@ -281,7 +286,7 @@ This is the filesystem-as-working-memory principle: **Context Window = RAM, File
 
 After saving the plan, recommend one or more follow-up actions:
 
-- **Execute the plan** — Work through tasks sequentially, checking off each one
+- **`/executing-plans`** — Execute tasks step by step with verification and subagent parallelism
 - **`/plan-to-issues`** — Convert the plan into tracked GitHub Issues with labels and dependencies
 - **Manual execution** — Hand the plan to a developer for independent implementation
 
@@ -289,18 +294,18 @@ After saving the plan, recommend one or more follow-up actions:
 
 ## MUST DO
 
-- Always verify file paths against the actual codebase before including them in the plan
-- Always include a verification command for every task — no exceptions
-- Always wait for user approval between sections in Step 5
-- Always order tasks so dependencies come first
-- Always include the dependency graph (Step 3) even for simple plans
-- Split any task that would take more than 5 minutes into smaller tasks
+- Always verify file paths against the actual codebase before including them — Why: phantom paths produce unexecutable plans that waste downstream effort
+- Always include a verification command for every task — Why: unverifiable tasks get skipped or done incorrectly with no feedback signal
+- Always wait for user approval between sections in Step 5 — Why: plans are expensive to redo; early feedback prevents compounding errors
+- Always order tasks so dependencies come first — Why: executing out of order causes build failures and wasted rework
+- Always include the dependency graph (Step 3) even for simple plans — Why: the graph reveals hidden coupling that flat task lists miss
+- Split any task that would take more than 5 minutes into smaller tasks — Why: large tasks hide complexity and resist progress tracking
 
 ## MUST NOT DO
 
-- MUST NOT skip scope confirmation (Step 1) — misunderstood scope produces useless plans
-- MUST NOT include tasks without verification commands — unverifiable tasks get skipped or done wrong
-- MUST NOT present the entire plan at once — show section by section for review
-- MUST NOT begin implementation during this skill — this skill produces a plan, not code
-- MUST NOT include vague tasks like "refactor as needed" or "clean up" — every task must be specific and measurable
-- MUST NOT assume file paths exist — verify by searching the codebase first
+- MUST NOT skip scope confirmation (Step 1) — Why: misunderstood scope wastes all downstream effort
+- MUST NOT include tasks without verification commands — Why: unverifiable tasks accumulate silently broken state
+- MUST NOT present the entire plan at once — Why: reviewing 20+ tasks at once causes cognitive overload and missed issues
+- MUST NOT begin implementation during this skill — Why: this skill produces a plan, not code; mixing planning and coding causes scope drift
+- MUST NOT include vague tasks like "refactor as needed" — Why: vague tasks are unmeasurable and expand indefinitely
+- MUST NOT assume file paths exist — Why: phantom references waste time when the executor tries to find them
