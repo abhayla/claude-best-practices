@@ -42,19 +42,33 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 ## Architecture
 
-A curated hub of Claude Code patterns (agents, skills, rules, hooks) organized by stack — for the live count, see `registry/patterns.json` (one top-level key per pattern, excluding `_meta`). Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
+A curated hub of Claude Code patterns (agents, skills, rules, hooks) organized by stack — for the live count, see `registry/patterns.json` (one top-level key per pattern, excluding `_meta`); `registry/changelog.md` has human-readable history of pattern additions/removals. Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
 
 For sync direction semantics (hub↔projects, hub↔internet, aggregation flows), read `docs/SYNC-ARCHITECTURE.md` before modifying any sync script.
+
+### Pattern Types
+
+- **Agents** (`core/.claude/agents/*.md`) — sub-agents with isolated context, dispatched via `Agent()`. YAML frontmatter declares allowed tools.
+- **Skills** (`core/.claude/skills/<name>/SKILL.md`) — slash-command workflows. Frontmatter: `name`, `description`, optional `triggers`. Body is the procedure.
+- **Rules** (`core/.claude/rules/*.md`) — auto-loaded directives. `# Scope: global` loads always; `globs:` frontmatter scopes to matching paths.
+- **Hooks** (`core/.claude/hooks/*.sh`) — shell scripts wired into `settings.json` events (pre/post-tool, prompt-submit, etc.).
+
+### Synthesize Flywheel
+
+Projects can opt in to share back synthesized patterns by setting `allow_hub_sharing: true` in their `.claude/synthesis-config.yml`. `/synthesize-hub` then collates `synthesized: true` patterns from enrolled repos in `config/repos.yml`, dedups via 3-level matching (hash/structural/semantic), and drafts generalized hub PRs. Default is local-only — sharing is bilateral and opt-in. See `docs/synthesize-flywheel.md`.
 
 ### Key Directories
 
 - **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, `config/`, templates
 - **`.claude/rules/`** — Auto-loaded rules. Global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when working with matching files
 - **`config/`** — `settings.yml`, `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow docs), `pipeline-stages.yaml` (DAG config), `workflow-contracts.yaml` (step DAGs + artifact contracts)
+- **`docs/specs/`** — Canonical workflow/feature specs (e.g., `test-pipeline-three-lane-spec-v2.md`). Reference these — do not duplicate spec content elsewhere
 - **`docs/workflows/`** — Auto-generated workflow docs. Do not edit manually — regenerate after pattern changes
 - **`internet-sources/`** — Pending and archived sources for `scan_web.py` (`pending/`, `archived/`)
 - **`plans/`** — Durable implementation plans for multi-session initiatives. Write a plan here when work spans sessions or needs cross-subagent handoff; use in-session plan mode for single-session tasks.
 - **`.claude/tasks/`** — `todo.md` (current task checklist per `claude-behavior.md` rule 14) and `lessons.md` (correction patterns accumulated across sessions). Read `lessons.md` at session start; append after corrections.
+- **`.claude/sessions/`** — `/save-session` checkpoints; `/start-session` and `/continue` restore from here
+- **`.claude/advisor-sessions/`** — `/five-advisors` transcripts
 
 ### Stack Detection
 
@@ -82,6 +96,8 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 The 8 multi-step workflows (testing-pipeline, development-loop, debugging-loop, code-review, documentation, session-continuity, learning, skill-authoring) orchestrate from the user's T0 session via skills, NOT via subagents. Anthropic's Claude Code does not forward the `Agent` tool to dispatched subagents — any `Agent()` call inside a subagent silently inlines at runtime, defeating parallelism. Workflow skills run in T0 and dispatch flat worker subagents in a single message.
 
 The 8 legacy `core/.claude/agents/<workflow>-master-agent.md` files are `deprecated: true` (Phase 3, 2026-04-25) and MUST NOT be dispatched. New workflow logic goes in the matching `core/.claude/skills/<workflow>/SKILL.md`.
+
+The `project-manager-agent` runs the full PRD-to-Production pipeline and MUST run at T0 — it invokes the 8 workflow skills via `Skill("/<workflow>")`. Dispatching it as a subagent will silently break parallelism for the same reason workflow masters did.
 
 Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2.
 
@@ -133,6 +149,7 @@ Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, 
 
 - Fixtures: `scripts/tests/fixtures/` + shared in `scripts/tests/conftest.py`
 - Uses `tmp_path` for temp files and `sample_registry` fixture for registry tests
+- `scripts/tests/smoke-test/` — end-to-end provisioning smoke test (`bootstrap.py` + `recommend.py` against a fixture project)
 - Bug fixing: write a failing test first, then fix
 
 ## Key Conventions
