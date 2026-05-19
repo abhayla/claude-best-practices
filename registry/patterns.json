@@ -4252,20 +4252,21 @@
     "tier": "skip"
   },
   "ui-ux-pro-max": {
-    "hash": "2df4842f3cb08b52b96b2a37bcaf9576c26a1ac9174453ddd6db452ae4faae1d",
+    "hash": "e894964879a06795b91e0721da111829136607985123007d82a1e9e6977eb747",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
+    "upstream_ref": "nextlevelbuilder/ui-ux-pro-max-skill@b7e3af80f6e331f6fb456667b82b12cade7c9d35",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-05-19",
     "dependencies": [],
     "visibility": "public",
-    "description": "Design and implement UI/UX across 9 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui) with 50+ styles, color palettes, font pairings, and chart types. Use when planning, building, reviewing, or optimizing UI/UX for web and mobile applications.",
+    "description": "Design and implement UI/UX across 10 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui, HTML/CSS) with 50+ styles, 161 color palettes, 57 font pairings, 161 product types, 99 UX guidelines across 10 priority rule categories, and 25 chart types. Use when planning, building, reviewing, or optimizing UI/UX for web and mobile applications.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.1.0: Re-vendored from upstream nextlevelbuilder/ui-ux-pro-max-skill. +Navigation Patterns and Forms & Feedback rule categories, +google-fonts domain, +angular/laravel/threejs stacks, +source citations (Apple HIG / Material Design / WCAG) on every rule, +shadcn/ui MCP integration.",
     "tier": "must-have"
   },
   "update-practices": {
