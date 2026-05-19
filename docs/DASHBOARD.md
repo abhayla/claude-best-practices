@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-04-30 13:41 UTC (auto-generated)
+> Last updated: 2026-05-19 10:19 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -234,7 +234,7 @@
 | testing-pipeline-workflow | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | trace-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | twitter-x | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| ui-ux-pro-max | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| ui-ux-pro-max | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | update-practices | skill | 1.2.1 | hub:abhayla/claude-best-practices | — |
 | verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | visual-inspector-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |
