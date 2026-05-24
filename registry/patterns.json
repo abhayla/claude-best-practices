@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-04-30",
-    "total_patterns": 237
+    "last_updated": "2026-05-24",
+    "total_patterns": 238
   },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
@@ -2170,6 +2170,24 @@
     ],
     "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M008)",
     "tier": "must-have"
+  },
+  "grill-me": {
+    "hash": "c1251151196b04823d7adaacfa6c2187f871b74b6da03954657d3e1fae526ab1",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "scan:mattpocock/skills",
+    "discovered": "2026-05-24",
+    "last_updated": "2026-05-24",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Audit a plan or design by interviewing the user relentlessly until shared understanding is reached, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions \"grill me\".",
+    "tags": [
+      "workflow",
+      "productivity"
+    ],
+    "changelog": "v1.0.0: Initial registration (sourced from mattpocock/skills, MIT)",
+    "tier": "nice-to-have"
   },
   "handover": {
     "hash": "006c635be599c94015a375586494825b391817c69b834d5f5e1f3d1d48f5efe0",
