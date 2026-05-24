@@ -1,17 +1,17 @@
-# Claude Best Practices Hub â€” Dashboard
-> Last updated: 2026-05-24 09:34 UTC (auto-generated)
+# Claude Best Practices Hub — Dashboard
+> Last updated: 2026-05-24 09:52 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 239 |
-| Core (universal) | 172 |
-| Stack-specific | 67 |
+| Total Patterns | 237 |
+| Core (universal) | 166 |
+| Stack-specific | 71 |
 | Agents | 39 |
 | Configs | 2 |
 | Hooks | 9 |
 | Rules | 29 |
-| Skills | 160 |
+| Skills | 158 |
 
 ## Pattern Inventory
 
@@ -19,21 +19,19 @@
 
 | Name | Type | Version | Source | Dependencies |
 |------|------|---------|--------|--------------|
-| a11y-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | playwright |
-| adr | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| agent-evaluator | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| agent-orchestration | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| android | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
-| android-compose-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
-| android-compose-ui | rule | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
-| anthropic-agent-orchestration-guide | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
+| adr | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| agent-evaluator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| agent-orchestration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android-compose-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| android-compose-ui | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| anthropic-agent-orchestration-guide | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | anthropic-multi-agent-research-system-skill | skill | 1.0.0 | hub:abhayla/claude-best-practices | anthropic-agent-orchestration-guide |
 | anthropic-multi-agent-reviewer-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | anthropic-multi-agent-research-system-skill |
-| api-docs-generator | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| apply-selections | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
+| api-docs-generator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-verify | skill | 4.1.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | â€” |
 | brainstorm | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
@@ -48,19 +46,18 @@
 | code-readability | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
 | code-review-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | â€” |
 | code-review-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | code-review-master-agent, review-gate, request-code-review, receive-code-review |
-| code-reviewer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
-| configuration-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| context-management | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| context-reducer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
-| context-window-monitor | hook | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| context-window-statusline | hook | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| context-window-statusline-hook | hook | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| continue | skill | 1.1.0 | hub:abhayla/claude-best-practices | â€” |
-| contribute-practice | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
-| coverage-analysis | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| create-github-issue | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| dangerous-command-blocker | hook | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| dast-scan | skill | 1.0.0 | hub:abhayla/claude-best-practices | security-audit |
+| code-reviewer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| configuration-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| context-management | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| context-reducer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| context-window-monitor | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| context-window-statusline | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| context-window-statusline-hook | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| continue | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
+| contribute-practice | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| coverage-analysis | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| create-github-issue | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| dangerous-command-blocker | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | db-migrate | skill | 1.0.0 | hub:abhayla/claude-best-practices | schema-designer |
 | db-migrate-verify | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
 | debugger-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
@@ -108,13 +105,12 @@
 | learning-self-improvement | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
 | learning-self-improvement-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | â€” |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
-| middleware-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| parallel-worktree-orchestrator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| pattern-portability | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| pattern-self-containment | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| pattern-structure | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
+| monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| parallel-worktree-orchestrator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| pattern-portability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| pattern-self-containment | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| pattern-structure | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | perf-test | skill | 1.2.0 | hub:abhayla/claude-best-practices | web-quality |
 | pipeline-fix-pr | skill | 1.0.0 | hub:abhayla/claude-best-practices | serialize-fixes |
 | pipeline-orchestrator | skill | 2.0.0 | hub:abhayla/claude-best-practices | project-manager-agent |
@@ -139,9 +135,8 @@
 | research-mode | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
 | review-gate | skill | 2.0.0 | hub:abhayla/claude-best-practices | code-quality-gate, architecture-fitness, security-audit, adversarial-review, change-risk-scoring, pr-standards |
 | rule-curation | rule | 1.0.0 | hub:abhayla/claude-best-practices | pattern-portability, pattern-structure, pattern-self-containment |
-| rule-writing-meta | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| save-session | skill | 1.2.0 | hub:abhayla/claude-best-practices | â€” |
-| scan-discovery-report | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
+| rule-writing-meta | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| save-session | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | schema-designer | skill | 1.0.0 | hub:abhayla/claude-best-practices | pg-query, fastapi-db-migrate |
 | secret-scanner | hook | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
 | security-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
@@ -175,15 +170,14 @@
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | â€” |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
 | test-pipeline | skill | 3.0.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
-| test-pipeline-agent | agent | 4.4.0 | hub:abhayla/claude-best-practices | â€” |
-| test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | â€” |
-| tester-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | â€” |
-| testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | â€” |
-| testing-pipeline-master-agent | agent | 3.1.0 | hub:abhayla/claude-best-practices | â€” |
-| trace-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
-| ui-ux-pro-max | skill | 2.1.0 | hub:abhayla/claude-best-practices | â€” |
-| update-practices | skill | 1.2.1 | hub:abhayla/claude-best-practices | â€” |
-| verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | â€” |
+| test-pipeline-agent | agent | 4.4.0 | hub:abhayla/claude-best-practices | — |
+| test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| tester-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
+| testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
+| testing-pipeline-master-agent | agent | 3.1.0 | hub:abhayla/claude-best-practices | — |
+| ui-ux-pro-max | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| update-practices | skill | 1.2.1 | hub:abhayla/claude-best-practices | — |
+| verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | visual-inspector-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |
 | vue | rule | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
 | web-research-specialist-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | â€” |
