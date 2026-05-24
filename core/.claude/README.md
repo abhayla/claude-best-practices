@@ -129,7 +129,6 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 | `/strategic-architect` | Project diagnostics, bottleneck identification, roadmap |
 | `/writing-skills` | Author new Claude Code skills from scratch |
 | `/git-worktrees` | Manage git worktrees for isolated parallel development |
-| `/scan-discovery-report` | Report generator for scan results |
 
 ### Hub Sync
 | Skill | Description |

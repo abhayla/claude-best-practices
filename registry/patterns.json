@@ -2,12 +2,12 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-05-24",
-    "total_patterns": 239
+    "total_patterns": 237
   },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
@@ -463,26 +463,6 @@
       "documentation"
     ],
     "changelog": "v1.0.0: Initial release â€” multi-framework OpenAPI generation, validation, CI integration",
-    "tier": "must-have"
-  },
-  "apply-selections": {
-    "hash": "d3d4b6eda987c0fb42111c3edc81d7fd93a6e1c952ac751452da31cbe6a9fc7e",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-16",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Apply user-selected patterns from a nice-to-have PR by parsing checkbox state and removing unchecked files from the branch",
-    "tags": [
-      "provisioning",
-      "PR",
-      "checkbox",
-      "pattern-selection"
-    ],
-    "changelog": "v1.0.0: Initial release â€” checkbox parsing, file removal via GitHub API",
     "tier": "must-have"
   },
   "architecture-fitness": {
@@ -1100,7 +1080,7 @@
   "dast-scan": {
     "hash": "fca4e73c598463dad69e3a51150aa11af5d724e0224299c735730c26b1469641",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
@@ -1119,7 +1099,7 @@
       "fuzzing"
     ],
     "changelog": "v1.0.0: Initial release â€” ZAP, Nuclei, headers, sessions, fuzzing, CI",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "db-migrate": {
     "hash": "ea68c8aa074b059c61fae3cdb2451a1c7d31121b7d926c1362d469c5ae272087",
@@ -2485,7 +2465,7 @@
   "middleware-test": {
     "hash": "ba3f587d07a10aeff74c6606836160db1836297d97c3b9b84b57a2df734c4724",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -2498,7 +2478,7 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "mobile-a11y-test": {
     "hash": "f0b9cc5d9aa7d519739e0537a55f5866053764c71ab4ed921ef2f2d35be591a1",
@@ -3456,28 +3436,6 @@
     "changelog": "v1.2.0: Add triggers for natural language discoverability | v1.1.0: Add triggers, registry version sync | v1.0.0: Initial release",
     "tier": "must-have"
   },
-  "scan-discovery-report": {
-    "hash": "57d962a7c6b648b88427a3c7949580f4b5d7f6e6106703e61aef96f0cc72ee1e",
-    "type": "skill",
-    "category": "core",
-    "version": "1.0.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Comprehensive report generator for scan results from GitHub, Reddit, X/Twitter",
-    "tags": [
-      "scan",
-      "report",
-      "analysis",
-      "github",
-      "reddit",
-      "twitter"
-    ],
-    "changelog": "v1.0.0: Initial creation",
-    "tier": "must-have"
-  },
   "schema-designer": {
     "hash": "9c1d65b7a56face0d0d8b39ff3d5f86b5033851f0ce20250c3689013d3b1eb0d",
     "type": "skill",
@@ -4262,7 +4220,7 @@
   "trace-test": {
     "hash": "dbf4a700c41c687c1317c6272f93e728cc31992b1ed724fed9b0216301218516",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -4275,7 +4233,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "twitter-x": {
     "hash": "b6e63e1484238a3dd0c28f73dd5608035d1e4c1441d5a3a2309ad8934651e4d2",

@@ -246,7 +246,6 @@ workflows:
       skills:
         - adr
         - api-docs-generator
-        - apply-selections
         - changelog-contributing
         - diataxis-docs
         - doc-staleness
@@ -303,7 +302,6 @@ workflows:
         - reddit
         - redis-patterns
         - remotion-video
-        - scan-discovery-report
         - schema-designer
         - strategic-architect
         - tailwind-dev

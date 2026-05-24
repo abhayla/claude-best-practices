@@ -44,7 +44,7 @@ STACK_PREFIXES = ["fastapi-", "android-", "ai-gemini-", "firebase-", "react-", "
 
 # Hub-only patterns that MUST NOT appear in core/.claude/ (distributable template).
 # These are operational skills/rules for managing the hub itself, not for downstream projects.
-HUB_ONLY_SKILLS = {"synthesize-hub", "scan-repo", "scan-url"}
+HUB_ONLY_SKILLS = {"synthesize-hub", "scan-repo", "scan-url", "apply-selections", "scan-discovery-report"}
 HUB_ONLY_RULES = set()
 HUB_ONLY_AGENTS = set()
 
@@ -721,7 +721,7 @@ def check_cross_references(skills_dir: Path) -> list[str]:
     # Hub-only skills that exist in .claude/skills/ (not core/.claude/skills/) and
     # are valid cross-reference targets even though they won't be in the distributable
     # template. Skills referencing these are hub-aware and the references are intentional.
-    HUB_ONLY_VALID_REFS = {"synthesize-hub", "scan-repo", "scan-url"}
+    HUB_ONLY_VALID_REFS = {"synthesize-hub", "scan-repo", "scan-url", "apply-selections", "scan-discovery-report"}
 
     if skills_dir.exists():
         existing_skills = {d.name for d in skills_dir.iterdir()
