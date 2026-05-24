@@ -128,11 +128,16 @@ class TestRegistryEntryFields:
         assert errors == [], f"Invalid types:\n" + "\n".join(errors)
 
     def test_all_entries_have_valid_category(self):
-        """Category must be 'core' or 'stack:<stack-name>'."""
+        """Category must be 'core', 'need-basis', or 'stack:<stack-name>'."""
         from scripts.bootstrap import STACK_PREFIXES
         valid_stack_categories = {f"stack:{s}" for s in STACK_PREFIXES}
         # Also allow raw stack names for backward compat (to be cleaned up)
         legacy_stack_names = set(STACK_PREFIXES.keys())
+        # Non-stack categories defined for the registry:
+        #   'need-basis'  — stack-tied, only auto-included when the dep is detected
+        #   'third-party' — external-service wrappers, opt-in (tier: skip)
+        #   'deprecated'  — stubs in the 2-version-cycle removal window
+        extra_categories = {"need-basis", "third-party", "deprecated"}
 
         reg = _load_registry()
         errors = []
@@ -140,7 +145,10 @@ class TestRegistryEntryFields:
             if name == "_meta":
                 continue
             cat = entry.get("category", "")
-            if cat != "core" and cat not in valid_stack_categories and cat not in legacy_stack_names:
+            if (cat != "core"
+                    and cat not in valid_stack_categories
+                    and cat not in legacy_stack_names
+                    and cat not in extra_categories):
                 errors.append(f"'{name}' has invalid category: '{cat}'")
         assert errors == [], f"Invalid categories:\n" + "\n".join(errors)
 

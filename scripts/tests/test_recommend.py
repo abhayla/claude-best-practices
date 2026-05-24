@@ -356,9 +356,14 @@ class TestTierResource:
         assert tier_resource("tdd", "skill", []) == "must-have"
         assert tier_resource("systematic-debugging", "skill", []) == "must-have"
 
-    def test_must_have_stack_skill(self):
-        assert tier_resource("android-arch", "skill", ["android-compose"]) == "must-have"
-        assert tier_resource("fastapi-db-migrate", "skill", ["fastapi-python"]) == "must-have"
+    def test_need_basis_stack_skill(self):
+        # 'need-basis' category covers all stack-prefixed skills (android-*, fastapi-*,
+        # firebase-*, etc.). They're nice-to-have in the registry and stay nice-to-have
+        # even when their stack is detected — the user is expected to opt in rather than
+        # getting them auto-installed. This is the explicit semantic of "need basis".
+        assert tier_resource("android-arch", "skill", ["android-compose"]) == "nice-to-have"
+        assert tier_resource("fastapi-db-migrate", "skill", ["fastapi-python"]) == "nice-to-have"
+        assert tier_resource("firebase-dev", "skill", ["firebase-auth"]) == "nice-to-have"
 
     def test_nice_to_have_skill(self):
         # Stack-dependent skills stay nice-to-have until their stack is detected

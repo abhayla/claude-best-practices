@@ -444,7 +444,10 @@ MUST_HAVE_AGENTS = {"security-auditor-agent", "tester-agent", "test-pipeline-age
 # they are "skip unless dep detected" via DEP_PATTERN_MAP.
 ALWAYS_SKIP = {
     "contribute-practice",
-    "obsidian", "solidity-audit", "mcp-server-builder",
+    "obsidian", "mcp-server-builder",
+    # solidity-audit removed 2026-05-24: reclassified as need-basis (Ethereum stack).
+    # Behavior preserved via registry tier=skip in patterns.json; if a Solidity stack
+    # detector is added later, it can promote via dep_promoted set.
 }
 # update-practices removed from ALWAYS_SKIP 2026-04-24 (Phase 3.1 follow-up):
 # without it distributed to downstream projects, the documented sync flow

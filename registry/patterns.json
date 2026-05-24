@@ -106,7 +106,7 @@
   "ai-gemini-api": {
     "hash": "cecec051a4655c1a2e62bafd61c6469bea44a2de8bbd599d9de743c9738ee8ed",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
@@ -118,7 +118,7 @@
       "reference"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "android": {
     "hash": "082f7d56ff67e5cedf84dc9bd349ea7b05ebfb326f8114089ec62957047cb389",
@@ -138,7 +138,7 @@
   "android-adb-test": {
     "hash": "71f5bdd0eed6435cc3b98502d23bdcc5722c3becd5e153823f68fe56b4a5855c",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
@@ -152,12 +152,12 @@
       "reference"
     ],
     "changelog": "v2.0.0: Genericized and restructured",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "android-arch": {
     "hash": "1c33f79bd3e5db2cc654ff9c9f72ee6f2f6b079b02c2ef01346c0d174a4561a8",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -176,7 +176,7 @@
       "gradle"
     ],
     "changelog": "v2.0.0: Merged with claude-android-ninja references and templates",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "android-build-fixer-agent": {
     "hash": "1802316019f0b757144c9e8fe4b5a21c1a96b5e722bf35c9cda3c3551f9e2597",
@@ -234,7 +234,7 @@
   "android-gradle": {
     "hash": "48ed64dc0618935c453b92e21d0036a5a0d12673d366cf227c99cac8deabe616",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -247,7 +247,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "android-kotlin": {
     "hash": "1c40f0bfca4faacc2b1fe20a2177773f4b0724ef193bce56e724460086e84388",
@@ -295,7 +295,7 @@
   "android-mvi-scaffold": {
     "hash": "24a263cd1bb9293923671afdaafd9aeca4c4d71353bf22895959ef456fd93b59",
     "type": "skill",
-    "category": "android-compose",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "scan:ChrisWW/claude-code-android-skills+TaeseongYun/everything-claude-code-android",
     "discovered": "2026-03-13",
@@ -312,12 +312,12 @@
       "architecture"
     ],
     "changelog": "v1.0.0: Initial â€” consolidated from ChrisWW + TaeseongYun repos",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "android-run-e2e": {
     "hash": "4532522d50158ad5e12a9e91c84437233e6386fc99b4728bdb17a55103175cd9",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
@@ -331,12 +331,12 @@
       "reference"
     ],
     "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "android-run-tests": {
     "hash": "527c4d0eb53e9a780c4a6ba57b2505ee78b355e9c082a78c1152767d37c4b59c",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
@@ -350,12 +350,12 @@
       "workflow"
     ],
     "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "android-test-patterns": {
     "hash": "15d45b4d2bacb83272582c8dcd6899f5872e54f5017dc34d9ac51ee34eaed5c7",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:pipeline-audit",
     "discovered": "2026-03-13",
@@ -376,7 +376,7 @@
       "mockk"
     ],
     "changelog": "v1.0.0: Initial â€” JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "anthropic-agent-orchestration-guide": {
     "hash": "3d00e0fd06b096bf9b15293640e62cfd747dbc06a46c132a16cf0f5aaa36965d",
@@ -611,7 +611,7 @@
   "bun-elysia-test": {
     "hash": "57c9cb09cd284f60049e39c8785975c51ec73e66c207037dfdb8a8167e0e9e0f",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
@@ -670,7 +670,7 @@
   "chaos-resilience": {
     "hash": "c725e895fa93dc5c1da90b2eaa0be2eb932add91ea7cd11b42cf9ef7729612d1",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
@@ -685,7 +685,7 @@
       "circuit-breaker"
     ],
     "changelog": "v1.0.0: Initial release â€” failure injection, degradation verification, gameday",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "ci-cd-setup": {
     "hash": "8f08ff9470e6743c1f27d12792426293ecd086eabb1e0663c7341fae6f24cdaa",
@@ -841,7 +841,7 @@
   "compose-ui": {
     "hash": "e41b7978d0926404a5dc3674fb7991b6673791868b51b0f464af98b6acf99be4",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -974,7 +974,7 @@
   "contract-test": {
     "hash": "c7e2a7df3828e08d001b27f4911fa8fc5f31482c81203bab64566c54af8c3a76",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
@@ -990,7 +990,7 @@
       "consumer-driven"
     ],
     "changelog": "v1.0.0: Initial release â€” Pact consumer/provider, broker, CI integration",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "contribute-practice": {
     "hash": "846f08afd6a5ffe90d2aa80a4f24c3f2cf6faa452d9fc16ea199b880f8655113",
@@ -1051,7 +1051,7 @@
   "cross-platform-visual": {
     "hash": "5d9a973d7d94488d2003348b480f7a16c425a8ed9068b894e927df40cc2dfbb1",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -1068,7 +1068,7 @@
   "d3-viz": {
     "hash": "108d4cd7bef1a442883e63bba5cc592dc4b230f67dc14d77e7ec98f4098852f3",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -1340,7 +1340,7 @@
   "disaster-recovery": {
     "hash": "e27314a8c4d64310049662f1720ec0c503e883c280cdbe9da5fe466614526a2a",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
@@ -1360,7 +1360,7 @@
       "RPO"
     ],
     "changelog": "v1.0.0: Initial release â€” RTO/RPO, backup, restore, failover, DR drills",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "doc-staleness": {
     "hash": "0b278635a9fb5f0d695c96e47793343f3018f6aecb92ff21b59e9b6ef2475666",
@@ -1406,7 +1406,7 @@
   "docker-optimize": {
     "hash": "dddfb491b02ea13a13e91a2c1adf01cb78b6903145275326241d302c35bcb41f",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -1419,7 +1419,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "docs-manager-agent": {
     "hash": "8e03be4d7c9f7629de93308363c9149b280db85ac027caaadec2aa88b5f56b53",
@@ -1479,7 +1479,7 @@
   "drizzle-orm": {
     "hash": "688992e15810aee165976d6e05dc9b4e4447ee5a5f6ebe89d381a401d6c880aa",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -1666,7 +1666,7 @@
   "expo-dev": {
     "hash": "6607ae97f5cf98834524078f676b4598289fd2e2257beb52695fa5db2484008f",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -1766,7 +1766,7 @@
   "fastapi-db-migrate": {
     "hash": "fe589281be5c9bab2cf0b4d84991cd9292544c330a3159242619679045ceb88d",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
@@ -1781,12 +1781,12 @@
       "workflow"
     ],
     "changelog": "v1.1.0: Add triggers, boundary clarification with db-migrate/db-migrate-verify, flesh out check mode, add output format, expand CRITICAL RULES | v1.0.1: Initial release",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "fastapi-deploy": {
     "hash": "921db636dc9b466a2d430d4749086a16f4413421bb2a3810bf6423ab81dfb848",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
@@ -1803,12 +1803,12 @@
       "workflow"
     ],
     "changelog": "v1.1.0: Add triggers, fix blocking uvicorn (background+no-reload), flesh out seed loop, add CRITICAL RULES, cross-refs, rollback guidance | v1.0.0: Initial release",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "fastapi-run-backend-tests": {
     "hash": "327f7ec9fdf9e279f18ef8a462173cb481fb5c777926922535aa56de1d721fa2",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
@@ -1824,7 +1824,7 @@
       "workflow"
     ],
     "changelog": "v2.2.0: Add triggers, fix monorepo detection (collect all dirs), add failure-count guard (>10 asks user), optional dependency skip | v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "feature-flag": {
     "hash": "91605c6d99d5172eff2e8b481ddff097d3ad8e92fa04d5f17e54ecba65917c15",
@@ -1888,7 +1888,7 @@
   "firebase-ai": {
     "hash": "d447ce34e7d3437caf82477ad8f925adda38c6ef3978900b63505d316408b1e7",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -1901,12 +1901,12 @@
       "reference"
     ],
     "changelog": "v1.0.2: Add TOC, version caveat, remove internal nickname, fix Node.js version | v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "firebase-data-connect": {
     "hash": "e784aba821e1dd4d2f642ef128fc64791ab7e84c0ce63c0f71449d41b46a9dc0",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -1924,7 +1924,7 @@
   "firebase-dev": {
     "hash": "e7caa42829b54dc495669d9ea3dd6e137de78cefd476d8d320252c696d791b49",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -1937,12 +1937,12 @@
       "reference"
     ],
     "changelog": "v1.0.2: Add TOC, add deleteDoc to Write Operations (complete CRUD) | v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "firebase-test": {
     "hash": "7c91fa95906356fe35ade63c6431ee0ad11b13217bb9bc605d7dec1e1995954b",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
@@ -1957,7 +1957,7 @@
       "firestore"
     ],
     "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "fix-github-issue": {
     "hash": "0681fa889f34283d0ee05c62da9e8864d4db131aa076765bfafae92255f62e6d",
@@ -1984,7 +1984,7 @@
   "fix-issue": {
     "hash": "8c5b1e8fd251b9b61eac9aa9f8665f304e356c8ddc4a891ca737185b20cfc70d",
     "type": "skill",
-    "category": "core",
+    "category": "deprecated",
     "version": "2.6.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
@@ -2070,7 +2070,7 @@
   "flutter-dev": {
     "hash": "900e8f4dbf4ac2e056aec45a3d498b2f2ca36d790a70985de86218dd74912706",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2088,7 +2088,7 @@
   "flutter-e2e-test": {
     "hash": "992c0b48d253745b7d5812b61872c49ca077cd89bafed176381cc7bccd465238",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.2.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2159,7 +2159,7 @@
   "github": {
     "hash": "b7ebc3a39b0334afce9a55f1faa3af9a76c173c407c017f3208e9b2b95088be2",
     "type": "skill",
-    "category": "core",
+    "category": "third-party",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
@@ -2235,7 +2235,7 @@
   "hono-backend": {
     "hash": "b68e588a62aed476db95a79b4c2b221d46f447c6c5d03f10d7b33b0621662edb",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -2254,7 +2254,7 @@
   "html-prototype": {
     "hash": "55c51711fa7618eb340b1f39b1e9a1d980ec38ab57cf2c0fd016e23983604bfb",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
@@ -2270,12 +2270,12 @@
       "Nielsen"
     ],
     "changelog": "v1.0.0: Initial release â€” single-file prototypes with heuristic validation",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "iac-deploy": {
     "hash": "68ee18a7db5f14bba3d697bd538e12765264d1a5ed7f74b743cfba9285f00388",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2288,7 +2288,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "implement": {
     "hash": "21de16f34efd3f7ebe0022c844daa67b86aee0c09b92b4f312d4a8bfecbd8730",
@@ -2312,7 +2312,7 @@
   "incident-response": {
     "hash": "557880deaeb72684dc51b52f804270d7c4033d5e61a05085134c2b7edaed7d24",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2324,7 +2324,7 @@
       "reference"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "integration-test": {
     "hash": "f4f46b20a8c7c07e06295d31f88a99891cbbb9205a8e65708c73bfb3abed638e",
@@ -2348,7 +2348,7 @@
   "jest-dev": {
     "hash": "4842479b7a9203a8c2244c6d50fa015cf7ce14e6d0ee68bb73ebc8a9b74e3864",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
@@ -2368,7 +2368,7 @@
   "k8s-deploy": {
     "hash": "cc65a059af3aa6a8524f6f63311b3b0cee83a3b73b503642fadd6eb3d5d3b2d9",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2446,7 +2446,7 @@
   "mcp-server-builder": {
     "hash": "151b891925204bc3a51e083d34395962bf3abaa62339b9103dc8d6c0da74f224",
     "type": "skill",
-    "category": "core",
+    "category": "third-party",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -2503,7 +2503,7 @@
   "mobile-a11y-test": {
     "hash": "f0b9cc5d9aa7d519739e0537a55f5866053764c71ab4ed921ef2f2d35be591a1",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
@@ -2524,7 +2524,7 @@
   "mock-server": {
     "hash": "6660051f763120e6dc8957c4fd64f4afc544a730ca085bbecbe8cbf455e536c8",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
@@ -2539,12 +2539,12 @@
       "development"
     ],
     "changelog": "v1.0.0: Initial release",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "monitoring-setup": {
     "hash": "3df218890c163f09c1d799df8d9820de8c4b4c19a4ce4c1a867a8076339acb0f",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2556,7 +2556,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "monorepo": {
     "hash": "0ece2a4193372c0b6f9ee69920b6a8ff8b1faf82894911345a99dabb8bdee2e9",
@@ -2580,7 +2580,7 @@
   "nextjs-dev": {
     "hash": "659dd4587bc1e4da34ff12b09ec864013c02b8e632a90498c68d92045124e894",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -2599,7 +2599,7 @@
   "node-backend-dev": {
     "hash": "c2a112cafc37b72e26c6c2fb923889484a23973b076907a3b1ed63260a009dd6",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -2620,7 +2620,7 @@
   "nuxt-dev": {
     "hash": "d3590e76e07ea0a66f36ebf1ce8735c8ec02e85c4bb131275ed7a826b8926677",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2637,7 +2637,7 @@
   "obsidian": {
     "hash": "1b8e24011738a2f38247a28b72143868acca3f3c35e4b1ddbce3689c368b0a0b",
     "type": "skill",
-    "category": "core",
+    "category": "third-party",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2773,7 +2773,7 @@
   "pg-query": {
     "hash": "271b09ff3373b6985bbe59e82b6096dc14fc2984269e3a2d5a1c3d7105fe5d2d",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -2897,7 +2897,7 @@
   "pm2-deploy": {
     "hash": "d43372a9d6417346559c4c5fd8472bdd17afc98887401fd4469e7b728f55ff8f",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -2911,7 +2911,7 @@
       "nodejs"
     ],
     "changelog": "v1.0.0: Initial creation",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "post-fix-pipeline": {
     "hash": "6db86dcc06444323d59f70565c6876989031f7e96b500ad9b9f67e09fe4a94dc",
@@ -2977,7 +2977,7 @@
   "prisma-orm": {
     "hash": "6cb871452e04228bae25ee149598b87a68e5d1f85b3aca6911555b3b549dc1c8",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -3132,7 +3132,7 @@
   "pytest-dev": {
     "hash": "69d8586655534f5dbd093e1fa4699206ba817d3e874f66a3269539c245ca21c3",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
@@ -3171,7 +3171,7 @@
   "react-native-dev": {
     "hash": "d4f3bf8c474b7cf2c77bb14b62f67b1e84d958c74fffcdf60869e1cc01292b9b",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -3184,12 +3184,12 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "react-native-e2e": {
     "hash": "10cf4c92d18e399bbe5eca3123375834e4e932b350cfca43db9b3cc9d93c71df",
     "type": "skill",
-    "category": "stack:react-nextjs",
+    "category": "need-basis",
     "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -3203,7 +3203,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial registration",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "react-nextjs": {
     "hash": "9a44faf762afaaf91692ed078620ca2b03403e58a3ebbd55996dbfef42acc04a",
@@ -3227,7 +3227,7 @@
   "react-test-patterns": {
     "hash": "d942935ff6176b052994760baddeddb771da80b04820dba3741c0cac0dd484c8",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
@@ -3242,7 +3242,7 @@
       "nextjs"
     ],
     "changelog": "v1.0.0: Initial creation from testing gap audit",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "receive-code-review": {
     "hash": "14fef9d674050c8acc588e55dc84963a447cb65f21ab9f992e2a683dc9bc3f25",
@@ -3264,7 +3264,7 @@
   "reddit": {
     "hash": "ec26b2c49a8c9132ad5158032d4388585044b20877b1543cf8c32920d6a03997",
     "type": "skill",
-    "category": "core",
+    "category": "third-party",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
@@ -3282,7 +3282,7 @@
   "redis-patterns": {
     "hash": "da4325233710ff4d429424ef7539f4c622f8a9a54766206bc63ee58bcb830b32",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -3318,7 +3318,7 @@
   "remotion-video": {
     "hash": "d5da8a983c2f852bc671739258f73de7a0db7f8ecb8f0a2f8c7d6a2c548ee605",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -3799,7 +3799,7 @@
   "solidity-audit": {
     "hash": "95f1932d817939e4d9dd9f3d66b0197f1d2590b50b84e946059475500d9b0bb3",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -3812,7 +3812,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "skip"
+    "tier": "nice-to-have"
   },
   "ssot-audit": {
     "hash": "e33c331b6af06d3de8e67a642e22f45e35bda8a29a6030b40e50bb7b61600eb6",
@@ -3949,7 +3949,7 @@
   "tailwind-dev": {
     "hash": "a0ad693a26df2ec4db5d224aec9c2e0824933e065a14e59b3bd65b30e851ce1e",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -4239,7 +4239,7 @@
   "testing-pipeline-workflow": {
     "hash": "eee314489377a657072a959204d8c1c6e6df0b29536d8e6c474e5c9f0c7d432c",
     "type": "skill",
-    "category": "core",
+    "category": "deprecated",
     "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
@@ -4280,7 +4280,7 @@
   "twitter-x": {
     "hash": "b6e63e1484238a3dd0c28f73dd5608035d1e4c1441d5a3a2309ad8934651e4d2",
     "type": "skill",
-    "category": "core",
+    "category": "third-party",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
@@ -4373,7 +4373,7 @@
   "vitest-dev": {
     "hash": "1540521791e39ab81a50b127a5e73d3f5c0b63809ec426eecfe684453032fdc3",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -4411,7 +4411,7 @@
   "vue-dev": {
     "hash": "4dbae3acf182a41c51845dd7a6398ce0a4ef90030aa562c84d797176736a62b9",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -4429,7 +4429,7 @@
   "vue-test": {
     "hash": "d5a8970e63bd31b6ab2f44f332a1fea3d0f215813b656484fb0984a45c3e94d6",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
@@ -4449,7 +4449,7 @@
   "web-quality": {
     "hash": "7ab5ed263119a04bfbb97c4f62097fd0c7830528f1e41dbdbb3c9c61cf1ca7db",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
@@ -4461,7 +4461,7 @@
       "workflow"
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "web-research-specialist-agent": {
     "hash": "8b6df4fa5107cdd13f84c5a2d87e173af3e38c8c564be6c407e5fabcfc3076b6",
@@ -4485,7 +4485,7 @@
   "web-scraper": {
     "hash": "d3abd173cb3be1bd8b75283a84faea99becd25e3310cc70474a40ac6a95a1022",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -4499,12 +4499,12 @@
       "cheerio"
     ],
     "changelog": "v1.0.0: Initial creation",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "websocket-patterns": {
     "hash": "8f823b06700e351995427b46e8fb6d11350516259cb487bf28331ef9584f28b2",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
@@ -4517,7 +4517,7 @@
       "realtime"
     ],
     "changelog": "v1.0.0: Initial creation",
-    "tier": "must-have"
+    "tier": "nice-to-have"
   },
   "workflow": {
     "hash": "ff80a950e0d9d23cb723ffde736e104871091d5c33eab386ba702e08448852f4",
@@ -4596,7 +4596,7 @@
   "xml-to-compose": {
     "hash": "9e8f752ae62eab85b18509b0e86abb2d75d14ac81970e6e0b015c3fede0a805f",
     "type": "skill",
-    "category": "core",
+    "category": "need-basis",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
