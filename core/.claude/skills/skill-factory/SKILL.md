@@ -58,7 +58,7 @@ Classify each detected pattern into exactly one of these 5 categories:
 
 | Category | Location | When to Use | Examples |
 |----------|----------|-------------|---------|
-| **Skill** (`.claude/skills/`) | Multi-step workflow triggered by user command. Has clear start/end, requires judgment, runs in conversation context. | `/fix-issue`, `/implement`, `/tdd`, test-debug-fix cycles |
+| **Skill** (`.claude/skills/`) | Multi-step workflow triggered by user command. Has clear start/end, requires judgment, runs in conversation context. | `/fix-github-issue`, `/implement`, `/tdd`, test-debug-fix cycles |
 | **Agent** (`.claude/agents/`) | Autonomous sub-task that runs in isolation with own tool access. Delegatable work without continuous user interaction. | Code reviewer, test runner, build validator, dependency auditor |
 | **Hook** (`.claude/hooks/`) | Automatic trigger on tool events (PreToolUse/PostToolUse). Enforcement gates, auto-formatting, validation. No user invocation. | Auto-format on save, block commits without tests, screenshot resize |
 | **MCP Server** (`.mcp.json`) | External tool integration via Model Context Protocol. Bridges to third-party services or local tools that need a persistent server. | Database queries, browser automation, Slack notifications, CI status |

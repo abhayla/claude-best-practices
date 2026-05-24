@@ -201,7 +201,7 @@ def test_test_healer_agent_has_explicit_tools_field():
 
 
 def test_test_healer_agent_tools_includes_skill():
-    """test-healer-agent tools must include Skill (it invokes /fix-issue in PR2)."""
+    """test-healer-agent tools must include Skill (it invokes /fix-github-issue in PR2)."""
     healer_path = AGENTS_DIR / "test-healer-agent.md"
     content = healer_path.read_text(encoding="utf-8")
     # Search just the frontmatter

@@ -47,7 +47,7 @@ Stage 5: Tasks → Implementation (coding + verification)
 - Can subagent-driven-dev parallelize work across multiple agents?
 - Can auto-verify map changed files to targeted tests and run them?
 - Can verify-screenshots provide visual proof (screenshot comparison) that UI changes are correct?
-- Can fix-loop / fix-issue handle failures iteratively?
+- Can fix-loop / fix-github-issue handle failures iteratively?
 - Does batch handle codebase-wide changes with impact analysis?
 - Is there a skill for database migrations during implementation? (fastapi-db-migrate for Alembic — generic equivalent?)
 

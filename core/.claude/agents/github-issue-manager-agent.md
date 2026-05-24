@@ -18,7 +18,7 @@ version: "1.0.0"
 
 1. **Hard-fail on missing GitHub.** If `/create-github-issue` returns `GITHUB_NOT_CONNECTED`, propagate that error to the T0 orchestrator — do NOT swallow and do NOT mark the test as "no Issue, continue." T0 honors `partial_failure_policy: abort_on_first_blocked` (per `core/.claude/config/test-pipeline.yml`) and aborts the entire triage on the first blocked preflight.
 2. **One Issue per failed test.** Consolidate all 3 lanes' findings into a SINGLE Issue body via `/create-github-issue` — do NOT create one Issue per lane. The skill's body template covers all three lanes in one Issue.
-3. **Honor dedup result.** If the skill returns `deduped: true`, propagate that — T0 treats a deduped Issue identically to a freshly-created one for downstream fixer dispatch (the existing Issue's number is still a valid target for `/fix-issue`).
+3. **Honor dedup result.** If the skill returns `deduped: true`, propagate that — T0 treats a deduped Issue identically to a freshly-created one for downstream fixer dispatch (the existing Issue's number is still a valid target for `/fix-github-issue`).
 4. **No agent dispatch.** Worker agent — only `Skill()` and `Bash` calls. MUST NOT call `Agent()` (platform constraint — see `agent-orchestration.md` §3).
 
 > See `core/.claude/rules/agent-orchestration.md` (rule 3 tier enforcement) and `docs/specs/test-pipeline-three-lane-spec.md` v1.6 §3.7 for full normative rules.

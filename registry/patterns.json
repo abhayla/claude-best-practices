@@ -2,7 +2,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-05-24",
-    "total_patterns": 238
+    "total_patterns": 239
   },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
@@ -800,7 +800,7 @@
     "deprecated_by": "code-review-workflow"
   },
   "code-review-workflow": {
-    "hash": "0478cd9226b5b11c96860dea2c3e1d92af28085109de65d7cd2e088f5e571691",
+    "hash": "94eb29c428dd059420e0ef6b1fb96c4c50eeb825d1d3afcfb3031dba768abb6e",
     "type": "skill",
     "category": "core",
     "version": "2.0.0",
@@ -1270,7 +1270,7 @@
     "tier": "must-have"
   },
   "development-loop": {
-    "hash": "1d9fa7c288e2c7f66cecb486fb53c5683d011ec24a71b5e2fbfbce6acd212712",
+    "hash": "b2b2cdda76cd5c29bf27fb73b3fa5b45393aa53047b23b61acf09c197f4b2d11",
     "type": "skill",
     "category": "core",
     "version": "2.0.0",
@@ -1458,7 +1458,7 @@
     "deprecated_by": "documentation-workflow"
   },
   "documentation-workflow": {
-    "hash": "ce9c2ae2ab24301d1f6dfdc0115a851f6b6014b55dae48c29e4aaae16a50cf38",
+    "hash": "56056623a491aa4f3ee44c1a8c224b96ec904c3bf43491fe9a669bbfa4cef643",
     "type": "skill",
     "category": "core",
     "version": "2.0.0",
@@ -1681,7 +1681,7 @@
     "tier": "nice-to-have"
   },
   "failure-triage-agent": {
-    "hash": "6ef83710399a30d3c537be60e111a57376f3875e02ef7823657e50be7e3768a7",
+    "hash": "4a7e60b9492c6d7372cfedae5546dec8d43306638cafe8b7010990f9dfa6e643",
     "type": "agent",
     "category": "core",
     "version": "1.1.0",
@@ -1959,14 +1959,14 @@
     "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "must-have"
   },
-  "fix-issue": {
-    "hash": "c71d0109c4413c9ec9e347c55525299f43ab2a339710c152e9caca94f26d1bcb",
+  "fix-github-issue": {
+    "hash": "0681fa889f34283d0ee05c62da9e8864d4db131aa076765bfafae92255f62e6d",
     "type": "skill",
     "category": "core",
-    "version": "2.6.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-05-24",
     "dependencies": [
       "fix-loop",
       "post-fix-pipeline"
@@ -1978,8 +1978,34 @@
       "bug-fix",
       "workflow"
     ],
-    "changelog": "v2.4.0: Tighten triggers (require # for broad phrases), add issue extraction + error handling, lock summary format, always run post-fix-pipeline | v2.1.0: Add triggers, preamble constraints, MUST/MUST NOT rules, dependencies, registry sync | v2.0.0: Genericized and restructured",
+    "changelog": "v3.0.0: Renamed from fix-issue → fix-github-issue (MAJOR — invocation surface change). Old name preserved as deprecation stub for 2 version cycles. | v2.6.0: prior history under former name fix-issue",
     "tier": "must-have"
+  },
+  "fix-issue": {
+    "hash": "8c5b1e8fd251b9b61eac9aa9f8665f304e356c8ddc4a891ca737185b20cfc70d",
+    "type": "skill",
+    "category": "core",
+    "version": "2.6.1",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-10",
+    "last_updated": "2026-05-24",
+    "dependencies": [
+      "fix-github-issue"
+    ],
+    "visibility": "public",
+    "deprecated": true,
+    "deprecated_by": "fix-github-issue",
+    "deprecated_since": "2026-05-24",
+    "removal_target": "fix-github-issue v5.0.0",
+    "description": "Route deprecated /fix-issue invocations to the renamed /fix-github-issue skill. Use when any existing caller still references the old name; this stub forwards verbatim. Removed at fix-github-issue v5.0.0.",
+    "tags": [
+      "github",
+      "bug-fix",
+      "workflow",
+      "deprecated"
+    ],
+    "changelog": "v2.6.1: Deprecated → stub forwards to fix-github-issue | v2.6.0: prior content moved to fix-github-issue v3.0.0",
+    "tier": "skip"
   },
   "fix-loop": {
     "hash": "f5c8399879ebc3d90871f55071e7d71ced185f8e4bb12b012e9b13552cd6f966",
@@ -2150,7 +2176,7 @@
     "tier": "skip"
   },
   "github-issue-manager-agent": {
-    "hash": "1ab79abfa3ddbd9f9e282c6733eaab1ca10cf02aa336ed99efacb56487736ee0",
+    "hash": "f509ff36668f74821c7dccaf5afb8be99b6873286f361c4650bd849b43efc57e",
     "type": "agent",
     "category": "core",
     "version": "1.0.0",
@@ -2172,7 +2198,7 @@
     "tier": "must-have"
   },
   "grill-me": {
-    "hash": "c1251151196b04823d7adaacfa6c2187f871b74b6da03954657d3e1fae526ab1",
+    "hash": "97800f2544a95d3a1486d1b002146aef0629228dbb03e537001edd119db26fa8",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -2265,7 +2291,7 @@
     "tier": "must-have"
   },
   "implement": {
-    "hash": "1e9470229be30d633eb005fcb67f592961399552248a2e340daf48a36a30714d",
+    "hash": "21de16f34efd3f7ebe0022c844daa67b86aee0c09b92b4f312d4a8bfecbd8730",
     "type": "skill",
     "category": "core",
     "version": "2.2.0",
@@ -3737,7 +3763,7 @@
     "tier": "must-have"
   },
   "skill-factory": {
-    "hash": "64362bee6104875ae486d7e68f42f733ab403ea43a490b12071410b6b0652075",
+    "hash": "fa9ea08e6fd6d01131a97445f3389990f10cd50fb0c03ac5ad6dad6aa2fea1ce",
     "type": "skill",
     "category": "core",
     "version": "3.0.0",
@@ -3789,7 +3815,7 @@
     "tier": "skip"
   },
   "ssot-audit": {
-    "hash": "dac5b69e7c8e649f3112cff2f5b03b8ea4e0b99003c8d0cf3c42d5b9f98ffd54",
+    "hash": "e33c331b6af06d3de8e67a642e22f45e35bda8a29a6030b40e50bb7b61600eb6",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -4036,7 +4062,7 @@
     "tier": "must-have"
   },
   "test-healer-agent": {
-    "hash": "03bae7b0c142514670b59b0159819e8eb36937d038da842bf18f5afbcb7f7a75",
+    "hash": "8199848edf9a729a3b904012cdb40686e52f7ad5da32ebfaa222534503d4a145",
     "type": "agent",
     "category": "core",
     "version": "2.3.0",

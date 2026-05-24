@@ -152,7 +152,7 @@ For each skill:
 
 1. Extract the skill's core workflow steps
 2. Check if CLAUDE.md contains similar procedural content
-3. CLAUDE.md may reference a skill by name ("Use `/fix-issue` for bug fixes") -- this is a pointer, not duplication
+3. CLAUDE.md may reference a skill by name ("Use `/fix-github-issue` for bug fixes") -- this is a pointer, not duplication
 
 ### 3c. Settings-to-CLAUDE.md Duplication
 

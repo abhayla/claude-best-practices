@@ -3,7 +3,7 @@ name: implement
 description: >
   Implement a feature or fix following a structured workflow: requirements analysis,
   test creation, implementation, test execution, fix-loop delegation, and verification.
-  Use when user requests new functionality or structured bug fixes. Use /fix-issue
+  Use when user requests new functionality or structured bug fixes. Use /fix-github-issue
   for GitHub Issues, /tdd for strict red-green-refactor, /development-loop for
   full ideation-to-commit orchestration.
 triggers:

@@ -58,7 +58,7 @@ T2A in STEP 6 of T2A's lifecycle. Dispatches T3 worker agents
 
 2. **Issue-manager fan-out + fan-in coordination** — for each classified failure, dispatch `github-issue-manager-agent` to create or dedup-comment a GitHub Issue. Apply `partial_failure_policy: abort_on_first_blocked` per spec §3.7.1: any `GITHUB_NOT_CONNECTED` from any issue-manager aborts the entire triage immediately. Batched at `max_concurrent_issue_managers` (default 5).
 
-3. **Fixer fan-out (batched)** — for each Issue with `recommended_action == AUTO_HEAL`, dispatch `test-healer-agent` with `commit_mode=diff_only` and the issue_number. Healer invokes `/fix-issue --diff-only` and writes diff to `test-results/fixes/{issue_number}.diff`. Batched at `max_concurrent_fixers` (default 5). `ISSUE_ONLY` / `QUARANTINE` / `RETRY_INFRA` recommended_actions MUST skip fixer dispatch.
+3. **Fixer fan-out (batched)** — for each Issue with `recommended_action == AUTO_HEAL`, dispatch `test-healer-agent` with `commit_mode=diff_only` and the issue_number. Healer invokes `/fix-github-issue --diff-only` and writes diff to `test-results/fixes/{issue_number}.diff`. Batched at `max_concurrent_fixers` (default 5). `ISSUE_ONLY` / `QUARANTINE` / `RETRY_INFRA` recommended_actions MUST skip fixer dispatch.
 
 4. **`/serialize-fixes` invocation (or `/pipeline-fix-pr` if `--fix-pr-mode` was passed via T2A dispatch context, REQ-C003)** — after all fixer batches complete, invoke the appropriate skill:
    - **Default:** `Skill("/serialize-fixes", args="test-results/fixes/*.diff")` — applies diffs sequentially to current branch; commits land in working-branch history.

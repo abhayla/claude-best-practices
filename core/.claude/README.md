@@ -47,7 +47,7 @@ cp -r core/.claude/ /path/to/your/project/.claude/
 |-------|-------------|
 | `/implement` | Structured feature implementation workflow |
 | `/tdd` | Strict red-green-refactor TDD cycle |
-| `/fix-issue` | Analyze and fix a GitHub issue |
+| `/fix-github-issue` | Analyze and fix a GitHub issue |
 | `/fix-loop` | Iterative fix cycle until tests pass |
 | `/code-quality-gate` | Complexity, duplication, SOLID, Clean Architecture, logging checks |
 | `/feature-flag` | Feature toggles (LaunchDarkly, Unleash, env-var) with cleanup |

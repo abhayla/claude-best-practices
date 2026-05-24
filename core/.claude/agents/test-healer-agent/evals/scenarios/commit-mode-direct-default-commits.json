@@ -20,7 +20,7 @@
     "trigger_reliability": "Healer detects commit_mode is absent → falls back to direct (legacy /fix-loop / e2e-conductor pathway)",
     "output_structure": "Return contract includes commit_sha (because commit happened)",
     "non_negotiable_adherence": "Backward compat preserved per spec §3.14",
-    "side_effect_correctness": "Healer invokes /fix-issue without --diff-only flag; /post-fix-pipeline commits",
+    "side_effect_correctness": "Healer invokes /fix-github-issue without --diff-only flag; /post-fix-pipeline commits",
     "error_propagation": "Backward compat is not an error condition"
   }
 }

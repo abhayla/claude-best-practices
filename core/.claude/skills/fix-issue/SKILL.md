@@ -1,171 +1,65 @@
 ---
 name: fix-issue
-description: >
-  Analyze and implement a fix for a specific GitHub Issue. Fetches issue details
-  via `gh`, explores codebase for root cause, plans minimal fix, implements,
-  verifies with tests, and runs post-fix-pipeline. Use when user says "fix
-  issue #N" or references a GitHub Issue. For new feature work without a
-  GitHub Issue, use /implement instead. For iterative test fixing, use /fix-loop.
-  For bugs without a GitHub Issue, use /debugging-loop or /systematic-debugging.
+description: Route deprecated /fix-issue invocations to the renamed /fix-github-issue skill. Use when any existing caller (downstream project, eval scenario, agent body) still references the old name; this stub forwards verbatim and prints a one-time migration notice. Removed at fix-github-issue v5.0.0.
 type: workflow
-triggers:
-  - fix issue #
-  - fix #
-  - resolve issue #
-  - work on issue #
-  - investigate issue #
-  - gh issue fix
-allowed-tools: "Bash Read Grep Glob Write Edit Skill"
-argument-hint: "<issue-number or issue-url> [--diff-only]"
-version: "2.6.0"
+deprecated: true
+deprecated_by: fix-github-issue
+deprecated_since: "2026-05-24"
+removal_target: "fix-github-issue v5.0.0"
+allowed-tools: "Skill"
+argument-hint: "<forwarded to /fix-github-issue verbatim>"
+version: "2.6.1"
 ---
 
-# Fix GitHub Issue
+# fix-issue (Deprecated)
 
-Fetch a GitHub Issue, diagnose root cause, implement a minimal fix, verify with tests, and finalize via post-fix-pipeline.
+This skill has been renamed to **`fix-github-issue`** to reflect that it is GitHub-specific.
+The original name was ambiguous — it could plausibly mean any issue tracker.
+The skill body has always been GitHub-only: it calls `gh issue view`, expects GitHub Issue URLs, and writes commit messages with `fix: resolve #N` referencing GitHub Issue numbers.
 
-**Critical:** This skill requires `gh` CLI authenticated. If $ARGUMENTS is empty, ask the user for the issue number. Always fetch the issue first — never guess what the issue is about. Delegate test failures to `/fix-loop`, not manual retry.
+## STEP 1: Forward to the new skill
 
-**Issue:** $ARGUMENTS
-
----
-
-## STEP 1: Fetch and Parse Issue
-
-**Extract issue number** from `$ARGUMENTS`:
-- `#42` or `42` → use `42`
-- `https://github.com/owner/repo/issues/42` → extract `42`
-- If no number found, ask the user
-
-```bash
-gh issue view $ISSUE_NUMBER --json title,body,labels,assignees,comments,state
-```
-
-**Error handling:**
-
-| Condition | Action |
-|-----------|--------|
-| `gh` not authenticated | Report: "Run `gh auth login` first" → STOP |
-| Issue not found | Report: "Issue #N not found in this repo" → STOP |
-| Issue state is `CLOSED` | Confirm with user: "Issue #N is already closed. Continue anyway?" |
-| No repro steps for a bug | Derive repro hypothesis from description; flag as assumption |
-
-**Parse the issue into a structured brief:**
-```markdown
-**Title:** <issue title>
-**Type:** bug | feature | enhancement | chore
-**Repro steps:** <from body, or derived hypothesis>
-**Expected:** <expected behavior>
-**Actual:** <current behavior>
-**Mentioned files/components:** <extracted from body and comments>
-**Labels:** <issue labels>
-```
-
-## STEP 2: Explore and Diagnose
-
-Search the codebase for root cause (bugs) or implementation location (features):
-
-1. **Grep** for keywords, error messages, and component names from the issue brief
-2. **Read** the 2-3 most relevant source files identified by search
-3. **Read** existing tests in the affected area to understand current coverage
-4. **Check** git blame on suspected lines to understand recent changes
-
-**Decision point:**
-
-| Situation | Action |
-|-----------|--------|
-| Root cause is clear after exploration | Proceed to Step 3 |
-| Root cause unclear after 10+ minutes of exploration | Escalate: `Skill("systematic-debugging", args="<issue brief>")` and use its diagnosis output |
-| Issue is a feature request with complex requirements | Escalate: `Skill("implement", args="<parsed requirements from issue>")` then skip to Step 4 |
-
-## STEP 3: Implement and Test
-
-1. **Write a failing test** that reproduces the bug (or defines the feature behavior)
-2. **Implement the minimal fix** — change only what the issue requires
-3. **Run targeted tests** for the changed area
-4. **If tests fail**, delegate: `Skill("fix-loop", args="<failure output> retest_command: <cmd>")`
-5. **Run broader test suite** for regression check
-
-**Scope guard:** If the fix requires changes to > 3 files, confirm approach with user before proceeding. Large fixes often indicate a misdiagnosed root cause.
-
-## STEP 4: Finalize
-
-**Mode detection:** check `$ARGUMENTS` for `--diff-only` flag.
-
-### Default mode (no flag)
-
-Run the post-fix pipeline to commit, document, and capture learnings:
+Forward `$ARGUMENTS` unchanged to the new skill:
 
 ```
-Skill("post-fix-pipeline", args="fixes_applied: [summary of changes] issue: #$ISSUE_NUMBER")
+Skill("fix-github-issue", args="$ARGUMENTS")
 ```
 
-If `post-fix-pipeline` is not available, manually:
-1. Commit with conventional message: `fix: resolve #N — <description>`
-2. Update docs if behavior changed
-3. Capture learnings via `Skill("learn-n-improve", args="session")`
+That single call performs every step of the original workflow.
+The flow is unchanged — fetch issue, diagnose, implement, verify, finalize.
+No argument transformation is required: the new skill accepts the same `<issue-number-or-url> [--diff-only]` shape.
 
-### `--diff-only` mode (NEW in PR2 of test-pipeline-three-lane spec)
+## STEP 2: Print a one-line migration notice
 
-When `--diff-only` is present in `$ARGUMENTS`, **skip `/post-fix-pipeline` entirely**. Instead:
+After forwarding, print exactly:
 
-1. Capture the proposed changes as a unified diff:
-   ```bash
-   git diff --staged > test-results/fixes/${ISSUE_NUMBER}.diff
-   # If nothing staged but working-tree has changes:
-   git diff > test-results/fixes/${ISSUE_NUMBER}.diff
-   ```
-2. Reset the working tree to clean state:
-   ```bash
-   git stash push -u -m "fix-issue-diff-only-${ISSUE_NUMBER}" || git reset --hard HEAD
-   ```
-3. Return contract:
-   ```json
-   {
-     "result": "DIFF_WRITTEN",
-     "issue_number": ${ISSUE_NUMBER},
-     "diff_path": "test-results/fixes/${ISSUE_NUMBER}.diff",
-     "no_commit": true,
-     "reason": "Caller (test-healer-agent in commit_mode=diff_only) will batch-apply via /serialize-fixes"
-   }
-   ```
-
-**Why diff-only mode exists:** the three-lane test pipeline's `/test-pipeline` skill (spec v2.2, skill-at-T0) dispatches multiple parallel fixers in one T0 message at STEP 6 TRIAGE Fan-out 3. Each fixer must NOT commit independently (parallel commits race on the working tree). T0 collects all diffs, then invokes `/serialize-fixes` to apply them sequentially with `git apply --check` first. See spec v2.2 §3.3.
-
-**Backward compat:** Default mode (no flag) is unchanged — existing `/fix-loop`, development-loop, and direct user invocations continue to work as before. Spec §3.14.
-
-## STEP 5: Summarize
-
-```markdown
-## Fix Summary: Issue #N — <title>
-
-**Root cause:** <1-2 sentences>
-**Fix:** <what was changed and why>
-**Files changed:** <list>
-**Tests:** <added/modified/verified>
-**Follow-up:** <items or "none">
+```
+NOTE: /fix-issue is deprecated — please use /fix-github-issue going forward.
 ```
 
----
+The notice runs once per invocation.
+It helps callers notice the rename without breaking the immediate workflow.
 
-## Failure Modes
+## STEP 3: Return whatever the new skill returns
 
-| Failure | Prevention |
-|---------|-----------|
-| `gh` not installed or authenticated | Check in Step 1 before any code exploration |
-| Issue body is vague or missing repro steps | Derive hypothesis and flag as assumption — do not guess silently |
-| Root cause misdiagnosed → fix doesn't resolve issue | Write reproducing test FIRST (Step 3) — if test doesn't fail, diagnosis is wrong |
-| Fix touches too many files → scope creep | Enforce 3-file scope guard; escalate to user if exceeded |
-| Post-fix-pipeline unavailable | Graceful fallback to manual commit + docs + learnings |
+Pass through the return contract from `/fix-github-issue` unchanged.
+Existing callers (test-healer-agent, test-pipeline, downstream projects) keep working during the transition window.
+Do not transform, filter, or augment the return — the stub is transparent.
 
----
+## Removal lifecycle (per pattern-structure.md SemVer policy)
+
+- **2026-05-24** — deprecated, this stub installed at v2.6.1
+- **fix-github-issue v4.x.x** — stub still present; deprecation notice printed on every invocation
+- **fix-github-issue v5.0.0** — stub removed; `/fix-issue` returns "skill not found"
+
+Downstream projects should migrate during the v4.x.x window.
+Run `/update-practices` to pull the new skill into your project's `.claude/`.
+Then run `grep -r "fix-issue" .claude/` to find local references that need updating.
+The CI validator (`workflow_quality_gate_validate_patterns.py`) will flag any remaining references at PR time.
 
 ## CRITICAL RULES
 
-- MUST fetch the GitHub Issue via `gh issue view` before any code changes — Why: the issue body is the source of truth; guessing from title alone leads to wrong fixes
-- MUST write a failing test before implementing the fix — Why: a test that doesn't fail before the fix proves nothing; TDD catches misdiagnosed root causes
-- MUST verify with tests before declaring done — Why: untested fixes create false confidence and break in production
-- MUST confirm approach with user if fix requires > 3 files — Why: large fixes usually indicate misdiagnosed root cause or scope creep
-- MUST NOT guess issue content from the title alone — Why: titles are often misleading; the body and comments contain the real context
-- MUST NOT implement unrelated improvements while fixing — Why: scope discipline prevents regressions and keeps PRs reviewable. Use a separate PR instead
-- MUST NOT skip post-fix-pipeline — Why: uncommitted fixes are lost fixes; learnings not captured repeat as future mistakes
+- MUST forward all arguments verbatim — the stub adds nothing of its own to the call
+- MUST NOT duplicate the fix-github-issue body here — single source of truth lives at core/.claude/skills/fix-github-issue/SKILL.md
+- MUST NOT remove this stub before fix-github-issue v5.0.0 — downstream consumers need the deprecation window
+- MUST print the migration notice after forwarding so callers see the rename signal

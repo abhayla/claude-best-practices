@@ -8,7 +8,7 @@ description: >
   (plan-executor-agent, optionally planner-researcher-agent) via Agent() at T0
   where subagent dispatch actually works. Invokes inline sub-skills
   (/brainstorm, /writing-plans, /auto-verify, /post-fix-pipeline) via Skill().
-  Use when building a feature end-to-end. For bug fixes use /fix-issue or
+  Use when building a feature end-to-end. For bug fixes use /fix-github-issue or
   /debugging-loop; for just implementation use /implement.
 type: workflow
 triggers:

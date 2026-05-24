@@ -379,7 +379,7 @@ def make_test_healer_pr2_scenarios():
                 "trigger_reliability": "Healer detects commit_mode is absent → falls back to direct (legacy /fix-loop / e2e-conductor pathway)",
                 "output_structure": "Return contract includes commit_sha (because commit happened)",
                 "non_negotiable_adherence": "Backward compat preserved per spec §3.14",
-                "side_effect_correctness": "Healer invokes /fix-issue without --diff-only flag; /post-fix-pipeline commits",
+                "side_effect_correctness": "Healer invokes /fix-github-issue without --diff-only flag; /post-fix-pipeline commits",
                 "error_propagation": "Backward compat is not an error condition"
             }
         },
@@ -412,8 +412,8 @@ def make_test_healer_pr2_scenarios():
             }
         },
         {
-            "scenario_name": "issue-number-propagated-to-fix-issue",
-            "description": "When commit_mode=diff_only AND issue_number provided, healer invokes /fix-issue --diff-only with the issue_number.",
+            "scenario_name": "issue-number-propagated-to-fix-github-issue",
+            "description": "When commit_mode=diff_only AND issue_number provided, healer invokes /fix-github-issue --diff-only with the issue_number.",
             "input": {
                 "dispatch_context": {
                     "issue_number": 5678,
@@ -427,19 +427,19 @@ def make_test_healer_pr2_scenarios():
             "expected_contract": {
                 "fix_applied": True,
                 "diff_path": "test-results/fixes/5678.diff",
-                "fix_issue_invoked_with": "*5678*"
+                "fix_github_issue_invoked_with": "*5678*"
             },
             "rubric_hints": {
                 "trigger_reliability": "issue_number is read from dispatch context, not derived",
-                "output_structure": "fix_issue_invoked_with contains the exact issue_number",
-                "non_negotiable_adherence": "Spec §3.9 chain: T2B → healer (issue_number) → /fix-issue --diff-only (issue_number) → diff file",
+                "output_structure": "fix_github_issue_invoked_with contains the exact issue_number",
+                "non_negotiable_adherence": "Spec §3.9 chain: T2B → healer (issue_number) → /fix-github-issue --diff-only (issue_number) → diff file",
                 "side_effect_correctness": "Diff filename matches issue_number (test-results/fixes/5678.diff)",
                 "error_propagation": "Issue number must be valid integer; healer rejects malformed values"
             }
         },
         {
             "scenario_name": "skill-tool-grant-not-silently-collapsed",
-            "description": "Verify Skill tool is in tools field — without it, Skill('fix-issue') would silently collapse.",
+            "description": "Verify Skill tool is in tools field — without it, Skill('fix-github-issue') would silently collapse.",
             "input": {
                 "dispatch_context": {"static_check": True},
                 "filesystem_setup": {},
@@ -454,7 +454,7 @@ def make_test_healer_pr2_scenarios():
                 "output_structure": "Boolean flags reflect frontmatter contents",
                 "non_negotiable_adherence": "T3 tier rule: tools must NOT include Agent (per agent-orchestration.md rule 3)",
                 "side_effect_correctness": "PR1 fix preserved into PR2 (test-healer-agent didn't lose Skill grant)",
-                "error_propagation": "If Skill tool missing, Skill('fix-issue') silently does nothing — caught by this scenario"
+                "error_propagation": "If Skill tool missing, Skill('fix-github-issue') silently does nothing — caught by this scenario"
             }
         },
         {

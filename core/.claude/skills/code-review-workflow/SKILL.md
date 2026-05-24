@@ -83,7 +83,7 @@ adversarial-review, change-risk-scoring, pr-standards. Writes
 Gate: `verdict != "REJECTED"` — if REJECTED, transition to `step_status.QUALITY_GATES = blocked`.
 
 If blocked AND `--auto-fix` set: attempt auto-fix for each blocking finding
-via `/fix-issue --diff-only` OR `/fix-loop` depending on finding type.
+via `/fix-github-issue --diff-only` OR `/fix-loop` depending on finding type.
 Re-run `/review-gate` after auto-fix applies. If still REJECTED after
 one auto-fix pass, escalate to user (don't loop further).
 

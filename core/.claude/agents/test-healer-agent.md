@@ -32,7 +32,7 @@ mcp-servers:
 2. **NEVER modify application source code for SELECTOR / TIMING / DATA fixes.** Only modify test code. Changing app code to make a test pass is the #1 way to hide real regressions.
 3. **NEVER apply the same fix twice.** Track attempt history; each retry MUST try a different strategy. Repeating a failed approach wastes the shared retry budget.
 4. **NEVER exceed the retry budget passed by the T0 orchestrator.** In dispatched mode, use the shared budget passed in the dispatch context from `/e2e-visual-run` or `/test-pipeline`, not the hardcoded 15. Standalone mode (direct `/fix-loop` invocation, etc.) falls back to 15.
-5. **`commit_mode` parameter gating.** Read `commit_mode` from dispatch context: `direct` (default) preserves existing commit-via-`/post-fix-pipeline` behavior; `diff_only` invokes `/fix-issue --diff-only` with the provided `issue_number` and writes the proposed change as a unified diff to `test-results/fixes/{issue_number}.diff` instead of committing. Backward compat: ABSENT `commit_mode` defaults to `direct` for direct `/fix-loop` and other standalone callsites.
+5. **`commit_mode` parameter gating.** Read `commit_mode` from dispatch context: `direct` (default) preserves existing commit-via-`/post-fix-pipeline` behavior; `diff_only` invokes `/fix-github-issue --diff-only` with the provided `issue_number` and writes the proposed change as a unified diff to `test-results/fixes/{issue_number}.diff` instead of committing. Backward compat: ABSENT `commit_mode` defaults to `direct` for direct `/fix-loop` and other standalone callsites.
 6. **NEVER auto-regen visual baselines for `BASELINE_DRIFT_INTENTIONAL` UNLESS `update_baselines: true` is in the dispatch context (REQ-S002 of test-pipeline-three-lane spec).** Without the flag, BASELINE_DRIFT_INTENTIONAL stays ISSUE_ONLY (per spec §3.6 auto-fix matrix). With the flag, healer can regenerate `__snapshots__/*.png` baselines and commit them. The flag propagates from `/test-pipeline --update-baselines` or `/e2e-visual-run --update-baselines` directly through the T0 dispatch context (no intermediate tier).
 
 > See `core/.claude/rules/agent-orchestration.md` and `core/.claude/rules/testing.md` for full normative rules.
@@ -160,8 +160,8 @@ For each item in fix_queue (or per-Issue dispatch from T2B):
      - browser_console_messages → app errors
   6. Branch on commit_mode (PR2):
      IF commit_mode == "diff_only" AND issue_number provided:
-       → Skill("fix-issue", args="${issue_number} --diff-only")
-       → /fix-issue writes test-results/fixes/${issue_number}.diff and resets working tree
+       → Skill("fix-github-issue", args="${issue_number} --diff-only")
+       → /fix-github-issue writes test-results/fixes/${issue_number}.diff and resets working tree
        → record diff_path; do NOT proceed to /post-fix-pipeline
      ELSE (commit_mode default = direct, legacy callsite):
        → Dispatch Skill("fix-loop") with inspection context

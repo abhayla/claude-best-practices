@@ -168,7 +168,7 @@ Gate: if `critical_stale_count > 0`, transition to `step_status.STALENESS
      Staleness: <critical>/<moderate>/<minor>
    ============================================================
    ```
-3. **Handoff:** critical staleness → suggest `/fix-issue` for each;
+3. **Handoff:** critical staleness → suggest `/fix-github-issue` for each;
    structure moves → suggest `/code-review-workflow` to surface the
    rename diff in a PR.
 

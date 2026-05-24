@@ -407,7 +407,7 @@ MUST_HAVE_HOOKS = {"dangerous-command-blocker", "secret-scanner"}
 
 # Core workflow skills that are high-value for any non-trivial project
 CORE_WORKFLOW_SKILLS = {
-    "implement", "fix-loop", "fix-issue", "tdd", "auto-verify",
+    "implement", "fix-loop", "fix-github-issue", "tdd", "auto-verify",
     "systematic-debugging", "continue", "handover", "skill-master",
     "pr-standards", "request-code-review", "receive-code-review",
     "code-quality-gate", "writing-plans", "executing-plans",
@@ -1934,7 +1934,7 @@ def generate_hub_practices_section(
     lines.append("## Rules for Claude")
     lines.append("")
     lines.append(
-        "1. **Bug Fixing**: Use `/fix-loop` or `/fix-issue`. "
+        "1. **Bug Fixing**: Use `/fix-loop` or `/fix-github-issue`. "
         "Start by writing a test that reproduces the bug, "
         "then fix and prove with a passing test."
     )

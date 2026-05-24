@@ -20,9 +20,11 @@ workflows:
         - executing-plans
         - expo-dev
         - firebase-dev
+        - fix-github-issue
         - fix-issue
         - flutter-dev
         - git-worktrees
+        - grill-me
         - implement
         - jest-dev
         - mcp-server-builder
@@ -139,6 +141,7 @@ workflows:
         - debugging-loop
         - fastapi-run-backend-tests
         - firebase-test
+        - fix-github-issue
         - fix-issue
         - fix-loop
         - flutter-e2e-test
@@ -194,6 +197,7 @@ workflows:
       skills:
         - agent-evaluator
         - claude-guardian
+        - five-advisors
         - mcp-server-builder
         - prompt-auto-enhance
         - semgrep-rules

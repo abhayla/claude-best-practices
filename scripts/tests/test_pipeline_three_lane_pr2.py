@@ -2,7 +2,7 @@
 
 Covers spec §6 success criteria for PR2:
 - #3, 9, 10, 11, 12 (Issue creation + dedup + atomic switchover)
-- #13, 14 (backward compat for /fix-loop and /fix-issue)
+- #13, 14 (backward compat for /fix-loop and /fix-github-issue)
 - #16, 17 (validator passes + empty Issue body fields)
 - #20, 22, 23, 24 (T1 step deletion + evals + atomic diff apply + fan-in coordination)
 - #26, 31 (PR2 atomic switchover + pre-merge migration)
@@ -127,23 +127,23 @@ def test_escalation_report_writes_to_test_results():
     assert "test-results/escalation-report.md" in body
 
 
-# ── /fix-issue --diff-only flag (REQ-M014, REQ-M017) ──────────────────────────
+# ── /fix-github-issue --diff-only flag (REQ-M014, REQ-M017) ──────────────────
 
 
-def test_fix_issue_diff_only_flag_documented():
-    body = (SKILLS_DIR / "fix-issue" / "SKILL.md").read_text(encoding="utf-8")
-    assert "--diff-only" in body, "/fix-issue MUST document --diff-only flag"
+def test_fix_github_issue_diff_only_flag_documented():
+    body = (SKILLS_DIR / "fix-github-issue" / "SKILL.md").read_text(encoding="utf-8")
+    assert "--diff-only" in body, "/fix-github-issue MUST document --diff-only flag"
 
 
-def test_fix_issue_diff_only_writes_diff_no_commit():
-    body = (SKILLS_DIR / "fix-issue" / "SKILL.md").read_text(encoding="utf-8")
+def test_fix_github_issue_diff_only_writes_diff_no_commit():
+    body = (SKILLS_DIR / "fix-github-issue" / "SKILL.md").read_text(encoding="utf-8")
     assert "test-results/fixes/" in body, "diff-only MUST write to test-results/fixes/"
     assert "DIFF_WRITTEN" in body or "no_commit" in body
 
 
-def test_fix_issue_default_mode_unchanged():
+def test_fix_github_issue_default_mode_unchanged():
     """Backward compat: default mode (no flag) still calls /post-fix-pipeline."""
-    body = (SKILLS_DIR / "fix-issue" / "SKILL.md").read_text(encoding="utf-8")
+    body = (SKILLS_DIR / "fix-github-issue" / "SKILL.md").read_text(encoding="utf-8")
     assert "post-fix-pipeline" in body
 
 

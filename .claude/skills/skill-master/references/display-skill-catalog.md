@@ -17,7 +17,7 @@ Discovered {N} skills across {M} categories.
   /executing-plans     — <description from frontmatter>
   /writing-plans       — <description from frontmatter>
   /fix-loop            — <description from frontmatter>
-  /fix-issue           — <description from frontmatter>
+  /fix-github-issue    — <description from frontmatter>
 
 --- Quality ---
   /systematic-debugging — <description from frontmatter>

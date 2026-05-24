@@ -113,7 +113,7 @@ Once your project has a `.claude/` directory, you can use all the skills directl
 ```
 /development-loop   Full build cycle: ideate → plan → implement → verify → commit
 /implement          Build a feature with TDD workflow
-/fix-issue 42       Fix GitHub issue #42
+/fix-github-issue 42 Fix GitHub issue #42
 /fix-loop           Iterative fix until tests pass
 /debugging-loop     Structured bug diagnosis → fix → verify → learn
 /tdd                Strict red-green-refactor cycle
@@ -317,7 +317,7 @@ Universal patterns (no prefix) are included for all stacks.
 |-------|-------------|
 | `/synthesize-project` | Provision hub patterns + generate project-specific patterns from your codebase |
 | `/implement` | Structured feature implementation with TDD workflow |
-| `/fix-issue` | Analyze and fix a GitHub issue end-to-end |
+| `/fix-github-issue` | Analyze and fix a GitHub issue end-to-end |
 | `/fix-loop` | Iterative fix cycle until tests pass |
 | `/tdd` | Strict red-green-refactor cycle |
 | `/continue` | Resume work from a previous session |
