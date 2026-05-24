@@ -11,8 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Python 3.12** required (all CI workflows use 3.12)
 - Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`
-- **Windows**: use `set PYTHONPATH=. &&` prefix instead of `PYTHONPATH=.`, or use Git Bash. All commands below assume Unix shell syntax (forward slashes, `PYTHONPATH=.` prefix)
-- **New here?** For downstream provisioning options (copy-all, smart, full synthesis), see `README.md`.
+- **Windows (PowerShell)**: prefix commands with `$env:PYTHONPATH = "."` and a semicolon (e.g., `$env:PYTHONPATH = "."; python -m pytest scripts/tests/ -v`). For cmd.exe use `set PYTHONPATH=. &&`. Git Bash works with the Unix syntax shown below.
+- **New here?** For downstream provisioning options (copy-all, smart, full synthesis), see `README.md`; for deeper setup walkthroughs, see `docs/GETTING-STARTED.md`.
 - **`CLAUDE.local.md`** (repo root, gitignored) — per-developer overrides and local notes (e.g., local paths, secrets-free environment tweaks, in-progress scratch notes that shouldn't ship). Distinct from: auto-memory (cross-session user prefs) and `.claude/tasks/lessons.md` (correction patterns across sessions). Safe to read/update; never commit.
 
 ## Commands
@@ -64,6 +64,7 @@ Projects can opt in to share back synthesized patterns by setting `allow_hub_sha
 - **`config/`** — `settings.yml`, `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow docs), `pipeline-stages.yaml` (DAG config), `workflow-contracts.yaml` (step DAGs + artifact contracts)
 - **`docs/specs/`** — Canonical workflow/feature specs (e.g., `test-pipeline-three-lane-spec-v2.md`). Reference these — do not duplicate spec content elsewhere
 - **`docs/workflows/`** — Auto-generated workflow docs. Do not edit manually — regenerate after pattern changes
+- **`docs/WORKFLOW-DIAGRAM.md`** — Visual reference for the skill-at-T0 workflow orchestration model. Read alongside the "Workflow Orchestration (skill-at-T0)" section below
 - **`internet-sources/`** — Pending and archived sources for `scan_web.py` (`pending/`, `archived/`)
 - **`plans/`** — Durable implementation plans for multi-session initiatives. Write a plan here when work spans sessions or needs cross-subagent handoff; use in-session plan mode for single-session tasks.
 - **`.claude/tasks/`** — `todo.md` (current task checklist per `claude-behavior.md` rule 14) and `lessons.md` (correction patterns accumulated across sessions). Read `lessons.md` at session start; append after corrections.
