@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-05-24",
-    "total_patterns": 237
+    "last_updated": "2026-05-28",
+    "total_patterns": 241
   },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
@@ -4568,5 +4568,95 @@
     ],
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have"
+  },
+  "improve-codebase-architecture": {
+    "hash": "46863c531cc7c364045df1fa09ddfb63364d6a3c6eeef66c50737b63eda905c7",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "upstream:mattpocock/skills@engineering/improve-codebase-architecture",
+    "discovered": "2026-05-28",
+    "last_updated": "2026-05-28",
+    "dependencies": [
+      "grill-with-docs",
+      "adr"
+    ],
+    "visibility": "public",
+    "description": "Surface architectural friction and propose deepening opportunities (Ousterhout deep-modules lens). Produces an HTML report with before/after diagrams, then drops into a grilling loop to refine the chosen candidate.",
+    "tags": [
+      "architecture",
+      "refactoring",
+      "deep-modules",
+      "design",
+      "review"
+    ],
+    "changelog": "v1.0.0: Initial port from mattpocock/skills with hub-portability adaptations (no auto-open, Agent-tool dispatch, references/ layout)",
+    "tier": "must-have"
+  },
+  "grill-with-docs": {
+    "hash": "0f7db518881271fc675ca81a47b17ebafd9d8920984bdef23617e63011d642b2",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "upstream:mattpocock/skills@engineering/grill-with-docs",
+    "discovered": "2026-05-28",
+    "last_updated": "2026-05-28",
+    "dependencies": [
+      "adr"
+    ],
+    "visibility": "public",
+    "description": "Docs-aware grilling session: one question at a time, challenges plan against CONTEXT.md domain glossary and docs/adr/, updates documentation inline as decisions crystallise. Docs-aware variant of /grill-me.",
+    "tags": [
+      "planning",
+      "design",
+      "documentation",
+      "adr",
+      "glossary"
+    ],
+    "changelog": "v1.0.0: Initial port from mattpocock/skills; companion to /improve-codebase-architecture",
+    "tier": "must-have"
+  },
+  "zoom-out": {
+    "hash": "a4528d649eb071f17d73d667145dcbcb445b0523a7263a9b6d4f60cdde45ba51",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "upstream:mattpocock/skills@engineering/zoom-out",
+    "discovered": "2026-05-28",
+    "last_updated": "2026-05-28",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Go up one layer of abstraction and produce a map of surrounding modules, callers, and how the current code fits into the bigger picture. Uses project domain vocabulary when available.",
+    "tags": [
+      "exploration",
+      "context",
+      "mapping",
+      "navigation"
+    ],
+    "changelog": "v1.0.0: Initial port from mattpocock/skills",
+    "tier": "must-have"
+  },
+  "to-prd": {
+    "hash": "1a24bb473e6fa546ac7e61e4115a585e853e515ad35240cec7c6751ce32afe62",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "upstream:mattpocock/skills@engineering/to-prd",
+    "discovered": "2026-05-28",
+    "last_updated": "2026-05-28",
+    "dependencies": [
+      "improve-codebase-architecture",
+      "plan-to-issues"
+    ],
+    "visibility": "public",
+    "description": "Synthesize a PRD from current conversation context and codebase understanding (no interview). Looks for deep-module opportunities during module sketching. Inverse direction of /prd-parser (parse) — this is the synthesize direction.",
+    "tags": [
+      "prd",
+      "planning",
+      "synthesis",
+      "specification"
+    ],
+    "changelog": "v1.0.0: Initial port from mattpocock/skills",
+    "tier": "must-have"
   }
 }
