@@ -10,8 +10,9 @@ registry+changelog+validators per `core/.claude/rules/rule-curation.md`.
 
 Each tier ships as its **own branch + PR** (per standing preference).
 
-## Tier 1 — 8 universal verification/governance rules  ← IN PROGRESS
+## Tier 1 — 8 universal verification/governance rules  ← ✅ DONE (PR #41)
 Branch: `feat/promote-firekaro-verification-rules`. Pure-additive, no script changes.
+Shipped 2026-06-10: 8 rules + design-ssot, registry+changelog, all validators green.
 
 | New hub rule | From firekaro | Scope |
 |---|---|---|
