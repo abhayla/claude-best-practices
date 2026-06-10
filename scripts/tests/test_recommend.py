@@ -446,6 +446,28 @@ class TestTierResource:
         assert tier_resource("vue", "rule", ["fastapi-python"]) == "skip"
         assert tier_resource("vue", "rule", []) == "skip"
 
+    def test_promoted_stack_rules_skip_without_dep(self):
+        """Tier-3 dep-gated rules (hono/prisma/vuetify) skip when their dep is absent."""
+        assert tier_resource("hono-conventions", "rule", []) == "skip"
+        assert tier_resource("prisma-conventions", "rule", []) == "skip"
+        assert tier_resource("vue-e2e", "rule", []) == "skip"
+        # Wrong stack detected, still no relevant dep
+        assert tier_resource("hono-conventions", "rule", ["fastapi-python"]) == "skip"
+
+    def test_promoted_stack_rules_dep_promoted_overrides_skip(self):
+        """Dep promotion (hono/prisma/vuetify detected) overrides the skip."""
+        assert tier_resource("hono-conventions", "rule", [], dep_promoted={"hono-conventions"}) == "must-have"
+        assert tier_resource("prisma-conventions", "rule", [], dep_promoted={"prisma-conventions"}) == "must-have"
+        assert tier_resource("vue-e2e", "rule", [], dep_promoted={"vue-e2e"}) == "must-have"
+
+    def test_new_stack_rules_have_dep_promotion_path(self):
+        """The 3 Tier-3 rules must be reachable via DEP_PATTERN_MAP (else they never fire)."""
+        promotable = set()
+        for patterns in DEP_PATTERN_MAP.values():
+            promotable |= patterns
+        for name in ("hono-conventions", "prisma-conventions", "vue-e2e"):
+            assert name in promotable, f"{name} has no DEP_PATTERN_MAP promotion path"
+
     def test_fastapi_rules_skipped_without_fastapi_stack(self):
         """FastAPI rules skip when project is not FastAPI."""
         assert tier_resource("fastapi-backend", "rule", ["android-compose"]) == "skip"

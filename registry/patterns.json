@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-05-28",
-    "total_patterns": 241
+    "last_updated": "2026-06-10",
+    "total_patterns": 244
   },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
@@ -4348,13 +4348,13 @@
     "tier": "nice-to-have"
   },
   "vue": {
-    "hash": "7887a375c5954f4ce4acdc3c60f3daa1b512dcd7247f186c131e3527800bc0d9",
+    "hash": "1329fcee8245d56a1dba96c5aead406160c0517a5f09add1c52c7243690755c9",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-10",
     "dependencies": [],
     "visibility": "public",
     "description": "Vue 3 Composition API conventions: script setup, Pinia stores, composables, router",
@@ -4363,7 +4363,7 @@
       "frontend",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya patterns | v1.1.0: Tier-3 promotion — + ref-over-reactive/server-client split, URL-query sync, two-tier form validation, API response unwrapping (from firekaro-planner)",
     "tier": "must-have"
   },
   "vue-dev": {
@@ -4657,6 +4657,70 @@
       "specification"
     ],
     "changelog": "v1.0.0: Initial port from mattpocock/skills",
+    "tier": "must-have"
+  },
+  "hono-conventions": {
+    "hash": "18f0333b4aed9e47d42d9df8743c977592c124b736426c9258903f88420ecd48",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Hono backend route conventions: new Hono() + global auth + export default, inline Zod (.partial() updates), findFirst ownership, POST for actions, discriminated response envelope, opt-in pagination, rate-limit factory.",
+    "tags": [
+      "hono",
+      "backend",
+      "typescript",
+      "api",
+      "stack:hono"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
+    "tier": "must-have"
+  },
+  "prisma-conventions": {
+    "hash": "6398af845fb99a386a700a26e3d42405e0bf46f1eec9f6be3c52b77937d6dcbe",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Prisma model + query conventions: cuid PKs + timestamps, onDelete:Cascade + @@index, findFirst (not findUnique) for ownership, upsert singletons, Promise.all parallel reads, dev-mode globalThis client singleton.",
+    "tags": [
+      "prisma",
+      "orm",
+      "database",
+      "typescript",
+      "stack:prisma"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
+    "tier": "must-have"
+  },
+  "vue-e2e": {
+    "hash": "6166c44a4bf8a26990a998d6ea07c7e7e18b06e9192f9dd089167e2f7792ce24",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Vuetify + Playwright E2E conventions: networkidle navigation, component animation timing, workers:1 for data-dependent suites, and the vee-validate fill() gotcha (use pressSequentially + blur).",
+    "tags": [
+      "vue",
+      "vuetify",
+      "playwright",
+      "e2e",
+      "testing",
+      "stack:vue"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
     "tier": "must-have"
   }
 }
