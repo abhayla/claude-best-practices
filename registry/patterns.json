@@ -1249,6 +1249,27 @@
     "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
     "tier": "must-have"
   },
+  "design-ssot": {
+    "hash": "b47bbcb703e5b8c45a8042e0a688ec32d1ef8be853b87d1d01d092e7ad8ef599",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-05-30",
+    "last_updated": "2026-05-30",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Design/scope SSOT: each design decision and screen/feature pattern has one canonical doc, captured at decision time (incl. discussion-only sessions), propagated on change, with a goal contract before finalized scope. Distinct from configuration-ssot (config layering) and design-principles DRY (code-level).",
+    "tags": [
+      "SSOT",
+      "design",
+      "scope",
+      "documentation",
+      "workflow"
+    ],
+    "changelog": "v1.0.0: Initial creation - design/scope decision SSOT with capture-on-decision, propagate-on-change, and goal-contract triggers",
+    "tier": "must-have"
+  },
   "development-loop": {
     "hash": "b2b2cdda76cd5c29bf27fb73b3fa5b45393aa53047b23b61acf09c197f4b2d11",
     "type": "skill",
@@ -4657,6 +4678,173 @@
       "specification"
     ],
     "changelog": "v1.0.0: Initial port from mattpocock/skills",
+    "tier": "must-have"
+  },
+  "output-plausibility-verification": {
+    "hash": "15a0ccbe2b0b1aae9ad23917470f5409e1be04de367c4a4ac492e6e78a884b43",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Verify user-facing computed values are domain-SANE, not just that they render/persist/pass — the substance axis of verification. Default-path checks, plausibility bounds, shape-locks-are-not-correctness-proofs.",
+    "tags": [
+      "verification",
+      "testing",
+      "quality",
+      "plausibility",
+      "workflow"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "tier": "must-have"
+  },
+  "independent-test-verification": {
+    "hash": "fa408a16950274f8227ed792f17f9b666e019c567c2beb0617aa673b491d01aa",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Every non-trivial test verdict must be re-checked by a separate, context-blind agent given the same inputs + raw evidence — doer/checker separation (IEEE-1012). Single-level two-wave dispatch.",
+    "tags": [
+      "verification",
+      "testing",
+      "agents",
+      "orchestration",
+      "quality"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "tier": "must-have"
+  },
+  "supervisor-verification": {
+    "hash": "535c74f367db2d66910ea3570a039457a9e234678cd9787529ca9ec1606cc67c",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "The T0 orchestrator must reproduce a worker's claimed gate and inspect output substance before accepting — reading a return contract is not verifying it. Includes a drive-the-UI loop for rendered changes.",
+    "tags": [
+      "verification",
+      "orchestration",
+      "agents",
+      "quality",
+      "workflow"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "tier": "must-have"
+  },
+  "decision-authority": {
+    "hash": "16e9ef0bed19d50c2141b88964194e18257eecbfde9e05757b76147004d7e777",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Decide-vs-escalate taxonomy: DECIDE on reversible/internal/best-practice-clear work, ESCALATE only irreversible/outward/material/fork. Confidence-gate-on-intent + anti-over-ask (no trailing offer, no narrate-and-stop).",
+    "tags": [
+      "governance",
+      "workflow",
+      "decision-making",
+      "autonomy"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "tier": "must-have"
+  },
+  "bug-triage-discipline": {
+    "hash": "75783f318bd168bf71ee6b5ac8743d8a782d9fd7b513ae5ca5cc87b011b19eda",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Every bug fix must answer why tests missed it and run a repo-wide sibling-class audit before closing; one canonical tracker is SSOT; shape-vs-substance is a named miss class.",
+    "tags": [
+      "bugs",
+      "testing",
+      "quality",
+      "workflow",
+      "triage"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "tier": "must-have"
+  },
+  "environment-validation": {
+    "hash": "a0cb27e65a92342b5accb5dbb05b15e63a5a2ba5facc09d033b65cd56c28b1a7",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Validate required env vars at boot in one validator before binding a listener; reject placeholder secrets in production; log only the variable name, never its value.",
+    "tags": [
+      "security",
+      "ops",
+      "configuration",
+      "fail-fast",
+      "boot"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "tier": "must-have"
+  },
+  "e2e-readiness-signal": {
+    "hash": "307f775ba544c7bf128053c59eee6ee0f57d4cd3810ee2494410ef400ca77c33",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "E2E tests wait on an explicit app-emitted readiness signal after navigation, never a fixed delay — the positive pattern behind the no-sleep prohibition. Framework-agnostic.",
+    "tags": [
+      "testing",
+      "e2e",
+      "flakiness",
+      "playwright",
+      "cypress"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — path-scoped E2E verification/governance rule",
+    "tier": "must-have"
+  },
+  "e2e-persistence-verification": {
+    "hash": "cc8dd88ac9b07136d321b5538db55699f003f9ecf7542beb98c39cdf6f1bd221",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "E2E tests that create records must verify actual persistence (per iteration in loops) plus the final reloaded UI — never trust a closed dialog or end-of-loop count as success.",
+    "tags": [
+      "testing",
+      "e2e",
+      "persistence",
+      "flakiness",
+      "verification"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — path-scoped E2E verification/governance rule",
     "tier": "must-have"
   }
 }
