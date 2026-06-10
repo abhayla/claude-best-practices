@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-05-28",
-    "total_patterns": 241
+    "last_updated": "2026-06-10",
+    "total_patterns": 242
   },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
@@ -4658,5 +4658,27 @@
     ],
     "changelog": "v1.0.0: Initial port from mattpocock/skills",
     "tier": "must-have"
+  },
+  "autonomous-contract": {
+    "hash": "99c827db6f90698d7a5a66d4f43e623b546e2b1fda20d25f2e4a9b19e3231d39",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
+    "tags": [
+      "autonomous",
+      "goal",
+      "workflow",
+      "contract",
+      "unattended",
+      "self-improvement"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4",
+    "tier": "nice-to-have"
   }
 }
