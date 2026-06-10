@@ -3,8 +3,9 @@ name: writing-plans
 description: >
   Generate detailed implementation plans with bite-sized tasks, exact file paths,
   code snippets, and verification commands. Use after /brainstorm or when you have
-  a clear feature to implement. NOT for requirements exploration (use /brainstorm)
-  or direct implementation without planning (use /implement).
+  a clear feature to implement. NOT for requirements exploration (use /brainstorm),
+  direct implementation without planning (use /implement), or an unattended/headless
+  run that never pauses for input (use /autonomous-contract).
 triggers:
   - write plan
   - implementation plan

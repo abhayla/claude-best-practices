@@ -1492,10 +1492,10 @@
     "tier": "nice-to-have"
   },
   "e2e-best-practices": {
-    "hash": "f893f2925244a923c8476608dd1f3375b0207c1a2d0c3e5a1f2c7b59b51a3c47",
+    "hash": "f60ebead91c8eb23fc9f50e8956b7ed44b6086c12683f989b667f10217a24f4b",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-28",
     "last_updated": "2026-04-02",
@@ -1605,10 +1605,10 @@
     "tier": "must-have"
   },
   "error-handling": {
-    "hash": "be8fc6427420d12d592c1037400ff1b7ec57babcc57e9fd2f066e87129bcf181",
+    "hash": "95038922dec3131d0fe66c78e5a9e8ada404572a3ee632b549f43b74fd708bbe",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-21",
     "last_updated": "2026-04-21",
@@ -2136,10 +2136,10 @@
     "tier": "nice-to-have"
   },
   "git-worktrees": {
-    "hash": "93164fc36e691921771d3fb4d85f7781af50b10e799cea175df0285a4252670b",
+    "hash": "c657668a752064fb217d7af3d72f9309e101e6f1809a1e9d8eec02d022e038c8",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
     "last_updated": "2026-04-02",
@@ -3524,10 +3524,10 @@
     "tier": "must-have"
   },
   "security-baseline": {
-    "hash": "c410e31b70b74c30be00989660ff9a66626f14e84648f756ecf98756ccabe0c9",
+    "hash": "5ac695ab043efa7eb689712f399be98b21ae7f851cf78ca856673de1adb0dbe0",
     "type": "rule",
     "category": "core",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-21",
     "last_updated": "2026-04-21",
@@ -4370,7 +4370,7 @@
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-06-10",
+    "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
     "description": "Vue 3 Composition API conventions: script setup, Pinia stores, composables, router",
@@ -4379,7 +4379,7 @@
       "frontend",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya patterns | v1.1.0: Tier-3 promotion — + ref-over-reactive/server-client split, URL-query sync, two-tier form validation, API response unwrapping (from firekaro-planner)",
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya patterns",
     "tier": "must-have"
   },
   "vue-dev": {
@@ -4529,10 +4529,10 @@
     "tier": "nice-to-have"
   },
   "writing-plans": {
-    "hash": "efb7375ee614c7a407902c2b052e12f02589c3dbb055742977926d3bac376b2b",
+    "hash": "b43845df38ab214ac08a3b2eb7c370eeb0a7fa31c5cd13fb23388cbb5f84a92f",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
     "last_updated": "2026-04-02",
@@ -4947,9 +4947,31 @@
     "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
     "tier": "must-have"
   },
+  "autonomous-contract": {
+    "hash": "99c827db6f90698d7a5a66d4f43e623b546e2b1fda20d25f2e4a9b19e3231d39",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
+    "tags": [
+      "autonomous",
+      "goal",
+      "workflow",
+      "contract",
+      "unattended",
+      "self-improvement"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4",
+    "tier": "nice-to-have"
+  },
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-10",
-    "total_patterns": 255
+    "total_patterns": 256
   }
 }

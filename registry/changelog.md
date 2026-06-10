@@ -4,6 +4,12 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-10 — Tier 4: `autonomous-contract` skill from firekaro-planner goal-creator
+
+Tier 4 (final) of the hub-promotion pass (see `plans/hub-promotion-firekaro.md`). Source: `project:firekaro-planner`. Brainstorm spec: `docs/specs/autonomous-contract-skill-spec.md`.
+
+- **added** skill `autonomous-contract` (workflow, category: core, tier: nice-to-have) — authors a dense, zero-open-questions contract to hand to an autonomous executor (Claude Code's built-in `/goal`, or `/loop` / routines / headless) that runs unattended until a Definition of Done. Generalized + executor-anchored-on-`/goal` from firekaro's `goal-creator`. Full apparatus: interview-first Clarification Gate (scoped by `decision-authority`), idempotency preflight, worktree+lock+commit-gate isolation (points to `git-worktrees`), cross-session progress log, DONE/PENDING/BLOCKED/NEXT summary, DoD-verb precision (`dod-verbs`), and blast-radius verification gates that **point to** the Tier 1–3 hub rules (`supervisor-verification`, `independent-test-verification`, `output-plausibility-verification`, `e2e-persistence-verification`, `bug-triage-discipline`) rather than inlining them (`configuration-ssot`). References: `contract-template.md`, `baked-in-rules.md`, `example-contract.md`. Authors and stops — never runs the executor, never commits; Mode B folds run learnings back (PROPOSE-only, per `learnings-routing`).
+
 ### 2026-06-10 — Tier 3: new Hono + Prisma + Vuetify-E2E stack rules from firekaro-planner
 
 Tier 3 of the hub-promotion pass (see `plans/hub-promotion-firekaro.md`). New dependency-gated stack rules + a `vue.md` enrichment. Source: `project:firekaro-planner`. Wiring: `recommend.py` `DEP_PATTERN_MAP` (hono→hono-conventions, prisma→prisma-conventions, vuetify→vue-e2e) + `RESOURCE_STACK_REQUIREMENTS` empty-set gates (mirroring `bun-elysia`). No `bootstrap.py` `STACK_PREFIXES` change needed — these detect via project dependencies, not stack prefixes.
