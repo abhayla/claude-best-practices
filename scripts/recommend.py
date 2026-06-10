@@ -85,15 +85,17 @@ DEP_PATTERN_MAP = {
     "vitest": {"vitest-dev"},
     "jest": {"jest-dev"},
     "@playwright/test": {"playwright"},
-    "prisma": {"prisma-orm"},
+    "prisma": {"prisma-orm", "prisma-conventions"},  # prisma rule
+    "@prisma/client": {"prisma-orm", "prisma-conventions"},
     "drizzle-orm": {"drizzle-orm"},
     "next": {"nextjs-dev"},
     "vue": {"vue-dev", "vue-test", "vue"},  # vue rule
     "nuxt": {"nuxt-dev", "vue"},            # Nuxt implies Vue rule
     "pinia": {"vue-dev", "vue"},            # Pinia implies Vue rule
+    "vuetify": {"vue", "vue-e2e"},          # Vuetify implies Vue rule + Vuetify/Playwright E2E rule
     "react-native": {"react-native-dev", "react-native-e2e"},
     "expo": {"expo-dev"},
-    "hono": {"hono-backend"},
+    "hono": {"hono-backend", "hono-conventions"},  # hono rule
     "elysia": {"bun-elysia-test", "bun-elysia"},  # bun-elysia rule
     "socket.io": {"websocket-patterns"},
     "ws": {"websocket-patterns"},
@@ -472,6 +474,9 @@ RESOURCE_STACK_REQUIREMENTS: dict[str, set[str]] = {
     "flutter": {"android-compose"}, # Flutter projects detected via deps
     "firebase": {"firebase-auth"},
     "bun-elysia": set(),            # No stack detector — requires elysia dep
+    "hono-conventions": set(),      # No stack detector — requires hono dep
+    "prisma-conventions": set(),    # No stack detector — requires prisma dep
+    "vue-e2e": set(),               # No stack detector — requires vuetify dep
     "fastapi-backend": {"fastapi-python"},
     "fastapi-database": {"fastapi-python"},
     # Agents
