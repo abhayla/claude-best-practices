@@ -1,9 +1,4 @@
 {
-  "_meta": {
-    "version": "3.1.0",
-    "last_updated": "2026-06-10",
-    "total_patterns": 250
-  },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
     "type": "skill",
@@ -1497,13 +1492,13 @@
     "tier": "nice-to-have"
   },
   "e2e-best-practices": {
-    "hash": "f893f2925244a923c8476608dd1f3375b0207c1a2d0c3e5a1f2c7b59b51a3c47",
+    "hash": "f60ebead91c8eb23fc9f50e8956b7ed44b6086c12683f989b667f10217a24f4b",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-28",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-10",
     "dependencies": [],
     "visibility": "public",
     "description": "Cross-framework E2E testing best practices for selector strategy, test data isolation, CI pipeline tiering, mock decisions, auth patterns, and parallel execution",
@@ -1513,7 +1508,7 @@
       "best-practices",
       "cross-framework"
     ],
-    "changelog": "v1.0.0: Initial release â€” 10 sections covering gaps across existing E2E skills",
+    "changelog": "v1.0.0: Initial release â€” 10 sections covering gaps across existing E2E skills | v1.1.0: Tier-2 promotion from firekaro-planner — merged generalized verification/ops guidance",
     "tier": "must-have"
   },
   "e2e-conductor-agent": {
@@ -1610,13 +1605,13 @@
     "tier": "must-have"
   },
   "error-handling": {
-    "hash": "be8fc6427420d12d592c1037400ff1b7ec57babcc57e9fd2f066e87129bcf181",
+    "hash": "95038922dec3131d0fe66c78e5a9e8ada404572a3ee632b549f43b74fd708bbe",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-21",
-    "last_updated": "2026-04-21",
+    "last_updated": "2026-06-10",
     "dependencies": [],
     "visibility": "public",
     "description": "Universal error handling constraints: fail fast, no silent failures, explicit over implicit, validate at boundaries, resource cleanup. Global scope.",
@@ -1625,7 +1620,7 @@
       "defensive-coding",
       "baseline"
     ],
-    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "changelog": "v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research | v1.1.0: Tier-2 promotion from firekaro-planner — merged generalized verification/ops guidance",
     "tier": "must-have"
   },
   "escalation-report": {
@@ -2141,20 +2136,20 @@
     "tier": "nice-to-have"
   },
   "git-worktrees": {
-    "hash": "93164fc36e691921771d3fb4d85f7781af50b10e799cea175df0285a4252670b",
+    "hash": "c657668a752064fb217d7af3d72f9309e101e6f1809a1e9d8eec02d022e038c8",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-10",
     "dependencies": [],
     "visibility": "public",
     "description": "Git worktree isolation patterns for parallel development",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research | v1.1.0: Tier-2 promotion from firekaro-planner — merged generalized verification/ops guidance",
     "tier": "must-have"
   },
   "github": {
@@ -3529,13 +3524,13 @@
     "tier": "must-have"
   },
   "security-baseline": {
-    "hash": "c410e31b70b74c30be00989660ff9a66626f14e84648f756ecf98756ccabe0c9",
+    "hash": "5ac695ab043efa7eb689712f399be98b21ae7f851cf78ca856673de1adb0dbe0",
     "type": "rule",
     "category": "core",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-21",
-    "last_updated": "2026-04-21",
+    "last_updated": "2026-06-10",
     "dependencies": [],
     "visibility": "public",
     "description": "Universal security baseline: input validation, secret management, least privilege, dependency hygiene, defense in depth, output encoding. Global scope.",
@@ -3544,7 +3539,7 @@
       "baseline",
       "owasp"
     ],
-    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research | v1.1.0: Tier-2 promotion from firekaro-planner — merged generalized verification/ops guidance",
     "tier": "must-have"
   },
   "semgrep-rules": {
@@ -4534,20 +4529,20 @@
     "tier": "nice-to-have"
   },
   "writing-plans": {
-    "hash": "efb7375ee614c7a407902c2b052e12f02589c3dbb055742977926d3bac376b2b",
+    "hash": "9f09422c110a98e0fa9d65177a38759e29eb47e9b1e7f67c71daeb70f6c5cf6b",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-10",
     "dependencies": [],
     "visibility": "public",
     "description": "Structured implementation planning with atomic plan chunks",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research | v1.3.0: Tier-2 promotion from firekaro-planner — merged generalized verification/ops guidance",
     "tier": "must-have"
   },
   "writing-skills": {
@@ -4846,5 +4841,51 @@
     ],
     "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — path-scoped E2E verification/governance rule",
     "tier": "must-have"
+  },
+  "dod-verbs": {
+    "hash": "ed8a9bb8ad27bdaa2bbd6f2ab34309a499ff395042e587acbdfa427eba77f13a",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Definition-of-done verbs are load-bearing: every acceptance criterion states an explicit ACTION + COMPLETENESS BAR; elastic verbs (handle/support/report) get satisfied at the weakest reading by an autonomous executor.",
+    "tags": [
+      "planning",
+      "quality",
+      "acceptance-criteria",
+      "workflow"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 2 quick-win meta-rule",
+    "tier": "must-have"
+  },
+  "learnings-routing": {
+    "hash": "5ed967b0fc0455fb84056f06f78039a2319e089c2d713d4514cee88d82d834d7",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-10",
+    "last_updated": "2026-06-10",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Type each learning GENERIC vs PRODUCT-SPECIFIC before filing, route to exactly one canonical home, prefer a deterministic gate over prose, dedup, and treat rule-changes as PROPOSE-only.",
+    "tags": [
+      "learning",
+      "self-improvement",
+      "ssot",
+      "workflow",
+      "governance"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 2 quick-win meta-rule",
+    "tier": "must-have"
+  },
+  "_meta": {
+    "version": "3.1.0",
+    "last_updated": "2026-06-10",
+    "total_patterns": 252
   }
 }

@@ -9,7 +9,7 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "<topic: selectors|data|ci|mocks|auth|parallel|all>"
-version: "1.0.0"
+version: "1.1.0"
 triggers:
   - e2e best practices
   - e2e patterns
@@ -264,6 +264,32 @@ Staging MUST mirror production configuration, not just code. Common parity failu
 - Different auth provider config (mock vs real OAuth)
 - Missing CDN/proxy layer that affects CORS behavior
 
+### Production: What NEVER Runs There, and What MUST Run After Every Deploy
+
+Production answers one question — *"is the live release healthy?"* — not *"does
+everything still work?"*. Keep heavy testing pre-merge.
+
+**NEVER on production:**
+- **Full regression suite** — pollutes real multi-tenant data, slow/flaky against live infra, risks touching real-user PII
+- **Load / stress testing** — can self-DoS the live site, skew analytics, hit provider/cost limits (run against a local/staging-like env)
+- **Active pentest / fuzzing** — risky and often unauthorized against prod; keep it pre-merge or in an authorized isolated env
+- **Destructive interactions** — any create/edit/delete of real data
+
+**MUST run after every production deploy (big or small):** a green health
+endpoint is NOT sufficient — a deploy can ship a broken bundle the health check
+never exercises. After every deploy:
+1. **Automated smoke** — health endpoint + a real read round-trip through the
+   production data path + confirm the served bundle hash actually changed (proves
+   the new build is live, not a cached old one).
+2. **Post-deploy UI verification (unauthenticated, non-destructive)** — drive the
+   live site: screenshot + structural snapshot + console of the unauth surface
+   (primary control present and interactive, no new console errors). The unauth
+   surface needs no session, so this runs on every deploy.
+3. **Authenticated critical-path** — only when the deploy touched an authed
+   screen OR a real session is available (use a dedicated test account, never a
+   real user's). If no session is available, surface the skip verbatim ("authed
+   prod verification SKIPPED — needs a session") — never a silent skip.
+
 ---
 
 ## E2E Auth Patterns
@@ -432,6 +458,31 @@ check with content assertions:
 | No error messages visible | No server errors or validation failures |
 | Correct count of items | Data completeness (not truncated) |
 | No placeholder text visible | Data replaced loading states |
+
+### Calculation Verification — use the API as the oracle
+
+For apps that render **computed values** (totals, projections, scores, rates),
+scraping the rendered number is the wrong oracle — it couples the test to display
+formatting and Vuetify/render timing, and it tests the formatter, not the
+calculation. Instead, fetch the computed value from the **API** and compare:
+
+- **Fetch from the API, not the DOM** — request the calculated value directly
+  (the test runner's HTTP client carries auth); this tests the actual calculation
+  logic and sidesteps render-timing flake.
+- **Compare with a tolerance, not equality** — floating-point and cross-module
+  rounding make exact equality flaky. Use a percentage tolerance (e.g. 1% within
+  a module, up to ~5% across modules where rounding accumulates).
+- **Validate empty/error states explicitly — never `test.skip()`** — assert the
+  empty shape or the error status; skipping hides regressions.
+- **Normalize units at the boundary** — an endpoint may return a rate as `3.5`
+  or `0.035`; normalize before comparing so the test isn't unit-fragile.
+- Reserve DOM-scraping for verifying the *formatter* (that `1500000` renders as
+  the expected localized string) — a separate, smaller concern from "is the
+  number correct."
+
+This pairs with `core/.claude/rules/output-plausibility-verification.md`: the API
+oracle confirms the value matches the computation; a plausibility bound confirms
+the computation itself is domain-sane.
 
 ---
 

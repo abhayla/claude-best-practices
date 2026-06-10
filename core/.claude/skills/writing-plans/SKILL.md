@@ -14,7 +14,7 @@ triggers:
   - break down feature
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<feature description, spec file path, or brainstorm output>"
-version: "1.2.0"
+version: "1.3.0"
 type: workflow
 ---
 
@@ -194,6 +194,24 @@ Before presenting the plan, run through this self-review checklist:
 - [ ] Critical path has 20% buffer allocated
 - [ ] Risk mitigation tasks generated for high-scoring PRD risks (P×I ≥ 8)
 - [ ] WBS hierarchy maps to PRD milestones
+- [ ] Every acceptance/verification criterion states an ACTION + a COMPLETENESS BAR (no elastic verbs like "handle"/"support"/"report") — a plan handed to an autonomous executor satisfies the weakest reading of a vague verb (see `core/.claude/rules/dod-verbs.md`)
+
+### 4.1 Mechanical Zero-Open-Questions Gate
+
+A self-review checklist is advisory; a grep is deterministic. Before presenting
+(Step 5) — especially if the plan may be handed to `/executing-plans` to run
+unattended — the plan file MUST pass a mechanical scan for unresolved decisions
+and unfilled blanks. Any hit BLOCKS handoff until resolved:
+
+```bash
+# Both greps MUST return clean (no matches) before Step 5
+grep -nE '<[a-z _-]+>|TBD|TODO|FIXME|decide whether|PASTE|XXX|\?\?\?' docs/plans/<feature>-plan.md
+grep -niE 'either .* or |we could|option [ab]:|not sure|figure out' docs/plans/<feature>-plan.md
+```
+
+A placeholder, an un-chosen option, or a "decide later" left in the plan becomes
+an hours-long autonomous run that builds the wrong thing. Resolve every fork in
+the plan, not at execution time.
 
 Fix any issues found before proceeding.
 
