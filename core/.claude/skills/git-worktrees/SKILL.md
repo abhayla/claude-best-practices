@@ -16,7 +16,7 @@ triggers:
   - worktree isolation
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<task requiring isolated parallel development or worktree management>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -102,6 +102,30 @@ a git worktree for subagents, run them inside it, and manage lifecycle.
 **Read:** `references/claude-code-isolation.md` for the isolation parameter, dispatching multiple agents, and retrieving results.
 
 **Read:** `references/42-when-to-use-isolation-worktree.md` for decision criteria.
+
+---
+
+## STEP 4.5: Background Autonomous-Run Isolation (lock + commit gate)
+
+When a **long, unattended run** executes in a worktree while you keep working in
+the main checkout, isolation alone is not enough — you also need a guard so the
+two cannot commit over each other. Use a lock + a commit gate:
+
+1. **Dedicated worktree per run** — `../<repo>-worktrees/run-<slug>` on its own
+   branch, created at run start and removed on success.
+2. **Lock file** — the run writes a lock (e.g. `.run-active.lock` containing a
+   unique run token) into the worktree at start and deletes it on completion. A
+   stale lock signals a crashed run to clean up, not a second concurrent run.
+3. **Commit gate (the real guard)** — a `pre-commit` hook HARD-BLOCKS any commit
+   whose run token doesn't match the active lock, so an interactive session and
+   the background run cannot interleave commits on the same branch. A rule is
+   advisory; the hook is the zero-exception gate (`rule-writing-meta.md`).
+4. **Cross-session progress log** — the run appends to a gitignored
+   `*-PROGRESS.md` in the worktree, readable from another session via
+   `git worktree list` to check status without attaching.
+
+This makes a multi-hour background run safe to launch and walk away from while
+the main checkout stays usable.
 
 ---
 

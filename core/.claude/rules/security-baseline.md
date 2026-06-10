@@ -26,6 +26,16 @@ MUST NOT hard-code secrets in source, committed config, test fixtures, or docume
 - Assume git history is permanent and replicated — rotating the exposed secret is mandatory; rewriting history (`git filter-branch`, `git filter-repo`, force-push) is best-effort cleanup, not a substitute for rotation
 - Separate dev/staging/prod secrets; never share credentials across environments
 
+## Structured Logging as a Redaction Choke Point
+
+All server/service logging MUST go through a **single structured logger** configured with field-level redaction — not scattered `print`/`console.*` calls. The logger is the one choke point where secrets are stripped before emission; bypassing it defeats the protection and produces logs that cannot be correlated.
+
+- Route all logging through one configured logger (pino, structlog, zap, slf4j, etc.); block raw `console.*`/`print` in service code via a linter rule
+- Configure field-name redaction once on the logger (`password`, `secret`, `token`, `authorization`, `cookie`, and their nested paths) — redaction is the single choke point, not a per-call concern
+- Pass secrets/PII only as **structured fields**, never interpolated into the message string. Redaction operates on object fields, NOT on the formatted message: `log.info({ password }, "...")` is redacted; `log.info(\`pw=${password}\`)` leaks the secret in plaintext
+- MUST NOT log full request/response bodies for auth, OTP, token, or profile endpoints — log field names or shapes, never raw values
+- Attach a correlation/trace id to every request-scoped log so failures can be traced across the stack
+
 ## Least Privilege
 
 Every principal (code, service account, database user, CI token, deploy credential) MUST operate with the minimum permissions required for its function. Deny-by-default is the baseline; grants are explicit.
@@ -68,3 +78,4 @@ MUST encode data appropriately for the sink (HTML, SQL, shell, LDAP, JSON, XML, 
 - MUST NOT catch-and-ignore security exceptions — let them propagate to logging and alerting
 - MUST run dependency vulnerability scans on every PR, not just on release
 - MUST rotate any secret that appears in git history, even after force-push
+- MUST route logging through one structured logger with field-level redaction; MUST NOT interpolate secrets into a log message string (redaction covers fields, not the formatted message)

@@ -58,10 +58,31 @@ Error messages MUST tell the operator what went wrong, where, and what to do nex
 - Identify the subsystem and the operation (`[db.users.insert] unique constraint violated on email`)
 - Avoid leaking secrets, PII, or internal paths in user-facing errors — detailed traces belong in logs, not HTTP responses
 
+## Numeric & Derived-Value Safety
+
+Computed and derived values that flow to users or to downstream logic MUST be guarded against the numeric failure modes that pass type-checks but produce garbage: `NaN`, `Infinity`, and division by zero. A value that "type-checks as a number" is not necessarily a *valid* number.
+
+- Guard every division/derivation on a value that could be zero or absent — `total > 0 ? part / total : 0`, never a bare `part / total`
+- Check finiteness before returning a derived number — reject `NaN`/`Infinity` and substitute a safe default (`isFinite(result) ? result : 0`)
+- Apply a safe default on a non-OK response before consuming its body — never index into a payload you have not confirmed succeeded
+- Verify the *shape* of external/derived data before iterating — an endpoint that "returns a list" may return an object on error; guard with an `Array.isArray`-style check, not blind iteration
+- This is the substance-level companion to boundary validation above: validation rejects bad *input*; this rejects bad *derived output* before it renders or persists (see `output-plausibility-verification.md`)
+
+## Fire-and-Forget Side Effects
+
+A request/response handler MUST return its primary response without awaiting **advisory** side effects (notifications, cache invalidation hints, cross-domain syncs). But a detached promise is still an error path that MUST be observable.
+
+- Await only the side effects the response's correctness depends on; do NOT await advisory ones (they block the response for no benefit)
+- Every fire-and-forget call MUST carry an error handler that **logs** the failure through the project's logger (see `security-baseline.md` for the logging choke point) — a detached promise without a logged failure path is a silent failure
+- MUST NOT use a bare discard (e.g. `void promise`) as a substitute for a logged error handler — it suppresses the rejection silently
+- MUST NOT let an advisory side-effect failure propagate into the primary request's error path — the user gets their primary response regardless of advisory-effect status
+
 ## CRITICAL RULES
 
 - MUST NOT write empty `catch` / `except` blocks
 - MUST NOT use `null` / `None` as a generic failure signal — return typed results instead
+- MUST guard derived numbers against `NaN` / `Infinity` / division-by-zero before returning or rendering them
+- MUST attach a logged error handler to every fire-and-forget side effect; MUST NOT silence it with a bare discard
 - MUST validate all data crossing a trust boundary before it reaches business logic
 - MUST release resources on every exit path — success and failure alike
 - MUST include actionable context in every error message — subsystem, operation, input, expected vs. observed
