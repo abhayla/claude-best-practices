@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-12 02:21 UTC (auto-generated)
+> Last updated: 2026-06-12 09:14 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 260 |
-| Core (universal) | 189 |
+| Total Patterns | 261 |
+| Core (universal) | 190 |
 | Stack-specific | 71 |
 | Agents | 39 |
 | Configs | 2 |
 | Hooks | 11 |
-| Rules | 45 |
+| Rules | 46 |
 | Skills | 163 |
 
 ## Pattern Inventory
@@ -121,6 +121,7 @@
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | no-overask-guard | hook | 1.0.0 | project:firekaro-planner | — |
+| notifier-integration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | output-plausibility-verification | rule | 1.0.0 | project:firekaro-planner | — |
 | parallel-worktree-orchestrator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -141,9 +142,9 @@
 | prisma-conventions | rule | 1.0.0 | project:firekaro-planner | — |
 | project-manager-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | agent-orchestration |
 | project-scaffold | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup |
-| prompt-auto-enhance | skill | 3.2.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
-| prompt-auto-enhance-rule | rule | 3.0.0 | hub:abhayla/claude-best-practices | prompt-auto-enhance |
-| prompt-enhance-reminder | hook | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| prompt-auto-enhance | skill | 3.6.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
+| prompt-auto-enhance-rule | rule | 3.1.0 | hub:abhayla/claude-best-practices | prompt-auto-enhance |
+| prompt-enhance-reminder | hook | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | prompt-logger | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | quality-gate-evaluator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | react-nextjs | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
