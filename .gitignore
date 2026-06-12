@@ -31,3 +31,6 @@ CLAUDE.local.md
 .claude/.enhance-misses.log
 .claude/.keepgoing-count
 .claude/.overask-violations.log
+
+# goal-run scratch logs (per docs/goals contracts)
+docs/goals/.run/
