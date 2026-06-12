@@ -2687,13 +2687,13 @@
     "tier": "nice-to-have"
   },
   "pattern-portability": {
-    "hash": "052a3192d0ccb8c3aeb3c01dec2b54f24401b47a61b5e8cb74706b072fdc18f9",
+    "hash": "a6e0bef672ffe762a706be651dad6db2e7738ec3815423df482ebef15b83b3ef",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-12",
     "dependencies": [],
     "visibility": "public",
     "description": "Portability standards for distributed patterns: no hardcoded paths, no project-specific references, least-privilege tools, no environment assumptions",
@@ -2702,7 +2702,7 @@
       "portability",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core; v1.1.0: added Templates-with-Wire-Contracts section (null-vs-absent serialization, receiver validator semantics, cross-language payload equivalence, mandatory independent review)",
     "tier": "nice-to-have"
   },
   "pattern-self-containment": {
@@ -4948,13 +4948,13 @@
     "tier": "must-have"
   },
   "autonomous-contract": {
-    "hash": "99c827db6f90698d7a5a66d4f43e623b546e2b1fda20d25f2e4a9b19e3231d39",
+    "hash": "19c838c33216de2f453e3b17f07ff55c45915515fd0b6ac6cea32ca93a7ed073",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-10",
+    "last_updated": "2026-06-12",
     "dependencies": [],
     "visibility": "public",
     "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
@@ -4966,7 +4966,7 @@
       "unattended",
       "self-improvement"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4",
+    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation)",
     "tier": "nice-to-have"
   },
   "_meta": {

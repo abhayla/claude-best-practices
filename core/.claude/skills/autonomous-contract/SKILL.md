@@ -14,7 +14,7 @@ description: >
 type: workflow
 allowed-tools: "Read Write Edit Grep Glob Bash"
 argument-hint: "[one-line description of the goal, optional]"
-version: "1.0.0"
+version: "1.1.0"
 triggers:
   - autonomous contract
   - create a goal contract
@@ -169,7 +169,7 @@ Quality bar (this is what separates a good contract from a vague one):
 - **Provision the env for every mandated check.** Don't mandate a check the run's own environment can't reach (e.g. an auth-OFF test inside an auth-ON sweep) — give it its own sub-run with its own setup, and mark security/data-integrity gates non-deferrable.
 - **"Tested via the UI" means hand-entry through the real forms, not a seed/fixture load.** A seed proves *render*, not *entry* — never let it satisfy a build/journey requirement.
 - **Honest defaults.** No synthetic/fake data; surface uncertainty as an explicit `**Assumption:** X`, never as fiction.
-- **Self-contained.** The run should not need this skill or any chat history — everything is in the contract plus the rule files it names (which load transitively). List those references explicitly.
+- **Self-contained.** The run should not need this skill or any chat history — everything is in the contract plus the rule files it names (which load transitively). List those references explicitly — and **verify every cited file exists at drafting time** (`ls` each referenced path, especially cross-repo ones and style-reference files). A stale citation forces the executor to improvise mid-run; the contract MUST instead either cite a real file or state the fallback ("if X is absent, use Y").
 
 Length here buys an unattended run that builds the right thing — be dense on purpose.
 

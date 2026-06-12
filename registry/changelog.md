@@ -4,6 +4,13 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-12 — notifier-hub-pattern learnings fold-back (pattern-portability + autonomous-contract)
+
+Folding back the two LEARNINGS-TO-FOLD-BACK proposals from the notifier-hub-pattern goal run (user-approved).
+
+- **updated** rule `pattern-portability` (v1.0.0 → v1.1.0) — new "Templates with Wire Contracts" section: distributed code templates that POST to a service MUST be checked against the receiver's validator semantics (null-vs-absent serialization — `JSON.stringify` drops `undefined`, Python serializes `None` as `null`; enum/optionality verification from the receiver's real types; cross-language payload equivalence; independent fresh-context review as the mandatory catching layer, since no hub validator type-checks template code). Source: Rule-29 HIGH finding on `owner_notify.py`.
+- **updated** skill `autonomous-contract` (v1.0.0 → v1.1.0) — Self-contained principle now requires verifying every cited reference file exists at drafting time, or stating an explicit fallback. Source: the goal contract cited `structured-logging.md` as the house-style reference, which does not exist in the hub.
+
 ### 2026-06-12 — notifier-integration: owner-alert + heartbeat standard (rule + templates)
 
 Promoted FireKaro's proven owner-alert integration (`server/src/lib/owner-notify.ts`) into a distributable hub pattern. Source: `project:firekaro-planner` via goal contract `docs/goals/2026-06-12-notifier-hub-pattern.md`.
