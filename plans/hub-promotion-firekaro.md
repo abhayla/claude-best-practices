@@ -55,9 +55,25 @@ Branch: `feat/hub-autonomous-contract-skill` (later). `/brainstorm` first.
   cross-session progress log, DONE/PENDING/BLOCKED/NEXT summary, DoD-verbs, env-provisioning
 - De-firekaro the `/goal` executor coupling; needs `/skill-evaluator` before merge
 
+## Tier 5 — session-governance layer (Abhay-directed, 2026-06-12)  ← ✅ DONE (PRs #45, #46, #47)
+Promoted firekaro's June-10/11 governance work in dependency order, one PR each.
+**Overrides the SKIP verdict below for `plan-before-coding` + `engineering-roles`** —
+explicit user direction 2026-06-12, because the v3.6.0 governance tail cross-references both.
+
+| PR | Tier | Shipped |
+|---|---|---|
+| #45 | 5a | rules `plan-before-coding` (must-have) + `engineering-roles` (nice-to-have), generalized |
+| #46 | 5b | hooks `no-overask-guard` (Stop) + `session-governance-status` (SessionStart) + core settings wiring |
+| #47 | 5c | `prompt-auto-enhance` 3.2.0→3.6.0, rule 3.1.0 (format A, compact 97 lines per lean-rule tests), `prompt-enhance-reminder` 2.1.0; hub `.claude/` mirrored + adopts the 5b hooks |
+
+Deliberately NOT promoted from the same firekaro window: `member-landscape-verification`
+(domain-specific), `app-login` learnings (project-specific), reddit/twitter-x refreshes
+(originated from hub).
+
 ## SKIP (verified project-specific / duplicate)
-plan-before-coding (=rule 1), documentation-management (=design-ssot), commit-convention
-(=git-collaboration), session-management (=session skills), engineering-roles,
+~~plan-before-coding (=rule 1)~~ (promoted in Tier 5a — user override), documentation-management
+(=design-ssot), commit-convention (=git-collaboration), session-management (=session skills),
+~~engineering-roles~~ (promoted in Tier 5a — user override),
 must-have-only-focus (=YAGNI), type-organization, all finance-domain rules,
 ui-verification / e2e-test-runner / e2e-auto-fixer / verify-ui skills,
 fintech-domain-analyst agent, wati-* skills.
