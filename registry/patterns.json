@@ -4971,7 +4971,47 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-06-10",
-    "total_patterns": 256
+    "last_updated": "2026-06-12",
+    "total_patterns": 258
+  },
+  "plan-before-coding": {
+    "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-12",
+    "last_updated": "2026-06-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Visible plan (plan mode, autonomous contract, or inline plan block) required BEFORE the first code edit on any non-trivial change: approach+WHY, concrete file list, build sequence, verification, risks. Root-cause + full consumer/surface map is part of the plan; both mandates propagate to every dispatched code-changing worker.",
+    "tags": [
+      "governance",
+      "planning",
+      "workflow",
+      "root-cause"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — SSOT for the plan-first discipline",
+    "tier": "must-have"
+  },
+  "engineering-roles": {
+    "hash": "bfc54421ac2b1b2751c1b199618330ebbe07d9e64516005b10da04dd90293127",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-12",
+    "last_updated": "2026-06-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Autonomous role router: infer the engineering role from the task signal, state `Role: <name> — <why>`, and dispatch the role's named agents/skills (routing layer, no capability duplication). Includes router table, condensed mandates, canonical multi-role sequences with a mandatory independent-reviewer edge, and a routing feedback loop.",
+    "tags": [
+      "governance",
+      "roles",
+      "routing",
+      "orchestration"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns)",
+    "tier": "nice-to-have"
   }
 }

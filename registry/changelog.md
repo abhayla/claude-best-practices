@@ -4,6 +4,13 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-12 — Tier 5a: supporting governance rules from firekaro-planner (user-approved override of the Tier-plan SKIP verdict)
+
+First of three PRs promoting firekaro's session-governance layer (rules → hooks → prompt-auto-enhance v3.6.0). Source: `project:firekaro-planner`. These two were originally marked SKIP in `plans/hub-promotion-firekaro.md`; promoted on explicit user direction because the v3.6.0 prompt-auto-enhance governance tail (Tier 5c) cross-references them.
+
+- **added** rule `plan-before-coding` (global, tier: must-have) — SSOT for the plan-first discipline: visible plan (plan mode / `/autonomous-contract` / inline plan block) BEFORE the first code edit on any non-trivial change, with approach+WHY, concrete file list, build sequence, verification, and risks. Folds in the root-cause + full consumer/surface map as part of the plan (never a one-symptom patch), and propagates both mandates to every dispatched code-changing worker (`supervisor-verification`). Generalized: domain-critical-logic trigger replaces firekaro's financial-math paths; goal-contract surface retargeted to `/autonomous-contract`.
+- **added** rule `engineering-roles` (global, tier: nice-to-have) — autonomous role router: infer the role from the task signal, state `Role: <name> — <why>`, dispatch the role's named agents/skills (routing layer over existing tooling, `configuration-ssot`). Router table + condensed mandates for 15 generic roles, canonical multi-role sequences with a mandatory independent-reviewer edge (`independent-test-verification`), and a mis-route→`lessons.md` feedback loop. Generalized: project-stage block templated for downstream copies; domain-analyst roles documented as project-specific additions (hub ships none, YAGNI); all dispatch targets retargeted to existing hub patterns.
+
 ### 2026-06-10 — Tier 4: `autonomous-contract` skill from firekaro-planner goal-creator
 
 Tier 4 (final) of the hub-promotion pass (see `plans/hub-promotion-firekaro.md`). Source: `project:firekaro-planner`. Brainstorm spec: `docs/specs/autonomous-contract-skill-spec.md`.
