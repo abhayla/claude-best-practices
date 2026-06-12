@@ -26,3 +26,8 @@ CLAUDE.local.md
 # may include secrets/PII. The seed at core/.claude/tasks/prompts.md stays
 # tracked so provisioning can copy it into downstream projects.
 /.claude/tasks/prompts.md
+
+# Session-governance runtime state (no-overask-guard.sh / prompt-enhance-reminder.sh)
+.claude/.enhance-misses.log
+.claude/.keepgoing-count
+.claude/.overask-violations.log
