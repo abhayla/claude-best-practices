@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-10 03:58 UTC (auto-generated)
+> Last updated: 2026-06-12 02:18 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 256 |
-| Core (universal) | 185 |
+| Total Patterns | 258 |
+| Core (universal) | 187 |
 | Stack-specific | 71 |
 | Agents | 39 |
 | Configs | 2 |
 | Hooks | 9 |
-| Rules | 43 |
+| Rules | 45 |
 | Skills | 163 |
 
 ## Pattern Inventory
@@ -85,6 +85,7 @@
 | e2e-readiness-signal | rule | 1.0.0 | project:firekaro-planner | — |
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
 | e2e-visual-run | skill | 5.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
+| engineering-roles | rule | 1.0.0 | project:firekaro-planner | — |
 | environment-validation | rule | 1.0.0 | project:firekaro-planner | — |
 | error-handling | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | escalation-report | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
@@ -128,6 +129,7 @@
 | perf-test | skill | 1.2.0 | hub:abhayla/claude-best-practices | web-quality |
 | pipeline-fix-pr | skill | 1.0.0 | hub:abhayla/claude-best-practices | serialize-fixes |
 | pipeline-orchestrator | skill | 2.0.0 | hub:abhayla/claude-best-practices | project-manager-agent |
+| plan-before-coding | rule | 1.0.0 | project:firekaro-planner | — |
 | plan-executor-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | plan-to-issues | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | planner-researcher-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
