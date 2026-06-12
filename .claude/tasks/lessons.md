@@ -197,3 +197,22 @@ configs should not wait for a user to opt into `--tier nice-to-have`.
 **Resolution:** prompt-logger promoted to must-have; `test-pipeline`
 added to CONFIG_SKILL_MAP so its config inherits must-have tier.
 Committed `2e71a6e`.
+
+## 2026-06-12 — Porting a TS JSON client to Python: None ≠ omitted key
+
+**Surfaced during:** notifier-hub-pattern goal run — Rule-29 independent
+review of `core/.claude/templates/owner_notify.py` (HIGH finding).
+
+**What I got wrong:** The Python port of `owner-notify.ts` passed optional
+fields straight into the JSON payload (`"type": None`). `JSON.stringify`
+silently DROPS `undefined` keys, but Python's `json` serializes `None` as
+`null` — and the receiving validator (Notifier `/notify`) rejects a non-string
+`type` with 400, silently dropping every alert sent without an explicit type
+(requests doesn't raise on 4xx).
+
+**What to do instead:** When porting a TS HTTP client to Python, filter unset
+optionals before serializing (`{k: v for k, v in payload.items() if v is not
+None}`) — match JSON.stringify's undefined-dropping, and check the receiver's
+validator semantics for null vs absent. Gate-gap: no hub validator type-checks
+template code against its wire contract — independent review (rule 29) is the
+catching layer; keep it mandatory for templates.
