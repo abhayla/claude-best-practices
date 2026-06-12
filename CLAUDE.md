@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Python 3.12** required (all CI workflows use 3.12)
 - Setup: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`
-- **Windows (PowerShell)**: prefix commands with `$env:PYTHONPATH = "."` and a semicolon (e.g., `$env:PYTHONPATH = "."; python -m pytest scripts/tests/ -v`). For cmd.exe use `set PYTHONPATH=. &&`. Git Bash works with the Unix syntax shown below.
+- **Windows (PowerShell)**: prefix commands with `$env:PYTHONPATH = "."` and a semicolon (e.g., `$env:PYTHONPATH = "."; python -m pytest scripts/tests/ -v`). For cmd.exe use `set PYTHONPATH=. &&`. Git Bash works with the Unix syntax shown below. When writing **ad-hoc Python one-liners** to inspect `registry/patterns.json` or other config files, set `$env:PYTHONUTF8 = "1"` (or pass `encoding="utf-8"` to `open()`) — these files contain non-ASCII bytes and Python's default Windows codec (cp1252) raises `UnicodeDecodeError`. The repo's own scripts already pass `encoding="utf-8"`; this only bites improvised commands.
 - **New here?** For downstream provisioning options (copy-all, smart, full synthesis), see `README.md`; for deeper setup walkthroughs, see `docs/GETTING-STARTED.md`.
 - **`CLAUDE.local.md`** (repo root, gitignored) — per-developer overrides and local notes (e.g., local paths, secrets-free environment tweaks, in-progress scratch notes that shouldn't ship). Distinct from: auto-memory (cross-session user prefs) and `.claude/tasks/lessons.md` (correction patterns across sessions). Safe to read/update; never commit.
 
@@ -87,6 +87,8 @@ Available stacks and their prefixes:
 | Flutter | `flutter-*` | `DEP_PATTERN_MAP` |
 | Vue/Nuxt | `vue-*` / `nuxt-*` | `DEP_PATTERN_MAP` |
 | Bun/Elysia | `bun-elysia-*` | `DEP_PATTERN_MAP` |
+| Expo | `expo-*` | `DEP_PATTERN_MAP` |
+| Hono | `hono-*` | `DEP_PATTERN_MAP` |
 
 ### Sync Flows
 
@@ -134,7 +136,7 @@ Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, 
 - **`config/repos.yml`** — Downstream project repos for `sync_to_projects.py` and `recommend.yml`
 - **`config/settings.yml`** — Hub-level settings
 - **`config/pipeline-stages.yaml`** — DAG config for pipeline orchestration
-- **`config/telemetry-aggregates.json`** — Historical effectiveness data from `aggregate_telemetry.py` runs
+- **`config/telemetry-aggregates.json`** — Historical effectiveness data from `aggregate_telemetry.py` runs. Generated output — may not exist until the first telemetry run; do not treat its absence as an error
 
 ### CI Workflows
 
