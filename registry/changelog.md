@@ -4,6 +4,12 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-12 — notifier-integration: owner-alert + heartbeat standard (rule + templates)
+
+Promoted FireKaro's proven owner-alert integration (`server/src/lib/owner-notify.ts`) into a distributable hub pattern. Source: `project:firekaro-planner` via goal contract `docs/goals/2026-06-12-notifier-hub-pattern.md`.
+
+- **added** rule `notifier-integration` (v1.0.0) — owner alerts AND uptime heartbeats via the Notifier gateway: `NOTIFIER_URL`/`NOTIFIER_KEY`, fail-open `notifyOwner()` contract (no-op unset env, 2s timeout, fire-and-forget, never throws), canonical detector set (signup / unhandled-5xx / DB-down / boot-env), heartbeat directive, explicit healthchecks.io/UptimeRobot/cron-ping.me retirement, no end-user PII. Ships with `templates/owner-notify.ts` + `templates/owner_notify.py` (notifyOwner + heartbeat companions) and `templates/claude-md-production-monitoring-block.md` (v1.0.0) — templates ride along via provisioning's full `core/.claude/` copy (not registry-tracked, per `templates/` precedent).
+
 ### 2026-06-12 — Tier 5c: prompt-auto-enhance v3.6.0 from firekaro-planner (skill + rule + reminder hook)
 
 Final PR of the Tier-5 session-governance promotion. Source: `project:firekaro-planner`, where v3.3→v3.6 were hardened across four 5-prompt verification campaigns with documented defects and fixes. Hub-operational `.claude/` copies (skill, rule, hooks, settings wiring) updated in lockstep with `core/.claude/`.
