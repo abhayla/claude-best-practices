@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-12 02:18 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-12 02:21 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">258</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">187</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">260</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">189</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">71</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">39</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">2</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">9</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">45</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">163</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">39</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">2</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">11</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">45</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">163</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -1399,6 +1399,15 @@ tr:hover { background: var(--primary-light); }
                 <td>—</td>
                 <td>nextjs, react, frontend</td>
             </tr>
+            <tr data-type="hook" data-category="core">
+                <td>no-overask-guard</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:firekaro-planner</td>
+                <td>—</td>
+                <td>governance, hook, stop-discipline, telemetry</td>
+            </tr>
             <tr data-type="skill" data-category="need-basis">
                 <td>node-backend-dev</td>
                 <td><span class="badge badge-skill">skill</span></td>
@@ -1902,6 +1911,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>orchestration, workflow, session</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>session-governance-status</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>project:firekaro-planner</td>
+                <td>no-overask-guard</td>
+                <td>governance, hook, session-start, telemetry</td>
             </tr>
             <tr data-type="hook" data-category="core">
                 <td>session-reminder</td>

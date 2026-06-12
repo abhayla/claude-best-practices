@@ -1,15 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-12 02:18 UTC (auto-generated)
+> Last updated: 2026-06-12 02:21 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 258 |
-| Core (universal) | 187 |
+| Total Patterns | 260 |
+| Core (universal) | 189 |
 | Stack-specific | 71 |
 | Agents | 39 |
 | Configs | 2 |
-| Hooks | 9 |
+| Hooks | 11 |
 | Rules | 45 |
 | Skills | 163 |
 
@@ -120,6 +120,7 @@
 | learnings-routing | rule | 1.0.0 | project:firekaro-planner | — |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| no-overask-guard | hook | 1.0.0 | project:firekaro-planner | — |
 | orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | output-plausibility-verification | rule | 1.0.0 | project:firekaro-planner | — |
 | parallel-worktree-orchestrator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -163,6 +164,7 @@
 | serialize-fixes | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
+| session-governance-status | hook | 1.0.0 | project:firekaro-planner | no-overask-guard |
 | session-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-summarizer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-author-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | writing-skills, pattern-structure |
