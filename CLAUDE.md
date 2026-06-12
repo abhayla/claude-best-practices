@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **`core/.claude/`** — Distributable template for downstream projects. NEVER put hub-only config here. NEVER use patterns from this directory (skills, agents, rules, hooks) when working on this hub repo — they are for downstream projects only.
 - **`.claude/`** (repo root) — Hub-only operational config (scan skills, `synthesize-hub`, hub agents, hooks). This is what THIS repo uses. NEVER distribute this.
+- **Exception — governance SSOT reads**: the auto-loaded `.claude/rules/prompt-auto-enhance.md` pipeline cites SSOT detail files (`engineering-roles.md`, `decision-authority.md`, `supervisor-verification.md`, `configuration-ssot.md`, `plan-before-coding.md`, `independent-test-verification.md`, `git-collaboration.md`) that live only in `core/.claude/rules/`. READING those files when the pipeline points to them is correct and expected — the prohibition above is about dispatching core skills/agents/hooks as if they were hub config, not about reading rule documentation.
 
 ## Environment
 
@@ -61,6 +62,7 @@ Projects can opt in to share back synthesized patterns by setting `allow_hub_sha
 
 - **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, `config/`, templates
 - **`.claude/rules/`** — Auto-loaded rules. Global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when working with matching files
+- **`.claude/hooks/`** — Hub-only governance/telemetry hooks wired into `.claude/settings.json`: `session-governance-status.sh` (session-start governance banner), `prompt-enhance-reminder.sh` (gates prompt-auto-enhance triggering), `no-overask-guard.sh` (Stop-hook telemetry for missed enhance banners), `prompt-logger.sh`, `auto-learn-trigger.sh`, `pattern-quality-gate.sh`, `post-failure-capture.sh`. Their runtime state files (`.claude/.enhance-misses.log` etc.) are gitignored
 - **`config/`** — `settings.yml`, `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow docs), `pipeline-stages.yaml` (DAG config), `workflow-contracts.yaml` (step DAGs + artifact contracts)
 - **`docs/specs/`** — Canonical workflow/feature specs (e.g., `test-pipeline-three-lane-spec-v2.md`). Reference these — do not duplicate spec content elsewhere
 - **`docs/workflows/`** — Auto-generated workflow docs. Do not edit manually — regenerate after pattern changes
@@ -75,7 +77,7 @@ Projects can opt in to share back synthesized patterns by setting `allow_hub_sha
 
 Two mechanisms: (1) **Stack prefixes** in `STACK_PREFIXES` (`bootstrap.py`) — `fastapi-*`, `android-*`, `react-*`, `firebase-*`, `ai-gemini-*`. (2) **Dependency detection** via `DEP_PATTERN_MAP` (`recommend.py`) — matches `flutter-*`, `vue-*`, `bun-elysia-*`, etc. from project dependencies. Universal patterns have no prefix. Adding a new stack requires changes in `STACK_PREFIXES` (bootstrap.py), `STACK_DETECTORS` (recommend.py), and optionally `DEP_PATTERN_MAP` (recommend.py).
 
-Available stacks and their prefixes:
+Available stacks and their prefixes (full per-stack pattern listing: `docs/STACK-CATALOG.md`):
 
 | Stack | Prefix | Detection |
 |-------|--------|-----------|
