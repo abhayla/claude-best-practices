@@ -4972,7 +4972,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-12",
-    "total_patterns": 258
+    "total_patterns": 260
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5013,5 +5013,47 @@
     ],
     "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns)",
     "tier": "nice-to-have"
+  },
+  "no-overask-guard": {
+    "hash": "270521b33f9daab9c9d5a3f6fc5c57acc0f4359fae485d248a8fadbe8feb79a6",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-12",
+    "last_updated": "2026-06-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Stop hook enforcing stop-discipline deterministically: BLOCKS over-ask (trailing offer / multiple-choice / recommendation+question) and narrate-and-stop endings on reversible work and re-injects the decision-authority rule; exempts genuine blockers and *Sync-check:* intent grills; logs enhance-banner/block/role misses as non-blocking telemetry; per-turn auto-continue cap of 12 via .claude/.keepgoing-count.",
+    "tags": [
+      "governance",
+      "hook",
+      "stop-discipline",
+      "telemetry"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses",
+    "tier": "must-have"
+  },
+  "session-governance-status": {
+    "hash": "3cf87f5cf60ed7f7e58dcc21d523c11ca81675687c187c860cb16869ebf9aaf3",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-12",
+    "last_updated": "2026-06-12",
+    "dependencies": [
+      "no-overask-guard"
+    ],
+    "visibility": "public",
+    "description": "SessionStart hook emitting a machine-readable governance status block: supervisor duty pointer, git branch/uncommitted count, role-router pointer, and a 7-day summary of the enhance-misses telemetry log with an explicit-zero line (so 'clean' is distinguishable from 'not wired') and a high-miss-rate alert.",
+    "tags": [
+      "governance",
+      "hook",
+      "session-start",
+      "telemetry"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project handoff-register and domain-analyst lines removed; pointers retargeted to hub rules)",
+    "tier": "must-have"
   }
 }

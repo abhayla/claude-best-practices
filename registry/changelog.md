@@ -4,6 +4,14 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-12 — Tier 5b: session-governance hooks from firekaro-planner
+
+Second of three PRs promoting firekaro's session-governance layer. Source: `project:firekaro-planner`. Wires two new hook events into the distributable `core/.claude/settings.json` template (`Stop` + `SessionStart`).
+
+- **added** hook `no-overask-guard` (Stop, tier: must-have) — deterministic stop-discipline guard: BLOCKS over-ask (trailing offer / multiple-choice / recommendation+question) and narrate-and-stop endings on reversible work, re-injecting the `decision-authority` rule to force continuation; exempts genuine blockers and `*Sync-check:*` intent grills; logs enhance-banner/block/role misses to `.claude/.enhance-misses.log` as non-blocking telemetry; caps auto-continues at 12 per user turn via `.claude/.keepgoing-count` (reset by `prompt-enhance-reminder`). Carries the per-turn text-aggregation fix (analyze ALL assistant text since the last real user prompt, not the last block) that eliminated 58/59 false-positive banner misses in firekaro's 7-day log.
+- **added** hook `session-governance-status` (SessionStart, tier: must-have) — machine-readable governance status block at session boot: supervisor-duty pointer (`supervisor-verification`), git branch + uncommitted count, role-router pointer (`engineering-roles`), and a 7-day enhance-misses summary with an explicit-zero line (so "clean" is distinguishable from "summary not wired") plus a >5/week alert.
+- **changed** `core/.claude/settings.json` — added `SessionStart` → `session-governance-status.sh` and `Stop` → `no-overask-guard.sh` hook wiring alongside the existing `UserPromptSubmit` → `prompt-enhance-reminder.sh`.
+
 ### 2026-06-12 — Tier 5a: supporting governance rules from firekaro-planner (user-approved override of the Tier-plan SKIP verdict)
 
 First of three PRs promoting firekaro's session-governance layer (rules → hooks → prompt-auto-enhance v3.6.0). Source: `project:firekaro-planner`. These two were originally marked SKIP in `plans/hub-promotion-firekaro.md`; promoted on explicit user direction because the v3.6.0 prompt-auto-enhance governance tail (Tier 5c) cross-references them.
