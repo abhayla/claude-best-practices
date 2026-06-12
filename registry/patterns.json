@@ -4972,7 +4972,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-12",
-    "total_patterns": 260
+    "total_patterns": 261
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5054,6 +5054,27 @@
       "telemetry"
     ],
     "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project handoff-register and domain-analyst lines removed; pointers retargeted to hub rules)",
+    "tier": "must-have"
+  },
+  "notifier-integration": {
+    "hash": "8ee056a5d215e0b15aa2c5c55d9c2bee76e5eb25fbfad0a2108500a433be99d0",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-12",
+    "last_updated": "2026-06-12",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Owner-alerting and uptime-heartbeat standard via the Notifier gateway: NOTIFIER_URL/NOTIFIER_KEY env vars, the fail-open notifyOwner() contract, canonical detector set (signup/5xx/DB-down/boot-env), heartbeat directive, explicit healthchecks.io/UptimeRobot retirement, no end-user PII. Ships with owner-notify.ts / owner_notify.py templates and a CLAUDE.md production-monitoring block. Global scope.",
+    "tags": [
+      "monitoring",
+      "notifier",
+      "observability",
+      "alerting",
+      "heartbeat"
+    ],
+    "changelog": "v1.0.0: Initial release — generalized from FireKaro's proven owner-notify.ts integration; notifier-integration rule + owner-notify templates + production-monitoring CLAUDE.md block",
     "tier": "must-have"
   }
 }
