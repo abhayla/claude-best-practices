@@ -138,13 +138,13 @@ examples).
 
 ## Grade Thresholds
 
-| Grade | Score (1-10) | Action |
+| Grade | Score (1-10, half-open bands — fixed 2026-06-11, no holes) | Action |
 |-------|-------------|--------|
-| **A** | 8.0-10.0 | Skip strengthening, execute as-is |
-| **B** | 6.0-7.9 | Strengthen ONLY dimensions scoring below 7 |
-| **C** | 4.0-5.9 | Full strengthening (all weak dimensions) |
-| **D** | 3.0-3.9 | Full strengthening with heavy warning |
-| **F** | 1.0-2.9 | Suggested rewrite with intent-drift caveats |
+| **A** | ≥ 8.0 | Skip strengthening, execute as-is (sole exception: the cap-exempt role fix still applies when Role dim < 7 — see SKILL.md Guardrail 1) |
+| **B** | [6.0, 8.0) | Strengthen ONLY dimensions scoring below 7 |
+| **C** | [4.0, 6.0) | Full strengthening (all weak dimensions) |
+| **D** | [3.0, 4.0) | Full strengthening with heavy warning |
+| **F** | < 3.0 | Suggested rewrite with intent-drift caveats |
 
 ## Floor Rules (with explicit precedence)
 

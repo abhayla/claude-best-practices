@@ -3035,20 +3035,20 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance": {
-    "hash": "a8a3ed306c1751387cba68dfc36ddac4ef395f312be0e7dbbca9a50c8c73c104",
+    "hash": "17a151044d12a93e266acd1ac2a245a7a258a55b901ee9d91ca553271b9799fd",
     "type": "skill",
     "category": "core",
-    "version": "3.2.0",
+    "version": "3.6.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-30",
+    "last_updated": "2026-06-12",
     "dependencies": [
       "writing-skills",
       "claude-guardian",
       "skill-author"
     ],
     "visibility": "public",
-    "description": "Grade and strengthen non-trivial prompts using a 6-dimension rubric, then diagnose weak dimensions against 11 failure categories with severity-prioritized fixes and 3 guardrails. Also handles resource CRUD batch approval and prompt reliability scoring.",
+    "description": "Grade and strengthen non-trivial prompts using a 6-dimension rubric, then diagnose weak dimensions against 11 failure categories with severity-prioritized fixes and 3 guardrails. v3.6: transcription normalization (STEP 0-pre), evidence-override lane, post-rewrite re-grade with proof-of-lift (STEP 3.6), blind re-grade audit, role routing (STEP 4.7), execute-under-decision-authority + git stages (5/6). Also handles resource CRUD batch approval and prompt reliability scoring.",
     "tags": [
       "prompt-enhancement",
       "prompt-strengthening",
@@ -3060,17 +3060,17 @@
       "workflow",
       "format-locking"
     ],
-    "changelog": "v3.2.0: Replace STEP 4.7 Execution Mode menu with one-line skill hint (lighter advisory, never gating). v3.1.1: Execution Mode Selection Gate. v3.0.0: Mandatory step transcript + final prompt preview rendering, no upper limit on Clarification Gate. v2.0.0: Step 0 prompt grading (6 weighted dimensions), 11 failure categories, 3 guardrails.",
+    "changelog": "v3.2.0: Replace STEP 4.7 Execution Mode menu with one-line skill hint (lighter advisory, never gating). v3.1.1: Execution Mode Selection Gate. v3.0.0: Mandatory step transcript + final prompt preview rendering, no upper limit on Clarification Gate. v2.0.0: Step 0 prompt grading (6 weighted dimensions), 11 failure categories, 3 guardrails. | v3.6.0: Promoted firekaro v3.3-v3.6 battle-tested upgrades (4 verification campaigns): cap-exempt grade-independent role fix, half-open grade bands, role tie-break, STEP 3.6 re-grade + lift gate, STEP 0-pre transcription normalization, evidence-override lane, blind re-grade audit, enhance-misses telemetry loop",
     "tier": "must-have"
   },
   "prompt-auto-enhance-rule": {
-    "hash": "9dc0872c1c0c9def615946973777b9e7a64216de7a3c2176ec3dd5ccd6abe616",
+    "hash": "80da56a341d4d4dd4cec3f1be34d43b807285135643304038083826972fd9c3c",
     "type": "rule",
     "category": "core",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-30",
+    "last_updated": "2026-06-12",
     "dependencies": [
       "prompt-auto-enhance"
     ],
@@ -3083,17 +3083,17 @@
       "context-gathering",
       "automation"
     ],
-    "changelog": "v3.0.0: Replaced CRITICAL RULES with Pipeline Rules listing load-bearing contracts. Clarification Gate now has no upper limit on questions (ask until confident). Mandatory step transcript + final prompt preview render every time. v2.0.0: Slim from 97 to 48 lines. Lean trigger delegating to /prompt-auto-enhance skill.",
+    "changelog": "v3.0.0: Replaced CRITICAL RULES with Pipeline Rules listing load-bearing contracts. Clarification Gate now has no upper limit on questions (ask until confident). Mandatory step transcript + final prompt preview render every time. v2.0.0: Slim from 97 to 48 lines. Lean trigger delegating to /prompt-auto-enhance skill. | v3.1.0: MANDATORY OUTPUT (format A), unified 0-6 pipeline table with governance tail, tiered Clarification+Confidence gate, output-blast-radius unconditional indicator",
     "tier": "must-have"
   },
   "prompt-enhance-reminder": {
-    "hash": "2d1c1e8a05c3c25cd01990094d4922843930b290457998f61a619923be69a5c2",
+    "hash": "0844207ff3d8f37d47aea83b37cc0d302aca488b2d4fd735eeaedff0eb32c1d4",
     "type": "hook",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-04-30",
+    "last_updated": "2026-06-12",
     "dependencies": [],
     "visibility": "public",
     "description": "UserPromptSubmit hook that injects a deterministic reminder for the Enhanced indicator on every user prompt. v2: deterministic trigger gate filters trivial prompts and known continuation phrases at the hook layer.",
@@ -3102,7 +3102,7 @@
       "prompt-enhance",
       "deterministic"
     ],
-    "changelog": "v2.0.0: Add deterministic trigger gate — hook itself filters prompts ≤15 chars and known continuation phrases (yes/ok/proceed/continue/etc.) so the strengthening pipeline never runs on trivial prompts. Moves the skip-for-direct-instructions rule from the model layer to the deterministic hook layer. v1.0.0: Initial release — deterministic Enhanced indicator reminder.",
+    "changelog": "v2.0.0: Add deterministic trigger gate — hook itself filters prompts ≤15 chars and known continuation phrases (yes/ok/proceed/continue/etc.) so the strengthening pipeline never runs on trivial prompts. Moves the skip-for-direct-instructions rule from the model layer to the deterministic hook layer. v1.0.0: Initial release — deterministic Enhanced indicator reminder. | v2.1.0: governance-tail reminders (format-A mandatory output, role, plan-before-coding, decide-dont-ask, grill-when-unsure, dont-narrate-and-stop) + per-turn .keepgoing-count reset for no-overask-guard",
     "tier": "must-have"
   },
   "prompt-logger": {

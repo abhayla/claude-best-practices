@@ -4,6 +4,16 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-12 — Tier 5c: prompt-auto-enhance v3.6.0 from firekaro-planner (skill + rule + reminder hook)
+
+Final PR of the Tier-5 session-governance promotion. Source: `project:firekaro-planner`, where v3.3→v3.6 were hardened across four 5-prompt verification campaigns with documented defects and fixes. Hub-operational `.claude/` copies (skill, rule, hooks, settings wiring) updated in lockstep with `core/.claude/`.
+
+- **updated** skill `prompt-auto-enhance` (v3.2.0 → v3.6.0) — STEP 0-pre transcription normalization (voice fillers/stutters stripped; phonetic mishears rendered as auditable `heard → read as` mappings; load-bearing mishears route to the Clarification Gate); evidence-override lane (a quoted concrete flaw in a ≥7 dimension may be fixed, cap-counted, labeled); cap-exempt grade-independent MISSING_ROLE fix (applies even at Grade A); half-open grade bands (no unmapped scores); role tie-break rule (primary deliverable wins; co-primary = OVER_SCOPED); STEP 3.6 post-rewrite re-grade with proof-of-lift gate (`Overall before → after`, no-lift → re-map, max 2 retries); blind re-grade audit (context-blind agent re-scores both prompts on deterministic triggers; divergence >1.5 logs `regrade-divergence` and the blind score wins); R1≠R2 clarification; STEP 4.7 role routing (`engineering-roles`), STEP 5 execute-under-`decision-authority`, STEP 6 conditional git via `git-manager-agent`.
+- **updated** rule `prompt-auto-enhance-rule` — new **MANDATORY OUTPUT (format A)** section: every non-trivial turn renders the compact "What changed / Final prompt executed" block (one-liner on trivial turns); the unified 0→6 pipeline table (strengthen → role → plan → execute → verify → git) with pointer-pattern SSOT references; output-side unconditional-indicator clause (banner fires on output blast radius even when the prompt hook stayed silent); tiered Clarification & Confidence Gate (small gaps → one question; consequential fork <~95% → `/grill-me`/`/grill-with-docs`; pre-authorized → waived); format-A-default verbosity.
+- **updated** hook `prompt-enhance-reminder` (v2.0.0 → v2.1.0) — reminder lines for the governance tail (role / gate / decision-authority / git), ALWAYS-SHOW-THE-ENHANCED-PROMPT (format A), PLAN BEFORE CODING, DECIDE-DON'T-ASK, GRILL-WHEN-UNSURE (with the `*Sync-check:*` marker contract), DON'T-NARRATE-AND-STOP; resets `.claude/.keepgoing-count` per user prompt (bounding the Tier 5b Stop-hook auto-continue cap per turn).
+- **updated** `references/grading-rubric.md` — scoring anchors aligned to the half-open grade bands.
+- **changed** hub-operational `.claude/` — mirrored the updated skill/rule/reminder hook; adopted `no-overask-guard.sh` (Stop) + `session-governance-status.sh` (SessionStart) from Tier 5b with `settings.json` wiring, so the hub itself runs the full governance loop.
+
 ### 2026-06-12 — Tier 5b: session-governance hooks from firekaro-planner
 
 Second of three PRs promoting firekaro's session-governance layer. Source: `project:firekaro-planner`. Wires two new hook events into the distributable `core/.claude/settings.json` template (`Stop` + `SessionStart`).

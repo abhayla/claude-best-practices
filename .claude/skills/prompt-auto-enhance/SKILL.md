@@ -20,7 +20,7 @@ triggers:
 allowed-tools: "Read Grep Glob Skill Agent"
 argument-hint: "[prompt text to enhance or 'score' to evaluate reliability]"
 type: workflow
-version: "3.2.0"
+version: "3.6.0"
 ---
 
 # Prompt Auto-Enhance — Strengthening, Step Transcript, Final Preview, Resource CRUD
@@ -44,6 +44,34 @@ Skipped at the hook layer for:
 - Known continuation phrases ("yes", "ok", "continue", "now do …", "also …", etc.)
 
 Adapted from community pattern by @heyrimsha (source: x.com/heyrimsha/status/2035995286150234480).
+
+## STEP 0-pre: Transcription Normalization (runs BEFORE grading)
+
+User prompts are often voice-dictated; transcription artifacts recur (observed
+examples: "brown tortoise enhancement" → prompt-auto-enhance, "this grant" →
+this prompt). Normalize BEFORE grading so STEP 0 scores the intended prompt,
+not the transcription noise.
+
+**Detect:** filler tokens ("uh", "um"), stutters/repeats ("the the the",
+"how are how are"), mid-sentence restarts ("you had... you need to..."), and
+**phonetic mishears** — a noun phrase that is nonsense in context but
+phonetically resembles a repo/conversation term.
+
+**Act:**
+1. Strip fillers/stutters/restarts silently (they carry no meaning).
+2. For each phonetic mishear, render a visible mapping line so the
+   interpretation is auditable:
+   `heard: "<verbatim>" → read as: "<term>" (<phonetic|context> match)`
+3. **Load-bearing test:** if the misheard word changes WHAT gets built (two
+   plausible readings diverge materially), do NOT guess — route it to the
+   Clarification Gate with a `*Sync-check:*` banner. If one reading is the
+   only sensible one in context, proceed on it with the mapping shown.
+4. STEP 0 grades the NORMALIZED text; STEP 4.6 still shows the user's
+   ORIGINAL verbatim (the mapping lines bridge the two).
+5. **Render placement (locked):** full mode → the mapping lines
+   sit BETWEEN the Original and Final blocks in STEP 4.6; compact/format-A
+   mode → they are the first line(s) of "What changed:". Never omitted when
+   a mishear was resolved — an invisible reinterpretation is a guess.
 
 ## STEP 0: Quick Grade
 
@@ -71,11 +99,15 @@ Triggered by words like "write", "draft", "compose", "rewrite", "tone",
 
 | Grade | Range | Action |
 |-------|-------|--------|
-| A | 8.0-10.0 | Skip strengthening — prompt is strong |
-| B | 6.0-7.9 | Targeted fix — compact mode (1-2 fixes only) |
-| C | 4.0-5.9 | Full pipeline — diagnose all weak dimensions |
-| D | 3.0-3.9 | Full pipeline with heavy warning to user |
-| F | 1.0-2.9 | Suggested rewrite with caveats — original may be unsalvageable |
+| A | ≥ 8.0 | Skip strengthening — prompt is strong. Sole exception: the cap-exempt role fix still applies when Role dim < 7 (a role line never changes intent — Guardrail 2-safe; keeps the rule's MANDATORY-OUTPUT role contract grade-independent) |
+| B | [6.0, 8.0) | Targeted fix — compact mode (1-2 fixes + the cap-exempt role fix when Role dim < 7) |
+| C | [4.0, 6.0) | Full pipeline — diagnose all weak dimensions |
+| D | [3.0, 4.0) | Full pipeline with heavy warning to user |
+| F | < 3.0 | Suggested rewrite with caveats — original may be unsalvageable |
+
+Bands are half-open intervals (fixed): the old "6.0-7.9"-style
+ranges left holes (a weighted score of 2.95 or 7.95 mapped to NO grade).
+Every score in [1.0, 10.0] now maps to exactly one grade.
 
 **Floor rules (precedence — first match wins):**
 
@@ -101,6 +133,15 @@ Triggered by words like "write", "draft", "compose", "rewrite", "tone",
 Diagnose only categories mapped from dimensions scoring < 7 — skip categories
 whose parent dimension already scores 7+.
 
+**Evidence-override lane:** a CONCRETE flaw inside a
+dimension scoring ≥ 7 MAY still be fixed, under strict conditions: (a) the
+diagnosis quotes the exact offending fragment; (b) the fix counts against the
+5-cap; (c) it is labeled `[evidence-override]` in Changes Applied. This closes
+the gap where a strong prompt carries one real defect (a wrong domain fact, a
+contradictory clause) that the dimension gate would otherwise make unfixable —
+found when an ambiguous term in an Intent-7 prompt had no legal fix.
+No quote → no override; "could be better" never qualifies.
+
 ## STEP 1: Diagnose Prompt Weaknesses
 
 Analyze the prompt against the failure category table. Classify every
@@ -114,7 +155,7 @@ weakness found — a prompt may have multiple.
 | **MISSING_CONTEXT** | Critical | Prompt assumes knowledge not provided (file paths, prior decisions, domain terms) | Add explicit context: which files, which module, what prior state |
 | **CONFLICTING_CONSTRAINTS** | High | Prompt asks for contradictory things ("make it fast and thorough") | Identify the conflict, prioritize one, note the tradeoff |
 | **OVER_SCOPED** | High | Asks for too many things at once; would require 5+ files changed | Break into sequential focused prompts, suggest ordering |
-| **UNDER_CONSTRAINED** | Medium | Vague where specificity is needed. Apply the measurability test: "Can a reviewer objectively verify this constraint was followed?" (see `references/constraint-engineering.md`) | Add measurable constraints. Replace vague terms ("be concise" -> "under 100 words", "be thorough" -> "cover all N checklist items") |
+| **UNDER_CONSTRAINED** | Medium | Vague where specificity is needed. Apply the measurability test: "Can a reviewer objectively verify this constraint was followed?" (see `references/constraint-engineering.md`) | Add measurable constraints. Replace vague terms ("be concise" -> "under 100 words", "be thorough" -> "cover all N checklist items"). **When the measurable value is user-owned** (a target, tolerance, or acceptance number only the user can set — e.g. "more accurate" → accurate against WHAT, to WHAT tolerance), defer it to the Clarification Gate exactly like MISSING_CONTEXT — never invent the number (Guardrail 2) and never leave the vague term standing |
 | **MISSING_OUTPUT_SPEC** | Medium | No indication of what the result should look like | Add a locked output template with named sections, explicit order, numeric length bounds (see `references/format-locking.md`) |
 | **AMBIGUOUS_SCOPE** | Medium | Unclear which files, modules, or layers are in scope | Add explicit scope boundaries ("only in src/api/", "just the tests") |
 | **IMPLICIT_ASSUMPTIONS** | Low | Prompt relies on assumptions that may not hold (env setup, dependencies, prior steps) | Make assumptions explicit or add verification steps |
@@ -140,6 +181,15 @@ role as the first line, before context. Use the imperative form
 (`Act as a …`) — Anthropic's prompting docs document this as the
 strongest persona pattern for Claude 4.x.
 
+**R1 ≠ R2 — the conflation that caused real misses:** the
+`Role: <name> — <why>` line rendered at STEP 4.7 is the **R2 operating
+engineering role** (`engineering-roles.md`) and does NOT satisfy this
+policy. R1 is the persona INSIDE the strengthened prompt text — the
+Final-prompt block (STEP 4.6) MUST open with `Act as …` whenever
+Role & Framing < 7, even when an R2 `Role:` line is also rendered in
+the same response. Rendering the R2 line while leaving the prompt text
+roleless is the exact defect this paragraph exists to prevent.
+
 Detect the task class from the prompt's main verb + nearest object,
 then pick the role from the table. If no row matches, fall back to
 the **template** at the bottom.
@@ -155,9 +205,9 @@ the **template** at the bottom.
 | **Specialized synthesis — system design** | design, architect + (system / service / pipeline / scale / distributed) | "Act as a staff engineer designing for the stated scale and failure modes. Call out trade-offs, rejected alternatives, and the failure cases your design does NOT handle." |
 | **Specialized synthesis — API design** | design, define + (API / endpoint / schema / contract / interface) | "Act as an API designer optimizing for backwards compatibility, naming consistency, and a clean error surface. Surface every breaking change risk explicitly." |
 | **Specialized synthesis — data modeling** | design, model + (schema / table / DB / migration / index) | "Act as a database engineer who optimizes schemas for the stated query pattern, write throughput, and migration safety. Call out N+1 and lock contention risks up front." |
-| **Tone-sensitive — onboarding/UX** | write, draft + (onboarding / welcome / first-time / activation) | "Act as a B2B onboarding copywriter who writes for first-time non-technical users — warm + professional, second-person, no jargon, scannable structure." |
+| **Tone-sensitive — onboarding/UX** | write, draft + (onboarding / welcome / first-time / activation) | "Act as an onboarding copywriter who writes for first-time non-technical users — warm + professional, second-person, no jargon, scannable structure." |
 | **Tone-sensitive — error/UX strings** | write, draft + (error / warning / banner / toast / empty state) | "Act as a UX writer specializing in error messages — clear about what went wrong, actionable about what to do next, never blames the user, max 1 sentence." |
-| **Tone-sensitive — marketing copy** | write, draft + (landing / hero / pitch / launch / announcement) | "Act as a B2B marketing copywriter focused on benefit-led messaging that respects technical readers' intelligence — no hype, no buzzwords." |
+| **Tone-sensitive — marketing copy** | write, draft + (landing / hero / pitch / launch / announcement) | "Act as a marketing copywriter focused on benefit-led messaging that respects the reader's intelligence — no hype, no buzzwords." |
 | **Tone-sensitive — developer docs** | write, draft + (docs / README / guide / how-to / tutorial) | "Act as a technical writer specializing in developer documentation — accuracy first, scannable structure, copy-pasteable examples, every claim verified against current code." |
 | **Advisory / decision support** | should we, recommend, compare, trade-off, evaluate options | "Act as a senior engineer who gives opinionated, source-cited recommendations grounded in stated constraints. Name a default position with reasoning, not a multiple-choice menu." |
 | **Translation / adaptation** | rewrite for X audience, port from Y to Z, simplify, expand | "Act as a translator who preserves the source's intent and structure while replacing tone/idiom for the target audience. Flag every place where literal translation breaks meaning." |
@@ -185,6 +235,12 @@ delete-flag lifecycle.
 **Rules for role selection:**
 
 - Always **one role**, not a list of options.
+- **Tie-break when 2+ rows match:** pick the row matching
+  the prompt's PRIMARY deliverable — the outcome the user would accept as
+  "done" — not the means mentioned along the way ("add indexes to make
+  queries faster" → faster queries is the deliverable, indexes the means →
+  perf row, not data modeling). If two deliverables are genuinely co-primary,
+  that is an OVER_SCOPED signal: split, and give each sub-prompt its own role.
 - Always **task-class appropriate** — generic "AI assistant" framing
   is never the answer when Role < 7.
 - Position the role as the **first line** of the strengthened prompt,
@@ -194,6 +250,11 @@ delete-flag lifecycle.
   missing (concerns, focus area).
 - If the user's prompt explicitly contradicts a default role (e.g.,
   "be casual" against a formal-default class), the user wins.
+- **Adapt the audience qualifier to the documented product persona**
+  (CLAUDE.md / the product plan): B2B vs B2C, technical vs non-technical.
+  Never ship a default qualifier that contradicts the persona — a wrong
+  audience frame is worse than no role at all (observed failure: a table's
+  old "B2B" defaults contradicted a product's documented B2C persona).
 
 #### XML Tag Reference
 
@@ -279,6 +340,11 @@ Apply all fixes to produce a strengthened version.
 
 - Maximum **5 non-Critical fixes** per rewrite
 - Critical severity fixes are never capped — apply all of them
+- The **MISSING_ROLE fix is likewise cap-exempt** (treated like Critical): whenever
+  Role & Framing < 7, the `Act as …` line is added — including in Grade-B compact
+  mode, whose 1-2-fix budget applies to the OTHER fixes. Rationale: roleless-but-
+  otherwise-decent prompts land exactly in compact mode, which previously starved
+  the role fix out (observed in production sessions).
 - Grade D: full pipeline runs but show a heavy warning
 - Grade F: present a suggested rewrite with caveats (original may need rethinking)
 
@@ -307,6 +373,37 @@ new requirements added beyond what the user implied. Verify before presenting.
 - Remove qualifiers and hedging language flagged in Step 1
 - For MISSING_STRUCTURE diagnoses, wrap distinct sections in XML tags
 - Long context above the query, constraints near the task definition
+
+## STEP 3.6: Re-Grade the Strengthened Prompt
+
+Re-score the strengthened prompt on the SAME rubric and weights as STEP 0.
+This is the proof-of-lift: the pipeline's contract is "rank the prompt,
+enhance to a higher number, then run it" — not "rewrite and hope".
+
+- Render the lift as `Overall: <before> → <after> (Grade <X> → <Y>)` — it
+  appears in the Step 4 grade card and the Step 4.5 transcript.
+- **Self-check gate:** if the re-grade does NOT raise the overall score, the
+  rewrite failed — return to STEP 2 and re-map fixes (max 2 retries, then
+  surface the failure honestly instead of presenting a non-improving rewrite).
+- Grade-A originals (role-only addition) typically move a few tenths via the
+  Role dimension — that small lift is expected and sufficient.
+
+**Blind re-grade sampling (anti self-grading bias):** the
+re-grade is scored by the same model that wrote the rewrite — structurally
+motivated to show lift (the author-verifies-own-work blind spot — see independent-test-verification.md).
+Deterministic audit triggers — blind re-grade fires when ANY of:
+- the claimed lift is ≥ 3.0 points (big claims get audited), OR
+- the turn is part of an explicit test/audit campaign, OR
+- the user asks for it.
+
+**Mechanism:** dispatch a context-blind agent whose prompt contains ONLY the
+original prompt text, the strengthened prompt text, and the rubric path
+(`references/grading-rubric.md`) — no pipeline narrative, no self-graded
+scores, no expected answer. The agent scores both on the rubric and returns
+the two overalls. If `|blind_after − self_after| > 1.5`, log
+`regrade-divergence` to `.claude/.enhance-misses.log` and REPORT the blind
+score alongside the self-score (the blind number wins the rendered lift).
+Cost note: fires only on the triggers above, never per-turn.
 
 ## STEP 4: Show Grade Card + Changes Applied
 
@@ -347,6 +444,14 @@ Changes Applied (4):
   Pruning: removed "please" (Cat A — politeness filler)
 ```
 
+**Grade D warning line (locked format):** when the prompt graded D,
+render this line ABOVE the grade card — the "heavy warning" is this exact string,
+not an improvised paraphrase:
+```
+⚠ Grade D (<score>/10): this prompt needed heavy reconstruction — review the
+Final Prompt block before relying on the execution.
+```
+
 Step 4 deliberately does NOT show the original or strengthened prompt
 text — that's STEP 4.6's job. Showing it here would either duplicate
 Step 4.6 (when no clarification is pending) or require a "[pending]"
@@ -374,6 +479,7 @@ Pipeline Transcript:
   Step 3 — Rewrite:        <N> changes applied; word count <before> → <after> (Δ <delta>)
                            Guardrail 2 (Intent Preservation): PASS|FAIL[, reason]
                            Guardrail 3 (Over-Constraint): clean | <N> constraints added
+  Step 3.6 — Re-Grade:     Overall <before> → <after> (Grade <X> → <Y>) — lift confirmed|FAILED
   Clarification Gate:      <N> questions asked, <resolved|in-progress>
 ```
 
@@ -410,7 +516,7 @@ is intentionally avoided.
 ────────────────────────────────────────────────────
 ```
 
-For Grade A (no changes — original IS the final prompt):
+For Grade A with Role dim ≥ 7 (no changes — original IS the final prompt):
 ```
 ─── Final Prompt (unchanged from original) ───
 
@@ -418,6 +524,26 @@ For Grade A (no changes — original IS the final prompt):
 
 ────────────────────────────────────────────
 ```
+
+For Grade A with Role dim < 7 (the sole Grade-A change — role line prepended,
+body untouched):
+```
+─── Final Prompt (role added; otherwise unchanged) ───
+
+Act as …
+
+<original prompt verbatim>
+
+────────────────────────────────────────────
+```
+
+**OVER_SCOPED rendering:** when Step 3 split the prompt into
+sequential focused sub-prompts, the Final block contains the **numbered
+sequence** — each sub-prompt opens with its OWN task-class R1 role (a split
+under one generic role re-creates the role-miss inside every sub-task) —
+followed by a one-line ordering rationale. STEP 5 executes the sub-prompts
+in the stated order **in the same turn** (build-don't-narrate), unless the
+user picks a subset.
 
 The skill does not pause for approval here — execution proceeds to STEP 5
 in the same response. Showing the final prompt is for transparency, not
@@ -479,11 +605,36 @@ prompt block ends and STEP 5 runs. The user is not interrupted with a
 suggestion to use `/tdd` or `/development-loop` — those are direct-action
 intents the user already framed clearly.
 
-## STEP 5: Execute
+## STEP 4.7: Route to a role
+
+Infer the engineering/PM role from the strengthened prompt and state it in one
+line: `Role: <name> — <why>`. Dispatch that role's backing agents/skills; sequence
+roles for multi-part work. Full router + role list: `engineering-roles.md`
+(pointer pattern — do not duplicate the table here).
+
+## STEP 5: Execute (under decision-authority)
 
 Proceed with the strengthened prompt as if the user had entered it directly.
 The rest of the auto-enhance pipeline (Tier 1/2 context, CRUD detection)
 applies to the strengthened version, not the original.
+
+Classify each decision under DACI (`decision-authority.md`):
+- **DECIDE** reversible / internal / best-practice-clear work — just do it, report after
+- **DECIDE + INFORM** tactical product calls — do it, drop a one-line note
+- **ESCALATE** irreversible / outward-facing / financially-material / strategic /
+  genuine-fork — one line with a recommended option, and keep working every non-gated item
+
+## STEP 6: Git (conditional)
+
+If the turn produced committable changes, dispatch `git-manager-agent` to
+stage → secret-scan → commit (conventional + the Co-Authored-By trailer) → push;
+`.githooks/pre-commit` is the deterministic secret gate. Branch + `--no-ff` merge
+for cohesive multi-file work; gate scaled to the change (code → type-check + tests,
+docs → cross-ref check). **Skip git entirely on Q&A / read-only turns.** Escalate
+only destructive history ops (force-push, rewrite of pushed commits, hard reset or
+deletion of `main`). Detail: `decision-authority.md` → "Git authority".
+
+### When NOT to Strengthen
 
 ### When NOT to Strengthen
 
@@ -491,15 +642,26 @@ Most filtering happens at the hook layer. Within the skill, additional skips:
 
 | Condition | Action |
 |-----------|--------|
-| Grade A (8.0+) | Skip strengthening; still show transcript + final prompt |
+| Grade A (8.0+) | Skip strengthening (except the cap-exempt role fix when Role dim < 7); still show transcript + final prompt |
 | User says "do exactly this" or quotes a specific command | Skip strengthening; still show transcript + final prompt |
 | Pure knowledge question (not an action request) | Skip strengthening; just answer |
 | Action-oriented question ("how should I test this?") | Strengthen before answering |
 
-## Clarification Gate
+## Clarification & Confidence Gate
 
-The Clarification Gate runs AFTER strengthening and BEFORE STEP 4.6 (final
-prompt preview), so the previewed prompt reflects the resolved intent.
+The gate runs AFTER strengthening and BEFORE STEP 4.6 (final prompt preview),
+so the previewed prompt reflects the resolved intent. It is tiered (merges the
+lightweight clarification gate with the `decision-authority.md` confidence gate):
+
+- **1–2 small gaps** → the Clarification Gate below (one targeted question at a time, locked format).
+- **Consequential fork** (expensive to reverse, materially changes the product, no clear
+  best-practice winner) **and confidence < ~95%** → converge via **`/grill-me`** or
+  **`/grill-with-docs`** before building — do not guess at WHAT to build. (`grill-with-docs`
+  preferred when the decision should be recorded into CONTEXT/ADRs.)
+- **"You take a call" / pre-authorized** → gate waived; proceed on best judgment, stating
+  one-line assumptions.
+
+Confidence is about **intent**, never a reversible execution detail (those are just decided in STEP 5).
 
 **Trigger:** the prompt is > 15 characters (the only floor — handled
 deterministically by the hook). For every prompt that reaches this skill,
@@ -544,10 +706,12 @@ Rules for this format:
 **Sequencing summary:**
 1. STEP 0-3: grade, diagnose, rewrite (internal)
 2. STEP 4: show grade card + Changes Applied (metadata only — no prompt text)
-3. **Clarification Gate** (if ambiguity remains, ask until confident, locked format)
+3. **Clarification & Confidence Gate** (if ambiguity/consequential fork remains — ask one question, or `/grill-me` for a consequential fork under ~95% confidence)
 4. STEP 4.5: show step transcript (counts and deltas only — no per-dim or per-fix lists)
 5. STEP 4.6: show original → final strengthened prompt; OPTIONALLY append a one-line italic skill hint when the prompt clearly fits a non-direct-execution workflow (advisory only, never gating)
-6. STEP 5: execute the strengthened prompt directly
+6. STEP 4.7: state `Role: <name> — <why>` and dispatch its agents/skills (`engineering-roles.md`)
+7. STEP 5: execute the strengthened prompt under decision-authority (decide reversible; escalate irreversible in one line)
+8. STEP 6: if the turn produced committable changes, git via `git-manager-agent` + the secret-scan hook (skip on Q&A / read-only turns)
 
 ---
 
@@ -706,7 +870,7 @@ the signals are clear.
 
 These are the load-bearing contracts. The rest of the skill is procedure.
 
-- Run STEP 0 (Quick Grade) before any diagnosis, and skip diagnosis entirely for Grade A
+- Run STEP 0 (Quick Grade) before any diagnosis, and skip diagnosis for Grade A — with ONE exception: the cap-exempt MISSING_ROLE fix applies at every grade, A included, whenever Role dim < 7
 - Gather Tier 1 context before responding to any prompt — without it, responses risk duplicating existing patterns or contradicting CLAUDE.md
 - Show the grade card, step transcript, and final prompt every time strengthening activates — silent changes erode trust
 - Include the strengthening count in the `*Enhanced:*` indicator when fixes are applied
