@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-12 09:14 UTC (auto-generated)
+> Last updated: 2026-06-12 09:34 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -33,7 +33,7 @@
 | architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-verify | skill | 4.1.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
-| autonomous-contract | skill | 1.0.0 | project:firekaro-planner | — |
+| autonomous-contract | skill | 1.1.0 | project:firekaro-planner | — |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | brainstorm | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | branching | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
@@ -125,7 +125,7 @@
 | orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | output-plausibility-verification | rule | 1.0.0 | project:firekaro-planner | — |
 | parallel-worktree-orchestrator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| pattern-portability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| pattern-portability | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | pattern-self-containment | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | pattern-structure | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | perf-test | skill | 1.2.0 | hub:abhayla/claude-best-practices | web-quality |
