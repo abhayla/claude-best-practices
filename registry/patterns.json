@@ -2208,8 +2208,8 @@
       "workflow",
       "productivity"
     ],
-    "changelog": "v1.0.0: Initial registration (sourced from mattpocock/skills, MIT)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial registration (sourced from mattpocock/skills, MIT). Tier promoted nice-to-have -> must-have: universal core skill, companion grill-with-docs already must-have.",
+    "tier": "must-have"
   },
   "handover": {
     "hash": "006c635be599c94015a375586494825b391817c69b834d5f5e1f3d1d48f5efe0",
