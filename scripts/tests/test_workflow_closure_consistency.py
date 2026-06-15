@@ -77,3 +77,32 @@ def test_at_least_the_known_workflows_are_covered():
     assert {"development-loop", "test-pipeline"} <= covered, (
         f"expected core workflows in coverage set, got {sorted(covered)}"
     )
+
+
+def test_workflow_contracts_config_is_distributable_and_synced():
+    """The contract config workflows read at STEP 1 must be in the distributable
+    template AND identical to the hub's operational copy (no drift)."""
+    hub_copy = HUB / "config" / "workflow-contracts.yaml"
+    dist_copy = HUB / "core" / ".claude" / "config" / "workflow-contracts.yaml"
+    assert dist_copy.exists(), "workflow-contracts.yaml must be in core/.claude/config/ to provision downstream"
+    assert hub_copy.read_text(encoding="utf-8") == dist_copy.read_text(encoding="utf-8"), (
+        "core/.claude/config/workflow-contracts.yaml has drifted from config/workflow-contracts.yaml — keep them identical"
+    )
+
+
+def test_workflows_declare_their_contract_config_in_closure():
+    """Every workflow whose SKILL reads workflow-contracts.yaml must declare it as
+    a dependency, so the closure provisions it downstream."""
+    missing = []
+    for sp in sorted((HUB / "core" / ".claude" / "skills").glob("*/SKILL.md")):
+        name = sp.parent.name
+        entry = REGISTRY.get(name, {})
+        if not isinstance(entry, dict) or entry.get("deprecated"):
+            continue
+        body = sp.read_text(encoding="utf-8")
+        if re.search(r"^type:\s*reference", body, re.MULTILINE):
+            continue  # reference/guide skills may mention the file illustratively
+        reads_it = re.search(r"[Rr]ead[^\n]*workflow-contracts\.yaml", body)
+        if reads_it and "workflow-contracts" not in entry.get("dependencies", []):
+            missing.append(name)
+    assert not missing, f"workflows read workflow-contracts.yaml but don't declare it as a dependency: {missing}"

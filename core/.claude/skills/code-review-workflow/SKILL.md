@@ -19,7 +19,7 @@ triggers:
   - full review pipeline
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<branch name, 'current', or review scope description>"
-version: "2.1.0"
+version: "2.1.1"
 ---
 
 # /code-review-workflow — Skill-at-T0 Orchestrator
@@ -58,7 +58,7 @@ findings requires explicit user confirmation.
 ## STEP 1: INIT
 
 1. **Parse args.** Default scope is `current` branch vs `main`.
-2. **Read config.** `config/workflow-contracts.yaml` → `workflows.code-review`.
+2. **Read config.** `.claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.code-review`.
    `master_agent` should be null; `sub_orchestrators` empty (Phase 3.4 shape).
 3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
 4. **Initialize state** at `.workflows/code-review/state.json` (schema 2.0.0):

@@ -1,0 +1,379 @@
+# Workflow Contract Definitions — Read by workflow master-agents at runtime.
+# Edit this file to change skill ordering, artifact contracts, or orchestration rules.
+# Each workflow is an independent DAG that can run standalone or as a stage
+# dispatched by project-manager-agent.
+
+defaults:
+  max_retries_per_step: 3
+  global_retry_budget: 15
+  timeout_default_minutes: 20
+
+workflows:
+
+  development-loop:
+    description: "Ideate → plan → execute → verify → commit — skill-at-T0 orchestrator (Phase 3.2, spec v2.2). /development-loop body runs at T0 and dispatches workers directly."
+    # master_agent null since Phase 3.2 (2026-04-24) — development-loop-master-agent
+    # deprecated; orchestration lives in /development-loop SKILL.md v2.0.0 body.
+    master_agent: null
+    entry_skill: development-loop
+    state_file: ".workflows/development-loop/state.json"
+    # sub_orchestrators intentionally empty — plan-executor-agent and
+    # planner-researcher-agent are dispatched directly from T0 by the skill
+    # body, they are NOT intermediate orchestrators (they can't dispatch
+    # further per platform constraint; see agent-orchestration.md §2).
+    sub_orchestrators: []
+    steps:
+      - id: ideate
+        skill: brainstorm
+        depends_on: []
+        artifacts_out:
+          spec: { path: "docs/specs/<feature>-spec.md", schema: spec_v1 }
+        timeout_minutes: 30
+      - id: plan
+        skill: writing-plans
+        depends_on: [ideate]
+        artifacts_in:
+          spec: "ideate.artifacts_out.spec"
+        artifacts_out:
+          plan: { path: "docs/plans/<feature>-plan.md", schema: plan_v1 }
+        timeout_minutes: 25
+      - id: execute
+        dispatch: plan-executor-agent
+        depends_on: [plan]
+        artifacts_in:
+          plan: "plan.artifacts_out.plan"
+        artifacts_out:
+          # Project-relative source root — nominal location only. The authoritative
+          # list of edits is the worker's `changed_files` return contract, so this is
+          # NOT a binding glob. "." keeps it generic across stacks (src/, app/src/main,
+          # backend/, lib/, module root, …) — never assume a project-specific subdir.
+          source: { path: ".", schema: source_v1 }
+        timeout_minutes: 60
+      - id: verify
+        skill: auto-verify
+        depends_on: [execute]
+        artifacts_in:
+          source: "execute.artifacts_out.source"
+        artifacts_out:
+          verification: { path: "test-results/auto-verify.json", schema: test_result_v1 }
+        gate: "verification.result == PASSED"
+        timeout_minutes: 30
+      - id: commit
+        skill: post-fix-pipeline
+        depends_on: [verify]
+        skip_when: "mode == 'dispatched'"
+        artifacts_out:
+          commit_sha: { type: string, schema: git_sha }
+    handoff_suggestions:
+      - workflow: testing-pipeline
+        when: "verify step PASSED"
+        reason: "Implementation verified — run full test pipeline"
+      - workflow: code-review
+        when: "commit step completed"
+        reason: "Code committed — ready for review"
+
+  testing-pipeline:
+    description: "Three-lane test pipeline — skill-at-T0 orchestrator (spec v2.2). /test-pipeline body runs at T0 and dispatches workers directly."
+    # master_agent is null as of Phase 3.1 (2026-04-24): the T0-only orchestrator
+    # model dissolves the intermediate testing-pipeline-master-agent. The
+    # /test-pipeline skill's body IS the orchestrator; it runs in the user's T0
+    # session. Retained as a key (null-valued) per spec v2.2 §7 Q2 decision to
+    # keep schema uniform across workflows for Phase 3.2–3.8's matching surgery.
+    master_agent: null
+    # entry_skill names the skill-at-T0 that is now the canonical invocation
+    # surface for this workflow. Projects invoke this via the slash command.
+    entry_skill: test-pipeline
+    state_file: ".workflows/testing-pipeline/state.json"
+    # sub_orchestrators is intentionally empty per spec v2.2 §7 Q2. The flat
+    # worker agents (test-scout-agent, tester-agent, fastapi-api-tester-agent,
+    # visual-inspector-agent, test-failure-analyzer-agent,
+    # github-issue-manager-agent, fixer agents) are dispatched directly from
+    # T0 by the /test-pipeline skill — they are NOT sub-orchestrators because
+    # they do not orchestrate further work (workers cannot dispatch subagents
+    # per the platform constraint; see agent-orchestration.md §2).
+    sub_orchestrators: []
+    steps:
+      - id: tdd_red
+        skill: tdd-failing-test-generator
+        depends_on: []
+        artifacts_out:
+          failing_tests: { path: "tests/", schema: test_files_v1 }
+        timeout_minutes: 25
+      - id: fix_loop
+        skill: fix-loop
+        depends_on: [tdd_red]
+        artifacts_in:
+          failing_tests: "tdd_red.artifacts_out.failing_tests"
+        artifacts_out:
+          fix_result: { path: "test-results/fix-loop.json", schema: test_result_v1 }
+        gate: "fix_result.result IN (PASSED, FIXED)"
+        timeout_minutes: 30
+      - id: auto_verify
+        skill: auto-verify
+        depends_on: [fix_loop]
+        artifacts_out:
+          verification: { path: "test-results/auto-verify.json", schema: test_result_v1 }
+        gate: "verification.result == PASSED"
+        timeout_minutes: 30
+      - id: e2e
+        # Phase 3.1: e2e step is now absorbed into the /test-pipeline skill
+        # body (STEP 4 WAVE 2 UI lane). The separate e2e-conductor-agent
+        # dispatch is removed — /test-pipeline dispatches visual-inspector-agent
+        # directly from T0 at STEP 4. For standalone E2E pipeline invocation,
+        # use /e2e-visual-run (which is also a skill-at-T0 orchestrator).
+        skill: test-pipeline
+        inline_step: WAVE_2_UI
+        depends_on: [fix_loop]
+        skip_when: "no_ui_tests == true"
+        artifacts_out:
+          e2e_state: { path: ".workflows/testing-pipeline/state.json", schema: testing_pipeline_state_v2 }
+        gate: "e2e_state.step_status.WAVE2 == done"
+        timeout_minutes: 45
+      - id: quality_gate
+        skill: code-quality-gate
+        depends_on: [auto_verify, e2e]
+        artifacts_out:
+          quality: { path: "test-results/code-quality-gate.json", schema: quality_gate_v1 }
+        gate: "quality.result == PASSED"
+        timeout_minutes: 20
+      - id: post_fix
+        skill: post-fix-pipeline
+        depends_on: [quality_gate]
+        skip_when: "mode == 'dispatched'"
+        artifacts_out:
+          commit_sha: { type: string, schema: git_sha }
+    handoff_suggestions:
+      - workflow: code-review
+        when: "quality_gate step PASSED"
+        reason: "Tests passing, quality verified — ready for review"
+
+  debugging-loop:
+    description: "Bug diagnosis → fix → verify → learn — skill-at-T0 orchestrator (Phase 3.3, spec v2.2)."
+    master_agent: null
+    entry_skill: debugging-loop
+    state_file: ".workflows/debugging-loop/state.json"
+    # debugger-agent and test-failure-analyzer-agent dispatched directly from
+    # T0 by the skill body (STEP 2a + 2c). Not sub-orchestrators — they don't
+    # dispatch further (platform constraint; see agent-orchestration.md §2).
+    sub_orchestrators: []
+    steps:
+      - id: diagnose
+        skill: systematic-debugging
+        depends_on: []
+        artifacts_out:
+          root_cause: { path: ".workflows/debugging-loop/diagnosis.json", schema: diagnosis_v1 }
+        timeout_minutes: 30
+      - id: fix
+        skill: fix-loop
+        depends_on: [diagnose]
+        artifacts_in:
+          root_cause: "diagnose.artifacts_out.root_cause"
+        artifacts_out:
+          fix_result: { path: "test-results/fix-loop.json", schema: test_result_v1 }
+        gate: "fix_result.result IN (PASSED, FIXED)"
+        timeout_minutes: 30
+      - id: verify
+        skill: auto-verify
+        depends_on: [fix]
+        artifacts_out:
+          verification: { path: "test-results/auto-verify.json", schema: test_result_v1 }
+        gate: "verification.result == PASSED"
+        timeout_minutes: 25
+      - id: learn
+        skill: learn-n-improve
+        depends_on: [verify]
+        artifacts_in:
+          root_cause: "diagnose.artifacts_out.root_cause"
+          fix_result: "fix.artifacts_out.fix_result"
+        artifacts_out:
+          learning: { path: ".claude/learnings.json", schema: learning_v1 }
+        timeout_minutes: 10
+    handoff_suggestions:
+      - workflow: testing-pipeline
+        when: "verify step PASSED"
+        reason: "Bug fixed — run full test pipeline to check for regressions"
+
+  code-review:
+    description: "Quality gates → optional deep audit → PR → feedback — skill-at-T0 orchestrator (Phase 3.4, spec v2.2)."
+    master_agent: null
+    entry_skill: code-review-workflow
+    state_file: ".workflows/code-review/state.json"
+    # code-reviewer-agent + security-auditor-agent dispatched directly from T0
+    # by /code-review-workflow STEP 2b --deep-audit (parallel, single-message).
+    # Not sub-orchestrators — workers only.
+    sub_orchestrators: []
+    steps:
+      - id: quality_gates
+        skill: review-gate
+        depends_on: []
+        artifacts_out:
+          review_report: { path: "test-results/review-gate.json", schema: review_v1 }
+        gate: "review_report.verdict != REJECTED"
+        timeout_minutes: 30
+      - id: create_pr
+        skill: request-code-review
+        depends_on: [quality_gates]
+        artifacts_in:
+          review_report: "quality_gates.artifacts_out.review_report"
+        artifacts_out:
+          pr_url: { type: string, schema: url }
+        skip_when: "mode == 'dispatched'"
+        timeout_minutes: 15
+      - id: handle_feedback
+        skill: receive-code-review
+        depends_on: [create_pr]
+        artifacts_in:
+          pr_url: "create_pr.artifacts_out.pr_url"
+        artifacts_out:
+          feedback_status: { path: ".workflows/code-review/feedback.json", schema: feedback_v1 }
+        gate: "feedback_status.all_resolved == true"
+        skip_when: "mode == 'dispatched'"
+        timeout_minutes: 30
+    handoff_suggestions:
+      - workflow: documentation
+        when: "handle_feedback step completed"
+        reason: "PR approved — update documentation"
+
+  documentation:
+    description: "ADR → API docs → structure → staleness — skill-at-T0 orchestrator (Phase 3.5, spec v2.2)."
+    master_agent: null
+    entry_skill: documentation-workflow
+    state_file: ".workflows/documentation/state.json"
+    # docs-manager-agent dispatched directly from T0 by the skill body
+    # STEP 4 (optional, for bulk content drafting). Worker only.
+    sub_orchestrators: []
+    steps:
+      - id: adr
+        skill: adr
+        depends_on: []
+        skip_when: "no_architecture_decisions == true"
+        artifacts_out:
+          adrs: { path: "docs/adr/", schema: adr_v1 }
+        timeout_minutes: 20
+      - id: api_docs
+        skill: api-docs-generator
+        depends_on: []
+        skip_when: "no_api == true"
+        artifacts_out:
+          api_docs: { path: "docs/api/", schema: openapi_v1 }
+        timeout_minutes: 20
+      - id: structure
+        skill: doc-structure-enforcer
+        depends_on: [adr, api_docs]
+        artifacts_out:
+          structure_report: { path: ".workflows/documentation/structure.json", schema: doc_report_v1 }
+        timeout_minutes: 15
+      - id: staleness
+        skill: doc-staleness
+        depends_on: [structure]
+        artifacts_out:
+          staleness_report: { path: ".workflows/documentation/staleness.json", schema: staleness_v1 }
+        timeout_minutes: 15
+    handoff_suggestions: []
+
+  session-continuity:
+    description: "Save → restore → handover — skill-at-T0 orchestrator (Phase 3.6, spec v2.2)."
+    master_agent: null
+    entry_skill: session-continuity
+    state_file: ".workflows/session-continuity/state.json"
+    # session-summarizer-agent dispatched directly from T0 by the skill body
+    # (optional, via --deep-summary flag). Worker only.
+    sub_orchestrators: []
+    steps:
+      - id: save
+        skill: save-session
+        depends_on: []
+        artifacts_out:
+          session_file: { path: ".claude/sessions/<session-id>.json", schema: session_v1 }
+        timeout_minutes: 10
+      - id: handover
+        skill: handover
+        depends_on: [save]
+        artifacts_in:
+          session_file: "save.artifacts_out.session_file"
+        artifacts_out:
+          handover_doc: { path: ".claude/handover.md", schema: handover_v1 }
+        timeout_minutes: 10
+    handoff_suggestions: []
+
+  learning-self-improvement:
+    description: "Capture → detect patterns → propose skills → validate knowledge — skill-at-T0 orchestrator (Phase 3.7, spec v2.2)."
+    master_agent: null
+    entry_skill: learning-self-improvement
+    state_file: ".workflows/learning-self-improvement/state.json"
+    # session-summarizer-agent + context-reducer-agent dispatched directly
+    # from T0 by the skill body (optional, --deep-analysis flag). Workers only.
+    sub_orchestrators: []
+    steps:
+      - id: capture
+        skill: learn-n-improve
+        depends_on: []
+        artifacts_out:
+          learnings: { path: ".claude/learnings.json", schema: learnings_v1 }
+        timeout_minutes: 15
+      - id: detect_patterns
+        skill: skill-factory
+        depends_on: [capture]
+        artifacts_in:
+          learnings: "capture.artifacts_out.learnings"
+        artifacts_out:
+          proposed_skills: { path: ".workflows/learning-self-improvement/proposals.json", schema: skill_proposal_v1 }
+        timeout_minutes: 20
+      - id: knowledge_test
+        skill: test-knowledge
+        depends_on: [detect_patterns]
+        artifacts_out:
+          knowledge_report: { path: ".workflows/learning-self-improvement/knowledge.json", schema: knowledge_v1 }
+        timeout_minutes: 15
+    handoff_suggestions:
+      - workflow: skill-authoring
+        when: "detect_patterns produced proposals"
+        reason: "New skill proposals detected — author and validate them"
+
+  skill-authoring:
+    description: "Overlap-check → author → validate → register — skill-at-T0 orchestrator (Phase 3.8, spec v2.2). Final workflow-master retirement."
+    master_agent: null
+    entry_skill: skill-authoring-workflow
+    state_file: ".workflows/skill-authoring/state.json"
+    # skill-author-agent dispatched directly from T0 by the skill body
+    # (optional, STEP 2a for richer drafts). Worker only.
+    sub_orchestrators: []
+    steps:
+      - id: author
+        skill: writing-skills
+        depends_on: []
+        artifacts_out:
+          draft_skill: { path: "core/.claude/skills/<skill-name>/SKILL.md", schema: skill_v1 }
+        timeout_minutes: 25
+      - id: validate
+        skill: claude-guardian
+        depends_on: [author]
+        artifacts_in:
+          draft_skill: "author.artifacts_out.draft_skill"
+        artifacts_out:
+          validation: { path: ".workflows/skill-authoring/validation.json", schema: validation_v1 }
+        gate: "validation.passed == true"
+        timeout_minutes: 15
+      - id: catalog
+        skill: skill-master
+        depends_on: [validate]
+        artifacts_out:
+          catalog_entry: { path: ".workflows/skill-authoring/catalog.json", schema: catalog_v1 }
+        timeout_minutes: 10
+    handoff_suggestions: []
+
+# Cross-workflow handoffs — read by project-manager-agent
+# Maps pipeline stages to workflow masters for dispatched mode.
+# null = no workflow master, use direct stage agent dispatch.
+stage_to_workflow:
+  stage_1_prd: development-loop
+  stage_2_plan: development-loop
+  stage_3_scaffold: development-loop
+  stage_4_demo: null
+  stage_5_schema: null
+  stage_6_pre_tests: testing-pipeline
+  stage_7_impl: development-loop
+  stage_8_post_tests: testing-pipeline
+  stage_9_review: code-review
+  stage_10_deploy: null
+  stage_11_docs: documentation

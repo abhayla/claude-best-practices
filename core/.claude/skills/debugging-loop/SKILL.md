@@ -22,7 +22,7 @@ triggers:
   - debug fix and verify
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<bug description, error output, or issue URL>"
-version: "2.1.1"
+version: "2.1.2"
 ---
 
 # /debugging-loop — Skill-at-T0 Orchestrator
@@ -63,7 +63,7 @@ Canonical pattern: `workflow-master-template.md` v2.0.0.
 ## STEP 1: INIT
 
 1. **Parse args.** If empty, ask for bug description + error output.
-2. **Read config.** `config/workflow-contracts.yaml` → `workflows.debugging-loop`.
+2. **Read config.** `.claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.debugging-loop`.
    `master_agent` should be null; `sub_orchestrators` empty (Phase 3.3 shape).
 3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
 4. **Detect input type.**

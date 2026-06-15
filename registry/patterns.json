@@ -775,10 +775,10 @@
     "deprecated_by": "code-review-workflow"
   },
   "code-review-workflow": {
-    "hash": "ed770bd675ec8dcc8e3ee472c4093540230e3233c68ee3d474803cdda7558fd7",
+    "hash": "f1f3b303ce495c6043b333678095671cd83baf0ad3cfbff64428c09e834d8556",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -787,7 +787,8 @@
       "receive-code-review",
       "request-code-review",
       "review-gate",
-      "security-auditor-agent"
+      "security-auditor-agent",
+      "workflow-contracts"
     ],
     "visibility": "public",
     "description": "Slash-command wrapper for code-review-master-agent. Pre-merge quality gates, PR creation, and review feedback handling.",
@@ -1154,10 +1155,10 @@
     "tier": "must-have"
   },
   "debugging-loop": {
-    "hash": "bfa6df54a2c3a8523fa32dc113456e8d6f58eb1835d0d6db83ed84a1512f7f6d",
+    "hash": "68c2182ea0ea832560a31ef0588a4aa0fae460e6a8cfbdf569575e6f423eb129",
     "type": "skill",
     "category": "core",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -1167,7 +1168,8 @@
       "fix-loop",
       "learn-n-improve",
       "systematic-debugging",
-      "test-failure-analyzer-agent"
+      "test-failure-analyzer-agent",
+      "workflow-contracts"
     ],
     "visibility": "public",
     "description": "Full-cycle bug resolution orchestrator: chains systematic-debugging, fix-loop, auto-verify, and learn-n-improve via debugging-loop-master-agent.",
@@ -1268,20 +1270,21 @@
     "tier": "must-have"
   },
   "development-loop": {
-    "hash": "48de3c35df4b5a027ce5529ad6c8e0de3f0592e05a28ede5c026c96005e2ca8a",
+    "hash": "262a83a25fc7c612781140536344373809651b752473428022739383e96d152a",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
     "dependencies": [
-      "brainstorm",
-      "writing-plans",
       "auto-verify",
-      "post-fix-pipeline",
+      "brainstorm",
       "plan-executor-agent",
-      "planner-researcher-agent"
+      "planner-researcher-agent",
+      "post-fix-pipeline",
+      "workflow-contracts",
+      "writing-plans"
     ],
     "visibility": "public",
     "description": "Full development cycle skill-at-T0 orchestrator: invokes brainstorm, writing-plans, auto-verify, post-fix-pipeline via Skill() and dispatches plan-executor-agent (+ optional planner-researcher-agent) via Agent() at T0.",
@@ -1456,10 +1459,10 @@
     "deprecated_by": "documentation-workflow"
   },
   "documentation-workflow": {
-    "hash": "6f7898e7b919310c7662f6b5f5d1d012c77fc1bf8e8947313c28e531dabaa32d",
+    "hash": "7cbe17dbe37704d10cec4d58e9468bb2ca8a3e4b929f81d9e267d64c90614624",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -1468,7 +1471,8 @@
       "api-docs-generator",
       "doc-staleness",
       "doc-structure-enforcer",
-      "docs-manager-agent"
+      "docs-manager-agent",
+      "workflow-contracts"
     ],
     "visibility": "public",
     "description": "Slash-command wrapper for documentation-master-agent. Full doc generation and maintenance orchestration.",
@@ -2413,10 +2417,10 @@
     "tier": "must-have"
   },
   "learning-self-improvement": {
-    "hash": "2e846260cbea185a786664e098550bf2912bc00b8807a23b1d7f27b280099310",
+    "hash": "1455968c02e8226a26019ff6e7592f8a47c8bc1107818101717821789149efe6",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -2425,7 +2429,8 @@
       "learn-n-improve",
       "session-summarizer-agent",
       "skill-factory",
-      "test-knowledge"
+      "test-knowledge",
+      "workflow-contracts"
     ],
     "visibility": "public",
     "description": "Slash-command wrapper for learning-self-improvement-master-agent. Knowledge accumulation and skill proposal generation.",
@@ -3601,10 +3606,10 @@
     "tier": "must-have"
   },
   "session-continuity": {
-    "hash": "6b8e1d8afc1b9b3cd72f36573b61875b9533f84e2b0abedae203d9286e2686e2",
+    "hash": "31d4e288bf81c5529134bedcedf1d01fb0065abdbd06c6a09967a8c7d5739091",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -3612,7 +3617,8 @@
       "handover",
       "save-session",
       "session-summarizer-agent",
-      "start-session"
+      "start-session",
+      "workflow-contracts"
     ],
     "visibility": "public",
     "description": "Slash-command wrapper for session-continuity-master-agent. Session save, restore, and handover.",
@@ -3724,10 +3730,10 @@
     "deprecated_by": "skill-authoring-workflow"
   },
   "skill-authoring-workflow": {
-    "hash": "974378db33e072e93f717cf78e1e3968640d3bb2976819ef9bf3dfae9fb01f54",
+    "hash": "9ed3bcc68529e12af8647ecdb1ee8fd5e5bbf4ab91bd375044f125773ffc950e",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -3735,6 +3741,7 @@
       "claude-guardian",
       "skill-author-agent",
       "skill-master",
+      "workflow-contracts",
       "writing-skills"
     ],
     "visibility": "public",
@@ -5011,7 +5018,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-12",
-    "total_patterns": 261
+    "total_patterns": 262
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5114,6 +5121,24 @@
       "heartbeat"
     ],
     "changelog": "v1.0.0: Initial release — generalized from FireKaro's proven owner-notify.ts integration; notifier-integration rule + owner-notify templates + production-monitoring CLAUDE.md block",
+    "tier": "must-have"
+  },
+  "workflow-contracts": {
+    "hash": "da0f67dc3c5e35410d2bc23b87f97169b6a5161cb544fc067f7eb045e0f4f304",
+    "type": "config",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-15",
+    "last_updated": "2026-06-15",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Per-workflow step DAGs + artifact contracts + gate expressions read by the skill-at-T0 workflow orchestrators at STEP 1.",
+    "tags": [
+      "workflow",
+      "config",
+      "orchestration"
+    ],
     "tier": "must-have"
   }
 }

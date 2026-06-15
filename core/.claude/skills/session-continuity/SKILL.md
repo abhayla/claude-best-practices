@@ -12,7 +12,7 @@ description: >
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<'save', 'restore', 'handover', or session file path>"
-version: "2.1.0"
+version: "2.1.1"
 triggers:
   - session continuity
   - manage session
@@ -63,7 +63,7 @@ new-ones); always surface freshness assessment on restore.
    - keyword `restore` → find most recent session file, restore it
    - keyword `handover` → produce handover doc from most recent saved session
    - path ending in `.json` or `.md` under `.claude/sessions/` → restore that file
-2. **Read config.** `config/workflow-contracts.yaml` → `workflows.session-continuity`.
+2. **Read config.** `.claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.session-continuity`.
    `master_agent` should be null; `sub_orchestrators` empty (Phase 3.6).
 3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
 4. **Initialize state** at `.workflows/session-continuity/state.json` (schema

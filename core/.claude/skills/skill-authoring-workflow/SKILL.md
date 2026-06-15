@@ -13,7 +13,7 @@ description: >
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<skill name, learning reference, or pattern description>"
-version: "2.1.0"
+version: "2.1.1"
 ---
 
 # /skill-authoring-workflow — Skill-at-T0 Orchestrator
@@ -57,7 +57,7 @@ pointing at `.claude/skill-proposals/`), or free-form pattern description.
 ## STEP 1: INIT + OVERLAP_CHECK
 
 1. **Parse args.** Resolve `input` to one of: concrete name, proposal path, or description.
-2. **Read config.** `config/workflow-contracts.yaml` → `workflows.skill-authoring`.
+2. **Read config.** `.claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.skill-authoring`.
    `master_agent` should be null; `sub_orchestrators` empty (Phase 3.8).
 3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
 4. **Initialize state** at `.workflows/skill-authoring/state.json` (schema 2.0.0):
