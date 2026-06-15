@@ -22,7 +22,7 @@ triggers:
   - debug fix and verify
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<bug description, error output, or issue URL>"
-version: "2.1.0"
+version: "2.1.1"
 ---
 
 # /debugging-loop — Skill-at-T0 Orchestrator
@@ -55,8 +55,8 @@ Canonical pattern: `workflow-master-template.md` v2.0.0.
 
 | Flag | Default | Meaning |
 |------|---------|---------|
-| `--skip-verify` | off | Skip STEP 3 VERIFY (fix is trusted; e.g., trivial typo) |
-| `--skip-learn` | off | Skip STEP 4 LEARN (rare; learning is normally mandatory) |
+| `--skip-verify` | off | Skip STEP 4 VERIFY (fix is trusted; e.g., trivial typo) |
+| `--skip-learn` | off | Skip STEP 5 LEARN (rare; learning is normally mandatory) |
 
 ---
 
