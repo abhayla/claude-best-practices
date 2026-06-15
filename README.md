@@ -1,6 +1,11 @@
 # Claude Best Practices Hub
 
-A curated knowledge hub of **229 battle-tested patterns** (agents, skills, rules, hooks) for [Claude Code](https://claude.ai/code). Copy them to your project, or let `/synthesize-project` analyze your codebase and generate project-specific patterns automatically.
+A curated knowledge hub for [Claude Code](https://claude.ai/code) with two goals:
+
+1. **Distribute reusable patterns** — battle-tested agents, skills, rules, and hooks (for the live count, see `registry/patterns.json`) that you provision into your projects.
+2. **Create, update, and maintain reusable workflows** — orchestrated multi-step processes (testing, development, debugging, code-review, documentation, and more) that projects adopt to improve productivity.
+
+Copy patterns to your project, or let `/synthesize-project` analyze your codebase and generate project-specific patterns automatically.
 
 ---
 
@@ -333,7 +338,7 @@ Universal patterns (no prefix) are included for all stacks.
 | `/debugging-loop` | Structured diagnosis → fix → verify → learn |
 | `/code-review-workflow` | Quality gates → PR → review feedback |
 
-See [`core/.claude/README.md`](core/.claude/README.md) for all 155 skills.
+See [`core/.claude/README.md`](core/.claude/README.md) for the full skills catalog.
 
 ---
 
@@ -359,7 +364,7 @@ config/                        # Hub configuration
   settings.yml                 #   Scan schedules, dedup thresholds, gold standards
 
 config/workflow-contracts.yaml  # Workflow DAGs with artifact contracts (8 workflows)
-registry/patterns.json         # Machine-readable index of all 225 patterns
+registry/patterns.json         # Machine-readable index of all patterns (source of truth for the count)
 scripts/                       # Python tools (bootstrap, recommend, validate, sync, docs)
 docs/                          # Dashboard, getting started, sync architecture, flywheel
 ```

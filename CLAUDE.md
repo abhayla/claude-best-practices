@@ -45,6 +45,8 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 A curated hub of Claude Code patterns (agents, skills, rules, hooks) organized by stack — for the live count, see `registry/patterns.json` (one top-level key per pattern, excluding `_meta`); `registry/changelog.md` has human-readable history of pattern additions/removals. Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
 
+The hub has two delivery tiers: **atomic patterns** (above) and **reusable workflows** — the 8 orchestrated multi-step processes the hub creates, updates, and maintains for downstream projects to adopt for productivity (see "Workflow Orchestration (skill-at-T0)" below).
+
 For sync direction semantics (hub↔projects, hub↔internet, aggregation flows), read `docs/SYNC-ARCHITECTURE.md` before modifying any sync script.
 
 ### Pattern Types
