@@ -781,12 +781,13 @@
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
+    "last_updated": "2026-06-15",
     "dependencies": [
-      "code-review-master-agent",
-      "review-gate",
+      "code-reviewer-agent",
+      "receive-code-review",
       "request-code-review",
-      "receive-code-review"
+      "review-gate",
+      "security-auditor-agent"
     ],
     "visibility": "public",
     "description": "Slash-command wrapper for code-review-master-agent. Pre-merge quality gates, PR creation, and review feedback handling.",
@@ -795,7 +796,7 @@
       "workflow",
       "review"
     ],
-    "changelog": "v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4)",
+    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4)",
     "tier": "must-have"
   },
   "code-reviewer-agent": {
@@ -1159,13 +1160,14 @@
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
+    "last_updated": "2026-06-15",
     "dependencies": [
-      "debugging-loop-master-agent",
-      "systematic-debugging",
-      "fix-loop",
       "auto-verify",
-      "learn-n-improve"
+      "debugger-agent",
+      "fix-loop",
+      "learn-n-improve",
+      "systematic-debugging",
+      "test-failure-analyzer-agent"
     ],
     "visibility": "public",
     "description": "Full-cycle bug resolution orchestrator: chains systematic-debugging, fix-loop, auto-verify, and learn-n-improve via debugging-loop-master-agent.",
@@ -1174,7 +1176,7 @@
       "workflow",
       "debugging"
     ],
-    "changelog": "v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
+    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
     "tier": "must-have"
   },
   "debugging-loop-master-agent": {
@@ -1460,8 +1462,14 @@
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
+    "last_updated": "2026-06-15",
+    "dependencies": [
+      "adr",
+      "api-docs-generator",
+      "doc-staleness",
+      "doc-structure-enforcer",
+      "docs-manager-agent"
+    ],
     "visibility": "public",
     "description": "Slash-command wrapper for documentation-master-agent. Full doc generation and maintenance orchestration.",
     "tags": [
@@ -1469,7 +1477,7 @@
       "workflow",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5)",
+    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5)",
     "tier": "must-have"
   },
   "drizzle-orm": {
@@ -2406,8 +2414,14 @@
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
+    "last_updated": "2026-06-15",
+    "dependencies": [
+      "context-reducer-agent",
+      "learn-n-improve",
+      "session-summarizer-agent",
+      "skill-factory",
+      "test-knowledge"
+    ],
     "visibility": "public",
     "description": "Slash-command wrapper for learning-self-improvement-master-agent. Knowledge accumulation and skill proposal generation.",
     "tags": [
@@ -2415,7 +2429,7 @@
       "workflow",
       "learning"
     ],
-    "changelog": "v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7)",
+    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7)",
     "tier": "must-have"
   },
   "learning-self-improvement-master-agent": {
@@ -3586,8 +3600,13 @@
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
+    "last_updated": "2026-06-15",
+    "dependencies": [
+      "handover",
+      "save-session",
+      "session-summarizer-agent",
+      "start-session"
+    ],
     "visibility": "public",
     "description": "Slash-command wrapper for session-continuity-master-agent. Session save, restore, and handover.",
     "tags": [
@@ -3595,7 +3614,7 @@
       "workflow",
       "session"
     ],
-    "changelog": "v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
+    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
     "tier": "must-have"
   },
   "session-continuity-master-agent": {
@@ -3704,8 +3723,13 @@
     "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
+    "last_updated": "2026-06-15",
+    "dependencies": [
+      "claude-guardian",
+      "skill-author-agent",
+      "skill-master",
+      "writing-skills"
+    ],
     "visibility": "public",
     "description": "Slash-command wrapper for skill-authoring-master-agent. Pattern creation with overlap detection and quality gates.",
     "tags": [
@@ -3713,7 +3737,7 @@
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 — final workflow-master retirement)",
+    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 — final workflow-master retirement)",
     "tier": "must-have"
   },
   "skill-evaluator": {
