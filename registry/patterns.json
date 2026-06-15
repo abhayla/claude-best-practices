@@ -1588,10 +1588,10 @@
     "tier": "nice-to-have"
   },
   "e2e-visual-run": {
-    "hash": "001c1047c4ab778afb51ff81602c2c6a90589434aa41f8fdee4d67d054f76aec",
+    "hash": "8c33c3259d1bc7aca6292973682d55c9cbe7ce9c7a17dfcad25d91673324e3a4",
     "type": "skill",
     "category": "core",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
     "last_updated": "2026-06-15",
@@ -1614,7 +1614,7 @@
       "accessibility",
       "playwright"
     ],
-    "changelog": "deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing. | v5.0.0 (2026-04-24): MAJOR — full body rewrite as independent skill-at-T0 orchestrator; no longer dispatches deprecated e2e-conductor-agent; dispatches scout/tester/visual-inspector/healer workers directly from T0",
+    "changelog": "v5.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (parity with the other orchestrator workflows). | deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing. | v5.0.0 (2026-04-24): MAJOR — full body rewrite as independent skill-at-T0 orchestrator; no longer dispatches deprecated e2e-conductor-agent; dispatches scout/tester/visual-inspector/healer workers directly from T0",
     "tier": "must-have"
   },
   "error-handling": {

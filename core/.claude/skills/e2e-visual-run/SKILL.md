@@ -20,7 +20,7 @@ triggers:
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "[section-name] [--update-baselines]"
-version: "5.0.0"
+version: "5.1.0"
 ---
 
 # /e2e-visual-run — Skill-at-T0 Orchestrator (Playwright)
@@ -91,6 +91,30 @@ T0 orchestrations with their own `run_id` scopes.
    }
    ```
 7. Append INIT to `.workflows/e2e-visual/events.jsonl`.
+
+---
+
+## STEP 1.5: PREFLIGHT (dependency-closure gate — BLOCK on missing workers)
+
+Before any dispatch, verify the runtime closure this workflow needs is present
+AND dispatchable. Pattern provisioning copies by tier and may not resolve a
+skill's full closure, so a project can have this skill without its workers — a
+silent inline run or a mid-dispatch crash is the failure this gate prevents.
+
+- **Required worker agents** (dispatched via `Agent()`): `test-scout-agent`,
+  `tester-agent`, `visual-inspector-agent`, `test-healer-agent`. File presence
+  (`.claude/agents/<name>.md`) is necessary but NOT sufficient — the agent registry
+  is pinned at session start (`pattern-structure.md` → "registry session-pinning"),
+  so probe runtime dispatchability for any agent on the path about to run.
+- **Required sub-skills** (invoked via `Skill()`): `serialize-fixes`, `fix-loop`,
+  `verify-screenshots` (only those on the path you will actually run).
+- **On any missing/undispatchable dependency → BLOCK** with verdict
+  `WORKER_REGISTRY_NOT_LOADED`, list what is missing, and emit: "run
+  `/update-practices` to provision the closure, then RESTART the session (agent
+  registry is pinned at session start), then re-run." Write the BLOCKED verdict to
+  this run's report artifact and STOP.
+
+Only when the required closure is present and dispatchable, continue.
 
 ---
 
@@ -309,6 +333,7 @@ surfaced in STEP 8 for user review.
 
 ## CRITICAL RULES
 
+- MUST run STEP 1.5 PREFLIGHT before any dispatch and BLOCK with `WORKER_REGISTRY_NOT_LOADED` if a required worker agent or sub-skill (on the path being run) is missing/undispatchable. Provisioning does not always resolve dependency closures, so this skill can be present without its workers.
 - MUST run at T0 — this skill's body is injected into the user's session; it
   MUST NOT be invoked by another agent via `Agent()`. Workers cannot dispatch
   further subagents (platform constraint).
