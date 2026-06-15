@@ -496,10 +496,10 @@
     "tier": "must-have"
   },
   "auto-verify": {
-    "hash": "cb09a9642171dcde2d1421bf43181f9c09a4f5b4f11142cc9fd475c621e69358",
+    "hash": "a4908d4d3a65f06b7a4290aa761e9c4b18901b28d84b8b061f5835d1b61835e8",
     "type": "skill",
     "category": "core",
-    "version": "4.2.0",
+    "version": "4.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-06-15",
@@ -510,7 +510,7 @@
     "visibility": "public",
     "description": "Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces structured results for pipeline consumption.",
     "tags": [],
-    "changelog": "v4.2.0 (2026-06-15): MINOR — NO_TESTS_FOR_CHANGE: under --strict-gates a code change that executed 0 tests is FAILED, not a vacuous PASS (fixes #50). | v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured | v2.1.0: split STEP 2.5 sub-content to references/visual-proof-review.md (412 lines, under 500 cap)",
+    "changelog": "v4.3.0 (2026-06-15): MINOR — monorepo runner scoping: scope test runner to the changed sub-package, not repo root, in multi-stack monorepos (fixes #53). | v4.2.0 (2026-06-15): MINOR — NO_TESTS_FOR_CHANGE: under --strict-gates a code change that executed 0 tests is FAILED, not a vacuous PASS (fixes #50). | v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured | v2.1.0: split STEP 2.5 sub-content to references/visual-proof-review.md (412 lines, under 500 cap)",
     "tier": "must-have"
   },
   "batch": {
