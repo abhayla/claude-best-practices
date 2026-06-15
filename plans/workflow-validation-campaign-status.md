@@ -30,12 +30,19 @@ code-review (quality-gate-before-PR), documentation (skip-conditions + staleness
 - **documentation** — sub-skills (doc-staleness, doc-structure-enforcer, adr, api-docs-generator) present; skip-conditions audited.
 - **learning-self-improvement** — closure + capture/propose gate-behavior audited; sub-skills present.
 
-## Status: all 8 workflows validated
-Every workflow is validated across structure (Tier-A guard), contract, gates, closures, and its defining behavioral property. Four (development-loop, debugging-loop, test-pipeline, session-continuity) additionally have full end-to-end sandbox runs.
+## Status: COMPLETE — all 8 workflows validated
+Every workflow is validated across structure (Tier-A guard), contract, gates, closures, defining behavior, AND a sandbox provisioning+behavior pass:
+- development-loop, debugging-loop, test-pipeline, session-continuity — full end-to-end sandbox runs.
+- code-review, documentation, learning-self-improvement, skill-authoring — sandbox provisioning (closure + PREFLIGHT) + defining-behavior validation (code-review gate-before-PR; skill-authoring BLOCKING validate proven; documentation sub-skills runnable; learning closure+capture).
 
-## Optional / on-demand (low marginal value)
-- Full multi-agent end-to-end scenario runs for code-review / documentation / learning (their closures, gates, and sub-skills are already validated; a full agent run adds marginal coverage). Best run on-demand in a fresh context.
-- **#53** monorepo VERIFY verification — run validated workflows against real monorepos (KKB/AlgoChanakya).
+## Resolved this campaign
+- Closure defects across all orchestrators — fixed (#49/#54/#55/#56/#59) + permanent guard (#57).
+- Vacuous-green VERIFY gate — fixed (#50/#52).
+- debugging-loop flag step-numbers — fixed (#58).
+- e2e-visual-run missing gate — fixed (#59).
+- Monorepo runner mis-scoping (#53) — verified real + fixed (#63).
+
+No open items. 0 open issues. Optional deep multi-agent scenario runs can be done on-demand but add low marginal value (closures/gates/sub-skills already validated).
 
 ## Also open
 - **#53** monorepo VERIFY verification — run validated workflows against real monorepos (KKB/AlgoChanakya).
