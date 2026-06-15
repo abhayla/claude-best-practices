@@ -20,7 +20,7 @@ triggers:
   - new feature end to end
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<feature description, issue URL, or spec file path>"
-version: "2.1.0"
+version: "2.1.1"
 ---
 
 # /development-loop — Skill-at-T0 Orchestrator
@@ -74,7 +74,7 @@ suggest `/implement` directly. Proceed with the full cycle only on confirmation.
    - **Complex**: 6+ files, cross-layer, architecture decisions — all 5 steps
    - Uncertain → **Medium**
    - `--skip-*` flags override the heuristic
-2. **Read config.** `Read config/workflow-contracts.yaml` → `workflows.development-loop`. Pull step DAG + artifact contracts. master_agent should be null (Phase 3.2); sub_orchestrators should be empty list.
+2. **Read config.** `Read .claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.development-loop`. Pull step DAG + artifact contracts. master_agent should be null (Phase 3.2); sub_orchestrators should be empty list.
 3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
 4. **Initialize state.** `Write .workflows/development-loop/state.json`:
    ```json

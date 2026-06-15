@@ -12,7 +12,7 @@ description: >
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<'session' | 'detect-patterns' | 'full' | specific topic>"
-version: "2.1.0"
+version: "2.1.1"
 ---
 
 # /learning-self-improvement — Skill-at-T0 Orchestrator
@@ -52,7 +52,7 @@ propose from a single incident. Reactive curation, not speculative.
 ## STEP 1: INIT
 
 1. **Parse args.** Normalize mode.
-2. **Read config.** `config/workflow-contracts.yaml` → `workflows.learning-self-improvement`.
+2. **Read config.** `.claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.learning-self-improvement`.
    `master_agent` should be null; `sub_orchestrators` empty (Phase 3.7).
 3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
 4. **Initialize state** at `.workflows/learning-self-improvement/state.json`

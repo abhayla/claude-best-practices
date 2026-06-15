@@ -19,7 +19,7 @@ triggers:
   - docs pipeline
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "[scope: 'all' | 'adr' | 'api' | 'structure' | 'staleness']"
-version: "2.1.0"
+version: "2.1.1"
 ---
 
 # /documentation-workflow — Skill-at-T0 Orchestrator
@@ -53,7 +53,7 @@ dispatched subagents don't receive the `Agent` tool
 ## STEP 1: INIT
 
 1. **Parse args.** Normalize `scope` to one of the 5 values.
-2. **Read config** `config/workflow-contracts.yaml` → `workflows.documentation`.
+2. **Read config** `.claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.documentation`.
    `master_agent` should be null; `sub_orchestrators` empty.
 3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
 4. **Initialize state** at `.workflows/documentation/state.json` (schema
