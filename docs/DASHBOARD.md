@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-14 13:35 UTC (auto-generated)
+> Last updated: 2026-06-15 07:50 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -69,7 +69,7 @@
 | deploy-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup, k8s-deploy |
 | design-principles | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | design-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| development-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | development-loop-master-agent, brainstorm, writing-plans, executing-plans, auto-verify, post-fix-pipeline |
+| development-loop | skill | 2.1.0 | hub:abhayla/claude-best-practices | brainstorm, writing-plans, auto-verify, post-fix-pipeline, plan-executor-agent, planner-researcher-agent |
 | development-loop-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | diataxis-docs | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | doc-staleness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
