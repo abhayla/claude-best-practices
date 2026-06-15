@@ -47,6 +47,8 @@ from scripts.recommend import (
     build_sync_classification,
     update_improved_to_local,
     update_manifest_after_sync,
+    _ensure_runtime_gitignore,
+    RUNTIME_IGNORE_ENTRIES,
 )
 
 
@@ -2509,3 +2511,96 @@ class TestResourceStackRequirementsIntegrity:
             f"{orphans}. Every required stack must appear in STACK_PREFIXES or "
             f"be emitted by STACK_DETECTORS."
         )
+
+
+class TestRuntimeGitignore:
+    """_ensure_runtime_gitignore: ephemeral workflow dirs must be gitignored downstream."""
+
+    def test_creates_gitignore_when_absent(self, tmp_path):
+        modified = _ensure_runtime_gitignore(tmp_path)
+        assert modified is True
+        content = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+        for entry in RUNTIME_IGNORE_ENTRIES:
+            assert entry in content.splitlines()
+
+    def test_idempotent_second_call_no_change(self, tmp_path):
+        assert _ensure_runtime_gitignore(tmp_path) is True
+        before = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+        assert _ensure_runtime_gitignore(tmp_path) is False
+        assert (tmp_path / ".gitignore").read_text(encoding="utf-8") == before
+
+    def test_appends_to_existing_without_clobbering(self, tmp_path):
+        gi = tmp_path / ".gitignore"
+        gi.write_text("node_modules/\ndist/\n", encoding="utf-8")
+        assert _ensure_runtime_gitignore(tmp_path) is True
+        lines = gi.read_text(encoding="utf-8").splitlines()
+        assert "node_modules/" in lines and "dist/" in lines
+        for entry in RUNTIME_IGNORE_ENTRIES:
+            assert entry in lines
+
+    def test_only_missing_entries_appended(self, tmp_path):
+        gi = tmp_path / ".gitignore"
+        gi.write_text("test-results/\n", encoding="utf-8")
+        assert _ensure_runtime_gitignore(tmp_path) is True
+        content = gi.read_text(encoding="utf-8")
+        # the already-present entry is not duplicated
+        assert content.count("test-results/") == 1
+        assert ".workflows/" in content.splitlines()
+
+    def test_apply_to_local_gitignores_runtime_dirs(self, tmp_path):
+        # apply_to_local with empty gaps still ensures the runtime gitignore exists
+        from scripts.recommend import apply_to_local
+        hub_root = Path(__file__).resolve().parents[2]
+        apply_to_local(hub_root, tmp_path, {"must-have": [], "nice-to-have": []})
+        content = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+        for entry in RUNTIME_IGNORE_ENTRIES:
+            assert entry in content.splitlines()
+
+
+class TestDependencyClosure:
+    """Provisioning a skill must pull its registry-`dependencies` closure,
+    even when a dependency is tiered nice-to-have (the development-loop bug)."""
+
+    def test_development_loop_pulls_plan_executor_agent(self, tmp_path):
+        # plan-executor-agent is tiered nice-to-have but development-loop requires
+        # it — provisioning development-loop (must-have) must still bring it along.
+        from scripts.recommend import apply_to_local
+        hub_root = Path(__file__).resolve().parents[2]
+        gaps = {"must-have": [{"name": "development-loop", "type": "skill"}],
+                "nice-to-have": []}
+        apply_to_local(hub_root, tmp_path, gaps)
+        assert (tmp_path / ".claude" / "agents" / "plan-executor-agent.md").exists()
+        # and the rest of the declared closure
+        assert (tmp_path / ".claude" / "skills" / "auto-verify" / "SKILL.md").exists()
+        assert (tmp_path / ".claude" / "agents" / "planner-researcher-agent.md").exists()
+
+    def test_closure_skips_deprecated_dependencies(self, tmp_path):
+        # The corrected development-loop deps no longer list the deprecated
+        # development-loop-master-agent; ensure it is NOT provisioned.
+        from scripts.recommend import apply_to_local
+        hub_root = Path(__file__).resolve().parents[2]
+        gaps = {"must-have": [{"name": "development-loop", "type": "skill"}],
+                "nice-to-have": []}
+        apply_to_local(hub_root, tmp_path, gaps)
+        assert not (tmp_path / ".claude" / "agents" / "development-loop-master-agent.md").exists()
+
+    def test_provision_dependency_closure_direct(self, tmp_path):
+        from scripts.recommend import _provision_dependency_closure
+        hub_root = Path(__file__).resolve().parents[2]
+        copied = _provision_dependency_closure(hub_root, tmp_path, ["development-loop"])
+        assert any("plan-executor-agent" in c for c in copied)
+
+    def test_reprovision_completes_closure_from_existing(self, tmp_path):
+        # Simulate an already-provisioned project missing a (nice-to-have) worker:
+        # development-loop present, plan-executor-agent deleted. A re-provision with
+        # EMPTY gaps (dev-loop is no longer a "gap") must still restore the worker
+        # via the existing-pattern closure seed.
+        from scripts.recommend import apply_to_local, _existing_pattern_names
+        hub_root = Path(__file__).resolve().parents[2]
+        apply_to_local(hub_root, tmp_path, {"must-have": [{"name": "development-loop", "type": "skill"}]})
+        worker = tmp_path / ".claude" / "agents" / "plan-executor-agent.md"
+        assert worker.exists()
+        worker.unlink()
+        assert "development-loop" in _existing_pattern_names(tmp_path)
+        apply_to_local(hub_root, tmp_path, {"must-have": [], "nice-to-have": []})
+        assert worker.exists(), "re-provision must restore the closure worker from existing seed"

@@ -20,7 +20,7 @@ triggers:
   - new feature end to end
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<feature description, issue URL, or spec file path>"
-version: "2.0.0"
+version: "2.1.0"
 ---
 
 # /development-loop — Skill-at-T0 Orchestrator
@@ -90,6 +90,42 @@ suggest `/implement` directly. Proceed with the full cycle only on confirmation.
    }
    ```
 5. **Append INIT event** to `events.jsonl`.
+
+---
+
+## STEP 1.5: PREFLIGHT (dependency-closure gate — BLOCK on missing workers)
+
+Before any dispatch, verify the runtime closure this skill depends on is present
+AND dispatchable. Pattern provisioning copies skills/agents by tier and does NOT
+always resolve a skill's full dependency closure — so a project can end up with
+`/development-loop` but without its workers. Catch that here with an actionable
+BLOCK, never a silent inline run or a mid-EXECUTE crash.
+
+1. **Required sub-skills** (invoked via `Skill()`): `brainstorm` (only if IDEATE
+   will run), `writing-plans` (only if PLAN will run), `auto-verify`,
+   `post-fix-pipeline` (unless `--no-commit`). Check each exists in the project's
+   `.claude/skills/<name>/SKILL.md`.
+2. **Required worker agents** (dispatched via `Agent()`): `plan-executor-agent`
+   (always), `planner-researcher-agent` (only if `--research`). A file-existence
+   check (`.claude/agents/<name>.md`) is necessary but NOT sufficient — Claude
+   Code pins the agent registry at session start (`pattern-structure.md` →
+   "registry session-pinning"). Probe runtime dispatchability early.
+3. **On any missing/undispatchable dependency → BLOCK** with verdict
+   `WORKER_REGISTRY_NOT_LOADED`, listing what's missing, and emit the remediation
+   verbatim:
+   ```
+   ============================================================
+   Development Loop: BLOCKED — WORKER_REGISTRY_NOT_LOADED
+     Missing closure: <names>
+     Fix: run /update-practices to provision the development-loop
+          closure, then RESTART the session (agent registry is
+          pinned at session start), then re-run /development-loop.
+   ============================================================
+   ```
+   Write the BLOCKED verdict to `test-results/development-loop-verdict.json`
+   (STEP 7 schema, `result: "BLOCKED"`) and STOP. Do NOT proceed to IDEATE.
+
+Only when the closure is present and dispatchable, continue to STEP 2.
 
 ---
 
@@ -245,6 +281,11 @@ Update `state.artifacts.commit_sha`.
 
 ## CRITICAL RULES
 
+- MUST run STEP 1.5 PREFLIGHT before any dispatch and BLOCK with
+  `WORKER_REGISTRY_NOT_LOADED` if a required sub-skill or worker agent is
+  missing/undispatchable. Provisioning does not resolve dependency closures, so
+  a downstream project can have this skill without its workers — a silent inline
+  run or mid-EXECUTE crash is the failure this gate prevents.
 - MUST run at T0 — this skill's body is injected into the user's session.
   If dispatched as a worker (i.e., from another agent), `Agent` is stripped
   at runtime and the EXECUTE step dispatch silently becomes inline serial

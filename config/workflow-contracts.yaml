@@ -43,7 +43,11 @@ workflows:
         artifacts_in:
           plan: "plan.artifacts_out.plan"
         artifacts_out:
-          source: { path: "src/", schema: source_v1 }
+          # Project-relative source root — nominal location only. The authoritative
+          # list of edits is the worker's `changed_files` return contract, so this is
+          # NOT a binding glob. "." keeps it generic across stacks (src/, app/src/main,
+          # backend/, lib/, module root, …) — never assume a project-specific subdir.
+          source: { path: ".", schema: source_v1 }
         timeout_minutes: 60
       - id: verify
         skill: auto-verify
