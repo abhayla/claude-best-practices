@@ -15,5 +15,8 @@
 - Validate `/synthesize-hub` (project→hub flywheel) separately — needs an enrolled downstream repo with `synthesized: true` patterns.
 - Verify the other 7 workflows (testing-pipeline, debugging-loop, code-review, documentation, session-continuity, learning, skill-authoring).
 
+- 2026-06-15 — EXECUTION started (user: "Go ahead"). Phase 0–1 committed (branch chore/harden-development-loop). Phase 2 sandbox (Node+TS, node --test) created + provisioned via /synthesize-project (recommend.py path).
+- 2026-06-15 — DISCOVERY (Phase 2 real run): provisioning is NOT closure-aware. `plan-executor-agent` is tiered nice-to-have, so a must-have provision shipped /development-loop WITHOUT its EXECUTE worker. Root-cause fix: implemented `_provision_dependency_closure` in recommend.py — walks each provisioned pattern's registry `dependencies` transitively and copies them regardless of tier; seeds from BOTH newly-copied AND already-present patterns so re-provision/update also completes the closure. +4 closure tests. Verified: sandbox now has plan-executor-agent after (re-)provision. This generalizes to every workflow skill, not just development-loop.
+
 ## Blockers
-- (none) — plan pending approval.
+- (none) — execution in progress.
