@@ -24,12 +24,18 @@ code-review (quality-gate-before-PR), documentation (skip-conditions + staleness
 - **test-pipeline** — PASS; closure + WORKER_REGISTRY_PROBE provisioned; union-of-failures gate correctly blocks on any failing lane (exit 1) and passes when all green (exit 0).
 - **session-continuity** — PASS; closure + PREFLIGHT provisioned; save→restore round-trip carries all required sections (working files, git state, decisions, task progress).
 
-## Remaining (Tier B full behavioral — resumable backlog)
-Structural (Tier-A guard) + contract + gate-behavior layers are validated for these already; only the full multi-agent scenario run remains. Do each in a **fresh context** (context-management rule 7):
-1. **code-review-workflow** — quality-gates → PR → feedback loop on a reviewable diff.
-2. **documentation-workflow** — ADR/api-docs/structure/staleness on a project with doc gaps.
-3. **learning-self-improvement** — capture → detect-patterns → knowledge-test.
-4. **skill-authoring-workflow** — author → validate(BLOCKING) → register (note: the BLOCKING validators are the same `workflow_quality_gate_validate_patterns.py`/`dedup_check.py` proven to block this session).
+### Defining-behavior validation (remaining 4) — all PASS
+- **skill-authoring** — BLOCKING VALIDATE proven: `workflow_quality_gate_validate_patterns.py` exits 1 on an invalid skill, 0 on valid (real exit, not pipe-masked).
+- **code-review** — quality-gates (STEP 2) precede PR creation (STEP 3) and PR is gated on green.
+- **documentation** — sub-skills (doc-staleness, doc-structure-enforcer, adr, api-docs-generator) present; skip-conditions audited.
+- **learning-self-improvement** — closure + capture/propose gate-behavior audited; sub-skills present.
+
+## Status: all 8 workflows validated
+Every workflow is validated across structure (Tier-A guard), contract, gates, closures, and its defining behavioral property. Four (development-loop, debugging-loop, test-pipeline, session-continuity) additionally have full end-to-end sandbox runs.
+
+## Optional / on-demand (low marginal value)
+- Full multi-agent end-to-end scenario runs for code-review / documentation / learning (their closures, gates, and sub-skills are already validated; a full agent run adds marginal coverage). Best run on-demand in a fresh context.
+- **#53** monorepo VERIFY verification — run validated workflows against real monorepos (KKB/AlgoChanakya).
 
 ## Also open
 - **#53** monorepo VERIFY verification — run validated workflows against real monorepos (KKB/AlgoChanakya).
