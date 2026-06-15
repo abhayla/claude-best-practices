@@ -44,10 +44,16 @@ def _parse_frontmatter_version(text: str) -> str | None:
 # ── SKILL.md (thin wrapper) content assertions ──────────────────────────────
 
 
-def test_skill_md_version_is_5_0_0():
-    """v5.0.0 (Phase 3.1): MAJOR rewrite as skill-at-T0 orchestrator."""
+def test_skill_md_version_major_is_5():
+    """v5.x (Phase 3.1): MAJOR rewrite as skill-at-T0 orchestrator.
+
+    Pin the MAJOR version (the rewrite invariant), not an exact minor — minor
+    bumps (e.g. adding the PREFLIGHT gate in 5.1.0) must not break this guard.
+    """
     version = _parse_frontmatter_version(_read(SKILL_MD))
-    assert version == "5.0.0", f"expected 5.0.0, got {version!r}"
+    assert version is not None and version.split(".")[0] == "5", (
+        f"expected a 5.x version, got {version!r}"
+    )
 
 
 def test_skill_md_is_skill_at_t0_orchestrator():
