@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-15 09:03 UTC (auto-generated)
+> Last updated: 2026-06-15 09:11 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -63,7 +63,7 @@
 | db-migrate | skill | 1.0.0 | hub:abhayla/claude-best-practices | schema-designer |
 | db-migrate-verify | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | debugger-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| debugging-loop | skill | 2.1.0 | hub:abhayla/claude-best-practices | auto-verify, debugger-agent, fix-loop, learn-n-improve, systematic-debugging, test-failure-analyzer-agent |
+| debugging-loop | skill | 2.1.1 | hub:abhayla/claude-best-practices | auto-verify, debugger-agent, fix-loop, learn-n-improve, systematic-debugging, test-failure-analyzer-agent |
 | debugging-loop-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | decision-authority | rule | 1.0.0 | project:firekaro-planner | — |
 | deploy-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup, k8s-deploy |
