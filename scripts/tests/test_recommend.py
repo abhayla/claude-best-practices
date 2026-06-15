@@ -2604,3 +2604,52 @@ class TestDependencyClosure:
         assert "development-loop" in _existing_pattern_names(tmp_path)
         apply_to_local(hub_root, tmp_path, {"must-have": [], "nice-to-have": []})
         assert worker.exists(), "re-provision must restore the closure worker from existing seed"
+
+
+class TestSelectiveWorkflowProvisioning:
+    """--workflows subset selection: only chosen workflows + their closures copy;
+    shared resources still travel; unselected workflows' exclusives do not."""
+
+    HUB = Path(__file__).resolve().parents[2]
+
+    def _gaps_all_workflows(self):
+        from scripts.recommend import _workflow_entry_skills
+        wf = _workflow_entry_skills(self.HUB)
+        return {"must-have": [{"name": w, "type": "skill"} for w in sorted(wf)],
+                "nice-to-have": []}
+
+    def _skill(self, td, name):
+        return (Path(td) / ".claude" / "skills" / name / "SKILL.md").exists()
+
+    def _agent(self, td, name):
+        return (Path(td) / ".claude" / "agents" / f"{name}.md").exists()
+
+    def test_select_one_workflow_excludes_others_keeps_shared(self, tmp_path):
+        apply_to_local(self.HUB, tmp_path, self._gaps_all_workflows(),
+                       select_workflows={"development-loop"})
+        # selected workflow + its closure
+        assert self._skill(tmp_path, "development-loop")
+        assert self._agent(tmp_path, "plan-executor-agent")
+        # SHARED resource (auto-verify, also used by debugging-loop) MUST be present
+        assert self._skill(tmp_path, "auto-verify"), "shared resource excluded — the bug to prevent"
+        assert (tmp_path / ".claude" / "config" / "workflow-contracts.yaml").exists()
+        # unselected workflow skill + its EXCLUSIVE resources absent
+        assert not self._skill(tmp_path, "debugging-loop")
+        assert not self._agent(tmp_path, "debugger-agent")
+        assert not self._skill(tmp_path, "systematic-debugging")
+
+    def test_select_two_workflows_union_excludes_third(self, tmp_path):
+        apply_to_local(self.HUB, tmp_path, self._gaps_all_workflows(),
+                       select_workflows={"development-loop", "debugging-loop"})
+        assert self._skill(tmp_path, "development-loop")
+        assert self._skill(tmp_path, "debugging-loop")
+        assert self._skill(tmp_path, "auto-verify")          # shared
+        assert self._agent(tmp_path, "debugger-agent")        # now-selected B worker
+        # a third, unselected workflow + its exclusive worker absent
+        assert not self._skill(tmp_path, "code-review-workflow")
+        assert not self._agent(tmp_path, "code-reviewer-agent")
+
+    def test_no_selection_provisions_all_workflows(self, tmp_path):
+        apply_to_local(self.HUB, tmp_path, self._gaps_all_workflows(), select_workflows=None)
+        for w in ("development-loop", "debugging-loop", "code-review-workflow"):
+            assert self._skill(tmp_path, w)

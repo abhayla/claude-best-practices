@@ -1461,16 +1461,40 @@ def _provision_dependency_closure(
     return copied
 
 
+def _workflow_entry_skills(hub_root: Path) -> set[str]:
+    """Names of the workflow entry-skills, from config/workflow-contracts.yaml.
+
+    These are the patterns a user selects among; all OTHER patterns (base rules,
+    stack skills) are not workflow-scoped and always provision per stack/tier.
+    """
+    import yaml
+    p = hub_root / "config" / "workflow-contracts.yaml"
+    if not p.exists():
+        return set()
+    data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    return {(spec or {}).get("entry_skill", wf)
+            for wf, spec in (data.get("workflows") or {}).items()}
+
+
 def apply_to_local(
     hub_root: Path,
     target_dir: Path,
     gaps: dict[str, list[dict]],
     tier: str = "must-have",
+    select_workflows: Optional[set[str]] = None,
 ) -> list[str]:
     """Copy recommended resources from hub to a local project directory.
 
     Only copies resources at or above the specified tier.
     Idempotent: files already matching the hub content are skipped.
+
+    select_workflows: if not None, provision ONLY the named workflow ORCHESTRATOR
+    skills (a subset) and their transitive closures — other workflow orchestrator
+    skills are skipped. Shared resources still travel (they are in a selected
+    workflow's closure). Standalone patterns that are independently must-have
+    still provision on their own merit (they are not "workflows"); only patterns
+    reachable EXCLUSIVELY via an unselected workflow's closure (e.g. nice-to-have
+    workers) are withheld. Non-workflow base patterns always provision.
     """
     copied = []
     claude_src = hub_root / "core" / ".claude"
@@ -1479,11 +1503,16 @@ def apply_to_local(
     if tier == "nice-to-have":
         tiers_to_apply.append("nice-to-have")
 
+    all_workflows = _workflow_entry_skills(hub_root) if select_workflows is not None else set()
+
     provisioned_names = []
     for t in tiers_to_apply:
         for item in gaps.get(t, []):
             name = item["name"]
             rtype = item["type"]
+            # Selective mode: skip workflow entry-skills the user did not select.
+            if select_workflows is not None and name in all_workflows and name not in select_workflows:
+                continue
             units = _resource_copy_units(claude_src, target_dir, name, rtype)
             if not units:
                 print(f"  WARNING: hub {rtype} '{name}' not found in {claude_src}")
@@ -1499,7 +1528,11 @@ def apply_to_local(
     # they are tiered nice-to-have. Without this, e.g. /development-loop ships
     # without plan-executor-agent and cannot run. Seed with both newly-copied AND
     # already-present patterns so re-provision/update also completes the closure.
-    closure_seed = sorted(set(provisioned_names) | _existing_pattern_names(target_dir))
+    existing = _existing_pattern_names(target_dir)
+    if select_workflows is not None:
+        # Respect selection on re-provision: don't re-seed closures of unselected workflows.
+        existing = {n for n in existing if n not in all_workflows or n in select_workflows}
+    closure_seed = sorted(set(provisioned_names) | existing)
     copied.extend(_provision_dependency_closure(hub_root, target_dir, closure_seed))
 
     # Ensure ephemeral workflow runtime dirs are gitignored in the target project.
@@ -2285,6 +2318,7 @@ def provision_to_local(
     stacks: list[str],
     tier: str = "must-have",
     on_conflict: str = "auto",
+    select_workflows: Optional[set[str]] = None,
 ) -> dict:
     """Orchestrate full provisioning to a local directory.
 
@@ -2304,7 +2338,7 @@ def provision_to_local(
     Returns a summary dict.
     """
     # Step 1: Copy missing resources
-    copied = apply_to_local(hub_root, target_dir, gaps, tier)
+    copied = apply_to_local(hub_root, target_dir, gaps, tier, select_workflows=select_workflows)
 
     # Step 1b: Copy config files whose associated skills are in the project,
     # even if the config itself is in a lower tier. Config files are runtime
@@ -2937,6 +2971,14 @@ def main():
     parser.add_argument("--tier", choices=["must-have", "nice-to-have"],
                         default="must-have",
                         help="Minimum tier to apply (default: must-have)")
+    parser.add_argument("--workflows", default=None,
+                        help="Comma-separated workflow orchestrators to provision "
+                             "(e.g. development-loop,debugging-loop). Only these "
+                             "workflow ORCHESTRATORS are copied among the workflows; "
+                             "the others are skipped. Each selected workflow's full "
+                             "closure travels (shared resources included). Standalone "
+                             "must-have patterns still provision on their own merit. "
+                             "Omit to provision all workflows.")
     parser.add_argument("--on-conflict",
                         choices=["auto", "skip", "overwrite", "error", "interactive"],
                         default="auto",
@@ -3047,11 +3089,17 @@ def main():
         if third_party_matched:
             print(format_recommendations(third_party_matched))
 
+    # Parse optional workflow selection (subset provisioning).
+    select_workflows = None
+    if getattr(args, "workflows", None):
+        select_workflows = {w.strip() for w in args.workflows.split(",") if w.strip()}
+
     # Step 6: Apply if requested
     if args.apply:
         print(f"\nApplying {args.tier} tier recommendations...")
         if args.local:
-            copied = apply_to_local(hub_root, Path(args.local), gaps, args.tier)
+            copied = apply_to_local(hub_root, Path(args.local), gaps, args.tier,
+                                    select_workflows=select_workflows)
             print(f"Copied {len(copied)} files to {args.local}/.claude/")
             for f in copied:
                 print(f"  + {f}")
@@ -3074,7 +3122,7 @@ def main():
         if args.local:
             summary = provision_to_local(
                 hub_root, Path(args.local), gaps, stacks, args.tier,
-                on_conflict=args.on_conflict,
+                on_conflict=args.on_conflict, select_workflows=select_workflows,
             )
             # Install third-party skills after hub patterns are copied
             if third_party_matched:
