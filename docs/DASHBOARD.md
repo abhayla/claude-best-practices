@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-15 08:05 UTC (auto-generated)
+> Last updated: 2026-06-15 08:29 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -47,7 +47,7 @@
 | code-quality-gate | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-readability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-review-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
-| code-review-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | code-review-master-agent, review-gate, request-code-review, receive-code-review |
+| code-review-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | code-reviewer-agent, receive-code-review, request-code-review, review-gate, security-auditor-agent |
 | code-reviewer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | configuration-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | context-management | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -63,7 +63,7 @@
 | db-migrate | skill | 1.0.0 | hub:abhayla/claude-best-practices | schema-designer |
 | db-migrate-verify | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | debugger-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
-| debugging-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | debugging-loop-master-agent, systematic-debugging, fix-loop, auto-verify, learn-n-improve |
+| debugging-loop | skill | 2.0.0 | hub:abhayla/claude-best-practices | auto-verify, debugger-agent, fix-loop, learn-n-improve, systematic-debugging, test-failure-analyzer-agent |
 | debugging-loop-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | decision-authority | rule | 1.0.0 | project:firekaro-planner | — |
 | deploy-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup, k8s-deploy |
@@ -76,7 +76,7 @@
 | doc-structure-enforcer | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | docs-manager-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | documentation-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
-| documentation-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| documentation-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | adr, api-docs-generator, doc-staleness, doc-structure-enforcer, docs-manager-agent |
 | dod-verbs | rule | 1.0.0 | project:firekaro-planner | — |
 | e2e-best-practices | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | e2e-conductor-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | test-scout-agent, visual-inspector-agent, test-healer-agent |
@@ -115,7 +115,7 @@
 | independent-test-verification | rule | 1.0.0 | project:firekaro-planner | — |
 | integration-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | learn-n-improve | skill | 2.3.0 | hub:abhayla/claude-best-practices | — |
-| learning-self-improvement | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| learning-self-improvement | skill | 2.0.0 | hub:abhayla/claude-best-practices | context-reducer-agent, learn-n-improve, session-summarizer-agent, skill-factory, test-knowledge |
 | learning-self-improvement-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | learnings-routing | rule | 1.0.0 | project:firekaro-planner | — |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
@@ -163,14 +163,14 @@
 | security-baseline | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | serialize-fixes | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
-| session-continuity | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| session-continuity | skill | 2.0.0 | hub:abhayla/claude-best-practices | handover, save-session, session-summarizer-agent, start-session |
 | session-continuity-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | session-governance-status | hook | 1.0.0 | project:firekaro-planner | no-overask-guard |
 | session-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-summarizer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-author-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | writing-skills, pattern-structure |
 | skill-authoring-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
-| skill-authoring-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| skill-authoring-workflow | skill | 2.0.0 | hub:abhayla/claude-best-practices | claude-guardian, skill-author-agent, skill-master, writing-skills |
 | skill-evaluator | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | skill-factory | skill | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-master | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
