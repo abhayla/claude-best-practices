@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-15 08:59 UTC (auto-generated)
+> Last updated: 2026-06-15 09:03 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -84,7 +84,7 @@
 | e2e-pipeline | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | e2e-readiness-signal | rule | 1.0.0 | project:firekaro-planner | — |
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
-| e2e-visual-run | skill | 5.0.0 | hub:abhayla/claude-best-practices | fix-loop, verify-screenshots |
+| e2e-visual-run | skill | 5.0.0 | hub:abhayla/claude-best-practices | fix-loop, serialize-fixes, test-healer-agent, test-scout-agent, tester-agent, verify-screenshots, visual-inspector-agent |
 | engineering-roles | rule | 1.0.0 | project:firekaro-planner | — |
 | environment-validation | rule | 1.0.0 | project:firekaro-planner | — |
 | error-handling | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
@@ -151,7 +151,7 @@
 | receive-code-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | regression-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | request-code-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| research-mode | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| research-mode | skill | 1.0.0 | hub:abhayla/claude-best-practices | web-research-specialist-agent |
 | review-gate | skill | 2.0.0 | hub:abhayla/claude-best-practices | code-quality-gate, architecture-fitness, security-audit, adversarial-review, change-risk-scoring, pr-standards |
 | rule-curation | rule | 1.0.0 | hub:abhayla/claude-best-practices | pattern-portability, pattern-structure, pattern-self-containment |
 | rule-writing-meta | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -190,7 +190,7 @@
 | test-healer-agent | agent | 2.3.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| test-pipeline | skill | 3.0.0 | hub:abhayla/claude-best-practices | test-pipeline-agent, fix-loop, auto-verify, post-fix-pipeline |
+| test-pipeline | skill | 3.0.0 | hub:abhayla/claude-best-practices | auto-verify, escalation-report, fastapi-api-tester-agent, fix-loop, github-issue-manager-agent, pipeline-fix-pr, post-fix-pipeline, serialize-fixes, test-failure-analyzer-agent, test-scout-agent, tester-agent, visual-inspector-agent |
 | test-pipeline-agent | agent | 4.4.0 | hub:abhayla/claude-best-practices | — |
 | test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
