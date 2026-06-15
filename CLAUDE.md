@@ -128,6 +128,8 @@ Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, 
 - **`pipeline_aggregator.py`** — Standalone aggregator for testing-pipeline results: reads `test-results/*.json` and applies the union-of-failures rule
 - **`bootstrap.sh`** (repo root, not in `scripts/`) — Curl-pipe-bash installer for downstream users: `curl -sL .../bootstrap.sh | bash -s -- --stacks <list> [--target <dir>]`. Calls `bootstrap.py` after fetching the repo
 
+> One-off migration scripts (e.g. `pr2_premerge_migration.py`, a single-use PR1→PR2 hash-format transition from PR #15) are intentionally NOT listed here — they live in git history, not the standing toolchain. Don't "fix" their omission.
+
 ### Key Config Files
 
 - **`registry/patterns.json`** — Machine-readable index of all patterns. Manually maintained — edit after adding/removing patterns
