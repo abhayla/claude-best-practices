@@ -18,5 +18,18 @@
 - 2026-06-15 — EXECUTION started (user: "Go ahead"). Phase 0–1 committed (branch chore/harden-development-loop). Phase 2 sandbox (Node+TS, node --test) created + provisioned via /synthesize-project (recommend.py path).
 - 2026-06-15 — DISCOVERY (Phase 2 real run): provisioning is NOT closure-aware. `plan-executor-agent` is tiered nice-to-have, so a must-have provision shipped /development-loop WITHOUT its EXECUTE worker. Root-cause fix: implemented `_provision_dependency_closure` in recommend.py — walks each provisioned pattern's registry `dependencies` transitively and copies them regardless of tier; seeds from BOTH newly-copied AND already-present patterns so re-provision/update also completes the closure. +4 closure tests. Verified: sandbox now has plan-executor-agent after (re-)provision. This generalizes to every workflow skill, not just development-loop.
 
+- 2026-06-15 — Phase 3 (end-to-end run, Node sandbox): /development-loop cycle PLAN→EXECUTE→VERIFY→COMMIT produced a real committed feature (parseDollars, inverse of formatCents); TDD red→green; 7/7 tests; runtime dirs correctly gitignored (not committed). Sandbox commit 2ed6ac4.
+- 2026-06-15 — Phase 3.5.2 (PREFLIGHT negative test): worker removed → BLOCKED WORKER_REGISTRY_NOT_LOADED; restored → PASS. Safety net verified.
+- 2026-06-15 — Phase 4 (genericity, Python/pytest sandbox): closure (incl. plan-executor-agent) + PREFLIGHT + gitignore all provision correctly for a second, structurally different stack. No Node-specific assumption leaked.
+- 2026-06-15 — Phase 5: full local CI green — dedup --validate-all, secret-scan, workflow_quality_gate (PASS, 4 pre-existing oversized-skill warnings), pytest 1400 passed/144 skipped/1 xfailed.
+
+## synthesize-project issues report (per user ask)
+- BLOCKING: none. `/synthesize-project --local --skip-synthesis` worked; its STEP 1 correctly delegates to recommend.py.
+- Surfaced-through-it (now FIXED in this PR): the dependency-closure gap was exposed via synthesize-project's provisioning path (root cause was recommend.py, not the skill).
+- NON-BLOCKING (reported, not fixed here — keeps PR single-purpose): provisioning emits 26 reconciliation_warnings ("rules/<x>.md exists on disk but is not listed in CLAUDE.md") — the generated project CLAUDE.md does not enumerate the provisioned rules. Candidate for a follow-up (recommend.py CLAUDE.md rule-listing or a reconciliation step).
+
+## Result
+- DoD met: fresh provision → /development-loop runs to PASSED + commit, zero manual .claude/ fixups; works on 2 stacks; closure declared + co-provisioned + preflight-guarded; CI green. Pending: PR + merge.
+
 ## Blockers
-- (none) — execution in progress.
+- (none).
