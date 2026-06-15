@@ -1154,10 +1154,10 @@
     "tier": "must-have"
   },
   "debugging-loop": {
-    "hash": "c765f706fee48f5e48311cb67513344761603374535b29179d6558a24a26e81d",
+    "hash": "bfa6df54a2c3a8523fa32dc113456e8d6f58eb1835d0d6db83ed84a1512f7f6d",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -1176,7 +1176,7 @@
       "workflow",
       "debugging"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
+    "changelog": "v2.1.1 (2026-06-15): PATCH — fix stale step numbers in --skip-verify/--skip-learn flag descriptions (VERIFY=STEP4, LEARN=STEP5). | v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
     "tier": "must-have"
   },
   "debugging-loop-master-agent": {
