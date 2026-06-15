@@ -775,10 +775,10 @@
     "deprecated_by": "code-review-workflow"
   },
   "code-review-workflow": {
-    "hash": "94eb29c428dd059420e0ef6b1fb96c4c50eeb825d1d3afcfb3031dba768abb6e",
+    "hash": "ed770bd675ec8dcc8e3ee472c4093540230e3233c68ee3d474803cdda7558fd7",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -796,7 +796,7 @@
       "workflow",
       "review"
     ],
-    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4)",
     "tier": "must-have"
   },
   "code-reviewer-agent": {
@@ -1154,10 +1154,10 @@
     "tier": "must-have"
   },
   "debugging-loop": {
-    "hash": "4c8c4d49e68318cc3532f492e37504736d6905d8d94fd7c80fdf4b8788e2d3f1",
+    "hash": "c765f706fee48f5e48311cb67513344761603374535b29179d6558a24a26e81d",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -1176,7 +1176,7 @@
       "workflow",
       "debugging"
     ],
-    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
     "tier": "must-have"
   },
   "debugging-loop-master-agent": {
@@ -1456,10 +1456,10 @@
     "deprecated_by": "documentation-workflow"
   },
   "documentation-workflow": {
-    "hash": "56056623a491aa4f3ee44c1a8c224b96ec904c3bf43491fe9a669bbfa4cef643",
+    "hash": "6f7898e7b919310c7662f6b5f5d1d012c77fc1bf8e8947313c28e531dabaa32d",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -1477,7 +1477,7 @@
       "workflow",
       "documentation"
     ],
-    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5)",
     "tier": "must-have"
   },
   "drizzle-orm": {
@@ -2408,10 +2408,10 @@
     "tier": "must-have"
   },
   "learning-self-improvement": {
-    "hash": "11f7ee88c29b8dc09dd7d779a4ede6066bc97e9694b7926ea95eabe8a30ca2e4",
+    "hash": "2e846260cbea185a786664e098550bf2912bc00b8807a23b1d7f27b280099310",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -2429,7 +2429,7 @@
       "workflow",
       "learning"
     ],
-    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7)",
     "tier": "must-have"
   },
   "learning-self-improvement-master-agent": {
@@ -3594,10 +3594,10 @@
     "tier": "must-have"
   },
   "session-continuity": {
-    "hash": "128c9fd539b4efa17f1d0a0cf42057bc6e89b8eb5c4943ffe950031c83a8f6b6",
+    "hash": "6b8e1d8afc1b9b3cd72f36573b61875b9533f84e2b0abedae203d9286e2686e2",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -3614,7 +3614,7 @@
       "workflow",
       "session"
     ],
-    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
     "tier": "must-have"
   },
   "session-continuity-master-agent": {
@@ -3717,10 +3717,10 @@
     "deprecated_by": "skill-authoring-workflow"
   },
   "skill-authoring-workflow": {
-    "hash": "2818c83d8ca018860d79b6ea06d2b0f84ddc2f0c7580fbc7fa970be2d3c2d39f",
+    "hash": "974378db33e072e93f717cf78e1e3968640d3bb2976819ef9bf3dfae9fb01f54",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-15",
@@ -3737,7 +3737,7 @@
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 — final workflow-master retirement)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 — final workflow-master retirement)",
     "tier": "must-have"
   },
   "skill-evaluator": {
