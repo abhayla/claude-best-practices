@@ -15,18 +15,21 @@ Strategy: **Tier A** (automated, all-workflows, permanent) + **Tier B** (behavio
 - Step-reference consistency: clean across all 9 (debugging-loop drift fixed in #58).
 - Contract completeness (REPORT + gate + CRITICAL RULES + closure gate): all 9 pass.
 
+### Gate-behavior audit (all 5 remaining workflows) — clean
+code-review (quality-gate-before-PR), documentation (skip-conditions + staleness), session-continuity (save/restore/handover), learning (capture + propose gate), skill-authoring (BLOCKING validate + register) — all gate behaviors present at the contract level; no F-DBG1-class defects.
+
 ### Tier B — behavioral (full sandbox runs)
 - **development-loop** — full QA, 14/14; found+fixed vacuous-green VERIFY gate (#50/#52). Report: `development-loop-qa-report.md`.
 - **debugging-loop** — full QA; diagnose→fix→verify→learn on a seeded bug; found+fixed F-DBG1 flag step-numbers (#58). Report: `debugging-loop-qa-report.md`.
+- **test-pipeline** — PASS; closure + WORKER_REGISTRY_PROBE provisioned; union-of-failures gate correctly blocks on any failing lane (exit 1) and passes when all green (exit 0).
+- **session-continuity** — PASS; closure + PREFLIGHT provisioned; save→restore round-trip carries all required sections (working files, git state, decisions, task progress).
 
-## Remaining (Tier B behavioral — resumable backlog)
-Each needs a domain-specific sandbox scenario; do each in a **fresh context** (context-management rule 7) to keep quality high:
-1. **test-pipeline** (highest blast radius left) — three-lane run; verify gate aggregation + WORKER_REGISTRY_PROBE + escalation budgets.
-2. **code-review-workflow** — quality-gates → PR → feedback loop on a reviewable diff.
-3. **documentation-workflow** — ADR/api-docs/structure/staleness on a project with doc gaps.
-4. **session-continuity** — save → restore → handover round-trip fidelity.
-5. **learning-self-improvement** — capture → detect-patterns → knowledge-test.
-6. **skill-authoring-workflow** — author → validate(BLOCKING) → register.
+## Remaining (Tier B full behavioral — resumable backlog)
+Structural (Tier-A guard) + contract + gate-behavior layers are validated for these already; only the full multi-agent scenario run remains. Do each in a **fresh context** (context-management rule 7):
+1. **code-review-workflow** — quality-gates → PR → feedback loop on a reviewable diff.
+2. **documentation-workflow** — ADR/api-docs/structure/staleness on a project with doc gaps.
+3. **learning-self-improvement** — capture → detect-patterns → knowledge-test.
+4. **skill-authoring-workflow** — author → validate(BLOCKING) → register (note: the BLOCKING validators are the same `workflow_quality_gate_validate_patterns.py`/`dedup_check.py` proven to block this session).
 
 ## Also open
 - **#53** monorepo VERIFY verification — run validated workflows against real monorepos (KKB/AlgoChanakya).
