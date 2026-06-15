@@ -1594,10 +1594,15 @@
     "version": "5.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-06-15",
     "dependencies": [
       "fix-loop",
-      "verify-screenshots"
+      "serialize-fixes",
+      "test-healer-agent",
+      "test-scout-agent",
+      "tester-agent",
+      "verify-screenshots",
+      "visual-inspector-agent"
     ],
     "visibility": "public",
     "description": "Playwright-only: run full E2E suite with queue-based orchestration, dual-signal visual verification, and classification-driven auto-healing",
@@ -1609,7 +1614,7 @@
       "accessibility",
       "playwright"
     ],
-    "changelog": "v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing. | v5.0.0 (2026-04-24): MAJOR — full body rewrite as independent skill-at-T0 orchestrator; no longer dispatches deprecated e2e-conductor-agent; dispatches scout/tester/visual-inspector/healer workers directly from T0",
+    "changelog": "deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing. | v5.0.0 (2026-04-24): MAJOR — full body rewrite as independent skill-at-T0 orchestrator; no longer dispatches deprecated e2e-conductor-agent; dispatches scout/tester/visual-inspector/healer workers directly from T0",
     "tier": "must-have"
   },
   "error-handling": {
@@ -3366,8 +3371,10 @@
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-24",
-    "last_updated": "2026-03-24",
-    "dependencies": [],
+    "last_updated": "2026-06-15",
+    "dependencies": [
+      "web-research-specialist-agent"
+    ],
     "visibility": "public",
     "description": "Citation-backed research with anti-hallucination constraints: direct quotes, source verification, and explicit knowledge gaps",
     "tags": [
@@ -3376,7 +3383,7 @@
       "citations",
       "fact-checking"
     ],
-    "changelog": "v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output",
+    "changelog": "deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output",
     "tier": "must-have"
   },
   "review-gate": {
@@ -4127,12 +4134,20 @@
     "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-25",
+    "last_updated": "2026-06-15",
     "dependencies": [
-      "test-pipeline-agent",
-      "fix-loop",
       "auto-verify",
-      "post-fix-pipeline"
+      "escalation-report",
+      "fastapi-api-tester-agent",
+      "fix-loop",
+      "github-issue-manager-agent",
+      "pipeline-fix-pr",
+      "post-fix-pipeline",
+      "serialize-fixes",
+      "test-failure-analyzer-agent",
+      "test-scout-agent",
+      "tester-agent",
+      "visual-inspector-agent"
     ],
     "visibility": "public",
     "description": "Full test verification pipeline: fix failures, verify changes, review visual proof, commit. Thin wrapper dispatching test-pipeline-agent.",
@@ -4141,7 +4156,7 @@
       "pipeline",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial release â€” preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a — CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap | v2.1.1 (2026-04-24): PATCH — budget key names aligned with actual config (budgets.* → budget.*; added retry.global_budget). PR #26 schema gate correctly detected the mismatch at run-time on the testbed. | v2.2.0 (2026-04-25): MINOR — auto-injection fixes (user-goal description + 20 triggers); STEP 1 CONFIG_MISSING + PIPELINE_IN_PROGRESS + arg-validation gates; STEP 2 empty-suite early exit + stack runner fallback; STEP 3 partial-execution check + granular dispatch events; STEP 4 checkpoint flag ownership contract + single-signal cap doc link; STEP 6 budget pre-check (dispatches_used+chunk_size) + recommended-action dispatch matrix (all 6 action types); STEP 7 deterministic affected-subset algorithm + max_verify_affected_tests cap; STEP 8 regression re-entry with counter continuation; STEP 9 error handling + always-write finalized_at + lock release; dispatch counter accounting docs (explains the 4-vs-5 observation); artifact path conventions; --only-issues flag expansion; 8 new CRITICAL RULES | v2.3.0 (2026-04-25): MINOR — STEP 1 sub-step 2b WORKER_REGISTRY_PROBE gate; fail-fast BLOCKED with WORKER_REGISTRY_NOT_LOADED + restart remediation when newly-synced workers are not in Claude Code runtime registry; closes the 2026-04-25 FIREKaro-Vue downstream validation finding",
+    "changelog": "deps corrected to real runtime closure (drop deprecated test-pipeline-agent; add the 6 dispatched worker agents + escalation-report/pipeline-fix-pr/serialize-fixes) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a — CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap | v2.1.1 (2026-04-24): PATCH — budget key names aligned with actual config (budgets.* → budget.*; added retry.global_budget). PR #26 schema gate correctly detected the mismatch at run-time on the testbed. | v2.2.0 (2026-04-25): MINOR — auto-injection fixes (user-goal description + 20 triggers); STEP 1 CONFIG_MISSING + PIPELINE_IN_PROGRESS + arg-validation gates; STEP 2 empty-suite early exit + stack runner fallback; STEP 3 partial-execution check + granular dispatch events; STEP 4 checkpoint flag ownership contract + single-signal cap doc link; STEP 6 budget pre-check (dispatches_used+chunk_size) + recommended-action dispatch matrix (all 6 action types); STEP 7 deterministic affected-subset algorithm + max_verify_affected_tests cap; STEP 8 regression re-entry with counter continuation; STEP 9 error handling + always-write finalized_at + lock release; dispatch counter accounting docs (explains the 4-vs-5 observation); artifact path conventions; --only-issues flag expansion; 8 new CRITICAL RULES | v2.3.0 (2026-04-25): MINOR — STEP 1 sub-step 2b WORKER_REGISTRY_PROBE gate; fail-fast BLOCKED with WORKER_REGISTRY_NOT_LOADED + restart remediation when newly-synced workers are not in Claude Code runtime registry; closes the 2026-04-25 FIREKaro-Vue downstream validation finding",
     "tier": "must-have"
   },
   "test-pipeline-agent": {
