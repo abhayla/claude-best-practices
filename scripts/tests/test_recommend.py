@@ -47,6 +47,8 @@ from scripts.recommend import (
     build_sync_classification,
     update_improved_to_local,
     update_manifest_after_sync,
+    _ensure_runtime_gitignore,
+    RUNTIME_IGNORE_ENTRIES,
 )
 
 
@@ -2509,3 +2511,47 @@ class TestResourceStackRequirementsIntegrity:
             f"{orphans}. Every required stack must appear in STACK_PREFIXES or "
             f"be emitted by STACK_DETECTORS."
         )
+
+
+class TestRuntimeGitignore:
+    """_ensure_runtime_gitignore: ephemeral workflow dirs must be gitignored downstream."""
+
+    def test_creates_gitignore_when_absent(self, tmp_path):
+        modified = _ensure_runtime_gitignore(tmp_path)
+        assert modified is True
+        content = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+        for entry in RUNTIME_IGNORE_ENTRIES:
+            assert entry in content.splitlines()
+
+    def test_idempotent_second_call_no_change(self, tmp_path):
+        assert _ensure_runtime_gitignore(tmp_path) is True
+        before = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+        assert _ensure_runtime_gitignore(tmp_path) is False
+        assert (tmp_path / ".gitignore").read_text(encoding="utf-8") == before
+
+    def test_appends_to_existing_without_clobbering(self, tmp_path):
+        gi = tmp_path / ".gitignore"
+        gi.write_text("node_modules/\ndist/\n", encoding="utf-8")
+        assert _ensure_runtime_gitignore(tmp_path) is True
+        lines = gi.read_text(encoding="utf-8").splitlines()
+        assert "node_modules/" in lines and "dist/" in lines
+        for entry in RUNTIME_IGNORE_ENTRIES:
+            assert entry in lines
+
+    def test_only_missing_entries_appended(self, tmp_path):
+        gi = tmp_path / ".gitignore"
+        gi.write_text("test-results/\n", encoding="utf-8")
+        assert _ensure_runtime_gitignore(tmp_path) is True
+        content = gi.read_text(encoding="utf-8")
+        # the already-present entry is not duplicated
+        assert content.count("test-results/") == 1
+        assert ".workflows/" in content.splitlines()
+
+    def test_apply_to_local_gitignores_runtime_dirs(self, tmp_path):
+        # apply_to_local with empty gaps still ensures the runtime gitignore exists
+        from scripts.recommend import apply_to_local
+        hub_root = Path(__file__).resolve().parents[2]
+        apply_to_local(hub_root, tmp_path, {"must-have": [], "nice-to-have": []})
+        content = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+        for entry in RUNTIME_IGNORE_ENTRIES:
+            assert entry in content.splitlines()

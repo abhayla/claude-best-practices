@@ -14,7 +14,10 @@ Created: 2026-06-15
 
 3. **Portability: `src/` assumption** in `config/workflow-contracts.yaml` → `development-loop.steps[execute].artifacts_out.source.path: "src/"`. Violates pattern-portability ("MUST NOT assume project-specific directory structures"). Real stacks: Android `app/src/main`, FastAPI `backend/`, Flutter `lib/`, Go module root. Needs to be project-detected or non-binding/descriptive.
 
-4. **Provisioning closure mechanism — UNVERIFIED.** `recommend.py` matched "dependency" in grep; must confirm whether it co-provisions a skill's full closure (agents + sub-skills) and from WHICH source (the stale registry field vs. live scan). This determines whether fixing #1 is sufficient.
+4. **Provisioning closure mechanism — RESOLVED (2026-06-15): there is NONE.** `recommend.py --provision` (which `/synthesize-project` STEP 1 delegates to entirely) selects patterns by TIER (must-have/nice-to-have via stack matching in `assign_tier`, recommend.py:754+), then copies files (`_resolve_resource_files`/`_copy_if_changed`). It NEVER reads a pattern's registry `dependencies` field — the only "dependencies" logic (recommend.py:141/169/223) is PROJECT-dependency detection (package.json/pyproject → stack promotion). `bootstrap.py` has no closure logic either.
+   - Consequence: fixing #1 is necessary (correctness) but NOT sufficient — nothing consumes the field at provision time.
+   - The closure likely travels INCIDENTALLY because workflow skills + their worker agents are universal (unprefixed) → classified must-have. To be VERIFIED empirically in the sandbox: provision via /synthesize-project and check whether `plan-executor-agent`, `planner-researcher-agent`, brainstorm, auto-verify, post-fix-pipeline all land.
+   - Therefore the PREFLIGHT BLOCK (Finding #2 fix) is the load-bearing safety net regardless of provisioning. Building a real closure-resolver in recommend.py is deferred unless the sandbox proves the incidental closure fails (YAGNI).
 
 5. **Runtime-artifact dirs.** Skill writes `.workflows/development-loop/`, `test-results/`, `test-evidence/`. These are ephemeral; provisioning should ensure they're `.gitignore`d downstream (testing.md already mandates gitignoring test-results/ + test-evidence/).
 

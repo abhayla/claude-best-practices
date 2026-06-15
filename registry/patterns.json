@@ -1266,29 +1266,29 @@
     "tier": "must-have"
   },
   "development-loop": {
-    "hash": "b2b2cdda76cd5c29bf27fb73b3fa5b45393aa53047b23b61acf09c197f4b2d11",
+    "hash": "48de3c35df4b5a027ce5529ad6c8e0de3f0592e05a28ede5c026c96005e2ca8a",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-06-15",
     "dependencies": [
-      "development-loop-master-agent",
       "brainstorm",
       "writing-plans",
-      "executing-plans",
       "auto-verify",
-      "post-fix-pipeline"
+      "post-fix-pipeline",
+      "plan-executor-agent",
+      "planner-researcher-agent"
     ],
     "visibility": "public",
-    "description": "Full development cycle orchestrator: chains brainstorm, writing-plans, executing-plans, auto-verify, post-fix-pipeline via development-loop-master-agent.",
+    "description": "Full development cycle skill-at-T0 orchestrator: invokes brainstorm, writing-plans, auto-verify, post-fix-pipeline via Skill() and dispatches plan-executor-agent (+ optional planner-researcher-agent) via Agent() at T0.",
     "tags": [
       "orchestration",
       "workflow",
       "development"
     ],
-    "changelog": "v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK on missing workers/sub-skills); correct dependencies to real runtime closure (drop deprecated development-loop-master-agent + unused executing-plans; add plan-executor-agent + planner-researcher-agent) | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model | v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release",
     "tier": "must-have"
   },
   "development-loop-master-agent": {

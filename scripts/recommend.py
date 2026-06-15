@@ -1323,6 +1323,36 @@ def _copy_if_changed(src: Path, dest: Path) -> bool:
     return True
 
 
+# Ephemeral per-run artifacts that workflow skills (development-loop, test-pipeline,
+# etc.) write into a downstream project. They MUST be gitignored — committing them
+# pollutes the repo with run state (testing.md mandates ignoring test-results/ +
+# test-evidence/; .workflows/ holds orchestrator state per agent-orchestration.md §6).
+RUNTIME_IGNORE_ENTRIES = (".workflows/", "test-results/", "test-evidence/")
+_RUNTIME_IGNORE_HEADER = "# Ephemeral Claude Code workflow runtime artifacts (claude-best-practices hub)"
+
+
+def _ensure_runtime_gitignore(target_dir: Path) -> bool:
+    """Ensure the project's .gitignore ignores ephemeral workflow runtime dirs.
+
+    Idempotent: appends only entries not already present. Returns True if the
+    file was modified.
+    """
+    gitignore = target_dir / ".gitignore"
+    existing = gitignore.read_text(encoding="utf-8") if gitignore.exists() else ""
+    present = {line.strip() for line in existing.splitlines()}
+    missing = [e for e in RUNTIME_IGNORE_ENTRIES if e not in present]
+    if not missing:
+        return False
+    block = ""
+    if existing and not existing.endswith("\n"):
+        block += "\n"
+    if _RUNTIME_IGNORE_HEADER not in present:
+        block += f"\n{_RUNTIME_IGNORE_HEADER}\n"
+    block += "".join(f"{e}\n" for e in missing)
+    gitignore.write_text(existing + block, encoding="utf-8")
+    return True
+
+
 def apply_to_local(
     hub_root: Path,
     target_dir: Path,
@@ -1407,6 +1437,9 @@ def apply_to_local(
                 else:
                     print(f"  WARNING: hub config '{name}' not found in {claude_src / 'config'}")
 
+    # Ensure ephemeral workflow runtime dirs are gitignored in the target project.
+    _ensure_runtime_gitignore(target_dir)
+
     return copied
 
 
@@ -1451,9 +1484,9 @@ def apply_to_repo(
             print("No resources to copy.")
             return None
 
-        # Commit
+        # Commit (.gitignore may have gained the runtime-artifact ignore block)
         subprocess.run(
-            ["git", "-C", tmpdir, "add", ".claude/"],
+            ["git", "-C", tmpdir, "add", ".claude/", ".gitignore"],
             capture_output=True, text=True, check=True,
         )
 
