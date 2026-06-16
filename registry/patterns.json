@@ -5039,7 +5039,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-16",
-    "total_patterns": 263
+    "total_patterns": 264
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5160,6 +5160,41 @@
       "config",
       "orchestration"
     ],
+    "tier": "must-have"
+  },
+  "loop-engineering": {
+    "hash": "9ca3dd87e2561c0f21d38c70545d28b3b398cc8d96daefa8ee1e006a7d8fe093",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-16",
+    "last_updated": "2026-06-16",
+    "dependencies": [
+      "auto-verify",
+      "brainstorm",
+      "code-reviewer-agent",
+      "debugging-loop",
+      "escalation-report",
+      "fix-loop",
+      "learn-n-improve",
+      "plan-executor-agent",
+      "post-fix-pipeline",
+      "status",
+      "systematic-debugging",
+      "workflow-contracts",
+      "writing-plans"
+    ],
+    "visibility": "public",
+    "description": "Autonomous DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker)→SHIP|FEEDBACK loop as a skill-at-T0 orchestrator. Self-verifying (maker plan-executor-agent ≠ checker code-reviewer-agent), self-healing (/fix-loop, /debugging-loop), self-learning (/learn-n-improve each cycle), self-feedback (/escalation-report + triage inbox on budget exhaustion). Composes existing hub workflows under hard budgets; creates no new engine.",
+    "tags": [
+      "orchestration",
+      "workflow",
+      "autonomous",
+      "self-healing",
+      "loop-engineering"
+    ],
+    "changelog": "v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
     "tier": "must-have"
   }
 }

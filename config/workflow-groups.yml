@@ -14,6 +14,7 @@ workflows:
       skills:
         - a11y-audit
         - anthropic-agent-orchestration-guide
+        - autonomous-contract
         - brainstorm
         - development-loop
         - disaster-recovery
@@ -26,6 +27,7 @@ workflows:
         - git-worktrees
         - grill-me
         - implement
+        - improve-codebase-architecture
         - jest-dev
         - mcp-server-builder
         - nextjs-dev
@@ -37,6 +39,7 @@ workflows:
         - pytest-dev
         - ssot-audit
         - subagent-driven-dev
+        - to-prd
         - vue-dev
         - writing-plans
       agents:
@@ -48,6 +51,33 @@ workflows:
         - web-research-specialist-agent
         - workflow-master-template
       rules:
+        - decision-authority
+        - plan-before-coding
+        - workflow
+
+  loop-engineering:
+    description: "Autonomous self-* meta-loop: discover, plan, execute (maker), verify (independent checker), ship or self-heal, learn each cycle."
+    seeds:
+      skills:
+        - auto-verify
+        - brainstorm
+        - debugging-loop
+        - escalation-report
+        - fix-loop
+        - learn-n-improve
+        - loop-engineering
+        - post-fix-pipeline
+        - status
+        - systematic-debugging
+        - writing-plans
+      agents:
+        - code-reviewer-agent
+        - plan-executor-agent
+      rules:
+        - independent-test-verification
+        - learnings-routing
+        - plan-before-coding
+        - supervisor-verification
         - workflow
 
   testing-pipeline:
@@ -124,11 +154,18 @@ workflows:
         - workflow-master-template
       rules:
         - agent-orchestration
+        - bug-triage-discipline
         - configuration-ssot
+        - e2e-persistence-verification
+        - e2e-readiness-signal
         - e2e-test-writing
+        - engineering-roles
+        - hono-conventions
+        - prisma-conventions
         - security-baseline
         - tdd-rule
         - testing
+        - vue-e2e
 
   debugging-loop:
     description: "Targeted bug diagnosis and structured resolution."
@@ -198,6 +235,7 @@ workflows:
         - agent-evaluator
         - claude-guardian
         - five-advisors
+        - grill-with-docs
         - mcp-server-builder
         - prompt-auto-enhance
         - semgrep-rules
@@ -252,6 +290,8 @@ workflows:
         - doc-structure-enforcer
         - documentation-workflow
         - firebase-ai
+        - grill-with-docs
+        - improve-codebase-architecture
       agents:
         - docs-manager-agent
         - documentation-master-agent
@@ -311,6 +351,7 @@ workflows:
         - web-scraper
         - websocket-patterns
         - xml-to-compose
+        - zoom-out
       agents:
         - parallel-worktree-orchestrator-agent
       rules:
@@ -320,11 +361,17 @@ workflows:
         - bun-elysia
         - code-readability
         - design-principles
+        - design-ssot
+        - dod-verbs
+        - environment-validation
         - error-handling
         - fastapi-backend
         - fastapi-database
         - firebase
         - flutter
+        - goal-anchored-decisions
+        - notifier-integration
+        - output-plausibility-verification
         - react-nextjs
         - vue
 

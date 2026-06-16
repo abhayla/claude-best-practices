@@ -4,6 +4,15 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-16 — loop-engineering: autonomous self-* meta-loop (skill + contract)
+
+Promoted the *Loop Engineering* pattern (Addy Osmani; Anthropic agent-loop docs) into a distributable hub workflow. Owner directive 2026-06-16; goal-anchored to the hub's reusable-patterns mission. Composes existing self-* assets — no new engine — per `rule-curation.md` (reactive-not-speculative) + KISS/DRY. Net new pattern: **1**. `total_patterns` 263 → 264.
+
+- **added** skill `loop-engineering` (v1.0.0, must-have) — skill-at-T0 orchestrator for the autonomous DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker)→SHIP|FEEDBACK loop. **Self-verifying** (maker `plan-executor-agent` ≠ checker `code-reviewer-agent`, per `independent-test-verification.md` + `supervisor-verification.md`), **self-healing** (`/fix-loop`, `/debugging-loop`), **self-learning** (`/learn-n-improve` each cycle), **self-feedback** (`/escalation-report` + triage inbox on budget exhaustion). Bounded by `global_retry_budget` + `--max-cycles`; STEP 1.5 PREFLIGHT BLOCKs downstream when the worker closure is missing or maker==checker. Spec: `docs/specs/loop-engineering-spec.md`.
+- **added** workflow contract `loop-engineering` to `config/workflow-contracts.yaml` (+ identical distributable copy in `core/.claude/config/`) — 7-step DAG with distinct maker/checker dispatches.
+- **added** tests — closure-coverage assertion + `test_loop_engineering_maker_differs_from_checker_in_contract` + `test_loop_engineering_skill_dispatches_two_distinct_agents` (regression guard so maker/checker can never silently collapse).
+- **added** `loop-engineering` workflow group seed in `config/workflow-groups.yml`; docs regenerated.
+
 ### 2026-06-12 — notifier-hub-pattern learnings fold-back (pattern-portability + autonomous-contract)
 
 Folding back the two LEARNINGS-TO-FOLD-BACK proposals from the notifier-hub-pattern goal run (user-approved).

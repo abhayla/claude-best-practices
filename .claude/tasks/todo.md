@@ -5,6 +5,31 @@
 
 ## Current Task
 
+### loop-engineering distributable pattern — 2026-06-16 — 🔵 IN PROGRESS
+
+User directive: build a fully-autonomous, self-healing / self-verifying /
+self-learning / self-feedback **loop-engineering** capability as a distributable
+hub pattern, working for THIS hub AND downstream projects, provisioning verified.
+Pre-authorized autonomous execution. Compose existing self-* assets (no new
+engines) per rule-curation + KISS/DRY → exactly 1 new pattern (the skill).
+
+Self-* → composed-from: healing=/fix-loop·/debugging-loop · verification=maker≠checker
+(supervisor-verification + independent-test-verification) · learning=/learn-n-improve ·
+feedback=/escalation-report+triage-inbox · autonomy=bounded budgets + /loop·/goal.
+
+- [x] Ground in live schemas (contracts, development-loop SKILL, registry shape, _meta=263)
+- [x] Decision: compose; 1 new pattern; escalate only outward downstream PRs/push
+- [ ] Phase 0 — Spec: docs/specs/loop-engineering-spec.md
+- [ ] Phase 1 — Skill: core/.claude/skills/loop-engineering/SKILL.md (skill-at-T0)
+- [ ] Phase 2 — Contract: loop-engineering DAG in BOTH workflow-contracts.yaml copies (identical)
+- [ ] Phase 3 — Registry: add entry + closure; _meta 263→264; changelog
+- [ ] Phase 4 — Tests (TDD): closure coverage + maker≠checker + contract-shape guards
+- [ ] Phase 5 — Verify: 4 validators + full pytest green
+- [ ] Phase 6 — Docs: generate_docs + generate_workflow_docs
+- [ ] Phase 7 — Downstream guarantee: PREFLIGHT runtime probe + closure test
+- [ ] Commit checkpoints per phase
+- [ ] ESCALATION GATE (do NOT auto-do): external downstream PRs / pushing branch to remote
+
 ### Promote firekaro Groups A/B/C → hub (3 PRs, merge to main) — 2026-06-12 — ✅ COMPLETE
 
 User directive: promote all three groups, separate PR each, fully autonomous,

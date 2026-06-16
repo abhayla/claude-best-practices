@@ -362,6 +362,83 @@ workflows:
         timeout_minutes: 10
     handoff_suggestions: []
 
+  loop-engineering:
+    description: "Autonomous DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker)→SHIP|FEEDBACK loop — skill-at-T0 orchestrator (v1.0.0). Self-healing (/fix-loop·/debugging-loop), self-verifying (maker≠checker), self-learning (/learn-n-improve). Composes existing workflows; creates no new engine."
+    master_agent: null
+    entry_skill: loop-engineering
+    state_file: ".workflows/loop-engineering/state.json"
+    # MAKER (execute → plan-executor-agent, isolation: worktree) and CHECKER
+    # (verify_review → code-reviewer-agent) are dispatched directly from T0 by the
+    # skill body. They MUST be distinct subagent_types — the maker never verifies
+    # its own work (independent-test-verification.md). Not sub-orchestrators:
+    # workers cannot dispatch further (agent-orchestration.md §2).
+    sub_orchestrators: []
+    steps:
+      - id: discover
+        skill: status
+        depends_on: []
+        skip_when: "explicit_unit_provided == true"
+        artifacts_out:
+          triage: { path: ".workflows/loop-engineering/triage-inbox.md", schema: triage_v1 }
+        timeout_minutes: 15
+      - id: plan
+        skill: writing-plans
+        depends_on: [discover]
+        artifacts_out:
+          plan: { path: "docs/plans/<unit>-plan.md", schema: plan_v1 }
+        timeout_minutes: 25
+      - id: execute  # MAKER
+        dispatch: plan-executor-agent
+        depends_on: [plan]
+        artifacts_in:
+          plan: "plan.artifacts_out.plan"
+        artifacts_out:
+          source: { path: ".", schema: source_v1 }
+        timeout_minutes: 60
+      - id: verify_mechanical
+        skill: auto-verify
+        depends_on: [execute]
+        artifacts_in:
+          source: "execute.artifacts_out.source"
+        artifacts_out:
+          verification: { path: "test-results/auto-verify.json", schema: test_result_v1 }
+        gate: "verification.result == PASSED"
+        timeout_minutes: 30
+      - id: verify_review  # CHECKER — MUST differ from the maker (execute)
+        dispatch: code-reviewer-agent
+        depends_on: [execute]
+        artifacts_in:
+          source: "execute.artifacts_out.source"
+        artifacts_out:
+          review: { path: "test-results/loop-engineering-review.json", schema: review_v1 }
+        gate: "review.gate == PASSED"
+        timeout_minutes: 25
+      - id: heal
+        skill: fix-loop
+        depends_on: [verify_mechanical, verify_review]
+        skip_when: "verify_mechanical.gate == PASSED AND verify_review.gate == PASSED"
+        artifacts_out:
+          fix_result: { path: "test-results/fix-loop.json", schema: test_result_v1 }
+        gate: "fix_result.result IN (PASSED, FIXED)"
+        timeout_minutes: 30
+      - id: ship
+        skill: post-fix-pipeline
+        depends_on: [verify_mechanical, verify_review]
+        skip_when: "no_ship == true OR verify_mechanical.gate == FAILED OR verify_review.gate == FAILED"
+        artifacts_out:
+          commit_sha: { type: string, schema: git_sha }
+        timeout_minutes: 20
+      - id: learn
+        skill: learn-n-improve
+        depends_on: [ship]
+        artifacts_out:
+          learning: { path: ".claude/learnings.json", schema: learning_v1 }
+        timeout_minutes: 10
+    handoff_suggestions:
+      - workflow: code-review
+        when: "ship step completed"
+        reason: "Loop shipped a unit — ready for review"
+
 # Cross-workflow handoffs — read by project-manager-agent
 # Maps pipeline stages to workflow masters for dispatched mode.
 # null = no workflow master, use direct stage agent dispatch.

@@ -127,15 +127,15 @@ class TestContractFilesExist:
         assert "max_retries_per_step" in defaults
         assert defaults["max_retries_per_step"] > 0
 
-    def test_has_eight_workflows(self, workflows):
-        assert len(workflows) == 8, (
-            f"Expected 8 workflow contracts, got {len(workflows)}: "
+    def test_has_nine_workflows(self, workflows):
+        assert len(workflows) == 9, (
+            f"Expected 9 workflow contracts, got {len(workflows)}: "
             f"{list(workflows.keys())}"
         )
 
 
-# All 8 workflows have now migrated to the skill-at-T0 pattern
-# (Phases 3.1-3.8 completed 2026-04-25). Legacy master-agent pattern retired.
+# All 9 workflows use the skill-at-T0 pattern (Phases 3.1-3.8 completed
+# 2026-04-25; loop-engineering added 2026-06-16). Legacy master-agent pattern retired.
 MASTER_AGENT_WORKFLOWS = []
 
 # Workflows that have migrated to the skill-at-T0 pattern (spec v2.2).
@@ -148,7 +148,8 @@ SKILL_AT_T0_WORKFLOWS = [
     "documentation",            # Phase 3.5 (PR #31)
     "session-continuity",       # Phase 3.6 (PR #32)
     "learning-self-improvement",# Phase 3.7 (PR #33)
-    "skill-authoring",          # Phase 3.8 (this PR) — final workflow-master retirement
+    "skill-authoring",          # Phase 3.8 — final workflow-master retirement
+    "loop-engineering",         # 2026-06-16 — autonomous self-* meta-loop
 ]
 
 
