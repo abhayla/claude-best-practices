@@ -4804,6 +4804,27 @@
     "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
     "tier": "must-have"
   },
+  "goal-anchored-decisions": {
+    "hash": "c9af5b366d31ecab57db0869d1e6632d4a2b4205131dd2b89d6c35cec6451343",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "project:firekaro-planner",
+    "discovered": "2026-06-16",
+    "last_updated": "2026-06-16",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Anchor every non-trivial decision (build vs defer vs cut, design forks, prioritization) to the project's documented goal + target user, not engineering convenience/feature-completeness/symmetry; prefer combinations; tie-break by primary persona + priority order; correctness/honesty/safety errors rank high regardless of fix size. The substantive-criterion complement to decision-authority (process/who).",
+    "tags": [
+      "governance",
+      "decision-making",
+      "prioritization",
+      "product",
+      "workflow"
+    ],
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — substantive-criterion governance rule complementing decision-authority",
+    "tier": "must-have"
+  },
   "bug-triage-discipline": {
     "hash": "75783f318bd168bf71ee6b5ac8743d8a782d9fd7b513ae5ca5cc87b011b19eda",
     "type": "rule",
@@ -5017,8 +5038,8 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-06-12",
-    "total_patterns": 262
+    "last_updated": "2026-06-16",
+    "total_patterns": 263
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
