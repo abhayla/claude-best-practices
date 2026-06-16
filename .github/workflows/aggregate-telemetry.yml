@@ -19,7 +19,9 @@ jobs:
       - run: pip install -r scripts/requirements.txt
       - name: Aggregate telemetry from enrolled repos
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Prefer a cross-repo PAT (HUB_SYNC_TOKEN) so telemetry can read
+          # PRIVATE enrolled repos; falls back to the default token for public repos.
+          GITHUB_TOKEN: ${{ secrets.HUB_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           PYTHONPATH=. python scripts/aggregate_telemetry.py \
             --registry registry/patterns.json \

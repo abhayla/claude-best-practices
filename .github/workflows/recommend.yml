@@ -23,7 +23,9 @@ jobs:
       - run: pip install -r scripts/requirements.txt
       - name: Run recommendations
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Prefer a cross-repo PAT (HUB_SYNC_TOKEN) so provisioning can reach
+          # PRIVATE enrolled repos; falls back to the default token for public repos.
+          GITHUB_TOKEN: ${{ secrets.HUB_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           if [ -n "${{ inputs.repo }}" ]; then
             echo "Running recommendations for ${{ inputs.repo }}"
