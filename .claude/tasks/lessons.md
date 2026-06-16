@@ -216,3 +216,11 @@ None}`) — match JSON.stringify's undefined-dropping, and check the receiver's
 validator semantics for null vs absent. Gate-gap: no hub validator type-checks
 template code against its wire contract — independent review (rule 29) is the
 catching layer; keep it mandatory for templates.
+
+## 2026-06-16 — Adding a registry pattern: bump `_meta.total_patterns` AND run pytest
+
+**Surfaced during:** Promoting `goal-anchored-decisions` to the hub (PR #71). CI `validate` went red on `test_registry_integrity.py::test_total_patterns_matches_entries` (`_meta.total_patterns=262 but actual entries=263`).
+
+**What I got wrong:** Added the `registry/patterns.json` entry but left `_meta.total_patterns` stale, and declared "validation passed" after running only `workflow_quality_gate_validate_patterns.py` + `dedup_check.py --validate-all` — neither checks the `_meta` count invariant. Skipped the full `pytest scripts/tests/` that CI actually runs.
+
+**What to do instead:** The hub pattern-add checklist is FOUR steps, not two: (1) add/remove files in `core/.claude/`, (2) update `registry/patterns.json` **including `_meta.total_patterns` + `_meta.last_updated`**, (3) run `PYTHONPATH=. python -m pytest scripts/tests/` (esp. `test_registry_integrity.py`) — the two validator scripts are necessary but NOT sufficient, (4) `dedup_check --validate-all` + `--secret-scan`. Never claim CI-green from a local subset; reproduce the CI command set (`validate-pr.yml`).
