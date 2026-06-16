@@ -17,3 +17,7 @@ repos:
     stacks: [fastapi-python, ai-gemini, vue-nuxt]
     auto_sync: true
     share_synthesized: true
+  - repo: abhayla/IPODhan
+    stacks: [react-nextjs]
+    auto_sync: true
+    share_synthesized: false  # IPODhan synthesis-config allow_hub_sharing: false (local-only)
