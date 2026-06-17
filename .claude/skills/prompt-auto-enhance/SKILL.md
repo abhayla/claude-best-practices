@@ -388,25 +388,28 @@ enhance to a higher number, then run it" — not "rewrite and hope".
 - Grade-A originals (role-only addition) typically move a few tenths via the
   Role dimension — that small lift is expected and sufficient.
 
-**Blind re-grade sampling (anti self-grading bias):** the
-re-grade is scored by the same model that wrote the rewrite — structurally
-motivated to show lift (the author-verifies-own-work blind spot — see independent-test-verification.md).
-Deterministic audit triggers — blind re-grade fires when ANY of:
-- the claimed lift is ≥ 2.0 points (big claims get audited), OR
-- ANY single dimension's claimed jump is ≥ 3.0 points (catches one-dimension
-  over-scoring even when the overall lift looks modest), OR
-- the turn is part of an explicit test/audit campaign, OR
-- the user asks for it.
+**Independent blind re-grade (MANDATORY — every enhanced turn, no threshold, no bypass):**
+the self re-grade is scored by the same model that wrote the rewrite — structurally motivated
+to show lift (the author-verifies-own-work blind spot — see independent-test-verification.md).
+So an INDEPENDENT reviewer re-grades on EVERY non-trivial enhanced turn. There is no lift
+threshold and no skip — it runs whether the claimed lift is large or small, including Grade-A
+and role-only changes (for an unchanged prompt it confirms before == after). This is not
+sampled or audited-on-suspicion; it is unconditional.
 
-**Mechanism:** dispatch a context-blind agent whose prompt contains ONLY the
-original prompt text, the strengthened prompt text, and the rubric path
-(`references/grading-rubric.md`) — no pipeline narrative, no self-graded
-scores, no expected answer. The agent scores both on the rubric and returns
-the two overalls. Whenever the blind re-grade fires, REPORT both scores in the
-STEP 4 after-card and **the blind number WINS the rendered lift** — the
-self-score never overrides the independent one. If `|blind_after − self_after|
-> 1.0`, also log `regrade-divergence` to `.claude/.enhance-misses.log` (the
-over-scoring telemetry). Cost note: fires only on the triggers above, never per-turn.
+**Who the reviewer is (state this in the output every time):** a context-blind subagent — a
+fresh model instance dispatched via `Agent()` that receives ONLY the original prompt, the
+strengthened prompt, and the rubric (the 6 dimensions + weights inline, or the
+`references/grading-rubric.md` path) — never the pipeline's own scores, narrative, or
+reasoning. It cannot see how the rewrite "wants" to score, which is what makes it independent.
+
+**Mechanism (keep it lean — it runs per turn):** dispatch the reviewer with the rubric
+INLINED (6 dimensions + weights + grade bands) and ask for ONLY the two score tables + the
+two overalls + a one-line verdict — no rationale paragraphs, no file reads unless a value is
+disputed. The reviewer scores both prompts and returns both overalls. ALWAYS report, in the
+STEP 4 after-card: (1) WHO the reviewer is + WHAT it did, and (2) its independent score — and
+**the blind number WINS the rendered lift** (the self-score never overrides it). If
+`|blind_after − self_after| > 1.0`, also log `regrade-divergence` to
+`.claude/.enhance-misses.log` (the over-scoring telemetry).
 
 ## STEP 4: Show Grade Card + Changes Applied
 
@@ -426,9 +429,10 @@ Grade: B (7.4 / 10) — 1 fix applied
 **Full mode** (default — Grade C/D/F and any turn with strengthening):
 render a BEFORE → AFTER card (two score columns), so the lift is visible
 per-dimension, not asserted as one delta number. The After column is the
-re-graded score (STEP 3.6). When the blind re-grade fired, add a `Blind after`
-column and use the BLIND overall as the rendered Overall-after (the self-after
-is shown only for comparison).
+re-graded score (STEP 3.6). The independent reviewer runs EVERY turn, so the
+card ALWAYS carries the blind result: use the BLIND overall as the rendered
+Overall-after (the self-after is shown only for comparison), and ALWAYS print
+the "Independent reviewer" line stating who it is and what it did.
 ```
 Prompt Grade Card (before → after):
 ┌────────────────────────┬────────┬───────┬────────┬─────────────┐
@@ -443,8 +447,10 @@ Prompt Grade Card (before → after):
 ├────────────────────────┼────────┼───────┼────────┼─────────────┤
 │ Overall                │  2.50  │  7.20 │        │ F → B       │
 └────────────────────────┴────────┴───────┴────────┴─────────────┘
-Re-grade source: BLIND (independent reviewer) — self-after was 8.50;
-  divergence 1.30 > 1.0 → blind wins, regrade-divergence logged.
+Independent reviewer (ran this turn — no exceptions): a context-blind Agent()
+  subagent re-graded both prompts from the rubric alone; it never saw these
+  self-scores. Reviewer after = 7.20 (B); self-after = 8.50 (A); divergence
+  1.30 > 1.0 → BLIND WINS the rendered lift, regrade-divergence logged.
 
 Changes Applied (5):
   [1] VAGUE_INTENT (Critical) → action verb chain (measure → cache → prove)
