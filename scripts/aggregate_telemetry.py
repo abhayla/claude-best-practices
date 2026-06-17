@@ -175,6 +175,21 @@ def compute_error_prevention_rate(
     return round(single_occurrence / total_classes, 2)
 
 
+def _linked_pattern_names(all_learnings: list[dict]) -> set[str]:
+    """Distinct `hub_pattern_link` values across all loaded learnings.
+
+    Lets aggregation include patterns that have linked learnings but no
+    sync-manifest adoption row, so their error_prevention_rate is not dropped.
+    """
+    names: set[str] = set()
+    for project_learnings in all_learnings:
+        for entry in project_learnings.get("learnings", []):
+            link = entry.get("hub_pattern_link")
+            if link:
+                names.add(link)
+    return names
+
+
 def aggregate_project_telemetry(
     project_dirs: list[Path],
     learnings_dirs: Optional[list[Path]] = None,
@@ -204,6 +219,14 @@ def aggregate_project_telemetry(
                 all_learnings.append(data)
             except (json.JSONDecodeError, UnicodeDecodeError):
                 pass
+
+    # Include any pattern that has linked learnings even if it is not in a
+    # project's sync-manifest adoption set — otherwise a hub_pattern_link signal
+    # (e.g. loop-engineering's preflight_blocked / escalated) is silently dropped
+    # at aggregation whenever the pattern was adopted via copy-all / synthesis
+    # (no manifest entry). adoption/retention fall back to None (omitted on write);
+    # the error_prevention_rate still surfaces.
+    all_patterns.update(_linked_pattern_names(all_learnings))
 
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     result = {}
@@ -415,6 +438,11 @@ def aggregate_remote(
     all_patterns: set[str] = set()
     for signals in project_signals:
         all_patterns.update(signals.keys())
+
+    # Include patterns that only appear via a learning's hub_pattern_link (no
+    # manifest adoption row) so their error_prevention_rate is not dropped — see
+    # _linked_pattern_names / aggregate_project_telemetry.
+    all_patterns.update(_linked_pattern_names(all_learnings))
 
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     effectiveness: dict[str, dict] = {}

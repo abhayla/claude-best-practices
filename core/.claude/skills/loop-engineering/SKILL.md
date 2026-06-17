@@ -268,10 +268,9 @@ Skill("/learn-n-improve", args="session")
 ```
 Captures the discover→plan→make→check→ship pattern (and any heal) into
 `.claude/learnings.json`, typed GENERIC vs PRODUCT-SPECIFIC (`learnings-routing.md`).
-Ensure the shipped-cycle entry is tagged for hub monitoring —
-`emit_signal("shipped", ["loop-engineering","shipped",<unit-class>], "<unit>")`
-(or have `/learn-n-improve` write the entry WITH `hub_pattern_link:
-"loop-engineering"`). Then loop back to STEP 2 DISCOVER for the next unit, until
+Then directly `emit_signal("shipped", ["loop-engineering","shipped",<unit-class>],
+"<unit>")` for hub monitoring (do NOT rely on `/learn-n-improve` to set the link —
+see Monitoring). Then loop back to STEP 2 DISCOVER for the next unit, until
 DISCOVER finds nothing actionable or a budget caps the run.
 
 ---
@@ -345,10 +344,15 @@ Emit points (each writes exactly one entry):
 - **STEP 6 FEEDBACK after a successful heal** → `emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what was healed>")`.
 - **STEP 6 budget exhaustion / ESCALATE** → `emit_signal("escalated", ["loop-engineering","escalated",<unit-class>], "<unresolved unit + what was tried>")`.
 
-`/learn-n-improve` at STEP 7 MAY satisfy the `shipped`/`healed` emission if it
-writes the entry with `hub_pattern_link: "loop-engineering"`; the defect signals
-(`preflight_blocked`, `escalated`) MUST be emitted directly here because they
-occur on paths where STEP 7 never runs.
+The DIRECT `emit_signal` path above is **authoritative for all four signals**. Do
+NOT rely on `/learn-n-improve` to set `hub_pattern_link` — in unattended mode it
+defaults that field to `null`, so a delegated entry is never matched by the
+aggregator. `/learn-n-improve` still runs for its own learning capture; it does
+not replace the `shipped`/`healed` emit.
+
+**Constraint — the project MUST commit `.claude/learnings.json`.** The hub reads
+the COMMITTED file via the GitHub API; a gitignored learnings file emits no
+hub-ward signal (same constraint as all error-prevention telemetry).
 
 ---
 

@@ -129,8 +129,14 @@ signature per defect class. The aggregator's `compute_error_prevention_rate` key
 on exactly those fields: a defect class that recurs across runs lowers the pattern's
 effectiveness rate; a one-off counts as addressed. Result lands in
 `registry/patterns.json` automatically — closing the monitor-downstream loop on the
-existing flywheel rather than a bespoke telemetry channel (KISS/DRY). The wiring is
-regression-guarded by `test_loop_engineering_emits_hub_linked_telemetry`.
+existing flywheel rather than a bespoke telemetry channel (KISS/DRY).
+
+`aggregate_telemetry` was hardened (v1.1.0) so a pattern that appears ONLY via a
+learning's `hub_pattern_link` — with no sync-manifest adoption row — is still
+aggregated (`_linked_pattern_names`): otherwise the `escalated` / `preflight_blocked`
+signals would be silently dropped in copy-all / synthesis adoptions that don't write
+a manifest. Guarded by `test_learnings_only_pattern_is_aggregated` (aggregator-level,
+end-to-end) plus `test_loop_engineering_emits_hub_linked_telemetry` (skill-level).
 
 **Constraint:** a downstream project must commit `.claude/learnings.json` for the
 signal to travel (same constraint as all error-prevention telemetry — not new).
