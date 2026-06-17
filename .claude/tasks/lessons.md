@@ -4,6 +4,32 @@
 <!-- Review at session start to avoid repeating mistakes. -->
 <!-- Format: date, what went wrong, what to do instead. -->
 
+## 2026-06-16 — Skill() invocations belong in FENCED code blocks, not inline backticks
+
+**Surfaced during:** authoring `core/.claude/skills/loop-engineering/SKILL.md`;
+`workflow_quality_gate_validate_patterns.py` failed with "References non-existent
+skill '/fix-loop'" and '/debugging-loop' — even though both skills exist.
+
+**What I got wrong:** I wrote the heal-arm dispatches as INLINE backticks —
+`` `Skill("/fix-loop", ...)` `` — inside prose. The validator's
+`check_cross_references()` strips only triple-fenced ``` blocks before scanning,
+then its `Skill\(["']([^"']+)` regex captures the FULL first arg *including the
+leading slash* (`/fix-loop`), and compares it to `existing_skills` which holds
+bare directory names (`fix-loop`). `/fix-loop` != `fix-loop` → false-positive
+"non-existent skill". (The separate `` `/name` `` regex captures *without* the
+slash, so plain-backtick refs are fine — only `Skill("/...")` in inline backticks
+breaks.)
+
+**What to do instead:** Put every `Skill("/...")` and `Agent(subagent_type=...)`
+invocation inside a triple-fenced ``` code block (as `/development-loop` and the
+other workflow skills do). Fenced blocks are stripped before cross-ref scanning,
+so the slash-prefixed capture never fires. Reserve inline backticks for bare
+`/skill-name` mentions, never for full `Skill("/skill-name", …)` calls.
+
+**Generalizable:** when a new skill body trips the cross-ref validator on a
+reference you KNOW exists, check whether it's an inline `Skill("/…")` — move it
+into a fenced block rather than touching the validator.
+
 ## 2026-04-22 — Aggregator "union of failures" rule needs a superset check
 
 **Surfaced during:** Phase H of the testing-pipeline overhaul, `test_flaky_scenario_surfaces_quarantined_issue` in `scripts/tests/test_pipeline_e2e.py`.

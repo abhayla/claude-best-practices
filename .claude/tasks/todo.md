@@ -5,6 +5,46 @@
 
 ## Current Task
 
+### loop-engineering distributable pattern — 2026-06-16 — ✅ BUILT & VERIFIED (push/PR escalated)
+
+User directive: build a fully-autonomous, self-healing / self-verifying /
+self-learning / self-feedback **loop-engineering** capability as a distributable
+hub pattern, working for THIS hub AND downstream projects, provisioning verified.
+Pre-authorized autonomous execution. Compose existing self-* assets (no new
+engines) per rule-curation + KISS/DRY → exactly 1 new pattern (the skill).
+
+Self-* → composed-from: healing=/fix-loop·/debugging-loop · verification=maker≠checker
+(supervisor-verification + independent-test-verification) · learning=/learn-n-improve ·
+feedback=/escalation-report+triage-inbox · autonomy=bounded budgets + /loop·/goal.
+
+- [x] Ground in live schemas (contracts, development-loop SKILL, registry shape, _meta=263)
+- [x] Decision: compose; 1 new pattern; escalate only outward downstream PRs/push
+- [x] Phase 0 — Spec: docs/specs/loop-engineering-spec.md
+- [x] Phase 1 — Skill: core/.claude/skills/loop-engineering/SKILL.md (skill-at-T0)
+- [x] Phase 2 — Contract: loop-engineering DAG in BOTH workflow-contracts.yaml copies (identical, test-verified)
+- [x] Phase 3 — Registry: entry + closure; _meta 263→264; changelog
+- [x] Phase 4 — Tests (TDD): closure coverage + maker≠checker guards (×2)
+- [x] Phase 5 — Verify: 4 validators + 1454 pytest green
+- [x] Phase 6 — Docs: generate_docs + generate_workflow_docs (new docs/workflows/loop-engineering.md)
+- [x] Phase 7 — Downstream guarantee: PREFLIGHT runtime probe + closure test + contract-sync test
+- [x] Independent code review (code-reviewer-agent) → PASSED, 0 blocking findings
+- [x] Lesson captured (fenced-vs-inline Skill() validator gotcha)
+- [x] Committed 10ec04f on feat/loop-engineering
+- [ ] ⛔ ESCALATION GATE (awaiting owner OK): push branch to remote + open hub PR (outward/publish)
+
+## Review
+
+- Goal-anchored decision held: composed existing self-* assets (healing/verification/
+  learning/feedback) → exactly 1 new pattern, no engine duplication. KISS/DRY/curation clean.
+- maker≠checker is enforced at THREE layers: SKILL body (2 distinct subagent_types),
+  contract DAG (execute≠verify_review dispatch), and 2 regression tests. Cannot silently collapse.
+- Downstream verification is structural, not hopeful: closure test proves workers ship with the
+  skill; PREFLIGHT BLOCKs at runtime if they didn't (registry session-pinning aware); contract-sync
+  test keeps the distributable copy honest.
+- The one real gotcha (inline `Skill("/x")` tripping the cross-ref validator) → fenced blocks; lesson filed.
+- Remaining: the actual downstream ROLLOUT (provisioning to external repos) is an outward action —
+  escalated, not auto-done.
+
 ### Promote firekaro Groups A/B/C → hub (3 PRs, merge to main) — 2026-06-12 — ✅ COMPLETE
 
 User directive: promote all three groups, separate PR each, fully autonomous,
