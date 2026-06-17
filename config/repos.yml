@@ -21,3 +21,7 @@ repos:
     stacks: [react-nextjs]
     auto_sync: true
     share_synthesized: false  # IPODhan synthesis-config allow_hub_sharing: false (local-only)
+  - repo: abhayla/RealFuelPricesinIndia
+    stacks: [react-nextjs]  # Next.js + Supabase + Playwright/Vitest; scraper/pipeline Node/TS backend
+    auto_sync: true
+    share_synthesized: false  # default local-only until the project opts in via synthesis-config
