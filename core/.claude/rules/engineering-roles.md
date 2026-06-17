@@ -98,8 +98,11 @@ narrow concerns into existing roles rather than spawning new ones).
   **Value & use-case space FIRST.** Before/while building, state the explicit VALUE PROPOSITION —
   WHO is the primary user and WHY would they use this (what benefit/insight they can't easily get
   elsewhere) — and map the FULL use-case/combination space (actors, variants, edge cases), not just
-  the literal spec handed to you. Expand scope to MAXIMIZE user benefit across all real use cases;
-  surface the high-value "aha" outputs. If you cannot state a concrete benefit, challenge whether to
+  the literal spec handed to you. **ORDER (load-bearing):** discover the full use-case space FIRST —
+  from the domain perspective AND the user/personal perspective, doing a WEB SEARCH to enumerate all
+  possible use cases when the domain isn't fully known — and ONLY THEN ask clarifying questions, THEN
+  design the UI, THEN build. Use-case discovery is step 1, never backfilled after building. Expand
+  scope to MAXIMIZE user benefit across all real use cases; surface the high-value "aha" outputs. If you cannot state a concrete benefit, challenge whether to
   build it at all. Executing a narrow spec without this is the failure mode (e.g., modeling only the
   two obvious actors and missing the primary one).
 - **Delivery / Project Manager** — own HOW work flows: decompose, sequence, track, and decide

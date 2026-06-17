@@ -5082,10 +5082,10 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "6c7c33e3e6a4b8e7062349b6046f6d78885dad615936cfe571684f4484b0b446",
+    "hash": "eec7ddab809b7df3722f181da7ce477139c98f5a5018b08b1f1e927d98e26ea1",
     "type": "rule",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
     "last_updated": "2026-06-17",
@@ -5098,7 +5098,7 @@
       "routing",
       "orchestration"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns) | v1.1.0 (2026-06-17): Product Manager mandate — research the domain BEFORE asking; decide domain/math/best-practice matters yourself (overridable assumptions), never ask the user a verifiable fact or a question premised on an unverified domain assumption. | v1.2.0 (2026-06-17): PM mandate — articulate the value proposition (primary user + why) and map the FULL use-case/combination space before building; expand scope to maximize benefit; challenge the build if no concrete benefit.",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns) | v1.1.0 (2026-06-17): Product Manager mandate — research the domain BEFORE asking; decide domain/math/best-practice matters yourself (overridable assumptions), never ask the user a verifiable fact or a question premised on an unverified domain assumption. | v1.2.0 (2026-06-17): PM mandate — articulate the value proposition (primary user + why) and map the FULL use-case/combination space before building; expand scope to maximize benefit; challenge the build if no concrete benefit. | v1.2.1 (2026-06-17): PM mandate — pin the ORDER: discover the full use-case space FIRST (domain + user perspective; web search to enumerate) -> THEN clarifying questions -> THEN UI -> THEN build; never backfill use-case discovery.",
     "tier": "nice-to-have"
   },
   "no-overask-guard": {

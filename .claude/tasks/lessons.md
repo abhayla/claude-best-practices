@@ -2,6 +2,12 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-17 — BA sequence: use-case discovery FIRST, then questions, then UI
+
+**Surfaced during:** calculator build (crystallized by Abhay). The load-bearing part is the ORDER, which my v1.2.0 edit hadn't pinned.
+
+**The rule:** Before anything else, **discover the FULL use-case space FIRST** — from the domain perspective AND the user/personal perspective, doing a **web search to enumerate all possible use cases** when the domain isn't fully known. **Only then** ask clarifying questions, **then** design the UI, **then** build. Use-case discovery is step 1, never backfilled after building. (I had done domain research late and centered the calculator on the wrong actor.) Rule: `engineering-roles.md` PM mandate v1.2.1.
+
 ## 2026-06-17 — PM: value proposition + full use-case space FIRST (don't just build the spec)
 
 **Surfaced during:** calculator build. Abhay's biggest critique: I executed the literal 4-scenario spec without doing the product/BA work — exploring ALL meaningful use-case combinations and articulating WHY anyone would use the tool (the benefit). Research afterward showed the build covered ~15% of the valuable surface AND missed the PRIMARY user.
