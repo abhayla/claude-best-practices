@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-16 18:17 UTC (auto-generated)
+> Last updated: 2026-06-17 03:13 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -119,7 +119,7 @@
 | learning-self-improvement | skill | 2.1.1 | hub:abhayla/claude-best-practices | context-reducer-agent, learn-n-improve, session-summarizer-agent, skill-factory, test-knowledge, workflow-contracts |
 | learning-self-improvement-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | learnings-routing | rule | 1.0.0 | project:firekaro-planner | — |
-| loop-engineering | skill | 1.0.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
+| loop-engineering | skill | 1.1.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | no-overask-guard | hook | 1.0.0 | project:firekaro-planner | — |

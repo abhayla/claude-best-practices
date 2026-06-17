@@ -4,6 +4,13 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-17 — loop-engineering: hub-ward monitoring (v1.1.0)
+
+Closes the downstream-observability gap: the loop now emits a hub-linked learning on every terminal outcome, so the existing weekly telemetry cron monitors it automatically — no new pipeline, no outward call from the project.
+
+- **updated** skill `loop-engineering` (v1.0.0 → v1.1.0, MINOR) — STEP 1.5 / STEP 6 / STEP 7 now append a `.claude/learnings.json` entry with `hub_pattern_link: "loop-engineering"` + a typed `signal` (`preflight_blocked` / `escalated` / `healed` / `shipped`) and a stable `tags` defect-class signature. `aggregate_telemetry.compute_error_prevention_rate` already keys on `hub_pattern_link` + `tags`, so escalations and PREFLIGHT blocks surface as per-pattern effectiveness in `registry/patterns.json` on the Friday cron over enrolled repos. Spec §5.1.
+- **added** regression tests — `test_loop_engineering_emits_hub_linked_telemetry` (all four signals present) + `test_loop_engineering_telemetry_link_matches_aggregator_key` (link value == registry key, else the aggregator silently drops it).
+
 ### 2026-06-16 — loop-engineering: autonomous self-* meta-loop (skill + contract)
 
 Promoted the *Loop Engineering* pattern (Addy Osmani; Anthropic agent-loop docs) into a distributable hub workflow. Owner directive 2026-06-16; goal-anchored to the hub's reusable-patterns mission. Composes existing self-* assets — no new engine — per `rule-curation.md` (reactive-not-speculative) + KISS/DRY. Net new pattern: **1**. `total_patterns` 263 → 264.

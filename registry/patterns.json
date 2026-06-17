@@ -5163,13 +5163,13 @@
     "tier": "must-have"
   },
   "loop-engineering": {
-    "hash": "9ca3dd87e2561c0f21d38c70545d28b3b398cc8d96daefa8ee1e006a7d8fe093",
+    "hash": "5d60693d89cd2dddc3f7637fb2a05490cea1945814ec301e044e39b6b2014af2",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-16",
-    "last_updated": "2026-06-16",
+    "last_updated": "2026-06-17",
     "dependencies": [
       "auto-verify",
       "brainstorm",
@@ -5186,7 +5186,7 @@
       "writing-plans"
     ],
     "visibility": "public",
-    "description": "Autonomous DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker)→SHIP|FEEDBACK loop as a skill-at-T0 orchestrator. Self-verifying (maker plan-executor-agent ≠ checker code-reviewer-agent), self-healing (/fix-loop, /debugging-loop), self-learning (/learn-n-improve each cycle), self-feedback (/escalation-report + triage inbox on budget exhaustion). Composes existing hub workflows under hard budgets; creates no new engine.",
+    "description": "Autonomous DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker)→SHIP|FEEDBACK loop as a skill-at-T0 orchestrator. Self-verifying (maker plan-executor-agent ≠ checker code-reviewer-agent), self-healing (/fix-loop, /debugging-loop), self-learning (/learn-n-improve each cycle), self-feedback (/escalation-report + triage inbox on budget exhaustion). Emits hub-linked telemetry (hub_pattern_link) on every terminal signal so the weekly aggregate_telemetry cron monitors downstream defects/effectiveness. Composes existing hub workflows under hard budgets; creates no new engine.",
     "tags": [
       "orchestration",
       "workflow",
@@ -5194,7 +5194,7 @@
       "self-healing",
       "loop-engineering"
     ],
-    "changelog": "v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
+    "changelog": "v1.1.0 (2026-06-17): MINOR — hub-ward monitoring: emit a hub-linked .claude/learnings.json entry (hub_pattern_link: loop-engineering) on every terminal signal (preflight_blocked / escalated / healed / shipped) so the existing weekly aggregate_telemetry cron surfaces downstream defects + effectiveness in the registry, no new pipeline. Spec §5.1. | v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
     "tier": "must-have"
   }
 }

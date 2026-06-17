@@ -23,7 +23,7 @@ triggers:
   - unattended feedback cycle
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -127,8 +127,10 @@ inline run (the 2026-04-24 failure mode).
           pinned at session start), then re-run /loop-engineering.
    ============================================================
    ```
-   Write the BLOCKED verdict to `test-results/loop-engineering-verdict.json` and
-   STOP. Do NOT proceed.
+   Write the BLOCKED verdict to `test-results/loop-engineering-verdict.json`,
+   `emit_signal("preflight_blocked", ["loop-engineering","preflight_blocked",<missing-name>], "<gap>")`
+   (see Monitoring — this is the #1 downstream defect and MUST reach the hub),
+   and STOP. Do NOT proceed.
 
 Only when the closure is present, dispatchable, and maker≠checker, continue.
 
@@ -237,7 +239,8 @@ Skill("/post-fix-pipeline", args="<run_id>, test-results/auto-verify.json")
 Captures docs update + commit. Record `state.artifacts.commit_sha`. → STEP 7 LEARN.
 
 **FAIL — self-heal (bounded):** pick the healer by root-cause clarity, then
-return to STEP 5 VERIFY and increment `retries_used`:
+return to STEP 5 VERIFY and increment `retries_used`. When a heal subsequently
+PASSES VERIFY, `emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what healed>")`:
 
 ```
 # clear root cause:
@@ -251,9 +254,10 @@ Skill("/debugging-loop", args="<failure context>")
 ```
 Skill("/escalation-report", args="<run_id>")
 ```
-Append the unresolved unit to `state.triage_inbox` with what was tried, then STOP
-with `result: "ESCALATED"`. NEVER loop unbounded — a loop running unattended is a
-loop making mistakes unattended (Osmani).
+Append the unresolved unit to `state.triage_inbox` with what was tried,
+`emit_signal("escalated", ["loop-engineering","escalated",<unit-class>], "<unit + what was tried>")`,
+then STOP with `result: "ESCALATED"`. NEVER loop unbounded — a loop running
+unattended is a loop making mistakes unattended (Osmani).
 
 ---
 
@@ -264,8 +268,11 @@ Skill("/learn-n-improve", args="session")
 ```
 Captures the discover→plan→make→check→ship pattern (and any heal) into
 `.claude/learnings.json`, typed GENERIC vs PRODUCT-SPECIFIC (`learnings-routing.md`).
-Then loop back to STEP 2 DISCOVER for the next unit, until DISCOVER finds nothing
-actionable or a budget caps the run.
+Ensure the shipped-cycle entry is tagged for hub monitoring —
+`emit_signal("shipped", ["loop-engineering","shipped",<unit-class>], "<unit>")`
+(or have `/learn-n-improve` write the entry WITH `hub_pattern_link:
+"loop-engineering"`). Then loop back to STEP 2 DISCOVER for the next unit, until
+DISCOVER finds nothing actionable or a budget caps the run.
 
 ---
 
@@ -302,8 +309,57 @@ actionable or a budget caps the run.
 
 ---
 
+## Monitoring & telemetry (hub-ward feedback signal)
+
+The loop's runtime artifacts (`test-results/loop-engineering-verdict.json`, the
+triage inbox) are gitignored and never leave the project. To make the loop
+**observable from the hub** without a new pipeline, every terminal outcome ALSO
+appends one entry to the project's `.claude/learnings.json` — the same file the
+hub's weekly `aggregate_telemetry.py` already scans. The hub aggregator keys on
+`hub_pattern_link` and groups recurring defect classes by `tags`
+(`compute_error_prevention_rate`), so escalations/blocks surface as per-pattern
+effectiveness in `registry/patterns.json` automatically (Friday cron, enrolled
+repos in `config/repos.yml`). No new uploader, no outward call from the project.
+
+**emit_signal(signal, tags, message)** — read `.claude/learnings.json` (treat a
+missing file as `{"learnings": []}`), APPEND (never overwrite) one entry, write back:
+
+```json
+{
+  "hub_pattern_link": "loop-engineering",
+  "signal": "shipped | healed | escalated | preflight_blocked",
+  "tags": ["loop-engineering", "<signal>", "<stable defect/unit class>"],
+  "error": { "message": "<one-line what happened>" },
+  "run_id": "<run_id>",
+  "ts": "<iso>"
+}
+```
+
+Use a STABLE `tags` signature per defect class (e.g. the failing test id or the
+missing-closure name) — the aggregator counts a class that recurs across runs as
+"recurring despite the pattern" (lower effectiveness), and a one-off as addressed.
+
+Emit points (each writes exactly one entry):
+- **STEP 1.5 BLOCK** → `emit_signal("preflight_blocked", ["loop-engineering","preflight_blocked",<missing-name>], "<closure gap or maker==checker>")`.
+- **STEP 6 SHIP** → `emit_signal("shipped", ["loop-engineering","shipped",<unit-class>], "<unit>")` (in addition to STEP 7 LEARN).
+- **STEP 6 FEEDBACK after a successful heal** → `emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what was healed>")`.
+- **STEP 6 budget exhaustion / ESCALATE** → `emit_signal("escalated", ["loop-engineering","escalated",<unit-class>], "<unresolved unit + what was tried>")`.
+
+`/learn-n-improve` at STEP 7 MAY satisfy the `shipped`/`healed` emission if it
+writes the entry with `hub_pattern_link: "loop-engineering"`; the defect signals
+(`preflight_blocked`, `escalated`) MUST be emitted directly here because they
+occur on paths where STEP 7 never runs.
+
+---
+
 ## CRITICAL RULES
 
+- MUST emit a hub-linked `.claude/learnings.json` entry (`hub_pattern_link:
+  "loop-engineering"`) on every terminal outcome — `preflight_blocked`,
+  `escalated`, `healed`, `shipped` — so the hub's weekly aggregator can monitor
+  this pattern's downstream defects/effectiveness. The defect signals
+  (`preflight_blocked`, `escalated`) MUST NOT be skipped — they are the whole
+  point of downstream monitoring.
 - MUST run STEP 1.5 PREFLIGHT before any dispatch and BLOCK with
   `WORKER_REGISTRY_NOT_LOADED` if a worker/sub-skill is missing OR maker==checker.
   Provisioning does not resolve closures — a downstream project can have this skill

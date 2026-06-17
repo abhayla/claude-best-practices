@@ -104,6 +104,33 @@ def test_loop_engineering_maker_differs_from_checker_in_contract():
     )
 
 
+def test_loop_engineering_emits_hub_linked_telemetry():
+    """The loop must emit hub-linked learnings so the weekly aggregator
+    (aggregate_telemetry.compute_error_prevention_rate keys on `hub_pattern_link`)
+    can monitor downstream defects/effectiveness. Guards that the monitoring wiring
+    — and all four terminal signals — can't be silently dropped from the skill."""
+    body = (HUB / "core" / ".claude" / "skills" / "loop-engineering" / "SKILL.md").read_text(encoding="utf-8")
+    assert 'hub_pattern_link' in body and 'loop-engineering' in body, (
+        "loop-engineering SKILL.md must wire hub_pattern_link telemetry for hub monitoring"
+    )
+    for signal in ("preflight_blocked", "escalated", "healed", "shipped"):
+        assert signal in body, (
+            f"loop-engineering must emit the '{signal}' telemetry signal — it is a "
+            f"downstream feedback/defect signal the hub aggregator monitors"
+        )
+
+
+def test_loop_engineering_telemetry_link_matches_aggregator_key():
+    """The hub_pattern_link value emitted by the skill MUST equal the registry key
+    the aggregator looks up, or the signal is silently dropped at aggregation."""
+    body = (HUB / "core" / ".claude" / "skills" / "loop-engineering" / "SKILL.md").read_text(encoding="utf-8")
+    assert "loop-engineering" in REGISTRY, "loop-engineering must be a registry key"
+    # the skill must link to EXACTLY its own registry name, or the aggregator drops the signal
+    assert re.search(r'hub_pattern_link["\']?\s*:\s*["\']loop-engineering["\']', body), (
+        "skill must set hub_pattern_link to exactly 'loop-engineering' (the registry key the aggregator queries)"
+    )
+
+
 def test_loop_engineering_skill_dispatches_two_distinct_agents():
     """The SKILL.md body must dispatch a maker AND a separate checker (not the same
     agent twice) — the runtime guarantee behind the contract-level maker≠checker."""
