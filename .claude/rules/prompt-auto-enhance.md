@@ -25,9 +25,11 @@ every substantive turn. Render FULL mode (not the compact block):
 
 - **Non-trivial prompt:** after the banner, render in this order:
   1. **Pipeline transcript** — per-step counts/deltas (skill STEP 4.5)
-  2. **Before→after grade card** — per-dimension before/after scores + Changes Applied (skill
-     STEP 4). The after-grade is NEVER self-asserted: when the blind re-grade fires (lift ≥ 2.0,
-     any single-dim jump ≥ 3.0, test, or on request — STEP 3.6) the BLIND reviewer's number wins.
+  2. **Before→after card + independent reviewer (EVERY turn, no threshold, no bypass)** —
+     per-dimension before/after scores + Changes Applied. On every enhanced turn an independent
+     context-blind `Agent()` reviewer (fresh instance; sees only the two prompts + rubric, never
+     the pipeline's scores) re-grades both prompts. The card MUST state who the reviewer is, what
+     it did, and its score — and the BLIND number wins the lift. Self-grading never sets it (STEP 3.6).
   3. **Original → Final Strengthened Prompt**, fenced blocks (skill STEP 4.6); the Final
      block MUST open with the R1 `Act as …` persona whenever Role & Framing scored < 7
   4. **`Role: <name> — <why>`** line (R2, stage 4.7) — never a substitute for the R1 persona
@@ -53,16 +55,13 @@ stage's detail lives in its SSOT (`configuration-ssot.md`):
 | **5.5 Verify** | Reproduce the doer's gate + independent review before commit; fires on OUTPUT blast radius, even on turns the hook skipped | `supervisor-verification.md`, `independent-test-verification.md` |
 | **6 Git** | Only if committable changes: secret-scan → commit → push via `git-manager-agent` | `decision-authority.md`, `git-collaboration.md` |
 
-## Tier 1 — Always
+## Context tiers — gather before responding
 
 1. Existing `.claude/` patterns — know what exists, do not duplicate
 2. CLAUDE.md — already loaded, reference it
 3. Git state — branch, recent commits, uncommitted changes
-
-## Tier 2 — Conditional (prompt references specific files/features)
-
-4. Nearby files — structural context
-5. `registry/patterns.json` — check before suggesting new patterns
+4. *(conditional — prompt references files/features)* Nearby files — structural context
+5. *(conditional)* `registry/patterns.json` — check before suggesting new patterns
 
 ## Clarification & Confidence Gate — ask/grill until confident (before STEP 4.6)
 
