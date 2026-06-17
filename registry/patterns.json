@@ -3142,13 +3142,13 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance": {
-    "hash": "17a151044d12a93e266acd1ac2a245a7a258a55b901ee9d91ca553271b9799fd",
+    "hash": "e3bfb7be633ae0b9d7693bde8300f168b180ccdf565bd14128832019e9e3be64",
     "type": "skill",
     "category": "core",
     "version": "3.6.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-18",
     "dependencies": [
       "writing-skills",
       "claude-guardian",
@@ -3171,7 +3171,7 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance-rule": {
-    "hash": "12877db71410ca4744eb6e6867cce0b5be47f4e290f65705a629b818b4ced405",
+    "hash": "2bb13cedf0bfc834fb24d379752df5ff145eaa576cae63440abc0b659a8493b7",
     "type": "rule",
     "category": "core",
     "version": "3.1.0",
