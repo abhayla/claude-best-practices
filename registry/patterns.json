@@ -1,4 +1,25 @@
 {
+  "provenance-report": {
+    "hash": "f3cc7148a8afc408d870b1bb04fc111008c116906ec60dc5b1cb8c294c3e6510",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-17",
+    "last_updated": "2026-06-17",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Generate an owner-facing 'Behind the Scenes' build-provenance HTML report for the CURRENT project: what was done, how, with which roles/skills/agents/workflows/hooks, in what sequence, done-vs-open, plus a loophole/edge-case audit. Self-contained offline HTML written to docs/process-report/ in the TARGET project (per-project, differs per project) from real on-disk data + the session's known sequence; never fabricated.",
+    "tags": [
+      "observability",
+      "provenance",
+      "owner-report",
+      "html",
+      "transparency"
+    ],
+    "changelog": "v1.0.0 (2026-06-17): Initial — per-project behind-the-scenes provenance report (timeline, roles, patterns used, agents, gates, done-vs-open, loophole audit).",
+    "tier": "nice-to-have"
+  },
   "full-space-first": {
     "hash": "90951c6dfce65879ec67937552a3d5963cc4a182b3f954428b4c1d5230124a4d",
     "type": "rule",
@@ -5101,7 +5122,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-17",
-    "total_patterns": 267
+    "total_patterns": 268
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
