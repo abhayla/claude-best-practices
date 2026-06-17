@@ -1,9 +1,9 @@
 {
   "provenance-report": {
-    "hash": "f3cc7148a8afc408d870b1bb04fc111008c116906ec60dc5b1cb8c294c3e6510",
+    "hash": "60b24b402ae1f4f8ca94eb3c51a04b1857a3f18b0bc2c29d8f8ca34e1a8b4bdc",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-17",
     "last_updated": "2026-06-17",
@@ -17,7 +17,7 @@
       "html",
       "transparency"
     ],
-    "changelog": "v1.0.0 (2026-06-17): Initial — per-project behind-the-scenes provenance report (timeline, roles, patterns used, agents, gates, done-vs-open, loophole audit).",
+    "changelog": "v1.0.0 (2026-06-17): Initial — per-project behind-the-scenes provenance report (timeline, roles, patterns used, agents, gates, done-vs-open, loophole audit). | v1.1.0 (2026-06-17): require a featured INTERACTIVE inline-SVG process-flow diagram (actual stages + labeled loops + gate markers; clickable nodes → per-stage roles/skills/agents/hooks/rules/gate/outputs).",
     "tier": "nice-to-have"
   },
   "full-space-first": {
