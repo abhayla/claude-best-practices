@@ -3108,13 +3108,13 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance-rule": {
-    "hash": "80da56a341d4d4dd4cec3f1be34d43b807285135643304038083826972fd9c3c",
+    "hash": "81b20cd4fb639297a1e0ac02276987ceaaa20f0aacbdfda1e0ea0344c0098ea3",
     "type": "rule",
     "category": "core",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-17",
     "dependencies": [
       "prompt-auto-enhance"
     ],
@@ -3127,7 +3127,7 @@
       "context-gathering",
       "automation"
     ],
-    "changelog": "v3.0.0: Replaced CRITICAL RULES with Pipeline Rules listing load-bearing contracts. Clarification Gate now has no upper limit on questions (ask until confident). Mandatory step transcript + final prompt preview render every time. v2.0.0: Slim from 97 to 48 lines. Lean trigger delegating to /prompt-auto-enhance skill. | v3.1.0: MANDATORY OUTPUT (format A), unified 0-6 pipeline table with governance tail, tiered Clarification+Confidence gate, output-blast-radius unconditional indicator",
+    "changelog": "v3.0.0: Replaced CRITICAL RULES with Pipeline Rules listing load-bearing contracts. Clarification Gate now has no upper limit on questions (ask until confident). Mandatory step transcript + final prompt preview render every time. v2.0.0: Slim from 97 to 48 lines. Lean trigger delegating to /prompt-auto-enhance skill. | v3.1.0: MANDATORY OUTPUT (format A), unified 0-6 pipeline table with governance tail, tiered Clarification+Confidence gate, output-blast-radius unconditional indicator | v3.2.0 (2026-06-17): Clarification Gate — ask exactly ONE question per turn (grouped by category), each with a recommended option + justification + why alternatives are weaker, and sequenced on prior answers (never ask something already answered/implied/contradicted).",
     "tier": "must-have"
   },
   "prompt-enhance-reminder": {
