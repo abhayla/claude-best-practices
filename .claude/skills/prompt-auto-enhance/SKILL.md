@@ -427,30 +427,32 @@ Grade: B (7.4 / 10) — 1 fix applied
 ```
 
 **Full mode** (default — Grade C/D/F and any turn with strengthening):
-render a BEFORE → AFTER card (two score columns), so the lift is visible
-per-dimension, not asserted as one delta number. The After column is the
-re-graded score (STEP 3.6). The independent reviewer runs EVERY turn, so the
-card ALWAYS carries the blind result: use the BLIND overall as the rendered
-Overall-after (the self-after is shown only for comparison), and ALWAYS print
-the "Independent reviewer" line stating who it is and what it did.
+render a card with FOUR score columns per dimension — Before, Self-after,
+**Reviewer-after**, Weight — so the independent reviewer's full per-dimension
+grade card is VISIBLE, not just its two overalls. The independent reviewer runs
+EVERY turn (STEP 3.6); its `Reviewer-after` column IS its grade card. The BLIND
+overall is the rendered Overall-after (self-after shown only for comparison), and
+ALWAYS print the "Independent reviewer" line stating who it is and what it did.
+The Reviewer-after column is NOT optional — omitting it (showing only the
+reviewer's overall) is the exact gap this format closes.
 ```
-Prompt Grade Card (before → after):
-┌────────────────────────┬────────┬───────┬────────┬─────────────┐
-│ Dimension              │ Before │ After │ Weight │ Fix         │
-├────────────────────────┼────────┼───────┼────────┼─────────────┤
-│ Intent Clarity         │  4.0   │  7.0  │  0.25  │ [1]         │
-│ Context Sufficiency    │  2.0   │  6.0  │  0.20  │ [2] ⚠framed │
-│ Constraint Precision   │  2.0   │  9.0  │  0.20  │ [3]         │
-│ Output Specification   │  2.0   │  7.0  │  0.15  │ [4]         │
-│ Role & Framing         │  1.0   │  9.0  │  0.10  │ [5]         │
-│ Example Grounding      │  3.0   │  5.0  │  0.10  │ —           │
-├────────────────────────┼────────┼───────┼────────┼─────────────┤
-│ Overall                │  2.50  │  7.20 │        │ F → B       │
-└────────────────────────┴────────┴───────┴────────┴─────────────┘
-Independent reviewer (ran this turn — no exceptions): a context-blind Agent()
-  subagent re-graded both prompts from the rubric alone; it never saw these
-  self-scores. Reviewer after = 7.20 (B); self-after = 8.50 (A); divergence
-  1.30 > 1.0 → BLIND WINS the rendered lift, regrade-divergence logged.
+Prompt Grade Card (before → after — self vs independent reviewer):
+┌────────────────────────┬────────┬────────────┬────────────────┬────────┬───────┐
+│ Dimension              │ Before │ Self-after │ Reviewer-after │ Weight │ Fix   │
+├────────────────────────┼────────┼────────────┼────────────────┼────────┼───────┤
+│ Intent Clarity         │  4.0   │   9.0      │   9.0          │  0.25  │ [1]   │
+│ Context Sufficiency    │  2.0   │   7.0      │   6.0 ⚠framed  │  0.20  │ [2]   │
+│ Constraint Precision   │  1.0   │   9.0      │   9.0          │  0.20  │ [3]   │
+│ Output Specification   │  1.0   │   8.0      │   8.0          │  0.15  │ [4]   │
+│ Role & Framing         │  1.0   │   9.0      │   9.0          │  0.10  │ [5]   │
+│ Example Grounding      │  2.0   │   7.0      │   6.0          │  0.10  │ —     │
+├────────────────────────┼────────┼────────────┼────────────────┼────────┼───────┤
+│ Overall                │  2.05  │   8.20     │  7.85 (wins)   │        │ F → B │
+└────────────────────────┴────────┴────────────┴────────────────┴────────┴───────┘
+Independent reviewer (ran this turn — no exceptions): a context-blind Agent() subagent
+  re-graded both prompts from the rubric alone; it never saw the self-scores. The
+  Reviewer-after column above IS its grade card. Reviewer overall 7.85 (B) WINS over
+  self 8.20 (A); divergence 0.35 < 1.0 → no flag, but the blind number still wins.
 
 Changes Applied (5):
   [1] VAGUE_INTENT (Critical) → action verb chain (measure → cache → prove)
