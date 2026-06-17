@@ -1,4 +1,24 @@
 {
+  "human-approval-gates": {
+    "hash": "6d4bf0e205f2dfe2138416120895046f4a1cf0a28804faf1a3c91baad777868d",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-17",
+    "last_updated": "2026-06-17",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Three mandatory human product-approval gates in an idea→production pipeline: G1 UI-mockup before build, G2 feature acceptance before release, G3 production deploy. Complements decision-authority.md (autonomy over reversible detail) — these are product-acceptance pauses the pipeline MUST stop for; present the artifact, never infer approval from a green automated check.",
+    "tags": [
+      "pipeline",
+      "approval-gates",
+      "human-in-the-loop",
+      "delivery"
+    ],
+    "changelog": "v1.0.0 (2026-06-17): Initial creation — names the three product-approval pauses (UI mockup, feature acceptance, production deploy) for the idea→production pipeline; supports README goal #3.",
+    "tier": "nice-to-have"
+  },
   "a11y-audit": {
     "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
     "type": "skill",
@@ -5038,8 +5058,8 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-06-16",
-    "total_patterns": 264
+    "last_updated": "2026-06-17",
+    "total_patterns": 265
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
