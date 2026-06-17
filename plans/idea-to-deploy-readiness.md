@@ -29,14 +29,14 @@ in `core/` so any downstream project inherits the capability.
 
 ## Units (sequence)
 
-### Unit 1 — Human-approval gates (SSOT spine) · low risk · DO FIRST
-- **New rule** `core/.claude/rules/human-approval-gates.md` (`# Scope: global`): defines the
-  mandatory human checkpoints in the idea→deploy pipeline — UI/design-mockup approval before
-  implementation, feature acceptance after verification, production-deploy approval (the last
-  one points to `decision-authority.md`, which already gates deploy — no duplication).
-- Registry: add entry + bump `_meta.total_patterns` + `last_updated`; run
-  `pytest scripts/tests/` (esp. `test_registry_integrity.py`), the 2 validators, `generate_docs.py`.
-- Verification: validators green + full pytest green.
+### Unit 1 — Human-approval gates (SSOT spine) · low risk · ✅ DONE (2026-06-17)
+- **Shipped:** `core/.claude/rules/human-approval-gates.md` (`# Scope: global`) — the three
+  mandatory human checkpoints: G1 UI/design-mockup approval before implementation, G2 feature
+  acceptance after verification, G3 production-deploy approval (G3 points to
+  `decision-authority.md` — no duplication).
+- Registry entry added + `_meta` bumped 264→265; registry validation + quality gate +
+  78 `test_registry_integrity` tests all green. (Built now, not deferred: a rule is structurally
+  verifiable without the app, unlike Units 2–3 which need the real idea/stack.)
 
 ### Unit 2 — Domain-research BA step · medium risk
 - Enhance `core/.claude/skills/brainstorm` requirements stage + the Product Manager role
