@@ -78,6 +78,18 @@ self-improve micro-cycle (do NOT defer it to the end):
 
 The hardened hub + the accumulated lessons are the real deliverable of the run; the app proves them.
 
+**Execution engine.** The build does not run the self-improve cycle as a side-discipline — it runs
+*under* `/loop-engineering` (v1.1.0), whose DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker, maker≠checker)
+→GATE→(SHIP|FEEDBACK self-heal)→LEARN cycle IS the iterative self-feedback loop, bounded by
+`--max-cycles` + retry budget. Cross-run compounding rides `/learning-self-improvement` (capture →
+3+-evidence pattern detection → staged skill/rule proposals → staleness prune).
+
+**Honest gap — Unit 5 (measured self-feedback).** Loops 1–2 self-heal and capture lessons well, but the
+*measured* fitness signal (am I provably improving task-over-task — first-pass success rate up, heals/cycle
+down?) is thin: it depends on `aggregate_telemetry.py`'s effectiveness data, which is nascent (audit gap B).
+This closes as the dogfood run accumulates cycles — surface per-run metrics (cycles, heals, escalations,
+first-pass-pass) and trend them so "improving" is evidenced, not asserted. Build when enough runs exist.
+
 ## Done = README goal #3 is truthfully met: an idea runs idea→clarify(domain-deep)→UI+approve
 →build→test→verify→sign-off→deploy-to-VPS, with the right role at each stage — AND the
 self-improvement loop above ran at every stage (lessons captured, gaps closed in the hub).
