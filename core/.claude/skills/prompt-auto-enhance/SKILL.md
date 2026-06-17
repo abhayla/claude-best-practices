@@ -392,7 +392,9 @@ enhance to a higher number, then run it" — not "rewrite and hope".
 re-grade is scored by the same model that wrote the rewrite — structurally
 motivated to show lift (the author-verifies-own-work blind spot — see independent-test-verification.md).
 Deterministic audit triggers — blind re-grade fires when ANY of:
-- the claimed lift is ≥ 3.0 points (big claims get audited), OR
+- the claimed lift is ≥ 2.0 points (big claims get audited), OR
+- ANY single dimension's claimed jump is ≥ 3.0 points (catches one-dimension
+  over-scoring even when the overall lift looks modest), OR
 - the turn is part of an explicit test/audit campaign, OR
 - the user asks for it.
 
@@ -400,10 +402,11 @@ Deterministic audit triggers — blind re-grade fires when ANY of:
 original prompt text, the strengthened prompt text, and the rubric path
 (`references/grading-rubric.md`) — no pipeline narrative, no self-graded
 scores, no expected answer. The agent scores both on the rubric and returns
-the two overalls. If `|blind_after − self_after| > 1.5`, log
-`regrade-divergence` to `.claude/.enhance-misses.log` and REPORT the blind
-score alongside the self-score (the blind number wins the rendered lift).
-Cost note: fires only on the triggers above, never per-turn.
+the two overalls. Whenever the blind re-grade fires, REPORT both scores in the
+STEP 4 after-card and **the blind number WINS the rendered lift** — the
+self-score never overrides the independent one. If `|blind_after − self_after|
+> 1.0`, also log `regrade-divergence` to `.claude/.enhance-misses.log` (the
+over-scoring telemetry). Cost note: fires only on the triggers above, never per-turn.
 
 ## STEP 4: Show Grade Card + Changes Applied
 
@@ -420,29 +423,40 @@ Grade: B (7.4 / 10) — 1 fix applied
   [1] UNDER_CONSTRAINED → added output format spec
 ```
 
-**Full mode** (Grade C/D/F):
+**Full mode** (default — Grade C/D/F and any turn with strengthening):
+render a BEFORE → AFTER card (two score columns), so the lift is visible
+per-dimension, not asserted as one delta number. The After column is the
+re-graded score (STEP 3.6). When the blind re-grade fired, add a `Blind after`
+column and use the BLIND overall as the rendered Overall-after (the self-after
+is shown only for comparison).
 ```
-Prompt Grade Card:
-┌────────────────────────┬───────┬────────┬─────────────┐
-│ Dimension              │ Score │ Weight │ Action      │
-├────────────────────────┼───────┼────────┼─────────────┤
-│ Intent Clarity         │  8.0  │  0.25  │ —           │
-│ Context Sufficiency    │  5.0  │  0.20  │ Fixed [1,2] │
-│ Constraint Precision   │  6.0  │  0.20  │ Fixed [3]   │
-│ Output Specification   │  4.0  │  0.15  │ Fixed [4]   │
-│ Role & Framing         │  9.0  │  0.10  │ —           │
-│ Example Grounding      │  6.0  │  0.10  │ Skipped     │
-├────────────────────────┼───────┼────────┼─────────────┤
-│ Overall                │  6.30 │        │ Grade: B    │
-└────────────────────────┴───────┴────────┴─────────────┘
+Prompt Grade Card (before → after):
+┌────────────────────────┬────────┬───────┬────────┬─────────────┐
+│ Dimension              │ Before │ After │ Weight │ Fix         │
+├────────────────────────┼────────┼───────┼────────┼─────────────┤
+│ Intent Clarity         │  4.0   │  7.0  │  0.25  │ [1]         │
+│ Context Sufficiency    │  2.0   │  6.0  │  0.20  │ [2] ⚠framed │
+│ Constraint Precision   │  2.0   │  9.0  │  0.20  │ [3]         │
+│ Output Specification   │  2.0   │  7.0  │  0.15  │ [4]         │
+│ Role & Framing         │  1.0   │  9.0  │  0.10  │ [5]         │
+│ Example Grounding      │  3.0   │  5.0  │  0.10  │ —           │
+├────────────────────────┼────────┼───────┼────────┼─────────────┤
+│ Overall                │  2.50  │  7.20 │        │ F → B       │
+└────────────────────────┴────────┴───────┴────────┴─────────────┘
+Re-grade source: BLIND (independent reviewer) — self-after was 8.50;
+  divergence 1.30 > 1.0 → blind wins, regrade-divergence logged.
 
-Changes Applied (4):
-  [1] MISSING_CONTEXT (Critical) → defer to Clarification Gate Q1
-  [2] IMPLICIT_ASSUMPTIONS (Low)  → pin precondition explicitly
+Changes Applied (5):
+  [1] VAGUE_INTENT (Critical) → action verb chain (measure → cache → prove)
+  [2] MISSING_CONTEXT (Critical) → defer to Clarification Gate Q1
   [3] UNDER_CONSTRAINED (Medium)  → replace vague phrase with measurable target
   [4] MISSING_OUTPUT_SPEC (Medium)→ add deliverable triple
-  Pruning: removed "please" (Cat A — politeness filler)
+  [5] MISSING_ROLE (cap-exempt)   → prepend task-class persona
+  Pruning: removed "so it's faster" (Cat A — vague threshold)
 ```
+Each `After` score that rose MUST be earned by a listed Fix `[n]` — a lift
+with no fix behind it is an inflated number; flag it `⚠framed` (improved
+framing, unresolved substance) rather than crediting full points.
 
 **Grade D warning line (locked format):** when the prompt graded D,
 render this line ABOVE the grade card — the "heavy warning" is this exact string,

@@ -13,29 +13,30 @@ pipeline only runs on substantive prompts.
 silent.** The hook gates on PROMPT shape; short / slash-command / continuation prompts
 still spawn substantive work, and the discipline fires on the output's blast radius,
 not the prompt's shape. Whenever a turn produces substantive output (real analysis,
-multi-step answer, tool edits/commits), self-apply the banner + `Role:` line +
-governance tail even with no reminder injected. The Stop hook `no-overask-guard.sh`
+multi-step answer, tool edits/commits), self-apply the banner + full process (transcript
++ grade card + final prompt) + `Role:` line + governance tail even with no reminder injected. The Stop hook `no-overask-guard.sh`
 logs substantive turns missing the banner to `.claude/.enhance-misses.log` (telemetry,
 non-blocking). Genuinely trivial turns (`yes`/`go ahead`) are exempt.
 
-## MANDATORY OUTPUT — always SHOW the enhanced prompt (format A)
+## MANDATORY OUTPUT — always SHOW the full enhancement process (default ON)
 
-The one-liner is NOT enough — without the block the user never sees the strengthened
-prompt or whether enhancement ran. Two shapes:
+The one-liner is NOT enough — by default the user wants to SEE the whole pipeline on
+every substantive turn. Render FULL mode (not the compact block):
 
-- **Non-trivial prompt:** after the banner, render a **compact Enhanced-prompt block**:
-  > **What changed:** <fixes/additions made to the raw ask — 1-3 bullets>
-  > **Final prompt executed:** <the exact strengthened prompt, verbatim>
-
-  Compact — NOT the full grade-card wall (that renders on request, on explicit
-  `/prompt-auto-enhance` invocations, and in test/audit runs). The Final-prompt block
-  MUST open with the R1 `Act as …` persona whenever Role & Framing scored < 7 (skill's
-  Role Selection Guide) — the `Role:` line (R2, stage 4.7) never substitutes for it.
+- **Non-trivial prompt:** after the banner, render in this order:
+  1. **Pipeline transcript** — per-step counts/deltas (skill STEP 4.5)
+  2. **Before→after grade card** — per-dimension before/after scores + Changes Applied (skill
+     STEP 4). The after-grade is NEVER self-asserted: when the blind re-grade fires (lift ≥ 2.0,
+     any single-dim jump ≥ 3.0, test, or on request — STEP 3.6) the BLIND reviewer's number wins.
+  3. **Original → Final Strengthened Prompt**, fenced blocks (skill STEP 4.6); the Final
+     block MUST open with the R1 `Act as …` persona whenever Role & Framing scored < 7
+  4. **`Role: <name> — <why>`** line (R2, stage 4.7) — never a substitute for the R1 persona
 - **Trivial / continuation prompt:** render the one-liner
   `*Enhanced: no change — ran your input as-is*` so the user is never left guessing.
 
-Skipping the block on a non-trivial turn is a defect (class-C telemetry backstop).
-This section is the SSOT for the FORMAT; stage 4.6 produces the content.
+Skipping the process on a non-trivial turn is a defect (class-C telemetry backstop). This
+section is the SSOT for the FORMAT; skill stages 4–4.7 produce the content. Compact
+format-A is a fallback ONLY when the user explicitly asks to reduce verbosity.
 
 ## The unified per-prompt pipeline (0 → 6)
 
@@ -52,16 +53,13 @@ stage's detail lives in its SSOT (`configuration-ssot.md`):
 | **5.5 Verify** | Reproduce the doer's gate + independent review before commit; fires on OUTPUT blast radius, even on turns the hook skipped | `supervisor-verification.md`, `independent-test-verification.md` |
 | **6 Git** | Only if committable changes: secret-scan → commit → push via `git-manager-agent` | `decision-authority.md`, `git-collaboration.md` |
 
-## Tier 1 — Always
+## Context tiers — gather before responding
 
 1. Existing `.claude/` patterns — know what exists, do not duplicate
 2. CLAUDE.md — already loaded, reference it
 3. Git state — branch, recent commits, uncommitted changes
-
-## Tier 2 — Conditional (prompt references specific files/features)
-
-4. Nearby files — structural context
-5. `registry/patterns.json` — check before suggesting new patterns
+4. *(conditional — prompt references files/features)* Nearby files — structural context
+5. *(conditional)* `registry/patterns.json` — check before suggesting new patterns
 
 ## Clarification & Confidence Gate — ask/grill until confident (before STEP 4.6)
 
@@ -91,8 +89,9 @@ flow in `/prompt-auto-enhance` — no resource changes without explicit user app
 
 - Banner on every response; Tier 1 gathered before responding; strengthening runs on
   every non-filtered prompt via the `/prompt-auto-enhance` pipeline (skip only Grade A
-  / pure knowledge questions — the format-A block still renders)
-- Format A is the default verbosity; full transcript on request / explicit invocation
+  / pure knowledge questions — the full process still renders)
+- Full process (transcript + grade card + final prompt + role) is the default verbosity;
+  compact format-A is a fallback only when the user explicitly asks to reduce it
 - After the final prompt: role (4.7) → plan if coding (4.8) → execute under
   decision-authority (5) → verify edge (5.5) → git only if changes (6)
 - Optional one-line skill hint at STEP 4.6 (max 2 skills, informational only — the

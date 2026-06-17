@@ -21,10 +21,10 @@
     "tier": "nice-to-have"
   },
   "full-space-first": {
-    "hash": "2f09a48cde1b964d89548e263a0c7e0ce802eeac8bc862c1f30b64942452aef9",
+    "hash": "f0dda963329cb50fbb0f56f3c349c5c6947b344972a966a020381e893e3e2434",
     "type": "rule",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-17",
     "last_updated": "2026-06-18",
@@ -42,10 +42,10 @@
     "tier": "nice-to-have"
   },
   "ba-usecase-discovery-reminder": {
-    "hash": "95b0fc965cad6d314755f7164a56169c6676092a4d92da0ef2d9d83d1594b934",
+    "hash": "140cf80d87ed293a908015d9f42024d90ccf2ae372b3e8f613e7f5d4b80a6748",
     "type": "hook",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-17",
     "last_updated": "2026-06-18",
@@ -63,13 +63,13 @@
     "tier": "nice-to-have"
   },
   "human-approval-gates": {
-    "hash": "6d4bf0e205f2dfe2138416120895046f4a1cf0a28804faf1a3c91baad777868d",
+    "hash": "6f349756a882b1824e5ce8697f278e857168bf82e390806a3d3a71ceb297d087",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-17",
-    "last_updated": "2026-06-17",
+    "last_updated": "2026-06-18",
     "dependencies": [],
     "visibility": "public",
     "description": "Three mandatory human product-approval gates in an idea→production pipeline: G1 UI-mockup before build, G2 feature acceptance before release, G3 production deploy. Complements decision-authority.md (autonomy over reversible detail) — these are product-acceptance pauses the pipeline MUST stop for; present the artifact, never infer approval from a green automated check.",
@@ -3142,13 +3142,13 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance": {
-    "hash": "17a151044d12a93e266acd1ac2a245a7a258a55b901ee9d91ca553271b9799fd",
+    "hash": "e3bfb7be633ae0b9d7693bde8300f168b180ccdf565bd14128832019e9e3be64",
     "type": "skill",
     "category": "core",
     "version": "3.6.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-18",
     "dependencies": [
       "writing-skills",
       "claude-guardian",
@@ -3171,13 +3171,13 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance-rule": {
-    "hash": "da87edff4137b5b3d225a5904965e6b8ca7977a96dd20b028632b3291e16e108",
+    "hash": "32f6f10631411bccb5a0c485bc3cfe0248648450898ea21af8f8209399c16fa7",
     "type": "rule",
     "category": "core",
     "version": "3.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-06-17",
+    "last_updated": "2026-06-18",
     "dependencies": [
       "prompt-auto-enhance"
     ],
@@ -5121,8 +5121,8 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-06-17",
-    "total_patterns": 268
+    "last_updated": "2026-06-18",
+    "total_patterns": 269
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5145,10 +5145,10 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "7ed1e0228802681db2c516250edb45078bd531b516d43d3c26107c370bacfd00",
+    "hash": "2a98b4753ffd4f9f83f1cbb67f08588a501a9277960c218fecf56ae06408e7be",
     "type": "rule",
     "category": "core",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
     "last_updated": "2026-06-18",
@@ -5279,5 +5279,26 @@
     ],
     "changelog": "v1.1.0 (2026-06-17): MINOR — hub-ward monitoring: emit a hub-linked .claude/learnings.json entry (hub_pattern_link: loop-engineering) on every terminal signal (preflight_blocked / escalated / healed / shipped) so the existing weekly aggregate_telemetry cron surfaces downstream defects + effectiveness in the registry, no new pipeline. Spec §5.1. | v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
     "tier": "must-have"
+  },
+  "ba-discovery-checklist": {
+    "hash": "71f9861e91ec21c16b77b8a50618777d01fe07dc2e0b36712813f112cdeee33b",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-18",
+    "last_updated": "2026-06-18",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Global BA completeness discipline: the six-item discovery checklist (actors, value-per-actor, lifecycle, component-by-actor benefit matrix, variants, aha-outputs), the ACTORS x COMPONENTS x LIFECYCLE matrix discipline (never reason about the headline figure as a scalar), and a mandatory INDEPENDENT completeness audit before G1. Operational SSOT that converts the repeated incompleteness misses into a checked, enforced discipline.",
+    "tags": [
+      "global-rule",
+      "requirements",
+      "completeness",
+      "ba",
+      "verification"
+    ],
+    "changelog": "v1.0.0 (2026-06-18): Initial — enumerated BA completeness checklist + matrix discipline + independent pre-G1 audit, after three repeated incompleteness misses (actors, lifecycle costs, component-by-actor benefits).",
+    "tier": "nice-to-have"
   }
 }
