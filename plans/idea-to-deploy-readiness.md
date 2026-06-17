@@ -109,9 +109,10 @@ reaches the hub (the silent loophole). Wiring them at birth is non-negotiable:
 4. **`allow_hub_sharing: true`** in the app's `.claude/synthesis-config.yml` (enables `/synthesize-hub`).
 5. **Routing discipline** (`learnings-routing.md`) — generic learnings flow hub-ward; product-specific stay in the app. The loop-engineering signals carry `hub_pattern_link` so the aggregator matches them.
 
-Build this as a real `/bootstrap-dogfood-project` step (or fold into `/synthesize-project`) when the
-project-creation stage is hit — until then this checklist is the contract. A run is NOT "set up"
-until all 5 are verified green.
+This checklist is now backed by a deterministic gate: the hub-only skill
+`.claude/skills/bootstrap-dogfood-project/SKILL.md` wires + verifies all 5 and refuses to declare a
+run `READY` until each is green (gitignored/untracked `learnings.json` = hard fail). Run it right
+after synthesizing the app repo, before the first feature commit.
 
 ## Done = README goal #3 is truthfully met: an idea runs idea→clarify(domain-deep)→UI+approve
 →build→test→verify→sign-off→deploy-to-VPS, with the right role at each stage — AND the
