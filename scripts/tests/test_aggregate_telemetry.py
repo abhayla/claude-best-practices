@@ -371,6 +371,33 @@ class TestAggregateProjectTelemetry:
         result = aggregate_project_telemetry([project_a_claude_dir])
         assert "last_updated" in result.get("fix-loop", {})
 
+    def test_learnings_only_pattern_is_aggregated(self, tmp_path):
+        """B1 regression: a pattern appearing ONLY via a learning's
+        hub_pattern_link (no sync-manifest adoption row) MUST still get an
+        error_prevention_rate — otherwise loop-engineering's escalated /
+        preflight_blocked signals are silently dropped at aggregation."""
+        claude = tmp_path / "proj" / ".claude"
+        (claude / "skills" / "fix-loop").mkdir(parents=True)
+        (claude / "skills" / "fix-loop" / "SKILL.md").write_text("x")
+        (claude / "sync-manifest.json").write_text(json.dumps({
+            "files": {"skills/fix-loop/SKILL.md": {"provisioned_date": "2026-06-01"}}
+        }))
+        # loop-engineering signal present in learnings but NOT in the manifest:
+        (claude / "learnings.json").write_text(json.dumps({"learnings": [
+            {"hub_pattern_link": "loop-engineering", "signal": "escalated",
+             "tags": ["loop-engineering", "escalated", "unitA"],
+             "error": {"message": "unresolved unit"}},
+        ]}))
+
+        result = aggregate_project_telemetry([tmp_path / "proj"])
+
+        assert "loop-engineering" in result, (
+            "learnings-only pattern dropped at aggregation — B1 regression"
+        )
+        assert result["loop-engineering"]["error_prevention_rate"] is not None
+        # adoption/retention are None (no manifest row) — expected, omitted on write
+        assert result["loop-engineering"]["adoption_rate"] is None
+
 
 # --- Tests: write_effectiveness_to_registry ---
 

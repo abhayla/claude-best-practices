@@ -108,6 +108,39 @@ A hub skill green locally can ship broken. Guarantees:
 4. **Contract ships.** The DAG lives in `core/.claude/config/workflow-contracts.yaml`
    (kept byte-identical to `config/` by `test_workflow_contracts_config_is_distributable_and_synced`).
 
+## 5.1 Monitoring (hub-ward feedback — automatic, no new pipeline)
+
+The loop's runtime artifacts (`test-results/loop-engineering-verdict.json`, triage
+inbox) are gitignored and stay local. To make downstream behaviour observable from
+the hub WITHOUT a new uploader or outward call, every terminal outcome appends one
+hub-linked entry to `.claude/learnings.json` — the file the hub's weekly
+`aggregate_telemetry.py` already scans on the Friday cron against enrolled repos
+(`config/repos.yml`).
+
+| Terminal signal | Emitted at | What it tells the hub |
+|---|---|---|
+| `preflight_blocked` | STEP 1.5 | provisioning shipped the skill without its worker closure (the #1 downstream defect) |
+| `escalated` | STEP 6 budget exhaustion | a unit the loop could not resolve under budget |
+| `healed` | STEP 6 (heal then pass) | self-healing worked — positive effectiveness |
+| `shipped` | STEP 7 | a unit completed cleanly |
+
+Each entry sets `hub_pattern_link: "loop-engineering"` and a STABLE `tags`
+signature per defect class. The aggregator's `compute_error_prevention_rate` keys
+on exactly those fields: a defect class that recurs across runs lowers the pattern's
+effectiveness rate; a one-off counts as addressed. Result lands in
+`registry/patterns.json` automatically — closing the monitor-downstream loop on the
+existing flywheel rather than a bespoke telemetry channel (KISS/DRY).
+
+`aggregate_telemetry` was hardened (v1.1.0) so a pattern that appears ONLY via a
+learning's `hub_pattern_link` — with no sync-manifest adoption row — is still
+aggregated (`_linked_pattern_names`): otherwise the `escalated` / `preflight_blocked`
+signals would be silently dropped in copy-all / synthesis adoptions that don't write
+a manifest. Guarded by `test_learnings_only_pattern_is_aggregated` (aggregator-level,
+end-to-end) plus `test_loop_engineering_emits_hub_linked_telemetry` (skill-level).
+
+**Constraint:** a downstream project must commit `.claude/learnings.json` for the
+signal to travel (same constraint as all error-prevention telemetry — not new).
+
 ## 6. Out of scope / escalation
 
 - Running the loop against an **external downstream repo** (outward PR/push) is an
