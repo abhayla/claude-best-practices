@@ -3171,7 +3171,7 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance-rule": {
-    "hash": "2bb13cedf0bfc834fb24d379752df5ff145eaa576cae63440abc0b659a8493b7",
+    "hash": "32f6f10631411bccb5a0c485bc3cfe0248648450898ea21af8f8209399c16fa7",
     "type": "rule",
     "category": "core",
     "version": "3.1.0",

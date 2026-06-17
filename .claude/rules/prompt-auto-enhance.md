@@ -53,16 +53,13 @@ stage's detail lives in its SSOT (`configuration-ssot.md`):
 | **5.5 Verify** | Reproduce the doer's gate + independent review before commit; fires on OUTPUT blast radius, even on turns the hook skipped | `supervisor-verification.md`, `independent-test-verification.md` |
 | **6 Git** | Only if committable changes: secret-scan → commit → push via `git-manager-agent` | `decision-authority.md`, `git-collaboration.md` |
 
-## Tier 1 — Always
+## Context tiers — gather before responding
 
 1. Existing `.claude/` patterns — know what exists, do not duplicate
 2. CLAUDE.md — already loaded, reference it
 3. Git state — branch, recent commits, uncommitted changes
-
-## Tier 2 — Conditional (prompt references specific files/features)
-
-4. Nearby files — structural context
-5. `registry/patterns.json` — check before suggesting new patterns
+4. *(conditional — prompt references files/features)* Nearby files — structural context
+5. *(conditional)* `registry/patterns.json` — check before suggesting new patterns
 
 ## Clarification & Confidence Gate — ask/grill until confident (before STEP 4.6)
 
