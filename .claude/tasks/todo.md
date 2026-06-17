@@ -5,6 +5,16 @@
 
 ## Current Task
 
+### loop-engineering — 2026-06-17 — ✅ SHIPPED (merged) + hub-ward monitoring (v1.1.0)
+
+- #75 merged (3636620): the autonomous self-* meta-loop.
+- #76 merged (0f19c21): hub-ward monitoring — loop emits hub-linked learnings on every
+  terminal signal (preflight_blocked/escalated/healed/shipped) → existing weekly
+  aggregate_telemetry cron surfaces downstream defects/effectiveness, no new pipeline.
+- Independent review caught + fixed B1 (aggregator dropped learnings-only patterns);
+  guarded by an end-to-end test. Lesson filed (aggregation must seed from its key field).
+- Remaining: external downstream rollout stays per-repo / owner-gated (unchanged).
+
 ### loop-engineering distributable pattern — 2026-06-16 — ✅ BUILT & VERIFIED (push/PR escalated)
 
 User directive: build a fully-autonomous, self-healing / self-verifying /
