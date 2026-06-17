@@ -2,7 +2,7 @@
 
 # Full-Space-First — discover the whole space before acting, at every stage
 
-version: "1.0.0"
+version: "1.1.0"
 
 The biggest failure mode surfaced building real features: executing the NARROW
 literal input instead of first discovering the FULL relevant space from the
@@ -16,7 +16,7 @@ the consumer's benefit — never satisfy only the literal input handed to you.
 
 | Stage | "Full space" to discover FIRST | SSOT (detail) |
 |---|---|---|
-| Requirements / BA | all use-cases + actors + the value proposition (who/why) | `engineering-roles.md` PM mandate |
+| Requirements / BA | all use-cases + actors + the value proposition (who/why) + the full cost/benefit LIFECYCLE over the usage horizon (recurring/operating costs + the tax treatment of each stream, not just the one-time transaction) | `engineering-roles.md` PM mandate |
 | Design / UI-UX | the full option space (multiple distinct designs), all UX states | `engineering-roles.md` UI/UX role |
 | Build / code | all code paths + edge cases + the DEFAULT product path (not happy-path only) | `error-handling.md`, `output-plausibility-verification.md` |
 | Test | the full test-case/combination space; coverage completeness; substance not shape | `testing.md`, `output-plausibility-verification.md`, `dod-verbs.md` |
@@ -29,6 +29,10 @@ the consumer's benefit — never satisfy only the literal input handed to you.
 
 - **Discover first.** Enumerate the full space (domain + user perspective); WEB-SEARCH to enumerate
   it when the space isn't fully known — before questions, design, code, tests, or ship.
+- **Cover the full LIFECYCLE, not the triggering event.** For any cost/benefit or decision tool,
+  the "space" is temporal too: model every recurring cost AND benefit over the realistic usage
+  horizon (operating/running, maintenance, financing-with-tax-treatment, exit/resale), not just the
+  one-time transaction. Comparing only the upfront event is the incompleteness miss in disguise.
 - **Anchor to benefit.** Coverage serves the consumer's benefit + the documented goal
   (`goal-anchored-decisions.md`), never feature-symmetry or local convenience.
 - **Verify completeness before "done".** Ask "what case / actor / path / sibling did I NOT cover?"
