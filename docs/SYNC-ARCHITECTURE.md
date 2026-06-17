@@ -1,6 +1,6 @@
 # Sync Architecture
 
-## 5 Sync Flows
+## 6 Sync Flows
 
 ### 1. Project → Hub (scan-projects)
 ```
@@ -40,6 +40,14 @@ Local pattern → validate → dedup check → PR to hub
 ```
 - Triggered: User runs `/contribute-practice` in Claude Code
 - Output: PR to hub repo
+
+### 6. Enrolled Projects → Hub (telemetry aggregation)
+```
+Enrolled repos (.claude/ adoption + learnings.json) → aggregate_telemetry.py → effectiveness metrics in registry/patterns.json
+```
+- Triggered: Weekly cron (Friday) via `aggregate-telemetry.yml`, or manual
+- Script: `scripts/aggregate_telemetry.py` (remote mode default; `--local` for a single repo)
+- Output: Adoption signals + error-prevention effectiveness written back to `registry/patterns.json`. Unlike flows 1/2/5, this aggregates signals (not pattern files) and commits metrics directly — it does not open a pattern PR.
 
 ## Deduplication
 

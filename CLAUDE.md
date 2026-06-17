@@ -45,7 +45,7 @@ PYTHONPATH=. python scripts/generate_workflow_docs.py
 
 A curated hub of Claude Code patterns (agents, skills, rules, hooks) organized by stack — for the live count, see `registry/patterns.json` (one top-level key per pattern, excluding `_meta`); `registry/changelog.md` has human-readable history of pattern additions/removals. Three provisioning modes: (1) copy all from `core/.claude/` and prune, (2) smart provision via `recommend.py --provision` (auto-detects stacks), (3) full synthesis via `/synthesize-project`.
 
-The hub has two delivery tiers: **atomic patterns** (above) and **reusable workflows** — the 8 orchestrated multi-step processes the hub creates, updates, and maintains for downstream projects to adopt for productivity (see "Workflow Orchestration (skill-at-T0)" below).
+The hub has two delivery tiers: **atomic patterns** (above) and **reusable workflows** — the 9 orchestrated multi-step processes the hub creates, updates, and maintains for downstream projects to adopt for productivity (the original 8, plus `loop-engineering`; see "Workflow Orchestration (skill-at-T0)" below).
 
 For sync direction semantics (hub↔projects, hub↔internet, aggregation flows), read `docs/SYNC-ARCHITECTURE.md` before modifying any sync script.
 
@@ -96,7 +96,7 @@ Available stacks and their prefixes (full per-stack pattern listing: `docs/STACK
 
 ### Sync Flows
 
-Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `collate.py` (project→hub), `scan_web.py` (internet→hub), `sync_to_projects.py` (hub→projects), `recommend.py` (hub→project advisory).
+Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `collate.py` (project→hub), `scan_web.py` (internet→hub), `sync_to_projects.py` (hub→projects), `recommend.py` (hub→project advisory), `aggregate_telemetry.py` (enrolled projects→hub telemetry).
 
 ### Workflow Orchestration (skill-at-T0)
 
@@ -105,6 +105,8 @@ The 8 multi-step workflows (testing-pipeline, development-loop, debugging-loop, 
 The 8 legacy `core/.claude/agents/<workflow>-master-agent.md` files are `deprecated: true` (Phase 3, 2026-04-25) and MUST NOT be dispatched. New workflow logic goes in the matching `core/.claude/skills/<workflow>/SKILL.md`.
 
 The `project-manager-agent` runs the full PRD-to-Production pipeline and MUST run at T0 — it invokes the 8 workflow skills via `Skill("/<workflow>")`. Dispatching it as a subagent will silently break parallelism for the same reason workflow masters did.
+
+`loop-engineering` (PRs #75–77) is a 9th distributable skill-at-T0 workflow (`core/.claude/skills/loop-engineering/SKILL.md`, spec at `docs/specs/loop-engineering-spec.md`) — a standalone autonomous self-* meta-loop. It is NOT part of the PRD-to-Production pipeline, which is why the counts above (legacy master-agents, project-manager-agent's workflow skills) remain 8.
 
 Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2.
 
