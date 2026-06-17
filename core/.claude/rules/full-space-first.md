@@ -16,7 +16,7 @@ the consumer's benefit — never satisfy only the literal input handed to you.
 
 | Stage | "Full space" to discover FIRST | SSOT (detail) |
 |---|---|---|
-| Requirements / BA | all use-cases + actors + the value proposition (who/why) + the full cost/benefit LIFECYCLE over the usage horizon (recurring/operating costs + the tax treatment of each stream, not just the one-time transaction) | `engineering-roles.md` PM mandate |
+| Requirements / BA | all use-cases + actors + value-per-actor + the full cost/benefit LIFECYCLE over the usage horizon + the component×actor benefit matrix (run the six-item checklist + independent audit) | `ba-discovery-checklist.md`, `engineering-roles.md` PM mandate |
 | Design / UI-UX | the full option space (multiple distinct designs), all UX states | `engineering-roles.md` UI/UX role |
 | Build / code | all code paths + edge cases + the DEFAULT product path (not happy-path only) | `error-handling.md`, `output-plausibility-verification.md` |
 | Test | the full test-case/combination space; coverage completeness; substance not shape | `testing.md`, `output-plausibility-verification.md`, `dod-verbs.md` |

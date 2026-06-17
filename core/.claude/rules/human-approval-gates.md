@@ -22,7 +22,10 @@ asked," discovered too late.
 
 ## Why these three (and not more)
 
-- Building before **G1** risks implementing the wrong thing beautifully.
+- Building before **G1** risks implementing the wrong thing beautifully. **G1 has a
+  precondition:** the BA discovery completeness audit (`ba-discovery-checklist.md`) MUST be
+  clean first — a mockup approved on incomplete discovery just bakes the gap in. Do not present
+  G1 while the independent completeness audit dissents.
 - Shipping before **G2** makes the user discover the misfit in production.
 - **G3** is the irreversible/outward gate `decision-authority.md` already owns; this
   rule only names it as a pipeline checkpoint.

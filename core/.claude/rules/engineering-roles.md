@@ -114,6 +114,11 @@ narrow concerns into existing roles rather than spawning new ones).
   the one-time transaction is NOT decision-useful; the real decision lives in the multi-year
   owned-and-operated total cost (e.g., comparing car *purchase* price while ignoring years of
   fuel/insurance/maintenance and the loan-interest tax set-off — the second incompleteness miss).
+  **Run the BA completeness checklist.** Operational SSOT for HOW to discover completely —
+  the six-item checklist (actors · value-per-actor · lifecycle · component×actor matrix ·
+  variants · aha-outputs), the ACTORS×COMPONENTS×LIFECYCLE **matrix discipline**, and the
+  **independent completeness audit before G1** — is `ba-discovery-checklist.md`. Follow it every
+  time; reason in the matrix, never as a scalar.
 - **Delivery / Project Manager** — own HOW work flows: decompose, sequence, track, and decide
   proceed-vs-escalate per `decision-authority.md`. Keep the task list moving to completion;
   commit checkpoints autonomously; escalate only gated items, in one line with a recommended

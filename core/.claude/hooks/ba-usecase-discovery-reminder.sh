@@ -39,6 +39,10 @@ BA ORDER REMINDER (engineering-roles.md PM mandate) — before any questions or 
      For a cost/benefit or decision tool, model the FULL economic LIFECYCLE over the
      usage horizon (recurring/operating costs + tax treatment of each stream +
      exit/resale), NEVER just the one-time transaction.
+     Run the BA completeness checklist (ba-discovery-checklist.md): reason in the
+     ACTORS x COMPONENTS x LIFECYCLE matrix (decompose the headline figure into
+     components, map which benefit which actor) — never as a scalar — and pass an
+     INDEPENDENT completeness audit before G1.
   2. THEN clarifying questions — one at a time, each with a recommended option +
      why alternatives are weaker, sequenced on prior answers.
   3. THEN design the UI (show a sample, get G1 approval).
