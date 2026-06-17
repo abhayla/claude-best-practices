@@ -35,7 +35,13 @@ Cross-check on-disk data against the session's known sequence; NEVER fabricate s
 
 ## STEP 2: Assemble the sections
 1. **Summary** — outcome + KPI tiles (tests, build, commits, agents, design options).
-2. **Timeline / sequence** — ordered steps with what was caught/corrected.
+2. **Process flow — INTERACTIVE diagram (featured).** An inline-SVG lifecycle diagram of the
+   ACTUAL path this project took (SDLC-style stages) WITH its real LOOPS drawn as labeled
+   loop-back arrows (e.g. clarify / design-iteration / fix-verify / owner-feedback / learn), plus
+   gate markers (G1/G2/G3). Each stage node is CLICKABLE (inline `<script>`, no libs) → a detail
+   panel showing that stage's Roles · Skills/Workflows · Agents · Hooks · Rules · Gate · Outputs.
+   This is the owner's "how it was planned + what ran behind the scenes at each stage" view.
+3. **Timeline / sequence** — ordered steps with what was caught/corrected.
 3. **Roles engaged** — PM/BA · UX · Full-Stack · QA · DevOps (per `engineering-roles.md`), one line each.
 4. **Patterns used (how & when)** — skills / rules / hooks / workflows actually used + when.
 5. **Agents dispatched** — agent · count · purpose.
