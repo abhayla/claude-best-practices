@@ -2,6 +2,12 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-17 — Global `.claude/` gitignore silently drops NEW pattern files
+
+**Surfaced during:** committing the BA reminder hook. The NEW file `core/.claude/hooks/ba-usecase-discovery-reminder.sh` was silently excluded from the commit (PR diff had settings+registry but not the script) — a global `~/.config/git/ignore` rule `.claude/` ignores `.claude/` at any depth, including `core/.claude/`. Already-tracked files keep committing (so edits look fine); only NEW files are dropped, and `git add` only prints an easy-to-miss hint.
+
+**What to do instead:** (1) Deterministic fix applied — repo `.gitignore` now has `!core/.claude/` to override the global rule so new distributable-template files track normally; for hub-only `.claude/` use `git add -f`. (2) ALWAYS run `git diff --stat main..<branch>` and confirm NEW pattern files are present before calling a PR complete — a new pattern file missing from the commit means the registry references a file not in the repo (CI fails / pattern silently absent). Verifying the diff caught this; not verifying would have shipped a broken pattern.
+
 ## 2026-06-17 — BA sequence: use-case discovery FIRST, then questions, then UI
 
 **Surfaced during:** calculator build (crystallized by Abhay). The load-bearing part is the ORDER, which my v1.2.0 edit hadn't pinned.
