@@ -5082,10 +5082,10 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "2fdfe086a98c70f203e1442740938174f81178657864964e3d65f1887160d050",
+    "hash": "6c7c33e3e6a4b8e7062349b6046f6d78885dad615936cfe571684f4484b0b446",
     "type": "rule",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
     "last_updated": "2026-06-17",
@@ -5098,7 +5098,7 @@
       "routing",
       "orchestration"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns) | v1.1.0 (2026-06-17): Product Manager mandate — research the domain BEFORE asking; decide domain/math/best-practice matters yourself (overridable assumptions), never ask the user a verifiable fact or a question premised on an unverified domain assumption.",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns) | v1.1.0 (2026-06-17): Product Manager mandate — research the domain BEFORE asking; decide domain/math/best-practice matters yourself (overridable assumptions), never ask the user a verifiable fact or a question premised on an unverified domain assumption. | v1.2.0 (2026-06-17): PM mandate — articulate the value proposition (primary user + why) and map the FULL use-case/combination space before building; expand scope to maximize benefit; challenge the build if no concrete benefit.",
     "tier": "nice-to-have"
   },
   "no-overask-guard": {

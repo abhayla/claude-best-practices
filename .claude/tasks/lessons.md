@@ -2,6 +2,14 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-17 — PM: value proposition + full use-case space FIRST (don't just build the spec)
+
+**Surfaced during:** calculator build. Abhay's biggest critique: I executed the literal 4-scenario spec without doing the product/BA work — exploring ALL meaningful use-case combinations and articulating WHY anyone would use the tool (the benefit). Research afterward showed the build covered ~15% of the valuable surface AND missed the PRIMARY user.
+
+**What I got wrong:** Treated the handed spec (person×company × cash×loan) as the scope. Never asked "who is the primary user, why would they use this, what maximizes their benefit?" The domain research (done late) revealed THREE actors not two — the **self-employed professional/proprietor** is the primary beneficiary; a salaried person is the no-benefit baseline. Also missed high-leverage levers: tax-slab, business-use %, EV vs ICE (40% vs 15% depreciation), lease-vs-buy, resale/STCG recapture, and break-even/threshold "aha" outputs.
+
+**What to do instead:** As PM/BA, BEFORE/while building: (1) state the VALUE PROPOSITION — primary user + why they'd use it + the benefit they can't get elsewhere; (2) map the FULL use-case/combination space (actors, variants, edge cases), not just the literal spec; (3) expand scope to maximize benefit across all real use cases and surface the high-value insights; (4) if you can't state a concrete benefit, challenge whether to build it. Rule updated: `engineering-roles.md` Product Manager mandate.
+
 ## 2026-06-17 — Calculator dogfood retrospective (multiple misses)
 
 **Surfaced during:** building the calculator app end-to-end. Consolidated honest misses:
