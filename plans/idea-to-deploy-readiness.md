@@ -61,5 +61,23 @@ in `core/` so any downstream project inherits the capability.
   STAGE-10-DEPLOY.
 - Verification: smoke-test the pipeline DAG; `test_workflow_closure_consistency.py` green.
 
+## Self-improvement loop (runs at EVERY stage — Abhay's standing directive 2026-06-17)
+
+While building the app, after each stage AND on every mistake/correction/friction, run a
+self-improve micro-cycle (do NOT defer it to the end):
+
+1. **Detect** — did I hit a mistake, friction, a routing miss, or a hub capability gap this stage?
+2. **Type it** (`learnings-routing.md`): GENERIC craft/process/tooling vs PRODUCT-SPECIFIC (this app's domain).
+3. **Route + act**:
+   - GENERIC craft/process → append to `.claude/tasks/lessons.md` (+ memory); propose a rule change (approval-gated) if it's a constraint.
+   - HUB CAPABILITY GAP (a Unit hit by a real caller) → close it in `core/` NOW + land via PR, then continue the build (concrete caller = no speculative YAGNI).
+   - PRODUCT-SPECIFIC → the app's own docs, never a hub pattern.
+4. **Prefer a deterministic gate** (hook/test/validator) over prose when mechanically enforceable.
+5. **Capture** via `/learn-n-improve` after any fix (per `claude-behavior.md` rule 15); dedup before filing.
+6. **Continue** the build — the app keeps moving; the hub upgrades + lessons are the durable byproduct.
+
+The hardened hub + the accumulated lessons are the real deliverable of the run; the app proves them.
+
 ## Done = README goal #3 is truthfully met: an idea runs idea→clarify(domain-deep)→UI+approve
-→build→test→verify→sign-off→deploy-to-VPS, with the right role at each stage.
+→build→test→verify→sign-off→deploy-to-VPS, with the right role at each stage — AND the
+self-improvement loop above ran at every stage (lessons captured, gaps closed in the hub).
