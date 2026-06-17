@@ -68,9 +68,12 @@ stage's detail lives in its SSOT (`configuration-ssot.md`):
 Merged intent-resolution gate (Clarification Gate + `decision-authority.md`
 confidence gate), tiered:
 
-- **1–2 small gaps** → one targeted question at a time; no upper limit; stop when
-  confidence is reached, not at a question count. Read the codebase before asking —
-  each question must be unanswerable from Tier 1/2 context.
+- **1–2 small gaps** → exactly ONE question per turn (no upper limit; stop when
+  confident, not at a count). Hold the full list internally, grouped by category
+  (functional → UI/UX → scale); ask the next only after the current is answered,
+  sequenced on prior answers — never ask what's already answered, implied, or
+  contradicted. Each question gives a **recommended** option + one-line why, and
+  why alternatives are weaker. Ask only what's unanswerable from Tier 1/2 context.
 - **Consequential fork** and confidence < ~95% → converge via `/grill-me` or
   `/grill-with-docs` before building — never guess at WHAT to build.
 - **"You take a call" / pre-authorized** → gate waived; proceed, stating assumptions.
