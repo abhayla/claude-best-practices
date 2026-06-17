@@ -1,6 +1,14 @@
 # Lessons Learned
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
+
+## 2026-06-17 — Clarification: ONE question per turn, each with a recommendation
+
+**Surfaced during:** the calculator dogfood build — at the requirements stage I dumped 11 questions in one turn. Abhay corrected: ask one at a time (grouped by category), and for each question give a recommended option + justification + why the other options are weaker.
+
+**What I got wrong:** Batched the entire question set in a single message — overwhelming, and a direct violation of the existing "one targeted question at a time" clause in the clarification gate. Also asked bare questions with no recommendation, forcing the user to reason from scratch.
+
+**What to do instead:** Hold the full question list internally; group by category (functional → UI/UX → scale); ask EXACTLY ONE per turn; only ask the next after the current is answered. Every question presents options with a **recommended** option + a one-line justification + a one-line reason each alternative is weaker — prefer `AskUserQuestion` with the recommended option first. **Sequence on prior answers** — re-read the running answer log before each question; never ask something already answered, implied, or contradicted earlier; drop/adapt now-moot queued questions as answers land. Rule updated: `core/.claude/rules/prompt-auto-enhance-rule.md` Clarification Gate.
 <!-- Review at session start to avoid repeating mistakes. -->
 <!-- Format: date, what went wrong, what to do instead. -->
 

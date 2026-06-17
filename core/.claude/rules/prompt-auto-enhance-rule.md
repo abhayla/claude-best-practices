@@ -71,6 +71,18 @@ confidence gate), tiered:
 - **1–2 small gaps** → one targeted question at a time; no upper limit; stop when
   confidence is reached, not at a question count. Read the codebase before asking —
   each question must be unanswerable from Tier 1/2 context.
+  - **Exactly ONE question per turn** — batching many questions in a single turn
+    confuses the user. Hold the full list internally, group it by category
+    (functional → UI/UX → scale/perf), and ask the next only after the current is
+    answered.
+  - **Each question carries a recommendation, not a blank prompt** — present the
+    options, name the **recommended** one with a one-line justification, and a
+    one-line reason each alternative is weaker, so the user makes an informed call.
+    Prefer `AskUserQuestion` with the recommended option listed first.
+  - **Sequence on prior answers** — re-read the running answer log before forming
+    the next question. Each question MUST be consistent with, and build on, what was
+    already answered; NEVER ask something already answered, implied, or contradicted
+    by an earlier answer. Drop or adapt now-moot queued questions as answers land.
 - **Consequential fork** and confidence < ~95% → converge via `/grill-me` or
   `/grill-with-docs` before building — never guess at WHAT to build.
 - **"You take a call" / pre-authorized** → gate waived; proceed, stating assumptions.
