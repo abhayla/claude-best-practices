@@ -54,6 +54,25 @@ full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
+# ── Reviewer-grade-card enforcement (content completeness; runs PRE-exemption) ──
+# The prompt-auto-enhance after-card MUST show the INDEPENDENT REVIEWER's per-dimension
+# column (skill STEP 4), not just its overall. Detection is precise: a rendered card has a
+# "self-after" column header; if "self-after" is present but "reviewer-after" is absent, the
+# reviewer's grade card was omitted. Runs BEFORE the sync-check exemption so enhance demos
+# (which carry the *Sync-check:* gate marker) are still checked. WHY a hook: prose in the
+# skill drifted unenforced across turns — zero-exception behaviour needs a hook, not prose.
+# Own loop-guard (.reviewcard-count, reset per turn by prompt-enhance-reminder.sh), cap 4.
+if printf '%s' "$full" | grep -qE "self-after" && ! printf '%s' "$full" | grep -qE "reviewer-after"; then
+  rc="$root/.claude/.reviewcard-count"
+  rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
+  printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
+  if [ "$rn" -lt 4 ]; then
+    printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
+    jq -nc --arg r "STOP BLOCKED (enhance: independent-reviewer grade card missing). You rendered a before→after grade card (Self-after column present) but omitted the Reviewer-after per-dimension column. The user requires the independent reviewer's per-dimension grade card EVERY enhanced turn, no bypass (prompt-auto-enhance skill STEP 4). Re-render the card WITH the Reviewer-after column (the blind reviewer's per-dimension scores), then continue." '{decision:"block", reason:$r}'
+    exit 0
+  fi
+fi
+
 # ── Exemption: a GENUINE blocker / escalation / user-input-needed stop is legitimate. ──
 # Includes the deliberate `*Sync-check:*` INTENT-GRILL marker: when the assistant is
 # genuinely NOT SURE WHAT THE USER IS ASKING (intent ambiguity OR a consequential design fork
