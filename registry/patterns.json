@@ -1,4 +1,25 @@
 {
+  "full-space-first": {
+    "hash": "90951c6dfce65879ec67937552a3d5963cc4a182b3f954428b4c1d5230124a4d",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-17",
+    "last_updated": "2026-06-17",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Cross-cutting global rule: at EVERY SDLC + loop-engineering stage, discover the full relevant space from the consumer's perspective (research / web-search when unknown) BEFORE acting — never execute only the narrow literal input. Per-stage manifestations (BA use-cases, design options, build code-paths, test coverage, bug sibling-sweep, deploy failure modes, loop DISCOVER) point to existing SSOTs; verify completeness before done.",
+    "tags": [
+      "global-rule",
+      "completeness",
+      "use-case-discovery",
+      "workflow",
+      "verification"
+    ],
+    "changelog": "v1.0.0 (2026-06-17): Initial — generalizes the BA use-case-first learning into a cross-cutting full-space-first principle applied to every stage via per-stage pointers.",
+    "tier": "nice-to-have"
+  },
   "ba-usecase-discovery-reminder": {
     "hash": "9ec5eb7c53ced315f90ab9abbd62fc302dc9713909bbfeff7025560eec94988f",
     "type": "hook",
@@ -5080,7 +5101,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-17",
-    "total_patterns": 266
+    "total_patterns": 267
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
