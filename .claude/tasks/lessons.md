@@ -4,6 +4,35 @@
 <!-- Review at session start to avoid repeating mistakes. -->
 <!-- Format: date, what went wrong, what to do instead. -->
 
+## 2026-06-17 — Aggregation that keys on a link field must SEED from it too (telemetry silent-drop)
+
+**Surfaced during:** wiring loop-engineering's hub-ward monitoring; the
+independent code-reviewer (maker/checker pass) caught it — my own unit test did not.
+
+**What I got wrong:** I added `hub_pattern_link: "loop-engineering"` emission to
+the skill and verified `aggregate_telemetry.compute_error_prevention_rate` keys on
+that field. Looked correct. But the ORCHESTRATION layer (`aggregate_project_telemetry`
+/ `aggregate_remote`) built its iteration set `all_patterns` ONLY from the
+sync-manifest adoption scan, then looped `for pattern in all_patterns:`. A learning
+linked to a pattern NOT in the manifest was loaded into memory but never iterated —
+silently dropped. The leaf function was right; the caller never asked it about the
+pattern. Classic "wrong-but-working": every unit test green, signal lost.
+
+**What to do instead:** when an aggregator/join keys records on a field X, its
+iteration/seed set MUST include `union(primary_set, distinct values of X across the
+records)` — not just the primary set. Here: seed `all_patterns` with manifest names
+∪ every `hub_pattern_link` found in learnings (`_linked_pattern_names`).
+
+**Generalizable (two lessons):**
+1. A unit test on the leaf compute fn does NOT prove the pipeline delivers — add an
+   END-TO-END test through the orchestration entry point (it's the one that flips
+   pre/post fix).
+2. The maker≠checker split earns its cost: an independent reviewer with fresh
+   context caught a silent-no-op that the author (me) + author-written unit tests
+   missed. Always run the independent pass on telemetry/aggregation wiring.
+
+**Pinned by:** `test_learnings_only_pattern_is_aggregated` in `scripts/tests/test_aggregate_telemetry.py`.
+
 ## 2026-06-16 — Skill() invocations belong in FENCED code blocks, not inline backticks
 
 **Surfaced during:** authoring `core/.claude/skills/loop-engineering/SKILL.md`;
