@@ -65,7 +65,8 @@ stage's detail lives in its SSOT (`configuration-ssot.md`):
 ## Clarification & Confidence Gate — ask/grill until confident (before STEP 4.6)
 
 Merged intent-resolution gate (Clarification Gate + `decision-authority.md`
-confidence gate), tiered:
+confidence gate), tiered. The gate question opens with the `*Sync-check:*` marker — a
+required-intent stop the `no-overask-guard.sh` hook EXEMPTS, never an over-ask:
 
 - **1–2 small gaps** → exactly ONE question per turn (no upper limit; stop when
   confident, not at a count). Hold the full list internally, grouped by category
@@ -77,9 +78,8 @@ confidence gate), tiered:
   `/grill-with-docs` before building — never guess at WHAT to build.
 - **"You take a call" / pre-authorized** → gate waived; proceed, stating assumptions.
 
-Confidence is about **intent**, never reversible execution detail (stage 5 decides
-those). The final prompt is shown for transparency, not approval — execution proceeds
-in the same response.
+Confidence is about **intent**, never reversible execution detail (stage 5 decides those).
+The final prompt is shown for transparency — execution proceeds in the same response.
 
 ## Resource CRUD
 

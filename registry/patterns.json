@@ -3142,7 +3142,7 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance": {
-    "hash": "13200b3604d847eccd52dc22b52fdbeb0dad2f411cb930f1d3e77e4d9497e91a",
+    "hash": "7ab92bb36c518e72f187be70d907e68732f1be493fedc7f706633f0d1dedc883",
     "type": "skill",
     "category": "core",
     "version": "3.6.0",
@@ -3171,7 +3171,7 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance-rule": {
-    "hash": "5ce3849ac8754168c117c5983d40b2b23a88168f9fc75364cdeed9592073b5d3",
+    "hash": "565750b1e8117cba959db8df13e56b90a6eb58b328ae5b409e9b60d3c951148d",
     "type": "rule",
     "category": "core",
     "version": "3.1.0",
