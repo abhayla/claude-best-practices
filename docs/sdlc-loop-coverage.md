@@ -4,6 +4,44 @@ How this hub's idea→production pipeline (README goal #3) maps to two industry 
 models, with an **honest** documented / implemented / tested status per stage. Updated
 2026-06-17. Gaps here are the same ones tracked in `plans/idea-to-deploy-readiness.md`.
 
+## The combined model — SDLC (WHAT) × Loop-Engineering (HOW)
+
+The two reference models are **complementary, not competing**:
+
+- **SDLC** (Software Development Life *Cycle*) = the **stations / WHAT** — the phases every feature
+  passes through (Requirements → Design → Build → Test → Integrate → Deploy → Operate). Phase
+  sequence, waterfall/iterative lineage — gives **depth & discipline per phase**. Each station maps
+  to a hub **role + workflow** (`engineering-roles.md` + the 9 workflows).
+- **Loop-Engineering** (Addy Osmani's AI-agent pattern) = the **engine / HOW** — DISCOVER → PLAN →
+  EXECUTE(maker) → VERIFY(checker) → SHIP | FEEDBACK → LEARN. Agile **cadence** (short iterations,
+  continuous feedback, working increments, inspect-and-adapt), agentic form (maker ≠ checker,
+  bounded, self-healing). Implemented as the `loop-engineering` skill / `development-loop`.
+  *Note: agile in spirit, not formal Scrum/Kanban.*
+
+**Combination:** run each SDLC station **inside** a bounded maker-checker feedback loop — SDLC's
+rigor + agile's responsiveness. A unit of work enters at DISCOVER (Requirements/use-cases/value),
+flows PLAN (Design, G1 approval) → EXECUTE (Build, TDD) → VERIFY (Test + independent review) → SHIP
+(Deploy gate) ; FEEDBACK self-heals failures and LEARN feeds the next cycle.
+
+```
+   loop-engineering ENGINE (agile cadence)
+   DISCOVER → PLAN → EXECUTE(maker) → VERIFY(checker) → SHIP ─┐
+       ▲                                                      │ FEEDBACK (self-heal)
+       └───────────────── LEARN ◀──────────────────────────────┘
+   drives a unit THROUGH the SDLC stations (WHAT, depth per phase):
+   Requirements ─ Design ─ Build ─ Test ─ Integrate ─ Deploy ─ Operate
+```
+
+**Cross-cutting rails (apply at EVERY station AND every loop turn):** `full-space-first`,
+value/use-case-first (`engineering-roles.md` PM), human-approval gates (`human-approval-gates.md`),
+maker≠checker verification (`independent-test-verification.md`, `supervisor-verification.md`),
+self-improve/learn-each-cycle. Encoded as global rules so they fire everywhere — not per-stage notes.
+
+**Reusable across projects:** the SDLC roles, the loop engine, and the cross-cutting rails all ship
+as distributable hub patterns (rules/skills/agents/hooks); any project inherits the combined model
+via `/synthesize-project` / provisioning. The hub IS the mechanism that makes "SDLC stations driven
+by an agile loop, with these rails" reusable everywhere.
+
 ## Reference A — 10-step SDLC (Communication → Operation & Maintenance)
 
 | # | SDLC stage | Hub owner (role · skills) | Documented | Implemented | Tested |
