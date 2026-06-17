@@ -701,7 +701,7 @@ confidence is reached, not when a question count is hit.
 
 **Question format (locked template):**
 ```
-Question N of unbounded — Clarification Gate
+*Sync-check:* Question N of unbounded — Clarification Gate
 
 <one specific question, unanswerable from Tier 1/2 context>
 
@@ -713,6 +713,11 @@ Why: <one sentence citing a specific source — file path with line number,
 
 (Confirm, correct, or specify a different value.)
 ```
+
+The gate opens with the `*Sync-check:*` marker because it IS a genuine required-intent
+question, not a permission-to-start over-ask — the `no-overask-guard.sh` Stop hook EXEMPTS
+that marker (decision-authority.md "Confidence gate"). Without it, a fired gate (and any
+rendered demo of one) trips the over-ask guard.
 
 Rules for this format:
 - The Recommendation is a **single value**, not a multiple-choice list. The
