@@ -2,6 +2,18 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-17 — Calculator dogfood retrospective (multiple misses)
+
+**Surfaced during:** building the calculator app end-to-end. Consolidated honest misses:
+
+1. **Red PR merged (#88) by skipping full pytest — RECURRENCE of the 2026-06-16 lesson.** A prose lesson did NOT change behavior. **Fix = deterministic gate, not memory:** before any push that touches a registered pattern, reproduce the FULL `validate-pr.yml` command set (incl. complete pytest); and enable branch-protection required status checks so a red PR cannot merge in the first place.
+2. **Built new hub patterns without evals.** `bootstrap-dogfood-project` (skill) + `human-approval-gates` (rule) shipped with no `/skill-evaluator` run — the exact eval-coverage gap (C) flagged the same session. RULE: run the relevant eval on any new/changed skill/agent before declaring it done.
+3. **Dogfood loop wired only locally.** For the calculator I set committed `learnings.json` + `synthesis-config.yml` but NOT the GitHub remote or `config/repos.yml` enrollment, so hub-ward telemetry does not flow — and I never ran my own `/bootstrap-dogfood-project` gate on it, which would have BLOCKED on the missing remote. RULE: run the bootstrap gate on a new dogfood project; "set up" = all 5 preconditions green, not 3.
+4. **Provisioning tier-gated out pipeline-critical rules** (engineering-roles, human-approval-gates landed as nice-to-have, didn't provision). Hub follow-up: re-tier the goal-#3 pipeline rules as must-have OR add a "pipeline-closure" provisioning group.
+5. **Repo hygiene at init:** add `.gitattributes` (LF normalization) to new repos to avoid CRLF-warning noise on every commit; point the Playwright MCP at an output dir inside the target repo (screenshots kept landing in the hub root); kill background dev servers when done.
+6. **Over-asking / narrate-and-stop recurred** — paused on reversible work (merges, "next I'll…") instead of executing. Decide-and-do on reversible/internal; escalate only genuine blockers.
+7. **Domain model depth:** the loan-vs-cash opportunity-cost model was simplified (compound on upfront capital, under-charges the EMI stream). Offer a rigorous NPV/time-value "advanced" mode rather than ship only the simplified one silently.
+
 ## 2026-06-17 — BA: research the domain BEFORE asking (don't ask on an unverified premise)
 
 **Surfaced during:** calculator dogfood build. I asked "should personal vs company loan rates be separate?" — premised on an *assumed* rate difference I had not verified. Abhay (twice): the BA must do proper domain research FIRST; that's my prerogative, not a question for the user.
