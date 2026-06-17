@@ -90,6 +90,29 @@ down?) is thin: it depends on `aggregate_telemetry.py`'s effectiveness data, whi
 This closes as the dogfood run accumulates cycles — surface per-run metrics (cycles, heals, escalations,
 first-pass-pass) and trend them so "improving" is evidenced, not asserted. Build when enough runs exist.
 
+## Where the app lives + how feedback returns (no silent loophole)
+
+The app is built in its **own repo** (the hub is the framework — building an app inside it would
+pollute the template), synthesized via `/synthesize-project --repo <app>`. Feedback returns to the
+hub by 4 paths: in-session hub PR (immediate, when a gap is hit — primary), `/contribute-practice`
+(on-demand pattern push), `collate.py`/scan-projects (weekly), `aggregate_telemetry.py` (weekly,
+reads committed `.claude/learnings.json`). `/synthesize-hub` generalizes shared patterns.
+
+### Dogfood-bootstrap checklist — MUST run at app-project creation, BEFORE the first code line
+
+These are preconditions the feedback flows assume; if unset, the app improves locally but nothing
+reaches the hub (the silent loophole). Wiring them at birth is non-negotiable:
+
+1. **GitHub remote** — create + push the app repo (aggregators read via GitHub API; local-only = invisible).
+2. **Enroll** the repo in the hub's `config/repos.yml` (else collate + telemetry never scan it).
+3. **Commit `.claude/learnings.json`** — MUST NOT be gitignored (hub reads the committed file; gitignored = zero signal — loop-engineering's #1 silent failure).
+4. **`allow_hub_sharing: true`** in the app's `.claude/synthesis-config.yml` (enables `/synthesize-hub`).
+5. **Routing discipline** (`learnings-routing.md`) — generic learnings flow hub-ward; product-specific stay in the app. The loop-engineering signals carry `hub_pattern_link` so the aggregator matches them.
+
+Build this as a real `/bootstrap-dogfood-project` step (or fold into `/synthesize-project`) when the
+project-creation stage is hit — until then this checklist is the contract. A run is NOT "set up"
+until all 5 are verified green.
+
 ## Done = README goal #3 is truthfully met: an idea runs idea→clarify(domain-deep)→UI+approve
 →build→test→verify→sign-off→deploy-to-VPS, with the right role at each stage — AND the
 self-improvement loop above ran at every stage (lessons captured, gaps closed in the hub).
