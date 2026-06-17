@@ -1,4 +1,25 @@
 {
+  "ba-usecase-discovery-reminder": {
+    "hash": "9ec5eb7c53ced315f90ab9abbd62fc302dc9713909bbfeff7025560eec94988f",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-17",
+    "last_updated": "2026-06-17",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "UserPromptSubmit hook that injects the BA discipline order (engineering-roles PM mandate) on build/feature-shaped prompts: discover the full use-case space FIRST (domain + user perspective; web-search to enumerate) -> then clarifying questions -> then UI -> then build. Salience layer (deterministic trigger, advisory); quality/completeness is enforced by the rule + independent review, not the hook.",
+    "tags": [
+      "hook",
+      "user-prompt-submit",
+      "BA",
+      "use-case-discovery",
+      "governance"
+    ],
+    "changelog": "v1.0.0 (2026-06-17): Initial — fires the BA use-case-discovery-first order on build/feature prompts.",
+    "tier": "nice-to-have"
+  },
   "human-approval-gates": {
     "hash": "6d4bf0e205f2dfe2138416120895046f4a1cf0a28804faf1a3c91baad777868d",
     "type": "rule",
@@ -5059,7 +5080,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-17",
-    "total_patterns": 265
+    "total_patterns": 266
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
