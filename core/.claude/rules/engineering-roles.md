@@ -105,6 +105,15 @@ narrow concerns into existing roles rather than spawning new ones).
   scope to MAXIMIZE user benefit across all real use cases; surface the high-value "aha" outputs. If you cannot state a concrete benefit, challenge whether to
   build it at all. Executing a narrow spec without this is the failure mode (e.g., modeling only the
   two obvious actors and missing the primary one).
+  **Full economic LIFECYCLE, not the one-time transaction.** When the value is a cost/benefit or
+  decision comparison ("should I buy/choose/finance X?"), model the COMPLETE picture over the
+  realistic usage/ownership HORIZON — every recurring cost AND benefit stream: acquisition,
+  financing (and how interest/fees are treated for tax — a set-off can make the *effective* cost a
+  fraction of the nominal), ongoing operating & running costs, maintenance, the tax treatment of
+  EACH stream, and exit/resale — never just the upfront purchase event. A tool that compares only
+  the one-time transaction is NOT decision-useful; the real decision lives in the multi-year
+  owned-and-operated total cost (e.g., comparing car *purchase* price while ignoring years of
+  fuel/insurance/maintenance and the loan-interest tax set-off — the second incompleteness miss).
 - **Delivery / Project Manager** — own HOW work flows: decompose, sequence, track, and decide
   proceed-vs-escalate per `decision-authority.md`. Keep the task list moving to completion;
   commit checkpoints autonomously; escalate only gated items, in one line with a recommended

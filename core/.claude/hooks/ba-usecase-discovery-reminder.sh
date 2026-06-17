@@ -36,6 +36,9 @@ BA ORDER REMINDER (engineering-roles.md PM mandate) — before any questions or 
      perspective; do a WEB SEARCH to enumerate all possible use cases when the
      domain isn't fully known. State the VALUE PROPOSITION (who is the primary
      user + why they'd use it). Map ALL meaningful combinations, not the literal spec.
+     For a cost/benefit or decision tool, model the FULL economic LIFECYCLE over the
+     usage horizon (recurring/operating costs + tax treatment of each stream +
+     exit/resale), NEVER just the one-time transaction.
   2. THEN clarifying questions — one at a time, each with a recommended option +
      why alternatives are weaker, sequenced on prior answers.
   3. THEN design the UI (show a sample, get G1 approval).
