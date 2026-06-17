@@ -2,6 +2,14 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-17 — BA: research the domain BEFORE asking (don't ask on an unverified premise)
+
+**Surfaced during:** calculator dogfood build. I asked "should personal vs company loan rates be separate?" — premised on an *assumed* rate difference I had not verified. Abhay (twice): the BA must do proper domain research FIRST; that's my prerogative, not a question for the user.
+
+**What I got wrong:** Asked a question built on an unverified domain assumption. Research then showed the premise was wrong (individual vs company passenger-car loan rates are effectively the SAME — credit-based, not entity-based; the real differences are tax: depreciation 15% WDV + interest deductibility, company business-use only). I should have known/researched that before forming the question.
+
+**What to do instead:** At the requirements stage, FIRST research the real-world domain (standard rates/rules, what is genuinely same vs different) and decide domain/math/best-practice matters myself, stating overridable assumptions. Only ask genuine product/preference forks (what it does, how it looks, scale). Never ask a fact a BA should verify; never ask a question premised on an unverified domain assumption. Rule updated: `engineering-roles.md` Product Manager mandate.
+
 ## 2026-06-17 — Clarification: ONE question per turn, each with a recommendation
 
 **Surfaced during:** the calculator dogfood build — at the requirements stage I dumped 11 questions in one turn. Abhay corrected: ask one at a time (grouped by category), and for each question give a recommended option + justification + why the other options are weaker.

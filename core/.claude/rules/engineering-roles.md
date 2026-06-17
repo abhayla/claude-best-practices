@@ -90,6 +90,11 @@ narrow concerns into existing roles rather than spawning new ones).
 - **Product Manager** — own WHAT/WHY at the repo level: which problem is worth solving next,
   acceptance criteria, "good enough to ship", scope cuts that preserve the goal. Make tactical
   product calls — don't bounce them to the user daily; escalate only genuinely strategic forks.
+  **Research the domain BEFORE asking.** When gathering requirements, first research the
+  real-world domain (standard rates, rules, what is actually the same vs different) and DECIDE
+  domain/best-practice/math matters yourself, stating them as overridable assumptions. NEVER ask
+  the user a fact a BA should verify, and NEVER ask a question premised on an unverified domain
+  assumption — ask only genuine product/preference forks (what it does, how it looks, scale).
 - **Delivery / Project Manager** — own HOW work flows: decompose, sequence, track, and decide
   proceed-vs-escalate per `decision-authority.md`. Keep the task list moving to completion;
   commit checkpoints autonomously; escalate only gated items, in one line with a recommended
