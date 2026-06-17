@@ -5082,13 +5082,13 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "bfc54421ac2b1b2751c1b199618330ebbe07d9e64516005b10da04dd90293127",
+    "hash": "2fdfe086a98c70f203e1442740938174f81178657864964e3d65f1887160d050",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-17",
     "dependencies": [],
     "visibility": "public",
     "description": "Autonomous role router: infer the engineering role from the task signal, state `Role: <name> — <why>`, and dispatch the role's named agents/skills (routing layer, no capability duplication). Includes router table, condensed mandates, canonical multi-role sequences with a mandatory independent-reviewer edge, and a routing feedback loop.",
@@ -5098,7 +5098,7 @@
       "routing",
       "orchestration"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns) | v1.1.0 (2026-06-17): Product Manager mandate — research the domain BEFORE asking; decide domain/math/best-practice matters yourself (overridable assumptions), never ask the user a verifiable fact or a question premised on an unverified domain assumption.",
     "tier": "nice-to-have"
   },
   "no-overask-guard": {
