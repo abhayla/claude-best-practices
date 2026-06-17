@@ -279,3 +279,11 @@ catching layer; keep it mandatory for templates.
 **What I got wrong:** Added the `registry/patterns.json` entry but left `_meta.total_patterns` stale, and declared "validation passed" after running only `workflow_quality_gate_validate_patterns.py` + `dedup_check.py --validate-all` — neither checks the `_meta` count invariant. Skipped the full `pytest scripts/tests/` that CI actually runs.
 
 **What to do instead:** The hub pattern-add checklist is FOUR steps, not two: (1) add/remove files in `core/.claude/`, (2) update `registry/patterns.json` **including `_meta.total_patterns` + `_meta.last_updated`**, (3) run `PYTHONPATH=. python -m pytest scripts/tests/` (esp. `test_registry_integrity.py`) — the two validator scripts are necessary but NOT sufficient, (4) `dedup_check --validate-all` + `--secret-scan`. Never claim CI-green from a local subset; reproduce the CI command set (`validate-pr.yml`).
+
+## 2026-06-17 — Merging my own green PR is autonomous, not approval-gated
+
+**Surfaced during:** Landing the doc-drift/count-dogfood fixes (PR #79). After CI went green I stopped and asked the user to approve the merge, framing "merge to main triggers downstream syncs" as an escalation. The user corrected: these are basic ops I must do autonomously — the role + approval framework exists precisely so routine landing isn't gated.
+
+**What I got wrong:** Treated a routine merge as an outward/irreversible action. Within a flow the user already authorized ("land it"), merging a green, CI-passing PR I authored on its own branch is reversible/expected work. Normal downstream CI side-effects (`update-docs`, `sync-to-projects`) are designed behavior, NOT a reason to escalate. I also over-escalated one step earlier (asking before opening the PR).
+
+**What to do instead:** Once "land it" is authorized and CI is green, carry the whole chain autonomously: commit → push → PR → **merge → branch cleanup → sync main**. Reserve approval-gating for genuinely destructive/irreversible/strategic git ops only: force-push, history rewrite, deleting others' work, prod deploy, spend, DNS cutover, a true product fork. Routine merges and expected downstream syncs do not qualify. State a one-line FYI if useful, but do not wait.
