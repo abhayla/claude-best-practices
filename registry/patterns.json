@@ -5122,7 +5122,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-18",
-    "total_patterns": 269
+    "total_patterns": 271
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5299,6 +5299,51 @@
       "verification"
     ],
     "changelog": "v1.0.0 (2026-06-18): Initial — enumerated BA completeness checklist + matrix discipline + independent pre-G1 audit, after three repeated incompleteness misses (actors, lifecycle costs, component-by-actor benefits).",
+    "tier": "nice-to-have"
+  },
+  "web-analytics-instrumentation": {
+    "hash": "cd35df46bd8c5ebb345d3c9e803d386c16e784f97622ae85909c3cbe62513f0b",
+    "type": "rule",
+    "category": "need-basis",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-18",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Path-scoped web-frontend rule: every public site ships GA4 (one property per site) via Google Tag Manager, explicit GA4 events for CTAs and affiliate links, Consent Mode v2 defaults, per-domain Search Console, and is not DONE until a real hit to google-analytics.com/g/collect (or GA Realtime) is verified and the measurement ID is recorded.",
+    "tags": [
+      "web-analytics",
+      "ga4",
+      "gtm",
+      "search-console",
+      "consent-mode",
+      "affiliate-tracking"
+    ],
+    "changelog": "v1.0.0 (2026-06-18): Initial - web analytics instrumentation standard (GA4 one-property-per-site via GTM, verified CTA/affiliate events, Consent Mode v2, Search Console).",
+    "tier": "nice-to-have"
+  },
+  "analytics-setup": {
+    "hash": "ef7648183915474b165f15ef8ba8a2b4769c2148cf45cf2676739ea6b981b4b6",
+    "type": "skill",
+    "category": "need-basis",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-18",
+    "dependencies": [
+      "playwright",
+      "verify-screenshots"
+    ],
+    "visibility": "public",
+    "description": "Set up GA4 (one property per site) via GTM, add explicit GA4 events for CTAs and affiliate links, configure Consent Mode v2, verify per-domain Search Console, and verify a real collect hit before marking done. Use for web visitor/marketing measurement (GA4/GTM/conversion/affiliate tracking) — not app/infra observability (that is monitoring-setup).",
+    "tags": [
+      "analytics",
+      "ga4",
+      "gtm",
+      "tag-manager",
+      "conversion-tracking",
+      "affiliate-tracking"
+    ],
+    "changelog": "v1.0.0 (2026-06-18): Initial - GA4+GTM+Search Console setup with explicit CTA/affiliate events, Consent Mode v2, and mandatory hit verification.",
     "tier": "nice-to-have"
   }
 }
