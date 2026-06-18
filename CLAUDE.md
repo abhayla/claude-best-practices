@@ -74,6 +74,7 @@ Projects can opt in to share back synthesized patterns by setting `allow_hub_sha
 - **`.claude/tasks/`** — `todo.md` (current task checklist per `claude-behavior.md` rule 14) and `lessons.md` (correction patterns accumulated across sessions). Read `lessons.md` at session start; append after corrections.
 - **`.claude/sessions/`** — `/save-session` checkpoints; `/start-session` and `/continue` restore from here
 - **`.claude/advisor-sessions/`** — `/five-advisors` transcripts
+- **`.remember/`** (gitignored) — SessionStart-hook handoff log: `remember.md` (next-handoff buffer) + `now.md`/`recent.md`/`archive.md`/`today-*.md` history. Auto-surfaced at session start; write the next handoff to `remember.md`. Distinct from `.claude/tasks/` (todo + lessons) and auto-memory (cross-session user prefs)
 
 ### Stack Detection
 
