@@ -35,6 +35,9 @@ CLAUDE.local.md
 # goal-run scratch logs (per docs/goals contracts)
 docs/goals/.run/
 
+# Playwright MCP scratch (screenshots, console logs, page/ARIA snapshots) — ephemeral verification artifacts
+.playwright-mcp/
+
 # The distributable template MUST be fully tracked despite a global ~/.config/git/ignore ".claude/" rule.
 # Without this, NEW core/.claude pattern files (hooks/skills/rules/agents) are silently dropped on commit.
 !core/.claude/
