@@ -32,13 +32,13 @@ root="$(git rev-parse --show-toplevel 2>/dev/null)"
 slice=$(jq -s '
   ( [ .[] | (.type=="user" and ((.message.content|type)=="string"
       or ([.message.content[]?|.type]|index("tool_result")|not))) ]
-    | (length - 1 - (reverse|index(true))) ) as $lu
-  | (if $lu == null then . else .[$lu+1:] end)
+    | (reverse|index(true)) ) as $ri
+  | (if $ri == null then . else .[(length-$ri):] end)
   | { text: ([ .[] | select(.type=="assistant") | .message.content[]?
                 | select(.type=="text") | .text ] | join("\n")),
       tools: ([ .[] | select(.type=="assistant") | .message.content[]?
                 | select(.type=="tool_use")
-                | (.name + " :: " + ((.input.file_path // .input.command // "")|tostring)) ] | join("\n")) }
+                | (.name + " :: " + ((.input.file_path // .input.edits[0].file_path // .input.command // "")|tostring)) ] | join("\n")) }
 ' "$tp" 2>/dev/null)
 [ -z "$slice" ] && exit 0
 
