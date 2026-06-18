@@ -68,14 +68,14 @@ Merged intent-resolution gate (Clarification Gate + `decision-authority.md`
 confidence gate), tiered. The gate question opens with the `*Sync-check:*` marker — a
 required-intent stop the `no-overask-guard.sh` hook EXEMPTS, never an over-ask:
 
-- **1–2 small gaps** → exactly ONE question per turn (no upper limit; stop when
-  confident, not at a count). Hold the full list internally, grouped by category
-  (functional → UI/UX → scale); ask the next only after the current is answered,
-  sequenced on prior answers — never ask what's already answered, implied, or
-  contradicted. Each question gives a **recommended** option + one-line why, and
-  why alternatives are weaker. Ask only what's unanswerable from Tier 1/2 context.
-- **Consequential fork** and confidence < ~95% → converge via `/grill-me` or
-  `/grill-with-docs` before building — never guess at WHAT to build.
+- **Exactly 1 small gap** → ONE question per turn (no upper limit; stop when confident, not at
+  a count). Hold the full list internally; ask the next only after the current is answered,
+  sequenced on prior answers — never ask what's already answered, implied, or contradicted.
+  Each question gives a **recommended** option + one-line why. Ask only what's unanswerable
+  from Tier 1/2 context.
+- **≥2 material unknowns, OR a fork expensive to reverse with no best-practice default**
+  (confidence in WHAT to build < ~95%) → `/grill-me` (or `/grill-with-docs` for ADR-worthy
+  calls); converge BEFORE strengthening — don't collapse 2+ forks into one question, don't guess.
 - **"You take a call" / pre-authorized** → gate waived; proceed, stating assumptions.
 
 Confidence is about **intent**, never reversible execution detail (stage 5 decides those).

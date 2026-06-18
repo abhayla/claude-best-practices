@@ -675,11 +675,15 @@ The gate runs AFTER strengthening and BEFORE STEP 4.6 (final prompt preview),
 so the previewed prompt reflects the resolved intent. It is tiered (merges the
 lightweight clarification gate with the `decision-authority.md` confidence gate):
 
-- **1–2 small gaps** → the Clarification Gate below (one targeted question at a time, locked format).
-- **Consequential fork** (expensive to reverse, materially changes the product, no clear
-  best-practice winner) **and confidence < ~95%** → converge via **`/grill-me`** or
-  **`/grill-with-docs`** before building — do not guess at WHAT to build. (`grill-with-docs`
-  preferred when the decision should be recorded into CONTEXT/ADRs.)
+- **Exactly 1 small gap** (a single unanswerable detail) → the Clarification Gate below (one
+  targeted question at a time, locked format).
+- **≥2 distinct material unknowns, OR a fork that is expensive to reverse / materially changes
+  the product / has no clear best-practice winner** (confidence in WHAT to build < ~95%) →
+  route to **`/grill-me`** (or **`/grill-with-docs`** when the decision should be recorded into
+  CONTEXT/ADRs) and converge BEFORE strengthening — do NOT collapse multiple forks into a single
+  clarification question, and do NOT guess. **Concrete routing test:** if the strengthened prompt
+  would defer 2+ separate Q1-style placeholders, that is a grill, not one Clarification question.
+  No after-card renders on a grill turn — there is no strengthened prompt to re-grade yet.
 - **"You take a call" / pre-authorized** → gate waived; proceed on best judgment, stating
   one-line assumptions.
 
