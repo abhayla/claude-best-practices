@@ -5347,10 +5347,10 @@
     "tier": "nice-to-have"
   },
   "verifier-edge-guard": {
-    "hash": "8015a5ffbf7e80c64fe19c732f360f3a81d255711f9be5097afc900384ac53a7",
+    "hash": "fcc86a43da26db7a7b275b64b41fa58bb72cf4edd5c0394041ca0b12242b9cdd",
     "type": "hook",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-18",
     "last_updated": "2026-06-18",
@@ -5364,7 +5364,7 @@
       "governance",
       "salience"
     ],
-    "changelog": "v1.0.0 (2026-06-18): Initial — telemetry-first verifier-edge miss detector (Phase 2 of BA-gate/fragile-governance hardening).",
+    "changelog": "v1.0.1 (2026-06-18): independent-review fixes — project MultiEdit edits[0].file_path (was a silent false-negative); guard the last-real-user index against a null subtraction so the zero-real-user branch actually keeps the whole transcript. v1.0.0 (2026-06-18): Initial — telemetry-first verifier-edge miss detector (Phase 2 of BA-gate/fragile-governance hardening).",
     "tier": "nice-to-have"
   }
 }

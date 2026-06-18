@@ -78,6 +78,21 @@ def test_hook_covers_all_three_builder_signals():
     assert "pytest" in body and "playwright test" in body, "must detect a test-runner Bash command"
 
 
+def test_multiedit_path_is_projected():
+    # MultiEdit carries targets under .input.edits[].file_path, not .input.file_path —
+    # the projection MUST include edits[0].file_path or MultiEdit silently never fires
+    # (false-negative found in independent review).
+    body = CORE_HOOK.read_text(encoding="utf-8")
+    assert ".input.edits[0].file_path" in body, "MultiEdit target path must be projected"
+
+
+def test_last_user_slice_guards_null():
+    # The last-real-user index must not subtract from null when there is no real user
+    # message (jq error → dead 'keep whole transcript' branch). Guard via index(true) null-check.
+    body = CORE_HOOK.read_text(encoding="utf-8")
+    assert "if $ri == null then ." in body, "the zero-real-user branch must be guarded, not a raw subtraction"
+
+
 def test_hook_checks_done_claim_and_verifier_evidence():
     body = CORE_HOOK.read_text(encoding="utf-8")
     assert "tests pass" in body or "all (tests )?pass" in body, "must gate on a done/pass claim"
