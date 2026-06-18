@@ -60,13 +60,22 @@ zero-exception rules to hooks"). Specifics:
 - [x] **Guard:** `scripts/tests/test_ba_gate_wiring.py` (6 tests) pins hub-wiring + offer-behavior + keyword coverage.
 - [x] **Functional:** "work on the loan calculator" fires; refactor/bugfix/continuation stay silent.
 
-### Phase 2 — whole-class salience (sibling fragile gates)
-- [ ] **2.1** Inventory the class: G1/G2 approval, supervisor-verification,
-      independent-test-verification, output-plausibility-verification, reviewer-edge.
-- [ ] **2.2** For each, decide hook-able vs rule-only; add a deterministic salience trigger
-      (PostToolUse/Stop reminder) where a clean signal exists; sharpen rule wording where not.
-- [ ] **2.3** Avoid reminder-fatigue: gate each injection on its real signal (e.g. plausibility
-      reminder only on computed-value/UI output turns), not every prompt.
+### Phase 2 — whole-class salience (sibling fragile gates) — DONE 2026-06-18
+- [x] **2.1** Inventoried the class: 3 hookable (reviewer-edge, independent-test-verify,
+      supervisor-verify) collapse to ONE concern ("independent verifier before done"); 2 rule-only
+      (G1/G2 flow-state, output-plausibility semantic) have no clean deterministic signal.
+- [x] **2.2** Built ONE consolidated `verifier-edge-guard.sh` Stop hook (not 3 PostToolUse hooks —
+      those fire per-edit → fatigue). Telemetry-first: logs `verifier-edge-miss` when a turn does
+      builder work (code edit / Task subagent / test run) + claims done WITHOUT verifier evidence.
+      Copied to hub (force-add), wired into BOTH Stop arrays, registered, `.verifier-misses.log`
+      gitignored. Rule-only gates got a 1-line salience note (engineering-roles pointer +
+      human-approval-gates + output-plausibility) — no padding.
+- [x] **2.3** Fatigue-avoidance by design: Stop hook fires once/turn, telemetry-only (zero
+      interruption), signal-gated on builder+done+no-verifier. Escalate to blocking only if the log
+      shows misses are frequent (documented in the hook header, mirroring no-overask class C).
+- [x] **CI:** registry resynced (hook v1.0.0 + engineering-roles/human-approval-gates/output-
+      plausibility hashes); guard `scripts/tests/test_verifier_edge_guard.py`; 6 synthetic-transcript
+      firing cases verified (code-edit/subagent/test-run → log; verifier-mentioned/analysis/no-done → silent).
 
 ### Phase 3 — CI + distribution
 - [ ] **3.1** Update `registry/patterns.json` if any pattern frontmatter/version changes;

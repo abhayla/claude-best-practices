@@ -143,7 +143,10 @@ The recurring chains:
 
 - EVERY builder role (Full-Stack, Frontend, Debugging, Senior/Clean-Arch) → **Code-Quality
   Reviewer before "done"**. The author is never the sole verifier
-  (`independent-test-verification.md`, `supervisor-verification.md`).
+  (`independent-test-verification.md`, `supervisor-verification.md`). The
+  `verifier-edge-guard.sh` Stop hook is the deterministic salience layer for this edge — it
+  logs a `verifier-edge-miss` when a turn does builder work + claims done with NO independent
+  verification, so the miss is visible even when the prose rule is forgotten under context pressure.
 - ANY change to domain-critical calculation or data-integrity logic → the project's domain
   analyst (where one exists) auto-dispatches **in parallel with Code-Quality** — not
   user-triggered. Self-review + code review miss domain-correctness bugs.

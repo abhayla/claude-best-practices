@@ -51,3 +51,9 @@ the test was green on a path no user actually sees.
   (see `bug-triage-discipline.md`).
 - MUST NOT accept "renders / no console error" as proof a computed value is
   correct — that is a claim about shape, never about substance.
+
+> **Salience note:** this gate is **advisory-only** — plausibility is semantic, so no
+> deterministic hook can detect a domain-absurd-but-rendering value (unlike the
+> verifier-edge gates, which `verifier-edge-guard.sh` now backstops). The codifiable slice
+> is the **plausibility bound** above — encode it as a CI assertion on the default path so an
+> absurd value fails the build; the prose rule carries the rest and demands extra self-discipline.

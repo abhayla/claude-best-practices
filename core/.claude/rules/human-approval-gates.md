@@ -68,3 +68,9 @@ irreversible set; more gates is not more safety, it is friction.
 - MUST record each approval against the run / goal-contract.
 - MUST treat a gate pause as required clarification, not an over-ask — it is exempt
   from the decide-don't-ask ban.
+
+> **Salience note:** G1/G2 are **advisory-only** — firing on a flow-state ("a mockup exists,
+> now about to build") that no prompt/tool signal cleanly detects, so unlike the verifier-edge
+> gates they have no deterministic hook. G1's precondition (the BA completeness audit) DOES get
+> the `ba-usecase-discovery-reminder.sh` salience layer; the gate pauses themselves rely on this
+> rule + the model's discipline. Treat a forgotten G1/G2 as a first-class miss to capture in `lessons.md`.
