@@ -132,7 +132,7 @@ The recurring chains:
 
 | Trigger | Sequence (→ = then, ∥ = parallel, [ ] = conditional) |
 |---|---|
-| Feature, domain-critical logic touched | [PM if scope unclear] → Architect → Full-Stack/Frontend → **[Domain Analyst] ∥ Code-Quality Reviewer** → QA → [Security if auth/PII] → [DevOps if release] |
+| Feature, domain-critical logic touched | **PM/BA — OFFER full-space discovery (the `ba-usecase-discovery-reminder.sh` hook surfaces the *Sync-check:* offer; NOT a self-judged "if scope unclear" skip)** → Architect → Full-Stack/Frontend → **[Domain Analyst] ∥ Code-Quality Reviewer** → QA → [Security if auth/PII] → [DevOps if release] |
 | Feature, no domain-critical logic | [PM] → Architect → Full-Stack/Frontend → **Code-Quality Reviewer** → QA → [DevOps if release] |
 | Bug fix | Debugging (root cause) → Full-Stack (fix) → **Code-Quality Reviewer**; + [Domain Analyst if domain logic changed] → QA regression |
 | Refactor (behavior unchanged) | Senior/Clean-Arch → **Code-Quality Reviewer** → QA (tests stay green) |
