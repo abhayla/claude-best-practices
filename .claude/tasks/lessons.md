@@ -371,3 +371,15 @@ catching layer; keep it mandatory for templates.
 **The proof the gate matters:** when I finally ran the BA discovery (after being caught), it surfaced materially better-fit options the build had missed — Umami self-hosted (free, privacy-clean, unified 15-site view), server-side GTM for ad-blocker resilience, PostHog for the product apps, and the correctness fix that affiliate *conversions* live in the partner dashboard, not GA4 (GA4 sees the click only). The eval had been catching these reactively *after* building — exactly the symptom of skipping BA. (The user ultimately chose Google-only anyway, but chose it *informed* — which is the entire point of G1.)
 
 **What to do instead:** For ANY "build/create this feature" request — including hub patterns — run the pipeline IN ORDER: full-space BA discovery (web-search the option space) → `ba-discovery-checklist` matrix → present a **G1 design for explicit user approval** → only then build. The hub feature itself is a product; "create a feature in this project" is NOT a license to skip BA/G1. A built-first PR is held as a draft/spike until G1 approves the design. Plan-before-coding + the confidence gate apply: when 2+ materially different valid designs exist (which a real BA discovery almost always reveals), converge with the user BEFORE building, not after.
+
+## Up-front enhancement: a hard PreToolUse deny is the WRONG enforcement (2026-06-18)
+Audit gap G1 ("force the enhance process UP FRONT, before tool work") was attempted as a
+PreToolUse hook that DENIES the first Edit/Write until the reviewer card is present in the
+current turn. It false-positives on MULTI-SEGMENT turns: when the Stop hook re-injects feedback
+(a user-type message), it creates a new turn boundary, so a post-stop-block CONTINUATION looks
+card-less and the gate blocks legitimate continuation edits — it bricked an edit in-session.
+**Decision:** reverted (Bash recovery path worked because the matcher excluded Bash). The
+correct enforcement layer is the **Stop hook** (catches omission at end-of-turn) + the
+**UserPromptSubmit reminder** (demands rendering up-front). A PreToolUse hard-deny tied to
+"card present in THIS segment" cannot distinguish "rendered earlier in a multi-part turn" and
+is too blunt. If up-front telemetry is wanted later, make it ADVISORY (log), never a hard deny.

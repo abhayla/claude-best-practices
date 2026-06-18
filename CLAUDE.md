@@ -64,7 +64,7 @@ Projects can opt in to share back synthesized patterns by setting `allow_hub_sha
 
 - **`core/.claude/`** — All distributable patterns: `agents/`, `skills/` (each with `SKILL.md`), `rules/`, `hooks/`, `config/`, templates
 - **`.claude/rules/`** — Auto-loaded rules. Global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when working with matching files
-- **`.claude/hooks/`** — Hub-only governance/telemetry hooks wired into `.claude/settings.json`: `session-governance-status.sh` (session-start governance banner), `prompt-enhance-reminder.sh` (gates prompt-auto-enhance triggering), `no-overask-guard.sh` (Stop-hook telemetry for missed enhance banners), `ba-usecase-discovery-reminder.sh` (UserPromptSubmit BA/deep-research OFFER gate, wired hub-wide PRs #113/#114), `prompt-logger.sh`, `auto-learn-trigger.sh`, `pattern-quality-gate.sh`, `post-failure-capture.sh`. Their runtime state files (`.claude/.enhance-misses.log` etc.) are gitignored
+- **`.claude/hooks/`** — Hub-only governance/telemetry hooks wired into `.claude/settings.json`: `session-governance-status.sh` (session-start governance banner), `prompt-enhance-reminder.sh` (gates prompt-auto-enhance triggering), `no-overask-guard.sh` (Stop-hook telemetry for missed enhance banners), `ba-usecase-discovery-reminder.sh` (UserPromptSubmit BA/deep-research OFFER gate, wired hub-wide PRs #113/#114), `verifier-edge-guard.sh` (Stop-hook telemetry for builder done-claims missing verifier evidence — the 3 hookable fragile gates, PRs #116/#117), `prompt-logger.sh`, `auto-learn-trigger.sh`, `pattern-quality-gate.sh`, `post-failure-capture.sh`. Their runtime state files (`.claude/.enhance-misses.log`, `.claude/.verifier-misses.log`, etc.) are gitignored
 - **`config/`** — `settings.yml`, `repos.yml` (downstream projects), `workflow-groups.yml` (seed patterns for workflow docs), `pipeline-stages.yaml` (DAG config), `workflow-contracts.yaml` (step DAGs + artifact contracts)
 - **`docs/specs/`** — Canonical workflow/feature specs (e.g., `test-pipeline-three-lane-spec-v2.md`). Reference these — do not duplicate spec content elsewhere
 - **`docs/workflows/`** — Auto-generated workflow docs. Do not edit manually — regenerate after pattern changes
@@ -140,7 +140,7 @@ Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, 
 - **`pipeline_aggregator.py`** — Standalone aggregator for testing-pipeline results: reads `test-results/*.json` and applies the union-of-failures rule
 - **`bootstrap.sh`** (repo root, not in `scripts/`) — Curl-pipe-bash installer for downstream users: `curl -sL .../bootstrap.sh | bash -s -- --stacks <list> [--target <dir>]`. Calls `bootstrap.py` after fetching the repo
 
-> One-off migration scripts (e.g. `pr2_premerge_migration.py`, a single-use PR1→PR2 hash-format transition from PR #15) are intentionally NOT listed here — they live in git history, not the standing toolchain. Don't "fix" their omission.
+> One-off migration scripts (e.g. `pr2_premerge_migration.py`, a single-use PR1→PR2 hash-format transition from PR #15) are intentionally omitted from this list — even though the file still sits in `scripts/`, it is a spent one-shot migration, not part of the standing toolchain. Don't "fix" its omission by documenting it.
 
 ### Key Config Files
 

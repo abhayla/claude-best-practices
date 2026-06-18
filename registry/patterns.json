@@ -3142,10 +3142,10 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance": {
-    "hash": "f0673fddaacd117473009532f294d9d13c90c9ce53ee5ab17aba32ab47fab902",
+    "hash": "ea7b6d66e0ac5363ffb5b39b0b3b894f3fd8ce7b731a3df8a7f5747796ea1a5f",
     "type": "skill",
     "category": "core",
-    "version": "3.6.0",
+    "version": "3.7.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-06-18",
@@ -3194,7 +3194,7 @@
     "tier": "must-have"
   },
   "prompt-enhance-reminder": {
-    "hash": "a4e0ad73ed6a7cb03c92f534cebee9e604867e86255912421ca5fc16a54ab122",
+    "hash": "227254b770667eafe4f9b92a9df6483dfbb9b1c6a916a58e7e73e8b3bc22f3de",
     "type": "hook",
     "category": "core",
     "version": "2.1.0",
@@ -5165,7 +5165,7 @@
     "tier": "nice-to-have"
   },
   "no-overask-guard": {
-    "hash": "4d0b1dc4dbb80cc8430fa7d746f8b08a88fe23b5c50ccbbd52d3e1e9420d1d1b",
+    "hash": "bfda8bf9819d1749b81aa687d3d8ad62c5ff17ffdb5bb2e849fc67db268c5fda",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",

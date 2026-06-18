@@ -54,22 +54,33 @@ full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
-# ── Reviewer-grade-card enforcement (content completeness; runs PRE-exemption) ──
-# The prompt-auto-enhance after-card MUST show the INDEPENDENT REVIEWER's per-dimension
-# column (skill STEP 4), not just its overall. Detection is precise: a rendered card has a
-# "self-after" column header; if "self-after" is present but "reviewer-after" is absent, the
-# reviewer's grade card was omitted. Runs BEFORE the sync-check exemption so enhance demos
-# (which carry the *Sync-check:* gate marker) are still checked. WHY a hook: prose in the
-# skill drifted unenforced across turns — zero-exception behaviour needs a hook, not prose.
-# Own loop-guard (.reviewcard-count, reset per turn by prompt-enhance-reminder.sh), cap 4.
-if printf '%s' "$full" | grep -qE "self-after" && ! printf '%s' "$full" | grep -qE "reviewer-after"; then
+# ── Full-process enforcement: the independent-reviewer grade card (PRE-exemption) ──
+# The prompt-auto-enhance pipeline MUST render the FULL process on EVERY substantive turn; its
+# definitive tell is the INDEPENDENT REVIEWER's per-dimension card. This guard blocks when a
+# substantive turn (>=300 chars) is NOT a verifiable trivial declaration and shows NO reviewer
+# card — INDEPENDENT of banner shape, so the strongest omission (disguised/missing banner)
+# cannot escape (gaps G3/G4/G7/G9/G11 from the 2026-06-18 enforcement audit). Runs BEFORE the
+# sync-check exemption. Loop-guard (.reviewcard-count, reset per turn), cap 4.
+# G4: a turn is exempt only if its FIRST line declares "ran as-is" AND the turn is short —
+# a long working turn cannot dodge by mentioning the phrase somewhere in prose.
+trivial=""
+printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement" && [ "${#last_text}" -lt 600 ] && trivial="1"
+# G11: detect the full process by the reviewer-card token SET (not one literal), so a
+# legitimately-worded card is not false-blocked.
+card=""
+printf '%s' "$full" | grep -qE "reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
+# G7: block on substantive + not-trivial + NO card, regardless of banner shape.
+if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
   rc="$root/.claude/.reviewcard-count"
   rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   if [ "$rn" -lt 4 ]; then
     printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: independent-reviewer grade card missing). You rendered a before→after grade card (Self-after column present) but omitted the Reviewer-after per-dimension column. The user requires the independent reviewer's per-dimension grade card EVERY enhanced turn, no bypass (prompt-auto-enhance skill STEP 4). Re-render the card WITH the Reviewer-after column (the blind reviewer's per-dimension scores), then continue." '{decision:"block", reason:$r}'
+    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead." '{decision:"block", reason:$r}'
     exit 0
+  else
+    # G9: cap exhausted — the turn escaped without the card; log a distinct escalation line.
+    printf '%s\tcard-block-EXHAUSTED (cap 4) — full process still unrendered, turn released\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   fi
 fi
 
