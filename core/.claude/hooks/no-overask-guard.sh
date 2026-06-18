@@ -55,27 +55,32 @@ tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
 # ── Full-process enforcement: the independent-reviewer grade card (PRE-exemption) ──
-# The prompt-auto-enhance pipeline MUST render the FULL process — whose definitive tell is the
-# INDEPENDENT REVIEWER's per-dimension "reviewer-after" card column (skill STEP 3.6/4) — on
-# EVERY substantive enhanced turn. Block when: the turn is substantive (>=300), opens with the
-# *Enhanced banner, is NOT the trivial "ran as-is" one-liner, and the "reviewer-after" column
-# is ABSENT — REGARDLESS of whether a partial strengthened-prompt block was shown. WHY drop the
-# old "block-present" gate: keying on "self-after|final prompt|what changed" let a banner-ONLY
-# turn (whole process omitted, none of those tokens present) EVADE the block and be merely
-# logged — omitting MORE escaped while omitting less got caught (backwards). Now any
-# substantive enhanced turn must render the reviewer card OR declare the prompt trivial. Runs
-# BEFORE the sync-check exemption. Loop-guard (.reviewcard-count, reset per turn), cap 4.
-trivial="";  printf '%s' "$full" | grep -qE "ran (your )?input as-is|ran as-is|no change — ran|no enhancement" && trivial="1"
-if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] \
-   && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' \
-   && ! printf '%s' "$full" | grep -qE "reviewer-after"; then
+# The prompt-auto-enhance pipeline MUST render the FULL process on EVERY substantive turn; its
+# definitive tell is the INDEPENDENT REVIEWER's per-dimension card. This guard blocks when a
+# substantive turn (>=300 chars) is NOT a verifiable trivial declaration and shows NO reviewer
+# card — INDEPENDENT of banner shape, so the strongest omission (disguised/missing banner)
+# cannot escape (gaps G3/G4/G7/G9/G11 from the 2026-06-18 enforcement audit). Runs BEFORE the
+# sync-check exemption. Loop-guard (.reviewcard-count, reset per turn), cap 4.
+# G4: a turn is exempt only if its FIRST line declares "ran as-is" AND the turn is short —
+# a long working turn cannot dodge by mentioning the phrase somewhere in prose.
+trivial=""
+printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement" && [ "${#last_text}" -lt 600 ] && trivial="1"
+# G11: detect the full process by the reviewer-card token SET (not one literal), so a
+# legitimately-worded card is not false-blocked.
+card=""
+printf '%s' "$full" | grep -qE "reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
+# G7: block on substantive + not-trivial + NO card, regardless of banner shape.
+if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
   rc="$root/.claude/.reviewcard-count"
   rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   if [ "$rn" -lt 4 ]; then
     printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive enhanced turn opened with the *Enhanced banner but did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column (skill STEP 3.6/4). Render the FULL process now: pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, render the '*Enhanced: no change — ran your input as-is*' one-liner instead." '{decision:"block", reason:$r}'
+    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead." '{decision:"block", reason:$r}'
     exit 0
+  else
+    # G9: cap exhausted — the turn escaped without the card; log a distinct escalation line.
+    printf '%s\tcard-block-EXHAUSTED (cap 4) — full process still unrendered, turn released\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   fi
 fi
 
