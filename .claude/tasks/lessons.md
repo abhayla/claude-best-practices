@@ -8,6 +8,8 @@
 
 **What to do instead:** (1) Deterministic fix applied — repo `.gitignore` now has `!core/.claude/` to override the global rule so new distributable-template files track normally; for hub-only `.claude/` use `git add -f`. (2) ALWAYS run `git diff --stat main..<branch>` and confirm NEW pattern files are present before calling a PR complete — a new pattern file missing from the commit means the registry references a file not in the repo (CI fails / pattern silently absent). Verifying the diff caught this; not verifying would have shipped a broken pattern.
 
+**RECURRED 2026-06-18** (BA-gate Phase 1): the `!core/.claude/` override does NOT cover the HUB `.claude/` (intentionally selective). A NEW hub hook `.claude/hooks/ba-usecase-discovery-reminder.sh` was silently dropped by `git add -A`; only `git add -f` tracks it. The new `test_ba_gate_wiring.py` guard caught it — **but only at CI**, because the test asserts `Path.exists()` (filesystem, passes locally even when untracked), not git-tracked status. NET RULE: after `git add -A` of any hub `.claude/` change, run `git status --short .claude/` and force-add any `??`/missing NEW hub file; treat a `M settings.json` with no matching hook file as the tell. The CI catch is the backstop, NOT the primary gate — verify the staged diff locally first.
+
 ## 2026-06-17 — BA sequence: use-case discovery FIRST, then questions, then UI
 
 **Surfaced during:** calculator build (crystallized by Abhay). The load-bearing part is the ORDER, which my v1.2.0 edit hadn't pinned.
