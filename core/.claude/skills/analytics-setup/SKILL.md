@@ -33,6 +33,11 @@ NEVER mark this skill done without a verified hit. ALWAYS use one GA4 property
 PER SITE. ALWAYS fire explicit events for CTAs/affiliate links — enhanced
 measurement does not distinguish them.
 
+**Known limitation (client-side GA4/GTM):** ad-blockers drop 15–50% of hits,
+heavier for tech/finance audiences. If that loss becomes material, the optional
+mitigation is **server-side GTM** (a GCP Cloud Run container on a first-party
+subdomain) — added infrastructure, out of scope for the default client-side setup.
+
 **Request:** $ARGUMENTS
 
 ---
@@ -161,6 +166,12 @@ In GTM: create a **Custom Event trigger** on `cta_click` and a **GA4 Event tag**
 parameters. For the gtag fallback, replace the `dataLayer.push` with
 `gtag('event','cta_click',{cta_type:'affiliate',partner:'zerodha',ref_code:'ZMPHZC',placement:'hero'})`.
 
+**Affiliate scope (be honest):** GA4 captures the affiliate **click** only. The
+actual **conversion** (account opened/funded) lives in the affiliate partner's
+dashboard (Zerodha `c=ZMPHZC`, AngelOne) — reconcile clicks → conversions there.
+Do NOT report GA4 as measuring funded accounts unless the partner provides a
+server-to-server postback (most retail broker programs do not).
+
 In React/Vue, attach the same payload in the click handler rather than inline
 `onclick`. **CSP caveat:** inline `onclick` is blocked by any `script-src` CSP
 without `'unsafe-inline'` — if the site ships a CSP (it should), bind the handler
@@ -239,6 +250,11 @@ analytics inventory, do not hardcode a path):
 Also verify the domain in **Google Search Console** (DNS TXT, or the GTM/GA
 verification method) and note it. The inventory is how every future session
 learns the site is measured — an unrecorded ID is a future re-discovery cost.
+
+**Portfolio view (many sites):** one-GA4-property-per-site gives no native
+cross-site rollup. For a unified view across a portfolio, enable GA4 **BigQuery
+export** (free tier) on each property and build one **Looker Studio** dashboard
+over the combined datasets.
 
 ---
 

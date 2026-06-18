@@ -5302,7 +5302,7 @@
     "tier": "nice-to-have"
   },
   "web-analytics-instrumentation": {
-    "hash": "cd35df46bd8c5ebb345d3c9e803d386c16e784f97622ae85909c3cbe62513f0b",
+    "hash": "7ec5ebe5ad5e405bb835688d4ab1d5d9e868336e203ae45169fcd2ab7d5cec90",
     "type": "rule",
     "category": "need-basis",
     "version": "1.0.0",
@@ -5323,7 +5323,7 @@
     "tier": "nice-to-have"
   },
   "analytics-setup": {
-    "hash": "ef7648183915474b165f15ef8ba8a2b4769c2148cf45cf2676739ea6b981b4b6",
+    "hash": "9a67823cbe4bb20e0c29be81146014d2e32fdc48e72298887870f12211b1d6cc",
     "type": "skill",
     "category": "need-basis",
     "version": "1.0.0",

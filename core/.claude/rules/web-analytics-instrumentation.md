@@ -36,8 +36,10 @@ ever referenced inside a fenced block below, never inline).
   enhanced measurement does not meaningfully distinguish. Every revenue-bearing
   CTA fires a named event with parameters identifying the partner and placement,
   e.g. a Zerodha open-account link (`c=ZMPHZC`) and an AngelOne link each emit a
-  distinct `cta_click` / affiliate event. Affiliate conversions are the point of
-  the site — they MUST be measured explicitly, not inferred.
+  distinct `cta_click` / affiliate event. The on-site signal is the affiliate
+  **click** — measure it explicitly. The actual **conversion** (account funded)
+  is owned by the affiliate partner's dashboard and reconciled there; GA4 sees
+  the click, not the funded account — do NOT claim GA4 measures conversions.
 
 ## Consent & Privacy (India DPDP-aware)
 
