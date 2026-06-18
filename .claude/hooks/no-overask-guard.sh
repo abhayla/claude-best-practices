@@ -54,21 +54,29 @@ full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
-# ── Reviewer-grade-card enforcement (content completeness; runs PRE-exemption) ──
-# The prompt-auto-enhance after-card MUST show the INDEPENDENT REVIEWER's per-dimension
-# column (skill STEP 4), not just its overall. Detection is precise: a rendered card has a
-# "self-after" column header; if "self-after" is present but "reviewer-after" is absent, the
-# reviewer's grade card was omitted. Runs BEFORE the sync-check exemption so enhance demos
-# (which carry the *Sync-check:* gate marker) are still checked. WHY a hook: prose in the
-# skill drifted unenforced across turns — zero-exception behaviour needs a hook, not prose.
-# Own loop-guard (.reviewcard-count, reset per turn by prompt-enhance-reminder.sh), cap 4.
-if printf '%s' "$full" | grep -qE "self-after" && ! printf '%s' "$full" | grep -qE "reviewer-after"; then
+# ── Reviewer-grade-card enforcement (PRESENCE + completeness; runs PRE-exemption) ──
+# The prompt-auto-enhance pipeline MUST render the full before→after card INCLUDING the
+# INDEPENDENT REVIEWER's per-dimension "Reviewer-after" column (skill STEP 3.6/4) on EVERY
+# enhanced turn. Fire when an enhancement was rendered — the *Enhanced banner + a
+# strengthened-prompt block (a "self-after" card column OR a "final prompt"/"what changed"
+# block), and NOT the trivial "ran as-is" one-liner — but the "reviewer-after" column is
+# ABSENT. This catches BOTH a malformed card (self-after present, reviewer-after missing) AND
+# TOTAL OMISSION of the card (the realistic failure the prior check missed: a compact
+# "what changed / final prompt" block with no card at all). Runs BEFORE the sync-check
+# exemption so enhance demos are still checked. WHY a hook: prose in the skill drifted
+# unenforced across turns — zero-exception behaviour needs a hook, not prose. Own loop-guard
+# (.reviewcard-count, reset per turn by prompt-enhance-reminder.sh), cap 4.
+enh_block=""; printf '%s' "$full" | grep -qE "self-after|final prompt|what changed" && enh_block="1"
+trivial="";  printf '%s' "$full" | grep -qE "ran (your )?input as-is|ran as-is|no change — ran|no enhancement" && trivial="1"
+if [ "${#last_text}" -ge 300 ] && [ -n "$enh_block" ] && [ -z "$trivial" ] \
+   && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' \
+   && ! printf '%s' "$full" | grep -qE "reviewer-after"; then
   rc="$root/.claude/.reviewcard-count"
   rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   if [ "$rn" -lt 4 ]; then
     printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: independent-reviewer grade card missing). You rendered a before→after grade card (Self-after column present) but omitted the Reviewer-after per-dimension column. The user requires the independent reviewer's per-dimension grade card EVERY enhanced turn, no bypass (prompt-auto-enhance skill STEP 4). Re-render the card WITH the Reviewer-after column (the blind reviewer's per-dimension scores), then continue." '{decision:"block", reason:$r}'
+    jq -nc --arg r "STOP BLOCKED (enhance: independent-reviewer grade card missing). This enhanced turn rendered a strengthened-prompt block but NO before→after grade card with the Reviewer-after per-dimension column. The user requires the FULL independent-reviewer per-dimension grade card (Before · Self-after · Reviewer-after · Weight) on EVERY enhanced turn — no compact bypass (prompt-auto-enhance skill STEP 3.6/4). Re-render the full card WITH the Reviewer-after column, then continue." '{decision:"block", reason:$r}'
     exit 0
   fi
 fi
