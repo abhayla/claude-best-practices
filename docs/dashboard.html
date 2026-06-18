@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-17 03:13 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-18 06:30 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">264</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">193</div><div class="label">Core</div></div>
-    <div class="stat-card"><div class="number">71</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">39</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">3</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">11</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">47</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">164</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">271</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">198</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">73</div><div class="label">Stack-specific</div></div>
+    <div class="stat-card"><div class="number">39</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">3</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">12</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">51</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">166</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -129,6 +129,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>reference</td>
+            </tr>
+            <tr data-type="skill" data-category="need-basis">
+                <td>analytics-setup</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>need-basis</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>playwright, verify-screenshots</td>
+                <td>analytics, ga4, gtm, tag-manager, conversion-tracking, affiliate-tracking</td>
             </tr>
             <tr data-type="rule" data-category="core">
                 <td>android</td>
@@ -318,6 +327,24 @@ tr:hover { background: var(--primary-light); }
                 <td>project:firekaro-planner</td>
                 <td>—</td>
                 <td>autonomous, goal, workflow, contract, unattended, self-improvement</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>ba-discovery-checklist</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>global-rule, requirements, completeness, ba, verification</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>ba-usecase-discovery-reminder</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.2.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>hook, user-prompt-submit, BA, use-case-discovery, governance</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>batch</td>
@@ -872,7 +899,7 @@ tr:hover { background: var(--primary-light); }
                 <td>engineering-roles</td>
                 <td><span class="badge badge-rule">rule</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
+                <td>1.4.0</td>
                 <td>project:firekaro-planner</td>
                 <td>—</td>
                 <td>governance, roles, routing, orchestration</td>
@@ -1121,6 +1148,15 @@ tr:hover { background: var(--primary-light); }
                 <td>testing, flutter, workflow</td>
             </tr>
             <tr data-type="rule" data-category="core">
+                <td>full-space-first</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.2.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>global-rule, completeness, use-case-discovery, workflow, verification</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
                 <td>git-collaboration</td>
                 <td><span class="badge badge-rule">rule</span></td>
                 <td>core</td>
@@ -1227,6 +1263,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>prototype, HTML, UI, demo, Nielsen</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>human-approval-gates</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.1.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>pipeline, approval-gates, human-in-the-loop, delivery</td>
             </tr>
             <tr data-type="skill" data-category="need-basis">
                 <td>iac-deploy</td>
@@ -1704,6 +1749,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>hook, prompt-log, session-history, audit</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>provenance-report</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.1.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>observability, provenance, owner-report, html, transparency</td>
             </tr>
             <tr data-type="skill" data-category="need-basis">
                 <td>pytest-dev</td>
@@ -2352,6 +2406,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>vue, testing, vitest, pinia</td>
+            </tr>
+            <tr data-type="rule" data-category="need-basis">
+                <td>web-analytics-instrumentation</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>need-basis</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>web-analytics, ga4, gtm, search-console, consent-mode, affiliate-tracking</td>
             </tr>
             <tr data-type="skill" data-category="need-basis">
                 <td>web-quality</td>
