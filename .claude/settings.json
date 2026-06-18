@@ -52,6 +52,10 @@
           },
           {
             "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/ba-usecase-discovery-reminder.sh\""
+          },
+          {
+            "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/prompt-logger.sh\""
           }
         ]

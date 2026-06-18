@@ -42,16 +42,16 @@
     "tier": "nice-to-have"
   },
   "ba-usecase-discovery-reminder": {
-    "hash": "140cf80d87ed293a908015d9f42024d90ccf2ae372b3e8f613e7f5d4b80a6748",
+    "hash": "d970f262820b9806c0de0d9531f1d64388501004359beac6dff481c01f3707d5",
     "type": "hook",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-17",
     "last_updated": "2026-06-18",
     "dependencies": [],
     "visibility": "public",
-    "description": "UserPromptSubmit hook that injects the BA discipline order (engineering-roles PM mandate) on build/feature-shaped prompts: discover the full use-case space FIRST (domain + user perspective; web-search to enumerate) -> then clarifying questions -> then UI -> then build. Salience layer (deterministic trigger, advisory); quality/completeness is enforced by the rule + independent review, not the hook.",
+    "description": "UserPromptSubmit hook that, on a build/extend/work-on prompt for a product/feature/domain surface, injects a *Sync-check:* OFFER to run full BA discovery / deep research first (actors, value-per-actor, the full economic LIFECYCLE, the ACTORS x COMPONENTS x LIFECYCLE matrix per ba-discovery-checklist.md) — recommended-on for domain/user-facing builds, declinable for throwaway work. Salience layer (deterministic trigger, advisory); completeness is enforced by the rule + independent review, not the hook.",
     "tags": [
       "hook",
       "user-prompt-submit",
@@ -59,7 +59,7 @@
       "use-case-discovery",
       "governance"
     ],
-    "changelog": "v1.0.0 (2026-06-17): Initial — fires the BA use-case-discovery-first order on build/feature prompts.",
+    "changelog": "v1.3.0 (2026-06-18): mandate -> OFFER (asks the user whether to run BA/deep research, recommended-on); broadened keyword gate (add/extend/work-on/i-need/help-me + finance/tax/pricing/decision-tool domain signals) to stop common build phrasings silently missing; now also wired into the hub .claude/. v1.0.0 (2026-06-17): Initial — fires the BA use-case-discovery-first order on build/feature prompts.",
     "tier": "nice-to-have"
   },
   "human-approval-gates": {
@@ -5145,10 +5145,10 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "2a98b4753ffd4f9f83f1cbb67f08588a501a9277960c218fecf56ae06408e7be",
+    "hash": "f15d3afd13df68bbacca0becee375c11274753a4a62ed1c21b6f1ad98d482683",
     "type": "rule",
     "category": "core",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
     "last_updated": "2026-06-18",
