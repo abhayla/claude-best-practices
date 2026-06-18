@@ -20,7 +20,7 @@ triggers:
 allowed-tools: "Read Grep Glob Skill Agent"
 argument-hint: "[prompt text to enhance or 'score' to evaluate reliability]"
 type: workflow
-version: "3.6.0"
+version: "3.7.0"
 ---
 
 # Prompt Auto-Enhance — Strengthening, Step Transcript, Final Preview, Resource CRUD
@@ -388,13 +388,20 @@ enhance to a higher number, then run it" — not "rewrite and hope".
 - Grade-A originals (role-only addition) typically move a few tenths via the
   Role dimension — that small lift is expected and sufficient.
 
-**Independent blind re-grade (MANDATORY — every enhanced turn, no threshold, no bypass):**
-the self re-grade is scored by the same model that wrote the rewrite — structurally motivated
-to show lift (the author-verifies-own-work blind spot — see independent-test-verification.md).
-So an INDEPENDENT reviewer re-grades on EVERY non-trivial enhanced turn. There is no lift
-threshold and no skip — it runs whether the claimed lift is large or small, including Grade-A
-and role-only changes (for an unchanged prompt it confirms before == after). This is not
-sampled or audited-on-suspicion; it is unconditional.
+**Independent re-grade — the Reviewer-after card column is MANDATORY every enhanced turn; the
+BLIND `Agent()` dispatch is STAKES-THRESHOLDED (audit gap G8, 2026-06-18):** the self re-grade
+is scored by the same model that wrote the rewrite — structurally motivated to show lift (the
+author-verifies-own-work blind spot — see independent-test-verification.md). So the
+**Reviewer-after column is rendered on EVERY non-trivial enhanced turn**, but HOW it is produced
+scales with stakes so the cost never makes the whole card get silently dropped:
+- **Dispatch the context-blind `Agent()` reviewer** when stakes are high — self-grade ≤ B-
+  (any C / D / F), OR claimed lift > 1.5 points, OR the turn does destructive / irreversible /
+  wide-scope / domain-critical work. Label the column `(blind agent)`; its number WINS the lift.
+- **Otherwise** (Grade-A/B, small-lift, low-stakes turns) do a CHEAP **self spot-check** —
+  adversarially re-grade only the 2 LOWEST dimensions + sanity-check the overall — and label the
+  column `(self spot-check)`.
+The column is unconditional (the enforcement hook always sees it); only the expensive blind
+dispatch is proportional to stakes — an unaffordable per-turn mandate is what gets dropped.
 
 **Who the reviewer is (state this in the output every time):** a context-blind subagent — a
 fresh model instance dispatched via `Agent()` that receives ONLY the original prompt, the

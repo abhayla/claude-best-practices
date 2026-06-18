@@ -168,10 +168,10 @@ class TestSkillV2Structure:
             "SKILL.md must have Category C weakening language (output-side)"
         )
 
-    def test_skill_version_is_3_6_0(self):
+    def test_skill_version_is_3_7_0(self):
         content = _read(SKILL_PATH)
-        assert 'version: "3.6.0"' in content, (
-            "SKILL.md version must be 3.6.0"
+        assert 'version: "3.7.0"' in content, (
+            "SKILL.md version must be 3.7.0 (G8: blind-reviewer dispatch thresholded)"
         )
 
     def test_skill_references_grading_rubric(self):
@@ -365,12 +365,12 @@ class TestSkillHubCoreParity:
 class TestRegistryVersionSync:
     """Registry versions must be bumped to 2.0.0 for both skill and rule."""
 
-    def test_skill_registry_version_is_3_6_0(self):
+    def test_skill_registry_version_is_3_7_0(self):
         reg = _load_registry()
         entry = reg.get("prompt-auto-enhance", {})
-        assert entry.get("version") == "3.6.0", (
+        assert entry.get("version") == "3.7.0", (
             f"Registry 'prompt-auto-enhance' version is {entry.get('version')}, "
-            "must be 3.6.0"
+            "must be 3.7.0"
         )
 
     def test_rule_registry_version_is_3_1_0(self):

@@ -3142,10 +3142,10 @@
     "tier": "must-have"
   },
   "prompt-auto-enhance": {
-    "hash": "f0673fddaacd117473009532f294d9d13c90c9ce53ee5ab17aba32ab47fab902",
+    "hash": "ea7b6d66e0ac5363ffb5b39b0b3b894f3fd8ce7b731a3df8a7f5747796ea1a5f",
     "type": "skill",
     "category": "core",
-    "version": "3.6.0",
+    "version": "3.7.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
     "last_updated": "2026-06-18",
