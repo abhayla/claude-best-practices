@@ -63,10 +63,10 @@
     "tier": "nice-to-have"
   },
   "human-approval-gates": {
-    "hash": "6f349756a882b1824e5ce8697f278e857168bf82e390806a3d3a71ceb297d087",
+    "hash": "078826361ed968f0713ba9e1845e56883fad0872e591381cbf5eece16a875999",
     "type": "rule",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-17",
     "last_updated": "2026-06-18",
@@ -4805,13 +4805,13 @@
     "tier": "must-have"
   },
   "output-plausibility-verification": {
-    "hash": "15a0ccbe2b0b1aae9ad23917470f5409e1be04de367c4a4ac492e6e78a884b43",
+    "hash": "9ced95187dbd8e5b00342290d187e3e602bdf5d7e52a38f3e4c811beb8ec16e6",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-10",
+    "last_updated": "2026-06-18",
     "dependencies": [],
     "visibility": "public",
     "description": "Verify user-facing computed values are domain-SANE, not just that they render/persist/pass — the substance axis of verification. Default-path checks, plausibility bounds, shape-locks-are-not-correctness-proofs.",
@@ -5122,7 +5122,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-18",
-    "total_patterns": 271
+    "total_patterns": 272
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5145,10 +5145,10 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "f15d3afd13df68bbacca0becee375c11274753a4a62ed1c21b6f1ad98d482683",
+    "hash": "e444193435b747b9286e8379339dc44203d95b0cdd257f350331576b8729e958",
     "type": "rule",
     "category": "core",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
     "last_updated": "2026-06-18",
@@ -5344,6 +5344,27 @@
       "affiliate-tracking"
     ],
     "changelog": "v1.0.0 (2026-06-18): Initial - GA4+GTM+Search Console setup with explicit CTA/affiliate events, Consent Mode v2, and mandatory hit verification.",
+    "tier": "nice-to-have"
+  },
+  "verifier-edge-guard": {
+    "hash": "8015a5ffbf7e80c64fe19c732f360f3a81d255711f9be5097afc900384ac53a7",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-18",
+    "last_updated": "2026-06-18",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Stop hook (telemetry-first) that makes the INDEPENDENT-VERIFIER edge visible: logs a verifier-edge-miss when a turn does builder work (code Edit/Write, a Task subagent, or a test run) AND claims done/pass BUT shows no evidence the independent verifier ran (code-review / blind test-verify / supervisor-reproduce). Consolidates the reviewer-edge, independent-test-verification and supervisor-verification gates into one signal-gated salience layer; non-blocking (escalate to block only if the log shows misses are frequent).",
+    "tags": [
+      "hook",
+      "stop",
+      "verification",
+      "governance",
+      "salience"
+    ],
+    "changelog": "v1.0.0 (2026-06-18): Initial — telemetry-first verifier-edge miss detector (Phase 2 of BA-gate/fragile-governance hardening).",
     "tier": "nice-to-have"
   }
 }
