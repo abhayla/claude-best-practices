@@ -5165,7 +5165,7 @@
     "tier": "nice-to-have"
   },
   "no-overask-guard": {
-    "hash": "dc1b6be1196a7504c852d32ad3acad4345fbf652e767532ed8a9503a3f319286",
+    "hash": "944acafc6bf146be77e42f2427a1d5659b52348e4bb0c8b5dce5378f3f7eeec9",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",

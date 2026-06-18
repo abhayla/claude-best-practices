@@ -34,15 +34,17 @@ def test_hub_copy_matches_core():
     assert HUB_HOOK.read_text(encoding="utf-8") == _body(), "hub no-overask hook drifted from core"
 
 
-def test_card_enforcement_covers_total_omission():
+def test_card_enforcement_does_not_depend_on_a_block_being_present():
     body = _body()
-    # The enforcement trigger MUST recognise a strengthened-prompt block by the
-    # compact-block tokens too (final prompt / what changed), not only a "self-after"
-    # card column — otherwise total omission of the card is invisible (the original hole).
-    assert re.search(r'grep -qE "self-after\|final prompt\|what changed"', body), (
-        "card-presence trigger must include 'final prompt'/'what changed', not only 'self-after' "
-        "(total card omission would otherwise go unenforced)"
+    # The trigger MUST NOT require a strengthened-prompt block ("enh_block" gate removed) —
+    # a banner-ONLY turn (no 'final prompt'/'what changed'/'self-after', whole process omitted)
+    # must still block. Keying on those tokens was the evasion hole this guards against.
+    assert "enh_block" not in body, (
+        "the 'enh_block' gate must be gone — a banner-only turn must not evade the card block"
     )
+    # It fires purely on: substantive + *Enhanced banner + not-trivial + reviewer-after ABSENT.
+    assert "head -1 | grep -qE '^\\*enhanced'" in body, "must gate on the *Enhanced banner first line"
+    assert 'grep -qE "reviewer-after"' in body, "must block on the missing Reviewer-after column"
 
 
 def test_card_enforcement_blocks_on_missing_reviewer_column():

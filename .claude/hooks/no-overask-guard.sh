@@ -54,21 +54,19 @@ full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
-# ── Reviewer-grade-card enforcement (PRESENCE + completeness; runs PRE-exemption) ──
-# The prompt-auto-enhance pipeline MUST render the full before→after card INCLUDING the
-# INDEPENDENT REVIEWER's per-dimension "Reviewer-after" column (skill STEP 3.6/4) on EVERY
-# enhanced turn. Fire when an enhancement was rendered — the *Enhanced banner + a
-# strengthened-prompt block (a "self-after" card column OR a "final prompt"/"what changed"
-# block), and NOT the trivial "ran as-is" one-liner — but the "reviewer-after" column is
-# ABSENT. This catches BOTH a malformed card (self-after present, reviewer-after missing) AND
-# TOTAL OMISSION of the card (the realistic failure the prior check missed: a compact
-# "what changed / final prompt" block with no card at all). Runs BEFORE the sync-check
-# exemption so enhance demos are still checked. WHY a hook: prose in the skill drifted
-# unenforced across turns — zero-exception behaviour needs a hook, not prose. Own loop-guard
-# (.reviewcard-count, reset per turn by prompt-enhance-reminder.sh), cap 4.
-enh_block=""; printf '%s' "$full" | grep -qE "self-after|final prompt|what changed" && enh_block="1"
+# ── Full-process enforcement: the independent-reviewer grade card (PRE-exemption) ──
+# The prompt-auto-enhance pipeline MUST render the FULL process — whose definitive tell is the
+# INDEPENDENT REVIEWER's per-dimension "reviewer-after" card column (skill STEP 3.6/4) — on
+# EVERY substantive enhanced turn. Block when: the turn is substantive (>=300), opens with the
+# *Enhanced banner, is NOT the trivial "ran as-is" one-liner, and the "reviewer-after" column
+# is ABSENT — REGARDLESS of whether a partial strengthened-prompt block was shown. WHY drop the
+# old "block-present" gate: keying on "self-after|final prompt|what changed" let a banner-ONLY
+# turn (whole process omitted, none of those tokens present) EVADE the block and be merely
+# logged — omitting MORE escaped while omitting less got caught (backwards). Now any
+# substantive enhanced turn must render the reviewer card OR declare the prompt trivial. Runs
+# BEFORE the sync-check exemption. Loop-guard (.reviewcard-count, reset per turn), cap 4.
 trivial="";  printf '%s' "$full" | grep -qE "ran (your )?input as-is|ran as-is|no change — ran|no enhancement" && trivial="1"
-if [ "${#last_text}" -ge 300 ] && [ -n "$enh_block" ] && [ -z "$trivial" ] \
+if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] \
    && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' \
    && ! printf '%s' "$full" | grep -qE "reviewer-after"; then
   rc="$root/.claude/.reviewcard-count"
@@ -76,7 +74,7 @@ if [ "${#last_text}" -ge 300 ] && [ -n "$enh_block" ] && [ -z "$trivial" ] \
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   if [ "$rn" -lt 4 ]; then
     printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: independent-reviewer grade card missing). This enhanced turn rendered a strengthened-prompt block but NO before→after grade card with the Reviewer-after per-dimension column. The user requires the FULL independent-reviewer per-dimension grade card (Before · Self-after · Reviewer-after · Weight) on EVERY enhanced turn — no compact bypass (prompt-auto-enhance skill STEP 3.6/4). Re-render the full card WITH the Reviewer-after column, then continue." '{decision:"block", reason:$r}'
+    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive enhanced turn opened with the *Enhanced banner but did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column (skill STEP 3.6/4). Render the FULL process now: pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, render the '*Enhanced: no change — ran your input as-is*' one-liner instead." '{decision:"block", reason:$r}'
     exit 0
   fi
 fi
