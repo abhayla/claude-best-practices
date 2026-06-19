@@ -34,6 +34,25 @@ workers = broken). So the order is: correct the FACT first (safe), then relax co
   (don't nest for nesting's sake — KISS; skill-at-T0 stays where it's already clean).
 - [ ] **C5:** Pilot ONE workflow with nested dispatch A/B; prove real nested parallelism; full CI green.
 
+## DECISION (2026-06-19, decided per KISS/YAGNI — resolves the C4 fork)
+
+The relaxation is a **REFRAME, not a sweeping rewrite.** The hub **KEEPS single-level dispatch as its
+default convention** — NOT because the platform forces it (it no longer does), but because it's simpler
+(KISS) and no concrete hub workflow yet needs nesting (YAGNI, rule 21: adopt extensibility at the second
+caller, not the first). Consequences that SHRINK the remaining cascade:
+- **C2 (validator):** `test_orchestrator_tool_grants.py` assertions STAY — they now enforce a deliberate
+  **hub convention**, not a platform limit. Only the test's rationale comments need a one-line update.
+  No red-first rewrite; existing patterns (no `Agent` on workers) remain valid and green.
+- **C3 (rule body):** reframe §1–§3/§10 prose from "platform-forced single-level" → "deliberately-chosen
+  single-level convention; nesting ≤5 available and adopted per concrete need." Prose-only, no pattern churn.
+- **C4 (CLAUDE.md):** correct the skill-at-T0 *rationale* (it's a choice now, not a platform constraint).
+- **C5 (pilot):** deferred until a concrete workflow demonstrably benefits from nesting (YAGNI — may never fire).
+
+This means the big-blast-radius fear was overstated: NO master-agent / workflow / `project-manager-agent`
+needs to change. The remaining work is a coherent **prose reframe of 2 rules + CLAUDE.md + validator
+comments** — still best done together in fresh context (so §1–§3/§10 stay internally consistent), but far
+lower risk than "rewire the orchestration model."
+
 ## Guard rails
 - **Don't nest for nesting's sake** — skill-at-T0 still works and is simpler for many flows. Nesting is
   now an OPTION; adopt it only where it removes a real T0-orchestration wart (`goal-anchored-decisions.md`).
