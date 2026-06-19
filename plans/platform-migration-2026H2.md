@@ -84,7 +84,16 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 - [ ] **4.3** Rewrite CLAUDE.md skill-at-T0 rationale **only after** 4.2 proves parallelism.
 
 ### Phase 5 — Self-updating layer (futuristic Layer 1) · risk: med
-- [ ] **5.1** Routine polls `code.claude.com/docs/en/whats-new` weekly, diffs a tracked baseline, auto-opens an issue when a new feature can absorb a hub pattern. Test: detects current baseline on first run.
+- [x] **5.1a** ✅ DONE (2026-06-19) — Wired the 5 official Claude Code release-tracking URLs
+  (`whats-new`, `sub-agents`, `hooks`, `worktrees`, `scheduled-tasks`) into the EXISTING
+  `config/urls.yml` → the existing `scan-internet.yml` weekly cron + `scan_web.py` now surface new
+  native features automatically. KISS/DRY: reused the internet→hub scan pipeline instead of building
+  a new poller (YAGNI). Tested: YAML parses, 19 URLs, 0 malformed. `whats-new` set to 14d expiry
+  (weekly cadence); others 30d.
+- [ ] **5.1b** (enhancement, deferred — YAGNI until 5.1a proves insufficient) auto-open a GitHub
+  issue when a discovery maps to a migratable hub pattern. The scan pipeline currently emits
+  discovery reports (`config/discoveries.json` + `/scan-discovery-report`); wiring discovery→issue
+  is a further step, only if the reports alone don't surface migrations reliably.
 
 ## Decisions / open items
 - **Goal codification:** the 3-layer goal stays in THIS plan until Abhay ratifies wording; only then

@@ -8,6 +8,36 @@ urls:
     last_verified: "2026-03-09"
     expires_after: 90d
     trust_level: high
+
+  # Official Claude Code RELEASE TRACKING — Layer-1 self-updating goal (README goal #4,
+  # plans/platform-migration-2026H2.md). The existing scan-internet pipeline watches these so
+  # the hub learns when a native primitive ships that can absorb/retire a hand-rolled pattern.
+  - url: https://code.claude.com/docs/en/whats-new
+    last_verified: "2026-06-19"
+    expires_after: 14d   # weekly release cadence — check often
+    trust_level: high
+    notes: "Official Claude Code changelog — primary signal for new native features to migrate onto"
+  - url: https://code.claude.com/docs/en/sub-agents
+    last_verified: "2026-06-19"
+    expires_after: 30d
+    trust_level: high
+    notes: "Sub-agents doc — tracks the subagent-dispatch constraint that agent-orchestration.md depends on (skill-at-T0)"
+  - url: https://code.claude.com/docs/en/hooks
+    last_verified: "2026-06-19"
+    expires_after: 30d
+    trust_level: high
+    notes: "Hook events reference — tracks new hook capabilities for the governance prose->harness migration"
+  - url: https://code.claude.com/docs/en/worktrees
+    last_verified: "2026-06-19"
+    expires_after: 30d
+    trust_level: high
+    notes: "Native worktree isolation — supersedes hand-rolled worktree orchestration"
+  - url: https://code.claude.com/docs/en/scheduled-tasks
+    last_verified: "2026-06-19"
+    expires_after: 30d
+    trust_level: high
+    notes: "Routines / scheduled cloud agents — target for migrating GH-Action crons"
+
   - url: https://github.com/hesreallyhim/awesome-claude-code
     last_verified: "2026-03-09"
     expires_after: 60d
