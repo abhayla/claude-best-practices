@@ -163,13 +163,13 @@
     "tier": "must-have"
   },
   "agent-orchestration": {
-    "hash": "01fd7bc1aa9e8fd2f51d1dbfcdb78378b9366133a8637425efafc6f4c5d69c93",
+    "hash": "ad8b6c854d2132a1c2deb4f262265fc50819965a58caa5bd9ff32bf400fc255f",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-19",
     "dependencies": [],
     "visibility": "public",
     "description": "8 constraints for multi-agent orchestration: 2-level hierarchy, no subagent-spawning, externalized DAGs, global retry budget, single state location",
@@ -178,7 +178,7 @@
       "agents",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation â€” Anthropic-aligned orchestration constraints",
+    "changelog": "v1.0.0: Initial creation â€” Anthropic-aligned orchestration constraints | 2026-06-19: PLATFORM UPDATE banner — nested subagents GA (Claude Code v2.1.172, <=5 levels); single-level model marked over-conservative pending cascade (plans/skill-at-t0-doctrine-relaxation.md)",
     "tier": "nice-to-have"
   },
   "ai-gemini-api": {
@@ -2832,13 +2832,13 @@
     "tier": "nice-to-have"
   },
   "pattern-structure": {
-    "hash": "6b0ccc7c302c03ed548320668ead03196c9134e2623e1e645b3c2457ffaff6c4",
+    "hash": "a8e7cc96d614fd6a5c0a1910711e4a6ea44e09ba1fc905fd84b0e00fcc002b9f",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-04-25",
+    "last_updated": "2026-06-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Structural requirements for skills, agents, and rules: required frontmatter, SemVer policy, type classification, deprecation lifecycle",
@@ -2847,7 +2847,7 @@
       "structure",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core | 2026-04-25: append Agent registry session-pinning subsection documenting Claude Code platform behavior + skill-author implications",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core | 2026-04-25: append Agent registry session-pinning subsection documenting Claude Code platform behavior + skill-author implications | 2026-06-19: PLATFORM UPDATE banner — nested subagents GA (Claude Code v2.1.172, <=5 levels); single-level model marked over-conservative pending cascade (plans/skill-at-t0-doctrine-relaxation.md)",
     "tier": "nice-to-have"
   },
   "perf-test": {

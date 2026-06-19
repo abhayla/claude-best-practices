@@ -76,14 +76,21 @@ silently inlined at their dispatch site instead of being dispatched as subagents
 
 ### Tool Grants (Platform-Constrained)
 
-Claude Code does NOT forward the `Agent` tool to dispatched subagents,
-regardless of what the subagent's frontmatter `tools:` field declares.
-[Anthropic's official docs](https://code.claude.com/docs/en/sub-agents)
-state this explicitly: *"subagents cannot spawn other subagents."*
+> **⚠️ 2026-06-19 — partly superseded:** nested subagent dispatch is now GA (Claude Code v2.1.172,
+> ≤5 levels). The "workers MUST NOT declare `Agent`" invariant below is **over-conservative, pending
+> relaxation** — see the PLATFORM UPDATE banner in `agent-orchestration.md` and
+> `plans/skill-at-t0-doctrine-relaxation.md`. Until that cascade lands, the single-level invariant below
+> still governs hub patterns (so the `test_orchestrator_tool_grants.py` validator stays in sync).
+
+Claude Code's single-level-dispatch era (the historical constraint, verified 2026-04-24):
+it did NOT forward the `Agent` tool to dispatched subagents,
+regardless of what the subagent's frontmatter `tools:` field declared.
+[Anthropic's official docs](https://code.claude.com/docs/en/sub-agents) at the time
+stated *"subagents cannot spawn other subagents."*
 Corroborated by [GH #19077](https://github.com/anthropics/claude-code/issues/19077),
 [GH #4182](https://github.com/anthropics/claude-code/issues/4182), and three
-independent 2026-04-24 runtime probes. See `agent-orchestration.md` §2 for
-the full platform-constraint note.
+independent 2026-04-24 runtime probes. See `agent-orchestration.md` for the
+full platform-constraint note **and the 2026-06-19 update superseding it.**
 
 **What this means for `tools:` frontmatter:**
 
