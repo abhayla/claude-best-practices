@@ -135,7 +135,11 @@ def main(argv=None) -> int:
     candidates = select_migratable(data, min_confidence=args.min_confidence)
     report = file_issues(candidates, apply=args.apply)
     print(json.dumps(report, indent=2))
-    return 0
+    # No silent failure (error-handling.md): when actually filing, a gh failure on ANY
+    # action must surface as a non-zero exit (the workflow step uses continue-on-error so
+    # it annotates the run without killing the scan). Dry-run always succeeds.
+    failed = [a for a in report["actions"] if a.get("ok") is False]
+    return 1 if (args.apply and failed) else 0
 
 
 if __name__ == "__main__":

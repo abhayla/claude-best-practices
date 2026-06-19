@@ -69,7 +69,14 @@ def test_signature_is_stable_and_typed():
     assert migratable_signature(e) == "discovery:rule:sub-agents-nesting"
 
 
-def test_dry_run_makes_no_gh_calls_and_reports_plan():
+def test_dry_run_makes_no_gh_calls_and_reports_plan(monkeypatch):
+    # Spy: dry-run must NEVER invoke gh (the cron-safety guarantee). Fail loudly if it does.
+    import scripts.discovery_to_issue as mod
+
+    def _boom(*a, **k):
+        raise AssertionError("dry-run must not call gh")
+
+    monkeypatch.setattr(mod, "_gh", _boom)
     cands = [_entry(), _entry(name="another", type="agent")]
     report = file_issues(cands, apply=False)
     assert report["applied"] is False

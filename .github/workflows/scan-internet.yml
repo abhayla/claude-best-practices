@@ -51,6 +51,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: File migratable-discovery issues (Phase 5.1b — close the self-updating loop)
+        continue-on-error: true   # a gh hiccup here annotates the run; it must NOT fail the scan/PR
         run: |
           # Turn high-confidence, officially-sourced, not-yet-in-hub discoveries into
           # deduplicated tracking issues so a newly-shipped native primitive becomes
