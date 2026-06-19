@@ -67,8 +67,8 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   enforcement is better served by Auto-mode hard-deny rules (Phase 3.2), not by re-homing telemetry hooks.
 
 ### Phase 2 — Deploy = finish line (calculator gap) · risk: med→high
-- [ ] **2.1** `claude ultrareview` (CI-callable) into testing-pipeline. Test: buggy branch → findings returned.
-- [ ] **2.2** `/autofix-pr` into fix-loop. Test: PR with failing test → auto-fix applied.
+- [x] **2.1** ✅ DONE (2026-06-19, PR #122) — adopted native `/code-review ultra` as an **additive opt-in pointer** in `code-review-workflow` + `review-gate` + `engineering-roles` (it's billed/user-triggered/cloud — the hub can't invoke it; the free local `/review-gate` stays default). NOT a replacement.
+- [x] **2.2** ✅ DONE (2026-06-19, PR #122) — adopted native `/autofix-pr` as an **additive opt-in pointer** in `fix-loop` + `pipeline-fix-pr` + `debugging-loop` + `engineering-roles` (cloud, needs Claude GitHub App; local `/fix-loop` stays default). NOT a replacement.
 - [ ] **2.3** computer-use UI verify + `vps-deploy` (Unit 3 of idea-to-deploy-readiness). Test: throwaway deploy, live smoke + rollback. **Needs Abhay's VPS creds — escalate at deploy.**
 
 ### Phase 3 — Cloud autonomy · risk: med
