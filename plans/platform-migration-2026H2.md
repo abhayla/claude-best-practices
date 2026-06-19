@@ -144,7 +144,10 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   e2e-conductor-agent · test-pipeline-agent · failure-triage-agent · testing-pipeline-master-agent ·
   testing-pipeline-workflow · fix-issue → deleted; superseded by `/test-pipeline` + `/fix-github-issue`.
   `total_patterns` 272→266; FULL CI green (1426 passed, 4 gates); independent review 0 blockers/majors.
-  Orphaned `e2e-pipeline.yml` flagged as a separate follow-up RETIRE (needs owner sign-off).
+  **CORRECTION 2026-06-19:** `e2e-pipeline.yml` is NOT orphaned (an earlier note wrongly said so) — it is
+  LIVE config read by `/e2e-visual-run`, `test-failure-analyzer-agent`, and `test-healer-agent` (classification
+  rules + error-context enrichment + healing config). KEEP. Lesson: verify a pattern's CURRENT consumers before
+  calling it orphaned; a changelog origin note is not its consumer list.
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
@@ -165,9 +168,12 @@ KEEP live-`/test-pipeline`-worker tests) + spec edit + `config/workflow-groups.y
 descriptions repointed, allowlist emptied + hash resynced, `workflow-groups.yml`/`recommend.py`/`CLAUDE.md`/spec
 updated, ~11 coupled test files surgically edited (dead-agent assertions removed, live-worker guards KEPT),
 `test_tier_dispatch_consistency.py` deleted (100% dead chain). FULL local CI green (1426 passed, all 4 gates);
-independent context-blind review returned 0 blockers / 0 majors. **Follow-up candidate (out of this scope):**
-`core/.claude/config/e2e-pipeline.yml` is now orphaned (its only consumer e2e-conductor-agent is gone) — a future
-RETIRE chunk, needs its own owner sign-off (it's a separate registered config pattern).
+independent context-blind review returned 0 blockers / 0 majors. **NO further RETIRE follow-up:** an earlier
+note flagged `core/.claude/config/e2e-pipeline.yml` as orphaned — that was WRONG. Re-verification (2026-06-19)
+found it is LIVE config still read by `/e2e-visual-run` + `test-failure-analyzer-agent` (classification rules,
+error_context_enrichment) + `test-healer-agent` (standalone healing config), and guarded by
+`test_classification_rules.py` / `test_analyzer_enriched_context.py`. It only ORIGINATED as the conductor's DAG;
+it outlived the conductor. KEEP — not a RETIRE candidate.
 
 ### MIGRATE (28 = 24 registered + 4 non-registry) → native primitive
 | Pattern | Native primitive | Phase |
