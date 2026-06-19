@@ -75,13 +75,26 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 - [ ] **3.1** Migrate crons (`scan-internet.yml` etc.) → Routines. Test: one routine fires in cloud.
 - [ ] **3.2** Auto-mode hard-deny rules: encode irreversible-action escalation list deterministically. Test: denied op blocked.
 
-### Phase 4 — Agent Teams replaces skill-at-T0 · risk: HIGH · **PROMOTED to next real chunk (2026-06-19)**
-- [ ] **4.1** ⏳ IN PROGRESS — Verify GA status of Agent Teams + recursive subagents. CRITICAL: if
-  recursive subagents are GA, `agent-orchestration.md` ("subagents cannot spawn subagents, verified
-  2026-04-24") is STALE and the entire skill-at-T0 doctrine needs revisiting. This gates the bulk of
-  the high-value migrations. Verify against official `code.claude.com` docs (sub-agents + whats-new).
-- [ ] **4.2** Pilot ONE workflow A/B vs current skill-at-T0. Test: real parallelism observed.
-- [ ] **4.3** Rewrite CLAUDE.md skill-at-T0 rationale **only after** 4.2 proves parallelism.
+### Phase 4 — Native nested dispatch (RETARGETED from "Agent Teams") · risk: HIGH · gated on owner sign-off
+- [x] **4.1** ✅ DONE (2026-06-19) — GA verdict (official `code.claude.com` docs, exact quotes):
+  - **Recursive/nested subagents: GA** since **v2.1.172** (~Jun 10 2026), **5-level hard cap, not
+    configurable** (depth-5 subagent gets no `Agent` tool). Official sub-agents doc now states "a
+    subagent can spawn its own subagents." → **`agent-orchestration.md`'s "subagents cannot spawn
+    subagents (verified 2026-04-24)" is FACTUALLY STALE.**
+  - **Agent Teams: EXPERIMENTAL**, flag-gated (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), documented
+    broken session-resumption → **NOT framework-ready.** (TeamCreate/TeamDelete removed in v2.1.178.)
+  - **Dynamic Workflows: RESEARCH PREVIEW** → **NOT framework-ready.**
+  - **Retarget:** the real, GA migration is **native recursive subagents**, NOT Agent Teams/Dynamic
+    Workflows (both too early for a distributable framework). Phases 4.2/4.3 below replace the old
+    Agent-Teams pilot.
+- [ ] **4.2** ⚠️ OWNER SIGN-OFF (rule-change, downstream-shipped, strategic) — Correct
+  `agent-orchestration.md` + `pattern-structure.md` + CLAUDE.md skill-at-T0 sections to reflect
+  "nested dispatch GA, ≤5 levels." This is a MAJOR doctrine shift with wide blast radius (every
+  master-agent, the 8 workflows, `project-manager-agent`, `test_orchestrator_tool_grants.py`
+  validator all assume single-level). PROPOSE-only per `claude-behavior.md` rule 5. Plan the cascade
+  before editing; do NOT relax the doctrine piecemeal.
+- [ ] **4.3** After 4.2 approved: pilot ONE workflow using nested dispatch A/B vs skill-at-T0.
+  Test: real nested parallelism observed; validator updated; tests green.
 
 ### Phase 5 — Self-updating layer (futuristic Layer 1) · risk: med
 - [x] **5.1a** ✅ DONE (2026-06-19) — Wired the 5 official Claude Code release-tracking URLs
