@@ -87,13 +87,14 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   - **Retarget:** the real, GA migration is **native recursive subagents**, NOT Agent Teams/Dynamic
     Workflows (both too early for a distributable framework). Phases 4.2/4.3 below replace the old
     Agent-Teams pilot.
-- [~] **4.2** ✅ RATIFIED by Abhay (2026-06-19) → cascade plan written: `plans/skill-at-t0-doctrine-relaxation.md`.
-  **C1 DONE + committed** (factual-correction banner on `agent-orchestration.md` + `pattern-structure.md`;
-  registry hashes resynced, both rules v1.1.0; validator + quality gate green). **C2–C5 REMAINING** —
-  the coherent doctrine relaxation (validator TDD → rule rewrite → CLAUDE.md → pilot). Deferred to a
-  focused fresh-context effort because (a) C2–C5 form a COHERENT set — applying C2 alone would break the
-  coherence C1's banner just guaranteed; (b) it touches dozens of downstream-shipped patterns + the
-  validator + workflows, needing full CI per chunk. Each lands plan-approved per the ratified option-1.
+- [x] **4.2** ✅ RATIFIED by Abhay (2026-06-19) → cascade plan: `plans/skill-at-t0-doctrine-relaxation.md`.
+  **C1–C4 DONE + committed.** C1: factual-correction banner (both rules v1.1.0). C2–C4 (commit `9c0619b`,
+  PR #120): the coherent prose reframe — single-level recast platform-forced → deliberate KISS/YAGNI
+  CONVENTION across 6 surfaces (`agent-orchestration` + `pattern-structure` → v1.2.0; coherence siblings
+  `independent-test-verification` + `supervisor-verification` → v1.1.0; test rationale; CLAUDE.md). Per the
+  C4 DECISION the validator assertions STAY (they now enforce a convention) — NO master-agent / workflow /
+  `project-manager-agent` changed. FULL local CI green (4 gates, 1486 passed); independent review 0 issues.
+  **Only C5 remains** (pilot nested dispatch on one workflow — DEFERRED, YAGNI, may never fire).
 - [ ] **4.3** After 4.2 approved: pilot ONE workflow using nested dispatch A/B vs skill-at-T0.
   Test: real nested parallelism observed; validator updated; tests green.
 
@@ -133,6 +134,12 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   subagents shipped W24 (Jun 2026) — **that rule may be stale.** → **Phase 4.1 (verify GA status)
   is promoted to the REAL next chunk.** Phases 1.1/1.2 deferred pending per-pattern confirm of
   marginal-vs-real; do NOT spend effort churning already-adopted patterns (KISS/YAGNI).
+
+- 2026-06-19 — **Phase 4.2 C2–C4 SHIPPED** (commit `9c0619b`, PR #120). Doctrine prose reframe complete:
+  single-level dispatch = deliberate KISS/YAGNI convention, not platform-forced. 6 surfaces reframed, 4
+  registry rules version-bumped + hash-resynced, FULL CI green, independent review 0 issues. Phase 4.2 now
+  effectively DONE (C5 pilot deferred YAGNI). **Next:** owner sign-off on the 6 RETIREs + downstream
+  MIGRATEs before any deletion (the lone remaining gated item in this initiative besides conditional pilots).
 
 ## Phase 0 Ledger (result — 2026-06-19)
 

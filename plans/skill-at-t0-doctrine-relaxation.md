@@ -27,12 +27,20 @@ workers = broken). So the order is: correct the FACT first (safe), then relax co
 - [x] **C1 (2026-06-19, safe):** Correct the FALSE fact — superseded-banner on `agent-orchestration.md`
   top blockquote + pointer in `pattern-structure.md`. Keep single-level invariant text but mark it
   "over-conservative, relaxation pending this plan." Patterns/validator unchanged → all green.
-- [ ] **C2 (TDD):** Update `test_orchestrator_tool_grants.py` to the new invariant (workers MAY declare
-  `Agent` unless at depth 5). Red first, then it defines the target.
-- [ ] **C3:** Rewrite `agent-orchestration.md` §1–§3, §10 + `pattern-structure.md` Tool Grants coherently.
-- [ ] **C4:** Correct CLAUDE.md skill-at-T0 rationale; decide which workflows actually benefit from nesting
-  (don't nest for nesting's sake — KISS; skill-at-T0 stays where it's already clean).
-- [ ] **C5:** Pilot ONE workflow with nested dispatch A/B; prove real nested parallelism; full CI green.
+- [x] **C2 (2026-06-19):** `test_orchestrator_tool_grants.py` — per the C4 DECISION the assertions STAY
+  (they now enforce the hub *convention*); only the module docstring + assert-message rationale reframed
+  to convention. AST-verified by independent review: every `assert` expression byte-identical (118 passed
+  / 77 skipped, unchanged). No red-first rewrite needed.
+- [x] **C3 (2026-06-19):** Reframed `agent-orchestration.md` §1–§3/§6/§10 + the dual-banner → one settled
+  convention note (v1.1.0→v1.2.0); `pattern-structure.md` Tool Grants section + tables (v1.1.0→v1.2.0).
+  Coherence sweep also reframed two §2-citing siblings that asserted the stale fact as bare truth:
+  `independent-test-verification.md` + `supervisor-verification.md` (v1.0.0→v1.1.0 each). Corrected the
+  subtle mechanism error too: runtime exposes `Agent` below the 5-level cap; only depth-5 withholds it.
+- [x] **C4 (2026-06-19):** CLAUDE.md "Workflow Orchestration (skill-at-T0)" rationale reframed
+  platform-constraint → deliberate convention. No master-agent / workflow / `project-manager-agent`
+  changed (the C4 DECISION's whole point — skill-at-T0 stays where it's already clean).
+- [ ] **C5 (deferred, YAGNI):** Pilot ONE workflow with nested dispatch A/B; prove real nested parallelism;
+  full CI green. Deferred until a concrete workflow demonstrably benefits from nesting — may never fire.
 
 ## DECISION (2026-06-19, decided per KISS/YAGNI — resolves the C4 fork)
 
@@ -62,3 +70,8 @@ lower risk than "rewire the orchestration model."
 
 ## Log
 - 2026-06-19 — Plan created (Phase 4.2 ratified). C1 done same turn.
+- 2026-06-19 — C2–C4 shipped (commit `9c0619b`, PR #120). Prose reframe across 6 surfaces
+  (2 rules v1.2.0 + 2 coherence-sibling rules v1.1.0 + test rationale + CLAUDE.md); registry hashes
+  resynced + changelog. FULL local CI green (4 gates, 1486 passed); independent context-blind review
+  returned 0 issues (AST-confirmed assertions unchanged). C5 pilot deferred (YAGNI). **Phase 4.2 prose
+  cascade COMPLETE** — only the C5 pilot (conditional/may-never-fire) remains open.
