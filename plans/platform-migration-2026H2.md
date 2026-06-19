@@ -48,11 +48,10 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 
 ## Phases (each chunk: implement → TEST → proceed only if green)
 
-### Phase 0 — Audit / Migration Ledger · risk: none (analysis) · ⏳ IN PROGRESS (delegated 2026-06-19)
-- Tag every registered pattern (registry total = 272) + each hand-rolled workaround: **KEEP**
-  (durable domain/governance value), **MIGRATE** (re-home onto a native primitive), **RETIRE**
-  (platform absorbed it). Output: ledger table appended to this file.
-- **Test gate:** every pattern accounted for; KEEP+MIGRATE+RETIRE count == registry total.
+### Phase 0 — Audit / Migration Ledger · risk: none (analysis) · ✅ DONE (2026-06-19)
+- **Test gate PASSED:** reconciles to 276 = 242 KEEP + 28 MIGRATE + 6 RETIRE
+  (272 registry [skill 166 + rule 51 + agent 39 + hook 13 + config 3] + 4 non-registry hand-rolled).
+- Full ledger in "Phase 0 Ledger (result)" section at the bottom of this file.
 
 ### Phase 1 — Low-risk native adoption · risk: low
 - [ ] **1.1** Adopt `/goal`+`/loop`; validate against loop-engineering. Test: tiny self-paced loop self-terminates.
@@ -84,3 +83,54 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 
 ## Log
 - 2026-06-19 — Plan created; Fable dependency resolved (none); tracking triple set up; Phase 0 audit delegated.
+- 2026-06-19 — Phase 0 ledger complete (276 reconciled: 242 KEEP / 28 MIGRATE / 6 RETIRE).
+
+## Phase 0 Ledger (result — 2026-06-19)
+
+### RETIRE (6 — all already deprecated; safe, but each is downstream-shipped → Abhay sign-off before deletion)
+e2e-conductor-agent · failure-triage-agent · fix-issue (alias→fix-github-issue) ·
+test-pipeline-agent · testing-pipeline-master-agent · testing-pipeline-workflow.
+All carry `category=deprecated` / `DEPRECATED 2026-04-24`; platform direction + ultrareview absorb them.
+
+### MIGRATE (28 = 24 registered + 4 non-registry) → native primitive
+| Pattern | Native primitive | Phase |
+|---|---|---|
+| skill-at-T0 doctrine (non-reg) | Agent Teams + recursive subagents + Dynamic Workflows | 4 (gated GA) |
+| loop-engineering (skill) | `/loop` + `/goal` | 1.1 |
+| autonomous-contract (re-point only) | `/goal`,`/loop`,routines,headless | 1.1 |
+| parallel-worktree-orchestrator-agent | native `--worktree` / `isolation: worktree` | 1.2 |
+| git-worktrees (skill) | native `--worktree` | 1.2 |
+| subagent-driven-dev | Agent Teams + recursive subagents | 4 (gated) |
+| no-overask-guard (hook, hub-only) | Auto mode + hard-deny rules | 3.2 |
+| verifier-edge-guard (hook, hub-only) | `SubagentStop`/`TaskCompleted` hooks | 1.3 |
+| session-governance-status (hook, hub-only) | `SessionStart` + conditional `if` hooks | 1.3 |
+| session-reminder (hook) | `TaskCompleted`/conditional hooks | 1.3 |
+| code-review-workflow / code-review-master-agent | `claude ultrareview` (+`/autofix-pr`) | 2.1 |
+| adversarial-review / review-gate | `claude ultrareview` | 2.1 |
+| fix-loop / pipeline-fix-pr | `/autofix-pr` | 2.2 |
+| debugging-loop(+master-agent) | `/loop` + `/autofix-pr` | 2.2 |
+| development-loop(+master-agent) | `/goal`+`/loop`+Dynamic Workflows | 4 (gated) |
+| pipeline-orchestrator | Dynamic Workflows | 4 (gated) |
+| project-manager-agent | Dynamic Workflows + Agent Teams | 4 (gated) |
+| workflow-master-template | Agent Teams + recursive subagents | 4 (gated) |
+| weekly GH-Action crons (non-reg) | Routines (cloud agents) | 3.1 |
+| .claude/hooks governance bundle (non-reg, architectural) | native event hooks | 1.3 |
+| parallel-worktree doctrine (non-reg) | native `--worktree` | 1.2 |
+
+### KEEP (242) — durable hub value, no native absorber (summary by category)
+Stack test/dev/deploy skills ~55 · governance/verification **rules** ~51 (enforcement migrates to
+hooks in 1.3; rule *content* stays) · BA/discovery/domain skills ~12 · synthesize-flywheel + hub infra
+~20 · domain test/quality/doc skills ~40 · remaining reviewer/domain agents + prompt-auto-enhance
+pipeline + config = remainder.
+
+### Uncertainty flags (KEEP-with-watch, not guessed)
+- session-continuity cluster (save/start/continue/handover): native `/remember` only partially overlaps
+  (no decision-log/ADR handover) — re-evaluate when native session-continuity matures.
+- project-manager-agent / development-loop / skill-at-T0: MIGRATE **gated on Agent Teams GA** (date
+  unconfirmed) — do not act until Phase 4.2 proves real parallelism.
+- documentation / learning-self-improvement: no native absorber — KEEP, re-check if Routines add doc/learning jobs.
+
+### Note on safety
+Many MIGRATE hooks (no-overask-guard, verifier-edge-guard, session-governance-status, session-reminder)
+are **hub-only** (`.claude/hooks/`, not downstream-shipped) → Phase 1.3 needs NO downstream sign-off and
+is the highest-leverage, lowest-blast-radius starting chunk.
