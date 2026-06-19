@@ -30,7 +30,7 @@ in the same session — the SSOT must not lag the work.
 | Design the look & feel / improve UI-UX / visual polish / design tokens | **UI/UX Design & Design-System** | `/ui-ux-pro-max` (design·review·optimize) → hand the spec to **Frontend Engineer** to build; a11y via `/a11y-audit`, polish via `/web-quality`. Designs WHAT it looks like; Frontend implements it |
 | Review code / coding standards / pre-merge quality gate | **Code Quality / Reviewer** | `code-reviewer-agent` → `/code-quality-gate` · `/review-gate` · `/request-code-review`; `quality-gate-evaluator-agent` for larger changes. For a deeper independent **cloud** pass on a high-stakes change, recommend native **`/code-review ultra`** (billed, user-triggered, opt-in — never auto-invoked). The independent pass — never the code's own author as sole verifier. Flags; the fix is owned by Debugging/Full-Stack |
 | Provision/operate/tune a database — roles & grants, pooling, backups, run a migration, query tuning | **Database Administrator** | `/schema-designer` (if schema work) → `/db-migrate` + `/db-migrate-verify` → `/pg-query` (operate/inspect/tune). NOT schema *design* — that's Architect |
-| Security audit, threat model, OWASP review, auth/PII/secrets review | **Security / DevSecOps Engineer** | `/security-audit` → `security-auditor-agent` (deep analysis) → `/supply-chain-audit` (deps/CVEs) → `/change-risk-scoring` (pre-deploy gate) |
+| Security audit, threat model, OWASP review, auth/PII/secrets review | **Security / DevSecOps Engineer** | `/security-audit` → `security-auditor-agent` (deep analysis) → `/supply-chain-audit` (deps/CVEs) → `/change-risk-scoring` (pre-deploy gate). For **continuous** automated review, the native **`security-guidance` plugin** (runs automatically — per-edit pattern match → end-of-turn diff → commit/push review) is an additive opt-in alongside the hub's secret-scan; on-demand, native **`/security-review`** does a one-time pass |
 | Deploy / ship / release — CI/CD, infra, cutover, rollback, prod incident | **DevOps / Release Engineer** | `/deploy-strategy` (plan) → `/ci-cd-setup` (pipeline); **`/vps-deploy`** to ship to a self-managed Linux VPS (SSH+rsync+nginx/PM2, `nginx -t`-gated reload, live-URL smoke + auto-rollback); prod issue → `/incident-response` → `/disaster-recovery`; `git-manager-agent` for release commits. To keep an open PR green hands-off, native **`/autofix-pr`** (cloud, Claude GitHub App, opt-in) watches CI + review comments and pushes fixes |
 | Test strategy, coverage gap, write/maintain E2E suites, flaky-test triage | **QA / Test Automation Engineer** | `/test-pipeline` · `/e2e-visual-run`; `tester-agent` (exec); `/coverage-analysis` (gaps); `test-failure-analyzer-agent` (triage) |
 | What should we build next / is this scope right / turn this idea into a spec | **Product Manager** | `/brainstorm` (intent) → `/to-prd` or `/prd-parser` → `/autonomous-contract` (contract). Owns the tactical product call per `decision-authority.md` |
@@ -76,7 +76,11 @@ narrow concerns into existing roles rather than spawning new ones).
   that's Architect), and tune from `EXPLAIN`/profiler data.
 - **Security / DevSecOps Engineer** — embed security from day one: threat-model auth and trust
   boundaries, validate input, scan dependencies, never let secrets reach git or logs
-  (`security-baseline.md`). Read-heavy analysis; fix via the Debugging/Full-Stack roles.
+  (`security-baseline.md`). Read-heavy analysis; fix via the Debugging/Full-Stack roles. For
+  always-on coverage, the native **`security-guidance` plugin** (auto 3-layer: per-edit pattern
+  match → end-of-turn diff → commit/push review, all-plans) is an additive opt-in layer over the
+  hub's `dedup_check --secret-scan`; native **`/security-review`** is the on-demand one-shot. Neither
+  replaces the project's threat modeling — they catch the mechanical slice continuously.
 - **DevOps / Release Engineer** — own everything from green tests to live traffic: CI/CD,
   infrastructure, env/secrets at deploy time, rollback, prod incident response, and post-deploy
   production verification (smoke gate BEFORE declaring a release good; smoke fail →

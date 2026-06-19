@@ -5005,10 +5005,10 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "c72f6573ad8b3087e263a361aafc1f16d489c30bea249bdd4a1a9250b5f17bf1",
+    "hash": "4715cdf96818a647e57b40dcb28872d6c5887e4c99a029854f36eb2b91d3ae39",
     "type": "rule",
     "category": "core",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
     "last_updated": "2026-06-19",
