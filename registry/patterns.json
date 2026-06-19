@@ -4728,13 +4728,13 @@
     "tier": "must-have"
   },
   "decision-authority": {
-    "hash": "16e9ef0bed19d50c2141b88964194e18257eecbfde9e05757b76147004d7e777",
+    "hash": "349e37543f26f5bbad5ccbd13c1c65c5d1e1dff2c77ec5603d45e48ce6427988",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-10",
+    "last_updated": "2026-06-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Decide-vs-escalate taxonomy: DECIDE on reversible/internal/best-practice-clear work, ESCALATE only irreversible/outward/material/fork. Confidence-gate-on-intent + anti-over-ask (no trailing offer, no narrate-and-stop).",

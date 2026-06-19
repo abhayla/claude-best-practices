@@ -5,7 +5,13 @@
       "Write",
       "Bash(cp *)"
     ],
-    "deny": []
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --no-verify:*)",
+      "Bash(git commit --no-verify:*)",
+      "Bash(git commit -n:*)"
+    ]
   },
   "hooks": {
     "PreToolUse": [
