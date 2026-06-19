@@ -5,7 +5,9 @@ globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 
 # Agent Orchestration Constraints
 
-> **Platform constraint (verified 2026-04-24):** Claude Code does not forward the `Agent` tool to dispatched subagents, regardless of what their frontmatter `tools:` field declares. [Anthropic's official documentation](https://code.claude.com/docs/en/sub-agents) states this directly: *"subagents cannot spawn other subagents."* Corroborated by open GitHub issues [#19077](https://github.com/anthropics/claude-code/issues/19077) and [#4182](https://github.com/anthropics/claude-code/issues/4182) and by three independent runtime probes. All rules below reflect this constraint — orchestration is single-level by platform design, not by preference. See §2 for the normative model.
+> **Single-level dispatch is a deliberate hub CONVENTION, not a platform limit.** Nested subagent dispatch is **GA in Claude Code (v2.1.172, ~Jun 2026)**: a subagent **CAN** spawn its own subagents, **capped at 5 levels deep** — only the depth-5 subagent receives no `Agent` tool, and the cap is fixed/not configurable ([sub-agents doc](https://code.claude.com/docs/en/sub-agents): *"a subagent can spawn its own subagents."*). The hub nonetheless keeps dispatch **single-level by default** because it is simpler (KISS) and no hub workflow yet needs nesting (YAGNI — adopt the second caller, not the first). Nesting ≤5 is therefore an **OPTION adopted per concrete need**, not a forced workaround: §2–§3/§10 describe this convention and `test_orchestrator_tool_grants.py` pins it; the guard rails for opting into nesting live in `plans/skill-at-t0-doctrine-relaxation.md`.
+>
+> **History:** this single-level model predates the GA, when *"subagents cannot spawn other subagents"* was literally true (verified 2026-04-24; GH [#19077](https://github.com/anthropics/claude-code/issues/19077), [#4182](https://github.com/anthropics/claude-code/issues/4182), three runtime probes). The v2.1.172 GA superseded that platform fact — the hub keeps single-level now by *choice*, not by force.
 
 ## 1. Orchestrators MUST Run at T0
 
@@ -18,18 +20,18 @@ Multi-stage coordination that dispatches worker subagents MUST execute in the us
 
 Both patterns are valid because both run at T0 where `Agent()` is actually available. A skill that merely dispatches an agent (a "thin wrapper skill") is also valid, but the resulting agent MUST be one whose own design assumes it runs at T0 — not one whose design assumes it is an intermediate-tier orchestrator.
 
-MUST NOT write an agent that dispatches worker subagents AND is itself intended to be dispatched as a subagent. Such an agent would declare `Agent` in `tools:` but never receive it at runtime, silently producing inline work instead of dispatched parallelism — the exact failure mode observed in the 2026-04-24 testbed run.
+By the single-level convention, MUST NOT write an agent that dispatches worker subagents AND is itself intended to be dispatched as a subagent — keep orchestrators at T0 and workers flat. Such a design also courts the depth-5 cap, where the runtime genuinely withholds `Agent` and every dispatch instruction in the body silently inlines (the failure mode the 2026-04-24 testbed hit, when *all* nesting was impossible). If an agent truly needs to orchestrate, mark it `dispatched_from: T0` so the choice is explicit and reviewed.
 
 ## 2. Single-Level Dispatch Model
 
-All orchestration obeys the platform's single-dispatch-level constraint:
+All hub orchestration follows a single-dispatch-level **convention** (a deliberate KISS/YAGNI choice — nesting ≤5 is available per the note above, adopted only per concrete need):
 
 | Role | Where it runs | What it can dispatch |
 |------|---------------|----------------------|
 | **Orchestrator** | T0 (user session or skill injected into T0) | Worker subagents via `Agent()`, utility skills via `Skill()` |
-| **Worker** | Subagent session dispatched by the T0 orchestrator | Skills via `Skill()`. MUST NOT attempt `Agent()` — it is absent at runtime regardless of frontmatter. |
+| **Worker** | Subagent session dispatched by the T0 orchestrator | Skills via `Skill()`. By convention does NOT dispatch further via `Agent()` — hub workers stay flat. (The runtime would permit it below the 5-level cap; hub patterns deliberately don't rely on that.) |
 
-**One dispatch level is the hard limit.** A T0 orchestrator → worker dispatch chain is 1 level deep. No worker can spawn another subagent. If a task decomposition needs work that looks multi-level, flatten it:
+**Single-level is the hub default, not a platform ceiling.** A T0 orchestrator → worker dispatch chain is 1 level deep by convention. The platform permits a worker to spawn its own subagents (≤5 levels), but hub patterns deliberately keep the dispatch graph flat and predictable. If a task decomposition needs work that looks multi-level, the default is to flatten it (adopt nesting only where a concrete workflow clearly benefits — see §10 and the guard rails in `plans/skill-at-t0-doctrine-relaxation.md`):
 
 - The T0 orchestrator dispatches a first wave of workers
 - Workers return structured contracts to T0
@@ -45,10 +47,10 @@ Parallelism is preserved at the T0 dispatch point: multiple `Agent()` calls in a
 
 Workers (agents dispatched from a T0 orchestrator) MUST conform to:
 
-1. **No `Agent` in `tools:` declarations.** Declaring `Agent` is misleading — the runtime will not expose it. Validator `scripts/tests/test_orchestrator_tool_grants.py` flags this.
-2. **No nested dispatch in the body.** Worker prompts MUST NOT instruct the worker to "dispatch agent X" — that instruction will be silently ignored, producing inline work. If multi-step coordination is needed, return to the T0 orchestrator with a structured contract so T0 can dispatch the next wave.
+1. **No `Agent` in `tools:` declarations.** By the single-level convention, hub workers don't orchestrate further, so they don't declare `Agent`. (The runtime would honor it below the 5-level cap; the convention is what keeps hub dispatch flat — it is not enforcing a platform limit.) Validator `scripts/tests/test_orchestrator_tool_grants.py` pins this.
+2. **No nested dispatch in the body.** Worker prompts MUST NOT instruct the worker to "dispatch agent X" — by convention a worker returns to the T0 orchestrator with a structured contract so T0 can dispatch the next wave, rather than nesting. (Nesting ≤5 is technically possible but deliberately unused by hub workers; opt in only via an explicit `dispatched_from: T0`/`dual-mode` design — §10.)
 3. **Skills-only for in-session workflows.** Workers MAY invoke skills via `Skill()` for inline workflow steps, but skill invocations do not create a new session — they run inline in the worker's own context. Parallel `Skill()` calls in one worker message are serialized by the runtime (empirically verified 2026-04-24); design for serial execution inside workers.
-4. **One focused responsibility per worker.** Because workers cannot subdivide work further, each worker MUST be scoped to a single-responsibility task. Multi-responsibility work belongs at the T0 orchestrator, which can dispatch multiple focused workers.
+4. **One focused responsibility per worker.** Because hub workers don't subdivide work further (by convention), each worker MUST be scoped to a single-responsibility task. Multi-responsibility work belongs at the T0 orchestrator, which can dispatch multiple focused workers.
 
 **Failure attribution:** The T0 orchestrator is responsible for aggregating worker return contracts, retrying failed workers (within the global retry budget — see Rule 5), and escalating unresolvable failures to the user. Workers propagate structured failure details (specific step, error, retry count) but do NOT decide whether to retry.
 
@@ -78,7 +80,7 @@ Each orchestration scope MUST have exactly one canonical state file:
 - A state file is owned by exactly ONE agent — the agent named in `master_agent` field of the workflow contract
 - The T0 orchestrator reads worker return contracts + worker-owned sub-files to aggregate state
 - Workers MUST NOT read or write the T0 orchestrator's state file directly; they communicate results via their return contract
-- Cross-workflow coordination flows through the T0 orchestrator (legacy "parent-child" language assumed nested orchestration that the platform does not support — see §2)
+- Cross-workflow coordination flows through the T0 orchestrator (legacy "parent-child" language assumed nested orchestration that the hub convention avoids — see §2)
 
 Every state mutation MUST be written to the state file before the next action. This ensures resume, rollback, and observability all read from one source of truth per scope.
 
@@ -105,14 +107,14 @@ Changes to workflow behavior MUST be made in the config file, not in agent bodie
 
 ## 10. Dual-Mode Operation
 
-An agent's file MAY describe two operational modes. Because of the single-dispatch-level constraint (§2), mode semantics differ from the legacy "standalone vs dispatched master" model:
+An agent's file MAY describe two operational modes. Under the single-level dispatch convention (§2), mode semantics differ from the legacy "standalone vs dispatched master" model:
 
 | Mode | When | Available tools | Constraints |
 |------|------|-----------------|-------------|
 | **T0 orchestrator** | User invokes directly OR a skill injects the agent's logic into T0 | Full tool set including `Agent` | MAY dispatch workers via `Agent()`; owns full lifecycle (init → dispatch → aggregate → commit → report) |
-| **Worker** | Dispatched as a subagent via `Agent()` from the T0 orchestrator | Full tool set EXCEPT `Agent` | MUST NOT attempt further subagent dispatch — `Agent` is absent at runtime per §2. MUST return a structured contract (`gate`, `artifacts`, `decisions`, `blockers`, `summary`) to the T0 orchestrator. Skip steps marked `skip_when: "mode == 'worker'"` — typically commit/PR steps and anything requiring further dispatch. |
+| **Worker** | Dispatched as a subagent via `Agent()` from the T0 orchestrator | Full tool set; by convention does NOT use `Agent` | By the hub convention does NOT dispatch further — stays flat (§2). MUST return a structured contract (`gate`, `artifacts`, `decisions`, `blockers`, `summary`) to the T0 orchestrator. Skip steps marked `skip_when: "mode == 'worker'"` — typically commit/PR steps and anything that would orchestrate further. |
 
-**Dual-mode viability:** An agent whose design requires dispatching workers can only run in T0 mode. If such an agent is dispatched as a worker, the `Agent` tool is absent and every dispatch instruction in its body is silently ignored — producing inline serial work instead of the intended parallelism (the exact failure mode observed in the 2026-04-24 testbed). Agents that support both modes MUST be designed so the worker-mode code path does not assume `Agent` is available.
+**Dual-mode viability:** An agent whose design requires dispatching workers SHOULD run in T0 mode by convention. The worker-mode code path MUST NOT assume `Agent` is available: the hub keeps workers flat, and at the depth-5 cap the runtime genuinely withholds `Agent` so any dispatch instruction silently inlines (the failure mode the 2026-04-24 testbed hit when nesting was impossible platform-wide). Designing the worker path to not depend on `Agent` keeps the agent correct whether it's kept flat by convention or hits the hard cap.
 
 In T0 mode, the agent IS the orchestrator and handles all lifecycle concerns including state creation, cleanup, worker dispatch, and final reporting.
 

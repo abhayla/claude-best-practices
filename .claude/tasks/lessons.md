@@ -2,6 +2,70 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-19 — "Verified" requires the FULL suite, not bash -n + a functional probe (red-PR miss)
+
+**Surfaced during:** the `*Session-boundary:*` hook tweak (`faa4c59`). I edited `no-overask-guard.sh`,
+verified it with `bash -n` + a crafted-transcript functional test, claimed "verified," and committed —
+but did NOT re-run `pytest scripts/tests/`. Remote CI then went RED (`1 failed, 1484 passed`) while my
+local was "green" because my last full-suite run predated the hook edit. **Rules:** (1) after editing ANY
+file that a test asserts on (hooks, patterns, configs), re-run the FULL local CI (all 4 gates incl. full
+pytest) BEFORE committing — a `bash -n`/functional probe proves the script RUNS, not that the repo's
+structural tests still pass. (2) "FULL CI green" is only true if the run POST-DATES the last edit; never
+carry a green result across a later change.
+
+## 2026-06-19 — no-overask-guard.sh + prompt-enhance-reminder.sh are DUAL-HOMED + REGISTERED (not hub-only)
+
+**Surfaced during:** same red PR. I assumed `no-overask-guard.sh` was a hub-only hook (`.claude/hooks/`,
+unregistered) and edited only that copy. WRONG: it (and `prompt-enhance-reminder.sh`) also ships a
+**distributable `core/.claude/hooks/` copy** that `test_no_overask_card_enforcement.py` pins to be
+**byte-identical** to the hub copy AND **registry-hash-matched** (it's a registered `type: hook` pattern).
+**Rule:** editing either of these two hooks requires editing/​copying BOTH copies (hub == core, byte-identical)
+AND resyncing the registry hash + version bump. CLAUDE.md's "hub-only hooks" list is misleading for these
+two — they are dual-homed. (The genuinely hub-only hooks — `session-governance-status.sh`,
+`prompt-logger.sh`, etc. — have no core copy; check `core/.claude/hooks/` before assuming hub-only.)
+
+## 2026-06-19 — Governance hooks over-fire at legitimate quality boundaries (the stop-loop)
+
+**Surfaced during:** the platform-migration session. At the end of a long, context-saturated session
+the `no-overask-guard.sh` (narrate-and-stop) and the enhance-render check entered a LOOP: every attempt
+to wrap up at a completed-tested-chunk boundary — with the only remaining work being owner-gated or a
+coherent-unit that genuinely needs fresh context — was blocked as a "narrate-and-stop violation," and
+every status summary was blocked for not re-rendering the full enhance card. The hooks cannot distinguish
+a *legitimate quality boundary* from an *avoidable stop*. This is the governance-by-harness-vs-internalization
+tension (flagged in the session's own opening retrospective), demonstrated live.
+
+**HOOK TWEAK — Abhay-APPROVED 2026-06-19, APPLIED in `.claude/hooks/no-overask-guard.sh`:** a
+`*Session-boundary:*` exemption now mirrors the existing `*Sync-check:*` exemption. When the final
+message opens a line with `*Session-boundary:*` AND the turn completed a tested chunk, the hook LOGS it
+(`session-boundary-stop (exempted, len=…)` → `.claude/.overask-violations.log`) instead of BLOCKING, and
+exits. The model may use the marker ONLY when (a) a tested/verified chunk is complete and committed, AND
+(b) all remaining work is either owner-gated (sign-off/deploy/spend) or explicitly deferred-for-quality
+with a one-line reason (e.g. coherent multi-file edit needing fresh, non-saturated context). Abuse guard:
+the Stop hook logs every use for audit, so over-use of the marker is visible; the exemption runs AFTER the
+reviewer-card guard, so a session-boundary wrap-up turn still renders the full enhance card. Verified
+2026-06-19: marker → exempt+logged; same narrate-and-stop without the marker → still blocks.
+
+## 2026-06-19 — Render the FULL enhance card on EVERY substantive turn, including continuations
+
+**Surfaced during:** same session — the enhance hook blocked me 5+ times for rendering only the one-liner
+(or a status without the card) on continuation / background-task-completion turns that still produced
+substantive output (commits, edits, analysis). **Rule:** the full process (banner + transcript + before→after
+card WITH the Reviewer-after column + Original→Final + Role) fires on OUTPUT blast radius, not prompt shape.
+A turn triggered by a background-agent completion or a short "go" that then does real work STILL needs the
+full card (with n/a rows where there's no user prompt to grade). Default to rendering it; don't wait for the block.
+
+## 2026-06-19 — Verify each MIGRATE before spending effort; platform "facts" go stale
+
+**Surfaced during:** Phase 0 audit → Phase 1/4 inspection. The subagent audit's headline (28 MIGRATE) was
+over-claimed: on per-pattern inspection, Phases 1.1/1.2/1.3 were marginal or already-adopted (the hub had
+already taken `isolation:worktree`, `/goal`+`/loop` when they shipped), and the real value was gated on one
+thing (nested-subagent GA). **Rules:** (1) a broad audit OVER-claims — verify each MIGRATE against the live
+pattern + official docs before investing; the "no-churn" discipline (don't migrate what's already adopted or
+marginal — KISS/YAGNI) saved real effort here. (2) Foundational PLATFORM-CONSTRAINT claims go stale:
+`agent-orchestration.md`'s "subagents cannot spawn subagents (verified 2026-04-24)" was FALSE by Jun 2026
+(nested dispatch GA v2.1.172, ≤5 levels). Periodically re-verify platform facts — now wired via the scan
+pipeline (`config/urls.yml` release-tracking URLs, Layer-1 self-updating goal).
+
 ## 2026-06-17 — Global `.claude/` gitignore silently drops NEW pattern files
 
 **Surfaced during:** committing the BA reminder hook. The NEW file `core/.claude/hooks/ba-usecase-discovery-reminder.sh` was silently excluded from the commit (PR diff had settings+registry but not the script) — a global `~/.config/git/ignore` rule `.claude/` ignores `.claude/` at any depth, including `core/.claude/`. Already-tracked files keep committing (so edits look fine); only NEW files are dropped, and `git add` only prints an easy-to-miss hint.

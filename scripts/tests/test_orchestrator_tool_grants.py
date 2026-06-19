@@ -1,9 +1,15 @@
-"""Tests for agent tool grants under the single-level dispatch model.
+"""Tests for agent tool grants under the hub's single-level dispatch convention.
 
 Per `core/.claude/rules/agent-orchestration.md` §2 (Single-Level Dispatch
-Model), Claude Code does NOT forward the `Agent` tool to dispatched
-subagents regardless of frontmatter (Anthropic docs: "subagents cannot
-spawn other subagents"; GH #19077 + #4182; 2026-04-24 runtime probes).
+Model), the hub keeps subagent dispatch single-level as a deliberate KISS/YAGNI
+**convention** — NOT because the platform forbids nesting. Nested subagent
+dispatch is GA (Claude Code v2.1.172, ~Jun 2026, ≤5 levels deep); the runtime
+only withholds `Agent` from a subagent at the depth-5 cap, not from every
+worker. This validator pins the convention so hub patterns stay flat and
+predictable (and adopt nesting only where a concrete workflow needs it); it is
+not asserting a runtime limit. (History: the convention predates GA, when
+"subagents cannot spawn other subagents" was literally true — GH #19077 +
+#4182; 2026-04-24 probes — now superseded by the v2.1.172 GA.)
 
 The context-aware invariant checked here, keyed off the `dispatched_from:`
 frontmatter field declared by each agent:
@@ -166,8 +172,9 @@ def test_t0_orchestrator_declares_agent_in_tools(agent_file):
 
 def test_worker_does_not_declare_agent_in_tools(agent_file):
     """Agents marked `dispatched_from: worker` (explicit or default) MUST
-    NOT include Agent in tools: — runtime strips it, and declaring it is
-    misleading (inline dispatch instructions produce silent serial work).
+    NOT include Agent in tools: — the hub's single-level convention keeps
+    dispatch flat, so workers don't orchestrate further (declaring Agent
+    would invite nested dispatch the convention deliberately avoids).
     """
     fm = _parse_frontmatter(agent_file)
     if _is_template_doc(fm, agent_file.stem):
@@ -181,11 +188,11 @@ def test_worker_does_not_declare_agent_in_tools(agent_file):
     assert "Agent" not in tools, (
         f"{agent_file.stem} declares dispatched_from: worker (or defaults "
         f"to it) but includes Agent in tools: {sorted(tools)}. Workers "
-        f"MUST NOT declare Agent — runtime strips it regardless. Any "
-        f"nested Agent() dispatch in the body will silently inline. If "
-        f"this agent genuinely dispatches subagents, it must run at T0: "
-        f"change dispatched_from to T0, and ensure no caller dispatches "
-        f"it via Agent()."
+        f"MUST NOT declare Agent — the hub keeps dispatch single-level by "
+        f"convention (nesting is GA ≤5 levels but adopted only per concrete "
+        f"need). If this agent genuinely needs to dispatch subagents, make "
+        f"that explicit: change dispatched_from to T0 (or dual-mode) so the "
+        f"nesting is a deliberate, reviewed choice — not an accidental one."
     )
 
 

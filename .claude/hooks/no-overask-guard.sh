@@ -84,6 +84,21 @@ if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
   fi
 fi
 
+# ── Exemption: *Session-boundary:* — a completed-tested-chunk stop is legitimate. ──
+# Mirrors *Sync-check:* but for the STOP side: when a tested/verified chunk is complete AND
+# committed, AND all remaining work is owner-gated (sign-off/deploy/spend) or explicitly
+# deferred-for-quality (a coherent unit needing fresh, non-saturated context), the model opens a
+# line with `*Session-boundary:*` and stops — that is a LEGITIMATE boundary, not a narrate-and-stop.
+# (Abhay-approved 2026-06-19; proposal in .claude/tasks/lessons.md.) The hook cannot verify the
+# "tested + committed + only-gated-remainder" preconditions deterministically, so unlike sync-check
+# it LOGS every use to the violations log for audit — abuse (using the marker to dodge real
+# reversible work) is therefore visible in telemetry. Runs AFTER the reviewer-card guard, so a
+# session-boundary wrap-up turn STILL renders the full enhance card.
+if printf '%s' "$full" | grep -qE "session-boundary"; then
+  printf '%s\tsession-boundary-stop (exempted, len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.overask-violations.log" 2>/dev/null
+  exit 0
+fi
+
 # ── Exemption: a GENUINE blocker / escalation / user-input-needed stop is legitimate. ──
 # Includes the deliberate `*Sync-check:*` INTENT-GRILL marker: when the assistant is
 # genuinely NOT SURE WHAT THE USER IS ASKING (intent ambiguity OR a consequential design fork

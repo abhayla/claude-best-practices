@@ -61,7 +61,7 @@ context — see Tool Grants below for the full invariant.
 | Value | Meaning | `Agent` in `tools:`? |
 |---|---|---|
 | `T0` | Agent is invoked directly by the user (never dispatched by another agent/skill) | MUST include `Agent` |
-| `worker` | Agent is only ever dispatched by a T0 orchestrator | MUST NOT include `Agent` — runtime will strip it |
+| `worker` | Agent is only ever dispatched by a T0 orchestrator | MUST NOT include `Agent` — hub convention keeps workers flat |
 | `dual-mode` | Agent supports both modes; worker-mode code path MUST NOT depend on `Agent` | MAY include `Agent`; validator emits a body-scan warning |
 
 If the field is absent, the validator defaults to `worker` (the safer choice).
@@ -74,31 +74,37 @@ will NOT expose the agent as a `subagent_type` — verified in the downstream
 test run 2026-04-24, where 6 pipeline agents with the scalar form were
 silently inlined at their dispatch site instead of being dispatched as subagents.
 
-### Tool Grants (Platform-Constrained)
+### Tool Grants (Single-Level Convention)
 
-Claude Code does NOT forward the `Agent` tool to dispatched subagents,
-regardless of what the subagent's frontmatter `tools:` field declares.
-[Anthropic's official docs](https://code.claude.com/docs/en/sub-agents)
-state this explicitly: *"subagents cannot spawn other subagents."*
-Corroborated by [GH #19077](https://github.com/anthropics/claude-code/issues/19077),
-[GH #4182](https://github.com/anthropics/claude-code/issues/4182), and three
-independent 2026-04-24 runtime probes. See `agent-orchestration.md` §2 for
-the full platform-constraint note.
+> **Single-level dispatch is a deliberate hub convention, not a platform limit.** Nested subagent
+> dispatch is GA (Claude Code v2.1.172, ≤5 levels). The "workers don't declare `Agent`" invariant below
+> is a KISS/YAGNI **convention** the hub keeps by choice (nesting adopted only per concrete need) — see
+> the convention note in `agent-orchestration.md` and the guard rails in
+> `plans/skill-at-t0-doctrine-relaxation.md`. `test_orchestrator_tool_grants.py` pins it.
+
+The hub keeps subagent dispatch single-level by convention: hub workers don't declare `Agent`, so they
+don't orchestrate further. The runtime would actually expose `Agent` to a worker below the 5-level cap —
+keeping workers flat is a hub *choice* that makes dispatch predictable, not a platform restriction.
+(History: the convention predates the GA, when Claude Code did NOT forward `Agent` to dispatched
+subagents and [the docs](https://code.claude.com/docs/en/sub-agents) stated *"subagents cannot spawn
+other subagents"* — verified 2026-04-24, [GH #19077](https://github.com/anthropics/claude-code/issues/19077),
+[GH #4182](https://github.com/anthropics/claude-code/issues/4182), three runtime probes; superseded by
+v2.1.172. See `agent-orchestration.md` for the full convention note.)
 
 **What this means for `tools:` frontmatter:**
 
-| Dispatch context | `Agent` in `tools:` | Runtime behavior |
+| Dispatch context | `Agent` in `tools:` | Convention |
 |---|---|---|
 | **T0 (user's session directly)** | Allowed, functional | `Agent()` dispatches workers as declared |
-| **Dispatched as a worker** (via `Agent(subagent_type=...)` from any caller) | **Misleading — do NOT declare** | `Agent` is stripped at runtime; any dispatch instruction in the agent body silently produces inline serial work instead |
+| **Dispatched as a worker** (via `Agent(subagent_type=...)` from any caller) | **By convention — do NOT declare** | Hub workers stay flat; they don't orchestrate further. (The runtime would honor `Agent` below the 5-level cap, but hub patterns deliberately don't nest from workers.) |
 
-**Invariant (revised 2026-04-24 to reflect the platform finding):**
+**Invariant (single-level convention; assertions pinned by the validator):**
 
 | Agent role | `Agent` in `tools:`? | Rationale |
 |---|---|---|
 | **T0 orchestrator** (user invokes directly; never dispatched) | **Yes** — required for worker dispatch | Runs in user's session where `Agent` is available |
-| **Dual-mode agent** (supports both T0 and worker modes — see `agent-orchestration.md` §10) | **Yes, for T0 mode only.** Worker-mode code path MUST NOT depend on `Agent` | An agent that lists `Agent` in `tools:` but is dispatched as a worker will have `Agent` stripped — dispatch instructions in its body become silent inline work |
-| **Worker** (only ever dispatched as a subagent) | **No** — runtime strips it; declaring it is misleading | See worker constraints in `agent-orchestration.md` §3 |
+| **Dual-mode agent** (supports both T0 and worker modes — see `agent-orchestration.md` §10) | **Yes, for T0 mode only.** Worker-mode code path MUST NOT depend on `Agent` | When dispatched as a worker the agent stays flat by convention; and at the depth-5 cap `Agent` is genuinely absent — so a worker-mode path that assumes `Agent` would silently inline |
+| **Worker** (only ever dispatched as a subagent) | **No** — flat by convention; declaring it would invite nesting the hub avoids | See worker constraints in `agent-orchestration.md` §3 |
 
 **Standard T0-orchestrator tool set:**
 `["Agent", "Bash", "Read", "Write", "Edit", "Grep", "Glob", "Skill"]`.
@@ -106,12 +112,12 @@ the full platform-constraint note.
 **Standard worker tool set:** same minus `Agent`. Workers MAY further narrow
 the set (e.g., omit `Write`/`Edit` if read-only).
 
-Runtime-verified pinning: `scripts/tests/test_orchestrator_tool_grants.py`
-asserts this invariant. A Phase 2 refactor (planned 2026-04-24) will add a
-`dispatched_from:` frontmatter field to every agent so the validator can
-decide context-aware whether `Agent` is required (T0 orchestrators) or
-forbidden (workers), plus a runtime-probe integration test that dispatches a
-throwaway subagent and asserts `Agent` is absent from its tool list.
+Validator pinning: `scripts/tests/test_orchestrator_tool_grants.py` asserts
+this convention, keyed off the `dispatched_from:` frontmatter field (above) so
+it decides context-aware whether `Agent` is required (T0 orchestrators) or
+omitted (workers). The validator pins the hub convention; it does not probe
+runtime nesting depth (the platform allows nesting ≤5 — the hub simply chooses
+not to use it from workers).
 
 ### Agent registry session-pinning (Claude Code platform behavior)
 

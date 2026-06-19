@@ -1,10 +1,11 @@
 # Claude Best Practices Hub
 
-A curated knowledge hub for [Claude Code](https://claude.ai/code) with three goals:
+A curated knowledge hub for [Claude Code](https://claude.ai/code) with four goals:
 
 1. **Distribute reusable patterns** — battle-tested agents, skills, rules, and hooks (for the live count, see `registry/patterns.json`) that you provision into your projects.
 2. **Create, update, and maintain reusable workflows** — orchestrated multi-step processes (testing, development, debugging, code-review, documentation, and more) that projects adopt to improve productivity.
 3. **Take an idea to a production-deployed app, end-to-end** — orchestrate the full lifecycle with the right engineering role owning each stage: BA / domain-expert (clarify, researching the domain on demand) → UX designer (sample UI + **user approval**) → developer (build) → tester (test) → QA / verifier (confirm it looks and works as asked) → DevOps (**deploy to production**), with explicit user-approval gates before build and before deploy.
+4. **Stay a thin layer on top of the latest platform, forever** — the hub continuously tracks Anthropic's Claude Code releases and **migrates hand-rolled patterns onto native primitives as they ship**, retiring (not maintaining) what the platform absorbs. "Done" means verified **in production**, not green-locally. Discretionary "remember-to" governance moves onto **deterministic harness hooks**. The hub gets *stronger* as the platform grows, never reimplements it. (Roadmap: `plans/platform-migration-2026H2.md`.)
 
 Copy patterns to your project, or let `/synthesize-project` analyze your codebase and generate project-specific patterns automatically.
 
