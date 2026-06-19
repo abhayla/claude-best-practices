@@ -614,13 +614,13 @@
     "tier": "must-have"
   },
   "brainstorm": {
-    "hash": "10031c3d1e10c93a9aca5c4f37ebfe58cb42ec21bd5a643c3174e302de48def4",
+    "hash": "05f2b8e3ac61739e28c42fc64767aa254d5f4222e5257dac55eef40d745f950d",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Explore intent through Socratic questioning, propose approaches with trade-offs, and produce a spec document. Use before building anything non-trivial to clarify requirements and evaluate alternatives.",

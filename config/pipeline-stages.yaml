@@ -152,6 +152,10 @@ stages:
 
   - id: stage_10_deploy
     name: "Deploy & Monitor"
+    # Deploy executor by target (see docs/stages/STAGE-10-DEPLOY.md Step 3): containerized →
+    # /iac-deploy+/k8s-deploy+/deploy-strategy; serverless/static → /iac-deploy; mobile →
+    # /deploy-strategy; self-managed Linux VPS (SSH+nginx/PM2) → /vps-deploy (live-URL smoke +
+    # rollback IS the deploy gate). G3 production-deploy is a human-approval gate (human-approval-gates.md).
     depends_on: [stage_9_review]
     artifacts_in:
       pr_url: "stage_9_review.artifacts_out.pr_url"
