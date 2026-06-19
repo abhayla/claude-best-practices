@@ -20,7 +20,16 @@ globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 > option** to adopt the moment a concrete multi-level need appears. **Adoption recipe (when that need
 > arrives):** mark the orchestrating worker `dispatched_from: dual-mode` and add `Agent` to its `tools:`
 > (validator-sanctioned for dual-mode per `pattern-structure.md`); keep its worker-mode path independent of
-> `Agent`; design for the 5-level cap. No production workflow is nested today — by evidence, not assumption.
+> `Agent`; design for the 5-level cap.
+>
+> **First concrete nested consumer (2026-06-20):** `/code-review-workflow --nested-verify` (opt-in)
+> adopts depth-2 nesting where it genuinely helps — each STEP 2b dimension audit (`code-reviewer-agent`,
+> `security-auditor-agent`, now `dispatched_from: dual-mode`) spawns one adversarial per-finding verifier
+> subagent to refute-or-confirm before returning, so only confirmed findings reach T0 (lower false-positive
+> rate). The DEFAULT path stays flat single-level — nesting is opt-in, and the dual-mode audit agents MUST
+> degrade to flat if `Agent` is withheld at the depth-5 cap. This is the "adopt nesting per concrete need"
+> case the C5 audit reserved; remaining workflows stay single-level until they show a comparable need.
+> Empirical false-positive-reduction is designed-for, not yet measured (needs a live run).
 
 ## 1. Orchestrators MUST Run at T0
 
