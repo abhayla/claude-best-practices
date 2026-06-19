@@ -5165,13 +5165,13 @@
     "tier": "nice-to-have"
   },
   "no-overask-guard": {
-    "hash": "bfda8bf9819d1749b81aa687d3d8ad62c5ff17ffdb5bb2e849fc67db268c5fda",
+    "hash": "6853b8fc46447352146ab66f9e48b95a04354e07c7f7d49ffc5eecb19f418114",
     "type": "hook",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Stop hook enforcing stop-discipline deterministically: BLOCKS over-ask (trailing offer / multiple-choice / recommendation+question) and narrate-and-stop endings on reversible work and re-injects the decision-authority rule; exempts genuine blockers and *Sync-check:* intent grills; logs enhance-banner/block/role misses as non-blocking telemetry; per-turn auto-continue cap of 12 via .claude/.keepgoing-count.",
