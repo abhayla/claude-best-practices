@@ -162,71 +162,6 @@ def test_test_healer_agent_default_commit_mode_is_direct():
     assert ("default" in body.lower() and "direct" in body.lower())
 
 
-# ── failure-triage-agent body activation (REQ-M006 — full body) ───────────────
-
-
-def test_failure_triage_agent_full_body_replaces_skeleton():
-    """PR1's NO_OP_PR1_SKELETON behavior MUST be replaced with full triage subgraph.
-
-    Note: NO_OP_PR1_SKELETON may still appear in MUST NOT prose (documenting that
-    we MUST NOT silently degrade to it). The test verifies the full body is active
-    by checking for the 5-step subgraph + absence of skeleton return-contract behavior.
-    """
-    body = (AGENTS_DIR / "failure-triage-agent.md").read_text(encoding="utf-8")
-    # Full body must mention the 5-step subgraph
-    for step in ["Analyzer fan-out", "Issue-manager fan-out", "Fixer fan-out", "serialize-fixes", "escalation-report"]:
-        assert step in body, f"full T2B body MUST cover step: {step}"
-    # Skeleton return contract MUST NOT be the agent's behavior
-    assert '"result": "NO_OP_PR1_SKELETON"' not in body, (
-        "failure-triage-agent still emits NO_OP_PR1_SKELETON contract — PR2 must return TRIAGE_COMPLETE / TRIAGE_INCOMPLETE / BLOCKED"
-    )
-    # Confirm new return contracts are documented
-    assert "TRIAGE_COMPLETE" in body
-    assert "TRIAGE_INCOMPLETE" in body
-
-
-def test_failure_triage_agent_version_bumped_to_1_0_0():
-    # Historical sentinel: PR1 was 0.1.0; PR2 activation bumps to 1.0.0.
-    # Bumped to 1.1.0 on 2026-04-24 for deprecation marker — the agent's
-    # nested-dispatch design is platform-incompatible (see lessons.md
-    # 2026-04-24 entry). Assertion relaxed to "major >= 1" — retains the
-    # regression surface that PR2 activation shipped, without re-pinning
-    # every subsequent patch.
-    body = (AGENTS_DIR / "failure-triage-agent.md").read_text(encoding="utf-8")
-    fm = body.split("---")[1]
-    version_line = next(line for line in fm.splitlines() if line.startswith("version:"))
-    # Parse out the "X.Y.Z" value, accepting optional quotes
-    version_value = version_line.split(":", 1)[1].strip().strip('"').strip("'")
-    major = int(version_value.split(".")[0])
-    assert major >= 1, (
-        f"PR2 activation required major >= 1 (found {version_value}); "
-        f"PR1 was 0.1.0"
-    )
-
-
-# ── T1 atomic switchover (REQ-M011, success criteria #20, #26) ────────────────
-
-
-def test_t1_inline_issue_creation_deleted():
-    """T1's old GitHub Issue Creation step is DELETED in PR2's atomic switchover."""
-    body = (AGENTS_DIR / "testing-pipeline-master-agent.md").read_text(encoding="utf-8")
-    # The old algorithmic body MUST be gone
-    assert 'gh issue create \\' not in body, (
-        "T1 still has the old `gh issue create` invocation — PR2 atomic switchover deletes it"
-    )
-    # The 4 PR1-temporary category-tailored body sections MUST be gone too
-    assert "category-tailored body section" not in body
-    # Pointer to T2B replacement MUST be present
-    assert "github-issue-manager-agent" in body
-    assert "T2B" in body or "failure-triage-agent" in body
-
-
-def test_t1_pr1_temporary_marker_removed():
-    """The PR1-TEMPORARY HTML comment MUST be removed in PR2."""
-    body = (AGENTS_DIR / "testing-pipeline-master-agent.md").read_text(encoding="utf-8")
-    assert "PR1-TEMPORARY EXTENSION" not in body
-
-
 # ── Pre-merge migration script (REQ-M011, success criterion #31) ──────────────
 
 
@@ -267,18 +202,6 @@ def test_analyzer_backward_compat_single_lane():
     assert "Backward compat" in body or "backward compat" in body or "single-lane" in body
 
 
-# ── T2A STEP 6 update (REQ-M006, AP9) ─────────────────────────────────────────
-
-
-def test_t2a_step6_expects_full_t2b_contract():
-    """T2A STEP 6 MUST expect TRIAGE_COMPLETE / TRIAGE_INCOMPLETE / BLOCKED, not NO_OP_PR1_SKELETON."""
-    body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    assert "TRIAGE_COMPLETE" in body, "T2A STEP 6 MUST handle full T2B return contract"
-    # NO_OP_PR1_SKELETON might still be mentioned in MUST NOT (legacy reference); verify it's not the expected behavior
-    # by checking that triage_outcome is in the return contract
-    assert "triage_outcome" in body
-
-
 # ── Backward compat (REQ-M032, success criteria #13, #14) ─────────────────────
 
 
@@ -316,13 +239,3 @@ def test_escalation_report_in_registry():
     with open(REPO_ROOT / "registry" / "patterns.json", encoding="utf-8") as f:
         registry = json.load(f)
     assert "escalation-report" in registry
-
-
-def test_failure_triage_agent_version_in_registry_is_1_0_0():
-    """Registry MUST reflect T2B's PR2 activation (1.0.0+); minor bumps acceptable
-    for additive changes like REQ-C003 conditional /pipeline-fix-pr routing."""
-    with open(REPO_ROOT / "registry" / "patterns.json", encoding="utf-8") as f:
-        registry = json.load(f)
-    version = registry["failure-triage-agent"]["version"]
-    major = int(version.split(".")[0])
-    assert major >= 1, f"PR2 activation requires major >= 1, got {version}"

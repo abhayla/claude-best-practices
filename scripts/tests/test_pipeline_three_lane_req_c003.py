@@ -54,24 +54,6 @@ def test_pipeline_fix_pr_returns_to_original_branch():
     assert "git checkout \"$ORIGINAL_BRANCH\"" in body or "return to original branch" in body.lower()
 
 
-def test_t2a_documents_fix_pr_mode_flag():
-    body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    assert "--fix-pr-mode" in body, "T2A MUST document --fix-pr-mode flag (REQ-C003)"
-    assert "REQ-C003" in body
-
-
-def test_t2a_routes_to_pipeline_fix_pr_when_flag_set():
-    """T2A's STEP 4 documentation must mention the routing change when --fix-pr-mode."""
-    body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    assert "/pipeline-fix-pr" in body, "T2A must document routing to /pipeline-fix-pr"
-
-
-def test_t2b_documents_fix_pr_mode_branching():
-    body = (AGENTS_DIR / "failure-triage-agent.md").read_text(encoding="utf-8")
-    assert "/pipeline-fix-pr" in body, "T2B MUST document the conditional /pipeline-fix-pr invocation"
-    assert "REQ-C003" in body
-
-
 def test_test_pipeline_yml_lists_fix_pr_mode_flag():
     cfg = yaml.safe_load((CONFIG_DIR / "test-pipeline.yml").read_text(encoding="utf-8"))
     assert "fix_pr_mode" in cfg["cli_flags"], "fix_pr_mode flag must be declared in cli_flags block"

@@ -140,10 +140,15 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   registry rules version-bumped + hash-resynced, FULL CI green, independent review 0 issues. Phase 4.2 now
   effectively DONE (C5 pilot deferred YAGNI). **Next:** owner sign-off on the 6 RETIREs + downstream
   MIGRATEs before any deletion (the lone remaining gated item in this initiative besides conditional pilots).
+- 2026-06-19 — **6-pattern RETIRE EXECUTED** (branch `chore/retire-deprecated-test-pipeline-patterns`).
+  e2e-conductor-agent · test-pipeline-agent · failure-triage-agent · testing-pipeline-master-agent ·
+  testing-pipeline-workflow · fix-issue → deleted; superseded by `/test-pipeline` + `/fix-github-issue`.
+  `total_patterns` 272→266; FULL CI green (1426 passed, 4 gates); independent review 0 blockers/majors.
+  Orphaned `e2e-pipeline.yml` flagged as a separate follow-up RETIRE (needs owner sign-off).
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
-### RETIRE (6 — owner-APPROVED 2026-06-19; DEFERRED to a fresh-context chunk — bigger blast radius than estimated)
+### RETIRE (6 — ✅ DONE 2026-06-19, branch `chore/retire-deprecated-test-pipeline-patterns`)
 e2e-conductor-agent · failure-triage-agent · fix-issue (alias→fix-github-issue) ·
 test-pipeline-agent · testing-pipeline-master-agent · testing-pipeline-workflow.
 All carry `category=deprecated` / `DEPRECATED 2026-04-24`; replaced by `/test-pipeline` (skill-at-T0, the
@@ -155,8 +160,14 @@ deletion = `FileNotFoundError`, not graceful skip; the canonical spec `docs/spec
 v2.2 still defines them as T1/T2A/T2B. Clean removal = surgical test deletion (drop dead-agent contract tests,
 KEEP live-`/test-pipeline`-worker tests) + spec edit + `config/workflow-groups.yml` (lines 25,131,139,140,149,152,182)
 + `scripts/recommend.py:442` MUST_HAVE_AGENTS + CLAUDE.md "8 legacy"→"7" + registry/changelog + `/update-workflow-docs`.
-**DEFERRED to a dedicated FRESH-CONTEXT chunk** (regression-sensitive removal of test coverage; context-rot risk
-at session tail). Full reference map captured in `.remember/remember.md` 2026-06-19.
+**✅ EXECUTED 2026-06-19** on branch `chore/retire-deprecated-test-pipeline-patterns`: 6 files deleted (+ the
+`failure-triage-agent/evals/` scenarios), 6 registry entries removed (`total_patterns` 272→266), 2 stale live
+descriptions repointed, allowlist emptied + hash resynced, `workflow-groups.yml`/`recommend.py`/`CLAUDE.md`/spec
+updated, ~11 coupled test files surgically edited (dead-agent assertions removed, live-worker guards KEPT),
+`test_tier_dispatch_consistency.py` deleted (100% dead chain). FULL local CI green (1426 passed, all 4 gates);
+independent context-blind review returned 0 blockers / 0 majors. **Follow-up candidate (out of this scope):**
+`core/.claude/config/e2e-pipeline.yml` is now orphaned (its only consumer e2e-conductor-agent is gone) — a future
+RETIRE chunk, needs its own owner sign-off (it's a separate registered config pattern).
 
 ### MIGRATE (28 = 24 registered + 4 non-registry) → native primitive
 | Pattern | Native primitive | Phase |

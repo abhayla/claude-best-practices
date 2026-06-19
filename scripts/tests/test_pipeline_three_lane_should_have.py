@@ -19,14 +19,6 @@ CONFIG_DIR = CORE_CLAUDE / "config"
 # ── REQ-S001: --only-issues N,M flag ─────────────────────────────────────────
 
 
-def test_t2a_documents_only_issues_flag():
-    body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    assert "--only-issues" in body, "T2A MUST document --only-issues flag (REQ-S001)"
-    assert "filter-test-ids" in body or "filtered set" in body, (
-        "T2A must explain how --only-issues propagates to scout"
-    )
-
-
 def test_test_pipeline_yml_lists_only_issues_in_cli_flags():
     cfg = yaml.safe_load((CONFIG_DIR / "test-pipeline.yml").read_text(encoding="utf-8"))
     assert "cli_flags" in cfg, "test-pipeline.yml must declare cli_flags block"
@@ -35,11 +27,6 @@ def test_test_pipeline_yml_lists_only_issues_in_cli_flags():
 
 
 # ── REQ-S002: --update-baselines flag ────────────────────────────────────────
-
-
-def test_t2a_documents_update_baselines_flag():
-    body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    assert "--update-baselines" in body, "T2A MUST document --update-baselines flag (REQ-S002)"
 
 
 def test_healer_nn_includes_update_baselines_gating():
@@ -95,18 +82,7 @@ def test_serialize_fixes_safety_aborts_on_rebase_failure():
     assert "git rebase --abort" in body, "Autosquash must abort on rebase failure to preserve original commits"
 
 
-def test_t2a_documents_autosquash_flag():
-    body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    assert "--autosquash" in body, "T2A MUST document --autosquash flag propagation (REQ-S005)"
-
-
 # ── REQ-S006: UI lane checkpoint optimization ────────────────────────────────
-
-
-def test_ui_lane_checkpoint_documented_in_t2a():
-    body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    assert "ui-tests-complete.flag" in body, "T2A MUST document the checkpoint flag (REQ-S006)"
-    assert "use_checkpoint" in body or "REQ-S006" in body
 
 
 def test_ui_lane_use_checkpoint_in_config():

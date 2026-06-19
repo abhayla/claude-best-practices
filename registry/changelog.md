@@ -4,6 +4,21 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — RETIRE 6 deprecated test-pipeline patterns (Platform Migration 2026 H2, Phase 0 ledger)
+
+Removes 6 patterns that were `deprecated`/`deprecated: true` since 2026-04-24, fully superseded by the active `/test-pipeline` skill-at-T0 (its flat workers) and `/fix-github-issue`. Owner-approved deletion 2026-06-19. `total_patterns` 272 → 266. Test surgery removed ONLY the dead-agent contract assertions; every live `/test-pipeline` worker guard (tester-agent, test-scout-agent, visual-inspector-agent, test-failure-analyzer-agent, github-issue-manager-agent, test-healer-agent) is preserved. The canonical spec `docs/specs/test-pipeline-three-lane-spec-v2.md` is annotated HISTORICAL (functional contract preserved in `/test-pipeline`), not deleted.
+
+- **removed** agent `e2e-conductor-agent` → `/test-pipeline` (+ `/e2e-visual-run`)
+- **removed** agent `test-pipeline-agent` → `/test-pipeline`
+- **removed** agent `failure-triage-agent` → `/test-pipeline` (+ its `evals/` scenarios)
+- **removed** agent `testing-pipeline-master-agent` → `/test-pipeline`
+- **removed** skill `testing-pipeline-workflow` → `/test-pipeline`
+- **removed** skill `fix-issue` (deprecation stub) → `/fix-github-issue`
+- **updated** `registry/patterns.json` — 6 entries removed; `_meta.total_patterns` 272→266; stale `description`s of live `test-pipeline` ("dispatching test-pipeline-agent") and `github-issue-manager-agent` ("Spawned by failure-triage-agent") repointed to `/test-pipeline`.
+- **updated** config `orchestrator-responsibility-allowlist` — sole entry (failure-triage-agent) removed → `allowlist: []`; hash resynced.
+- **updated** `config/workflow-groups.yml` (dropped 6 seeds), `scripts/recommend.py` (`MUST_HAVE_AGENTS` − test-pipeline-agent), `CLAUDE.md` (legacy master-agents 8→7; workflow map row repointed to `test-pipeline`).
+- **removed/edited** ~11 coupled test files — dead-agent assertions/cases/parametrize entries dropped; `test_tier_dispatch_consistency.py` deleted (its DISPATCH_CHAIN keyed only deleted orchestrators).
+
 ### 2026-06-19 — orchestration doctrine: single-level is a CONVENTION, not a platform limit (Phase 4.2 C2–C4)
 
 Reframes the hub's single-level subagent-dispatch doctrine from "platform-forced" to "deliberate KISS/YAGNI convention." Nested subagent dispatch went GA in Claude Code (v2.1.172, ≤5 levels), so the old rationale ("Claude Code does not forward `Agent` to subagents" / "runtime strips it") is factually stale. Prose-only reframe — **all validator assertions and existing patterns are unchanged and stay green** (workers still don't declare `Agent`, now by convention rather than platform limit). Also corrects one now-false mechanism claim: the runtime *would* expose `Agent` to a worker below the 5-level cap; only the depth-5 cap genuinely withholds it. No master-agent / workflow / `project-manager-agent` changed (per `plans/skill-at-t0-doctrine-relaxation.md` C4 decision). C5 pilot deferred (YAGNI).

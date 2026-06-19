@@ -15,10 +15,8 @@ import pytest
 import yaml
 
 from scripts.workflow_quality_gate_validate_patterns import (
-    RESPONSIBILITY_ALLOWLIST_PATH,
     RESPONSIBILITY_CAP,
     count_responsibilities,
-    load_responsibility_allowlist,
 )
 
 
@@ -118,73 +116,12 @@ def test_responsibility_cap_is_4():
     assert RESPONSIBILITY_CAP == 4
 
 
-def test_allowlist_loads_t2b_inaugural_entry():
-    """Allowlist YAML must exist with the failure-triage-agent entry."""
-    al = load_responsibility_allowlist()
-    assert "failure-triage-agent" in al
-    entry = al["failure-triage-agent"]
-    assert entry["responsibility_count"] == 5
-    assert entry["rule_8_cap"] == 4
-    assert entry["deviation"] == 1
-    assert entry["justification"]  # non-empty string
-
-
-def test_t1_responsibility_count_within_cap():
-    """T1 (testing-pipeline-master-agent) must be at the cap or below."""
-    count = count_responsibilities(AGENTS_DIR / "testing-pipeline-master-agent.md")
-    assert count <= RESPONSIBILITY_CAP, (
-        f"T1 has {count} responsibilities; rule-8 cap is {RESPONSIBILITY_CAP}. "
-        "Either split T1 or add an allowlist entry with justification."
-    )
-
-
-def test_t2a_responsibility_count_within_cap():
-    """T2A (test-pipeline-agent) must be at the cap or below post-rewrite."""
-    count = count_responsibilities(AGENTS_DIR / "test-pipeline-agent.md")
-    assert count <= RESPONSIBILITY_CAP, (
-        f"T2A has {count} responsibilities post-rewrite; should be exactly 4 per "
-        "spec §3.5 split."
-    )
-
-
-def test_t2b_responsibility_count_matches_allowlist():
-    """T2B (failure-triage-agent) skeleton has 5 responsibilities (5 placeholders);
-    must match the allowlisted count."""
-    count = count_responsibilities(AGENTS_DIR / "failure-triage-agent.md")
-    al = load_responsibility_allowlist()
-    entry = al["failure-triage-agent"]
-    assert count == entry["responsibility_count"], (
-        f"T2B has {count} responsibilities but allowlist documents "
-        f"{entry['responsibility_count']}. Update either the agent or the allowlist."
-    )
-
-
 def test_responsibility_count_function_handles_missing_section():
     """count_responsibilities returns 0 when ## Core Responsibilities is absent."""
     # Use a rule file as a control — rules don't have Core Responsibilities sections
     rules_file = CORE_CLAUDE / "rules" / "claude-behavior.md"
     if rules_file.exists():
         assert count_responsibilities(rules_file) == 0
-
-
-# ── Spec §3.7 + REQ-M034: T1 handles 4 new API categories ────────────────────
-
-
-def test_t1_handles_four_new_api_categories():
-    """T1's body MUST mention the 4 new API categories (PR1 extension)."""
-    # SUPERSEDED in PR2: PR1 introduced 4 new API categories handled by T1's
-    # inline step. PR2's atomic switchover DELETES T1's inline step entirely;
-    # T2B (failure-triage-agent) + github-issue-manager-agent now handle all
-    # categories via /create-github-issue. See test_pipeline_three_lane_pr2.py
-    # for PR2 verification of the deletion + delegation.
-    pytest.skip("Superseded by PR2 atomic switchover; T1 inline step deleted")
-
-
-def test_t1_extension_marked_pr1_temporary():
-    """SUPERSEDED in PR2: PR1 marker was a hint for the PR2 implementer.
-    PR2 atomic switchover deleted T1's inline step entirely; the marker is
-    no longer present (its purpose served). See test_pipeline_three_lane_pr2.py."""
-    pytest.skip("Superseded by PR2 atomic switchover; PR1-TEMPORARY marker removed with the deleted step")
 
 
 # ── Spec §3.2 + REQ-M027/M029: tool grants ───────────────────────────────────
@@ -236,19 +173,6 @@ def test_tester_agent_declares_lane_verdict_authority():
     assert "NEEDS_CONTRACT_VALIDATION" in nn_section
 
 
-# ── Spec §3.5 + REQ-M006: failure-triage-agent skeleton ──────────────────────
-
-
-def test_failure_triage_agent_skeleton_exists():
-    assert (AGENTS_DIR / "failure-triage-agent.md").exists()
-
-
-def test_failure_triage_agent_returns_no_op_in_pr1():
-    """Skeleton must declare it returns NO_OP_PR1_SKELETON contract."""
-    body = (AGENTS_DIR / "failure-triage-agent.md").read_text(encoding="utf-8")
-    assert "NO_OP_PR1_SKELETON" in body
-
-
 # ── Spec §4 EVALS + REQ-M036: /agent-evaluator skill ─────────────────────────
 
 
@@ -283,23 +207,6 @@ def test_agent_evaluator_describes_5_criterion_rubric():
         assert criterion in body, f"Rubric criterion {criterion} missing from /agent-evaluator body"
 
 
-# ── Spec §3.1 + REQ-M025: e2e-conductor isolation ────────────────────────────
-
-
-def test_e2e_conductor_uses_separate_namespace():
-    """e2e-conductor-agent reads/writes .workflows/e2e/ — distinct from
-    .workflows/testing-pipeline/. This protects e2e-conductor from the
-    testing-pipeline schema bump (closes reviewer-pass-2 N4)."""
-    conductor_path = AGENTS_DIR / "e2e-conductor-agent.md"
-    if not conductor_path.exists():
-        pytest.skip("e2e-conductor-agent not in this branch")
-    content = conductor_path.read_text(encoding="utf-8")
-    # The conductor's state file path should be in its own namespace (NOT testing-pipeline/sub/)
-    assert "workflows/testing-pipeline/sub" not in content, (
-        "e2e-conductor must not read T2A's sub-state — it has its own namespace"
-    )
-
-
 # ── Spec §3.13 + REQ-M025: schema mismatch abort policy ──────────────────────
 
 
@@ -308,19 +215,3 @@ def test_test_pipeline_yml_declares_schema_compatibility():
     schema_compat = cfg["state"]["schema_compatibility"]
     assert schema_compat["minimum_required"] == "2.0.0"
     assert schema_compat["on_mismatch"] == "abort_with_STATE_SCHEMA_INCOMPATIBLE"
-
-
-def test_t2a_documents_state_schema_check():
-    """T2A's body must document the schema_version check."""
-    t2a_body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    assert "STATE_SCHEMA_INCOMPATIBLE" in t2a_body
-
-
-# ── Spec §3.3 + REQ-M001: lane orchestration model ───────────────────────────
-
-
-def test_t2a_documents_7_step_lifecycle():
-    """T2A body documents the 7-step lifecycle (INIT → SCOUT → WAVE 1 → WAVE 2 → JOIN → TRIAGE DISPATCH → BUBBLE-UP)."""
-    t2a_body = (AGENTS_DIR / "test-pipeline-agent.md").read_text(encoding="utf-8")
-    for step_marker in ["STEP 1 — INIT", "STEP 2 — SCOUT", "STEP 3 — WAVE 1", "STEP 4 — WAVE 2", "STEP 5 — JOIN", "STEP 6 — TRIAGE DISPATCH", "STEP 7 — BUBBLE-UP"]:
-        assert step_marker in t2a_body, f"T2A missing {step_marker}"

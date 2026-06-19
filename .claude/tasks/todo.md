@@ -11,13 +11,24 @@
 Migrate hand-rolled hub patterns onto native Claude Code primitives (W13–24); close deploy gap;
 move governance prose→harness. Test-gated chunk-by-chunk. Fable dependency: none (Opus 4.8).
 
-- [ ] **Phase 0** — Audit/ledger: tag 272 patterns KEEP/MIGRATE/RETIRE (⏳ delegated to background agent)
-- [ ] **Phase 1** — native adoption: 1.1 `/goal`+`/loop` · 1.2 `--worktree` · 1.3 expanded hooks
-- [ ] **Phase 2** — deploy=finish: 2.1 `ultrareview` · 2.2 `/autofix-pr` · 2.3 computer-use + `vps-deploy`
-- [ ] **Phase 3** — cloud: 3.1 crons→Routines · 3.2 Auto-mode hard-deny
-- [ ] **Phase 4** — Agent Teams replaces skill-at-T0 (HIGH risk, gated on GA verify)
-- [ ] **Phase 5** — self-updating Routine (weekly whats-new diff → auto-issue)
-- ⚠️ Every RETIRE needs Abhay sign-off (downstream-shipped). Goal codification awaits ratification.
+**ACTIVE CHUNK (2026-06-19): RETIRE 6 deprecated test-pipeline patterns** — branch
+`chore/retire-deprecated-test-pipeline-patterns`. Owner-approved; e2e-conductor-agent,
+test-pipeline-agent, failure-triage-agent, testing-pipeline-master-agent (agents) +
+testing-pipeline-workflow, fix-issue (skills) → /test-pipeline + /fix-github-issue.
+- [x] 1. Re-verify reference map (re-grep 6 names)
+- [ ] 2. Test surgery — remove ONLY dead-agent assertions; KEEP live-worker guards
+- [ ] 3. Config/code fixes (workflow-groups.yml, recommend.py:442, allowlist, 2 stale descriptions)
+- [ ] 4. Docs (CLAUDE.md "8 legacy"→"7"; spec annotate T1/T2A/T2B retired)
+- [ ] 5. Delete 6 files + 6 registry entries + total 272→266 + changelog
+- [ ] 6. Regenerate docs (generate_docs + generate_workflow_docs)
+- [ ] 7. FULL local CI (4 gates) + independent blind review
+- [ ] 8. Land PR; update plan (RETIRE→DONE) + remember
+
+Phase status (parent initiative):
+- [x] **Phase 0** — Audit/ledger DONE (276 = 242 KEEP/28→25 MIGRATE/6 RETIRE)
+- [x] **Phase 4.2** — doctrine reframe C1–C4 DONE (PR #120); C5 pilot deferred YAGNI
+- [ ] **Phase 1** (1.1/1.2 marginal · 1.3 KEEP-decided) · **Phase 2** (deploy gap, VPS creds) · **Phase 3** · **Phase 5.1b**
+- ⚠️ Every RETIRE needs Abhay sign-off — GRANTED 2026-06-19 for these 6.
 
 ### loop-engineering — 2026-06-17 — ✅ SHIPPED (merged) + hub-ward monitoring (v1.1.0)
 

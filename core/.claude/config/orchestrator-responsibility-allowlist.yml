@@ -19,11 +19,8 @@
 # rather than re-allowlisted. The allowlist is for known, stable deviations
 # only — not for hiding ongoing growth.
 
-allowlist:
-  - agent: failure-triage-agent
-    responsibility_count: 5
-    rule_8_cap: 4
-    deviation: 1
-    justification: "Triage chain (analyzer → issue-manager → fixer → serialize → escalation) is one logical pipeline; further split would fragment context-sharing across the chain. Each step needs the previous step's full output to make decisions, defeating the cohesion benefit of having a single triage owner."
-    spec_reference: "docs/specs/test-pipeline-three-lane-spec.md#35-failure-triage-new-t2b-failure-triage-agent"
-    review_quarter: "2026-Q3"
+# Empty as of 2026-06-19: the sole entry (failure-triage-agent, count 5) was removed
+# when the deprecated three-lane T1/T2A/T2B agents were retired in favor of the
+# /test-pipeline skill-at-T0 orchestrator. No current orchestrator exceeds the rule-8
+# cap; add a justified entry here if one does.
+allowlist: []

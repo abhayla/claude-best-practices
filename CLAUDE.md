@@ -105,11 +105,11 @@ Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `coll
 
 The 8 multi-step workflows (testing-pipeline, development-loop, debugging-loop, code-review, documentation, session-continuity, learning, skill-authoring) orchestrate from the user's T0 session via skills, NOT via subagents. This is a deliberate KISS/YAGNI **convention, not a platform constraint**: nested subagent dispatch is GA (Claude Code v2.1.172, ≤5 levels deep), but no hub workflow yet needs it — so workflow skills run in T0 and dispatch flat worker subagents in a single message, adopting nesting only where a concrete workflow clearly benefits (see `core/.claude/rules/agent-orchestration.md` §2 + guard rails in `plans/skill-at-t0-doctrine-relaxation.md`).
 
-The 8 legacy `core/.claude/agents/<workflow>-master-agent.md` files are `deprecated: true` (Phase 3, 2026-04-25) and MUST NOT be dispatched. New workflow logic goes in the matching `core/.claude/skills/<workflow>/SKILL.md` — but the on-disk skill directory does NOT always equal the logical workflow name above. Resolve via this map before `ls`-ing or editing:
+The legacy `core/.claude/agents/<workflow>-master-agent.md` files are `deprecated: true` (Phase 3, 2026-04-25) and MUST NOT be dispatched — 7 remain after `testing-pipeline-master-agent` was retired (2026-06-19) with the deprecated three-lane agents (→ `/test-pipeline`). New workflow logic goes in the matching `core/.claude/skills/<workflow>/SKILL.md` — but the on-disk skill directory does NOT always equal the logical workflow name above. Resolve via this map before `ls`-ing or editing:
 
 | Logical workflow | Skill directory |
 |---|---|
-| testing-pipeline | `testing-pipeline-workflow` |
+| testing-pipeline | `test-pipeline` (the active skill; the deprecated `testing-pipeline-workflow` was retired 2026-06-19) |
 | code-review | `code-review-workflow` |
 | documentation | `documentation-workflow` |
 | learning | `learning-self-improvement` |
@@ -118,7 +118,7 @@ The 8 legacy `core/.claude/agents/<workflow>-master-agent.md` files are `depreca
 
 The `project-manager-agent` runs the full PRD-to-Production pipeline and MUST run at T0 — it invokes the 8 workflow skills via `Skill("/<workflow>")`. Keep it at T0 by the same single-level convention: PRD-to-Production orchestration stays flat and predictable rather than nesting from a dispatched worker.
 
-`loop-engineering` (PRs #75–77) is a 9th distributable skill-at-T0 workflow (`core/.claude/skills/loop-engineering/SKILL.md`, spec at `docs/specs/loop-engineering-spec.md`) — a standalone autonomous self-* meta-loop. It is NOT part of the PRD-to-Production pipeline, which is why the counts above (legacy master-agents, project-manager-agent's workflow skills) remain 8.
+`loop-engineering` (PRs #75–77) is a 9th distributable skill-at-T0 workflow (`core/.claude/skills/loop-engineering/SKILL.md`, spec at `docs/specs/loop-engineering-spec.md`) — a standalone autonomous self-* meta-loop. It is NOT part of the PRD-to-Production pipeline, which is why the count of workflow skills the `project-manager-agent` invokes remains 8 (the 8 logical workflows above — testing-pipeline is still one of them, now served by `/test-pipeline`). The legacy `<workflow>-master-agent.md` files are now 7 (testing-pipeline-master-agent retired 2026-06-19).
 
 Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2.
 

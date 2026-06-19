@@ -1,5 +1,15 @@
 # Spec: Three-Lane Test Pipeline (v2 — skill-at-T0 pattern)
 
+> **HISTORICAL — named-agent layer RETIRED 2026-06-19.** The T1/T2A/T2B agents this spec
+> defines (`testing-pipeline-master-agent`, `test-pipeline-agent`, `failure-triage-agent`) and
+> the separate `e2e-conductor-agent` were deprecated 2026-04-24 and **deleted 2026-06-19** (owner-
+> approved). The **functional contract is preserved** and now lives entirely in the `/test-pipeline`
+> skill-at-T0 (plus `/e2e-visual-run` for the UI lane and `/fix-github-issue` for issue creation),
+> which dispatches the surviving flat workers directly (tester-agent, test-scout-agent,
+> visual-inspector-agent, test-failure-analyzer-agent, github-issue-manager-agent, fixers). Read the
+> tier labels (T1/T2A/T2B) below as **responsibility-ownership documentation**, NOT as live
+> dispatchable agents. See `plans/platform-migration-2026H2.md` (RETIRE ledger).
+
 ## Meta
 
 - Author: Claude Code (Opus 4.7)

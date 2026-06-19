@@ -121,20 +121,3 @@ class TestBaselinesUpdatedVerdict:
             "aggregator unified verdict should be PASSED when all stages are "
             f"pass-set (including BASELINES_UPDATED); got {verdict['result']!r}"
         )
-
-
-class TestConductorAgentDocumentsBaselinesUpdatedVerdict:
-    """Ensure the e2e-conductor-agent.md body documents BASELINES_UPDATED
-    as one of the verdict outcomes, so downstream consumers know it can
-    appear in state files."""
-
-    def test_conductor_agent_lists_baselines_updated(self):
-        agent_path = (
-            REPO_ROOT / "core" / ".claude" / "agents" / "e2e-conductor-agent.md"
-        )
-        content = agent_path.read_text(encoding="utf-8")
-        assert "BASELINES_UPDATED" in content, (
-            "e2e-conductor-agent.md must document BASELINES_UPDATED in its "
-            "verdict schema — runtime verification (2026-04-22) confirmed "
-            "the agent emits this value for --update-baselines runs."
-        )
