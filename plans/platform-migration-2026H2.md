@@ -56,7 +56,15 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 ### Phase 1 — Low-risk native adoption · risk: low
 - [ ] **1.1** Adopt `/goal`+`/loop`; validate against loop-engineering. Test: tiny self-paced loop self-terminates.
 - [ ] **1.2** Native `--worktree` / `isolation: worktree`; document + wire into worktree patterns. Test: 2 parallel worktree agents, no file collision.
-- [ ] **1.3** Expanded hooks (`SubagentStop`,`TaskCompleted`,conditional `if`,`agent` hooks): re-home governance hooks onto deterministic events. Test: trigger event, hook fires. **Directly fixes Layer-3 enforcement gap.**
+- [x] **1.3** Expanded hooks — ✅ INVESTIGATED & RE-SCOPED (2026-06-19, no churn). **Finding** (Claude Code
+  v2.1.183, official hooks docs): native events (`SubagentStop`,`TaskCompleted`,`SessionStart`, etc.) ARE
+  available, BUT (a) conditional `if` works ONLY on tool events — not SessionStart/Stop/SubagentStop;
+  (b) `session-governance-status` is already a native `SessionStart` hook (nothing to migrate);
+  (c) `verifier-edge-guard` is a Stop-hook **by design** (catches main-loop done-claims) — `SubagentStop`/
+  `TaskCompleted` change semantics, not improve. **Decision: KEEP all 4 hooks as-is** (YAGNI/KISS — migrating
+  would be governance churn, the exact mistake flagged in this initiative's learnings). Native event hooks
+  recorded as available for **future additive** governance only when a concrete gap appears. Layer-3
+  enforcement is better served by Auto-mode hard-deny rules (Phase 3.2), not by re-homing telemetry hooks.
 
 ### Phase 2 — Deploy = finish line (calculator gap) · risk: med→high
 - [ ] **2.1** `claude ultrareview` (CI-callable) into testing-pipeline. Test: buggy branch → findings returned.
@@ -84,6 +92,10 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 ## Log
 - 2026-06-19 — Plan created; Fable dependency resolved (none); tracking triple set up; Phase 0 audit delegated.
 - 2026-06-19 — Phase 0 ledger complete (276 reconciled: 242 KEEP / 28 MIGRATE / 6 RETIRE).
+- 2026-06-19 — Goal RATIFIED by Abhay → codified as README goal #4. Phase 1.3 investigated on
+  v2.1.183: reclassified `session-governance-status`, `session-reminder`, `verifier-edge-guard`
+  from MIGRATE → **KEEP** (native-event migration is churn; see Phase 1.3 finding). `no-overask-guard`
+  stays MIGRATE (→ Auto-mode hard-deny, Phase 3.2). Net ledger drift: MIGRATE 28→25, KEEP 242→245.
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
