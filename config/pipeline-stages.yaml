@@ -10,6 +10,10 @@ pipeline:
 stages:
   - id: stage_1_prd
     name: "Requirements → PRD"
+    # Domain-research FIRST (idea-to-deploy Unit 2): for a regulated/specialized domain, the
+    # requirements step dispatches domain research (/research-mode etc.) BEFORE clarifying
+    # questions and writes domain-specific ACs — see /brainstorm STEP 1.0 + engineering-roles
+    # PM mandate. Never ask the user a fact a BA should verify.
     depends_on: []
     skip_when: "input_type == 'prd_file' AND prd_valid == true"
     artifacts_out:
@@ -44,6 +48,10 @@ stages:
 
   - id: stage_4_demo
     name: "HTML Demo"
+    # G1 HUMAN-APPROVAL PAUSE (human-approval-gates.md): after the demo/mockup is produced,
+    # project-manager-agent MUST pause for explicit user "build THIS" approval BEFORE
+    # implementation stages (5-8). Precondition: the BA completeness audit is clean
+    # (ba-discovery-checklist.md). Not an autonomous hand-off — present the artifact, stop.
     depends_on: [stage_1_prd, stage_3_scaffold]
     skip_when: "project_type IN ('cli', 'library', 'api_only', 'backend', 'data_pipeline', 'infrastructure')"
     artifacts_in:
@@ -140,6 +148,10 @@ stages:
 
   - id: stage_9_review
     name: "Code Review"
+    # G2 HUMAN-APPROVAL PAUSE (human-approval-gates.md): after build + verification (stages
+    # 5-8) and before release/deploy (stage 10), project-manager-agent MUST pause for explicit
+    # user feature-acceptance sign-off ("it works as I asked", on the verified default path).
+    # A green automated review feeds this gate; it does not replace the user's sign-off.
     depends_on: [stage_8_post_tests]
     artifacts_out:
       review_report:
