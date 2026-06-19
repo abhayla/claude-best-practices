@@ -16,13 +16,18 @@ move governance prose→harness. Test-gated chunk-by-chunk. Fable dependency: no
 test-pipeline-agent, failure-triage-agent, testing-pipeline-master-agent (agents) +
 testing-pipeline-workflow, fix-issue (skills) → /test-pipeline + /fix-github-issue.
 - [x] 1. Re-verify reference map (re-grep 6 names)
-- [ ] 2. Test surgery — remove ONLY dead-agent assertions; KEEP live-worker guards
-- [ ] 3. Config/code fixes (workflow-groups.yml, recommend.py:442, allowlist, 2 stale descriptions)
-- [ ] 4. Docs (CLAUDE.md "8 legacy"→"7"; spec annotate T1/T2A/T2B retired)
-- [ ] 5. Delete 6 files + 6 registry entries + total 272→266 + changelog
-- [ ] 6. Regenerate docs (generate_docs + generate_workflow_docs)
-- [ ] 7. FULL local CI (4 gates) + independent blind review
-- [ ] 8. Land PR; update plan (RETIRE→DONE) + remember
+- [x] 2. Test surgery — removed ONLY dead-agent assertions; live-worker guards KEPT
+- [x] 3. Config/code fixes (workflow-groups.yml, recommend.py, allowlist→[], 2 descriptions)
+- [x] 4. Docs (CLAUDE.md master-agents 8→7; spec HISTORICAL banner)
+- [x] 5. Deleted 6 files (+evals) + 6 registry entries + total 272→266 + changelog
+- [x] 6. Regenerated docs (generate_docs + generate_workflow_docs)
+- [x] 7. FULL local CI green (1426 passed, 4 gates) + independent blind review (0 blockers/majors)
+- [x] 8. Committed (2030fea), pushed, PR #121 OPEN (CI running); plan + remember updated
+
+**Review:** Surgical RETIRE — 3562 deletions, 359 insertions across 47 files. Kept e2e-pipeline.yml
+(7th pattern, out of approved scope) → flagged as follow-up RETIRE needing owner sign-off. Registry
+JSON edited via script (byte-identical round-trip → clean diff). Config hashes aren't file-verified by
+dedup_check but resynced anyway. NEXT: merge #121 when CI green (autonomous), then `git checkout main && pull`.
 
 Phase status (parent initiative):
 - [x] **Phase 0** — Audit/ledger DONE (276 = 242 KEEP/28→25 MIGRATE/6 RETIRE)
