@@ -4982,7 +4982,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-19",
-    "total_patterns": 266
+    "total_patterns": 267
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5005,10 +5005,10 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "581017b3212680406ea2c8cf57fcb1386e069c7153d55a3c60629f0668f8a488",
+    "hash": "c72f6573ad8b3087e263a361aafc1f16d489c30bea249bdd4a1a9250b5f17bf1",
     "type": "rule",
     "category": "core",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
     "last_updated": "2026-06-19",
@@ -5225,6 +5225,35 @@
       "salience"
     ],
     "changelog": "v1.0.1 (2026-06-18): independent-review fixes — project MultiEdit edits[0].file_path (was a silent false-negative); guard the last-real-user index against a null subtraction so the zero-real-user branch actually keeps the whole transcript. v1.0.0 (2026-06-18): Initial — telemetry-first verifier-edge miss detector (Phase 2 of BA-gate/fragile-governance hardening).",
+    "tier": "nice-to-have"
+  },
+  "vps-deploy": {
+    "hash": "e1c432ccb3c0de85cbc651b76a8666e43eb0240ab17d90577f280740d48518e6",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-19",
+    "last_updated": "2026-06-19",
+    "dependencies": [
+      "deploy-strategy",
+      "pm2-deploy",
+      "incident-response",
+      "disaster-recovery"
+    ],
+    "visibility": "public",
+    "description": "Deploy a built app to a Linux VPS over SSH: rsync artifacts to the webroot, validate+reload nginx (or reload PM2), smoke-test the live URL, and roll back automatically on smoke-fail. Env-var driven (DEPLOY_HOST/USER/SSH_KEY/WEBROOT/URL); never hardcodes host/keys.",
+    "tags": [
+      "deployment",
+      "vps",
+      "ssh",
+      "nginx",
+      "rsync",
+      "pm2",
+      "rollback",
+      "smoke-test"
+    ],
+    "changelog": "v1.0.0: Initial release — SSH+rsync static/PM2 deploy to a self-managed Linux VPS; nginx -t gated reload, live-URL smoke, backup+rollback, G3 human-approval gate. Closes idea-to-deploy-readiness Unit 3 (the deploy=finish-line gap).",
     "tier": "nice-to-have"
   }
 }

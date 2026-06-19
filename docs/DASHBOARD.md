@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-19 07:58 UTC (auto-generated)
+> Last updated: 2026-06-19 09:03 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 266 |
-| Core (universal) | 195 |
+| Total Patterns | 267 |
+| Core (universal) | 196 |
 | Stack-specific | 71 |
 | Agents | 35 |
 | Configs | 3 |
 | Hooks | 13 |
 | Rules | 51 |
-| Skills | 164 |
+| Skills | 165 |
 
 ## Pattern Inventory
 
@@ -86,7 +86,7 @@
 | e2e-readiness-signal | rule | 1.0.0 | project:firekaro-planner | — |
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
 | e2e-visual-run | skill | 5.1.0 | hub:abhayla/claude-best-practices | fix-loop, serialize-fixes, test-healer-agent, test-scout-agent, tester-agent, verify-screenshots, visual-inspector-agent |
-| engineering-roles | rule | 1.5.0 | project:firekaro-planner | — |
+| engineering-roles | rule | 1.6.0 | project:firekaro-planner | — |
 | environment-validation | rule | 1.0.0 | project:firekaro-planner | — |
 | error-handling | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | escalation-report | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
@@ -205,6 +205,7 @@
 | verifier-edge-guard | hook | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | visual-inspector-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |
+| vps-deploy | skill | 1.0.0 | hub:abhayla/claude-best-practices | deploy-strategy, pm2-deploy, incident-response, disaster-recovery |
 | vue | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | vue-e2e | rule | 1.0.0 | project:firekaro-planner | — |
 | web-research-specialist-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
