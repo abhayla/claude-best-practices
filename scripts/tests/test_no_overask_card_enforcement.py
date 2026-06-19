@@ -71,6 +71,37 @@ def test_cap_exhaustion_is_logged():
     assert "card-block-EXHAUSTED" in body, "cap exhaustion must log a distinct escalation (G9)"
 
 
+def test_substance_block_enforces_diagnose_to_fix_linkage():
+    body = _guard()
+    # the substance guard must detect the diagnose→fix tokens by a SET (not one literal)...
+    assert (
+        "diagnosis:|changes applied|missing_role" in body
+    ), "substance must be detected by the diagnosis/fix token set"
+    # ...and block on substantive + not-trivial + card-present + NO substance.
+    assert (
+        '[ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ]'
+        in body
+    ), "substance block must gate on (substantive AND not-trivial AND card-present AND no-substance)"
+    assert "diagnosis-block-EXHAUSTED" in body, (
+        "substance cap exhaustion must log a distinct escalation line"
+    )
+
+
+def test_substance_block_exempts_grade_a_zero_fix_turns():
+    body = _guard()
+    # a legitimate Grade-A / zero-fix turn has no diagnosis — it must be substance-accounted.
+    assert "grade: a|grade a[^a-z]|0 fix|no fix|zero fix" in body, (
+        "Grade-A / zero-fix turns must be exempt (tightened so 'grade and' can't false-match)"
+    )
+
+
+def test_reminder_resets_the_diagnosis_loop_guard():
+    rem = _reminder()
+    assert ".diagnosis-count" in rem, (
+        "reminder must reset the .diagnosis-count loop-guard per user turn"
+    )
+
+
 def test_reminder_demands_full_process_up_front_not_format_A():
     rem = _reminder()
     assert "format A" not in rem, "reminder must NOT demand the weaker compact 'format A' (G6)"

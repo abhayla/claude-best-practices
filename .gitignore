@@ -29,6 +29,7 @@ CLAUDE.local.md
 
 # Session-governance runtime state (no-overask-guard.sh / prompt-enhance-reminder.sh)
 .claude/.enhance-misses.log
+.claude/.diagnosis-count
 .claude/.keepgoing-count
 .claude/.overask-violations.log
 .claude/.reviewcard-count
