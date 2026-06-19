@@ -16,8 +16,10 @@ First, read these in order (do not skip):
    *Session-boundary:* hook tweak
 5. Run: gh issue view 119
 
-Where we are: branch chore/platform-migration-2026h2-tracking, PR #120. Last session
-shipped (all green, independent-reviewed):
+Where we are: PR #120 was squash-MERGED to main (branch deleted); epic issue #119 stays
+open as the initiative tracker. Create a FRESH branch off updated main for the RETIRE
+(e.g. chore/retire-deprecated-test-pipeline-patterns) and open a NEW PR. First: git
+checkout main && git pull. Last session shipped (all green, independent-reviewed, now on main):
 - Phase 4.2 C2–C4 (commit 9c0619b): reframed single-level subagent dispatch from
   "platform-forced" → deliberate KISS/YAGNI CONVENTION across 6 surfaces. Nested
   dispatch is GA (Claude Code v2.1.172, ≤5 levels); workers don't declare Agent by
@@ -91,8 +93,8 @@ Surgical removal plan (do in this order, test-gated):
      PYTHONPATH=. python -m pytest scripts/tests/ -v
    Watch specifically: test_readme_count_drift.py (README must not hardcode a stale count),
    and confirm no remaining dead cross-reference (the validator blocks those).
-8. Land as one commit on PR #120; update plans/platform-migration-2026H2.md (RETIRE → DONE)
-   + .remember/remember.md.
+8. Land on the NEW RETIRE branch / new PR (NOT #120 — that's merged); update
+   plans/platform-migration-2026H2.md (RETIRE → DONE) + .remember/remember.md.
 
 Apply lessons (.claude/tasks/lessons.md, 2026-06-19):
 - Render the FULL enhance card on EVERY substantive turn incl. continuations.
