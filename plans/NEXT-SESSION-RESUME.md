@@ -20,20 +20,20 @@ Where we are: PR #120 was squash-MERGED to main (branch deleted); epic issue #11
 open as the initiative tracker. Create a FRESH branch off updated main for the RETIRE
 (e.g. chore/retire-deprecated-test-pipeline-patterns) and open a NEW PR. First: git
 checkout main && git pull. Last session shipped (all green, independent-reviewed, now on main):
-- Phase 4.2 C2–C4 (commit 9c0619b): reframed single-level subagent dispatch from
+- Phase 4.2 C2–C4 (in merged PR #120): reframed single-level subagent dispatch from
   "platform-forced" → deliberate KISS/YAGNI CONVENTION across 6 surfaces. Nested
   dispatch is GA (Claude Code v2.1.172, ≤5 levels); workers don't declare Agent by
   hub CHOICE, not because the runtime strips it (only the depth-5 cap withholds it).
   Validator assertions UNCHANGED. Phase 4.2 is effectively DONE (only the conditional
   C5 pilot remains, YAGNI — may never fire).
-- *Session-boundary:* hook tweak (commit faa4c59): no-overask-guard.sh now exempts a
+- *Session-boundary:* hook tweak (in merged PR #120): no-overask-guard.sh now exempts a
   completed-tested-chunk stop that opens a line with *Session-boundary:* (logs it for
   audit instead of blocking). Use it to close sessions cleanly.
 
 THE PRIMARY NEXT TASK — execute the owner-APPROVED 6-pattern RETIRE (deferred last
 session to fresh context because it's a regression-sensitive removal of test coverage).
 Abhay already approved deletion on 2026-06-19; do NOT re-ask for approval — just execute
-it carefully, test-gated, as one PR on the current branch.
+it carefully, test-gated, as one NEW PR on the fresh branch (NOT #120 — it is merged).
 
 The 6 patterns (all category=deprecated since 2026-04-24; replacements verified):
   - e2e-conductor-agent           → /test-pipeline (+ /e2e-visual-run)
