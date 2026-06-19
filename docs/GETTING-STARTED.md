@@ -44,3 +44,18 @@ rm .claude/agents/fastapi-*
 rm -r .claude/skills/fastapi-*
 rm .claude/rules/fastapi-*
 ```
+
+### Avoiding skill collisions with Claude Code's bundled skills
+
+The hub provisions its own skills into `.claude/skills/`. Claude Code also ships **bundled** skills,
+workflows, and built-in commands. If a hub skill's name or trigger overlaps a bundled one, you can hide
+the bundled set so the hub's version wins, via the `disableBundledSkills` setting (or the
+`CLAUDE_CODE_DISABLE_BUNDLED_SKILLS` environment variable) — added in Claude Code v2.1.166–176 (W24, 2026-06).
+
+```jsonc
+// .claude/settings.json
+{ "disableBundledSkills": true }
+```
+
+Verify against the current [settings reference](https://code.claude.com/docs) before relying on it; this
+is opt-in — leave it off unless you actually observe a collision.
