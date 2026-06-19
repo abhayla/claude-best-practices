@@ -4,6 +4,14 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — Phase 3.2: governance prose → harness (deterministic `permissions.deny` rules)
+
+Encodes the git-gate-bypass slice of `decision-authority.md`'s irreversible-action escalation list as **deterministic deny rules** (they apply in EVERY permission mode), so a forgotten prose rule is *blocked*, not just discouraged. Owner-approved 2026-06-19. Scoped to unambiguous always-wrong invocations (no `reset --hard`/`rm -rf` — too false-positive-prone; no deploy/DNS matchers — Auto mode already hard-denies prod deploy + push-to-main natively).
+
+- **updated** `core/.claude/settings.json` + `.claude/settings.json` (hub dogfoods it) — `permissions.deny` now blocks `git push --force` / `-f`, `git push --no-verify`, `git commit --no-verify` / `-n` (maps to `git-collaboration.md` MUST-NOTs).
+- **updated** rule `decision-authority` (1.0.0 → 1.1.0, MINOR) — new "Harness enforcement (prose → deterministic deny rules)" section documenting the two harness layers (native Auto mode + these deny rules); hash resynced.
+- **added** test `test_governance_deny_rules.py` — pins the required deny set in both settings files + the decision-authority harness doc.
+
 ### 2026-06-19 — Add `vps-deploy` skill (Platform Migration 2.3 / idea-to-deploy-readiness Unit 3 — the deploy=finish-line gap)
 
 Closes the deploy gap with the reusable, env-var-driven deploy capability the readiness plan deferred until a real target existed. Owner-approved 2026-06-19; grounded in a verified self-managed Linux VPS stack (nginx + static webroots + PM2; NO Docker — so SSH+rsync+nginx, not docker-compose). `total_patterns` 266→267.
