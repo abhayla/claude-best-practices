@@ -19,7 +19,7 @@ triggers:
   - full review pipeline
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<branch name, 'current', or review scope description>"
-version: "2.1.1"
+version: "2.2.0"
 ---
 
 # /code-review-workflow — Skill-at-T0 Orchestrator
@@ -142,6 +142,15 @@ secret leakage, injection vectors). Return audit contract.
 Parallel via single-message dispatch. Increment `dispatches_used` by 2.
 Merge findings into the state's `deep_audit` block. Re-evaluate the
 APPROVED / WITH_CAVEATS / REJECTED verdict incorporating the new findings.
+
+**Native cloud alternative (optional):** for an even deeper, independent pass,
+the user MAY run Claude Code's native **`/code-review ultra`** (or
+`/code-review ultra <PR#>` for a GitHub PR) — a multi-agent review that runs in
+the cloud. It is **user-triggered and billed**, needs the Claude GitHub App, and
+**cannot be launched by this workflow itself** — surface it as a recommendation,
+never auto-invoke it. The local `/review-gate` (STEP 2) + this agent dispatch
+remain the free, default deep audit; `/code-review ultra` is an opt-in escalation
+for high-stakes changes.
 
 ---
 

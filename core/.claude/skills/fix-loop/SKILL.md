@@ -16,7 +16,7 @@ triggers:
   - retest until green
 allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
 argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "1.4.0"
+version: "1.5.0"
 type: workflow
 ---
 
@@ -36,6 +36,15 @@ Analyze failures, apply minimal fixes, and optionally retest until resolved.
 |-------|------|----------|
 | `retest_command` provided | **Full Loop** | Fix → retest → repeat until pass (max iterations) |
 | No `retest_command` | **Single Fix** | Analyze → apply one fix → report |
+
+> **Native cloud alternative for an open PR:** this skill is the **local, free, iterative**
+> fixer (you drive it; it fixes against a retest command in your working tree). When the
+> failures are **on an open PR's CI** and you want autonomous, hands-off fixing, Claude Code's
+> native **`/autofix-pr`** is the better fit — run it from the PR branch and Claude (via the
+> Claude GitHub App, in the cloud) watches CI + review comments and pushes fixes until green.
+> Use `/fix-loop` for local-iterative work; reach for `/autofix-pr` for cloud PR-watching.
+> They are complementary — `/autofix-pr` is opt-in (needs the GitHub App) and is never
+> auto-invoked by this skill.
 
 ## Parameters
 

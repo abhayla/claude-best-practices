@@ -858,13 +858,13 @@
     "deprecated_by": "code-review-workflow"
   },
   "code-review-workflow": {
-    "hash": "f1f3b303ce495c6043b333678095671cd83baf0ad3cfbff64428c09e834d8556",
+    "hash": "e05ee0af87d8ecc08d5261d417953aced1886d36cfe6f72d0e6e1cfbf63a37ba",
     "type": "skill",
     "category": "core",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-06-19",
     "dependencies": [
       "code-reviewer-agent",
       "receive-code-review",
@@ -1238,13 +1238,13 @@
     "tier": "must-have"
   },
   "debugging-loop": {
-    "hash": "68c2182ea0ea832560a31ef0588a4aa0fae460e6a8cfbdf569575e6f423eb129",
+    "hash": "f7660a560073aa163837292220705b175e94d1b7503677bdd519154a9463362c",
     "type": "skill",
     "category": "core",
-    "version": "2.1.2",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-06-19",
     "dependencies": [
       "auto-verify",
       "debugger-agent",
@@ -2027,13 +2027,13 @@
     "tier": "must-have"
   },
   "fix-loop": {
-    "hash": "f5c8399879ebc3d90871f55071e7d71ced185f8e4bb12b012e9b13552cd6f966",
+    "hash": "b7c76ea4cc466bebe6f358e87b1a730bad55b4cb6929e5fa0ac82fa601ba50af",
     "type": "skill",
     "category": "core",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-19",
     "dependencies": [
       "test-failure-analyzer-agent"
     ],
@@ -2814,13 +2814,13 @@
     "tier": "nice-to-have"
   },
   "pipeline-fix-pr": {
-    "hash": "7cb81ca3b56d36057450d764e14aa1febc6bf58cd702f6237608a293563fff62",
+    "hash": "9e04dbafeeddf7a7dcaffeeba3a30ed3fd4144ab72415165f630f7f2c45788c1",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-06-19",
     "dependencies": [
       "serialize-fixes"
     ],
@@ -3398,13 +3398,13 @@
     "tier": "must-have"
   },
   "review-gate": {
-    "hash": "87c49ccc621189020d560ecd11f5a470fa12fe34525fbe9bdcddd1105baf2f70",
+    "hash": "1ae55f153b7f7507f250dd24a03f6389dc7bf1b0d044d3419dadd568c98f8010",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-19",
     "dependencies": [
       "code-quality-gate",
       "architecture-fitness",
@@ -5005,13 +5005,13 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "e444193435b747b9286e8379339dc44203d95b0cdd257f350331576b8729e958",
+    "hash": "581017b3212680406ea2c8cf57fcb1386e069c7153d55a3c60629f0668f8a488",
     "type": "rule",
     "category": "core",
-    "version": "1.4.2",
+    "version": "1.5.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-18",
+    "last_updated": "2026-06-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Autonomous role router: infer the engineering role from the task signal, state `Role: <name> — <why>`, and dispatch the role's named agents/skills (routing layer, no capability duplication). Includes router table, condensed mandates, canonical multi-role sequences with a mandatory independent-reviewer edge, and a routing feedback loop.",

@@ -15,7 +15,7 @@ triggers:
   - pre-merge review
 allowed-tools: "Bash Read Grep Glob Skill"
 argument-hint: "[--skip <skill1,skill2>] [--fix] [--pr] [--threshold <0-100>] [--include-test-health]"
-version: "2.3.0"
+version: "2.4.0"
 type: workflow
 ---
 
@@ -386,3 +386,11 @@ This batch runs ONLY if `--include-test-health` is passed. It invokes the first 
 - MUST NOT create the PR without including the review gate summary in the PR description
 - MUST NOT re-run only failed checks when the fix touched files outside the original finding's scope — cross-cutting fixes require a full re-run of ALL checks to catch regressions in previously-passing areas
 - MUST NOT block on warnings from `change-risk-scoring` alone — risk score is advisory, not a hard gate (unless score exceeds threshold + 15)
+
+## Native cloud alternative (optional, opt-in)
+
+This gate is the **free, local** pre-merge quality pass and stays the default. For a deeper,
+independent multi-agent pass on a high-stakes change, the user MAY additionally run Claude
+Code's native **`/code-review ultra`** (cloud, **user-triggered + billed**, needs the Claude
+GitHub App). It complements — does not replace — this gate, and MUST NOT be auto-invoked from
+here (surface it as a recommendation only).

@@ -43,7 +43,7 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 | parallel-worktree-orchestrator-agent | native `--worktree` / `isolation: worktree` | MIGRATE (Phase 1.2) |
 | governance/verifier hooks | 27+ hook events incl. `SubagentStop`,`TaskCompleted`,`agent`/conditional `if` | MIGRATE (Phase 1.3) |
 | `/code-review ultra` | `claude ultrareview` (CI-callable, W17/18) | MIGRATE (Phase 2.1) |
-| weekly GH-Action crons | Routines (cloud agents, W16) | MIGRATE (Phase 3.1) |
+| weekly GH-Action crons | Routines (cloud agents, W16) | ~~MIGRATE~~ → **KEEP** (3.1 evaluated 2026-06-19: deterministic, not agentic — negative ROI) |
 | no-overask-guard forced autonomy | Auto mode + hard-deny rules (W13/19/21) | MIGRATE (Phase 3.2) |
 
 ## Phases (each chunk: implement → TEST → proceed only if green)
@@ -72,7 +72,14 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 - [ ] **2.3** computer-use UI verify + `vps-deploy` (Unit 3 of idea-to-deploy-readiness). Test: throwaway deploy, live smoke + rollback. **Needs Abhay's VPS creds — escalate at deploy.**
 
 ### Phase 3 — Cloud autonomy · risk: med
-- [ ] **3.1** Migrate crons (`scan-internet.yml` etc.) → Routines. Test: one routine fires in cloud.
+- [x] **3.1** ✅ EVALUATED → **KEEP as GH Actions, do NOT migrate** (2026-06-19, no churn). All 5
+  scheduled workflows (`scan-internet`, `scan-projects`, `expire-sources`, `recommend`,
+  `aggregate-telemetry`) are **deterministic Python+git pipelines** (scan_web/collate/check_freshness/
+  recommend/aggregate_telemetry) tightly coupled to GitHub context (checkout, `git`, `gh` CLI, repo
+  tokens, cross-repo configs). Routines are scheduled **cloud Claude agents** — there is no agentic
+  reasoning to add, and migrating would break the GitHub coupling + add cloud-auth burden for zero
+  gain (**negative ROI**). Mirrors the Phase 1.3 "investigated → KEEP" precedent. Re-open only if a
+  cron gains genuine agentic reasoning. (Verified via 3 Explore agents, 2026-06-19.)
 - [ ] **3.2** Auto-mode hard-deny rules: encode irreversible-action escalation list deterministically. Test: denied op blocked.
 
 ### Phase 4 — Native nested dispatch (RETARGETED from "Agent Teams") · risk: HIGH · gated on owner sign-off
@@ -196,7 +203,7 @@ it outlived the conductor. KEEP — not a RETIRE candidate.
 | pipeline-orchestrator | Dynamic Workflows | 4 (gated) |
 | project-manager-agent | Dynamic Workflows + Agent Teams | 4 (gated) |
 | workflow-master-template | Agent Teams + recursive subagents | 4 (gated) |
-| weekly GH-Action crons (non-reg) | Routines (cloud agents) | 3.1 |
+| weekly GH-Action crons (non-reg) | ~~Routines~~ → KEEP as GH Actions (3.1: deterministic, negative ROI) | 3.1 ✅ |
 | .claude/hooks governance bundle (non-reg, architectural) | native event hooks | 1.3 |
 | parallel-worktree doctrine (non-reg) | native `--worktree` | 1.2 |
 
