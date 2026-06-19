@@ -425,7 +425,20 @@ Invoke `/ci-cd-setup github-actions` (or gitlab-ci based on project):
 1. Invoke `/deploy-strategy` Step 9 — Fastlane setup, signing config, versioning, staged rollout
 2. Skip docker-optimize, k8s-deploy, iac-deploy
 
-**Output:** Infrastructure definitions (`terraform/`, `k8s/`, `helm/`, or platform config).
+#### Self-Managed VPS Path (SSH + nginx/PM2, no PaaS/K8s)
+
+For a project shipped to a Linux VPS you control (static site or Node/PM2 app on nginx —
+NOT a cloud PaaS or Kubernetes), invoke **`/vps-deploy`** as the deploy executor:
+
+1. Invoke `/vps-deploy <artifact-dir> [--app static|pm2]` — it reads `DEPLOY_HOST/USER/SSH_KEY/WEBROOT/URL`
+   from env, backs up the current release, `rsync`s the build, `nginx -t`-gates the reload (or reloads PM2),
+   **smoke-tests the live URL**, and **rolls back on smoke-fail**.
+2. Skip k8s-deploy / iac-deploy GitOps steps (this path is the executor itself).
+3. The live-URL smoke + rollback IS this stage's deploy gate — `result=PASSED` only on a verified live release.
+
+**Output:** a deployed, smoke-verified live URL + `test-results/vps-deploy.json`.
+
+**Output (all paths):** Infrastructure definitions (`terraform/`, `k8s/`, `helm/`, or platform config) — or, for the Self-Managed VPS path, the live deploy + rollback safety net.
 
 ---
 

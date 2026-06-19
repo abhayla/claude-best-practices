@@ -4,6 +4,14 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — idea-to-deploy-readiness: Unit 2 (domain-research BA) + Unit 4 deploy-executor wiring
+
+Closes the two autonomous gaps the migration's sibling plan (goal #3) still had after `vps-deploy` shipped.
+
+- **updated** skill `brainstorm` (1.1.0 → 1.2.0, MINOR; also fixed a prior 1.0.0/1.1.0 registry drift) — STEP 1 now opens with **STEP 1.0 Domain research FIRST**: for regulated/specialized domains, dispatch `/research-mode` / `/deep-research` BEFORE clarifying questions (never ask a fact a BA should verify), make the questions domain-informed, and write domain-specific ACs. Closes Unit 2's `/brainstorm`-body gap. Hash resynced.
+- **wired `/vps-deploy` into the pipeline (Unit 4 deploy-executor)** — `docs/stages/STAGE-10-DEPLOY.md` Step 3 gained a Self-Managed VPS Path (SSH+nginx/PM2, live-URL smoke + rollback = the gate); `config/pipeline-stages.yaml` `stage_10_deploy` documents the executor-by-target map + the G3 human-approval gate. (Docs/config — not registered patterns.)
+- Unit 4's remaining DAG gate-pauses + STAGE-4 edit are deferred to a focused pass (load-bearing `project-manager-agent`/DAG; context-rot discipline) — autonomous, not owner-blocked.
+
 ### 2026-06-19 — Phase 4.2-C5: empirical nested-dispatch pilot → evidence-based decision
 
 Ran the C5 pilot the honest way — **a live probe instead of an assertion**: a dispatched worker subagent successfully spawned its own sub-worker and returned its result, confirming nested dispatch works **in-environment** (≤5 levels), not just per the docs. Evidence-based decision: nesting is now a **tested, ready option**; the hub keeps single-level by **default** because a workflow audit (test-pipeline, development-loop, code-review-workflow, loop-engineering, project-manager-agent) found no current 2-level decomposition need (the one near-candidate, loop-engineering's MAKER→CHECKER, saves only one T0 round-trip vs depth-2 complexity). No production workflow nested — by evidence, not assumption.

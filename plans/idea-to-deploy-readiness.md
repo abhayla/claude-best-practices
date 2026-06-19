@@ -38,13 +38,14 @@ in `core/` so any downstream project inherits the capability.
   78 `test_registry_integrity` tests all green. (Built now, not deferred: a rule is structurally
   verifiable without the app, unlike Units 2–3 which need the real idea/stack.)
 
-### Unit 2 — Domain-research BA step · medium risk
-- Enhance `core/.claude/skills/brainstorm` requirements stage + the Product Manager role
-  routing in `engineering-roles.md` to dispatch domain research (`/research-mode`,
-  `/deep-research`, `web-research-specialist-agent`, `/grill-with-docs`) BEFORE asking
-  clarification, then write domain-specific acceptance criteria.
-- Verification: a brainstorm run on a regulated-domain idea surfaces domain-specific questions
-  + ACs that a generic run would miss.
+### Unit 2 — Domain-research BA step · ✅ DONE (2026-06-19)
+- `/brainstorm` STEP 1 now opens with **STEP 1.0 — Domain research FIRST**: for regulated/specialized
+  domains, dispatch `/research-mode` / `/deep-research` (or `web-research-specialist-agent`,
+  `/grill-with-docs`) BEFORE clarifying questions, make the questions domain-informed, and write
+  domain-specific ACs in STEP 5. (brainstorm 1.1.0→1.2.0; hash resynced.) The PM-role routing side was
+  already covered by the `engineering-roles.md` PM mandate + the `ba-usecase-discovery-reminder.sh` hook +
+  `ba-discovery-checklist.md`; this closes the `/brainstorm`-body gap.
+- Verification: the STEP 1.0 block instructs research-before-clarify on a regulated-domain idea.
 
 ### Unit 3 — VPS deploy-executor · high risk · BUILD DURING FIRST REAL APP
 - **New skill** `core/.claude/skills/vps-deploy` (`type: workflow`): SSH + `docker compose`
@@ -54,12 +55,15 @@ in `core/` so any downstream project inherits the capability.
   speculative. Needs Abhay's host + credentials at deploy time (escalate then).
 - Verification: deploy a throwaway container to the VPS, confirm live-URL smoke + rollback.
 
-### Unit 4 — Pipeline integration · medium risk
-- Wire Units 1–3 into `project-manager-agent` + `config/pipeline-stages.yaml`: insert the
-  approval-gate pauses, the domain-research step, and the deploy-executor stage; update
-  `docs/stages/STAGE-4-HTML-DEMO.md` (remove "runs autonomously" where a gate now pauses) and
-  STAGE-10-DEPLOY.
-- Verification: smoke-test the pipeline DAG; `test_workflow_closure_consistency.py` green.
+### Unit 4 — Pipeline integration · ⏳ PARTIAL (deploy-executor DONE 2026-06-19)
+- ✅ **Deploy-executor wired (2026-06-19):** `STAGE-10-DEPLOY.md` Step 3 gained a **Self-Managed VPS Path**
+  invoking `/vps-deploy` (SSH+nginx/PM2, live-URL smoke + rollback = the deploy gate); `pipeline-stages.yaml`
+  `stage_10_deploy` documents the executor-by-target map (incl. `/vps-deploy`) + the G3 human-approval gate.
+- ⏳ **Remaining (autonomous, no owner dep):** insert explicit G1/G2 approval-gate PAUSE steps into the DAG +
+  the Unit-2 domain-research step at Stage 1, and update `STAGE-4-HTML-DEMO.md` ("runs autonomously" → gate
+  pauses). Deferred to a fresh focused pass (it edits the load-bearing `project-manager-agent` + DAG — best
+  not rushed at context-tail, per the context-rot lesson). NOT owner-blocked.
+- Verification: `pipeline-stages.yaml` parses (11 stages); full CI green (1438) after the deploy-executor wiring.
 
 ## Self-improvement loop (runs at EVERY stage — Abhay's standing directive 2026-06-17)
 

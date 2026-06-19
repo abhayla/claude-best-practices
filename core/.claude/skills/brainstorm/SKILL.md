@@ -14,7 +14,7 @@ triggers:
   - explore approaches
 allowed-tools: "Read Write Edit Grep Glob"
 argument-hint: "<feature or problem description>"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -31,6 +31,15 @@ suggest the user skip brainstorm and use `/implement` directly.
 
 ## STEP 1: Understand Intent
 
+> **STEP 1.0 — Domain research FIRST (regulated/specialized domains).** If the idea sits in a
+> domain with real-world rules, rates, or standards (finance, tax, health, legal, billing, etc.),
+> dispatch domain research **BEFORE** asking the user anything — `/research-mode`
+> (or `web-research-specialist-agent`; `/grill-with-docs` for ADR-worthy forks). The point
+> (`engineering-roles.md` PM mandate + `full-space-first.md`): never ask the user a fact a BA should
+> verify, and never ask a question premised on an unverified domain assumption. Use the research to
+> (a) replace generic questions with **domain-informed** ones, and (b) write **domain-specific**
+> acceptance criteria in STEP 5. Skip only for a plainly generic/throwaway idea.
+
 Ask 3-5 probing questions before proposing anything. Do NOT skip this step even if the request seems simple.
 
 1. **Who is the user?** Who will use this feature and in what context?
@@ -39,6 +48,7 @@ Ask 3-5 probing questions before proposing anything. Do NOT skip this step even 
 4. **What are the constraints?** Time budget, tech stack limitations, scope boundaries?
 5. **What is out of scope?** What should this explicitly NOT do?
 
+Make the questions **domain-informed** by STEP 1.0's research — ask only what research can't answer.
 Wait for answers before proceeding. If the user says "just build it," push back once — misunderstood requirements cost more than five questions.
 
 ---
