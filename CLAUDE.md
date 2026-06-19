@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- Last audited against live repo: 2026-06-19 (registry 267==267, git/workflow-map/scripts/hooks verified accurate) -->
+<!-- Last audited against live repo: 2026-06-19 (registry 268==268, git/workflow-map/scripts/hooks verified accurate) -->
 
 ## Critical: Two `.claude/` Directories
 
@@ -138,6 +138,7 @@ Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, 
 - **`check_freshness.py`** — Detects stale patterns based on age and activity
 - **`assign_workflow_groups.py`** — Assigns patterns to workflow groups for doc generation
 - **`discovery_adapter.py`** — Adapter for the pattern discovery pipeline
+- **`discovery_to_issue.py`** — Closes the self-updating loop (Phase 5.1b): turns a migratable discovery from `config/discoveries.json` into a deduplicated GitHub issue. Dry-run by default; `--apply` files via `gh`. Wired into `scan-internet.yml`
 - **`aggregate_telemetry.py`** — Collects adoption signals + learnings from enrolled repos, writes effectiveness metrics to `registry/patterns.json`. Remote mode (default) vs local (`--local`). Runs weekly via `aggregate-telemetry.yml`
 - **`sync_to_local.py`** — Hub→local sync: pulls patterns into a local project directory
 - **`third_party_skills.py`** — Detects and includes third-party agent skills during provisioning (called by `recommend.py`)
