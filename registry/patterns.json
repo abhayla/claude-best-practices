@@ -4982,7 +4982,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-19",
-    "total_patterns": 267
+    "total_patterns": 268
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5255,5 +5255,26 @@
     ],
     "changelog": "v1.0.0: Initial release — SSH+rsync static/PM2 deploy to a self-managed Linux VPS; nginx -t gated reload, live-URL smoke, backup+rollback, G3 human-approval gate. Closes idea-to-deploy-readiness Unit 3 (the deploy=finish-line gap).",
     "tier": "nice-to-have"
+  },
+  "cross-project-context-capture": {
+    "hash": "b7b7e1d294864f6961bd910c38785a8a90de3880e52ed91574dfe77efcec60b9",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-19",
+    "last_updated": "2026-06-19",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Capture facts bigger than one repo (shared accounts, registrations, contacts, vendors, compliance text, cross-cutting prefs) to the workspace-level global files the moment they surface, in the same session; route by sensitivity (secrets -> global secrets file, non-secret -> global context file); reference by path only, never copy into a repo. Cross-project analog of learnings-routing + configuration-ssot.",
+    "tags": [
+      "governance",
+      "ssot",
+      "cross-project",
+      "secrets",
+      "workflow"
+    ],
+    "changelog": "v1.0.0: New hub rule — capture-on-sight of cross-project facts to workspace global files (secret vs non-secret routing), distributable to downstream projects",
+    "tier": "must-have"
   }
 }

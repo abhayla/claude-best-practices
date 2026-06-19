@@ -4,6 +4,10 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — Add cross-project context-capture rule (category: core, tier: must-have)
+
+- **added** rule `cross-project-context-capture` (`core/.claude/rules/cross-project-context-capture.md`, global scope) — capture-on-sight of facts bigger than one repo (shared accounts, registrations, contacts, vendors, compliance text, cross-cutting prefs) to the workspace-level global files, in the SAME session they surface; route by sensitivity (secret/credential → the global secrets file per `security-baseline.md`; non-secret fact/preference → the global context file); reference by PATH only, never copy contents into a repo (PII/leak + stale-copy risk). The cross-PROJECT analog of `learnings-routing` (one home WITHIN a project) and `configuration-ssot` (one canonical layer per fact). Portable by design — no hardcoded paths; a no-op when the workspace keeps no such files (YAGNI). Distributable to downstream projects. `_meta.total_patterns` 267 → 268.
+
 ### 2026-06-19 — idea-to-deploy-readiness Unit 4 COMPLETE: human-approval gates + domain-research step wired into the pipeline
 
 - **updated** agent `project-manager-agent` (1.0.0 → 1.1.0, MINOR) — responsibility #2 now MUST HALT for the human-approval gates G1 (after `stage_4_demo`), G2 (after `stage_9_review`), G3 (before `stage_10_deploy`) per `human-approval-gates.md` — present the artifact + STOP, never infer approval from silence. Folded into the existing responsibility (count stays 4 — rule-8 cap respected); hash resynced.
