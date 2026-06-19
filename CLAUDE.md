@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+<!-- Last audited against live repo: 2026-06-19 (registry 267==267, git/workflow-map/scripts/hooks verified accurate) -->
+
 ## Critical: Two `.claude/` Directories
 
 - **`core/.claude/`** — Distributable template for downstream projects. NEVER put hub-only config here. NEVER use patterns from this directory (skills, agents, rules, hooks) when working on this hub repo — they are for downstream projects only.
