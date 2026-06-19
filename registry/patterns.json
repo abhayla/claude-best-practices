@@ -3021,10 +3021,10 @@
     "tier": "nice-to-have"
   },
   "project-manager-agent": {
-    "hash": "5f7c8a0fa371c066d5d2220092f4a60ec7f28a627a2d3023333dbecf8f51ccf9",
+    "hash": "2459ec6c4cca8a757db87d7b7d40a48258d708ca855f7e327fbc723d7e404c6d",
     "type": "agent",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
     "last_updated": "2026-06-19",

@@ -136,35 +136,37 @@ Stage subagents should invoke it via:
 Skill("test-pipeline", args="<failure_output_or_flags>")
 ```
 
-## Workflow-Master Dispatch
+## Workflow-Mapped Stage Dispatch
 
 Before dispatching a stage, check `config/workflow-contracts.yaml` →
 `stage_to_workflow` mapping:
 
-- **If mapping exists** → dispatch the workflow-master-agent:
+- **If mapping exists** → run the mapped workflow as a **skill-at-T0** (the 8
+  `<workflow>-master-agent`s are RETIRED — `deprecated: true` — and MUST NOT be
+  dispatched; their orchestration now lives in the matching `core/.claude/skills/<workflow>/SKILL.md`).
+  Dispatch the stage agent and have it invoke the workflow via `Skill()`:
   ```
-  Agent(subagent_type="{workflow-id}-master-agent", prompt="
+  Skill("/<workflow-name>", args="
     ## Pipeline ID: {pipeline_id}
-    ## Mode: dispatched
-    ## Workflow: {workflow-id}
     ## Execute Steps: [{mapped_step_ids}]
-    ## Upstream Artifacts:
-      {artifact_name}: {path}
-    ## Expected Outputs:
-      {artifact_name}: {expected_path}
+    ## Upstream Artifacts: {artifact_name}: {path}
+    ## Expected Outputs: {artifact_name}: {expected_path}
   ")
   ```
-  The workflow-master handles all internal coordination (sub-orchestrators,
-  retries, gates) within its scope. You only care about the return contract.
+  The workflow skill handles its own internal coordination (worker dispatch,
+  retries, gates). You only care about the stage's return contract. (Opt-in:
+  with `--isolate-stage-workers` the stage agent MAY dispatch the workflow's
+  workers as depth-2 subagents instead of inline — see the opt-in note in
+  Constraints; the default is inline-`Skill()`.)
 
 - **If mapping is `null`** → dispatch a direct stage agent (existing behavior
   via the Stage Dispatch Protocol above)
 
 When multiple pipeline stages map to the same workflow (e.g., stage_1 and
-stage_7 both map to development-loop), dispatch with different `Execute Steps`
-subsets. The workflow-master executes only the requested steps per invocation.
+stage_7 both map to development-loop), invoke with different `Execute Steps`
+subsets — the workflow skill executes only the requested steps per invocation.
 
-The workflow-master returns the standard stage return contract:
+The stage returns the standard stage return contract:
 `{gate, artifacts, decisions, blockers, summary, duration_seconds}`
 
 ## Constraints
@@ -176,16 +178,24 @@ The workflow-master returns the standard stage return contract:
 - MUST validate artifact contracts before dispatching downstream stages
 - MUST NOT dispatch a stage before all `depends_on` have passed
 - MUST NOT retry more than 3 times per stage or 15 times globally
-- **T0-only guardrail (Phase 3.9, 2026-04-25):** This agent is `dispatched_from: T0`.
-  It MUST NOT be dispatched via `Agent(subagent_type="project-manager-agent", ...)`
-  from any other agent or skill — when dispatched as a worker, the `Agent` tool
-  is stripped at runtime and its own `Agent()` dispatches silently inline
-  (Anthropic platform constraint; see `agent-orchestration.md` §2). Instead,
-  invoke this agent only directly from the user's T0 session. All 8 workflow-
-  masters have been retired to skill-at-T0 pattern (Phases 3.1–3.8); stages
-  now invoke `Skill("/<workflow-name>", ...)` instead of
-  `Agent(subagent_type="<workflow>-master-agent", ...)`. The previous
-  "tiered nesting model" text here is retired — workflow-masters no longer
-  exist as sub-orchestrators.
+- **T0 guardrail (Phase 3.9, 2026-04-25; justification corrected 2026-06-20):** This agent is
+  `dispatched_from: T0` and SHOULD be invoked directly from the user's T0 session, not dispatched
+  as a worker — it owns the full pipeline lifecycle (state, git tags, human-approval pauses) that
+  belongs at T0. **Correction:** the original justification ("when dispatched as a worker the `Agent`
+  tool is stripped at runtime") is now **factually stale** — recursive subagents are GA (Claude Code
+  v2.1.172, ≤5-level cap; only the depth-5 subagent is denied `Agent`), so a dispatched worker is NOT
+  stripped of `Agent` except at the hard cap (see the corrected note in `agent-orchestration.md`). The
+  T0 convention stands as a **lifecycle-ownership choice + depth-cap safety margin**, not a platform
+  limit. All 8 workflow-masters remain retired to skill-at-T0 (Phases 3.1–3.8); stages invoke
+  `Skill("/<workflow-name>", ...)` by default.
+- **Opt-in stage-level nesting (depth-2, GA — `--isolate-stage-workers`):** because nesting is GA, a
+  stage agent (depth-1) MAY dispatch its workflow's internal workers as **depth-2 subagents** instead
+  of running the whole workflow inline via `Skill()` — isolating each worker's context out of the
+  stage's context and enabling real intra-stage parallelism. This is **opt-in**; the DEFAULT stays
+  inline-`Skill()` (byte-for-byte unchanged). When enabled, the stage agent is dispatched with
+  `mode: isolate-stage-workers` and MUST design for the 5-level cap (PM=0 → stage=1 → workflow
+  worker=2 → its own sub-worker=3 …), degrading to inline-`Skill()` if `Agent` is withheld near the
+  cap rather than silently inlining. Adopt per concrete need (`agent-orchestration.md` nested-consumer
+  note); empirical context/latency benefit is designed-for, measured per stage on a live run.
 - MUST tag git before each stage for clean rollback
 - MUST use `/test-pipeline` for test verification in Stages 7-8 (not raw `/fix-loop` + `/auto-verify`)
