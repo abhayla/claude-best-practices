@@ -87,12 +87,13 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   - **Retarget:** the real, GA migration is **native recursive subagents**, NOT Agent Teams/Dynamic
     Workflows (both too early for a distributable framework). Phases 4.2/4.3 below replace the old
     Agent-Teams pilot.
-- [ ] **4.2** ⚠️ OWNER SIGN-OFF (rule-change, downstream-shipped, strategic) — Correct
-  `agent-orchestration.md` + `pattern-structure.md` + CLAUDE.md skill-at-T0 sections to reflect
-  "nested dispatch GA, ≤5 levels." This is a MAJOR doctrine shift with wide blast radius (every
-  master-agent, the 8 workflows, `project-manager-agent`, `test_orchestrator_tool_grants.py`
-  validator all assume single-level). PROPOSE-only per `claude-behavior.md` rule 5. Plan the cascade
-  before editing; do NOT relax the doctrine piecemeal.
+- [~] **4.2** ✅ RATIFIED by Abhay (2026-06-19) → cascade plan written: `plans/skill-at-t0-doctrine-relaxation.md`.
+  **C1 DONE + committed** (factual-correction banner on `agent-orchestration.md` + `pattern-structure.md`;
+  registry hashes resynced, both rules v1.1.0; validator + quality gate green). **C2–C5 REMAINING** —
+  the coherent doctrine relaxation (validator TDD → rule rewrite → CLAUDE.md → pilot). Deferred to a
+  focused fresh-context effort because (a) C2–C5 form a COHERENT set — applying C2 alone would break the
+  coherence C1's banner just guaranteed; (b) it touches dozens of downstream-shipped patterns + the
+  validator + workflows, needing full CI per chunk. Each lands plan-approved per the ratified option-1.
 - [ ] **4.3** After 4.2 approved: pilot ONE workflow using nested dispatch A/B vs skill-at-T0.
   Test: real nested parallelism observed; validator updated; tests green.
 
