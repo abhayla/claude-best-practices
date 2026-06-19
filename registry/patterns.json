@@ -163,10 +163,10 @@
     "tier": "must-have"
   },
   "agent-orchestration": {
-    "hash": "e240759d5d8e1cb5d6e00ecea79c0a21a55c85e6de36ca7b913fcacd7b0679f1",
+    "hash": "fbe3f652c7656ae33c6617d6ec5e5c8a0d9196710f47b914ad7f2a42c7bb4ab0",
     "type": "rule",
     "category": "core",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
     "last_updated": "2026-06-19",
@@ -858,10 +858,10 @@
     "deprecated_by": "code-review-workflow"
   },
   "code-review-workflow": {
-    "hash": "e05ee0af87d8ecc08d5261d417953aced1886d36cfe6f72d0e6e1cfbf63a37ba",
+    "hash": "1f0eda24242ad846ef0a79ff41564a0e2288aa6f75bf7140287e380af6425139",
     "type": "skill",
     "category": "core",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
     "last_updated": "2026-06-19",
@@ -884,10 +884,10 @@
     "tier": "must-have"
   },
   "code-reviewer-agent": {
-    "hash": "5ded87d1620ad3001d5eca19785ba462d43506f150aea0fb27c39dce9d0e75b4",
+    "hash": "1dfe3909d4e616ad1bc00c14879a53489407201a0c710a2b38d920fce872ebb3",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
     "last_updated": "2026-04-02",
@@ -3541,10 +3541,10 @@
     "tier": "must-have"
   },
   "security-auditor-agent": {
-    "hash": "941d6631abf86b1f56f4bf4c9f04f2b2a86fe0f4975d08a1e6db4beea76129c3",
+    "hash": "c1ad55000b044ae677dff82e3aee91a2e1b3f2c33eb02b31a01f8b59b6058c60",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
     "last_updated": "2026-04-02",

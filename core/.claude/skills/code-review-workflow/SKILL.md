@@ -19,7 +19,7 @@ triggers:
   - full review pipeline
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<branch name, 'current', or review scope description>"
-version: "2.2.0"
+version: "2.3.0"
 ---
 
 # /code-review-workflow — Skill-at-T0 Orchestrator
@@ -52,6 +52,7 @@ findings requires explicit user confirmation.
 | `--no-pr` | off | Stop after STEP 2 QUALITY_GATES; don't create PR |
 | `--auto-fix` | off | Attempt auto-fix for blocking findings before escalating to user |
 | `--deep-audit` | off | Dispatch code-reviewer-agent + security-auditor-agent in STEP 2b for agent-level audit beyond the /review-gate skill's checks |
+| `--nested-verify` | off | (Requires `--deep-audit`.) Run STEP 2b dimension audits as **dual-mode nested orchestrators**: each audit spawns one adversarial verifier subagent per finding (depth-2) to refute-or-confirm BEFORE returning, so only confirmed findings reach T0. Default keeps the flat single-level parallel-sibling dispatch. See STEP 2b "Nested-verify mode". |
 
 ---
 
@@ -142,6 +143,50 @@ secret leakage, injection vectors). Return audit contract.
 Parallel via single-message dispatch. Increment `dispatches_used` by 2.
 Merge findings into the state's `deep_audit` block. Re-evaluate the
 APPROVED / WITH_CAVEATS / REJECTED verdict incorporating the new findings.
+
+### Nested-verify mode (opt-in, `--nested-verify` — requires `--deep-audit`)
+
+The DEFAULT dispatch above is flat (two parallel-sibling audits return raw findings to T0).
+The known weakness: raw audit findings include false positives, and T0 must then either accept
+them or serialize a second verification wave itself. `--nested-verify` adopts GA **recursive
+subagents** (Claude Code v2.1.172, ≤5-level cap) to push per-finding adversarial verification
+DOWN into each dimension audit — the first concrete nested-dispatch consumer in the hub
+(`agent-orchestration.md` nested-consumer note).
+
+When `--nested-verify` is set, dispatch the SAME two audits, but append `mode: nested-verify`
+to each dispatch prompt. In this mode each dual-mode audit agent (depth-1):
+
+1. Produces its raw findings (as today).
+2. For EACH finding, spawns ONE adversarial verifier subagent (depth-2) prompted to **refute**
+   the finding — default-to-refuted on uncertainty (`independent-test-verification.md` adversarial
+   posture). Per-finding verifiers run as a single-message batch.
+3. Returns ONLY findings the verifier could not refute, each tagged `verified: true` + the
+   verifier's one-line rationale. Refuted findings are dropped (logged in the return as
+   `refuted: <n>`).
+
+```
+Agent(subagent_type="code-reviewer-agent", prompt="""
+## Workflow: code-review deep audit
+## mode: nested-verify          # ← spawns depth-2 per-finding verifiers; flat if absent
+## Branch: <branch>
+## Upstream: <review-gate.json path>
+Audit for code smells, architectural drift, edge cases. For EACH finding, spawn one
+adversarial verifier subagent (depth-2) to refute it; return only the confirmed findings
+with `verified: true`. Design for the 5-level cap — if Agent dispatch fails or you are at
+the cap, fall back to the flat path and set `nested_verify: "fell-back-flat"` in your return.
+""")
+```
+
+**Guard rails (MUST):** (a) the default (no flag) path is byte-for-byte unchanged — flat, no
+nesting; (b) the audit agent's worker path MUST degrade to flat if `Agent` is unavailable
+(depth-5 cap) — never silently inline; (c) increment `dispatches_used` by 2 + the count of
+per-finding verifiers actually spawned, and honor the global retry budget
+(`agent-orchestration.md` §5); (d) T0 still supervises the confirmed findings
+(`supervisor-verification.md`) — nesting moves verification earlier, it does not remove the T0 gate.
+
+> **Verification status:** this mode is **structurally** integrated + CI-validated; its empirical
+> "does it produce better reviews / lower false-positive rate" is a SEPARATE live-run measurement,
+> not yet performed. Treat the false-positive-reduction benefit as designed-for, not yet measured.
 
 **Native cloud alternative (optional):** for an even deeper, independent pass,
 the user MAY run Claude Code's native **`/code-review ultra`** (or
@@ -240,6 +285,11 @@ Capture resolution status + outstanding comment count into state.
   `--auto-fix` is not set. The flag is opt-in, not default.
 - MUST emit both parallel Agent() calls in STEP 2b in a SINGLE T0 message.
   Splitting across messages serializes the dispatch.
+- MUST keep the DEFAULT (no `--nested-verify`) STEP 2b path flat and single-level —
+  `--nested-verify` is opt-in and MUST NOT change behavior when absent. When the flag IS
+  set, the dual-mode audit agents MUST degrade to the flat path if `Agent` is unavailable
+  (depth-5 cap) rather than silently inline, and T0 still supervises the confirmed findings
+  (`supervisor-verification.md`).
 - MUST preserve deferred-item TTL (14-day auto-promotion to blocker) — the
   /review-gate skill handles this; don't override.
 - MUST write `.workflows/code-review/state.json` + `events.jsonl` after
