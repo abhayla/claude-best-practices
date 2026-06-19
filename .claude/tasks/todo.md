@@ -5,6 +5,20 @@
 
 ## Current Task
 
+### Platform Migration & Futuristic Goal (2026 H2) — 2026-06-19 — ⏳ ACTIVE
+
+**SSOT:** `plans/platform-migration-2026H2.md` · **Tracker:** GitHub epic issue · resurfaced via `.remember/`.
+Migrate hand-rolled hub patterns onto native Claude Code primitives (W13–24); close deploy gap;
+move governance prose→harness. Test-gated chunk-by-chunk. Fable dependency: none (Opus 4.8).
+
+- [ ] **Phase 0** — Audit/ledger: tag 272 patterns KEEP/MIGRATE/RETIRE (⏳ delegated to background agent)
+- [ ] **Phase 1** — native adoption: 1.1 `/goal`+`/loop` · 1.2 `--worktree` · 1.3 expanded hooks
+- [ ] **Phase 2** — deploy=finish: 2.1 `ultrareview` · 2.2 `/autofix-pr` · 2.3 computer-use + `vps-deploy`
+- [ ] **Phase 3** — cloud: 3.1 crons→Routines · 3.2 Auto-mode hard-deny
+- [ ] **Phase 4** — Agent Teams replaces skill-at-T0 (HIGH risk, gated on GA verify)
+- [ ] **Phase 5** — self-updating Routine (weekly whats-new diff → auto-issue)
+- ⚠️ Every RETIRE needs Abhay sign-off (downstream-shipped). Goal codification awaits ratification.
+
 ### loop-engineering — 2026-06-17 — ✅ SHIPPED (merged) + hub-ward monitoring (v1.1.0)
 
 - #75 merged (3636620): the autonomous self-* meta-loop.
