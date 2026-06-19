@@ -143,10 +143,20 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
-### RETIRE (6 — all already deprecated; safe, but each is downstream-shipped → Abhay sign-off before deletion)
+### RETIRE (6 — owner-APPROVED 2026-06-19; DEFERRED to a fresh-context chunk — bigger blast radius than estimated)
 e2e-conductor-agent · failure-triage-agent · fix-issue (alias→fix-github-issue) ·
 test-pipeline-agent · testing-pipeline-master-agent · testing-pipeline-workflow.
-All carry `category=deprecated` / `DEPRECATED 2026-04-24`; platform direction + ultrareview absorb them.
+All carry `category=deprecated` / `DEPRECATED 2026-04-24`; replaced by `/test-pipeline` (skill-at-T0, the
+4 agents + testing-pipeline-workflow) and `/fix-github-issue` (fix-issue). **Abhay approved deletion
+2026-06-19**, but verify-before-delete found these are NOT inert: ~10+ test files (`test_pipeline_three_lane.py`,
+`test_pipeline_contracts.py`, `test_tier_dispatch_consistency.py` DISPATCH_CHAIN, `test_pipeline_integrity.py:487`)
+`_read()` the agent files and assert their CONTENT (responsibility counts / version-vs-registry / schema) →
+deletion = `FileNotFoundError`, not graceful skip; the canonical spec `docs/specs/test-pipeline-three-lane-spec-v2.md`
+v2.2 still defines them as T1/T2A/T2B. Clean removal = surgical test deletion (drop dead-agent contract tests,
+KEEP live-`/test-pipeline`-worker tests) + spec edit + `config/workflow-groups.yml` (lines 25,131,139,140,149,152,182)
++ `scripts/recommend.py:442` MUST_HAVE_AGENTS + CLAUDE.md "8 legacy"→"7" + registry/changelog + `/update-workflow-docs`.
+**DEFERRED to a dedicated FRESH-CONTEXT chunk** (regression-sensitive removal of test coverage; context-rot risk
+at session tail). Full reference map captured in `.remember/remember.md` 2026-06-19.
 
 ### MIGRATE (28 = 24 registered + 4 non-registry) → native primitive
 | Pattern | Native primitive | Phase |
