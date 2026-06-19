@@ -408,14 +408,15 @@ class TestRequireSvgFlag:
         assert "![" not in result
 
     def test_validate_svg_output_detects_missing_svgs(self, tmp_path):
-        """validate_svg_output must fail when expected SVGs are missing."""
+        """validate_svg_output WARNS (returns False) on a render shortfall — it MUST NOT
+        hard-fail the docs job (issue #127). The mmdc-presence guarantee lives in
+        check_svg_requirements; the caller hard-fails only on a TOTAL render breakage."""
         from scripts.generate_workflow_docs import validate_svg_output
         images_dir = tmp_path / "images"
         images_dir.mkdir()
-        # No SVG files exist but workflow has mermaid blocks
-        with pytest.raises(SystemExit) as exc_info:
-            validate_svg_output("test-workflow", images_dir, expected_count=2)
-        assert exc_info.value.code == 1
+        # No SVG files exist but workflow has mermaid blocks → warn, do NOT sys.exit
+        result = validate_svg_output("test-workflow", images_dir, expected_count=2)
+        assert result is False
 
     def test_validate_svg_output_passes_when_svgs_exist(self, tmp_path):
         """validate_svg_output must pass when expected SVGs are present."""
