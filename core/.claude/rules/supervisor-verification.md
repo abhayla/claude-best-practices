@@ -16,9 +16,10 @@ missing step: reading the claim ≠ verifying the claim.
 
 ## Who supervises whom
 
-The platform allows a single dispatch level (`agent-orchestration.md` §2): T0
-dispatches workers and they return; there is no higher checker. Therefore **T0
-IS the supervisor** and owns the quality of every output that flows back.
+The hub uses a single dispatch level by convention (`agent-orchestration.md`
+§2): T0 dispatches workers and they return flat; there is no higher checker.
+Therefore **T0 IS the supervisor** and owns the quality of every output that
+flows back.
 "I delegated it" never transfers the validation duty.
 
 ## The supervisor gate — for every dispatched worker output

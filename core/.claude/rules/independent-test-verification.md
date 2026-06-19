@@ -36,8 +36,8 @@ unjustified "PASS" claims.
 
 ## How (single-level dispatch)
 
-Subagents cannot spawn subagents (`agent-orchestration.md` §2), so the T0
-orchestrator runs **both** waves:
+Hub workers stay flat by the single-level convention (`agent-orchestration.md`
+§2), so the T0 orchestrator runs **both** waves itself:
 
 1. **Tester wave** — run/dispatch the test; write evidence to disk; return a
    compact verdict contract.

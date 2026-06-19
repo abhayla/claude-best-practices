@@ -163,10 +163,10 @@
     "tier": "must-have"
   },
   "agent-orchestration": {
-    "hash": "ad8b6c854d2132a1c2deb4f262265fc50819965a58caa5bd9ff32bf400fc255f",
+    "hash": "00f722f3b776c704b9e0d60aaca80ad60f1533c5c530b5868f9d244b0aeea3fc",
     "type": "rule",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
     "last_updated": "2026-06-19",
@@ -2832,10 +2832,10 @@
     "tier": "nice-to-have"
   },
   "pattern-structure": {
-    "hash": "a8e7cc96d614fd6a5c0a1910711e4a6ea44e09ba1fc905fd84b0e00fcc002b9f",
+    "hash": "5f448a650f4a7657ac99dc8cdc1990ad4f962ad635f78412eb9672399a1cff9a",
     "type": "rule",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
     "last_updated": "2026-06-19",
@@ -4826,13 +4826,13 @@
     "tier": "must-have"
   },
   "independent-test-verification": {
-    "hash": "fa408a16950274f8227ed792f17f9b666e019c567c2beb0617aa673b491d01aa",
+    "hash": "674c9db709e2bdd349dd970de5d78f8f547678255d561d96b691cace42bac2ca",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-10",
+    "last_updated": "2026-06-19",
     "dependencies": [],
     "visibility": "public",
     "description": "Every non-trivial test verdict must be re-checked by a separate, context-blind agent given the same inputs + raw evidence — doer/checker separation (IEEE-1012). Single-level two-wave dispatch.",
@@ -4847,13 +4847,13 @@
     "tier": "must-have"
   },
   "supervisor-verification": {
-    "hash": "535c74f367db2d66910ea3570a039457a9e234678cd9787529ca9ec1606cc67c",
+    "hash": "57273ebfeff2a961ea771dbdee2760d89700b0567d03844a1639f97aa16a5ba0",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-10",
+    "last_updated": "2026-06-19",
     "dependencies": [],
     "visibility": "public",
     "description": "The T0 orchestrator must reproduce a worker's claimed gate and inspect output substance before accepting — reading a return contract is not verifying it. Includes a drive-the-UI loop for rendered changes.",

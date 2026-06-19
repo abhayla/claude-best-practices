@@ -4,6 +4,17 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — orchestration doctrine: single-level is a CONVENTION, not a platform limit (Phase 4.2 C2–C4)
+
+Reframes the hub's single-level subagent-dispatch doctrine from "platform-forced" to "deliberate KISS/YAGNI convention." Nested subagent dispatch went GA in Claude Code (v2.1.172, ≤5 levels), so the old rationale ("Claude Code does not forward `Agent` to subagents" / "runtime strips it") is factually stale. Prose-only reframe — **all validator assertions and existing patterns are unchanged and stay green** (workers still don't declare `Agent`, now by convention rather than platform limit). Also corrects one now-false mechanism claim: the runtime *would* expose `Agent` to a worker below the 5-level cap; only the depth-5 cap genuinely withholds it. No master-agent / workflow / `project-manager-agent` changed (per `plans/skill-at-t0-doctrine-relaxation.md` C4 decision). C5 pilot deferred (YAGNI).
+
+- **updated** rule `agent-orchestration` (v1.1.0 → v1.2.0, MINOR) — §1–§3/§10 + §6 reframed to convention; the dated dual-banner collapsed into one settled note.
+- **updated** rule `pattern-structure` (v1.1.0 → v1.2.0, MINOR) — "Tool Grants (Platform-Constrained)" → "(Single-Level Convention)"; tables corrected from "`Agent` stripped at runtime" to "flat by convention"; stale planned-probe paragraph trimmed.
+- **updated** rule `independent-test-verification` (v1.0.0 → v1.1.0, MINOR) — coherence sibling: "Subagents cannot spawn subagents" → "hub workers stay flat by convention" (operational conclusion unchanged).
+- **updated** rule `supervisor-verification` (v1.0.0 → v1.1.0, MINOR) — coherence sibling: "The platform allows a single dispatch level" → "the hub uses a single dispatch level by convention."
+- **updated** `scripts/tests/test_orchestrator_tool_grants.py` (C2) — module docstring + assertion-message rationale reframed to convention; **assertions untouched** (118 passed / 77 skipped, unchanged).
+- **updated** `CLAUDE.md` (C4) — "Workflow Orchestration (skill-at-T0)" rationale reframed from platform-constraint to deliberate convention.
+
 ### 2026-06-17 — loop-engineering: hub-ward monitoring (v1.1.0)
 
 Closes the downstream-observability gap: the loop now emits a hub-linked learning on every terminal outcome, so the existing weekly telemetry cron monitors it automatically — no new pipeline, no outward call from the project.
