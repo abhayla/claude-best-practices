@@ -75,8 +75,11 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 - [ ] **3.1** Migrate crons (`scan-internet.yml` etc.) → Routines. Test: one routine fires in cloud.
 - [ ] **3.2** Auto-mode hard-deny rules: encode irreversible-action escalation list deterministically. Test: denied op blocked.
 
-### Phase 4 — Agent Teams replaces skill-at-T0 · risk: HIGH · gated
-- [ ] **4.1** Verify Agent Teams GA status (research caveat: GA date unconfirmed).
+### Phase 4 — Agent Teams replaces skill-at-T0 · risk: HIGH · **PROMOTED to next real chunk (2026-06-19)**
+- [ ] **4.1** ⏳ IN PROGRESS — Verify GA status of Agent Teams + recursive subagents. CRITICAL: if
+  recursive subagents are GA, `agent-orchestration.md` ("subagents cannot spawn subagents, verified
+  2026-04-24") is STALE and the entire skill-at-T0 doctrine needs revisiting. This gates the bulk of
+  the high-value migrations. Verify against official `code.claude.com` docs (sub-agents + whats-new).
 - [ ] **4.2** Pilot ONE workflow A/B vs current skill-at-T0. Test: real parallelism observed.
 - [ ] **4.3** Rewrite CLAUDE.md skill-at-T0 rationale **only after** 4.2 proves parallelism.
 
@@ -96,6 +99,17 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   v2.1.183: reclassified `session-governance-status`, `session-reminder`, `verifier-edge-guard`
   from MIGRATE → **KEEP** (native-event migration is churn; see Phase 1.3 finding). `no-overask-guard`
   stays MIGRATE (→ Auto-mode hard-deny, Phase 3.2). Net ledger drift: MIGRATE 28→25, KEEP 242→245.
+- 2026-06-19 — **SEQUENCING FINDING (re-prioritized):** inspecting Phase 1.2 showed the hub
+  ALREADY adopted the stable native primitives when they shipped — `git-worktrees` documents
+  `isolation: "worktree"` (STEP 4); `autonomous-contract` authors for native `/goal`+`/loop`.
+  So Phases 1.1/1.2/1.3 are largely **marginal enrichment or already-done**, not the "easy wins"
+  the audit headline implied. The genuinely un-adopted, HIGH-VALUE migrations (skill-at-T0 →
+  Agent Teams; orchestrator-agents → recursive subagents) are ALL gated on **Phase 4 (Agent
+  Teams/recursive-subagent GA)**. Live evidence it's worth checking: `agent-orchestration.md`
+  asserts "subagents cannot spawn subagents (verified 2026-04-24)" but research says recursive
+  subagents shipped W24 (Jun 2026) — **that rule may be stale.** → **Phase 4.1 (verify GA status)
+  is promoted to the REAL next chunk.** Phases 1.1/1.2 deferred pending per-pattern confirm of
+  marginal-vs-real; do NOT spend effort churning already-adopted patterns (KISS/YAGNI).
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
