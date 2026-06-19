@@ -2,6 +2,22 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-19 — Don't let YAGNI become "don't test"; the transition itself can BE the concrete need
+
+**Surfaced during:** the platform-migration close-out. I twice labeled Phase 4.2-C5 (nested-dispatch pilot)
+and 5.1b (auto-issue from scan) "YAGNI — no concrete need, deferred." Abhay pushed back: *"we ARE
+transitioning to the state-of-the-art Anthropic standard — that IS the need; why do you say there isn't
+one?"* He was right. Two distinct errors: (1) For 5.1b I deferred until "5.1a proves insufficient" — but
+THIS session was the proof (a manual audit, not the scan, caught the hub falling behind ~6 native features);
+the need was already demonstrated. (2) For C5 I asserted "no workflow benefits from nesting" as a conclusion
+**without running the pilot** — which was circular, since the pilot is how you'd KNOW. Fix: I ran a live
+probe (a dispatched worker spawned its own sub-worker → confirmed nesting works in-env), then made an
+evidence-based decision. **Rules:** (a) YAGNI rejects *speculative generality*, NOT *validating/adopting a
+capability the project is explicitly transitioning to* — when the stated goal is "migrate to standard X,"
+adopting/evaluating X is a concrete caller, not speculation. (b) Never assert "no benefit / not needed" about
+a testable thing without running the cheap test first — run it, then decide on evidence. (c) An owner saying
+"there is a need" overrides my YAGNI instinct; reclassify and do it (don't re-defend the deferral).
+
 ## 2026-06-19 — Read GLOBAL.md (infra SSOT) before claiming an infra/credential GAP
 
 **Surfaced during:** the deploy-gap discussion. I twice told Abhay the VPS deploy was "blocked — needs a

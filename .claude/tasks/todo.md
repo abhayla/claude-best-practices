@@ -11,23 +11,25 @@
 Migrate hand-rolled hub patterns onto native Claude Code primitives (W13–24); close deploy gap;
 move governance prose→harness. Test-gated chunk-by-chunk. Fable dependency: none (Opus 4.8).
 
-**Platform Migration 2026 H2 — shipped this session (all merged to main):**
-- ✅ **PR #121** — RETIRE 6 deprecated test-pipeline patterns → /test-pipeline + /fix-github-issue
-  (total 272→266). Surgical, test-gated, blind-reviewed.
-- ✅ **PR #122** — Phase 2.1/2.2: adopt native `/code-review ultra` + `/autofix-pr` as ADDITIVE
-  opt-in pointers (no replacement of free local skills); 6 patterns version+hash bumped.
-- ✅ **Phase 3.1** — crons→Routines DECLINED (deterministic pipelines, not agentic; negative ROI).
-- 🛑 **Withdrawn:** e2e-pipeline.yml RETIRE — re-verify showed it's LIVE config (not orphaned); corrected.
+**Platform Migration 2026 H2 — ✅ FULLY COMPLETE (all merged to main 2026-06-19):**
+- ✅ **#120** 4.2 C1–C4 doctrine reframe · **#121** RETIRE 6 (272→266) · **#122** 2.1/2.2 native
+  /code-review ultra + /autofix-pr by pointer (+ 3.1 crons→Routines DECLINED).
+- ✅ **#123** 2.3 — `vps-deploy` skill, live-validated on the real VPS (→267).
+- ✅ **#124** 3.2 — governance→harness deterministic `permissions.deny` rules.
+- ✅ **#125** 5.1b — self-updating loop closed (`discovery_to_issue.py`: scan discovery → tracked issue).
+- ✅ **#126** 4.2-C5 — empirical nested-dispatch pilot: PROVED nesting works in-env; evidence-based
+  keep-single-level decision + dual-mode adoption recipe (`agent-orchestration` v1.3.0).
+- ✅ 1.1/1.2 done-by-adoption · 1.3 KEEP · goal codified (README #4).
+- 🛑 **Withdrawn:** e2e-pipeline.yml RETIRE — re-verify showed it's LIVE config (corrected + lesson filed).
 
-**Phase status (parent initiative):**
-- [x] Phase 0 (ledger), Phase 4.2 C1–C4 (PR #120), Phase 5.1a (URLs), Phase 1.3 (KEEP), goal codified (README #4)
-- [x] **Phase 2.1 / 2.2** DONE (PR #122) · **Phase 3.1** KEEP-decided
-- [ ] **Phase 2.3** (deploy gap) — BLOCKED on owner: Hostinger Linux VPS (SSH+Docker) + a real app to deploy
-- [ ] **Phase 3.2** (Auto-mode hard-deny) — planned, approval-gated · **4.2 C5 / 5.1b** — deferred YAGNI
-- [ ] Phases 1.1/1.2 — settled "don't churn" (already-adopted/marginal)
+**Every phase shipped. Nothing parked, deferred, or owner-blocked.** (Owner pushed back on YAGNI-deferral
+of 5.1b/C5 and was right — both reclassified and DONE; C5 by actually running the test, not asserting.)
+Deploying a REAL app via `/vps-deploy` is a per-deploy G3 decision whenever desired.
 
-**Key lesson filed:** verify CURRENT consumers before calling a pattern orphaned/deletable; feed
-independent reviewers raw evidence, not my conclusion.
+**Lessons filed this session:** (1) verify CURRENT consumers before calling a pattern orphaned/deletable;
+(2) read GLOBAL.md (infra SSOT) before claiming a credential/host gap; (3) feed independent reviewers raw
+evidence not my conclusion; (4) don't let YAGNI become "don't test" — when transitioning to a new standard,
+the transition itself is the concrete need; run the experiment.
 
 ### loop-engineering — 2026-06-17 — ✅ SHIPPED (merged) + hub-ward monitoring (v1.1.0)
 
