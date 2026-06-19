@@ -8,6 +8,19 @@ globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 > **Single-level dispatch is a deliberate hub CONVENTION, not a platform limit.** Nested subagent dispatch is **GA in Claude Code (v2.1.172, ~Jun 2026)**: a subagent **CAN** spawn its own subagents, **capped at 5 levels deep** — only the depth-5 subagent receives no `Agent` tool, and the cap is fixed/not configurable ([sub-agents doc](https://code.claude.com/docs/en/sub-agents): *"a subagent can spawn its own subagents."*). The hub nonetheless keeps dispatch **single-level by default** because it is simpler (KISS) and no hub workflow yet needs nesting (YAGNI — adopt the second caller, not the first). Nesting ≤5 is therefore an **OPTION adopted per concrete need**, not a forced workaround: §2–§3/§10 describe this convention and `test_orchestrator_tool_grants.py` pins it; the guard rails for opting into nesting live in `plans/skill-at-t0-doctrine-relaxation.md`.
 >
 > **History:** this single-level model predates the GA, when *"subagents cannot spawn other subagents"* was literally true (verified 2026-04-24; GH [#19077](https://github.com/anthropics/claude-code/issues/19077), [#4182](https://github.com/anthropics/claude-code/issues/4182), three runtime probes). The v2.1.172 GA superseded that platform fact — the hub keeps single-level now by *choice*, not by force.
+>
+> **Empirically VERIFIED (2026-06-19, Phase 4.2-C5 pilot):** nested dispatch was confirmed working
+> **in this environment**, not just per the docs — a dispatched worker subagent successfully spawned its
+> own sub-worker and received its result (live probe). So the capability is real and ready; the doctrine
+> is no longer a doc-claim. **C5 evidence-based decision:** the hub still keeps single-level by **default**
+> because a workflow-by-workflow audit (test-pipeline, development-loop, code-review-workflow,
+> loop-engineering, project-manager-agent) found **no current workflow with a genuine 2-level decomposition
+> need** — their workers are parallel siblings, and the one near-candidate (loop-engineering's MAKER→CHECKER)
+> would only save one T0 round-trip while adding depth-2 complexity. Nesting is therefore a **tested, ready
+> option** to adopt the moment a concrete multi-level need appears. **Adoption recipe (when that need
+> arrives):** mark the orchestrating worker `dispatched_from: dual-mode` and add `Agent` to its `tools:`
+> (validator-sanctioned for dual-mode per `pattern-structure.md`); keep its worker-mode path independent of
+> `Agent`; design for the 5-level cap. No production workflow is nested today — by evidence, not assumption.
 
 ## 1. Orchestrators MUST Run at T0
 

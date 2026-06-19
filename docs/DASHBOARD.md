@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-19 09:35 UTC (auto-generated)
+> Last updated: 2026-06-19 10:17 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -22,7 +22,7 @@
 | adr | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | agent-evaluator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| agent-orchestration | rule | 1.2.0 | hub:abhayla/claude-best-practices | — |
+| agent-orchestration | rule | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-compose-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-compose-ui | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |

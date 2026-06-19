@@ -4,6 +4,13 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — Phase 4.2-C5: empirical nested-dispatch pilot → evidence-based decision
+
+Ran the C5 pilot the honest way — **a live probe instead of an assertion**: a dispatched worker subagent successfully spawned its own sub-worker and returned its result, confirming nested dispatch works **in-environment** (≤5 levels), not just per the docs. Evidence-based decision: nesting is now a **tested, ready option**; the hub keeps single-level by **default** because a workflow audit (test-pipeline, development-loop, code-review-workflow, loop-engineering, project-manager-agent) found no current 2-level decomposition need (the one near-candidate, loop-engineering's MAKER→CHECKER, saves only one T0 round-trip vs depth-2 complexity). No production workflow nested — by evidence, not assumption.
+
+- **updated** rule `agent-orchestration` (1.2.0 → 1.3.0, MINOR) — top note records the empirical verification + the evidence-based keep-single-level decision + a **dual-mode adoption recipe** (mark the worker `dispatched_from: dual-mode` + add `Agent`; validator-sanctioned, no code change) for when a concrete multi-level need arrives. Hash resynced.
+- No validator/pattern churn (dual-mode was already sanctioned by `pattern-structure.md`); convention assertions unchanged.
+
 ### 2026-06-19 — Phase 3.2: governance prose → harness (deterministic `permissions.deny` rules)
 
 Encodes the git-gate-bypass slice of `decision-authority.md`'s irreversible-action escalation list as **deterministic deny rules** (they apply in EVERY permission mode), so a forgotten prose rule is *blocked*, not just discouraged. Owner-approved 2026-06-19. Scoped to unambiguous always-wrong invocations (no `reset --hard`/`rm -rf` — too false-positive-prone; no deploy/DNS matchers — Auto mode already hard-denies prod deploy + push-to-main natively).

@@ -53,10 +53,12 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 > by pointer, PR #122), **2.3 (vps-deploy skill built + live-validated, PR #123)**, 3.1 (declined —
 > KEEP as GH Actions), 3.2 (governance→harness deny rules, PR #124), 4.1 (GA verify), 4.2 C1–C4
 > (doctrine reframe, PR #120), 5.1a (release-tracking URLs). The 6-pattern RETIRE shipped (PR #121).
-> **5.1b is now DONE** (self-updating loop closed — `discovery_to_issue.py`). The LAST open item is
-> **4.2-C5** (empirically pilot nested dispatch on one workflow) — reclassified from YAGNI-skip to a
-> genuine evaluation (the pilot is how we'd *know* if nesting helps; asserting "no benefit" without
-> running it was circular). In progress next. Nothing is owner-blocked.
+> **ALL PHASES DONE (2026-06-19).** 5.1b closed the self-updating loop (`discovery_to_issue.py`).
+> **4.2-C5 ✅ DONE** — ran the empirical pilot: a live probe CONFIRMED nested dispatch works in-environment
+> (a worker spawned its own sub-worker, ≤5 levels). Evidence-based decision recorded in
+> `agent-orchestration.md`: nesting is now a tested, ready option; the hub keeps single-level by default
+> because the workflow audit found no current 2-level decomposition need (forcing it would add complexity
+> for marginal gain). Nothing is owner-blocked; the migration initiative is complete.
 
 ### Phase 0 — Audit / Migration Ledger · risk: none (analysis) · ✅ DONE (2026-06-19)
 - **Test gate PASSED:** reconciles to 276 = 242 KEEP + 28 MIGRATE + 6 RETIRE
@@ -111,9 +113,14 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   `independent-test-verification` + `supervisor-verification` → v1.1.0; test rationale; CLAUDE.md). Per the
   C4 DECISION the validator assertions STAY (they now enforce a convention) — NO master-agent / workflow /
   `project-manager-agent` changed. FULL local CI green (4 gates, 1486 passed); independent review 0 issues.
-  **Only C5 remains** (pilot nested dispatch on one workflow — DEFERRED, YAGNI, may never fire).
-- [ ] **4.3** After 4.2 approved: pilot ONE workflow using nested dispatch A/B vs skill-at-T0.
-  Test: real nested parallelism observed; validator updated; tests green.
+  **C5 ✅ DONE 2026-06-19** (see below).
+- [x] **4.3 / C5** ✅ DONE (2026-06-19) — empirical nested-dispatch pilot. Live probe: a dispatched worker
+  successfully spawned its own sub-worker and returned its result → **real nested parallelism observed**,
+  capability confirmed in-environment (≤5 levels). Evidence-based decision: keep single-level default (the
+  workflow audit found no current 2-level need; loop-engineering's MAKER→CHECKER is the only near-candidate
+  and saves just one T0 round-trip vs depth-2 complexity); nesting recorded in `agent-orchestration.md` as a
+  tested, ready option with a dual-mode adoption recipe for when a concrete multi-level need arrives.
+  No validator change needed (dual-mode is already sanctioned). Tests green.
 
 ### Phase 5 — Self-updating layer (futuristic Layer 1) · risk: med
 - [x] **5.1a** ✅ DONE (2026-06-19) — Wired the 5 official Claude Code release-tracking URLs
