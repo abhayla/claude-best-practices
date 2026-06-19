@@ -102,10 +102,18 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
     subagents (verified 2026-04-24)" is FACTUALLY STALE.**
   - **Agent Teams: EXPERIMENTAL**, flag-gated (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), documented
     broken session-resumption → **NOT framework-ready.** (TeamCreate/TeamDelete removed in v2.1.178.)
-  - **Dynamic Workflows: RESEARCH PREVIEW** → **NOT framework-ready.**
-  - **Retarget:** the real, GA migration is **native recursive subagents**, NOT Agent Teams/Dynamic
-    Workflows (both too early for a distributable framework). Phases 4.2/4.3 below replace the old
-    Agent-Teams pilot.
+  - ~~**Dynamic Workflows: RESEARCH PREVIEW** → **NOT framework-ready.**~~ **⚠️ CORRECTED 2026-06-20
+    (Session B audit, verified vs live `workflows.md`):** this was WRONG — it conflated Dynamic Workflows
+    with Agent Teams. Dynamic Workflows are **GA, no experimental flag, on all paid plans since v2.1.154**
+    (verbatim: *"Dynamic workflows require Claude Code v2.1.154 or later and are available on all paid
+    plans"*). The `/workflows` (Workflow) tool is in fact available in-session today. → The Phase-4 "gated
+    on GA" deferral for the *Dynamic-Workflows* items below (development-loop, pipeline-orchestrator,
+    project-manager-agent) rests on a now-false premise and is **re-opened** for a fact-based re-decision
+    (tracked: `.claude/tasks/parallel-cc-adoption-research.md` F1/P1). Agent Teams remains experimental, so
+    the gate still stands for *team-specific* items only.
+  - **Retarget (amended 2026-06-20):** the GA-ready native primitives are now **recursive subagents AND
+    Dynamic Workflows** (both GA); only **Agent Teams** remains too early for a distributable framework.
+    Phases 4.2/4.3 below replace the old Agent-Teams pilot.
 - [x] **4.2** ✅ RATIFIED by Abhay (2026-06-19) → cascade plan: `plans/skill-at-t0-doctrine-relaxation.md`.
   **C1–C4 DONE + committed.** C1: factual-correction banner (both rules v1.1.0). C2–C4 (commit `9c0619b`,
   PR #120): the coherent prose reframe — single-level recast platform-forced → deliberate KISS/YAGNI
@@ -176,6 +184,14 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   LIVE config read by `/e2e-visual-run`, `test-failure-analyzer-agent`, and `test-healer-agent` (classification
   rules + error-context enrichment + healing config). KEEP. Lesson: verify a pattern's CURRENT consumers before
   calling it orphaned; a changelog origin note is not its consumer list.
+
+- 2026-06-20 — **FACT CORRECTION (Session B parallel adoption audit).** Phase 4.1's "Dynamic Workflows =
+  research preview / not framework-ready" was WRONG (conflated with Agent Teams). Live `workflows.md` (verified
+  2026-06-20): Dynamic Workflows are **GA since v2.1.154, all paid plans, no flag**. Corrected inline at 4.1;
+  the Dynamic-Workflows MIGRATE items (development-loop, pipeline-orchestrator, project-manager-agent) re-opened
+  for a fact-based YAGNI-vs-adopt re-decision. Recursive subagents (GA) + Auto-mode deny defaults + the 30-event
+  hook catalog also re-verified vs live docs — all consistent except this one item. Full audit:
+  `.claude/tasks/parallel-cc-adoption-research.md` (F1–F9 / P1–P6).
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
