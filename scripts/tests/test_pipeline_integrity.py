@@ -484,7 +484,7 @@ class TestOrchestrationConstraintsApplied:
         allowed_orchestrators = {
             "review-gate", "pipeline-orchestrator", "subagent-driven-dev",
             # Workflow master dispatch wrappers (thin skills that delegate to master agents)
-            "development-loop", "testing-pipeline-workflow", "debugging-loop",
+            "development-loop", "test-pipeline", "debugging-loop",
             "code-review-workflow", "documentation-workflow", "session-continuity",
             "learning-self-improvement", "skill-authoring-workflow",
         }

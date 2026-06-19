@@ -37,7 +37,6 @@ CODE_QUALITY_GATE = SKILLS_DIR / "code-quality-gate" / "SKILL.md"
 VERIFY_SCREENSHOTS = SKILLS_DIR / "verify-screenshots" / "SKILL.md"
 
 # Pipeline agents under test
-TEST_PIPELINE_AGENT = AGENTS_DIR / "test-pipeline-agent.md"
 TESTER_AGENT = AGENTS_DIR / "tester-agent.md"
 FAILURE_ANALYZER_AGENT = AGENTS_DIR / "test-failure-analyzer-agent.md"
 
@@ -215,23 +214,6 @@ class TestGateJsonContracts:
         """visual_review must have 'enabled' field for when capture-proof is off."""
         content = _read(AUTO_VERIFY)
         assert '"enabled"' in content
-
-    def test_pipeline_agent_reads_all_stage_outputs(self):
-        """Orchestrator must reference all test-results/*.json files."""
-        content = _read(TEST_PIPELINE_AGENT)
-        assert "test-results/" in content
-        assert "pipeline-verdict.json" in content
-
-    def test_pipeline_verdict_schema_in_orchestrator(self):
-        """T1 master is the authoritative aggregator and defines the
-        pipeline-verdict.json schema (v2.0.0 consolidation moved this from
-        test-pipeline-agent to testing-pipeline-master-agent)."""
-        master_agent = AGENTS_DIR / "testing-pipeline-master-agent.md"
-        content = _read(master_agent)
-        for field in ["run_id", "result", "stages_completed", "stage_results", "failures"]:
-            assert field in content, (
-                f"pipeline-verdict.json missing field in master agent: {field}"
-            )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -414,11 +396,6 @@ class TestCaptureProofIntegration:
         assert "manifest.json" in content
         assert "visual-review.json" in content
 
-    def test_pipeline_agent_references_evidence_dir(self):
-        content = _read(TEST_PIPELINE_AGENT)
-        assert "test-evidence" in content
-        assert "capture_proof" in content
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 6. STRICT GATES INTEGRATION
@@ -443,11 +420,6 @@ class TestStrictGatesIntegration:
     def test_post_fix_blocks_on_missing_upstream_with_strict(self):
         content = _read(POST_FIX)
         assert "BLOCKED: auto-verify output missing" in content or "strict-gates" in content.lower()
-
-    def test_pipeline_agent_always_passes_strict_gates(self):
-        content = _read(TEST_PIPELINE_AGENT)
-        assert "--strict-gates" in content
-        assert "always passed by this orchestrator" in content.lower() or "fail-closed" in content.lower()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -487,7 +459,6 @@ class TestVersionConsistency:
     @pytest.mark.parametrize("agent_name,path", [
         ("tester-agent", TESTER_AGENT),
         ("test-failure-analyzer-agent", FAILURE_ANALYZER_AGENT),
-        ("test-pipeline-agent", TEST_PIPELINE_AGENT),
     ])
     def test_agent_version_matches_registry(self, agent_name, path):
         fm = _parse_frontmatter(_read(path))

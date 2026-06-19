@@ -22,7 +22,6 @@ workflows:
         - expo-dev
         - firebase-dev
         - fix-github-issue
-        - fix-issue
         - flutter-dev
         - git-worktrees
         - grill-me
@@ -36,6 +35,7 @@ workflows:
         - plan-to-issues
         - prd-parser
         - project-scaffold
+        - provenance-report
         - pytest-dev
         - ssot-audit
         - subagent-driven-dev
@@ -85,6 +85,7 @@ workflows:
     seeds:
       skills:
         - agent-evaluator
+        - analytics-setup
         - android-adb-test
         - android-run-e2e
         - android-test-patterns
@@ -115,6 +116,7 @@ workflows:
         - pipeline-orchestrator
         - playwright
         - post-fix-pipeline
+        - provenance-report
         - react-native-e2e
         - react-test-patterns
         - regression-test
@@ -128,7 +130,6 @@ workflows:
         - test-data-management
         - test-maintenance
         - test-pipeline
-        - testing-pipeline-workflow
         - trace-test
         - verify-screenshots
         - vitest-dev
@@ -136,8 +137,6 @@ workflows:
       agents:
         - android-compose-agent
         - anthropic-multi-agent-reviewer-agent
-        - e2e-conductor-agent
-        - failure-triage-agent
         - fastapi-api-tester-agent
         - flutter-dart-agent
         - git-manager-agent
@@ -146,10 +145,8 @@ workflows:
         - quality-gate-evaluator-agent
         - test-failure-analyzer-agent
         - test-healer-agent
-        - test-pipeline-agent
         - test-scout-agent
         - tester-agent
-        - testing-pipeline-master-agent
         - visual-inspector-agent
         - workflow-master-template
       rules:
@@ -179,7 +176,6 @@ workflows:
         - fastapi-run-backend-tests
         - firebase-test
         - fix-github-issue
-        - fix-issue
         - fix-loop
         - flutter-e2e-test
         - mobile-a11y-test
@@ -238,6 +234,7 @@ workflows:
         - grill-with-docs
         - mcp-server-builder
         - prompt-auto-enhance
+        - provenance-report
         - semgrep-rules
         - skill-authoring-workflow
         - skill-evaluator
@@ -358,6 +355,7 @@ workflows:
         - android
         - android-compose-ui
         - android-kotlin
+        - ba-discovery-checklist
         - bun-elysia
         - code-readability
         - design-principles
@@ -369,9 +367,12 @@ workflows:
         - fastapi-database
         - firebase
         - flutter
+        - full-space-first
         - goal-anchored-decisions
+        - human-approval-gates
         - notifier-integration
         - output-plausibility-verification
         - react-nextjs
         - vue
+        - web-analytics-instrumentation
 

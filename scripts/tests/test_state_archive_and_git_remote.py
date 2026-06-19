@@ -19,18 +19,12 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = REPO_ROOT / "core" / ".claude" / "config" / "e2e-pipeline.yml"
-CONDUCTOR_PATH = REPO_ROOT / "core" / ".claude" / "agents" / "e2e-conductor-agent.md"
 
 
 @pytest.fixture(scope="module")
 def config() -> dict:
     with CONFIG_PATH.open(encoding="utf-8") as f:
         return yaml.safe_load(f)
-
-
-@pytest.fixture(scope="module")
-def conductor_body() -> str:
-    return CONDUCTOR_PATH.read_text(encoding="utf-8")
 
 
 def test_archive_enabled_by_default(config):
@@ -51,31 +45,6 @@ def test_canonical_paths_unchanged(config):
     assert (
         config["state"]["dispatched_file"]
         == ".workflows/testing-pipeline/e2e-state.json"
-    )
-
-
-def test_conductor_documents_archive_step(conductor_body):
-    assert "runs/{run_id}" in conductor_body, (
-        "Conductor must document the per-run archive path format"
-    )
-    assert "Archive per-run state snapshot" in conductor_body
-    assert "COPY" in conductor_body or "copy" in conductor_body, (
-        "Archive must COPY (not move) so canonical path stays for existing "
-        "callers — backward compatibility is the point"
-    )
-
-
-def test_archive_step_is_non_destructive(conductor_body):
-    archive_section_start = conductor_body.find("Archive per-run state snapshot")
-    assert archive_section_start > 0
-    # The archive block runs before the test-results write step. Grab a 1000-char
-    # window and assert the canonical file is preserved.
-    archive_section = conductor_body[archive_section_start : archive_section_start + 1000]
-    assert "STAYS where it is" in archive_section or "stays" in archive_section, (
-        "Archive step must explicitly state the canonical file is NOT moved"
-    )
-    assert "rm " not in archive_section.split("\n\n")[0] + archive_section.split("\n\n")[1], (
-        "Archive step must not include rm/delete of canonical file"
     )
 
 

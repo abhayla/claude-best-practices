@@ -11,13 +11,29 @@
 Migrate hand-rolled hub patterns onto native Claude Code primitives (W13–24); close deploy gap;
 move governance prose→harness. Test-gated chunk-by-chunk. Fable dependency: none (Opus 4.8).
 
-- [ ] **Phase 0** — Audit/ledger: tag 272 patterns KEEP/MIGRATE/RETIRE (⏳ delegated to background agent)
-- [ ] **Phase 1** — native adoption: 1.1 `/goal`+`/loop` · 1.2 `--worktree` · 1.3 expanded hooks
-- [ ] **Phase 2** — deploy=finish: 2.1 `ultrareview` · 2.2 `/autofix-pr` · 2.3 computer-use + `vps-deploy`
-- [ ] **Phase 3** — cloud: 3.1 crons→Routines · 3.2 Auto-mode hard-deny
-- [ ] **Phase 4** — Agent Teams replaces skill-at-T0 (HIGH risk, gated on GA verify)
-- [ ] **Phase 5** — self-updating Routine (weekly whats-new diff → auto-issue)
-- ⚠️ Every RETIRE needs Abhay sign-off (downstream-shipped). Goal codification awaits ratification.
+**ACTIVE CHUNK (2026-06-19): RETIRE 6 deprecated test-pipeline patterns** — branch
+`chore/retire-deprecated-test-pipeline-patterns`. Owner-approved; e2e-conductor-agent,
+test-pipeline-agent, failure-triage-agent, testing-pipeline-master-agent (agents) +
+testing-pipeline-workflow, fix-issue (skills) → /test-pipeline + /fix-github-issue.
+- [x] 1. Re-verify reference map (re-grep 6 names)
+- [x] 2. Test surgery — removed ONLY dead-agent assertions; live-worker guards KEPT
+- [x] 3. Config/code fixes (workflow-groups.yml, recommend.py, allowlist→[], 2 descriptions)
+- [x] 4. Docs (CLAUDE.md master-agents 8→7; spec HISTORICAL banner)
+- [x] 5. Deleted 6 files (+evals) + 6 registry entries + total 272→266 + changelog
+- [x] 6. Regenerated docs (generate_docs + generate_workflow_docs)
+- [x] 7. FULL local CI green (1426 passed, 4 gates) + independent blind review (0 blockers/majors)
+- [x] 8. Committed (2030fea), pushed, PR #121 OPEN (CI running); plan + remember updated
+
+**Review:** Surgical RETIRE — 3562 deletions, 359 insertions across 47 files. Kept e2e-pipeline.yml
+(7th pattern, out of approved scope) → flagged as follow-up RETIRE needing owner sign-off. Registry
+JSON edited via script (byte-identical round-trip → clean diff). Config hashes aren't file-verified by
+dedup_check but resynced anyway. NEXT: merge #121 when CI green (autonomous), then `git checkout main && pull`.
+
+Phase status (parent initiative):
+- [x] **Phase 0** — Audit/ledger DONE (276 = 242 KEEP/28→25 MIGRATE/6 RETIRE)
+- [x] **Phase 4.2** — doctrine reframe C1–C4 DONE (PR #120); C5 pilot deferred YAGNI
+- [ ] **Phase 1** (1.1/1.2 marginal · 1.3 KEEP-decided) · **Phase 2** (deploy gap, VPS creds) · **Phase 3** · **Phase 5.1b**
+- ⚠️ Every RETIRE needs Abhay sign-off — GRANTED 2026-06-19 for these 6.
 
 ### loop-engineering — 2026-06-17 — ✅ SHIPPED (merged) + hub-ward monitoring (v1.1.0)
 
