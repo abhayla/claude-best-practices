@@ -12,14 +12,16 @@ every status summary was blocked for not re-rendering the full enhance card. The
 a *legitimate quality boundary* from an *avoidable stop*. This is the governance-by-harness-vs-internalization
 tension (flagged in the session's own opening retrospective), demonstrated live.
 
-**What to do instead / PROPOSED HOOK TWEAK (pending Abhay approval — rule 5):** add a `*Session-boundary:*`
-exemption to `no-overask-guard.sh`, mirroring the existing `*Sync-check:*` exemption. When the final
-message opens a line with `*Session-boundary:*` AND the turn completed a tested chunk, the hook LOGS it as
-telemetry (like the other misses) instead of BLOCKING. The model may use the marker ONLY when (a) a
-tested/verified chunk is complete and committed, AND (b) all remaining work is either owner-gated
-(sign-off/deploy/spend) or explicitly deferred-for-quality with a one-line reason (e.g. coherent
-multi-file edit needing fresh, non-saturated context). Abuse guard: the Stop hook still logs every use to
-`.claude/.enhance-misses.log` for audit, so a model that over-uses the marker is visible.
+**HOOK TWEAK — Abhay-APPROVED 2026-06-19, APPLIED in `.claude/hooks/no-overask-guard.sh`:** a
+`*Session-boundary:*` exemption now mirrors the existing `*Sync-check:*` exemption. When the final
+message opens a line with `*Session-boundary:*` AND the turn completed a tested chunk, the hook LOGS it
+(`session-boundary-stop (exempted, len=…)` → `.claude/.overask-violations.log`) instead of BLOCKING, and
+exits. The model may use the marker ONLY when (a) a tested/verified chunk is complete and committed, AND
+(b) all remaining work is either owner-gated (sign-off/deploy/spend) or explicitly deferred-for-quality
+with a one-line reason (e.g. coherent multi-file edit needing fresh, non-saturated context). Abuse guard:
+the Stop hook logs every use for audit, so over-use of the marker is visible; the exemption runs AFTER the
+reviewer-card guard, so a session-boundary wrap-up turn still renders the full enhance card. Verified
+2026-06-19: marker → exempt+logged; same narrate-and-stop without the marker → still blocks.
 
 ## 2026-06-19 — Render the FULL enhance card on EVERY substantive turn, including continuations
 
