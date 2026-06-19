@@ -2,6 +2,28 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-19 — "Verified" requires the FULL suite, not bash -n + a functional probe (red-PR miss)
+
+**Surfaced during:** the `*Session-boundary:*` hook tweak (`faa4c59`). I edited `no-overask-guard.sh`,
+verified it with `bash -n` + a crafted-transcript functional test, claimed "verified," and committed —
+but did NOT re-run `pytest scripts/tests/`. Remote CI then went RED (`1 failed, 1484 passed`) while my
+local was "green" because my last full-suite run predated the hook edit. **Rules:** (1) after editing ANY
+file that a test asserts on (hooks, patterns, configs), re-run the FULL local CI (all 4 gates incl. full
+pytest) BEFORE committing — a `bash -n`/functional probe proves the script RUNS, not that the repo's
+structural tests still pass. (2) "FULL CI green" is only true if the run POST-DATES the last edit; never
+carry a green result across a later change.
+
+## 2026-06-19 — no-overask-guard.sh + prompt-enhance-reminder.sh are DUAL-HOMED + REGISTERED (not hub-only)
+
+**Surfaced during:** same red PR. I assumed `no-overask-guard.sh` was a hub-only hook (`.claude/hooks/`,
+unregistered) and edited only that copy. WRONG: it (and `prompt-enhance-reminder.sh`) also ships a
+**distributable `core/.claude/hooks/` copy** that `test_no_overask_card_enforcement.py` pins to be
+**byte-identical** to the hub copy AND **registry-hash-matched** (it's a registered `type: hook` pattern).
+**Rule:** editing either of these two hooks requires editing/​copying BOTH copies (hub == core, byte-identical)
+AND resyncing the registry hash + version bump. CLAUDE.md's "hub-only hooks" list is misleading for these
+two — they are dual-homed. (The genuinely hub-only hooks — `session-governance-status.sh`,
+`prompt-logger.sh`, etc. — have no core copy; check `core/.claude/hooks/` before assuming hub-only.)
+
 ## 2026-06-19 — Governance hooks over-fire at legitimate quality boundaries (the stop-loop)
 
 **Surfaced during:** the platform-migration session. At the end of a long, context-saturated session
