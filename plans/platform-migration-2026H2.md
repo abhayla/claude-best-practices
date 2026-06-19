@@ -90,7 +90,7 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   reasoning to add, and migrating would break the GitHub coupling + add cloud-auth burden for zero
   gain (**negative ROI**). Mirrors the Phase 1.3 "investigated → KEEP" precedent. Re-open only if a
   cron gains genuine agentic reasoning. (Verified via 3 Explore agents, 2026-06-19.)
-- [ ] **3.2** Auto-mode hard-deny rules: encode irreversible-action escalation list deterministically. Test: denied op blocked.
+- [x] **3.2** ✅ DONE (2026-06-19, PR #124) — governance prose → harness. Encoded the git-gate-bypass slice of `decision-authority.md`'s escalation list as deterministic `permissions.deny` rules (apply in EVERY mode) in `core/.claude/settings.json` + `.claude/settings.json` (force-push, `--no-verify`); native Auto mode covers prod-deploy/push-to-main/persistence. `decision-authority` 1.0.0→1.1.0 documents both harness layers + the prefix-matcher limit; `test_governance_deny_rules.py` pins it. Scoped to avoid false-positives (no `reset --hard`/`rm -rf`/deploy matchers).
 
 ### Phase 4 — Native nested dispatch (RETARGETED from "Agent Teams") · risk: HIGH · gated on owner sign-off
 - [x] **4.1** ✅ DONE (2026-06-19) — GA verdict (official `code.claude.com` docs, exact quotes):
