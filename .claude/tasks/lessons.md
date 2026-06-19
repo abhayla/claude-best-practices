@@ -495,3 +495,25 @@ correct enforcement layer is the **Stop hook** (catches omission at end-of-turn)
 **UserPromptSubmit reminder** (demands rendering up-front). A PreToolUse hard-deny tied to
 "card present in THIS segment" cannot distinguish "rendered earlier in a multi-part turn" and
 is too blunt. If up-front telemetry is wanted later, make it ADVISORY (log), never a hard deny.
+
+## 2026-06-19 — "Explain-don't-block": a greyed/disabled UI element reads as "hidden from me" to a novice
+**Surfaced during:** calc-2 Salary Optimizer — the owner reviewed the live UI as a fresh-graduate
+persona (zero tax knowledge) and found the greyed/inactive levers (HRA/80C/§24b shown "n/a")
+alarming: *"things are blocked and I don't know why — is something being hidden from me?"* The
+tool optimized correctly but TAUGHT nothing. **Rule:** for any tool that conditionally
+disables/hides options, every inactive element MUST answer three questions inline, in plain
+words — WHAT it is, WHY it's off FOR THIS USER, WHAT (if anything) to do — never a silent grey
+box, and never alarming-red. For domain tools aimed at non-experts, default to a
+beginner-explained surface (jargon→plain + a one-line ₹/example tooltip on every term),
+normalize the "you only have a few options" case, and put the power-user view behind a "Show
+full breakdown" toggle. Shift from "optimizer" to "teacher that also optimizes." (Generic UX craft.)
+
+## 2026-06-19 — A local-only dogfood repo is cut off from native Claude Code cloud features + the hub loop
+**Surfaced during:** the calc-2 Claude-Code-adoption self-assessment. The `calculator` repo has NO
+GitHub remote, so `/code-review ultra` and `/autofix-pr` (both need the Claude GitHub App on a real
+repo) AND hub telemetry / `repos.yml` enrollment are all unavailable — the app improves locally but
+nothing flows to the cloud-review or feedback loop. **Rule:** wire a GitHub remote for a dogfood/app
+repo EARLY (per `bootstrap-dogfood-project`'s 5 preconditions) so the native cloud capabilities and
+the hub feedback loop are reachable from the first feature — don't defer it until "after build."
+Creating the remote is an external-publish action → confirm visibility with the owner, but treat
+"no remote" as a first-class **adoption gap**, not a nicety.
