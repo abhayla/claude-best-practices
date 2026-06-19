@@ -55,15 +55,18 @@ in `core/` so any downstream project inherits the capability.
   speculative. Needs Abhay's host + credentials at deploy time (escalate then).
 - Verification: deploy a throwaway container to the VPS, confirm live-URL smoke + rollback.
 
-### Unit 4 — Pipeline integration · ⏳ PARTIAL (deploy-executor DONE 2026-06-19)
-- ✅ **Deploy-executor wired (2026-06-19):** `STAGE-10-DEPLOY.md` Step 3 gained a **Self-Managed VPS Path**
-  invoking `/vps-deploy` (SSH+nginx/PM2, live-URL smoke + rollback = the deploy gate); `pipeline-stages.yaml`
-  `stage_10_deploy` documents the executor-by-target map (incl. `/vps-deploy`) + the G3 human-approval gate.
-- ⏳ **Remaining (autonomous, no owner dep):** insert explicit G1/G2 approval-gate PAUSE steps into the DAG +
-  the Unit-2 domain-research step at Stage 1, and update `STAGE-4-HTML-DEMO.md` ("runs autonomously" → gate
-  pauses). Deferred to a fresh focused pass (it edits the load-bearing `project-manager-agent` + DAG — best
-  not rushed at context-tail, per the context-rot lesson). NOT owner-blocked.
-- Verification: `pipeline-stages.yaml` parses (11 stages); full CI green (1438) after the deploy-executor wiring.
+### Unit 4 — Pipeline integration · ✅ DONE (2026-06-19)
+- ✅ **Deploy-executor wired:** `STAGE-10-DEPLOY.md` Step 3 Self-Managed VPS Path → `/vps-deploy`;
+  `pipeline-stages.yaml` `stage_10_deploy` executor-by-target map + G3 gate.
+- ✅ **Human-approval gates wired:** `pipeline-stages.yaml` now documents G1 (after `stage_4_demo`),
+  G2 (after `stage_9_review`), G3 (before `stage_10_deploy`); `project-manager-agent` responsibility #2
+  now MUST HALT for G1/G2/G3 (present artifact + STOP, never infer approval) — folded into the existing
+  responsibility (count stays 4, rule-8 cap respected); `STAGE-4-HTML-DEMO.md` carries the G1 PAUSE banner
+  ("generation autonomous, then G1 stop before impl").
+- ✅ **Domain-research step:** `stage_1_prd` documents the Unit-2 domain-research-first step (→ `/brainstorm`
+  STEP 1.0). 
+- Verification: `pipeline-stages.yaml` parses; project-manager-agent responsibility count = 4 (≤ cap);
+  full CI green; hash/version resynced (project-manager-agent 1.0.0→1.1.0).
 
 ## Self-improvement loop (runs at EVERY stage — Abhay's standing directive 2026-06-17)
 

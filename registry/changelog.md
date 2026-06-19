@@ -4,6 +4,13 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — idea-to-deploy-readiness Unit 4 COMPLETE: human-approval gates + domain-research step wired into the pipeline
+
+- **updated** agent `project-manager-agent` (1.0.0 → 1.1.0, MINOR) — responsibility #2 now MUST HALT for the human-approval gates G1 (after `stage_4_demo`), G2 (after `stage_9_review`), G3 (before `stage_10_deploy`) per `human-approval-gates.md` — present the artifact + STOP, never infer approval from silence. Folded into the existing responsibility (count stays 4 — rule-8 cap respected); hash resynced.
+- **updated** `config/pipeline-stages.yaml` — `stage_1_prd` documents the domain-research-first step (Unit 2 → `/brainstorm` STEP 1.0); `stage_4_demo` documents the G1 pause; `stage_9_review` documents the G2 pause (G3 already on `stage_10_deploy`).
+- **updated** `docs/stages/STAGE-4-HTML-DEMO.md` — G1 human-approval PAUSE banner (demo generation autonomous, then STOP for "build THIS" before implementation).
+- Completes idea-to-deploy-readiness Unit 4 (pipeline integration). Verified: pipeline-stages.yaml parses, PM-agent responsibility count = 4 (≤ rule-8 cap), full CI green.
+
 ### 2026-06-19 — idea-to-deploy-readiness: Unit 2 (domain-research BA) + Unit 4 deploy-executor wiring
 
 Closes the two autonomous gaps the migration's sibling plan (goal #3) still had after `vps-deploy` shipped.

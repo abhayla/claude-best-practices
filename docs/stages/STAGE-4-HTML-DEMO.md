@@ -1,6 +1,7 @@
 # Stage 4: Interactive HTML UI Demo — AUDIT
 
-> **Purpose:** Audit whether `core/.claude/` has everything needed to generate a multi-file, interactive HTML prototype (website or mobile app) with realistic sample data, a shared design system, and an implementation mapping doc — fully autonomously.
+> **Purpose:** Audit whether `core/.claude/` has everything needed to generate a multi-file, interactive HTML prototype (website or mobile app) with realistic sample data, a shared design system, and an implementation mapping doc. The demo *generation* runs autonomously, **but it is immediately followed by the G1 human-approval gate.**
+> **🚦 G1 HUMAN-APPROVAL PAUSE (human-approval-gates.md):** after this stage produces the demo, `project-manager-agent` MUST STOP and present the mockup for explicit user "build THIS" approval BEFORE any implementation stage (5–8). The pipeline does NOT auto-proceed past the demo. (Precondition: the BA completeness audit is clean — `ba-discovery-checklist.md`.)
 > **Runs In:** Dedicated Claude Code context window
 > **Depends On:** Stage 1 (PRD) + Stage 3 (Scaffold — for design context)
 > **Last Updated:** 2026-03-14
