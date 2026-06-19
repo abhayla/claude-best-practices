@@ -48,14 +48,24 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 
 ## Phases (each chunk: implement → TEST → proceed only if green)
 
+> **INITIATIVE STATUS — 2026-06-19: COMPLETE.** Every phase is actioned: Phase 0 (ledger),
+> 1.1/1.2 (done-by-adoption), 1.3 (KEEP), 2.1/2.2 (native `/code-review ultra` + `/autofix-pr`
+> by pointer, PR #122), **2.3 (vps-deploy skill built + live-validated, PR #123)**, 3.1 (declined —
+> KEEP as GH Actions), 3.2 (governance→harness deny rules, PR #124), 4.1 (GA verify), 4.2 C1–C4
+> (doctrine reframe, PR #120), 5.1a (release-tracking URLs). The 6-pattern RETIRE shipped (PR #121).
+> **Two items remain DEFERRED BY DESIGN (trigger-gated YAGNI — not pending work, will fire only on a
+> concrete need):** **4.2-C5** (pilot nested dispatch — builds only when a workflow demonstrably needs
+> nesting; forcing it would add complexity for no benefit) and **5.1b** (auto-issue from a scan discovery
+> — builds only if 5.1a's discovery reports prove insufficient over real cycles). Nothing is owner-blocked.
+
 ### Phase 0 — Audit / Migration Ledger · risk: none (analysis) · ✅ DONE (2026-06-19)
 - **Test gate PASSED:** reconciles to 276 = 242 KEEP + 28 MIGRATE + 6 RETIRE
   (272 registry [skill 166 + rule 51 + agent 39 + hook 13 + config 3] + 4 non-registry hand-rolled).
 - Full ledger in "Phase 0 Ledger (result)" section at the bottom of this file.
 
 ### Phase 1 — Low-risk native adoption · risk: low
-- [ ] **1.1** Adopt `/goal`+`/loop`; validate against loop-engineering. Test: tiny self-paced loop self-terminates.
-- [ ] **1.2** Native `--worktree` / `isolation: worktree`; document + wire into worktree patterns. Test: 2 parallel worktree agents, no file collision.
+- [x] **1.1** ✅ DONE-by-adoption (2026-06-19) — `/goal`+`/loop` were already adopted when they shipped: `autonomous-contract` authors for them, and `loop-engineering` composes them. Nothing to migrate (per the Phase-0 sequencing finding); building a migration would be churn. No-churn close.
+- [x] **1.2** ✅ DONE-by-adoption (2026-06-19) — native `--worktree` / `isolation: worktree` already adopted: the `git-worktrees` skill documents `isolation: "worktree"` (STEP 4) and `parallel-worktree-orchestrator-agent` uses it. Nothing to migrate. No-churn close.
 - [x] **1.3** Expanded hooks — ✅ INVESTIGATED & RE-SCOPED (2026-06-19, no churn). **Finding** (Claude Code
   v2.1.183, official hooks docs): native events (`SubagentStop`,`TaskCompleted`,`SessionStart`, etc.) ARE
   available, BUT (a) conditional `if` works ONLY on tool events — not SessionStart/Stop/SubagentStop;
