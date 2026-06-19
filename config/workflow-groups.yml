@@ -133,6 +133,7 @@ workflows:
         - trace-test
         - verify-screenshots
         - vitest-dev
+        - vps-deploy
         - vue-test
       agents:
         - android-compose-agent
@@ -200,6 +201,7 @@ workflows:
         - semgrep-rules
         - skill-factory
         - test-knowledge
+        - vps-deploy
       agents:
         - context-reducer-agent
         - learning-self-improvement-master-agent

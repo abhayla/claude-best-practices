@@ -4,6 +4,13 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — Add `vps-deploy` skill (Platform Migration 2.3 / idea-to-deploy-readiness Unit 3 — the deploy=finish-line gap)
+
+Closes the deploy gap with the reusable, env-var-driven deploy capability the readiness plan deferred until a real target existed. Owner-approved 2026-06-19; grounded in a verified self-managed Linux VPS stack (nginx + static webroots + PM2; NO Docker — so SSH+rsync+nginx, not docker-compose). `total_patterns` 266→267.
+
+- **added** skill `vps-deploy` (v1.0.0, nice-to-have) — SSH+rsync deploy of a built artifact to a self-managed Linux VPS: backup prior release → rsync to webroot → **`nginx -t`-gated reload** (or PM2 reload) → **live-URL smoke** (verifies NEW-release substance, not just HTTP 200) → **auto-rollback on smoke-fail**. Portable: reads `DEPLOY_HOST/USER/SSH_KEY/WEBROOT/URL` from env (never hardcodes host/keys; keys stay in `~/.ssh/`). Treats prod deploy as a G3 human-approval gate; deps deploy-strategy/pm2-deploy/incident-response/disaster-recovery.
+- **updated** rule `engineering-roles` (1.5.0 → 1.6.0, MINOR) — DevOps/Release row points to `/vps-deploy`.
+
 ### 2026-06-19 — Adopt native `/code-review ultra` + `/autofix-pr` by pointer (Platform Migration 2.1/2.2); decline crons→Routines (3.1)
 
 Migration goal "thin layer on top of the platform": adopt two GA native Claude Code features as **additive pointers** in the distributable patterns — NOT replacements. Both are cloud / billed / Claude-GitHub-App, opt-in, and **never auto-invoked** by hub patterns; the free local hand-rolled skills (`/review-gate`, `/fix-loop`, etc.) stay the default. Verified before effort (3 Explore agents + web check): `/autofix-pr` is real ([web docs](https://code.claude.com/docs/en/claude-code-on-the-web)); `/code-review ultra` is user-triggered + billed.

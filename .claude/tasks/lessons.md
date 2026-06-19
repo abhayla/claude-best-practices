@@ -2,6 +2,22 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-19 — Read GLOBAL.md (infra SSOT) before claiming an infra/credential GAP
+
+**Surfaced during:** the deploy-gap discussion. I twice told Abhay the VPS deploy was "blocked — needs a
+Hostinger Linux VPS + SSH creds," after checking only `D:\Abhay\VibeCoding\GLOBAL.env` (the *secrets*
+file). Abhay corrected me ("the calculator was deployed there, you must have SSH"). On checking
+`GLOBAL.md` (the cross-project **infra** SSOT — which `~/.claude/CLAUDE.md` explicitly says to read FIRST
+for anything spanning projects) + `~/.ssh/`, the access was right there: Hostinger VPS `72.61.240.224`,
+key `~/.ssh/firekaro_v6_vps`, user `root`, hosting calculatekaro/firekaro/bestdemataccount. A read-only SSH
+probe connected immediately (SSH:22 is only firewalled for *GitHub-hosted* runners, not this env). **Rule:**
+before declaring ANY infra/credential/host gap, read `GLOBAL.md` (VPS inventory, SSH access, what-runs-where)
+AND `ls ~/.ssh/` — `GLOBAL.env` is only the secrets sibling; the infra map lives in GLOBAL.md, and the global
+CLAUDE.md already mandates reading it first. (Second "verify before claiming a gap" miss this session — same
+class as the e2e-pipeline "orphaned" miss below: I asserted a gap from a partial source instead of checking
+the authoritative one.) Also learned: the Hostinger box runs **nginx+static+PM2, NO Docker** — don't assume a
+deploy stack; probe it.
+
 ## 2026-06-19 — "Orphaned" requires a CURRENT-consumer check, not a changelog origin note
 
 **Surfaced during:** the e2e-pipeline RETIRE follow-up. After deleting `e2e-conductor-agent`, I flagged
