@@ -47,3 +47,4 @@ docs/goals/.run/
 
 # native-governance-hooks runtime state
 .claude/.config-changes.log
+.claude/.compaction-handoff.md
