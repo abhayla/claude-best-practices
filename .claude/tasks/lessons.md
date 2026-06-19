@@ -2,6 +2,22 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-19 — "Orphaned" requires a CURRENT-consumer check, not a changelog origin note
+
+**Surfaced during:** the e2e-pipeline RETIRE follow-up. After deleting `e2e-conductor-agent`, I flagged
+`core/.claude/config/e2e-pipeline.yml` as "orphaned — its only consumer is gone" based on its changelog
+(`"externalized DAG for e2e-conductor-agent"`) — and an independent reviewer, fed that same framing, echoed it.
+Abhay approved the RETIRE. On the fresh-branch re-grep (verify-before-delete), the config turned out to be LIVE:
+read by `/e2e-visual-run`, `test-failure-analyzer-agent` (classification_rules + error_context_enrichment), and
+`test-healer-agent` (standalone), guarded by `test_classification_rules.py` + `test_analyzer_enriched_context.py`,
+co-provisioned via `recommend.py`. Deleting it would have broken 3 live patterns + 2 tests. I withdrew the RETIRE
+post-approval. **Rules:** (1) Before calling ANY pattern orphaned/deletable, grep its CURRENT consumers across
+skills+agents+tests+scripts — a changelog "originated for X" line is NOT its consumer list; shared config outlives
+the pattern it was born for. (2) An independent reviewer briefed with my framing ("orphaned, out of scope") will
+inherit my blind spot — feed reviewers the raw evidence, not my conclusion (this is exactly the
+`independent-test-verification.md` rule I under-applied: the reviewer must re-derive, not re-bless). (3) An approval
+obtained on a wrong premise is not a license to act — correct the record and withdraw, don't proceed.
+
 ## 2026-06-19 — "Verified" requires the FULL suite, not bash -n + a functional probe (red-PR miss)
 
 **Surfaced during:** the `*Session-boundary:*` hook tweak (`faa4c59`). I edited `no-overask-guard.sh`,

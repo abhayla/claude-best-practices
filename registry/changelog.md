@@ -4,6 +4,18 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-19 — Adopt native `/code-review ultra` + `/autofix-pr` by pointer (Platform Migration 2.1/2.2); decline crons→Routines (3.1)
+
+Migration goal "thin layer on top of the platform": adopt two GA native Claude Code features as **additive pointers** in the distributable patterns — NOT replacements. Both are cloud / billed / Claude-GitHub-App, opt-in, and **never auto-invoked** by hub patterns; the free local hand-rolled skills (`/review-gate`, `/fix-loop`, etc.) stay the default. Verified before effort (3 Explore agents + web check): `/autofix-pr` is real ([web docs](https://code.claude.com/docs/en/claude-code-on-the-web)); `/code-review ultra` is user-triggered + billed.
+
+- **updated** skill `code-review-workflow` (2.1.1 → 2.2.0, MINOR) — DEEP_AUDIT step now recommends native `/code-review ultra` as an opt-in cloud deep pass alongside the local agent dispatch.
+- **updated** skill `review-gate` (registry 2.0.0 → 2.4.0; also fixes a prior file/registry version drift) — added a "native cloud alternative" note pointing to `/code-review ultra`; the local gate stays the free default.
+- **updated** skill `fix-loop` (1.4.0 → 1.5.0, MINOR) — documents `/autofix-pr` (cloud PR-watcher) vs `/fix-loop` (local iterative) boundary.
+- **updated** skills `pipeline-fix-pr` (1.0.0 → 1.1.0) + `debugging-loop` (2.1.2 → 2.2.0) — one-line `/autofix-pr` pointers for the open-PR case.
+- **updated** rule `engineering-roles` (1.4.2 → 1.5.0, MINOR) — Code-Quality/Reviewer row points to `/code-review ultra`; DevOps/Release row points to `/autofix-pr`.
+- All 6 registry hashes resynced; no pattern deleted/replaced (additive only).
+- **Phase 3.1 (crons→Routines): DECLINED** (no code change) — recorded in `plans/platform-migration-2026H2.md` as KEEP-as-GH-Actions. The 5 scheduled workflows are deterministic Python+git pipelines (not agentic); Routines are scheduled cloud agents → negative ROI. Mirrors the Phase 1.3 KEEP precedent.
+
 ### 2026-06-19 — RETIRE 6 deprecated test-pipeline patterns (Platform Migration 2026 H2, Phase 0 ledger)
 
 Removes 6 patterns that were `deprecated`/`deprecated: true` since 2026-04-24, fully superseded by the active `/test-pipeline` skill-at-T0 (its flat workers) and `/fix-github-issue`. Owner-approved deletion 2026-06-19. `total_patterns` 272 → 266. Test surgery removed ONLY the dead-agent contract assertions; every live `/test-pipeline` worker guard (tester-agent, test-scout-agent, visual-inspector-agent, test-failure-analyzer-agent, github-issue-manager-agent, test-healer-agent) is preserved. The canonical spec `docs/specs/test-pipeline-three-lane-spec-v2.md` is annotated HISTORICAL (functional contract preserved in `/test-pipeline`), not deleted.

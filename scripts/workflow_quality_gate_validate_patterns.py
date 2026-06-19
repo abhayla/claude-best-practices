@@ -708,7 +708,7 @@ def check_cross_references(skills_dir: Path) -> list[str]:
     # test_workflow_quality_gate_validate_patterns.py) prints a reminder when
     # more than ~6 months have passed since this comment was last touched — on
     # drift, re-check the upstream docs and add any new built-ins here.
-    # Last reviewed against upstream docs: 2026-06-10
+    # Last reviewed against upstream docs: 2026-06-19
     IGNORE_REFS = {
         "name", "skill-name", "removed-skill",  # template placeholders
         "clear", "docs", "redoc", "metrics", "proc",  # generic single words
@@ -717,6 +717,8 @@ def check_cross_references(skills_dir: Path) -> list[str]:
         "update-config", "continue", "compact", "help", "status",
         "model", "cost", "memory", "review", "agents", "exit",
         "goal", "loop",  # autonomous-run built-ins (code.claude.com/docs/en/goal.md)
+        "autofix-pr", "code-review",  # cloud PR auto-fix + multi-agent review built-ins
+                                      # (code.claude.com/docs/en/claude-code-on-the-web, /code-review)
     }
 
     # Hub-only skills that exist in .claude/skills/ (not core/.claude/skills/) and

@@ -22,7 +22,7 @@ triggers:
   - debug fix and verify
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<bug description, error output, or issue URL>"
-version: "2.1.2"
+version: "2.2.0"
 ---
 
 # /debugging-loop — Skill-at-T0 Orchestrator
@@ -161,6 +161,11 @@ Skill("/fix-loop", args="<error output>, diagnosis=<path>")
 `/fix-loop` iterates analyze → fix → retest up to 5 times. Each iteration
 MUST try a different approach per claude-behavior.md rule 15. Reads
 diagnosis.json for hints. Writes `test-results/fix-loop.json`.
+
+> If the bug lives on an **open PR** and you'd rather fix it autonomously in the cloud,
+> Claude Code's native **`/autofix-pr`** (run from the PR branch; needs the Claude GitHub App)
+> watches CI + review comments and pushes fixes until green — an opt-in alternative to this
+> local `/fix-loop` step. Not auto-invoked.
 
 Gate: `fix_result.result IN ("PASSED", "FIXED")`. If the gate fails after
 5 iterations, transition to `step_status.FIX = blocked` and jump to STEP 5

@@ -11,7 +11,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read"
 argument-hint: "<diffs-glob-or-list> [--base <branch>] [--no-push]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Pipeline Fix PR — Single-PR Fixer Batching (REQ-C003)
@@ -26,6 +26,12 @@ N commits on the working branch; honors team's PR-required workflow.
 
 > Spec reference: `docs/specs/test-pipeline-three-lane-spec.md` v1.6 §5 REQ-C003
 > Project convention: `core/.claude/rules/git-collaboration.md` § "Review Before Merge"
+>
+> **Native cloud alternative:** once the fix PR exists, the user MAY run Claude Code's native
+> **`/autofix-pr`** from the PR branch to have Claude autonomously watch CI + review comments and
+> push fixes until green (cloud, needs the Claude GitHub App). This skill builds the PR from
+> serialized fixer diffs; `/autofix-pr` is the opt-in native option for *keeping* it green
+> hands-off afterward. Never auto-invoked here.
 
 ---
 
