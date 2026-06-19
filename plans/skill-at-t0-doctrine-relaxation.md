@@ -39,8 +39,12 @@ workers = broken). So the order is: correct the FACT first (safe), then relax co
 - [x] **C4 (2026-06-19):** CLAUDE.md "Workflow Orchestration (skill-at-T0)" rationale reframed
   platform-constraint → deliberate convention. No master-agent / workflow / `project-manager-agent`
   changed (the C4 DECISION's whole point — skill-at-T0 stays where it's already clean).
-- [ ] **C5 (deferred, YAGNI):** Pilot ONE workflow with nested dispatch A/B; prove real nested parallelism;
-  full CI green. Deferred until a concrete workflow demonstrably benefits from nesting — may never fire.
+- [x] **C5 ✅ DONE (2026-06-19):** empirical nested-dispatch pilot run. Live probe confirmed a dispatched
+  worker CAN spawn its own sub-worker and return its result (real nested parallelism observed, ≤5 levels,
+  in-environment). Evidence-based decision: keep single-level default (no current workflow has a genuine
+  2-level decomposition need; loop-engineering MAKER→CHECKER saves only one T0 round-trip vs depth-2 cost);
+  nesting recorded in `agent-orchestration.md` (v1.3.0) as a tested, ready option + dual-mode adoption recipe.
+  No validator change needed (dual-mode already sanctioned). **Phase 4.2 fully complete.**
 
 ## DECISION (2026-06-19, decided per KISS/YAGNI — resolves the C4 fork)
 
