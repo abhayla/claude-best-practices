@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-19 11:38 UTC (auto-generated)
+> Last updated: 2026-06-19 12:08 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -144,7 +144,7 @@
 | pr-standards | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | prd-parser | skill | 1.0.0 | hub:abhayla/claude-best-practices | brainstorm |
 | prisma-conventions | rule | 1.0.0 | project:firekaro-planner | — |
-| project-manager-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | agent-orchestration |
+| project-manager-agent | agent | 1.1.0 | hub:abhayla/claude-best-practices | agent-orchestration |
 | project-scaffold | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup |
 | prompt-auto-enhance | skill | 3.7.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
 | prompt-auto-enhance-rule | rule | 3.1.0 | hub:abhayla/claude-best-practices | prompt-auto-enhance |
