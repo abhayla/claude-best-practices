@@ -29,11 +29,44 @@ from scripts.discovery_adapter import load_discoveries, is_in_registry
 MIGRATABLE_MIN_CONFIDENCE = 80
 MIGRATABLE_TYPES = {"skill", "agent", "rule", "hook"}
 ISSUE_LABEL = "discovery"
+# A migratable discovery is, by definition, a ready-to-act work item — label it so
+# an executor (a human or /implement) can pick it up. This is what closes
+# detect -> *actionable* item, not detect -> unread issue.
+AGENT_READY_LABEL = "ready-for-agent"
 
 
 def migratable_signature(entry: dict) -> str:
     """Stable dedup marker for a discovery's issue (survives re-scans)."""
     return f"discovery:{entry.get('type', 'unknown')}:{entry.get('name', 'unknown')}"
+
+
+def issue_labels(entry: dict) -> list[str]:
+    """Pure label set for a discovery issue (testable without gh)."""
+    return [ISSUE_LABEL, f"discovery-type-{entry.get('type')}", AGENT_READY_LABEL]
+
+
+def migration_plan(entry: dict) -> str:
+    """The agent-ready migration plan embedded in the issue — turns a bare
+    'evaluate this' prompt into a concrete, executable checklist. Honest scope:
+    this is a PLAN, not generated migration code (auto-writing the migration of a
+    hand-rolled pattern onto a native primitive needs human/agent judgment)."""
+    name, typ = entry.get("name"), entry.get("type")
+    return (
+        f"### Migration plan (agent-ready)\n"
+        f"1. **Verify the primitive** — confirm `{name}` exists + its current status in the live "
+        f"`code.claude.com/docs` (GA vs experimental vs preview); a doc claim can go stale.\n"
+        f"2. **Decide the adoption shape** (pick one):\n"
+        f"   - **Adopt-by-pointer** (most native features) — add an *additive opt-in* pointer in the "
+        f"relevant {typ}/role; keep the hub's existing path the default. No behavior change to current callers.\n"
+        f"   - **Migrate a hand-rolled pattern** — only if `{name}` supersedes an existing hub pattern; "
+        f"deprecate (don't delete) the old one for 2 version cycles (`pattern-structure.md`).\n"
+        f"   - **Reject** — if it duplicates existing hub value: `python scripts/discovery_adapter.py --reject`.\n"
+        f"3. **Implement** on a fresh branch (`/implement`); add a structural test for the new pointer/mode.\n"
+        f"4. **Verify** — resync the registry hash if a registered pattern changed; run FULL local CI "
+        f"(dedup `--validate-all` + `--secret-scan` + workflow gate + pytest) before the PR.\n"
+        f"5. **Keep the default unchanged** — native adoptions are additive/opt-in unless a migration is "
+        f"explicitly chosen + the old pattern deprecated."
+    )
 
 
 def select_migratable(data: dict, min_confidence: int = MIGRATABLE_MIN_CONFIDENCE,
@@ -70,8 +103,7 @@ def _issue_body(entry: dict) -> str:
         f"- **Discovered:** {entry.get('discovered')} · **seen:** {entry.get('seen_count', 1)}×\n"
         f"- **Sources:**\n{sources}\n\n"
         f"- **Preview:** {entry.get('content_preview', '')[:280]}\n\n"
-        f"**Next step (human):** evaluate vs the hub — adopt-by-pointer, migrate a hand-rolled "
-        f"pattern onto it, or reject (then `discovery_adapter.py --reject`). "
+        f"{migration_plan(entry)}\n\n"
         f"Dedup marker: `{sig}`."
     )
 
@@ -118,7 +150,7 @@ def file_issues(candidates: list[dict], apply: bool) -> dict:
         else:
             code, out = _gh(["issue", "create", "--title", title,
                              "--body", _issue_body(e),
-                             "--label", f"{ISSUE_LABEL},discovery-type-{e.get('type')}"])
+                             "--label", ",".join(issue_labels(e))])
             actions.append({"signature": sig, "action": "CREATED",
                             "url": out if code == 0 else None, "ok": code == 0})
     return {"result": "OK", "applied": apply, "candidates": len(candidates), "actions": actions}

@@ -9,6 +9,10 @@ from scripts.discovery_to_issue import (
     select_migratable,
     migratable_signature,
     file_issues,
+    issue_labels,
+    migration_plan,
+    _issue_body,
+    AGENT_READY_LABEL,
     MIGRATABLE_MIN_CONFIDENCE,
 )
 
@@ -67,6 +71,31 @@ def test_empty_discoveries_is_safe():
 def test_signature_is_stable_and_typed():
     e = _entry(name="sub-agents-nesting", type="rule")
     assert migratable_signature(e) == "discovery:rule:sub-agents-nesting"
+
+
+def test_issue_labels_marks_agent_ready():
+    """S11: a migratable discovery is a ready-to-act item — must carry the agent label."""
+    labels = issue_labels(_entry(type="agent"))
+    assert AGENT_READY_LABEL in labels
+    assert "discovery" in labels
+    assert "discovery-type-agent" in labels
+
+
+def test_migration_plan_is_executable_not_vague():
+    """The plan must give concrete, decidable steps — not a bare 'evaluate this'."""
+    plan = migration_plan(_entry(name="native-loop", type="skill"))
+    # Names the discovery, the three adoption shapes, and the safety defaults.
+    assert "native-loop" in plan
+    for token in ("Adopt-by-pointer", "Migrate a hand-rolled", "Reject", "FULL local CI"):
+        assert token in plan, f"migration plan missing decidable step: {token}"
+    assert "default" in plan.lower(), "plan must preserve the keep-default-unchanged safety rule"
+
+
+def test_issue_body_embeds_plan_and_dedup_marker():
+    e = _entry(name="native-loop", type="skill")
+    body = _issue_body(e)
+    assert "Migration plan (agent-ready)" in body
+    assert migratable_signature(e) in body  # dedup still intact after enrichment
 
 
 def test_dry_run_makes_no_gh_calls_and_reports_plan(monkeypatch):
