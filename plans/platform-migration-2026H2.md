@@ -53,10 +53,10 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
 > by pointer, PR #122), **2.3 (vps-deploy skill built + live-validated, PR #123)**, 3.1 (declined —
 > KEEP as GH Actions), 3.2 (governance→harness deny rules, PR #124), 4.1 (GA verify), 4.2 C1–C4
 > (doctrine reframe, PR #120), 5.1a (release-tracking URLs). The 6-pattern RETIRE shipped (PR #121).
-> **Two items remain DEFERRED BY DESIGN (trigger-gated YAGNI — not pending work, will fire only on a
-> concrete need):** **4.2-C5** (pilot nested dispatch — builds only when a workflow demonstrably needs
-> nesting; forcing it would add complexity for no benefit) and **5.1b** (auto-issue from a scan discovery
-> — builds only if 5.1a's discovery reports prove insufficient over real cycles). Nothing is owner-blocked.
+> **5.1b is now DONE** (self-updating loop closed — `discovery_to_issue.py`). The LAST open item is
+> **4.2-C5** (empirically pilot nested dispatch on one workflow) — reclassified from YAGNI-skip to a
+> genuine evaluation (the pilot is how we'd *know* if nesting helps; asserting "no benefit" without
+> running it was circular). In progress next. Nothing is owner-blocked.
 
 ### Phase 0 — Audit / Migration Ledger · risk: none (analysis) · ✅ DONE (2026-06-19)
 - **Test gate PASSED:** reconciles to 276 = 242 KEEP + 28 MIGRATE + 6 RETIRE
@@ -122,10 +122,14 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   native features automatically. KISS/DRY: reused the internet→hub scan pipeline instead of building
   a new poller (YAGNI). Tested: YAML parses, 19 URLs, 0 malformed. `whats-new` set to 14d expiry
   (weekly cadence); others 30d.
-- [ ] **5.1b** (enhancement, deferred — YAGNI until 5.1a proves insufficient) auto-open a GitHub
-  issue when a discovery maps to a migratable hub pattern. The scan pipeline currently emits
-  discovery reports (`config/discoveries.json` + `/scan-discovery-report`); wiring discovery→issue
-  is a further step, only if the reports alone don't surface migrations reliably.
+- [x] **5.1b** ✅ DONE (2026-06-19) — **closed the self-updating loop** (reclassified from YAGNI-deferred:
+  the concrete need is the initiative's own goal — this session proved a *manual* audit, not the scan,
+  caught the drift). New `scripts/discovery_to_issue.py`: selects **migratable** discoveries (pending +
+  confidence≥80 + high-trust + a known pattern type + NOT already in registry) and files a deduplicated
+  GitHub issue per discovery (comments on an existing one rather than duplicating). Wired into
+  `scan-internet.yml` (added `issues: write` + a post-scan `--apply` step). Reuses `discovery_adapter`
+  (load + `is_in_registry`) + the `/create-github-issue` dedup/label conventions; pure `select_migratable`
+  unit-tested (`test_discovery_to_issue.py`, 9 cases); dry-run by default. Detect → actionable work item.
 
 ## Decisions / open items
 - **Goal codification:** ✅ DONE — RATIFIED by Abhay 2026-06-19 and codified as **README goal #4**
