@@ -3117,7 +3117,7 @@
     "tier": "must-have"
   },
   "prompt-enhance-reminder": {
-    "hash": "227254b770667eafe4f9b92a9df6483dfbb9b1c6a916a58e7e73e8b3bc22f3de",
+    "hash": "6e22ec5fecb0c5ee4abac2d01c3e5da7f55eadfacb71b6eecef14c414a7139b7",
     "type": "hook",
     "category": "core",
     "version": "2.1.0",
@@ -5025,7 +5025,7 @@
     "tier": "nice-to-have"
   },
   "no-overask-guard": {
-    "hash": "6853b8fc46447352146ab66f9e48b95a04354e07c7f7d49ffc5eecb19f418114",
+    "hash": "b308d7bccea0c024fee39c106ee4c4e19eca0e56a295eb471b243706df8ac748",
     "type": "hook",
     "category": "core",
     "version": "1.1.0",

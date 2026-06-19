@@ -43,6 +43,8 @@ input=$(cat)
 printf '0' > "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/.keepgoing-count" 2>/dev/null
 # Same for the reviewer-grade-card enforcement loop-guard (no-overask-guard.sh).
 printf '0' > "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/.reviewcard-count" 2>/dev/null
+# Same for the diagnose→fix substance enforcement loop-guard (no-overask-guard.sh).
+printf '0' > "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/.diagnosis-count" 2>/dev/null
 
 # If jq is unavailable, fall back to always-emit (safer than always-skip — the
 # rule still applies, we just lose the trigger gate optimization).

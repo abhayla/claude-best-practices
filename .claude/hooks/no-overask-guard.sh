@@ -84,6 +84,34 @@ if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
   fi
 fi
 
+# ── Substance enforcement: the diagnose→fix linkage, not just the score card (2026-06-19) ──
+# WHY: the card block above enforces the reviewer COLUMN (shape) — but the hook could not see
+# whether the per-step IMPROVEMENT substance was present, so it silently rotted to a scores-only
+# card. The skill (STEP 1 Diagnose / STEP 2 Map Fixes / STEP 4 Changes Applied) mandates a
+# numbered Diagnosis block, a per-dimension Fix column, and a canonical Changes Applied list —
+# "every raised After score MUST be earned by a listed Fix [n]". Enforcing only the reviewer
+# column let the diagnose→fix chain disappear (the exact shape-vs-substance drift
+# output-plausibility-verification.md warns about; user-reported 2026-06-19). This guard fires
+# when an enhancement card IS rendered (card="1") on a substantive, non-trivial turn but shows
+# NONE of the diagnosis/fix substance tokens. Grade-A / zero-fix turns legitimately have no
+# diagnosis, so the token set treats "grade a"/"0 fix" as substance-accounted. Own loop-guard
+# (.diagnosis-count, reset per turn by prompt-enhance-reminder.sh), cap 4.
+substance=""
+printf '%s' "$full" | grep -qE "diagnosis:|changes applied|missing_role|missing_context|missing_output|vague_intent|under_constrained|missing_structure|missing_example|missing_constraint|grade: a|grade a[^a-z]|0 fix|no fix|zero fix" && substance="1"
+if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ]; then
+  dc="$root/.claude/.diagnosis-count"
+  dn=$(cat "$dc" 2>/dev/null || echo 0); case "$dn" in ''|*[!0-9]*) dn=0 ;; esac
+  printf '%s\tdiagnosis-substance-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((dn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
+  if [ "$dn" -lt 4 ]; then
+    printf '%s' "$((dn+1))" > "$dc" 2>/dev/null
+    jq -nc --arg r "STOP BLOCKED (enhance: per-step improvements not shown). The grade card rendered scores but NOT the diagnose→fix substance — the tell is a missing STEP 1 'Diagnosis:' block, no 'Fix' column linking each lifted dimension to a numbered fix, and no canonical 'Changes Applied' list (format: [n] CATEGORY (severity) → specific fix, using the failure taxonomy VAGUE_INTENT, MISSING_CONTEXT, UNDER_CONSTRAINED, MISSING_OUTPUT_SPEC, MISSING_ROLE…). Re-render the card WITH a Fix column and add the Diagnosis + Changes Applied blocks so every raised score is earned by a listed fix (skill STEP 1/2/4)." '{decision:"block", reason:$r}'
+    exit 0
+  else
+    # cap exhausted — substance still absent; log a distinct escalation line (mirrors G9).
+    printf '%s\tdiagnosis-block-EXHAUSTED (cap 4) — per-step substance still unrendered, turn released\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" >> "$root/.claude/.overask-violations.log" 2>/dev/null
+  fi
+fi
+
 # ── Exemption: *Session-boundary:* — a completed-tested-chunk stop is legitimate. ──
 # Mirrors *Sync-check:* but for the STOP side: when a tested/verified chunk is complete AND
 # committed, AND all remaining work is owner-gated (sign-off/deploy/spend) or explicitly
