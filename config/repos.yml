@@ -25,3 +25,7 @@ repos:
     stacks: [react-nextjs]  # Next.js + Supabase + Playwright/Vitest; scraper/pipeline Node/TS backend
     auto_sync: true
     share_synthesized: false  # default local-only until the project opts in via synthesis-config
+  - repo: abhayla/calculatekaro
+    stacks: [react]  # Vite + React + TS + Vitest; static SPA (CalculateKaro multi-calculator hub) — dogfood
+    auto_sync: false  # private dogfood app; pull hub patterns manually for now
+    share_synthesized: true  # opted in to share synthesized patterns back (bilateral; project synthesis-config must also allow)
