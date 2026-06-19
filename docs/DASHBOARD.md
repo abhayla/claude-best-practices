@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-19 14:38 UTC (auto-generated)
+> Last updated: 2026-06-19 19:50 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -22,7 +22,7 @@
 | adr | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | agent-evaluator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| agent-orchestration | rule | 1.3.0 | hub:abhayla/claude-best-practices | — |
+| agent-orchestration | rule | 1.4.0 | hub:abhayla/claude-best-practices | — |
 | android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-compose-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-compose-ui | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -49,8 +49,8 @@
 | code-quality-gate | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-readability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-review-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
-| code-review-workflow | skill | 2.2.0 | hub:abhayla/claude-best-practices | code-reviewer-agent, receive-code-review, request-code-review, review-gate, security-auditor-agent, workflow-contracts |
-| code-reviewer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| code-review-workflow | skill | 2.3.0 | hub:abhayla/claude-best-practices | code-reviewer-agent, receive-code-review, request-code-review, review-gate, security-auditor-agent, workflow-contracts |
+| code-reviewer-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | configuration-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | context-management | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | context-reducer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -165,7 +165,7 @@
 | schema-designer | skill | 1.0.0 | hub:abhayla/claude-best-practices | pg-query, fastapi-db-migrate |
 | secret-scanner | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | security-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| security-auditor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| security-auditor-agent | agent | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | security-baseline | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | serialize-fixes | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
