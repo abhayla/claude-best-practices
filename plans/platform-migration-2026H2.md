@@ -111,8 +111,8 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   is a further step, only if the reports alone don't surface migrations reliably.
 
 ## Decisions / open items
-- **Goal codification:** the 3-layer goal stays in THIS plan until Abhay ratifies wording; only then
-  promote to README/CLAUDE.md as the official north-star.
+- **Goal codification:** ✅ DONE — RATIFIED by Abhay 2026-06-19 and codified as **README goal #4**
+  (thin-layer-on-top / deploy-is-the-finish-line / governance-prose→harness). No longer open.
 - **Retirements are outward:** retiring a downstream-shipped pattern is consequential → each RETIRE
   needs Abhay sign-off before deletion (escalate per `decision-authority.md`).
 
