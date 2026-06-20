@@ -300,6 +300,13 @@ def generate_getting_started(hub_repo: str, available_stacks: list[str], counts:
         "rm .claude/rules/fastapi-*",
         "```",
         "",
+        "### Avoiding bundled-skill collisions",
+        "",
+        "Claude Code ships its own bundled skills. If a hub skill's name or trigger "
+        "collides with a bundled one, set `disableBundledSkills: true` in your project "
+        "`.claude/settings.json` (or export `CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1`) to hide "
+        "the bundled skills so the hub's adopted skills win.",
+        "",
     ])
 
     return "\n".join(lines)
