@@ -4981,8 +4981,8 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-06-19",
-    "total_patterns": 268
+    "last_updated": "2026-06-20",
+    "total_patterns": 270
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -5276,5 +5276,50 @@
     ],
     "changelog": "v1.0.0: New hub rule — capture-on-sight of cross-project facts to workspace global files (secret vs non-secret routing), distributable to downstream projects",
     "tier": "must-have"
+  },
+  "karpathy-advisor": {
+    "hash": "432626edf214fc143c48ca8ce42b02f91e913388b3afdc51547428c76a6c03e3",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-20",
+    "last_updated": "2026-06-20",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Apply Andrej Karpathy's documented lens to a decision, design, or situation ('what would Karpathy do/think here?'). Channels his decision heuristics (build-from-scratch to understand, march of nines, demo!=product, autonomy slider, verifiability gate, decade-not-year-of-agents, data over architecture, KISS minimal reference impls) to pressure-test a plan, choose between options, or sanity-check an AI/ML/eng claim. Full profile + sources in references/understanding.md.",
+    "tags": [
+      "advisor",
+      "decision-lens",
+      "karpathy",
+      "first-principles",
+      "ai-ml",
+      "anti-hype"
+    ],
+    "changelog": "v1.0.0 (2026-06-20): Initial - Karpathy decision-lens advisor skill built from his essays, talks, code, and 2025-26 writing; verbatim/paraphrase integrity flags; X-402 sourcing limit noted.",
+    "tier": "nice-to-have"
+  },
+  "karpathy-advisor-agent": {
+    "hash": "dbbc83afafce4bf032eadbdc0dc41ae5fe8b334b761cfa4dd44193d2306ad28a",
+    "type": "agent",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-20",
+    "last_updated": "2026-06-20",
+    "dependencies": [
+      "karpathy-advisor"
+    ],
+    "visibility": "public",
+    "description": "Consult Andrej Karpathy's documented thinking on a decision/design/situation via the /karpathy-advisor skill ('what would Karpathy do?'). Reactive T0 advisory agent; grounds every claim in the skill's profile, never fabricates a position.",
+    "tags": [
+      "advisor",
+      "decision-lens",
+      "karpathy",
+      "agent",
+      "first-principles"
+    ],
+    "changelog": "v1.0.0 (2026-06-20): Initial - T0 advisory agent that invokes /karpathy-advisor and returns a framed verdict in Karpathy persona.",
+    "tier": "nice-to-have"
   }
 }

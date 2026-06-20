@@ -5,6 +5,29 @@
 
 ## Current Task
 
+### Karpathy-advisor skill + agent — 2026-06-20 — ⏳ ACTIVE
+
+Goal: Research Andrej Karpathy thoroughly → understanding doc → distributable `karpathy-advisor`
+skill (decision lens) + agent that invokes it. Corpus: Thorough. Twitter: secondary capture.
+Placement: `core/.claude/skills/` + `core/.claude/agents/` + registry entry.
+
+**Phase 1 — Research (parallel agents, cited)** — ✅ all 5 returned cited + integrity-flagged
+- [x] A. Blog & essays · [x] B. Talks & podcasts · [x] C. GitHub & teaching · [x] D. Recent 2025-26 · [x] E. Career arc + meta
+
+**Phase 2 — Understanding doc** — ✅ `core/.claude/skills/karpathy-advisor/references/understanding.md`
+**Phase 3 — Skill + Agent** — ✅ `SKILL.md` (decision lens, reference type) + `karpathy-advisor-agent.md` (dual-mode)
+**Phase 4 — Register + validate** — ✅ registry 268→270; validator PASSED, dedup PASSED, secret-scan clean, 1459 pytest green, docs regen
+
+## Review (Karpathy-advisor)
+- Built distributable, per Abhay's choices (Thorough corpus · secondary Twitter capture · core/ placement).
+- Honest sourcing: X paywalled (402) → secondary capture; verbatim-vs-paraphrase flagged throughout; corrected
+  MSc=UBC (not Toronto); flagged the "Anthropic 2026" rumor as likely false and excluded it as fact.
+- agent dispatched_from corrected T0→dual-mode (it uses Skill(), never dispatches workers — validator caught it).
+- NOT committed: working tree mixed (CLAUDE.md revert task + untracked PNGs on chore/revert-subagentstop-wiring);
+  this work wants its own branch. Per harness git policy, awaiting go to land.
+
+---
+
 ### Platform Migration & Futuristic Goal (2026 H2) — 2026-06-19 — ⏳ ACTIVE
 
 **SSOT:** `plans/platform-migration-2026H2.md` · **Tracker:** GitHub epic issue · resurfaced via `.remember/`.
