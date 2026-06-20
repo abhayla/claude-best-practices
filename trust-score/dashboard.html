@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="15">
+<title>Trust Score — what the robot is building</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; margin:0; background:#fafbff; color:#222; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 30px; margin: 0 0 6px; }
+  .motto { font-size: 18px; color:#3a3a9a; font-weight:bold; margin-bottom:18px; }
+  .panel { background:#fff; border-radius:18px; padding:20px; margin-bottom:20px;
+            box-shadow:0 4px 14px rgba(0,0,0,0.06); }
+  .explain { font-size:17px; line-height:1.6; }
+  .progress-track { background:#eee; border-radius:20px; height:28px; overflow:hidden; margin-top:10px; }
+  .progress-fill { background:linear-gradient(90deg,#36b37e,#1b7f4b); height:100%;
+                    width:86%; transition:width .6s; }
+  .progress-num { text-align:right; font-weight:bold; font-size:15px; margin-top:4px; }
+  .card { border-radius:12px; padding:14px 16px; margin:12px 0; }
+  .card-top { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .card-icon { font-size:22px; }
+  .card-name { font-size:18px; font-weight:bold; flex:1; }
+  .card-badge { color:#fff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:20px; }
+  .card-kid { font-size:15px; margin-top:6px; color:#444; }
+  .gauge { text-align:center; }
+  .gauge-num { font-size:64px; font-weight:bold; color:#1b7f4b; }
+  .gauge-sub { font-size:15px; color:#666; }
+  .decision { display:inline-block; padding:8px 16px; border-radius:24px; font-weight:bold;
+               font-size:16px; margin:6px 4px; }
+  .sig { display:flex; align-items:center; gap:10px; margin:8px 0; }
+  .sig-label { flex:1; font-size:14px; }
+  .sig-label em { color:#888; font-style:italic; }
+  .sig-track { width:130px; background:#eee; border-radius:10px; height:14px; overflow:hidden; }
+  .sig-fill { background:#4c8bf5; height:100%; }
+  .sig-val { width:42px; text-align:right; font-size:13px; font-weight:bold; }
+  .foot { font-size:13px; color:#999; text-align:center; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🤖 The Robot's Report Card</h1>
+  <div class="motto">Don't build for autonomy — prove the trust score first.</div>
+
+  <div class="panel">
+    <div class="explain">We are teaching a robot to do jobs. Before the robot is allowed to do a job ALL BY ITSELF, it has to earn a good report card (a score out of 100). If the score is high AND the robot broke no safety rules, the card says the robot MAY work alone. But right now we are in 'shadow mode': the card is printed, but a grown-up still presses the button every single time. We watch quietly to make sure the report card is honest. Only when it has been honest for a long time do we let the robot act on it.</div>
+  </div>
+
+  <div class="panel">
+    <h2>How much is built?</h2>
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="progress-num">86% complete</div>
+    
+        <div class="card" style="border-left:10px solid #1b7f4b;background:#e3f6ec;">
+          <div class="card-top">
+            <span class="card-icon">✅</span>
+            <span class="card-name" style="color:#1b7f4b;">1. Plan & safe workspace</span>
+            <span class="card-badge" style="background:#1b7f4b;">DONE</span>
+          </div>
+          <div class="card-kid">Decide what to build and make a safe place to build it (a branch).</div>
+        </div>
+        <div class="card" style="border-left:10px solid #1b7f4b;background:#e3f6ec;">
+          <div class="card-top">
+            <span class="card-icon">✅</span>
+            <span class="card-name" style="color:#1b7f4b;">2. The rulebook (config)</span>
+            <span class="card-badge" style="background:#1b7f4b;">DONE</span>
+          </div>
+          <div class="card-kid">Write down how many points each test is worth, and the safety rules that can never be broken.</div>
+        </div>
+        <div class="card" style="border-left:10px solid #1b7f4b;background:#e3f6ec;">
+          <div class="card-top">
+            <span class="card-icon">✅</span>
+            <span class="card-name" style="color:#1b7f4b;">3. Write the exam first (tests)</span>
+            <span class="card-badge" style="background:#1b7f4b;">DONE</span>
+          </div>
+          <div class="card-kid">Write the test BEFORE the answer, so we know when the brain is correct. This is called TDD.</div>
+        </div>
+        <div class="card" style="border-left:10px solid #1b7f4b;background:#e3f6ec;">
+          <div class="card-top">
+            <span class="card-icon">✅</span>
+            <span class="card-name" style="color:#1b7f4b;">4. The brain (score engine)</span>
+            <span class="card-badge" style="background:#1b7f4b;">DONE</span>
+          </div>
+          <div class="card-kid">Build the part that adds up all the points and decides AUTO or ASK-A-GROWN-UP.</div>
+        </div>
+        <div class="card" style="border-left:10px solid #1b7f4b;background:#e3f6ec;">
+          <div class="card-top">
+            <span class="card-icon">✅</span>
+            <span class="card-name" style="color:#1b7f4b;">5. Make the exam pass</span>
+            <span class="card-badge" style="background:#1b7f4b;">DONE</span>
+          </div>
+          <div class="card-kid">Run the tests until every single one turns green.</div>
+        </div>
+        <div class="card" style="border-left:10px solid #1b7f4b;background:#e3f6ec;">
+          <div class="card-top">
+            <span class="card-icon">✅</span>
+            <span class="card-name" style="color:#1b7f4b;">6. The picture board (dashboard)</span>
+            <span class="card-badge" style="background:#1b7f4b;">DONE</span>
+          </div>
+          <div class="card-kid">This very page! It shows what is done and how the score works.</div>
+        </div>
+        <div class="card" style="border-left:10px solid #b26a00;background:#fff4e0;">
+          <div class="card-top">
+            <span class="card-icon">🔨</span>
+            <span class="card-name" style="color:#b26a00;">7. Show a real report card + save</span>
+            <span class="card-badge" style="background:#b26a00;">WORKING ON IT</span>
+          </div>
+          <div class="card-kid">Run one real example so you can see a score, then save all the work.</div>
+        </div>
+  </div>
+
+  <div class="panel gauge">
+    <h2>What does a report card look like?</h2>
+    <div class="gauge-num">99/100</div>
+    <div class="gauge-sub">(this is a pretend run, so you can see how it works)</div>
+    <div>
+      <span class="decision" style="background:#e3f6ec;color:#1b7f4b;">Robot's wish: AUTO</span>
+      <span class="decision" style="background:#fff4e0;color:#b26a00;">What really happens: ESCALATE 🧑 grown-up presses the button</span>
+    </div>
+    <p class="explain" style="text-align:left;margin-top:14px;">
+      Even though the score is high and the robot would like to work alone (<b>AUTO</b>),
+      we are in <b>shadow mode</b>, so a grown-up still decides every time (<b>ESCALATE</b>).
+      We watch quietly until the report card has been honest for a long time.
+    </p>
+    <h3 style="text-align:left;">The points that make up the score</h3>
+    
+        <div class="sig">
+          <div class="sig-label">Did all the tests pass? <em>(worth 30 points)</em></div>
+          <div class="sig-track"><div class="sig-fill" style="width:100%;"></div></div>
+          <div class="sig-val">100%</div>
+        </div>
+        <div class="sig">
+          <div class="sig-label">Did a DIFFERENT checker agree it works? <em>(worth 25 points)</em></div>
+          <div class="sig-track"><div class="sig-fill" style="width:100%;"></div></div>
+          <div class="sig-val">100%</div>
+        </div>
+        <div class="sig">
+          <div class="sig-label">How much of the work was tested? <em>(worth 15 points)</em></div>
+          <div class="sig-track"><div class="sig-fill" style="width:92%;"></div></div>
+          <div class="sig-val">92%</div>
+        </div>
+        <div class="sig">
+          <div class="sig-label">Did we break anything that used to work? <em>(worth 10 points)</em></div>
+          <div class="sig-track"><div class="sig-fill" style="width:100%;"></div></div>
+          <div class="sig-val">100%</div>
+        </div>
+        <div class="sig">
+          <div class="sig-label">Did we keep secrets safe? <em>(worth 10 points)</em></div>
+          <div class="sig-track"><div class="sig-fill" style="width:100%;"></div></div>
+          <div class="sig-val">100%</div>
+        </div>
+        <div class="sig">
+          <div class="sig-label">Is it healthy after going live? <em>(worth 10 points)</em></div>
+          <div class="sig-track"><div class="sig-fill" style="width:100%;"></div></div>
+          <div class="sig-val">100%</div>
+        </div>
+  </div>
+
+  <div class="foot">Last updated: 2026-06-20 · this page refreshes itself every 15 seconds</div>
+</div>
+</body>
+</html>
