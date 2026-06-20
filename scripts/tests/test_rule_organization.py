@@ -111,6 +111,7 @@ class TestHubRulesAreLean:
         "context-management.md",
         "workflow.md",
         "prompt-auto-enhance.md",
+        "product-incubation.md",  # hub-as-factory operating model (always-on global guardrail)
     }
 
     def test_hub_rules_are_approved_set(self):

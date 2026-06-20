@@ -3988,7 +3988,7 @@
     }
   },
   "prompt-auto-enhance-rule": {
-    "hash": "f0dcdf26d5ede94fe890350fca587a9218275fc6c4aa448733c9f3ae7de5294b",
+    "hash": "f1935dc5ae2f86dcd9cc4bf412f7db84afeb5d7e368b8f1dc1b1173bfc3de52d",
     "type": "rule",
     "category": "core",
     "version": "3.1.0",

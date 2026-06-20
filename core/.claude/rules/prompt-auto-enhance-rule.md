@@ -3,7 +3,6 @@
 # Prompt Auto-Enhance
 
 Every response starts with `*Enhanced: <what was checked>*` (under 15 words).
-Examples: *Enhanced: prompt graded (B, 2 fixes), git state, 3 rules*
 
 The hook (`prompt-enhance-reminder.sh`) gates triggering: prompts ≤15 chars and known
 continuation phrases skip injection at the deterministic layer, so the strengthening
@@ -91,10 +90,6 @@ flow in `/prompt-auto-enhance` — no resource changes without explicit user app
 - Banner on every response; Tier 1 gathered before responding; strengthening runs on
   every non-filtered prompt via the `/prompt-auto-enhance` pipeline (skip only Grade A
   / pure knowledge questions — the full process still renders)
-- Full process (transcript + grade card + final prompt + role) is the default verbosity;
-  compact format-A is a fallback only when the user explicitly asks to reduce it
-- After the final prompt: role (4.7) → plan if coding (4.8) → execute under
-  decision-authority (5) → verify edge (5.5) → git only if changes (6)
 - Optional one-line skill hint at STEP 4.6 (max 2 skills, informational only — the
   skill's job is prompt enhancement, not execution routing); skip on direct,
   mechanical, bug-fix, lookup, and documentation prompts
