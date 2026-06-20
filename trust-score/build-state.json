@@ -1,0 +1,15 @@
+{
+  "title": "Building the Trust Score (the robot's report card)",
+  "motto": "Don't build for autonomy — prove the trust score first.",
+  "updated": "2026-06-20",
+  "child_explainer": "We are teaching a robot to do jobs. Before the robot is allowed to do a job ALL BY ITSELF, it has to earn a good report card (a score out of 100). If the score is high AND the robot broke no safety rules, the card says the robot MAY work alone. But right now we are in 'shadow mode': the card is printed, but a grown-up still presses the button every single time. We watch quietly to make sure the report card is honest. Only when it has been honest for a long time do we let the robot act on it.",
+  "sections": [
+    {"id": 1, "name": "Plan & safe workspace", "kid": "Decide what to build and make a safe place to build it (a branch).", "status": "done"},
+    {"id": 2, "name": "The rulebook (config)", "kid": "Write down how many points each test is worth, and the safety rules that can never be broken.", "status": "done"},
+    {"id": 3, "name": "Write the exam first (tests)", "kid": "Write the test BEFORE the answer, so we know when the brain is correct. This is called TDD.", "status": "done"},
+    {"id": 4, "name": "The brain (score engine)", "kid": "Build the part that adds up all the points and decides AUTO or ASK-A-GROWN-UP.", "status": "done"},
+    {"id": 5, "name": "Make the exam pass", "kid": "Run the tests until every single one turns green.", "status": "done"},
+    {"id": 6, "name": "The picture board (dashboard)", "kid": "This very page! It shows what is done and how the score works.", "status": "done"},
+    {"id": 7, "name": "Show a real report card + save", "kid": "Run one real example so you can see a score, then save all the work.", "status": "done"}
+  ]
+}

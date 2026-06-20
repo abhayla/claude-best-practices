@@ -74,6 +74,10 @@
           {
             "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/session-governance-status.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/auto-git.sh\""
           }
         ]
       }
@@ -89,6 +93,10 @@
           {
             "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/verifier-edge-guard.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/auto-git.sh\""
           }
         ]
       }

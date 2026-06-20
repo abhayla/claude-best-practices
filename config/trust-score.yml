@@ -1,0 +1,45 @@
+# Trust Score rulebook — the "approval score" for autonomous-factory pipeline runs.
+#
+# A pipeline run sends in verification SIGNALS (each a number from 0.0 to 1.0).
+# We multiply each signal by its WEIGHT, add them up, and scale to 0-100.
+# Then HARD GATES can veto a high score for safety, and SHADOW MODE makes sure
+# the engine only ever RECOMMENDS — a human still acts — until the score is proven.
+#
+# Motto: don't build for autonomy — prove the trust score first.
+
+# Each signal is 0.0 (bad) .. 1.0 (perfect). Weights must sum to 1.0.
+weights:
+  tests_pass: 0.30              # fraction of tests passing
+  independent_verification: 0.25  # an independent verifier (NOT the doer) confirmed it — the keystone
+  coverage: 0.15               # test coverage fraction
+  regression_clean: 0.10       # no NEW failures vs the baseline
+  secret_scan_clean: 0.10      # no secrets leaked
+  production_health: 0.10      # post-deploy health ok (neutral 1.0 if not yet deployed)
+
+# A run must reach this score to be RECOMMENDED for AUTO. Below it -> ESCALATE.
+threshold: 85
+
+# Hard gates: if any of these signals is below its floor, force ESCALATE no matter
+# how high the score is. Safety can never be out-voted by a good average.
+hard_gates:
+  tests_pass: 1.0              # every test must pass
+  secret_scan_clean: 1.0       # zero tolerance for leaked secrets
+
+# Stages whose actions are irreversible (deploy, spend, DNS) ALWAYS escalate in the
+# crawl phase, regardless of score. Reversible/internal stages may earn AUTO.
+irreversible_stages:
+  - deploy
+  - spend
+  - dns
+
+# Shadow mode: the engine prints its recommendation but the EFFECTIVE decision is
+# always ESCALATE (a human acts). This is how we prove the score before trusting it.
+# Flip to false only after calibration shows a low false-confidence rate.
+shadow_mode: true
+
+# Calibration target: once we have enough shadow-mode runs, the false-confidence rate
+# (engine said "AUTO would be safe" but the human had to fix something) must be at or
+# below this before any stage graduates out of shadow mode.
+calibration:
+  min_runs: 30
+  max_false_confidence_rate: 0.05

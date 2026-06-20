@@ -48,3 +48,14 @@ docs/goals/.run/
 # native-governance-hooks runtime state
 .claude/.config-changes.log
 .claude/.compaction-handoff.md
+
+# Trust-score runtime calibration ledger (generated at runtime)
+trust-score/calibration-ledger.jsonl
+
+# Calculator-dogfood scratch mockups (not part of the hub; were polluting git status)
+/*.png
+
+# Auto-git hook runtime log
+.claude/.auto-git.log
+trust-score/sim-ledger.jsonl
+trust-score/ledgers/
