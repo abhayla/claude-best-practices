@@ -4728,13 +4728,13 @@
     "tier": "must-have"
   },
   "decision-authority": {
-    "hash": "349e37543f26f5bbad5ccbd13c1c65c5d1e1dff2c77ec5603d45e48ce6427988",
+    "hash": "99a10b1d0923568ba75f28c26a05295705cac2fd08ec86b547cc00a7f27a53f3",
     "type": "rule",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-20",
     "dependencies": [],
     "visibility": "public",
     "description": "Decide-vs-escalate taxonomy: DECIDE on reversible/internal/best-practice-clear work, ESCALATE only irreversible/outward/material/fork. Confidence-gate-on-intent + anti-over-ask (no trailing offer, no narrate-and-stop).",
@@ -4958,13 +4958,13 @@
     "tier": "must-have"
   },
   "autonomous-contract": {
-    "hash": "19c838c33216de2f453e3b17f07ff55c45915515fd0b6ac6cea32ca93a7ed073",
+    "hash": "73a203b9f81b38fb5bdaacf81cff208f366413ec79ad1b6bfdc41aa635ed2da2",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-20",
     "dependencies": [],
     "visibility": "public",
     "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
