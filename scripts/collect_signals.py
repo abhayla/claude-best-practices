@@ -70,7 +70,7 @@ def collect_and_record(signals: dict, stage: str | None, record: bool, human_had
     config = load_config(CONFIG_PATH)
     result = compute_trust_score(signals, config, stage=stage)
     if record:
-        record_run(result, LEDGER_PATH, human_had_to_fix=human_had_to_fix)
+        record_run(result, LEDGER_PATH, human_had_to_fix=human_had_to_fix, stage=stage)
     return result
 
 

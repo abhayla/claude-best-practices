@@ -118,22 +118,78 @@ def calibration_stats(runs: list[dict]) -> dict:
     }
 
 
-def record_run(result: dict, ledger_path: Path, human_had_to_fix: bool | None = None) -> dict:
+def record_run(
+    result: dict,
+    ledger_path: Path,
+    human_had_to_fix: bool | None = None,
+    stage: str | None = None,
+) -> dict:
     """Append one scored run to the calibration ledger (JSONL) and return the entry.
 
     `human_had_to_fix` is the ground truth a human supplies AFTER acting on the run.
     It is what lets calibration_stats() later measure the engine's false-confidence
-    rate — the number that must drop low before shadow mode can end.
+    rate — the number that must drop low before shadow mode can end. `stage` is stored
+    so graduation can be judged PER STAGE (a reversible stage can earn autonomy while an
+    irreversible one never does).
     """
     entry = {
         "score": result["score"],
         "recommended": result["recommended"],
         "human_had_to_fix": human_had_to_fix,
+        "stage": stage,
     }
     ledger_path.parent.mkdir(parents=True, exist_ok=True)
     with open(ledger_path, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry) + "\n")
     return entry
+
+
+def graduation_status(runs: list[dict], config: dict) -> dict:
+    """Decide, PER STAGE, whether a stage has earned autonomy (left shadow mode).
+
+    A stage graduates only when ALL hold: it is reversible (not in irreversible_stages),
+    it has at least `calibration.min_runs` recorded runs, at least one AUTO run, and its
+    false-confidence rate is at or below `calibration.max_false_confidence_rate`.
+    Irreversible stages (deploy, spend, dns) can NEVER graduate here — they always stay
+    human-gated in the crawl/walk phases.
+    """
+    cal = config.get("calibration", {})
+    min_runs = cal.get("min_runs", 30)
+    max_fc = cal.get("max_false_confidence_rate", 0.05)
+    irreversible = set(config.get("irreversible_stages", []))
+
+    by_stage: dict[str | None, list[dict]] = {}
+    for r in runs:
+        by_stage.setdefault(r.get("stage"), []).append(r)
+
+    stages = {}
+    for stage, stage_runs in by_stage.items():
+        stats = calibration_stats(stage_runs)
+        reversible = stage not in irreversible
+        graduated = (
+            reversible
+            and stats["total_runs"] >= min_runs
+            and stats["auto_runs"] > 0
+            and stats["false_confidence_rate"] <= max_fc
+        )
+        stages[stage] = {**stats, "reversible": reversible, "graduated": graduated}
+
+    return {
+        "stages": stages,
+        "graduated_stages": sorted(s for s, v in stages.items() if v["graduated"] and s),
+    }
+
+
+def walk_decision(result: dict, graduated_stages: list, stage: str | None) -> str:
+    """Real-time decision in walk phase: a graduated stage may auto-proceed; else escalate.
+
+    This is what a graduated stage uses INSTEAD of shadow mode: if the stage has earned
+    autonomy and the engine recommends AUTO, the action proceeds unattended; otherwise a
+    human is still asked.
+    """
+    if stage in graduated_stages and result.get("recommended") == "AUTO":
+        return "AUTO"
+    return "ESCALATE"
 
 
 def load_ledger(ledger_path: Path) -> list[dict]:

@@ -57,3 +57,4 @@ trust-score/calibration-ledger.jsonl
 
 # Auto-git hook runtime log
 .claude/.auto-git.log
+trust-score/sim-ledger.jsonl
