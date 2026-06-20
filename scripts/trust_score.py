@@ -118,22 +118,73 @@ def calibration_stats(runs: list[dict]) -> dict:
     }
 
 
+def record_run(result: dict, ledger_path: Path, human_had_to_fix: bool | None = None) -> dict:
+    """Append one scored run to the calibration ledger (JSONL) and return the entry.
+
+    `human_had_to_fix` is the ground truth a human supplies AFTER acting on the run.
+    It is what lets calibration_stats() later measure the engine's false-confidence
+    rate — the number that must drop low before shadow mode can end.
+    """
+    entry = {
+        "score": result["score"],
+        "recommended": result["recommended"],
+        "human_had_to_fix": human_had_to_fix,
+    }
+    ledger_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(ledger_path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry) + "\n")
+    return entry
+
+
+def load_ledger(ledger_path: Path) -> list[dict]:
+    """Read all recorded runs from the JSONL ledger (empty list if none yet)."""
+    if not ledger_path.exists():
+        return []
+    with open(ledger_path, encoding="utf-8") as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+
 def _main() -> int:
     parser = argparse.ArgumentParser(description="Compute a trust score for a pipeline run.")
-    parser.add_argument("--signals", required=True, type=Path, help="JSON file of signal values")
+    parser.add_argument("--signals", type=Path, help="JSON file of signal values")
     parser.add_argument("--stage", default=None, help="pipeline stage name (optional)")
     parser.add_argument(
         "--config",
         type=Path,
         default=Path(__file__).resolve().parent.parent / "config" / "trust-score.yml",
     )
+    parser.add_argument(
+        "--ledger",
+        type=Path,
+        default=Path(__file__).resolve().parent.parent / "trust-score" / "calibration-ledger.jsonl",
+    )
+    parser.add_argument("--record", action="store_true", help="append this run to the ledger")
+    parser.add_argument(
+        "--human-had-to-fix",
+        choices=["yes", "no"],
+        default=None,
+        help="ground truth: did a human have to fix something after the run?",
+    )
+    parser.add_argument("--report", action="store_true", help="print calibration stats and exit")
     args = parser.parse_args()
+
+    if args.report:
+        print(json.dumps(calibration_stats(load_ledger(args.ledger)), indent=2))
+        return 0
+
+    if not args.signals:
+        parser.error("--signals is required unless --report is used")
 
     with open(args.signals, encoding="utf-8") as f:
         signals = json.load(f)
     config = load_config(args.config)
     result = compute_trust_score(signals, config, stage=args.stage)
     print(json.dumps(result, indent=2))
+
+    if args.record:
+        fix = {"yes": True, "no": False, None: None}[args.human_had_to_fix]
+        record_run(result, args.ledger, human_had_to_fix=fix)
+        print(f"\nrecorded to {args.ledger}")
     return 0
 
 

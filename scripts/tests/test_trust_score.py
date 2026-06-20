@@ -11,6 +11,8 @@ from scripts.trust_score import (
     DEFAULT_CONFIG,
     calibration_stats,
     compute_trust_score,
+    load_ledger,
+    record_run,
 )
 
 
@@ -126,3 +128,27 @@ class TestCalibration:
         assert stats["auto_runs"] == 0
         assert stats["false_confidence_rate"] == 0.0
         assert stats["ready_to_graduate"] is False
+
+
+class TestLedger:
+    def test_record_then_load_roundtrips(self, tmp_path):
+        ledger = tmp_path / "ledger.jsonl"
+        result = compute_trust_score(_perfect_signals(), DEFAULT_CONFIG)
+        record_run(result, ledger, human_had_to_fix=False)
+        record_run(result, ledger, human_had_to_fix=True)
+        runs = load_ledger(ledger)
+        assert len(runs) == 2
+        assert runs[0]["recommended"] == "AUTO"
+        assert runs[1]["human_had_to_fix"] is True
+
+    def test_load_missing_ledger_is_empty(self, tmp_path):
+        assert load_ledger(tmp_path / "nope.jsonl") == []
+
+    def test_recorded_runs_feed_calibration(self, tmp_path):
+        ledger = tmp_path / "ledger.jsonl"
+        result = compute_trust_score(_perfect_signals(), DEFAULT_CONFIG)
+        record_run(result, ledger, human_had_to_fix=True)  # AUTO wish, but human had to fix
+        stats = calibration_stats(load_ledger(ledger))
+        assert stats["auto_runs"] == 1
+        assert stats["false_confidence"] == 1
+        assert stats["false_confidence_rate"] == 1.0
