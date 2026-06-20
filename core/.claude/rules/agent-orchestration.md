@@ -30,6 +30,21 @@ globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 > degrade to flat if `Agent` is withheld at the depth-5 cap. This is the "adopt nesting per concrete need"
 > case the C5 audit reserved; remaining workflows stay single-level until they show a comparable need.
 > Empirical false-positive-reduction is designed-for, not yet measured (needs a live run).
+>
+> **Native Workflow tool A/B — MEASURED 2026-06-20 (S2 pilot): no benefit for a fixed fan-out → KEEP
+> skill-at-T0.** The native `/workflows` (Dynamic Workflows) tool was A/B'd against skill-at-T0 on the
+> `test-pipeline` 3-lane Wave-1 DAG (3 parallel lane runners → union-of-failures), both arms running the
+> same 3 real hub check-commands. Result: **wall-clock identical** (Arm A skill-at-T0 ~80.6s vs Arm B
+> Workflow ~81.0s — both bounded by the same slowest-lane agent on the same parallel-`agent()` substrate),
+> **correctness identical** (both PASSED, same per-lane gates), token use within noise. The Workflow tool's
+> real value (deterministic JS control flow, `pipeline()` stage-overlap, resume, schema-validated returns)
+> does NOT engage for a **fixed single-wave sibling fan-out** — which is what the 3-lane is, and what
+> skill-at-T0 already does optimally and more simply (KISS; and it's the distributable default downstream
+> inherits). The tool DID execute cleanly in-environment (3/3 lanes, correct verdict) → it is a **viable,
+> confirmed option for genuinely DYNAMIC/multi-stage DAGs** (loop-until-dry, conditional fan-out, deep
+> pipelines — e.g. the F9 candidates: `project-manager-agent` context isolation, `code-review` find→verify),
+> just not a beneficial swap for fixed sibling fan-outs. Confirms the C5/F9 audit; "adopt only if measured
+> better" → not better → not adopted. Detail: `.claude/tasks/parallel-cc-adoption-research.md` (S2).
 
 ## 1. Orchestrators MUST Run at T0
 

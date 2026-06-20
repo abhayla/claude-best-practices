@@ -192,6 +192,17 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   for a fact-based YAGNI-vs-adopt re-decision. Recursive subagents (GA) + Auto-mode deny defaults + the 30-event
   hook catalog also re-verified vs live docs — all consistent except this one item. Full audit:
   `.claude/tasks/parallel-cc-adoption-research.md` (F1–F9 / P1–P6).
+- 2026-06-20 — **S2 native-Workflow-tool A/B EXECUTED → KEEP skill-at-T0 (no measured benefit).** Piloted
+  the native `/workflows` (Dynamic Workflows, GA per F1) against skill-at-T0 on the `test-pipeline` 3-lane
+  Wave-1 DAG, both arms running the same 3 real hub check-commands. **Wall-clock identical** (skill-at-T0
+  ~80.6s vs Workflow ~81.0s — same parallel-`agent()` substrate, same slowest-lane bound), **correctness
+  identical** (both PASSED, same per-lane gates), tokens within noise. The Workflow tool's value (deterministic
+  control flow / `pipeline()` overlap / resume / schema returns) doesn't engage for a fixed single-wave sibling
+  fan-out. **Decision: do NOT adopt; keep skill-at-T0 default.** Tool executed cleanly in-env (3/3 lanes) →
+  viable for genuinely DYNAMIC/multi-stage DAGs only (F9 candidates), not fixed fan-outs. Recorded in
+  `agent-orchestration.md` v1.5.0 + `.claude/tasks/parallel-cc-adoption-research.md` (S2). Confirms C5/F9 —
+  "adopt only if measured better" → not better → not adopted. **P5 (disableBundledSkills doc) shipped** same
+  session (PR #146); **native-event hooks verified** (PR #145, issue #144 for SubagentStop revert).
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
