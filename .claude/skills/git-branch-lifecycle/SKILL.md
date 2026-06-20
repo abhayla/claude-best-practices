@@ -4,13 +4,14 @@ description: >
   The model-driven control layer over the autonomous branch automation (auto-git.sh +
   auto-pr.sh hooks). Use to start an isolated parallel workstream in its own git worktree
   (`work`), to finish a branch NOW with an agent code-review before arming auto-merge
-  (`finish`), to clean up merged branches (`cleanup`), or to see the live branch/PR/merge
-  state (`status`). The hooks handle the unattended path automatically; this skill is the
-  judgment layer for parallel isolation, in-session review, and conflict handling.
+  (`finish`), to RECONCILE every branch (`cleanup` — merged→prune, unmerged→auto-PR+merge-on-green,
+  escalate only CI-red/strategic), or to see the live branch/PR/merge state (`status`). The
+  hooks handle the unattended path automatically; this skill is the judgment layer for parallel
+  isolation, in-session review, and conflict handling.
 type: workflow
 allowed-tools: "Bash Read Grep Glob Agent"
 argument-hint: "status | work <name> | finish [branch] | cleanup"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Git Branch Lifecycle — the control layer over autonomous git
@@ -106,23 +107,51 @@ a reviewer; this skill can).
 
 ---
 
-## STEP 4: `cleanup` — remove merged branches safely
+## STEP 4: `cleanup` — RECONCILE every branch (merged→prune, unmerged→land-or-escalate)
+
+"Clean up" MUST leave zero dangling branches WITHOUT losing work AND without handing the
+human a mechanical decision. So cleanup is a full reconcile, not just a prune. For EACH local
+branch (skip `main`/`master` and the current branch), classify by `commits ahead of main` +
+PR state, and act:
+
+| Branch state | Action (autonomous) |
+|---|---|
+| `gh` confirms a **MERGED** PR | `git branch -D` — content is on main, safe |
+| **0 commits** ahead of main | `git branch -D` — empty/stale, nothing to lose |
+| Commits ahead, **no PR / open PR** | **open a PR (idempotent) + arm `--auto --squash`** → CI-green lands it automatically; CI-red leaves it open |
+
+Only **escalate** (leave open, report for a human) a branch whose auto-PR is **CI-RED** (e.g.
+breaks a required gate) OR whose diff asserts a **public/strategic** surface (README
+positioning, a NEW governance rule). Even then, prefer opening the PR and letting the human
+**veto via the open PR** over blocking on a question — do NOT ask the human a land-or-delete
+question for content CI can adjudicate.
 
 ```bash
-git fetch --prune
-git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads/ | awk '$2=="[gone]"{print $1}' \
-  | while read -r b; do
-      [ "$b" = "$(git rev-parse --abbrev-ref HEAD)" ] && continue
-      if gh pr view "$b" --json state --jq '.state' 2>/dev/null | grep -q MERGED; then
-        git branch -D "$b" && echo "deleted merged branch $b"
-      else
-        echo "KEPT $b — no merged PR found (possible unmerged work); not deleting"
-      fi
-    done
+git fetch --prune >/dev/null 2>&1
+cur="$(git rev-parse --abbrev-ref HEAD)"
+for b in $(git for-each-ref --format '%(refname:short)' refs/heads/ | grep -vxE 'main|master'); do
+  [ "$b" = "$cur" ] && continue
+  state="$(gh pr view "$b" --json state --jq '.state' 2>/dev/null)"
+  if [ "$state" = "MERGED" ]; then
+    git branch -D "$b" && echo "PRUNED (merged): $b"; continue
+  fi
+  ahead="$(git rev-list --count origin/main..$b 2>/dev/null)"
+  if [ "${ahead:-0}" = "0" ]; then
+    git branch -D "$b" && echo "PRUNED (empty): $b"; continue
+  fi
+  git push -u origin "$b" >/dev/null 2>&1
+  gh pr view "$b" >/dev/null 2>&1 || gh pr create --base main --head "$b" --fill >/dev/null 2>&1
+  gh pr merge "$b" --auto --squash >/dev/null 2>&1 \
+    && echo "PR'D + auto-merge armed: $b (lands on green CI)" \
+    || echo "ESCALATE: $b — PR open but auto-merge could not arm (CI red / conflict); human decides"
+done
 ```
 
-A branch is deleted ONLY when `gh` confirms a MERGED PR (its content is on `main`). Anything
-without a merged PR is KEPT and reported — never guess a branch is safe to delete.
+After it runs, report the disposition per branch. The ONLY branches left for the human are
+CI-red or strategic ones — never a branch whose content CI could have adjudicated.
+
+A branch is hard-deleted ONLY when `gh` confirms MERGED or it has zero commits ahead — never
+guess. Unmerged work is never deleted; it is PR'd so CI (not a human, not a guess) decides.
 
 ---
 
@@ -130,12 +159,14 @@ without a merged PR is KEPT and reported — never guess a branch is safe to del
 
 - Always run the `code-reviewer-agent` review in `finish` BEFORE arming auto-merge — the author is never the sole verifier.
 - Always base a new `work` worktree on the latest `origin/main`, in a SIBLING folder (never nested in the repo).
-- Always confirm a MERGED PR via `gh` before deleting any local branch.
+- Always confirm a MERGED PR via `gh` before deleting any local branch (or that it has 0 commits ahead).
+- In `cleanup`, always AUTO-PR an unmerged branch and let CI decide — never ask the human a land-or-delete question that CI can adjudicate. Escalate ONLY CI-red or genuinely-strategic (public/governance) branches, and prefer a veto-via-open-PR over a blocking question.
 - Always treat the hooks as the SSOT for the unattended path — this skill complements, never duplicates, them.
 
 ## MUST NOT DO
 
 - MUST NOT arm auto-merge over a reviewer dissent or failing CI — a stalled PR is safe; a wrong merge is not.
-- MUST NOT `git branch -D` a branch with no confirmed merged PR — use `git branch -d` semantics / keep it.
+- MUST NOT `git branch -D` a branch that has unmerged commits and no merged PR — PR it instead (let CI decide); only hard-delete on a confirmed MERGED PR or 0 commits ahead.
+- MUST NOT bounce a mechanical land-or-delete decision to the human when an auto-PR + CI gate can decide it — that is the gap this skill exists to close.
 - MUST NOT create a worktree inside the repo working tree — it pollutes status and git operations.
 - MUST NOT push to or merge into `main` directly — everything lands via a PR + CI gate.
