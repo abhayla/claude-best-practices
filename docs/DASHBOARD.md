@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-20 04:17 UTC (auto-generated)
+> Last updated: 2026-06-20 05:24 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -33,7 +33,7 @@
 | architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-verify | skill | 4.3.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
-| autonomous-contract | skill | 1.1.0 | project:firekaro-planner | — |
+| autonomous-contract | skill | 1.2.0 | project:firekaro-planner | — |
 | ba-discovery-checklist | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ba-usecase-discovery-reminder | hook | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
@@ -68,7 +68,7 @@
 | debugger-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | debugging-loop | skill | 2.2.0 | hub:abhayla/claude-best-practices | auto-verify, debugger-agent, fix-loop, learn-n-improve, systematic-debugging, test-failure-analyzer-agent, workflow-contracts |
 | debugging-loop-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
-| decision-authority | rule | 1.1.0 | project:firekaro-planner | — |
+| decision-authority | rule | 1.2.0 | project:firekaro-planner | — |
 | deploy-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup, k8s-deploy |
 | design-principles | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | design-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
