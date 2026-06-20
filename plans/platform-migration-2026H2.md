@@ -238,6 +238,17 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
     CI gate. Paid recurring review deferred until a concrete quality gap justifies the spend. Issue #149 closed.
   - **Initiative now fully closed** — every backlog item shipped, decided, or deferred-with-rationale; no
     owner-gated items remain open (besides the epic #119 tracker).
+- 2026-06-20 — **LAYER 2 FIRST PROOF: real app deployed via `/vps-deploy`.** The dogfood calculator
+  (`calculatekaro.in`, the R8 Salary Optimizer, calc repo PR #3 → main) was deployed to production via the
+  `/vps-deploy` skill from a parallel session. **Verified live (read-only, this session):** `Last-Modified:
+  Sat, 20 Jun 2026 07:19:23Z` (fresh, vs the prior 2026-06-19 build), HTTP 200, `Cf-Cache-Status: DYNAMIC`
+  (origin-served). This is the **first real idea→production-DEPLOYED cycle** through the hub's own deploy
+  capability — corrects the earlier honest-audit gap ("Layer 2 has zero real proof"). `/vps-deploy`'s
+  live-URL smoke gate (+ auto-rollback) is the deploy's own G2/G3 verifier; the site is live + not rolled
+  back, so the procedure succeeded. **Honest caveat:** the site is an SPA, so a curl can't confirm the
+  client-rendered calc-2 UI (that's the building session's G2 + vps-deploy's smoke, not re-verified here).
+  **Still open for full dogfood-loop closure (owner-side):** the GitHub-App + telemetry/pattern feedback
+  back to the hub — deploy proof ≠ feedback-loop closure.
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
