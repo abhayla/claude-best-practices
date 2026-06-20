@@ -13,6 +13,7 @@ import math
 import re
 import statistics
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -266,6 +267,19 @@ def write_effectiveness_to_registry(
 
     for pattern_name, eff_data in effectiveness.items():
         if pattern_name not in registry or not isinstance(registry[pattern_name], dict):
+            # Observability (no-silent-failures): a learning's hub_pattern_link points at
+            # a pattern absent from the registry — a hub-only skill (effectiveness is N/A:
+            # it never ships downstream) or a typo'd link. Surface it instead of dropping
+            # silently, so mis-linked feedback is catchable. Only warn when the drop
+            # carries a linked-learning signal (error_prevention_rate set), not for plain
+            # adoption-only blips.
+            if eff_data.get("error_prevention_rate") is not None:
+                print(
+                    f"  WARN: hub_pattern_link='{pattern_name}' is not a registered "
+                    f"(distributable) pattern — its linked learning(s) produced no registry "
+                    f"effectiveness (hub-only skill, or a typo'd link).",
+                    file=sys.stderr,
+                )
             continue
 
         # Filter out None values
