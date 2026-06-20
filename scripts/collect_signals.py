@@ -99,6 +99,13 @@ def _main() -> int:
     p.add_argument("--independent-verification", type=float, default=0.0)
     p.add_argument("--regression-clean", type=float, default=1.0)
     p.add_argument("--production-health", type=float, default=1.0)
+    p.add_argument(
+        "--secret-scan-clean",
+        choices=["yes", "no"],
+        default=None,
+        help="per-project secret-scan result; if omitted, the hub's own scan runs "
+        "(only meaningful when scoring the hub itself)",
+    )
     p.add_argument("--stage", default=None)
     p.add_argument("--record", action="store_true")
     p.add_argument("--human-had-to-fix", choices=["yes", "no"], default=None)
@@ -116,7 +123,11 @@ def _main() -> int:
         independent_verification=args.independent_verification,
         regression_clean=args.regression_clean,
         production_health=args.production_health,
-        secret_scan_clean=run_secret_scan(),
+        secret_scan_clean=(
+            {"yes": 1.0, "no": 0.0}[args.secret_scan_clean]
+            if args.secret_scan_clean is not None
+            else run_secret_scan()
+        ),
     )
     fix = {"yes": True, "no": False, None: None}[args.human_had_to_fix]
     result = collect_and_record(
