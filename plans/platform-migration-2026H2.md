@@ -185,6 +185,23 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   rules + error-context enrichment + healing config). KEEP. Lesson: verify a pattern's CURRENT consumers before
   calling it orphaned; a changelog origin note is not its consumer list.
 
+- 2026-06-20 — **NATIVE-EVENT HOOK FIRING VERIFIED LIVE (fresh session, CC v2.1.183).** The 4 hooks
+  wired 2026-06-20 (PRs #140/#142) were session-pinned-untestable when wired; tested now with evidence:
+  - **`SubagentStart` → `subagent-governance-inject.sh`: ✅ PASS (LIVE).** A dispatched worker reproduced
+    `{gate, artifacts, decisions, blockers, summary}` **verbatim** + found the literal `subagent-governance-inject`
+    string — text present ONLY in the hook. `additionalContext` injects into the child. **Live governance — KEEP.**
+  - **`ConfigChange` → `config-change-crud-guard.sh`: ✅ PASS (LIVE).** A real `settings.json` edit produced
+    fresh `2026-06-20T03:51:17Z` telemetry lines (hook never run by hand). **Live governance — KEEP.**
+  - **`SubagentStop` → `subagent-verifier-edge.sh`: ❌ FAIL (wired-but-dead).** Fire-marker proved the EVENT
+    fires (9×), but its "SUPERVISOR GATE" `additionalContext` never reached T0 across 7 worker returns —
+    no parent-injection path in v2.1.183. Governance theater. → **Issue [#144] recommends reverting its
+    settings.json wiring (keep script).** No gap: the T0 Stop-hook `verifier-edge-guard.sh` already covers
+    the main-loop done-claim boundary.
+  - **`PreCompact` → `compaction-handoff.sh`: ⚠️ UNVERIFIED.** Cannot trigger compaction on demand; existing
+    `.compaction-handoff.md` is prior-session + unattributable. Left wired as-is (no evidence of non-firing).
+  - **Asymmetry learned:** `additionalContext` is honored where it injects into the agent the event is ABOUT —
+    the *child* (SubagentStart ✅), not the *parent* (SubagentStop ❌). Do not build further parent-injection
+    SubagentStop hooks until the platform surfaces that payload.
 - 2026-06-20 — **FACT CORRECTION (Session B parallel adoption audit).** Phase 4.1's "Dynamic Workflows =
   research preview / not framework-ready" was WRONG (conflated with Agent Teams). Live `workflows.md` (verified
   2026-06-20): Dynamic Workflows are **GA since v2.1.154, all paid plans, no flag**. Corrected inline at 4.1;
