@@ -41,6 +41,19 @@ if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
   fi
 fi
 
+# Guardrail 1b: don't stack NEW work onto an already-MERGED branch — its PR is closed, so
+# commits here can never land cleanly (gap G4). Carry the work to a fresh branch off latest main.
+if command -v gh >/dev/null 2>&1 && [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
+  if gh pr view "$branch" --json state --jq '.state' 2>/dev/null | grep -q MERGED; then
+    git fetch origin main >/dev/null 2>&1 || true
+    newb="auto/work-$(date '+%Y%m%d-%H%M%S')"
+    if git checkout -b "$newb" origin/main >/dev/null 2>&1 || git checkout -b "$newb" >/dev/null 2>&1; then
+      log "branch '$branch' is already merged; moved new work onto fresh '$newb' off main"
+      branch="$newb"
+    fi
+  fi
+fi
+
 # Guardrail 2: secret-scan must confirm clean before anything is staged.
 if command -v python >/dev/null 2>&1; then
   scan="$(PYTHONPATH=. python scripts/dedup_check.py --secret-scan 2>&1)"
