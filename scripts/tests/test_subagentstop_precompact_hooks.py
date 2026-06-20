@@ -32,8 +32,17 @@ def test_hooks_exist():
     assert COMPACT_HOOK.exists()
 
 
-def test_subagentstop_hook_wired():
-    assert "subagent-verifier-edge.sh" in _wired("SubagentStop")
+def test_subagentstop_hook_wiring_reverted():
+    # Wiring REVERTED 2026-06-20 (issue #144): live-tested in CC v2.1.183 — the
+    # SubagentStop event fires but its additionalContext never reaches the T0
+    # parent, so the hook was governance theater. The script is KEPT as a
+    # ready-to-activate artifact (see test_hooks_exist + the script-emits-JSON
+    # tests below); only the settings.json wiring was removed. Re-wire when the
+    # platform surfaces SubagentStop additionalContext to the parent loop.
+    assert "subagent-verifier-edge.sh" not in _wired("SubagentStop"), (
+        "SubagentStop wiring should stay reverted until CC surfaces its "
+        "additionalContext to the parent (issue #144)"
+    )
 
 
 def test_precompact_hook_wired():
