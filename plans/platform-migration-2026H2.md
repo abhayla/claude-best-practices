@@ -247,8 +247,21 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   live-URL smoke gate (+ auto-rollback) is the deploy's own G2/G3 verifier; the site is live + not rolled
   back, so the procedure succeeded. **Honest caveat:** the site is an SPA, so a curl can't confirm the
   client-rendered calc-2 UI (that's the building session's G2 + vps-deploy's smoke, not re-verified here).
-  **Still open for full dogfood-loop closure (owner-side):** the GitHub-App + telemetry/pattern feedback
-  back to the hub — deploy proof ≠ feedback-loop closure.
+  **Honest caveat:** the site is an SPA, so a curl can't confirm the client-rendered calc-2 UI (that's the
+  building session's G2 + vps-deploy's smoke, not re-verified here).
+- 2026-06-20 — **DOGFOOD FEEDBACK LOOP WIRED + VERIFIED (5/5 READY).** Ran `/bootstrap-dogfood-project` for
+  `abhayla/calculatekaro`: all five preconditions green — github_remote ✓, enrolled in `config/repos.yml`
+  (`share_synthesized: true`) ✓, `.claude/learnings.json` committed+tracked+not-ignored ✓,
+  `allow_hub_sharing: true` ✓, and the **last gap** — the learnings-routing declaration in the app's
+  CLAUDE.md — fixed via a **server-side PR (calculatekaro #4)** to avoid a working-tree collision with the
+  parallel build session. The loop carries real signal: **5 learnings staged** in the app to flow hub-ward.
+  **Framing correction:** the feedback loop is INDEPENDENT of the Claude GitHub App — the hub's
+  `collate.py` / `aggregate_telemetry.py` read the enrolled repo via the `gh` API (works on the private
+  repo with the owner's token); the GitHub App is only for the SEPARATE `/autofix-pr` cloud feature. So the
+  dogfood feedback loop is now CLOSED; the only remaining owner-side items are the optional cloud extras
+  (GitHub App → /autofix-pr; billed /code-review ultra — declined per #149) and the optional scheduled
+  scout (#153). The actual pattern/telemetry PULL runs on the hub's existing weekly crons (or on-demand
+  `collate.py --all` / `aggregate_telemetry.py`).
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
