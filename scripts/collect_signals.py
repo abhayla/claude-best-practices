@@ -25,6 +25,12 @@ CONFIG_PATH = ROOT / "config" / "trust-score.yml"
 LEDGER_PATH = ROOT / "trust-score" / "calibration-ledger.jsonl"
 
 
+def default_ledger_for(project: str) -> Path:
+    """Per-project ledger path. Calibration is per-project — IPODhan's trust history
+    can never vouch for another app — so each project gets its own ledger file."""
+    return ROOT / "trust-score" / "ledgers" / f"{project}.jsonl"
+
+
 def run_secret_scan() -> float:
     """Run the repo's secret-scan live; return 1.0 if confirmed clean, else 0.0."""
     try:
@@ -65,12 +71,23 @@ def assemble_signals(
     }
 
 
-def collect_and_record(signals: dict, stage: str | None, record: bool, human_had_to_fix=None) -> dict:
-    """Score assembled signals and (optionally) record the run to the ledger."""
-    config = load_config(CONFIG_PATH)
+def collect_and_record(
+    signals: dict,
+    stage: str | None,
+    record: bool,
+    human_had_to_fix=None,
+    ledger_path: Path | None = None,
+    config_path: Path | None = None,
+) -> dict:
+    """Score assembled signals and (optionally) record the run to a chosen ledger.
+
+    Paths resolve at call time (not import time) so the module-level LEDGER_PATH /
+    CONFIG_PATH stay overridable — passing None uses the current module defaults.
+    """
+    config = load_config(config_path or CONFIG_PATH)
     result = compute_trust_score(signals, config, stage=stage)
     if record:
-        record_run(result, LEDGER_PATH, human_had_to_fix=human_had_to_fix, stage=stage)
+        record_run(result, ledger_path or LEDGER_PATH, human_had_to_fix=human_had_to_fix, stage=stage)
     return result
 
 
@@ -85,7 +102,12 @@ def _main() -> int:
     p.add_argument("--stage", default=None)
     p.add_argument("--record", action="store_true")
     p.add_argument("--human-had-to-fix", choices=["yes", "no"], default=None)
+    p.add_argument("--project", default=None, help="per-project ledger name (e.g. IPODhan)")
+    p.add_argument("--ledger", type=Path, default=None, help="explicit ledger path (overrides --project)")
+    p.add_argument("--config", type=Path, default=CONFIG_PATH, help="trust-score rulebook")
     args = p.parse_args()
+
+    ledger_path = args.ledger or (default_ledger_for(args.project) if args.project else LEDGER_PATH)
 
     signals = assemble_signals(
         tests_passed=args.tests_passed,
@@ -97,10 +119,16 @@ def _main() -> int:
         secret_scan_clean=run_secret_scan(),
     )
     fix = {"yes": True, "no": False, None: None}[args.human_had_to_fix]
-    result = collect_and_record(signals, args.stage, args.record, human_had_to_fix=fix)
+    result = collect_and_record(
+        signals, args.stage, args.record, human_had_to_fix=fix,
+        ledger_path=ledger_path, config_path=args.config,
+    )
     import json
 
-    print(json.dumps({"signals": signals, "result": result}, indent=2))
+    out = {"signals": signals, "result": result}
+    if args.record:
+        out["recorded_to"] = str(ledger_path)
+    print(json.dumps(out, indent=2))
     return 0
 
 

@@ -1,6 +1,6 @@
 """Tests for the real-signal adapter (scripts/collect_signals.py)."""
 
-from scripts.collect_signals import assemble_signals, collect_and_record
+from scripts.collect_signals import assemble_signals, collect_and_record, default_ledger_for
 
 
 class TestAssembleSignals:
@@ -43,3 +43,18 @@ class TestCollectAndRecord:
         result = collect_and_record(sig, stage="test", record=False)
         assert result["recommended"] == "ESCALATE"
         assert result["hard_gate_triggered"] is True
+
+
+class TestPerProjectLedger:
+    def test_default_ledger_path_is_per_project(self):
+        assert default_ledger_for("IPODhan").name == "IPODhan.jsonl"
+        assert default_ledger_for("KKB").name == "KKB.jsonl"
+
+    def test_records_to_explicit_project_ledger(self, tmp_path):
+        from scripts.trust_score import load_ledger
+
+        ledger = tmp_path / "IPODhan.jsonl"
+        sig = assemble_signals(100, 100, 0.95, 1.0, 1.0, 1.0, 1.0)
+        collect_and_record(sig, stage="test", record=True, human_had_to_fix=False, ledger_path=ledger)
+        runs = load_ledger(ledger)
+        assert len(runs) == 1 and runs[0]["stage"] == "test"
