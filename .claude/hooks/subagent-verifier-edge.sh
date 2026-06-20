@@ -13,6 +13,16 @@
 # RUNTIME NOTE: unit-verified + wired, but whether SubagentStop fires in the
 # installed Claude Code version is session-pinned — confirm via a live dispatch
 # after a session restart (newly-wired hooks are not active mid-session).
+#
+# WIRING REVERTED 2026-06-20 (issue #144): live-tested in CC v2.1.183 — the
+# SubagentStop EVENT fires (proven via a temp fire-marker, 9x), but its
+# `additionalContext` payload never reaches the T0 PARENT across 7 worker returns;
+# there is no parent-injection path in this version, so the reminder below is
+# unreachable. This script is KEPT as a ready-to-activate artifact: re-add the
+# SubagentStop block to .claude/settings.json when the platform surfaces
+# SubagentStop additionalContext to the parent loop. The T0 Stop-hook
+# verifier-edge-guard.sh already covers the main-loop done-claim boundary, so
+# reverting the wiring leaves NO governance gap.
 exec 2>/dev/null
 
 read -r -d '' MSG <<'EOF'
