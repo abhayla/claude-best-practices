@@ -454,6 +454,50 @@ class TestWriteEffectivenessToRegistry:
         registry = json.loads(sample_registry_with_patterns.read_text())
         assert "nonexistent-pattern" not in registry
 
+    def test_warns_on_linked_pattern_not_in_registry(
+        self, sample_registry_with_patterns, capsys
+    ):
+        """A learning whose hub_pattern_link points at a pattern absent from the
+        registry (a hub-only skill, or a typo'd link) must surface a WARNING rather
+        than drop silently (no-silent-failures). Only fires when the drop carries a
+        linked-learning signal (error_prevention_rate is not None), not for plain
+        adoption-only signals."""
+        effectiveness = {
+            # e.g. a learning linked to the hub-only skill "synthesize-project"
+            "synthesize-project": {
+                "adoption_rate": None,
+                "retention_days_p50": None,
+                "error_prevention_rate": 1.0,
+                "sample_size": 0,
+                "last_updated": "2026-06-20",
+            },
+        }
+        write_effectiveness_to_registry(sample_registry_with_patterns, effectiveness)
+
+        registry = json.loads(sample_registry_with_patterns.read_text())
+        assert "synthesize-project" not in registry  # still not written
+        err = capsys.readouterr().err
+        assert "synthesize-project" in err
+        assert "not a registered" in err.lower()
+
+    def test_no_warning_for_adoption_only_unregistered_pattern(
+        self, sample_registry_with_patterns, capsys
+    ):
+        """An unregistered pattern with NO linked-learning signal (error_prevention_rate
+        None) is a plain adoption blip — skip it silently, no warning noise."""
+        effectiveness = {
+            "some-unregistered-pattern": {
+                "adoption_rate": 1.0,
+                "retention_days_p50": 10,
+                "error_prevention_rate": None,
+                "sample_size": 1,
+                "last_updated": "2026-06-20",
+            },
+        }
+        write_effectiveness_to_registry(sample_registry_with_patterns, effectiveness)
+        err = capsys.readouterr().err
+        assert "some-unregistered-pattern" not in err
+
     def test_omits_none_values(self, sample_registry_with_patterns):
         """None values (insufficient data) should not be written."""
         effectiveness = {
