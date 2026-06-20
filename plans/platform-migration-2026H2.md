@@ -197,8 +197,11 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
     no parent-injection path in v2.1.183. Governance theater. → **Issue [#144] recommends reverting its
     settings.json wiring (keep script).** No gap: the T0 Stop-hook `verifier-edge-guard.sh` already covers
     the main-loop done-claim boundary.
-  - **`PreCompact` → `compaction-handoff.sh`: ⚠️ UNVERIFIED.** Cannot trigger compaction on demand; existing
-    `.compaction-handoff.md` is prior-session + unattributable. Left wired as-is (no evidence of non-firing).
+  - **`PreCompact` → `compaction-handoff.sh`: ✅ PASS (live) — CORRECTED 2026-06-20.** Initially logged
+    UNVERIFIED (couldn't trigger compaction on demand). Later in the SAME session a real compaction fired the
+    hook: `.claude/.compaction-handoff.md` was rewritten at `2026-06-20T05:22:59Z` (mid-session, not manually
+    run) — evidence the PreCompact event fires in v2.1.183. So all 4 native-event hooks' firing is now known:
+    SubagentStart ✅, ConfigChange ✅, SubagentStop fires-but-parent-inject-fails ❌ (reverted), PreCompact ✅.
   - **Asymmetry learned:** `additionalContext` is honored where it injects into the agent the event is ABOUT —
     the *child* (SubagentStart ✅), not the *parent* (SubagentStop ❌). Do not build further parent-injection
     SubagentStop hooks until the platform surfaces that payload.
