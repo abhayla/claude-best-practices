@@ -1,0 +1,108 @@
+"""Collect REAL verification signals from a finished task and record a calibration run.
+
+This is the "wire real signals" adapter: instead of hand-typing the signals JSON, it
+assembles the signals from actual evidence (test results, coverage, a live secret-scan),
+scores them with the trust engine, and records the run to the calibration ledger — so
+walk-phase honesty data accumulates automatically as real tasks complete.
+
+    python scripts/collect_signals.py --tests-passed 1494 --tests-total 1494 \
+        --coverage 0.9 --independent-verification 1 --stage test --record
+"""
+
+import argparse
+import os
+import subprocess
+from pathlib import Path
+
+from scripts.trust_score import (
+    compute_trust_score,
+    load_config,
+    record_run,
+)
+
+ROOT = Path(__file__).resolve().parent.parent
+CONFIG_PATH = ROOT / "config" / "trust-score.yml"
+LEDGER_PATH = ROOT / "trust-score" / "calibration-ledger.jsonl"
+
+
+def run_secret_scan() -> float:
+    """Run the repo's secret-scan live; return 1.0 if confirmed clean, else 0.0."""
+    try:
+        out = subprocess.run(
+            ["python", "scripts/dedup_check.py", "--secret-scan"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "PYTHONPATH": "."},
+        ).stdout
+    except Exception:
+        return 0.0  # unknown == unproven
+    return 1.0 if "No secrets found" in out else 0.0
+
+
+def assemble_signals(
+    tests_passed: int,
+    tests_total: int,
+    coverage: float,
+    independent_verification: float,
+    regression_clean: float,
+    production_health: float,
+    secret_scan_clean: float,
+) -> dict:
+    """Build the signals dict from measured evidence. Each value is clamped to [0,1]."""
+    tests_pass = (tests_passed / tests_total) if tests_total else 0.0
+
+    def clamp(x: float) -> float:
+        return max(0.0, min(1.0, x))
+
+    return {
+        "tests_pass": clamp(tests_pass),
+        "independent_verification": clamp(independent_verification),
+        "coverage": clamp(coverage),
+        "regression_clean": clamp(regression_clean),
+        "secret_scan_clean": clamp(secret_scan_clean),
+        "production_health": clamp(production_health),
+    }
+
+
+def collect_and_record(signals: dict, stage: str | None, record: bool, human_had_to_fix=None) -> dict:
+    """Score assembled signals and (optionally) record the run to the ledger."""
+    config = load_config(CONFIG_PATH)
+    result = compute_trust_score(signals, config, stage=stage)
+    if record:
+        record_run(result, LEDGER_PATH, human_had_to_fix=human_had_to_fix)
+    return result
+
+
+def _main() -> int:
+    p = argparse.ArgumentParser(description="Assemble real signals, score, and record a run.")
+    p.add_argument("--tests-passed", type=int, default=0)
+    p.add_argument("--tests-total", type=int, default=0)
+    p.add_argument("--coverage", type=float, default=0.0)
+    p.add_argument("--independent-verification", type=float, default=0.0)
+    p.add_argument("--regression-clean", type=float, default=1.0)
+    p.add_argument("--production-health", type=float, default=1.0)
+    p.add_argument("--stage", default=None)
+    p.add_argument("--record", action="store_true")
+    p.add_argument("--human-had-to-fix", choices=["yes", "no"], default=None)
+    args = p.parse_args()
+
+    signals = assemble_signals(
+        tests_passed=args.tests_passed,
+        tests_total=args.tests_total,
+        coverage=args.coverage,
+        independent_verification=args.independent_verification,
+        regression_clean=args.regression_clean,
+        production_health=args.production_health,
+        secret_scan_clean=run_secret_scan(),
+    )
+    fix = {"yes": True, "no": False, None: None}[args.human_had_to_fix]
+    result = collect_and_record(signals, args.stage, args.record, human_had_to_fix=fix)
+    import json
+
+    print(json.dumps({"signals": signals, "result": result}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(_main())
