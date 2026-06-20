@@ -14,7 +14,7 @@ description: >
 type: workflow
 allowed-tools: "Read Write Edit Grep Glob Bash"
 argument-hint: "[one-line description of the goal, optional]"
-version: "1.1.0"
+version: "1.2.0"
 triggers:
   - autonomous contract
   - create a goal contract
@@ -205,6 +205,11 @@ Print, then stop:
    /goal docs/contracts/2026-06-10-<slug>.md
    ```
    (or the user's `/loop` / routine / headless equivalent).
+   For UNATTENDED / headless runs, launch the executor in **Auto mode**
+   (`claude --permission-mode auto -p …`, or start the session in Auto mode) per the
+   ratified S7 policy in `decision-authority.md` — the harness then deterministically
+   hard-denies the irreversible class when no human is watching. Interactive runs are
+   unchanged.
 3. A one-line note: the contract is written but **not committed** (committing is
    theirs to trigger), and **they run the executor** when ready.
 

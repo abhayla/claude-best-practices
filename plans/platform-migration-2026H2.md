@@ -220,6 +220,21 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   `agent-orchestration.md` v1.5.0 + `.claude/tasks/parallel-cc-adoption-research.md` (S2). Confirms C5/F9 —
   "adopt only if measured better" → not better → not adopted. **P5 (disableBundledSkills doc) shipped** same
   session (PR #146); **native-event hooks verified** (PR #145, issue #144 for SubagentStop revert).
+- 2026-06-20 — **SubagentStop wiring REVERTED** (PR #150, closes #144) — hub-only, reversible; script kept as
+  ready-to-activate artifact; wiring test re-pinned to the reverted state. SubagentStart + ConfigChange stay
+  (verified live); PreCompact stays (untested).
+- 2026-06-20 — **S7 + S8 owner decisions RATIFIED + enacted (Abhay):**
+  - **S7 (#148) ADOPTED (scoped):** autonomous/headless runs (`/goal`, `/loop`, routines, headless `claude -p`)
+    default to native **Auto mode** via launch-time `--permission-mode auto`; INTERACTIVE sessions unchanged;
+    deliberately NOT set as machine-wide `defaultMode:"auto"` in `~/.claude`. Ratified policy added to
+    `decision-authority.md` v1.2.0 (layer-1 harness enforcement) + actionable launch reminder in
+    `autonomous-contract` STEP 5 (v1.2.0). The Layer-3 "governance prose → harness" goal, scoped to where it
+    matters (no human watching).
+  - **S8 (#149) DECLINED → free option:** keep the free local review layer (`/review-gate` +
+    `code-reviewer-agent`) as default; native `/code-review ultra` stays an opt-in pointer only (PR #122), NOT a
+    CI gate. Paid recurring review deferred until a concrete quality gap justifies the spend. Issue #149 closed.
+  - **Initiative now fully closed** — every backlog item shipped, decided, or deferred-with-rationale; no
+    owner-gated items remain open (besides the epic #119 tracker).
 
 ## Phase 0 Ledger (result — 2026-06-19)
 
