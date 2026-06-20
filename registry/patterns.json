@@ -5005,13 +5005,13 @@
     "tier": "must-have"
   },
   "engineering-roles": {
-    "hash": "4715cdf96818a647e57b40dcb28872d6c5887e4c99a029854f36eb2b91d3ae39",
+    "hash": "c4249df4f75945ce83bb26f64b809b75cdef4dd8f06dedaae09b5200d56bad1a",
     "type": "rule",
     "category": "core",
     "version": "1.7.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-20",
     "dependencies": [],
     "visibility": "public",
     "description": "Autonomous role router: infer the engineering role from the task signal, state `Role: <name> — <why>`, and dispatch the role's named agents/skills (routing layer, no capability duplication). Includes router table, condensed mandates, canonical multi-role sequences with a mandatory independent-reviewer edge, and a routing feedback loop.",
