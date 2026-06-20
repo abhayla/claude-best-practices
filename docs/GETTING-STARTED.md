@@ -31,8 +31,8 @@ curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bo
 
 | Component | Count | Description |
 |-----------|-------|-------------|
-| Agents | 35 | Specialized sub-agents for code review, debugging, testing, etc. |
-| Skills | 165 | Slash-command workflows like `/implement`, `/fix-loop`, `/status` |
+| Agents | 36 | Specialized sub-agents for code review, debugging, testing, etc. |
+| Skills | 166 | Slash-command workflows like `/implement`, `/fix-loop`, `/status` |
 | Rules | 52 | Scoped coding rules that activate based on file paths |
 | Hooks | 13 | Example hooks you can adapt (see `hooks/README.md`) |
 

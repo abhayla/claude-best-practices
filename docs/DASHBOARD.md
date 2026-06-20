@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-20 05:24 UTC (auto-generated)
+> Last updated: 2026-06-20 05:52 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 268 |
-| Core (universal) | 197 |
+| Total Patterns | 270 |
+| Core (universal) | 199 |
 | Stack-specific | 71 |
-| Agents | 35 |
+| Agents | 36 |
 | Configs | 3 |
 | Hooks | 13 |
 | Rules | 52 |
-| Skills | 165 |
+| Skills | 166 |
 
 ## Pattern Inventory
 
@@ -118,6 +118,8 @@
 | improve-codebase-architecture | skill | 1.0.0 | upstream:mattpocock/skills@engineering/improve-codebase-architecture | grill-with-docs, adr |
 | independent-test-verification | rule | 1.1.0 | project:firekaro-planner | — |
 | integration-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| karpathy-advisor | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| karpathy-advisor-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | karpathy-advisor |
 | learn-n-improve | skill | 2.3.0 | hub:abhayla/claude-best-practices | — |
 | learning-self-improvement | skill | 2.1.1 | hub:abhayla/claude-best-practices | context-reducer-agent, learn-n-improve, session-summarizer-agent, skill-factory, test-knowledge, workflow-contracts |
 | learning-self-improvement-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
