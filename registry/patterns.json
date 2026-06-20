@@ -163,13 +163,13 @@
     "tier": "must-have"
   },
   "agent-orchestration": {
-    "hash": "fbe3f652c7656ae33c6617d6ec5e5c8a0d9196710f47b914ad7f2a42c7bb4ab0",
+    "hash": "1e04b56ce949133a6656511d95c4630aae20c23f713a0bfca7eabf2da72ff948",
     "type": "rule",
     "category": "core",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-20",
     "dependencies": [],
     "visibility": "public",
     "description": "8 constraints for multi-agent orchestration: 2-level hierarchy, no subagent-spawning, externalized DAGs, global retry budget, single state location",
@@ -178,7 +178,7 @@
       "agents",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation â€” Anthropic-aligned orchestration constraints | 2026-06-19: PLATFORM UPDATE banner — nested subagents GA (Claude Code v2.1.172, <=5 levels); single-level model marked over-conservative pending cascade (plans/skill-at-t0-doctrine-relaxation.md)",
+    "changelog": "v1.0.0: Initial creation â€” Anthropic-aligned orchestration constraints | 2026-06-19: PLATFORM UPDATE banner — nested subagents GA (Claude Code v2.1.172, <=5 levels); single-level model marked over-conservative pending cascade (plans/skill-at-t0-doctrine-relaxation.md) | 2026-06-20 (v1.5.0): S2 native-Workflow-tool A/B measured on test-pipeline 3-lane — wall-clock + correctness identical to skill-at-T0, KEEP skill-at-T0 (no benefit for fixed fan-out; tool viable for dynamic DAGs only)",
     "tier": "nice-to-have"
   },
   "ai-gemini-api": {
