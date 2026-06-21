@@ -53,32 +53,46 @@ All in the hub at `D:/Abhay/VibeCoding/claude-best-practices/docs/specs/`:
    + a scaffolded `goals.yml`; **zero edits to existing host files**.
 2. **`goals.yml` scaffolder** — generate the goal vocabulary from the host's `README` (Goals 1–N);
    if README is thin, write a TODO-stub and SUPPRESS goal-dependent outputs until ≥1 goal is real.
-3. **`/atlas scan`** — WALK (gitignore-aware + `.atlasignore`, skip binary/vendored) → CLASSIFY →
-   DERIVE purpose (heuristic-first; LLM on low-confidence, secret-gated, budget-capped) → GRAPH
-   (Python dependency edges; regex fallback else) → ANCHOR (propose a goal per file, `inferred`) →
-   PERSIST (write the sharded `.atlas/` Index with a content-hash per file) → REPORT (coverage % +
-   unconfirmed count). Re-running is **incremental** (hash-diff; only changed files re-derive).
-4. **`/atlas explain <file>`** — render the **G1-approved Variant B layout** with REAL data: WHAT,
-   GOAL (with a confidence bar + `inferred·unconfirmed`), HELPS, WIRING (→ calls / ← used by), and
-   the `[c]onfirm [e]dit [m]ap` affordance.
-5. **`/atlas goal <Gn>`** — list files mapped to a goal with `●/◐` confidence markers + a bus-factor
-   flag when one file carries a disproportionate share of the goal's edges.
-6. **`/atlas confirm <file>` / `/atlas correct <file> <Gn>`** — the human-confirm layer; confirmed
-   beats inferred; confirmation is recorded in the Index (with a date).
-7. **Uninstall contract** — removing the plugin + deleting `.atlas/` + `goals.yml` leaves the repo
+3. **Autonomous scan (ZERO manual effort — owner directive 2026-06-21).** The scan runs **automatically
+   on install** and **re-runs on every change via a bundled hook** — the user NEVER types `/atlas scan`.
+   Pipeline: WALK (gitignore-aware + `.atlasignore`, skip binary/vendored) → CLASSIFY → DERIVE purpose
+   (heuristic-first; LLM on low-confidence, secret-gated, budget-capped) → GRAPH (Python edges; regex
+   fallback) → ANCHOR (propose a goal per file, `inferred`; `G0`/infra allowed) → PERSIST (sharded
+   `.atlas/` Index, content-hash per file) → run is **incremental** (hash-diff). `/atlas scan` still
+   exists as a manual override but is never *required*.
+4. **Proactive Goal Pulse (the core value — owner directive).** A bundled **SessionStart hook** auto-
+   surfaces, with no command: per-goal status (on-track / drifting / orphan-goal), what the user is
+   currently working on + which goal it serves, and the **next best action** to advance a goal. Atlas
+   talks to the user; the user never has to ask. This is the always-reminding loop that ties every
+   change back to the project's goal.
+5. **`/atlas explain <file>`** — render the **G1-approved Variant B layout** with REAL data: WHAT, GOAL
+   (confidence bar), HELPS, WIRING (→ calls / ← used by, each edge tagged `static`/`inferred` + a
+   "graph may be incomplete" marker). The `[c]onfirm/[e]dit` affordance is an **optional** one-tap
+   inline override — never a required step.
+6. **`/atlas goal <Gn>`** — list files mapped to a goal with `●/◐` confidence markers + a bus-factor flag.
+7. **Passive/optional confirmation (NOT a gate).** Confirmation is never required and never blocks. It
+   accrues **passively** from normal work (the agent/user works on a file under a goal and doesn't
+   correct it → soft signal) and via the optional one-tap inline `correct`. Inference is **advisory and
+   never destructive** (no auto-delete, no hard-block) — so running on unconfirmed guesses is safe;
+   reminders self-improve over time.
+8. **Uninstall contract** — removing the plugin + deleting `.atlas/` + `goals.yml` leaves the repo
    **byte-identical**.
 
 ## 5. OUT of MVP scope (defer — do NOT build now)
 
 Dashboard (A5); adapters — trust-score / registry / PRD (A9/A10/C10); **embed mode** (F51); the full
 goal-change handler (§6 taxonomy — design only); CI presence-gate (F22); languages beyond Python +
-JS/TS-regex; auto-update hook (manual `/atlas scan` is acceptable for v0.1).
+JS/TS-regex. *(Auto-update + the proactive Goal Pulse are NO LONGER deferred — the owner's zero-manual-
+effort directive makes them CORE MVP, items 3–4 above.)*
 
 ## 6. Definition of DONE (every item observable on the DEFAULT path — `output-plausibility-verification.md`)
 
 DONE only when, dogfooded on the **hub repo itself** (`../claude-best-practices`, Python — immediate):
-- `/atlas scan` builds `.atlas/` covering **every non-ignored Python file** with a purpose + a
-  proposed goal-id valid in `goals.yml` + ≥0 dependency edges; prints coverage % and unconfirmed N.
+- **Install alone** (zero further commands) triggers a scan that builds `.atlas/` covering **every
+  non-ignored Python file** with a purpose + a goal-id valid in `goals.yml` (incl. `G0`/infra) + edges
+  tagged `static`/`inferred`; reports `mapped / scanned / ignored / total`.
+- **Goal Pulse** auto-appears at the next session start with **no command** — per-goal status + the
+  next-best-action — proving the proactive loop works hands-free.
 - `/atlas explain scripts/recommend.py` renders the **Variant B layout** with that file's real
   purpose, an `inferred` G1 goal + confidence bar, and its real `calls`/`used by` edges.
 - `/atlas goal G1` lists ≥1 file, each with a confidence marker.
