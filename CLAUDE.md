@@ -62,6 +62,10 @@ For sync direction semantics (hub↔projects, hub↔internet, aggregation flows)
 
 Projects can opt in to share back synthesized patterns by setting `allow_hub_sharing: true` in their `.claude/synthesis-config.yml`. `/synthesize-hub` then collates `synthesized: true` patterns from enrolled repos in `config/repos.yml`, dedups via 3-level matching (hash/structural/semantic), and drafts generalized hub PRs. Default is local-only — sharing is bilateral and opt-in. See `docs/synthesize-flywheel.md`.
 
+### Goal Vocabulary (`goals.yml`)
+
+`goals.yml` (repo root) is the **host-owned goal SSOT** — the vocabulary the hub steers by. It defines G0–G6 (G0 infra; G1 distribute patterns; G2 maintain workflows; G3 idea→deployed; G4 thin-layer-on-platform; G5 north-star: an autonomous self-improving machine; G6 package capabilities as installable plugins). Each goal carries a `dod:` (definition-of-done) of machine-checkable proxies — mostly `file`-exists checks, except G5 which additionally gates on the REAL bar (trust-score graduated over 30 runs) so the % stays honest. The SessionStart "Atlas Goal Pulse" banner and the `core/.claude/rules/goal-anchored-decisions.md` rule both read this file; edit goal definitions/DoDs here, never hardcode them. G6 builds one plugin at a time, owner-approved (see the recent G6 pilot build-then-revert in git log — strategic builds need explicit approval before building).
+
 ### Trust Score & Walk-Phase (autonomous-factory MVP)
 
 The hub's trust-score subsystem (PR #163, on `feat/trust-score-mvp`) is the gate that decides whether an autonomous-factory pipeline run is trustworthy enough to auto-land vs. must escalate to a human. **Motto: don't build for autonomy — prove the trust score first.** It runs in **shadow mode** (the engine only ever *recommends* — a human still acts — until calibration data proves the score), and is governed by **hard gates** (per-signal safety floors that a good weighted average can never out-vote) plus **per-stage graduation** (a reversible stage can earn autonomy before an irreversible one).
@@ -182,6 +186,7 @@ Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, 
 - **`config/test-pipeline.yml`** — Test pipeline stage definitions (fix-loop, auto-verify, post-fix stages)
 - **`config/repos.yml`** — Downstream project repos for `sync_to_projects.py` and `recommend.yml`
 - **`config/settings.yml`** — Hub-level settings
+- **`goals.yml`** (repo root) — Host-owned goal SSOT (G0–G6 + machine-checkable DoDs). Drives the SessionStart goal-pulse banner and `goal-anchored-decisions.md`. Edit goal definitions here, never hardcode them
 - **`config/pipeline-stages.yaml`** — DAG config for pipeline orchestration
 - **`config/trust-score.yml`** — Trust-score rulebook: signal weights (sum 1.0), RECOMMEND `threshold`, and `hard_gates` safety floors. Edit here — `scripts/trust_score.py` mirrors it as a default; never hard-code thresholds
 - **`config/telemetry-aggregates.json`** — Historical effectiveness data from `aggregate_telemetry.py` runs. Generated output — may not exist until the first telemetry run; do not treat its absence as an error
