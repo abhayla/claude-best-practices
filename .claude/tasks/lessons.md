@@ -517,3 +517,15 @@ repo EARLY (per `bootstrap-dogfood-project`'s 5 preconditions) so the native clo
 the hub feedback loop are reachable from the first feature — don't defer it until "after build."
 Creating the remote is an external-publish action → confirm visibility with the owner, but treat
 "no remote" as a first-class **adoption gap**, not a nicety.
+
+## 2026-06-21 — Pattern scoping: default to DISTRIBUTABLE, not hub-only
+**Surfaced during:** the git-branch-lifecycle scope review. I built the skill + `auto-git.sh`/`auto-pr.sh`
+in `.claude/` (hub-only) and defended it; Abhay pushed that they're obviously useful to ANY downstream
+project. **Root cause:** conflated "build/dogfood in the hub first" (a correct *staging* step) with
+"keep hub-only forever," and over-weighted a safety worry (auto-merge to downstream `main`) — forgetting
+that **`core/` patterns are OPT-IN (provisioned, not auto-active)**, so distributing is not unsafe;
+provisioning IS the consent step. **Rule:** for EVERY pattern ask first — "is this about operating the
+hub *itself* (→ hub-only) or generically useful to any project (→ distributable `core/`)?" The hub's
+mission is to distribute; default to `core/` for anything generic, keeping a `.claude/` copy only when
+the hub also *uses* it. Promote proactively once proven, genericizing hub deps (e.g. `dedup_check.py`
+→ pluggable `SECRET_SCAN_CMD`). Fixed: PR #170 promoted all three to `core/`.
