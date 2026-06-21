@@ -6794,9 +6794,9 @@
     "tier": "nice-to-have"
   },
   "auto-git": {
-    "hash": "f0b856da6dc120cfc24f0b20ebed25b83474760549ed777e377ec280c01d6e72",
+    "hash": "b359b9f235b583262fb436581a1fce29898d29660a668352a7cfdaea45d22994",
     "type": "hook",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "SessionStart+Stop hook: autonomous git handler — commits + pushes each turn's work to a task branch, keeps main clean, never stacks onto a merged branch; pluggable secret-scan gate. Companion to auto-pr.",
     "category": "core",
     "source": "hub:abhayla/claude-best-practices",

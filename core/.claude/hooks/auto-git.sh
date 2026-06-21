@@ -2,8 +2,10 @@
 # Autonomous git handler — so you never touch git.
 #
 # Wired into SessionStart + Stop (see settings.json). If the working tree has changes:
-# secret-scan -> stage -> commit with a generated message -> push the current branch.
-# Companion: auto-pr.sh (SessionEnd) opens the PR + arms CI-gated auto-merge.
+# secret-scan -> stage -> commit with a generated message -> push the current branch ->
+# open a PR if one is missing and the branch is ahead of main (CREATE only).
+# Companion: auto-pr.sh (SessionEnd) arms CI-gated auto-merge on that PR. Opening the PR
+# per-turn (not arming) keeps long / `/clear`-reset sessions from leaving work un-PR'd.
 #
 # FAIL-SAFE: always exits 0 (a git hiccup must never block the session).
 # GUARDRAILS:
@@ -93,6 +95,17 @@ if [ "${AUTO_GIT_PUSH:-1}" = "1" ] && git remote get-url origin >/dev/null 2>&1;
     log "pushed '$branch' to origin"
   else
     log "push failed (no creds/network?) — commit is safe locally on '$branch'"
+  fi
+fi
+
+# Ensure a PR exists once the branch is ahead of main, so a long session (or one reset with
+# `/clear`) never leaves work un-PR'd waiting on SessionEnd. CREATE only — NO `--auto` here:
+# merge-arming stays owned by auto-pr.sh at SessionEnd, so work never merges mid-session.
+if command -v gh >/dev/null 2>&1; then
+  ahead="$(git rev-list --count origin/main..HEAD 2>/dev/null || echo 0)"
+  if [ "${ahead:-0}" -gt 0 ] && ! gh pr view "$branch" --json number >/dev/null 2>&1; then
+    gh pr create --base main --head "$branch" --fill >/dev/null 2>&1 \
+      && log "opened PR for '$branch' (merge NOT armed — auto-pr.sh arms it at SessionEnd)"
   fi
 fi
 
