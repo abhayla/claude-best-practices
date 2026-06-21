@@ -14,7 +14,6 @@ workflows:
       skills:
         - a11y-audit
         - anthropic-agent-orchestration-guide
-        - autonomous-contract
         - brainstorm
         - development-loop
         - disaster-recovery
@@ -24,10 +23,12 @@ workflows:
         - fix-github-issue
         - flutter-dev
         - git-worktrees
+        - goal-creator
         - grill-me
         - implement
         - improve-codebase-architecture
         - jest-dev
+        - karpathy-advisor
         - mcp-server-builder
         - nextjs-dev
         - node-backend-dev
@@ -46,6 +47,7 @@ workflows:
         - android-build-fixer-agent
         - anthropic-multi-agent-reviewer-agent
         - development-loop-master-agent
+        - karpathy-advisor-agent
         - plan-executor-agent
         - planner-researcher-agent
         - web-research-specialist-agent
@@ -64,6 +66,7 @@ workflows:
         - debugging-loop
         - escalation-report
         - fix-loop
+        - git-branch-lifecycle
         - learn-n-improve
         - loop-engineering
         - post-fix-pipeline
@@ -108,6 +111,7 @@ workflows:
         - fastapi-run-backend-tests
         - fix-loop
         - flutter-e2e-test
+        - git-branch-lifecycle
         - integration-test
         - merge-strategy
         - mock-server
@@ -245,6 +249,7 @@ workflows:
         - writing-skills
       agents:
         - fastapi-database-admin-agent
+        - karpathy-advisor-agent
         - skill-author-agent
         - skill-authoring-master-agent
         - workflow-master-template
@@ -262,6 +267,7 @@ workflows:
       skills:
         - adversarial-review
         - code-review-workflow
+        - git-branch-lifecycle
         - mcp-server-builder
         - pr-standards
         - receive-code-review
@@ -360,6 +366,7 @@ workflows:
         - ba-discovery-checklist
         - bun-elysia
         - code-readability
+        - cross-project-context-capture
         - design-principles
         - design-ssot
         - dod-verbs

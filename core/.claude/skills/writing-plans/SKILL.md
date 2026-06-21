@@ -5,7 +5,7 @@ description: >
   code snippets, and verification commands. Use after /brainstorm or when you have
   a clear feature to implement. NOT for requirements exploration (use /brainstorm),
   direct implementation without planning (use /implement), or an unattended/headless
-  run that never pauses for input (use /autonomous-contract).
+  run that never pauses for input (use /goal-creator).
 triggers:
   - write plan
   - implementation plan

@@ -6398,18 +6398,19 @@
       "last_updated": "2026-06-20"
     }
   },
-  "autonomous-contract": {
-    "hash": "73a203b9f81b38fb5bdaacf81cff208f366413ec79ad1b6bfdc41aa635ed2da2",
+  "goal-creator": {
+    "hash": "65d4a346355ed32c7bcc96ff4bbbb954fc24faf7df8ab3e6be36dfda2889994a",
     "type": "skill",
     "category": "core",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-20",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
     "tags": [
+      "goal-creator",
       "autonomous",
       "goal",
       "workflow",
@@ -6417,7 +6418,7 @@
       "unattended",
       "self-improvement"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation); v2.0.0: renamed back to goal-creator (restoring the original firekaro-planner skill name per owner request)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,

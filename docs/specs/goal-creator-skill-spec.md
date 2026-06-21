@@ -1,4 +1,4 @@
-# Spec: `autonomous-contract` skill
+# Spec: `goal-creator` skill
 
 **Status:** DRAFT (brainstorm output) · **Date:** 2026-06-10 · **Tier 4** of `plans/hub-promotion-firekaro.md`
 **Source:** generalized from firekaro-planner `goal-creator` (v1.5.2)
@@ -18,7 +18,7 @@ contract** handed to an autonomous executor that will not pause to ask.
 
 ## 2. Chosen approach
 
-A **new standalone skill** `autonomous-contract` (not a `writing-plans` mode —
+A **new standalone skill** `goal-creator` (not a `writing-plans` mode —
 the genre, interview discipline, and "zero mid-run input" invariant are
 materially different). It is an **authoring** skill: it interviews to resolve
 every fork, writes a contract to `docs/contracts/`, and stops. It never runs
@@ -88,7 +88,7 @@ reader the intent without opening every file. The firekaro Rules map cleanly:
 
 **Must:** new standalone SKILL.md with STEP 0–5 + Mode B; `references/contract-template.md` + `references/baked-in-rules.md`; executor-anchored on `/goal` with alternatives; baked-in-rules as hub-rule pointers+gist; zero-open-questions mechanical gate; `docs/contracts/` convention; registry+changelog+`_meta`; passes all validators + full pytest; `/skill-evaluator` before merge.
 
-**Nice:** `references/example-contract.md` worked example; a `triggers:` list tuned for "create a goal / autonomous contract / unattended run"; cross-link from `writing-plans` STEP 7 (when to use autonomous-contract vs executing-plans).
+**Nice:** `references/example-contract.md` worked example; a `triggers:` list tuned for "create a goal / autonomous contract / unattended run"; cross-link from `writing-plans` STEP 7 (when to use goal-creator vs executing-plans).
 
 **Out of scope:** building any executor; a deterministic run-completion gate/hook (firekaro tracks this as a candidate — note it, don't build it); editing `/goal` itself; firekaro domain content.
 
@@ -97,7 +97,7 @@ reader the intent without opening every file. The firekaro Rules map cleanly:
 - Does the skill need a `Bash`-driven date/grep helper inline, or keep those as documented commands? (Lean: documented commands, matching `writing-plans`.)
 
 ## 6. Success criteria
-- A user can run `/autonomous-contract`, answer only genuine forks, and get a `docs/contracts/<slug>.md` that `/goal` can execute with zero mid-run questions.
+- A user can run `/goal-creator`, answer only genuine forks, and get a `docs/contracts/<slug>.md` that `/goal` can execute with zero mid-run questions.
 - The contract's verification section points to the hub rules (no inlined duplication) and the executor loads them transitively.
 - `/skill-evaluator full` passes (trigger reliability, output quality, no conflicts with `writing-plans`/`executing-plans`/`brainstorm`).
 - All hub validators + full `pytest scripts/tests/` green; registry `_meta` synced.
