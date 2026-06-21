@@ -529,3 +529,26 @@ hub *itself* (→ hub-only) or generically useful to any project (→ distributa
 mission is to distribute; default to `core/` for anything generic, keeping a `.claude/` copy only when
 the hub also *uses* it. Promote proactively once proven, genericizing hub deps (e.g. `dedup_check.py`
 → pluggable `SECRET_SCAN_CMD`). Fixed: PR #170 promoted all three to `core/`.
+
+## 2026-06-21 — Adversarial edge-case testing finds REAL bugs; "happy + 3 negatives" is not "tested"
+**Surfaced during:** the dual-home sync feature. I shipped it claiming "tested" after the happy path + 3
+negative cases. Abhay pushed: "did you test ALL gaps/edge cases?" An adversarial pass then found **4 real
+issues**, two of them genuine bugs the feature was *supposed* to catch but silently missed: (1) an
+unbalanced `DUAL-SYNC:END`-less fence silently stripped the rest of the file → **masked drift** (false
+"in sync"); (2) the gate compared only the primary file (`SKILL.md`) and **never the skill's `references/`
+subdir** → two `synced` skills had silently-drifted references (skill-master, executing-plans) that the
+gate kept passing. **Rules:** (a) "tested" requires an ADVERSARIAL matrix — malformed/boundary inputs,
+not just the inverse of the happy path; write tests that should FAIL on a real bug first, then fix. (b) For
+any "compare two things" feature, ask "am I comparing the WHOLE thing?" — comparing the headline artifact
+(SKILL.md) is not comparing the resource (dir + references/). (c) A binary classifier (synced/divergent)
+has a blind spot for the in-between case (partially-shared) — model it explicitly (the `shared` + fenced
+tier), don't let one bucket silently absorb it. Fixed: PRs #171/#173.
+
+## 2026-06-21 — Don't delete auto-checkpoint (`auto/work-*`) branches holding UNMERGED content
+**Surfaced during:** branch cleanup. The auto-git hook checkpoints uncommitted work onto `auto/work-*`
+branches. I deleted one as "stray noise" — but it held the ONLY commit of a lessons.md addition (the
+working-tree copy had already reverted on a branch switch), so I **lost the lesson** until I caught it
+(grep showed 0) and recovered it from the still-reachable orphaned commit object. **Rule:** an `auto/work-*`
+branch is the auto-git safety net — treat it like any unmerged branch: NEVER hard-delete one with content
+not on `main`; let the auto-pr SessionEnd flow PR + land it (or `/git-branch-lifecycle cleanup`, which
+auto-PRs unmerged branches instead of deleting them). Only delete after `gh` confirms its PR MERGED.
