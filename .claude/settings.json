@@ -46,6 +46,15 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/atlas-post-edit.sh\""
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -78,6 +87,10 @@
           {
             "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/auto-git.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/atlas-session-start.sh\""
           }
         ]
       }
