@@ -1,10 +1,12 @@
-# Lodestar — Goal Traceability Feature Catalog
+# Atlas — Goal Traceability Feature Catalog
 
-> **Product name: `Lodestar`** — the project's goal-navigation "second brain": keeps every file
-> traceable to the north-star goals. **Store: the `Atlas`** (`.lodestar/`) — a map of the territory
-> (file → purpose → goal → connections), not a flat database. Dependency-graph view = the
-> `Constellation`. Delivered as a **Claude Code plugin**, **sidecar-by-default** (zero edits to host
-> files), **auto-maintaining**, drop-in to any repo incl. the hub.
+> **Product name: `Atlas`** (renamed from Lodestar, 2026-06-21) — the project's goal-navigation
+> "second brain": keeps every file traceable to the north-star goals. **On-disk store: `.atlas/`**;
+> the persisted knowledge graph inside it is **the Index** (file → purpose → goal → connections),
+> not a flat database; the dependency-graph view is the **Constellation**. Commands: `/atlas scan`,
+> `/atlas explain <file>`, `/atlas goal <Gn>`, `/atlas map`. Delivered as a **Claude Code plugin**,
+> **sidecar-by-default** (zero edits to host files), **auto-maintaining**, drop-in to any repo incl.
+> the hub. Full BA discovery: `atlas-ba-discovery.md`.
 
 - **Author:** Claude Code (systems / product architect)
 - **Date:** 2026-06-21
@@ -147,7 +149,7 @@ Direction tags: **↑** bottom-up · **↓** top-down · **↔** both.
 | ID | Feature | Scenarios |
 |----|---------|-----------|
 | F47 | Packaged as a **Claude Code plugin** (native primitive: `.claude-plugin/`, marketplace) — drop-in to any repo incl. hub | S25 |
-| F48 | **Sidecar store** (`.goal-lens/` or plugin data) — map/graph/assignments live OUTSIDE host files; zero edits, zero added deps | S26 |
+| F48 | **Sidecar store** (`.atlas/` — the Index — or plugin data) — map/graph/assignments live OUTSIDE host files; zero edits, zero added deps | S26 |
 | F49 | **Auto-derivation + auto-refresh** — infer purpose + graph + proposed goal on install and on change (hook/CI/watcher) | S27 |
 | F50 | **Human-confirm/override layer** over inferred goal assignments (confirmed > inferred; inference never hard-gates CI) | S27 |
 | F51 | **Opt-in embed mode** — a command writes an in-file pointer when a team WANTS file-visible declaration; OFF by default | S1,S26 |
@@ -200,7 +202,7 @@ file unmapped/unconfirmed in the Atlas?" — a better gate, but not the same gat
 
 1. 🔴 **Atlas committed vs regenerated** — commit → staleness + merge conflicts; regenerate → must be
    deterministic. Lean: commit a deterministically-ordered, **per-file-sharded** Atlas (rare conflicts, reviewable diffs).
-2. 🔴 **Scan scope** — gitignore-aware + skip vendored/build/binary via `.lodestarignore`, else coverage lies.
+2. 🔴 **Scan scope** — gitignore-aware + skip vendored/build/binary via `.atlasignore`, else coverage lies.
 3. 🔴 **Secrets/privacy** — scanner reads file contents; LLM derivation can leak secrets → heuristic-first, secret-gated, local-inference option.
 4. 🔴 **Multi-language dependency edges (F16)** — pluggable per-language extractors + LLM fallback. Hardest piece.
 5. 🟡 **Rename/move/delete reconciliation** — content-hash per entry → detect moves, not delete+add.
@@ -210,14 +212,14 @@ file unmapped/unconfirmed in the Atlas?" — a better gate, but not the same gat
 9. 🟢 **`goals.yml` near-dependency** — scaffold from README; TODO stub if thin (never fail).
 10. 🟢 **CLAUDE.md pointer (F43) is an edit** — keep opt-in; default surfaces via command.
 11. 🟢 **Confidence display** — inferred vs confirmed visibly distinct everywhere.
-12. 🟢 **Uninstall contract** — repo byte-identical after removing `.lodestar/` + `goals.yml`.
+12. 🟢 **Uninstall contract** — repo byte-identical after removing `.atlas/` + `goals.yml`.
 
 ## INSTALL / BOOTSTRAP SCAN (existing-project onboarding)
 
-`/lodestar scan` — runs on install, then incrementally on every change:
+`/atlas scan` — runs on install, then incrementally on every change:
 
 ```
-1. WALK      enumerate files; gitignore-aware; apply .lodestarignore; skip binaries/vendored
+1. WALK      enumerate files; gitignore-aware; apply .atlasignore; skip binaries/vendored
 2. CLASSIFY  code / config / doc / test / asset → derivation strategy per type
 3. DERIVE    purpose per file: heuristic-first (path, name, docstring, imports, README);
              LLM only for low-confidence (secret-gated)
