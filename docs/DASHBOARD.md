@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-20 08:36 UTC (auto-generated)
+> Last updated: 2026-06-21 05:40 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 270 |
-| Core (universal) | 199 |
+| Total Patterns | 273 |
+| Core (universal) | 202 |
 | Stack-specific | 71 |
 | Agents | 36 |
 | Configs | 3 |
-| Hooks | 13 |
+| Hooks | 15 |
 | Rules | 52 |
-| Skills | 166 |
+| Skills | 167 |
 
 ## Pattern Inventory
 
@@ -32,8 +32,9 @@
 | api-docs-generator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | architecture-fitness | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| auto-git | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| auto-pr | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-verify | skill | 4.3.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent |
-| autonomous-contract | skill | 1.2.0 | project:firekaro-planner | — |
 | ba-discovery-checklist | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ba-usecase-discovery-reminder | hook | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
@@ -104,11 +105,13 @@
 | flutter | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-dart-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | full-space-first | rule | 1.2.0 | hub:abhayla/claude-best-practices | — |
+| git-branch-lifecycle | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | git-collaboration | rule | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | git-manager-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | git-worktrees | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | github-issue-manager-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | create-github-issue |
 | goal-anchored-decisions | rule | 1.0.0 | project:firekaro-planner | — |
+| goal-creator | skill | 2.0.0 | project:firekaro-planner | — |
 | grill-me | skill | 1.0.0 | scan:mattpocock/skills | — |
 | grill-with-docs | skill | 1.0.0 | upstream:mattpocock/skills@engineering/grill-with-docs | adr |
 | handover | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |

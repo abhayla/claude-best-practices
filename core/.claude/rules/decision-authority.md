@@ -105,7 +105,7 @@ This escalation list is **advisory prose** — and prose loses to time pressure.
    (the human is the seatbelt). Deliberately do NOT set `defaultMode: "auto"` in
    `~/.claude/settings.json` — that is the only place it takes effect, but it is machine-wide
    and would wrongly cover interactive sessions too; scope Auto mode at the autonomous-run
-   launch instead. Authoring guidance lives in `/autonomous-contract` STEP 5.
+   launch instead. Authoring guidance lives in `/goal-creator` STEP 5.
 2. **`permissions.deny` rules** in `settings.json` (apply in EVERY mode) encode the
    git-gate-bypass class `git-collaboration.md` forbids — `git push --force` / `-f`,
    `git push --no-verify`, `git commit --no-verify` / `-n`. A denied call is blocked and

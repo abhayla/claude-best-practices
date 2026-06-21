@@ -235,3 +235,53 @@ match are marked stale, not deleted. New §5 axis: **Index trust state** (valid 
 D1–D5 addressed in §§1–7 above; W1–W6 folded. **Discovery is G1-ready.** Primary-actor recommendation
 stands: design the bottom-up `explain` for BOTH A1 (agent) and A2 (developer); dashboard (A5) and
 adapters (A9/A10) are post-G1.
+
+## 10. Round-2 adversarial re-audit (2026-06-21) — 15 NEW gaps; 6 are 🔴 build-blockers
+
+A second fresh-context audit (beyond §9's D1–D5/W1–W6) surfaced gaps that strike load-bearing claims.
+**Verdict: NOT buildable as-is — 6 🔴 must resolve before the `/goal` run.** Resolutions below are
+authoritative; the contract (`atlas-mvp.md`) is updated to match.
+
+### 🔴 Blockers + resolutions
+- **G-R1 Rename-with-edit drops confirmed mappings.** Content-hash move-detection fails when a file is
+  moved AND edited in one commit → confirmed goal + history lost. **Resolution:** match on *git rename
+  detection* (path similarity) first, content-hash second; on ambiguity, carry the confirmed mapping
+  forward as `inferred·needs-reconfirm` — never silently drop a confirmation.
+- **G-R2 Sharded-Index merge conflicts undefined.** **Resolution:** add `/atlas resolve` + rule: on a
+  shard conflict the `confirmed` side wins; both-confirmed-and-differ → keep both + flag; both-inferred →
+  re-derive. Shards are 1-file each so conflicts are localized + machine-resolvable.
+- **G-R3 Agent self-staleness.** Agent edits a file → Index stale same-session (auto-update MVP-deferred).
+  **Resolution:** MVP stamps each Index entry's content-hash so `explain` SHOWS staleness, + an
+  `/atlas refresh <file>` the agent calls after writing. Name the window; don't pretend it's fresh.
+- **G-R4 Infra/build files have no honest goal.** **Resolution:** add a first-class **`G0` / `infra`**
+  `goals.yml` entry for files serving goals *indirectly* (build/test/config). ANCHOR may assign `G0`;
+  `G0` files are NOT orphans and NOT plausibility-absurd. Fixes Contradiction 3.
+- **G-R5 No Index integrity/authorship model.** A poisoned `confirmed` shard is a supply-chain hole.
+  **Resolution:** `.atlas/` diffs are PR-reviewed like code; `confirm` records actor + date; the agent
+  trusts `confirmed` ONLY when the Index is committed+reviewed (advisory in a dirty tree).
+- **G-R6 Graph is always partial but rendered as fact.** Dynamic imports / DI / dict-dispatch (which the
+  dogfood hub *itself* uses) are invisible to static parsing. **Resolution:** tag every edge with a
+  source (`static` vs `inferred`) + render a **"graph may be incomplete"** marker (the advisory
+  treatment goals already get under D2); bus-factor/blast-radius carry a partiality caveat.
+
+### 🟡 Should-fix (cheap + load-bearing)
+- **G-R7** Cold-start value gap — DoD proves mechanism not value; add a "confirm-N-to-be-useful" note.
+- **G-R8** No inference-accuracy metric — add a `correction_rate` signal (inferred-then-corrected %).
+- **G-R9** Host-repo conflict — check-before-write on `goals.yml`/`.atlas/`; detect + integrate existing
+  ADR/RTM/`goals:` frontmatter rather than re-infer over it.
+- **G-R10** Case-insensitive FS collision (`Foo.py`/`foo.py`) — **owner is on Windows + dogfoods this
+  repo**; normalize + detect casing collisions; define symlink (don't follow) + submodule (skip) handling.
+- **G-R11** Gameable coverage — REPORT `mapped / scanned / ignored / total`, not a single %.
+- **G-R12** Budget cap → non-deterministic Index — persist which files were heuristic-only so a re-scan
+  under the same cap is reproducible (reconciles with the deterministic-Index requirement).
+- **G-R13** DoD "valid goal on every file" vs "suppress on thin README" — reconcile via `G0` + an explicit
+  degraded-mode DoD (contract §6).
+
+### 🟢 Deferrable — named, not silently absent
+- **G-R14** No portfolio/fleet view — add Atlas goal-health to the hub's `aggregate_telemetry.py` (v1.x).
+- **G-R15** Watcher vs manual-scan/agent-edit race — single-writer lock + debounce (v1.1, with auto-update).
+
+### Process finding (RESOLVED this session)
+3 of the 5 spec docs had landed on `main` via PR #178 while the build branch predated that merge — so
+they were absent from the branch HEAD. **Fixed:** merged `origin/main` into `feat/enhance-mode-flag`; all
+5 docs are now co-located on the branch.

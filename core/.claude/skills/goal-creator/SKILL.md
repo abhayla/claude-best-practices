@@ -1,5 +1,5 @@
 ---
-name: autonomous-contract
+name: goal-creator
 description: >
   Author a "contract" — a dense, zero-open-questions markdown spec — to hand to
   an autonomous executor (Claude Code's built-in `/goal`, or `/loop`, a routine,
@@ -14,8 +14,11 @@ description: >
 type: workflow
 allowed-tools: "Read Write Edit Grep Glob Bash"
 argument-hint: "[one-line description of the goal, optional]"
-version: "1.2.0"
+version: "2.0.0"
 triggers:
+  - goal creator
+  - create a goal
+  - goal contract
   - autonomous contract
   - create a goal contract
   - draft a /goal contract

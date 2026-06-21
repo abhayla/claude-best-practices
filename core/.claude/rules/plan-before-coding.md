@@ -49,7 +49,7 @@ A plan is not a restatement of the ask. It MUST show:
   execute on approval. When requirements are still unclear, run `/brainstorm` or
   `/writing-plans` first.
 - **Finalized scope handed to an unattended executor** → author a contract via
-  `/autonomous-contract` — the contract IS the plan for autonomous runs.
+  `/goal-creator` — the contract IS the plan for autonomous runs.
 - **Smaller-but-non-trivial work** that does not warrant plan mode → write a short **inline plan
   block** (Approach / Files / Steps / Verification) in the response BEFORE the first
   `Edit`/`Write`.
@@ -83,7 +83,7 @@ bind **every role/agent the orchestrator dispatches to change code**. So:
   Planning comes AFTER intent is locked and decides HOW.
 - **TDD** (`tdd-rule.md`) red-first follows the plan: the plan names the tests; TDD writes them
   failing-first.
-- **Autonomous contract** (`/autonomous-contract`) is the planning artifact for unattended runs.
+- **Autonomous contract** (`/goal-creator`) is the planning artifact for unattended runs.
 - Per-turn reminders of this rule (e.g. via a prompt-submit hook) keep it from being missed under
   context pressure — see `prompt-auto-enhance-rule.md`.
 

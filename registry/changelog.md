@@ -4,6 +4,10 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-21 — Rename skill `autonomous-contract` → `goal-creator` (restore original name)
+
+- **renamed** skill `autonomous-contract` → `goal-creator` (`core/.claude/skills/goal-creator/SKILL.md`, 1.2.0 → 2.0.0 MAJOR — name change). Restores the original firekaro-planner skill name it was promoted from (commit `1895e06` had renamed it during Tier-4 promotion); owner requested the original name back. Registry key + hash resynced; cross-references updated in `decision-authority`, `engineering-roles`, `plan-before-coding`, `writing-plans`, and `config/workflow-groups.yml`; spec doc renamed `autonomous-contract-skill-spec.md` → `goal-creator-skill-spec.md`. The skill's PURPOSE is unchanged — it authors a zero-open-questions contract for the built-in `/goal` executor. No deprecation stub left: registry adoption `sample_size: 1` (hub-internal only) and all references are internal + updated, so a stub would protect nothing.
+
 ### 2026-06-20 — Add karpathy-advisor decision-lens skill + agent; route Decision Advisors in engineering-roles
 
 - **added** skill `karpathy-advisor` (`core/.claude/skills/karpathy-advisor/SKILL.md`, type: reference, category: core, tier: nice-to-have) + its `references/understanding.md` knowledge base — a "what would Karpathy do?" decision lens encoding Andrej Karpathy's documented heuristics (build-from-scratch-to-understand, march of nines, demo≠product, autonomy slider, verifiability gate, decade-not-year-of-agents, data over architecture, KISS minimal reference impls) for AI/ML / agents / build-vs-buy / learning decisions. Built from his essays, GitHub, talk/podcast transcripts, and 2025–26 writing. Sourcing integrity: his live X timeline is paywalled to automated fetch (HTTP 402) → notable tweets are secondary-sourced and flagged verbatim-vs-paraphrase; the lens never fabricates a position. (PR #154)

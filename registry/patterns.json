@@ -3953,13 +3953,13 @@
     }
   },
   "prompt-auto-enhance": {
-    "hash": "ea7b6d66e0ac5363ffb5b39b0b3b894f3fd8ce7b731a3df8a7f5747796ea1a5f",
+    "hash": "b3b826ced1eb0cb4058c3b5771e9ffa5e2160179c1ca25922dd1930c00be244b",
     "type": "skill",
     "category": "core",
     "version": "3.7.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-06-18",
+    "last_updated": "2026-06-21",
     "dependencies": [
       "writing-skills",
       "claude-guardian",
@@ -4024,7 +4024,7 @@
     "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "UserPromptSubmit hook that injects a deterministic reminder for the Enhanced indicator on every user prompt. v2: deterministic trigger gate filters trivial prompts and known continuation phrases at the hook layer.",
@@ -5833,13 +5833,13 @@
     }
   },
   "writing-plans": {
-    "hash": "b43845df38ab214ac08a3b2eb7c370eeb0a7fa31c5cd13fb23388cbb5f84a92f",
+    "hash": "ce9755cb42dfad629c211441cee82a0b708a8d8729257c43987364dad5b2ed23",
     "type": "skill",
     "category": "core",
     "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Structured implementation planning with atomic plan chunks",
@@ -6103,13 +6103,13 @@
     }
   },
   "decision-authority": {
-    "hash": "99a10b1d0923568ba75f28c26a05295705cac2fd08ec86b547cc00a7f27a53f3",
+    "hash": "9530c34a694b1b76dc34fcb985828edbab7270171d417252caf5e413d506582c",
     "type": "rule",
     "category": "core",
     "version": "1.2.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-20",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Decide-vs-escalate taxonomy: DECIDE on reversible/internal/best-practice-clear work, ESCALATE only irreversible/outward/material/fork. Confidence-gate-on-intent + anti-over-ask (no trailing offer, no narrate-and-stop).",
@@ -6398,18 +6398,19 @@
       "last_updated": "2026-06-20"
     }
   },
-  "autonomous-contract": {
-    "hash": "73a203b9f81b38fb5bdaacf81cff208f366413ec79ad1b6bfdc41aa635ed2da2",
+  "goal-creator": {
+    "hash": "65d4a346355ed32c7bcc96ff4bbbb954fc24faf7df8ab3e6be36dfda2889994a",
     "type": "skill",
     "category": "core",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-20",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
     "tags": [
+      "goal-creator",
       "autonomous",
       "goal",
       "workflow",
@@ -6417,7 +6418,7 @@
       "unattended",
       "self-improvement"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation); v2.0.0: renamed back to goal-creator (restoring the original firekaro-planner skill name per owner request)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6432,13 +6433,13 @@
     "total_patterns": 273
   },
   "plan-before-coding": {
-    "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
+    "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Visible plan (plan mode, autonomous contract, or inline plan block) required BEFORE the first code edit on any non-trivial change: approach+WHY, concrete file list, build sequence, verification, risks. Root-cause + full consumer/surface map is part of the plan; both mandates propagate to every dispatched code-changing worker.",
@@ -6458,13 +6459,13 @@
     }
   },
   "engineering-roles": {
-    "hash": "c4249df4f75945ce83bb26f64b809b75cdef4dd8f06dedaae09b5200d56bad1a",
+    "hash": "374baa3e6f5ad9afaa1c448e7546e22a5b45e36d7c6b2b9941f2e38be6947ca2",
     "type": "rule",
     "category": "core",
     "version": "1.7.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-20",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Autonomous role router: infer the engineering role from the task signal, state `Role: <name> — <why>`, and dispatch the role's named agents/skills (routing layer, no capability duplication). Includes router table, condensed mandates, canonical multi-role sequences with a mandatory independent-reviewer edge, and a routing feedback loop.",
@@ -6489,7 +6490,7 @@
     "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Stop hook enforcing stop-discipline deterministically: BLOCKS over-ask (trailing offer / multiple-choice / recommendation+question) and narrate-and-stop endings on reversible work and re-injects the decision-authority rule; exempts genuine blockers and *Sync-check:* intent grills; logs enhance-banner/block/role misses as non-blocking telemetry; per-turn auto-continue cap of 12 via .claude/.keepgoing-count.",
