@@ -141,9 +141,15 @@ into the design (not deferred-and-forgotten), scheduled after the steering MVP p
 | S21 | **Rotting-goal alarm** — goals untouched N days auto-surface | ⑥ drift |
 | S22 | **Goal-grouped release notes** — auto-changelog grouped by goal advanced (from N7 data) | ⑧ |
 
-> **Scope guard (YAGNI):** S2–S22 are a *roadmap*, deliberately NOT in the v0.1 MVP. The MVP remains the
-> steering loop (N1–N7) + S1 (machine-checkable DoD). Build that, prove it on the hub dogfood, then pull
-> from this roadmap by real demand — do not expand v0.1 to chase the roadmap.
+**v0.4 "Moonshot" tier — S23–S28 (owner-approved 2026-06-21; explicitly speculative):** S23 goal-driven
+scaffolding · S24 predictive drift forecasting · S25 goal trade-off mediation · S26 cross-project goal
+learning · S27 live goal co-pilot · S28 goal ROI weighting. Captured for completeness; revisit only after
+v0.1–v0.2 ship and real usage justifies them.
+
+> **Scope guard (YAGNI) — HARD LINE:** S2–S28 are a *roadmap*, deliberately NOT in the v0.1 MVP. The MVP
+> is FROZEN at: steering loop (N1–N7) + S1 (machine-checkable DoD) + the 6 Round-2 🔴 + autonomy. Build
+> that, prove it on the hub dogfood, then pull from this roadmap **by real demand**. Do NOT expand v0.1 to
+> chase the roadmap, and do NOT keep growing the roadmap in lieu of building — the spec is DONE.
 
 ## 5. OUT of MVP scope (defer — do NOT build now)
 
