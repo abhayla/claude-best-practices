@@ -70,7 +70,7 @@ The hub's trust-score subsystem (PR #163, on `feat/trust-score-mvp`) is the gate
 - **`scripts/trust_score.py`** — the engine: signals (0.0–1.0) → weighted 0–100 score → hard-gate veto → `graduation_status()` per stage. `config/trust-score.yml` is mirrored as the importable default.
 - **`scripts/collect_signals.py`** — the *real-signal* adapter: assembles signals from actual evidence (test counts, coverage, a live secret-scan) and records a run to `trust-score/calibration-ledger.jsonl` so honesty data accrues automatically as real tasks finish. Supports `--secret-scan-clean` to override for accurate per-project scoring.
 - **`scripts/simulate_walk_phase.py`** — a **sandbox** that fabricates realistic runs to stress-test the controller; writes ONLY to `trust-score/sim-ledger.jsonl` so fabricated data can never contaminate real calibration. Real graduation still requires real runs.
-- **`scripts/generate_trust_dashboard.py`** → `trust-score/dashboard.html` (self-contained, auto-refreshing) from `trust-score/build-state.json`.
+- **`scripts/generate_trust_dashboard.py`** → `trust-score/dashboard.html` (self-contained, auto-refreshing) from `trust-score/build-state.json` (build sections) + the live per-project calibration ledger `trust-score/ledgers/atlas.jsonl` (real runs accrued / 30 + false-confidence — sourced live, never hand-typed).
 - **`trust-score/`** — runtime ledgers and state: `build-state.json`, `calibration-ledger.jsonl` (real), `sim-ledger.jsonl` (sandbox), `ledgers/` (per-project), `dashboard.html`. Tests: `test_trust_score.py`, `test_walk_phase.py`, `test_collect_signals.py`.
 
 ### Autonomous Branch Lifecycle
