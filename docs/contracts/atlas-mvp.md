@@ -124,6 +124,27 @@ into the design (not deferred-and-forgotten), scheduled after the steering MVP p
 | S9 | **Test→goal safety map** — which tests protect which goal; high-%-no-tests = fragile | ③ gap | surfaces *unsafe* progress |
 | S10 | **Hub-machinery integration** — feed convergence into trust-score (`goal_delivery_confidence`) + PM agent | ⑧ close-loop | Atlas = goal-sensor for the autonomous factory (Goal-5) |
 
+### v0.3 "Atlas-Foresight" tier — S11–S22 (owner-approved 2026-06-21; roadmap, not MVP)
+
+| ID | Feature | Strengthens |
+|---|---|---|
+| S11 | **Project "Definition of Done" / north-star bar** — aggregate all goals into ONE top-level completion signal | ⑦ converge |
+| S12 | **Auto-goal-discovery** — detect emergent goals from commit/file clusters not yet in `goals.yml` | ② goal-model |
+| S13 | **Pre-edit blast-radius preview** — before a file changes, show which goals it touches + risk | ⑥ drift |
+| S14 | **Drift root-cause diagnosis** — when a goal stalls, diagnose *why* + suggest the unblock | ⑥⑦ |
+| S15 | **Goal ↔ issue-tracker sync** — bidirectional goals ↔ GitHub milestones/issues | ⑧ close-loop |
+| S16 | **Goal health score** — composite per goal (coverage × test-safety × velocity × confidence) | ③ gap |
+| S17 | **Effort × Impact backlog view** — plot ranked next-actions on an effort/impact quadrant | ④ prioritize |
+| S18 | **Reusable goal templates** — standard DoD templates (deploy / coverage / security goals) | ② goal-model |
+| S19 | **Goal ownership / RACI** — who owns each goal; routes stall-alerts | ⑤ steer |
+| S20 | **What-if simulation** — projected convergence if you focus on goal X next | ④⑦ |
+| S21 | **Rotting-goal alarm** — goals untouched N days auto-surface | ⑥ drift |
+| S22 | **Goal-grouped release notes** — auto-changelog grouped by goal advanced (from N7 data) | ⑧ |
+
+> **Scope guard (YAGNI):** S2–S22 are a *roadmap*, deliberately NOT in the v0.1 MVP. The MVP remains the
+> steering loop (N1–N7) + S1 (machine-checkable DoD). Build that, prove it on the hub dogfood, then pull
+> from this roadmap by real demand — do not expand v0.1 to chase the roadmap.
+
 ## 5. OUT of MVP scope (defer — do NOT build now)
 
 **embed mode** (F51); the full goal-change handler (§6 taxonomy — design only); CI presence-gate (F22);
