@@ -4018,7 +4018,7 @@
     }
   },
   "prompt-enhance-reminder": {
-    "hash": "6e22ec5fecb0c5ee4abac2d01c3e5da7f55eadfacb71b6eecef14c414a7139b7",
+    "hash": "586f816e9b77e2394234aa3a49155aba0cc514190d8c958c9dcfd1bb5380f277",
     "type": "hook",
     "category": "core",
     "version": "2.1.0",
@@ -6483,7 +6483,7 @@
     }
   },
   "no-overask-guard": {
-    "hash": "b308d7bccea0c024fee39c106ee4c4e19eca0e56a295eb471b243706df8ac748",
+    "hash": "5202204f81108ada56047872687809adc16299af93b81ebc4baaae4c0b871bba",
     "type": "hook",
     "category": "core",
     "version": "1.1.0",
