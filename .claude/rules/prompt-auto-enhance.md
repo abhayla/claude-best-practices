@@ -8,6 +8,30 @@ The hook (`prompt-enhance-reminder.sh`) gates triggering: prompts ≤15 chars an
 continuation phrases skip injection at the deterministic layer, so the strengthening
 pipeline only runs on substantive prompts.
 
+## ENHANCE_MODE — the session opt-out flag (`auto` | `ask` | `off`)
+
+A single session flag controls whether the **prompt-enhancement pipeline** runs. It is
+stored in `.claude/.enhance-mode` (a gitignored runtime file); **absent ⇒ `auto`**, so
+default behavior is unchanged. Set it inline — type `enhance auto`, `enhance ask`, or
+`enhance off` as a whole prompt and `prompt-enhance-reminder.sh` writes the flag and
+confirms. The flag gates **only** the enhancement process (the L2 strengthening pipeline
++ the L3 reviewer-card / diagnosis-substance enforcement in `no-overask-guard.sh`). The
+governance tail — plan-before-coding, decide-don't-ask, grill-when-unsure,
+narrate-and-stop, git — is **always active in every mode**; those are not the
+enhancement process.
+
+| Mode | Banner + grade card + reviewer + final-prompt | Stop-hook enhance enforcement | Governance tail |
+|---|---|---|---|
+| `auto` (default) | rendered every substantive turn | on (reviewer-card + diagnosis blocks) | on |
+| `ask` | suppressed; append one line *"Enhance available — reply `enhance`…"* | off | on |
+| `off` | suppressed entirely | off | on |
+
+**One-shot opt-in:** in `ask`/`off`, a bare `enhance` (or `enhance this`) re-runs the
+PRIOR prompt through the full pipeline for that turn without changing the stored mode.
+Everything below this section describes the **`auto`-mode** contract — in `ask`/`off` the
+banner + full-process requirement is suspended (and the L3 hook will not block its
+absence), while the governance rules still hold.
+
 **The indicator is unconditional on substantive OUTPUT — even when the hook stayed
 silent.** The hook gates on PROMPT shape; short / slash-command / continuation prompts
 still spawn substantive work, and the discipline fires on the output's blast radius,
