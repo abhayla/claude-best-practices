@@ -101,6 +101,29 @@ INTO the MVP. Atlas without these is a monitor, not a controller.
     auto-advance that goal's %-done in the ledger (N6). Promotes catalog **F32** from tag→credit. Without
     this the loop never closes.
 
+## 4d. Atlas-Intelligence enhancements S1–S10 (owner-approved 2026-06-21)
+
+The owner approved all 10 strategic suggestions. **S1 is promoted to MVP-CORE** (it upgrades N1/N2/N7
+from *estimated* to *measured*). **S2–S10 form a named v0.2 "Atlas-Intelligence" tier** — incorporated
+into the design (not deferred-and-forgotten), scheduled after the steering MVP proves out.
+
+15. **S1 — Machine-checkable Definition-of-Done (CORE).** Each goal's DoD in `goals.yml` may be an
+    *executable assertion* (a named test passes / a file exists / a command exits 0 / an endpoint 200s).
+    Atlas evaluates these → **% done is MEASURED from reality, not inferred** (N2/N7 read real signals).
+    DoD with no machine-check falls back to the inferred estimate. *Strengthens the keystone (N1).*
+
+| ID | v0.2 feature | Strengthens | Note |
+|---|---|---|---|
+| S2 | **Goal dependency graph** — goals depend on goals (meta-Constellation); unblock-first ordering | ④ prioritize | "can't advance G3 until G1 ≥ X%" |
+| S3 | **Active learning from corrections** — every `correct` retrains inference; `correction_rate`→signal | ① sense | self-improving accuracy |
+| S4 | **Anti-goals / guardrails** — constraints as negative goals (security, perf budget, no-new-deps) | ⑥ drift | flag *violations*, not just neglect |
+| S5 | **Confidence decay** — inferred mappings lose confidence over time until re-touched | ①⑩ | stale guesses self-flag |
+| S6 | **Owner stall-alerts via Notifier** — goal-stall/drift → the hub's Notifier gateway, off-session | ⑦ converge | proactive when away |
+| S7 | **Natural-language goal Q&A** — "what's left for G3 / riskiest file / what next?" | ⑨ query | human-steerer interface |
+| S8 | **Goal-aware review + commit rationale** — PR annotates goal-delta; auto goal-tagged commits | ⑥⑧ | steers the review process |
+| S9 | **Test→goal safety map** — which tests protect which goal; high-%-no-tests = fragile | ③ gap | surfaces *unsafe* progress |
+| S10 | **Hub-machinery integration** — feed convergence into trust-score (`goal_delivery_confidence`) + PM agent | ⑧ close-loop | Atlas = goal-sensor for the autonomous factory (Goal-5) |
+
 ## 5. OUT of MVP scope (defer — do NOT build now)
 
 **embed mode** (F51); the full goal-change handler (§6 taxonomy — design only); CI presence-gate (F22);
