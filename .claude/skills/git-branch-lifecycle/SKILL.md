@@ -102,7 +102,9 @@ a reviewer; this skill can).
    gh pr view "$BR" >/dev/null 2>&1 || gh pr create --base main --head "$BR" --fill
    gh pr merge "$BR" --auto --squash
    ```
+<!-- DUAL-SYNC:HUB-ONLY -->
    GitHub merges when the required CI checks (`validate`, `test`) pass, then deletes the branch.
+<!-- DUAL-SYNC:END -->
 5. **Report** the PR URL and that it is armed. Do not block waiting for CI.
 
 ---

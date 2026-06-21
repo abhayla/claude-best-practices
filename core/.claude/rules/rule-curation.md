@@ -46,3 +46,9 @@ Agents MUST declare `model` in frontmatter and include `## Core Responsibilities
 ## Rule Curation
 
 Every rule MUST declare its activation scope — either `globs:` in frontmatter or `# Scope: global` in the first 5 lines. Unscoped rules cause context pollution in projects where they don't apply.
+
+## Hub-only vs Distributable Scoping (+ dual-home sync)
+
+For EVERY new resource (skill / agent / rule / hook), decide its home BEFORE building: does it operate **the hub itself** (→ hub-only `.claude/`) or is it generically useful to **any project** (→ distributable `core/.claude/` + registry)? **Default to distributable** — the hub's mission is to distribute, and `core/` patterns are opt-in (provisioned, never auto-active). Build/dogfood in the hub first, then promote once proven (genericizing hub-specific deps). Promotion is bidirectional (hub→core when proven generic; core→hub when the hub must use it operationally).
+
+A resource that lives in BOTH trees (dual-home) MUST be classified in `config/dual-home-resources.yml` as `synced` (must stay identical), `shared` (shared skeleton identical; hub/downstream-specific lines fenced `DUAL-SYNC:HUB-ONLY`/`DOWNSTREAM-ONLY` so they cannot intermingle), or `divergent` (documented variant). The CI gate (`scripts/tests/test_dual_home_sync.py`) blocks drift + unclassified resources. Full doctrine: `docs/HUB-CORE-SYNC.md`.

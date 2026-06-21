@@ -1,0 +1,69 @@
+# Dual-home resources — patterns that live in BOTH .claude/ (hub-only operational) AND
+# core/.claude/ (the distributable template). SSOT for the drift gate:
+#   scripts/tests/test_dual_home_sync.py  — CI gate (fails on drift / unclassified resource)
+#   scripts/sync_dual_home.py             — check + reconcile/promote a change between the two
+#
+# Two classes (every dual-home resource MUST be in exactly one):
+#   synced     — MUST stay normalized-identical across both copies. A change to one side MUST be
+#                mirrored to the other (`python scripts/sync_dual_home.py --sync <name> --from hub|core`).
+#                The CI gate fails if a synced pair drifts.
+#   divergent  — intentionally differs (the hub operational copy and the distributable copy serve
+#                different needs). Each carries a reason. NOT auto-synced; reconcile by hand only the
+#                parts that are relevant to both sides.
+#
+# Adding a new dual-home resource? It MUST be classified here or the gate fails (no silent drift).
+# Doctrine + the hub-only/core/both scoping decision: docs/HUB-CORE-SYNC.md.
+
+synced:
+  agents:
+    - anthropic-multi-agent-reviewer-agent.md
+    - planner-researcher-agent.md
+    - quality-gate-evaluator-agent.md
+    - skill-author-agent.md
+    - web-research-specialist-agent.md
+  skills:
+    - anthropic-multi-agent-research-system-skill
+    - continue
+    - executing-plans
+    - five-advisors
+    - github
+    - grill-me
+    - prompt-auto-enhance
+    - reddit
+    - save-session
+    - skill-evaluator
+    - skill-master
+    - start-session
+    - twitter-x
+  rules:
+    - claude-behavior.md
+    - context-management.md
+    - workflow.md
+  hooks:
+    - ba-usecase-discovery-reminder.sh
+    - no-overask-guard.sh
+    - prompt-enhance-reminder.sh
+    - prompt-logger.sh
+    - session-governance-status.sh
+    - verifier-edge-guard.sh
+
+# shared: mostly-shared resources. The non-fenced SKELETON must be identical across both copies
+# (the gate enforces it); hub-specific lines are fenced `DUAL-SYNC:HUB-ONLY ... DUAL-SYNC:END` and
+# downstream-specific lines `DUAL-SYNC:DOWNSTREAM-ONLY ... DUAL-SYNC:END`. A HUB-ONLY fence may appear
+# ONLY in the hub copy and a DOWNSTREAM-ONLY fence ONLY in core (anti-intermingling). This is how a
+# resource keeps its shared logic in lockstep while its hub/downstream-specific bits legitimately differ.
+shared:
+  skills:
+    - git-branch-lifecycle
+
+divergent:
+  hooks:
+    auto-git.sh: "hub calls scripts/dedup_check.py --secret-scan; core is genericized (pluggable SECRET_SCAN_CMD -> gitleaks) + generic commit trailer"
+    auto-pr.sh: "core documents the GitHub branch-protection prerequisite + AUTO_MERGE opt-out generically (hub comment names its own checks)"
+  skills:
+    brainstorm: "pre-existing variant — hub and distributable copies differ; review whether the divergence is intentional"
+    claude-guardian: "pre-existing variant — core is the fuller distributable form; review whether intentional"
+    writing-plans: "pre-existing variant; review whether intentional"
+    writing-skills: "pre-existing variant — hub copy is substantially larger than the distributable; review whether intentional"
+  agents:
+    code-reviewer-agent.md: "pre-existing variant; review whether intentional"
