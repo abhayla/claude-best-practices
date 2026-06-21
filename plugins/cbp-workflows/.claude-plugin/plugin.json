@@ -1,0 +1,8 @@
+{
+  "name": "cbp-workflows",
+  "version": "0.0.1",
+  "description": "Claude Best Practices workflow patterns as a native plugin (Goal 6 pilot). Packages skills + agents + hooks; auto-loaded rules are intentionally NOT here (no plugin-native rules concept — kept as a copy-in step per issue #187).",
+  "author": { "name": "Abhay Kumar" },
+  "keywords": ["workflows", "best-practices", "goal-traceability", "claude-code"],
+  "hooks": "./hooks/hooks.json"
+}
