@@ -59,3 +59,6 @@ trust-score/calibration-ledger.jsonl
 .claude/.auto-git.log
 trust-score/sim-ledger.jsonl
 trust-score/ledgers/
+
+# Local scratch notes (untracked working notes, e.g. ad-hoc gap-analysis prompts)
+/Notes
