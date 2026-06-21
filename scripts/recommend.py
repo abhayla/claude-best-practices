@@ -2248,8 +2248,54 @@ def deep_merge_settings(base: dict, overlay: dict) -> dict:
     return result
 
 
+def referenced_hook_basenames(settings: dict) -> set[str]:
+    """Every `.claude/hooks/<name>.(sh|ps1)` file basename a settings dict wires.
+
+    Walks all hook command strings across every event so callers can reconcile
+    what is WIRED against what is actually delivered on disk.
+    """
+    names: set[str] = set()
+    for blocks in settings.get("hooks", {}).values():
+        for block in blocks:
+            for hook in block.get("hooks", []):
+                for m in re.finditer(
+                    r"\.claude/hooks/([A-Za-z0-9._-]+\.(?:sh|ps1))",
+                    hook.get("command", ""),
+                ):
+                    names.add(m.group(1))
+    return names
+
+
+def _deliver_referenced_hooks(hub_root: Path, target_dir: Path, settings: dict) -> list[str]:
+    """Copy any hook file the settings WIRES but the target is MISSING.
+
+    Closes the root-cause gap where settings.json merge wired a governance hook
+    (e.g. ba-usecase-discovery-reminder.sh) without the file ever being copied,
+    leaving a dangling reference that fails at runtime. Source of truth for
+    distributable hooks is core/.claude/hooks/; target-only hooks are left
+    untouched, and a hook absent from both is skipped (the consistency test
+    guards the templates so that case cannot ship).
+    """
+    src_hooks = hub_root / "core" / ".claude" / "hooks"
+    dst_hooks = target_dir / ".claude" / "hooks"
+    delivered: list[str] = []
+    for name in sorted(referenced_hook_basenames(settings)):
+        dst = dst_hooks / name
+        src = src_hooks / name
+        if dst.exists() or not src.exists():
+            continue
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+        delivered.append(name)
+    return delivered
+
+
 def provision_settings_json(hub_root: Path, target_dir: Path) -> str:
-    """Provision .claude/settings.json by merging hub defaults with existing."""
+    """Provision .claude/settings.json by merging hub defaults with existing.
+
+    After writing, delivers every hook the resulting settings WIRES so the
+    target can never reference a hook whose file was not copied.
+    """
     hub_settings_path = hub_root / "core" / ".claude" / "settings.json"
     target_settings_path = target_dir / ".claude" / "settings.json"
 
@@ -2264,10 +2310,12 @@ def provision_settings_json(hub_root: Path, target_dir: Path) -> str:
         target_settings_path.write_text(
             json.dumps(merged, indent=2) + "\n", encoding="utf-8"
         )
+        _deliver_referenced_hooks(hub_root, target_dir, merged)
         return "merged"
 
     target_settings_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(hub_settings_path, target_settings_path)
+    _deliver_referenced_hooks(hub_root, target_dir, hub_settings)
     return "created"
 
 
