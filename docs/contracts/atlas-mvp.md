@@ -172,6 +172,37 @@ MVP scope** (they are correctness/trust holes on the default path, not nice-to-h
 - **Honest coverage:** REPORT `mapped / scanned / ignored / total` (never a single gameable %).
 - **Windows-safe scan:** normalize + detect case-insensitive path collisions; don't follow symlinks; skip
   submodules. (The dogfood host is this Windows repo — exercised on run 1.)
+- **D3 — Index schema versioning + migrate-on-upgrade (resolved BA blocker, restored):** `.atlas/` carries a
+  schema version; when Atlas upgrades and the schema changes, a migration runs; a failed migration degrades
+  to `rebuild --from-scratch`, never corrupts. (The Index is a committed artifact → a schema bump is a
+  breaking change across every adopter; this MUST ship.)
+- **D4 — Index recovery / resync (resolved BA blocker, restored):** `/atlas rebuild --from-scratch`; the Index
+  is **advisory**, so a corrupt/partial/stale Index degrades gracefully (affected files read "unknown") rather
+  than crashing; entries key off content-hash so a git history-rewrite re-matches by content, stale entries
+  flagged not deleted.
+- **F25 orphan-FILE detection (restored):** the Goal Pulse + coverage surface files that serve **no** goal
+  (delete/review candidates) — not just orphan-*goals*. Advisory, never auto-deleted.
+- **F26 scope-creep flag (restored, batch form):** the Goal Pulse "drifting" status flags a change that
+  advances no stated goal / a non-priority goal. (The *real-time* interrupt is N5, v0.2.)
+
+## 5b. Disposition of every remaining catalog feature (no silent drops — owner traceability check 2026-06-21)
+
+A coverage audit found these were neither in-scope nor named-deferred. Each is now classified — nothing is
+silently dropped:
+
+| Feature | Disposition | Reason |
+|---|---|---|
+| F5 multi-goal | **CORE (lite)** | the Index maps a file to a goal **list**; *primary-designation + weighting* → v0.2 |
+| F25 orphan-file · F26 scope-creep · F29 coverage-gaps | **CORE** | folded into Goal Pulse + coverage (§8b above) |
+| F7 directory `_purpose` | **DEFER v0.2** | per-file mapping suffices for v0.1 |
+| F9 goal decomposition (sub-goal/capability tree) | **DEFER v0.2** | MVP goal model is **flat** (goal + DoD via N1); hierarchy is a recorded v0.2 choice |
+| F11 README↔goals drift guard | **DEFER v0.2** | scaffold-from-README is core; the drift guard is v0.2 |
+| F19 goal-scoped search/filter | **DEFER v0.2** | `/atlas goal <Gn>` covers the core need |
+| F23 sync gate · F28 new-file authoring gate | **DEFER v0.2** | companions to the CI presence-gate (F22), already deferred |
+| F31 traceability-matrix export | **DEFER v0.2** | A9-auditor tier, ships with the adapters |
+| F36 last-reviewed dates / re-review triggers | **DEFER v0.2** | content-hash staleness (§8b) covers the core staleness need |
+| F13 registry mirror (`patterns.json` gains `goals`) | **SUPERSEDED** | the sidecar `.atlas/` Index IS the map; the hub-registry mirror was the pre-plugin model (F47 replaced it) |
+| G-R7 cold-start "confirm-N-to-be-useful" | **DEFER v0.2 (named)** | documented as expected cold-start behavior; no MVP work |
 
 ## 9. Open questions
 
