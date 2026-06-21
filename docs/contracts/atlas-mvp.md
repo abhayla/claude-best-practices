@@ -108,7 +108,30 @@ DONE only when, dogfooded on the **hub repo itself** (`../claude-best-practices`
   `scan`/`explain`/`goal` on the hub repo for the owner's sign-off BEFORE declaring v0.1 done.
 - **G3 (deploy/publish)** — not in MVP (no marketplace publish yet).
 
+## 8b. Round-2 audit additions (2026-06-21) — MUST be built; resolve the 6 🔴 before "done"
+
+A second adversarial audit (`atlas-ba-discovery.md` §10) found 6 build-blockers. These are now **in
+MVP scope** (they are correctness/trust holes on the default path, not nice-to-haves):
+
+- **`G0`/infra goal:** `goals.yml` MUST include a first-class `G0` (infra/build/test/config) entry.
+  ANCHOR assigns `G0` to goal-less tooling files; `G0` files are NOT orphans and NOT plausibility-absurd.
+  (Resolves the DoD ↔ "every file gets a valid Gn" vs plausibility contradiction.)
+- **Graph partiality:** every Constellation edge is tagged `static` | `inferred`; `explain`/`goal` render
+  a "graph may be incomplete" marker; bus-factor/blast-radius carry a partiality caveat. The graph is
+  advisory like goals (D2) — never rendered as bare fact.
+- **Confirmation safety:** move-detection uses git rename-detection first (survives rename-with-edit); a
+  shard conflict resolves `confirmed`-wins (`/atlas resolve`); a `confirm` records actor + date; the agent
+  trusts `confirmed` only when the Index is committed (advisory in a dirty tree).
+- **Agent freshness:** each Index entry stamps the file's content-hash so `explain` SHOWS staleness; the
+  agent calls `/atlas refresh <file>` after writing it.
+- **Honest coverage:** REPORT `mapped / scanned / ignored / total` (never a single gameable %).
+- **Windows-safe scan:** normalize + detect case-insensitive path collisions; don't follow symlinks; skip
+  submodules. (The dogfood host is this Windows repo — exercised on run 1.)
+
 ## 9. Open questions
 
-**None.** Every fork is resolved above. If the run hits a genuinely undecidable fork, it MUST stop and
-record it in a `PROGRESS.md` under DONE/PENDING/BLOCKED/NEXT, not guess.
+**None blocking** — every fork is resolved across §§1–8b. The 6 Round-2 🔴 items above are decided and in
+scope (not open questions). 🟡/🟢 items (`correction_rate` metric, host pre-existing-traceability
+integration, deterministic-under-budget, portfolio fleet view, watcher single-writer lock) are explicitly
+**deferred past v0.1** and named in `atlas-ba-discovery.md` §10 — not silently dropped. If the run hits a
+genuinely undecidable fork, it MUST stop and record it in `PROGRESS.md` (DONE/PENDING/BLOCKED/NEXT), not guess.
