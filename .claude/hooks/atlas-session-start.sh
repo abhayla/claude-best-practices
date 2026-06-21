@@ -9,4 +9,7 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 ENGINE="$ROOT/../atlas/hooks/session_start.py"
 [ -f "$ENGINE" ] || exit 0
 CLAUDE_PROJECT_DIR="$ROOT" python "$ENGINE" 2>/dev/null || true
+# Deterministic fire-marker (gitignored runtime log) — verify next session with:
+#   tail .claude/.atlas-hook.log   →  a fresh "SessionStart pulse fired" line proves it ran.
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] SessionStart pulse fired" >> "$ROOT/.claude/.atlas-hook.log" 2>/dev/null || true
 exit 0
