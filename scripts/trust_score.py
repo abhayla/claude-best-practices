@@ -35,8 +35,9 @@ DEFAULT_CONFIG = {
 }
 
 
-def load_config(path: Path) -> dict:
+def load_config(path: Path | str) -> dict:
     """Load the trust-score rulebook from YAML, falling back to DEFAULT_CONFIG."""
+    path = Path(path)
     if not path.exists():
         return DEFAULT_CONFIG
     with open(path, encoding="utf-8") as f:

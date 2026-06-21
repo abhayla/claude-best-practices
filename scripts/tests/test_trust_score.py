@@ -11,9 +11,22 @@ from scripts.trust_score import (
     DEFAULT_CONFIG,
     calibration_stats,
     compute_trust_score,
+    load_config,
     load_ledger,
     record_run,
 )
+
+
+class TestLoadConfig:
+    """load_config must accept a str path, not only a Path (adapters pass strings)."""
+
+    def test_accepts_str_path(self, tmp_path):
+        p = tmp_path / "tc.yml"
+        p.write_text("threshold: 77\n", encoding="utf-8")
+        assert load_config(str(p))["threshold"] == 77
+
+    def test_missing_str_path_falls_back_to_default(self):
+        assert load_config("does/not/exist.yml") is DEFAULT_CONFIG
 
 
 def _perfect_signals():
