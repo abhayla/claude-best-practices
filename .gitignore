@@ -62,3 +62,9 @@ trust-score/ledgers/
 
 # Local scratch notes (untracked working notes, e.g. ad-hoc gap-analysis prompts)
 /Notes
+
+# Atlas product dogfood output (the /goal build scans this hub → sidecar Index + goal vocab).
+# Product runtime artifacts, NOT hub source (product-incubation.md §0) — preserved on disk,
+# kept out of the factory repo. Remove these lines only if the hub formally ADOPTS Atlas.
+/.atlas/
+/goals.yml
