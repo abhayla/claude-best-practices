@@ -1,0 +1,15 @@
+{
+  "name": "claude-best-practices",
+  "owner": { "name": "Abhay Kumar" },
+  "metadata": {
+    "description": "Claude Best Practices Hub — workflows, skills, agents, and hooks as installable plugins (Goal 6). NOTE: auto-loaded rules/ are NOT plugin-packageable and stay a copy-in step (see issue #187).",
+    "version": "0.0.1"
+  },
+  "plugins": [
+    {
+      "name": "cbp-workflows",
+      "source": "./cbp-workflows",
+      "description": "PILOT — proves the hub's workflow patterns (skills + agents + hooks) package as a native Claude Code plugin with central updates, instead of being copied into each project."
+    }
+  ]
+}
