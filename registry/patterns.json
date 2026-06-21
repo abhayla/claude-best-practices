@@ -6429,7 +6429,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-20",
-    "total_patterns": 270
+    "total_patterns": 273
   },
   "plan-before-coding": {
     "hash": "cb2d18b434b27f74d1047559728a8e70c483637436a8a74b1d6eca98167b9805",
@@ -6790,6 +6790,45 @@
       "first-principles"
     ],
     "changelog": "v1.0.0 (2026-06-20): Initial - T0 advisory agent that invokes /karpathy-advisor and returns a framed verdict in Karpathy persona.",
+    "tier": "nice-to-have"
+  },
+  "auto-git": {
+    "hash": "f0b856da6dc120cfc24f0b20ebed25b83474760549ed777e377ec280c01d6e72",
+    "type": "hook",
+    "version": "1.0.0",
+    "description": "SessionStart+Stop hook: autonomous git handler — commits + pushes each turn's work to a task branch, keeps main clean, never stacks onto a merged branch; pluggable secret-scan gate. Companion to auto-pr.",
+    "category": "core",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-21",
+    "last_updated": "2026-06-21",
+    "dependencies": [],
+    "visibility": "public",
+    "tier": "nice-to-have"
+  },
+  "auto-pr": {
+    "hash": "f2fe41d19642caea0ab08c182d2f27f188fee6c3a7d2970ad6481539704430c8",
+    "type": "hook",
+    "version": "1.0.0",
+    "description": "SessionEnd hook: opens a PR for the task branch and arms native CI-gated auto-merge (squash), prunes gh-confirmed-MERGED branches. Lands work on session close without touching git.",
+    "category": "core",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-21",
+    "last_updated": "2026-06-21",
+    "dependencies": [],
+    "visibility": "public",
+    "tier": "nice-to-have"
+  },
+  "git-branch-lifecycle": {
+    "hash": "5bc2f43d6959f529333e7303ddef678bb58b820d4fc422f6eeb77fb185ef742b",
+    "type": "skill",
+    "version": "1.1.0",
+    "description": "Model-driven control layer over the auto-git/auto-pr hooks: status, work (worktree parallel isolation), finish (agent review then merge), cleanup (reconcile every branch — merged prune, unmerged auto-PR+merge-on-green, escalate only CI-red/strategic).",
+    "category": "core",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-21",
+    "last_updated": "2026-06-21",
+    "dependencies": [],
+    "visibility": "public",
     "tier": "nice-to-have"
   }
 }

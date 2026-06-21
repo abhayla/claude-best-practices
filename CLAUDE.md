@@ -81,6 +81,7 @@ The hub manages its own git branches end-to-end so the user never touches git (P
 - **`.claude/hooks/auto-pr.sh`** (SessionEnd) — opens the PR, arms native CI-gated auto-merge (squash), prunes local branches `gh` confirms MERGED. Arms on session close (NOT per-turn) so work never merges mid-session. Off-switches `AUTO_PR_DISABLE=1` / `AUTO_MERGE=0`.
 - **`/git-branch-lifecycle`** skill (v1.1.0, model-driven layer) — `status`; `work <name>` (worktree for true parallel isolation); `finish` (agent code-review before merge); `cleanup` (reconcile EVERY branch — merged→prune, unmerged→auto-PR+merge-on-green, escalate only CI-red/strategic via open-PR veto, never a blocking land-or-delete question).
 - **GitHub config** — `main` protected on required check `validate` (the universal gate that runs the full suite on every PR; `enforce_admins=false` escape hatch); repo-level auto-merge + delete-branch-on-merge enabled. A PR squash-merges itself the moment CI is green, then its branch auto-deletes. NOTE: `.claude/` is gitignored, so new hooks/skills need `git add -f` to commit (auto-git's `git add -A` skips them).
+- **Distributable** — the skill + both hooks also ship in `core/.claude/` (genericized: pluggable `SECRET_SCAN_CMD`→gitleaks secret-scan, `AUTO_MERGE=0` opt-out, branch-protection setup as a per-repo prerequisite). The hub keeps its own operational copy in `.claude/` (uses `dedup_check.py`); downstream projects opt in by provisioning. Registered as `auto-git`, `auto-pr`, `git-branch-lifecycle` (nice-to-have).
 
 ### Key Directories
 
