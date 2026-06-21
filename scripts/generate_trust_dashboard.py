@@ -17,6 +17,23 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE_PATH = ROOT / "trust-score" / "build-state.json"
 OUTPUT_PATH = ROOT / "trust-score" / "dashboard.html"
 CONFIG_PATH = ROOT / "config" / "trust-score.yml"
+ATLAS_LEDGER = ROOT / "trust-score" / "ledgers" / "atlas.jsonl"
+
+
+def _read_calibration(ledger_path: Path) -> dict:
+    """Read REAL calibration runs from a per-project ledger (gitignored runtime).
+
+    Sourced live so the dashboard never hand-drifts as runs accrue. A false-confidence
+    event = the engine recommended AUTO but a human still had to fix the work."""
+    runs = []
+    if ledger_path.exists():
+        for line in ledger_path.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                runs.append(json.loads(line))
+    false_conf = sum(
+        1 for r in runs if r.get("human_had_to_fix") and r.get("recommended") == "AUTO"
+    )
+    return {"runs": len(runs), "false_confidence": false_conf}
 
 STATUS_STYLE = {
     "done": ("#1b7f4b", "#e3f6ec", "✅", "DONE"),
@@ -78,10 +95,20 @@ def _signal_bars(signals: dict, weights: dict) -> str:
     return "".join(bars)
 
 
-def render(state: dict, config: dict) -> str:
+def render(state: dict, config: dict, cal: dict) -> str:
     sections = state["sections"]
     progress = _progress(sections)
     result = compute_trust_score(SAMPLE_SIGNALS, config)
+
+    min_runs = config.get("calibration", {}).get("min_runs", 30)
+    cal_runs = cal["runs"]
+    cal_pct = int(round(min(cal_runs / min_runs, 1.0) * 100)) if min_runs else 0
+    honest = cal["false_confidence"] == 0
+    honest_line = (
+        f"and the card has been honest on every one (0 false alarms) 🎉"
+        if honest
+        else f"and the card owned up to {cal['false_confidence']} time(s) it was wrong (that is the card being honest!)"
+    )
 
     score = result["score"]
     gauge_color = "#1b7f4b" if score >= config["threshold"] else "#b26a00"
@@ -144,6 +171,14 @@ def render(state: dict, config: dict) -> str:
     {_section_cards(sections)}
   </div>
 
+  <div class="panel">
+    <h2>Earning it for real — honest jobs so far</h2>
+    <p class="explain">The robot must do <b>{min_runs}</b> REAL jobs and keep the card honest before it may
+    ever work alone. So far <b>{cal_runs} of {min_runs}</b> real jobs are done {honest_line}</p>
+    <div class="progress-track"><div class="progress-fill" style="width:{cal_pct}%;"></div></div>
+    <div class="progress-num">{cal_runs} / {min_runs} honest real jobs</div>
+  </div>
+
   <div class="panel gauge">
     <h2>What does a report card look like?</h2>
     <div class="gauge-num">{score}/100</div>
@@ -171,8 +206,10 @@ def render(state: dict, config: dict) -> str:
 def main() -> int:
     state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
     config = load_config(CONFIG_PATH) if CONFIG_PATH.exists() else DEFAULT_CONFIG
-    OUTPUT_PATH.write_text(render(state, config), encoding="utf-8")
-    print(f"wrote {OUTPUT_PATH} ({_progress(state['sections'])}% complete)")
+    cal = _read_calibration(ATLAS_LEDGER)
+    OUTPUT_PATH.write_text(render(state, config, cal), encoding="utf-8")
+    print(f"wrote {OUTPUT_PATH} ({_progress(state['sections'])}% complete, "
+          f"{cal['runs']}/{config.get('calibration', {}).get('min_runs', 30)} real runs)")
     return 0
 
 

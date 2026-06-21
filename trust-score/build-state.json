@@ -11,6 +11,6 @@
     {"id": 5, "name": "Make the exam pass", "kid": "Run the tests until every single one turns green.", "status": "done"},
     {"id": 6, "name": "The picture board (dashboard)", "kid": "This very page! It shows what is done and how the score works.", "status": "done"},
     {"id": 7, "name": "Show a real report card + save", "kid": "Run one real example so you can see a score, then save all the work.", "status": "done"},
-    {"id": 8, "name": "Prove the card is honest on REAL jobs (30 needed)", "kid": "Now the robot does REAL jobs, not pretend ones, and we watch the card stay honest. A second robot named Atlas did 11 real jobs — the card judged all 11 and was honest every time (0 false alarms). We need 30 honest real jobs before any robot may work alone, so we are 11 of 30 of the way there.", "status": "in_progress"}
+    {"id": 8, "name": "Prove the card is honest on REAL jobs (30 needed)", "kid": "Now the robot does REAL jobs, not pretend ones, and we watch the card stay honest. A second robot named Atlas is doing real jobs and the card judges each one. We need 30 honest real jobs before any robot may work alone — the live count is on the board below.", "status": "in_progress"}
   ]
 }
