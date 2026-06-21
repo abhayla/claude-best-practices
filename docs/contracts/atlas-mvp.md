@@ -253,6 +253,12 @@ silently dropped:
 | F36 last-reviewed dates / re-review triggers | **DEFER v0.2** | content-hash staleness (§8b) covers the core staleness need |
 | F13 registry mirror (`patterns.json` gains `goals`) | **SUPERSEDED** | the sidecar `.atlas/` Index IS the map; the hub-registry mirror was the pre-plugin model (F47 replaced it) |
 | G-R7 cold-start "confirm-N-to-be-useful" | **DEFER v0.2 (named)** | documented as expected cold-start behavior; no MVP work |
+| F39 · F40 · F41 · F42 (downstream-distribution quartet) | **SUPERSEDED** | the CC-plugin vehicle (F47) replaces the `core/.claude/` distribution model; each repo installs the plugin directly |
+| F43 CLAUDE.md "Vision & Goals" pointer | **DEFER v0.2 (opt-in adapter)** | host-file edit; opt-in under zero-touch, not v0.1 |
+| F45 workflow-contract goal field · F46 PRD→goal→file thread | **DEFER v0.2 (opt-in adapters)** | activate only when the host has those systems (catalog layer I) |
+| F44 `goal-anchored-decisions.md` reuse | **REUSE-AS-IS** | existing hub rule; no Atlas build work — referenced by §0/§1 anchor |
+| F20 onboarding map (repo-organized-by-goal view) | **DEFER v0.2** | the §4 `explain` + `goal` commands + Goal Pulse cover the core need; a dedicated map view is incremental |
+| F27 semantic purpose-vs-code drift (LLM compare) | **DEFER v0.2** | distinct from §8b content-hash *index* staleness and F11 README↔goals; semantic drift-compare is v0.2 |
 
 ## 9. Open questions
 
