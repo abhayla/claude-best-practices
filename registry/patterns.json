@@ -4409,7 +4409,7 @@
     }
   },
   "rule-curation": {
-    "hash": "df857bb4afb3fd7531fc1d393848c53010bc6ab11d2c5f0ae4c2b12886d1fcb2",
+    "hash": "86879bba2a7bbf9a386fa566d2ddae4d5a572c696b39e05f621372476ebee6fe",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6819,7 +6819,7 @@
     "tier": "nice-to-have"
   },
   "git-branch-lifecycle": {
-    "hash": "5bc2f43d6959f529333e7303ddef678bb58b820d4fc422f6eeb77fb185ef742b",
+    "hash": "e51c9bc6a51321ff39ad59ad9d475f5e1f5df705caad5c88a4f095d452c0ef25",
     "type": "skill",
     "version": "1.1.0",
     "description": "Model-driven control layer over the auto-git/auto-pr hooks: status, work (worktree parallel isolation), finish (agent review then merge), cleanup (reconcile every branch — merged prune, unmerged auto-PR+merge-on-green, escalate only CI-red/strategic).",

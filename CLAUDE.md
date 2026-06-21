@@ -124,6 +124,8 @@ Available stacks and their prefixes (full per-stack pattern listing: `docs/STACK
 
 Six sync directions — see `docs/SYNC-ARCHITECTURE.md`. Key entry points: `collate.py` (project→hub), `scan_web.py` (internet→hub), `sync_to_projects.py` (hub→projects), `recommend.py` (hub→project advisory), `aggregate_telemetry.py` (enrolled projects→hub telemetry).
 
+For the INTERNAL `.claude/` ↔ `core/.claude/` relationship — the hub-only/distributable/both scoping decision AND keeping the two copies of a dual-home resource honest — read `docs/HUB-CORE-SYNC.md`. A resource in both trees is classified in `config/dual-home-resources.yml` as `synced` (must match), `shared` (shared skeleton matches; hub/downstream-specific lines fenced `DUAL-SYNC:HUB-ONLY`/`DOWNSTREAM-ONLY` so they can't intermingle), or `divergent`; the gate `scripts/tests/test_dual_home_sync.py` (helper `scripts/sync_dual_home.py`) blocks drift + unclassified resources.
+
 ### Workflow Orchestration (skill-at-T0)
 
 The 8 multi-step workflows (testing-pipeline, development-loop, debugging-loop, code-review, documentation, session-continuity, learning, skill-authoring) orchestrate from the user's T0 session via skills, NOT via subagents. This is a deliberate KISS/YAGNI **convention, not a platform constraint**: nested subagent dispatch is GA (Claude Code v2.1.172, ≤5 levels deep), but no hub workflow yet needs it — so workflow skills run in T0 and dispatch flat worker subagents in a single message, adopting nesting only where a concrete workflow clearly benefits (see `core/.claude/rules/agent-orchestration.md` §2 + guard rails in `plans/skill-at-t0-doctrine-relaxation.md`).

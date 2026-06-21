@@ -26,7 +26,9 @@ Two layers run the branch lifecycle. Know which owns what before acting:
 
 The hooks already make the unattended path work — you can close any session and the work lands when CI is green. Use this skill only when you want the judgment layer.
 
+<!-- DUAL-SYNC:DOWNSTREAM-ONLY -->
 > **Setup (once per repo):** wire `auto-git.sh` (SessionStart + Stop) and `auto-pr.sh` (SessionEnd) in `.claude/settings.json`, and configure GitHub: branch protection on `main` with a required status check, repo auto-merge enabled, delete-branch-on-merge enabled. For repos where a human must approve every merge, set `AUTO_MERGE=0` (PRs open but don't auto-merge).
+<!-- DUAL-SYNC:END -->
 
 **Command:** $ARGUMENTS
 
@@ -104,7 +106,9 @@ a reviewer; this skill can).
    gh pr view "$BR" >/dev/null 2>&1 || gh pr create --base main --head "$BR" --fill
    gh pr merge "$BR" --auto --squash
    ```
+<!-- DUAL-SYNC:DOWNSTREAM-ONLY -->
    GitHub merges when the project's required CI checks pass, then deletes the branch.
+<!-- DUAL-SYNC:END -->
 5. **Report** the PR URL and that it is armed. Do not block waiting for CI.
 
 ---
@@ -172,3 +176,4 @@ guess. Unmerged work is never deleted; it is PR'd so CI (not a human, not a gues
 - MUST NOT bounce a mechanical land-or-delete decision to the human when an auto-PR + CI gate can decide it — that is the gap this skill exists to close.
 - MUST NOT create a worktree inside the repo working tree — it pollutes status and git operations.
 - MUST NOT push to or merge into `main` directly — everything lands via a PR + CI gate.
+
