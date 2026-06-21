@@ -45,6 +45,32 @@ Skipped at the hook layer for:
 
 Adapted from community pattern by @heyrimsha (source: x.com/heyrimsha/status/2035995286150234480).
 
+## ENHANCE_MODE — the session opt-out flag (`auto` | `ask` | `off`)
+
+A session flag controls whether the **prompt-enhancement pipeline** (this skill's STEP 0–4.6
+strengthening + the L3 reviewer-card / diagnosis-substance enforcement in `no-overask-guard.sh`)
+runs. The governance tail — plan-before-coding, decide-don't-ask, grill-when-unsure,
+narrate-and-stop, git — is **always active in every mode**; it is NOT part of the enhancement
+process and is never gated by this flag.
+
+**Storage:** `.claude/.enhance-mode` (gitignored runtime file). **Absent ⇒ `auto`** — so default
+behavior is unchanged.
+
+**Set it inline** — type one of these as a *whole prompt*; `prompt-enhance-reminder.sh` writes the
+flag and confirms: `enhance auto` · `enhance ask` · `enhance off`.
+
+| Mode | Banner + grade card + reviewer + final-prompt | Stop-hook enhance enforcement | Governance tail |
+|---|---|---|---|
+| `auto` (default) | rendered every substantive turn | on (reviewer-card + diagnosis blocks) | on |
+| `ask` | suppressed; append one line *"Enhance available — reply `enhance`…"* | off | on |
+| `off` | suppressed entirely | off | on |
+
+**One-shot opt-in:** in `ask`/`off`, a bare `enhance` (or `enhance this`) re-runs the PRIOR prompt
+through the full pipeline for that turn without changing the stored mode. Everything in the
+`auto`-mode contract below applies only when the mode is `auto` (or for that one-shot turn) — in
+`ask`/`off` the banner + full-process requirement is suspended (and the L3 hook will not block its
+absence), while the governance rules still hold.
+
 ## STEP 0-pre: Transcription Normalization (runs BEFORE grading)
 
 User prompts are often voice-dictated; transcription artifacts recur (observed

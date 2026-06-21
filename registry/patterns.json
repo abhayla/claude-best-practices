@@ -3953,13 +3953,13 @@
     }
   },
   "prompt-auto-enhance": {
-    "hash": "ea7b6d66e0ac5363ffb5b39b0b3b894f3fd8ce7b731a3df8a7f5747796ea1a5f",
+    "hash": "b3b826ced1eb0cb4058c3b5771e9ffa5e2160179c1ca25922dd1930c00be244b",
     "type": "skill",
     "category": "core",
     "version": "3.7.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-06-18",
+    "last_updated": "2026-06-21",
     "dependencies": [
       "writing-skills",
       "claude-guardian",
