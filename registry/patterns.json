@@ -4018,13 +4018,13 @@
     }
   },
   "prompt-enhance-reminder": {
-    "hash": "6e22ec5fecb0c5ee4abac2d01c3e5da7f55eadfacb71b6eecef14c414a7139b7",
+    "hash": "586f816e9b77e2394234aa3a49155aba0cc514190d8c958c9dcfd1bb5380f277",
     "type": "hook",
     "category": "core",
     "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-06-12",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "UserPromptSubmit hook that injects a deterministic reminder for the Enhanced indicator on every user prompt. v2: deterministic trigger gate filters trivial prompts and known continuation phrases at the hook layer.",
@@ -6484,13 +6484,13 @@
     }
   },
   "no-overask-guard": {
-    "hash": "b308d7bccea0c024fee39c106ee4c4e19eca0e56a295eb471b243706df8ac748",
+    "hash": "5202204f81108ada56047872687809adc16299af93b81ebc4baaae4c0b871bba",
     "type": "hook",
     "category": "core",
     "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Stop hook enforcing stop-discipline deterministically: BLOCKS over-ask (trailing offer / multiple-choice / recommendation+question) and narrate-and-stop endings on reversible work and re-injects the decision-authority rule; exempts genuine blockers and *Sync-check:* intent grills; logs enhance-banner/block/role misses as non-blocking telemetry; per-turn auto-continue cap of 12 via .claude/.keepgoing-count.",
