@@ -54,6 +54,14 @@ full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
+# ── ENHANCE_MODE gate (auto | ask | off; absent = auto) ──
+# Gates ONLY the prompt-enhancement enforcement (reviewer-card + diagnosis-substance
+# blocks and the enhance telemetry). The over-ask + narrate-and-stop guards below are
+# NOT gated — decide-don't-ask is governance, not the enhancement process. Set by
+# prompt-enhance-reminder.sh on an `enhance auto|ask|off` prompt.
+emode="$(tr -d '[:space:]' < "$root/.claude/.enhance-mode" 2>/dev/null)"
+case "$emode" in auto|ask|off) : ;; *) emode="auto" ;; esac
+
 # ── Full-process enforcement: the independent-reviewer grade card (PRE-exemption) ──
 # The prompt-auto-enhance pipeline MUST render the FULL process on EVERY substantive turn; its
 # definitive tell is the INDEPENDENT REVIEWER's per-dimension card. This guard blocks when a
@@ -70,7 +78,7 @@ printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — 
 card=""
 printf '%s' "$full" | grep -qE "reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
 # G7: block on substantive + not-trivial + NO card, regardless of banner shape.
-if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
+if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
   rc="$root/.claude/.reviewcard-count"
   rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
@@ -98,7 +106,7 @@ fi
 # (.diagnosis-count, reset per turn by prompt-enhance-reminder.sh), cap 4.
 substance=""
 printf '%s' "$full" | grep -qE "diagnosis:|changes applied|missing_role|missing_context|missing_output|vague_intent|under_constrained|missing_structure|missing_example|missing_constraint|grade: a|grade a[^a-z]|0 fix|no fix|zero fix" && substance="1"
-if [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ]; then
+if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ]; then
   dc="$root/.claude/.diagnosis-count"
   dn=$(cat "$dc" 2>/dev/null || echo 0); case "$dn" in ''|*[!0-9]*) dn=0 ;; esac
   printf '%s\tdiagnosis-substance-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((dn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
@@ -145,14 +153,14 @@ fi
 # "*enhanced" (case-insensitive). Log-only; never blocks, never sets $flag.
 # Limitation (v1, KISS): a short message that nonetheless made tool edits is not
 # caught by the length proxy — revisit with a tool_use scan if the log warrants.
-if [ "${#last_text}" -ge 300 ] && ! printf '%s' "$full" | head -1 | grep -qE '^\*enhanced'; then
+if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && ! printf '%s' "$full" | head -1 | grep -qE '^\*enhanced'; then
   printf '%s\tenhance-banner-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.enhance-misses.log" 2>/dev/null
 fi
 # Block-miss: substantive turn that HAS the banner but shows NEITHER the
 # enhanced-prompt block ("final prompt"/"what changed") NOR the trivial "ran as-is"
 # one-liner → the user can't see what was enhanced. Non-blocking telemetry (the
 # behavioral fix is the MANDATORY OUTPUT section in prompt-auto-enhance-rule.md).
-if [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' && ! printf '%s' "$full" | grep -qE "final prompt|what changed|ran (your )?input as-is|ran as-is|no change — ran|no enhancement"; then
+if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' && ! printf '%s' "$full" | grep -qE "final prompt|what changed|ran (your )?input as-is|ran as-is|no change — ran|no enhancement"; then
   printf '%s\tenhance-block-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.enhance-misses.log" 2>/dev/null
 fi
 # Role-miss (R1 persona): a final-prompt block whose text lacks "act as" — the R1 role
@@ -160,7 +168,7 @@ fi
 # Selection Guide: mandatory when the Role dimension scores < 7, at EVERY grade incl. A).
 # Limitation (v1, telemetry-only): role-sufficient prompts (Role >= 7) legitimately lack
 # it, so this LOGS, never blocks — escalate to a block only if the log shows it stays frequent.
-if [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | grep -qE "final (strengthened )?prompt" && ! printf '%s' "$full" | grep -qE "act as"; then
+if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | grep -qE "final (strengthened )?prompt" && ! printf '%s' "$full" | grep -qE "act as"; then
   printf '%s\trole-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.enhance-misses.log" 2>/dev/null
 fi
 
