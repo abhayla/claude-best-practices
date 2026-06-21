@@ -55,10 +55,12 @@ def test_manifest_has_no_stale_entries(manifest):
 
 
 def test_no_resource_classified_twice(manifest):
-    synced = {(k, n) for k, lst in (manifest.get("synced", {}) or {}).items() for n in (lst or [])}
-    divergent = {(k, n) for k, d in (manifest.get("divergent", {}) or {}).items() for n in (d or {})}
-    overlap = synced & divergent
-    assert not overlap, f"Resources classified as BOTH synced and divergent: {sorted(overlap)}"
+    def names(cls):
+        section = manifest.get(cls, {}) or {}
+        return {(k, n) for k, entries in section.items() for n in (entries or [])}
+    synced, shared, divergent = names("synced"), names("shared"), names("divergent")
+    overlaps = (synced & shared) | (synced & divergent) | (shared & divergent)
+    assert not overlaps, f"Resources classified in more than one tier (synced/shared/divergent): {sorted(overlaps)}"
 
 
 def test_divergent_entries_have_a_reason(manifest):
@@ -119,3 +121,62 @@ def test_strip_specific_removes_both_fence_types():
     text = ("a\n# DUAL-SYNC:HUB-ONLY\nh\n# DUAL-SYNC:END\n"
             "b\n<!-- DUAL-SYNC:DOWNSTREAM-ONLY -->\nd\n<!-- DUAL-SYNC:END -->\nc\n")
     assert s.strip_specific(text).splitlines() == ["a", "b", "c"]
+
+
+# ── edge cases (the gaps an adversarial pass surfaced) ──────────────────────
+
+def test_no_malformed_fences(report):
+    bad = [f"{r['kind']}/{r['name']}: {'; '.join(r['problems'])}" for r in report.get("malformed", [])]
+    assert bad == [], "shared resources with malformed DUAL-SYNC fences: " + str(bad)
+
+
+def test_unclosed_fence_is_caught_not_silently_stripped():
+    """The prime bug: a missing DUAL-SYNC:END swallows the rest of the file → could MASK drift."""
+    text = "shared A\n# DUAL-SYNC:HUB-ONLY\nhub stuff\nshared B IMPORTANT\n"   # no END
+    probs = s.fence_problems(text)
+    assert any("unclosed" in p for p in probs), f"unclosed fence must be flagged, got {probs}"
+
+
+def test_orphaned_end_and_nested_fences_are_caught():
+    assert any("no open fence" in p for p in s.fence_problems("a\n# DUAL-SYNC:END\nb\n"))
+    nested = "# DUAL-SYNC:HUB-ONLY\n# DUAL-SYNC:HUB-ONLY\nx\n# DUAL-SYNC:END\n# DUAL-SYNC:END\n"
+    assert any("nested" in p for p in s.fence_problems(nested))
+
+
+def test_well_formed_fences_have_no_problems():
+    ok = "a\n# DUAL-SYNC:HUB-ONLY\nx\n# DUAL-SYNC:END\nb\n<!-- DUAL-SYNC:DOWNSTREAM-ONLY -->\ny\n<!-- DUAL-SYNC:END -->\n"
+    assert s.fence_problems(ok) == []
+
+
+def test_sync_refuses_to_clobber_shared_or_divergent(monkeypatch, capsys):
+    """--sync must NOT blind-copy a shared/divergent resource (would destroy the other side's specifics)."""
+    fake = {"kind": "skills", "name": "x", "hub": None, "core": None}
+    monkeypatch.setattr(s, "discover", lambda: [fake])
+    monkeypatch.setattr(s, "classify", lambda *a: "shared")
+    assert s.sync_one("x", "hub") == 1
+    assert "REFUSED" in capsys.readouterr().out
+
+
+def test_extra_file_problems_detects_references_drift(tmp_path):
+    """A references/ file present on one side only (or differing) is drift, even if SKILL.md matches."""
+    hub = tmp_path / "hub"; core = tmp_path / "core"
+    (hub / "references").mkdir(parents=True); (core / "references").mkdir(parents=True)
+    (hub / "SKILL.md").write_text("same\n", encoding="utf-8")
+    (core / "SKILL.md").write_text("same\n", encoding="utf-8")
+    (hub / "references" / "extra.md").write_text("only in hub\n", encoding="utf-8")
+    res = {"kind": "skills", "name": "x", "hub_dir": hub, "core_dir": core}
+    probs = s.extra_file_problems(res)
+    assert any("only in hub: references/extra.md" == p for p in probs), probs
+    # add the same file to core → no problem
+    (core / "references" / "extra.md").write_text("only in hub\n", encoding="utf-8")
+    assert s.extra_file_problems(res) == []
+
+
+def test_crlf_vs_lf_is_not_drift(tmp_path):
+    """Windows line endings must not register as drift. Write RAW BYTES — write_text would
+    re-translate newlines on Windows and corrupt the fixture."""
+    h = tmp_path / "hub.sh"; c = tmp_path / "core.sh"
+    h.write_bytes(b"line one\nline two\n")          # LF
+    c.write_bytes(b"line one\r\nline two\r\n")      # CRLF — same content
+    assert s.in_sync({"hub": h, "core": c}), "CRLF vs LF must normalize equal"
+    assert s._skeleton(c.read_text(encoding="utf-8")) == s._skeleton(h.read_text(encoding="utf-8"))
