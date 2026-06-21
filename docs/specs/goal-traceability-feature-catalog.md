@@ -43,6 +43,12 @@ features?" It is deliberately unfiltered. Tiering into MVP/later happens in the 
 - **S23** Decisions tie to goals (already: `goal-anchored-decisions.md`).
 - **S24** Requirement→goal→file traceability for the idea→deploy pipeline.
 
+### Delivery model (added 2026-06-21 from owner suggestions)
+- **S25** Drop into *any* repo (new or existing, incl. the hub) with one install — no per-project wiring.
+- **S26** Install **without editing the host's existing files** and without adding runtime deps (zero-touch).
+- **S27** Stay current **automatically** — re-derive on change; never a manual re-annotation chore.
+- **S28** Survive as an **independent module** — versioned/tested/adopted on its own, decoupled from host internals.
+
 ---
 
 ## 2. Feature catalog (9 layers)
@@ -131,15 +137,51 @@ Direction tags: **↑** bottom-up · **↓** top-down · **↔** both.
 | F45 | Workflow-contract goal field (each of 9 workflows declares its goal) | S9,S15 |
 | F46 | PRD/BA → goal → file thread (requirement carries goal; files inherit) | S24 |
 
+### J. Delivery model — packaged, zero-touch, self-maintaining (↔) — added 2026-06-21
+| ID | Feature | Scenarios |
+|----|---------|-----------|
+| F47 | Packaged as a **Claude Code plugin** (native primitive: `.claude-plugin/`, marketplace) — drop-in to any repo incl. hub | S25 |
+| F48 | **Sidecar store** (`.goal-lens/` or plugin data) — map/graph/assignments live OUTSIDE host files; zero edits, zero added deps | S26 |
+| F49 | **Auto-derivation + auto-refresh** — infer purpose + graph + proposed goal on install and on change (hook/CI/watcher) | S27 |
+| F50 | **Human-confirm/override layer** over inferred goal assignments (confirmed > inferred; inference never hard-gates CI) | S27 |
+| F51 | **Opt-in embed mode** — a command writes an in-file pointer when a team WANTS file-visible declaration; OFF by default | S1,S26 |
+| F52 | **Layered architecture: standalone core + optional adapters** that activate only when present (registry, trust-score, workflow-contracts, PRD) — preserves independence while keeping deep integration | S28 |
+| F53 | **Goal-vocabulary scaffolder** — generates a starter `goals.yml` from README/prompt (the one near-dependency), so install stays near-zero-touch | S25,S19 |
+
+---
+
+## ARCHITECTURAL DECISION — Embedded vs Sidecar (the load-bearing fork)
+
+The owner's "no dependency / no edits to existing files" (S26) **conflicts** with the bottom-up
+requirement "standing on a file, instantly know its purpose" (S1) when taken literally — because the
+strongest way a file announces its own purpose is *in-file* text, which means editing the file.
+
+| | Embedded (in-file `goals:`) | Sidecar (external store) |
+|---|---|---|
+| Touches host files | Yes — violates S26 | **No** ✓ |
+| File self-describes without the plugin | **Yes** ✓ | No — file is *mute* if plugin removed |
+| Rot-resistance | High (visible on edit) | Depends fully on F49 auto-update |
+| Goal assignment | Human-declared | Inferred → confirmed (F50) |
+
+**Decision: Sidecar-by-default + opt-in embed (F48 + F51).** Bottom-up "what is this file for?" is
+answered by a **command/hover (F17)**, not in-file text — the same way an IDE surfaces symbol info a
+file never states. Accepted cost: **remove the plugin and the file goes mute again**, and goal
+assignment is *inferred-then-confirmed* rather than declared. This is the right trade for portability
+(S25–S28); teams that reject "mute without plugin" turn on F51 embed.
+
+This decision **supersedes** the spec's `core/.claude/` distribution approach (old F39–F42): the CC
+plugin (F47) is the cleaner native vehicle and serves Goal 1 (distribute) + Goal 4 (ride the platform).
+
 ---
 
 ## 3. Coverage matrix (proof of completeness)
 
 | Scenario group | Covering features |
 |---|---|
-| S1–S8 bottom-up | F1–F7, F17, F21, F22, F25, F27, F28, F35, F44 |
+| S1–S8 bottom-up | F1–F7, F17, F21, F22, F25, F27, F28, F35, F44, F51 |
 | S9–S15 top-down | F9, F13–F19, F24, F26, F29–F32, F37, F45 |
 | S16–S24 cross-cutting | F8, F11, F12, F20, F32–F34, F36, F39–F43, F46 |
+| S25–S28 delivery model | F47–F53 |
 
 Every scenario maps to ≥1 feature; every feature maps to ≥1 scenario. No gaps, no orphans.
 
