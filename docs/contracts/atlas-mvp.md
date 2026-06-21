@@ -78,12 +78,37 @@ All in the hub at `D:/Abhay/VibeCoding/claude-best-practices/docs/specs/`:
 8. **Uninstall contract** — removing the plugin + deleting `.atlas/` + `goals.yml` leaves the repo
    **byte-identical**.
 
+## 4c. STEERING CONTROL LOOP — PROMOTED TO CORE (owner directive 2026-06-21)
+
+A re-audit found the MVP was SENSE-only (a map + a passive reminder) — missing the back half that makes
+Atlas *steer*. Per the owner's "autonomous goal-steering" vision, the following move from deferred/catalog
+INTO the MVP. Atlas without these is a monitor, not a controller.
+
+9. **N1 — Rich goal model (the keystone).** `goals.yml` per-goal gains a machine-checkable
+   **Definition-of-Done** (acceptance criteria / a measurable completion signal), priority, and status —
+   not just a title. Promotes catalog **F10**. Everything below depends on this denominator.
+10. **N2 — Goal % done + gap.** Compute each goal's completion vs its DoD (N1) and the remaining-work delta.
+11. **N3 — Prioritization engine.** A defined scoring function ranks candidate next-actions by marginal
+    goal-advancement (inputs: goal priority × gap-size × bus-factor × blast-radius). "Next best action"
+    (item 4) becomes COMPUTED + ranked, not templated.
+12. **N4 — Task-feed to the executor.** Atlas emits a structured next-task queue (`.atlas/next.json` or a
+    `/goal`-consumable contract) that the agent / build loop PULLS from + injects goal+intent at
+    SubagentStart/file-open. Promotes catalog **F21**. This is the "steer the *processes*" actuator.
+13. **N6 — Convergence ledger.** Append-only per-goal %-done time-series → velocity + trend + ETA
+    ("G3 +5%/wk, ETA 3wk"; "G2 stalled 0% in 14d"). Promotes catalog **F34**. The capability that *defines*
+    steering.
+14. **N7 — Work→goal attribution (close the loop).** On commit/PR/merge, attribute the change to a goal and
+    auto-advance that goal's %-done in the ledger (N6). Promotes catalog **F32** from tag→credit. Without
+    this the loop never closes.
+
 ## 5. OUT of MVP scope (defer — do NOT build now)
 
-Dashboard (A5); adapters — trust-score / registry / PRD (A9/A10/C10); **embed mode** (F51); the full
-goal-change handler (§6 taxonomy — design only); CI presence-gate (F22); languages beyond Python +
-JS/TS-regex. *(Auto-update + the proactive Goal Pulse are NO LONGER deferred — the owner's zero-manual-
-effort directive makes them CORE MVP, items 3–4 above.)*
+**embed mode** (F51); the full goal-change handler (§6 taxonomy — design only); CI presence-gate (F22);
+languages beyond Python + JS/TS-regex; **N5** real-time drift-interrupt hook, **N8** graduated
+steering-action policy, **N9** goal-health dashboard (A5/F30), **N10** trust-score `goal_delivery_confidence`
+(F33) — these are the *next* steering tier (v0.2), named not silently dropped.
+*(NO LONGER deferred — promoted to CORE: auto-update + Goal Pulse (zero-manual-effort directive, items 3–4),
+and the steering control loop N1–N7 (items 9–14) per the autonomous-goal-steering directive.)*
 
 ## 6. Definition of DONE (every item observable on the DEFAULT path — `output-plausibility-verification.md`)
 
@@ -93,6 +118,12 @@ DONE only when, dogfooded on the **hub repo itself** (`../claude-best-practices`
   tagged `static`/`inferred`; reports `mapped / scanned / ignored / total`.
 - **Goal Pulse** auto-appears at the next session start with **no command** — per-goal status + the
   next-best-action — proving the proactive loop works hands-free.
+- **Steering loop closes (N1–N7):** each goal in `goals.yml` has a Definition-of-Done; Atlas reports a
+  **% done** per goal (not just coverage); the **next-best-action is RANKED** by the scoring function (not
+  templated); a **`.atlas/next.json` task-queue** is emitted and an agent dispatch consumes ≥1 task from
+  it; and after a commit that advances a goal, that goal's **% done moves in the convergence ledger** (a
+  before/after delta is observable). If any of these can't be shown on the hub dogfood, the steering MVP
+  is NOT done.
 - `/atlas explain scripts/recommend.py` renders the **Variant B layout** with that file's real
   purpose, an `inferred` G1 goal + confidence bar, and its real `calls`/`used by` edges.
 - `/atlas goal G1` lists ≥1 file, each with a confidence marker.
