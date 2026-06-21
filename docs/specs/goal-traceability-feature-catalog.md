@@ -1,6 +1,12 @@
-# Goal Traceability — Exhaustive Feature Catalog
+# Lodestar — Goal Traceability Feature Catalog
 
-- **Author:** Claude Code (systems architect)
+> **Product name: `Lodestar`** — the project's goal-navigation "second brain": keeps every file
+> traceable to the north-star goals. **Store: the `Atlas`** (`.lodestar/`) — a map of the territory
+> (file → purpose → goal → connections), not a flat database. Dependency-graph view = the
+> `Constellation`. Delivered as a **Claude Code plugin**, **sidecar-by-default** (zero edits to host
+> files), **auto-maintaining**, drop-in to any repo incl. the hub.
+
+- **Author:** Claude Code (systems / product architect)
 - **Date:** 2026-06-21
 - **Status:** DISCOVERY (companion to `goal-traceability-spec.md` — unfiltered feature list, not yet MVP-scoped)
 - **Method:** features are *derived from scenarios* — every scenario must have a covering feature; every feature must trace to a scenario. This is completeness-by-construction, not a brainstorm dump.
@@ -171,6 +177,58 @@ assignment is *inferred-then-confirmed* rather than declared. This is the right 
 
 This decision **supersedes** the spec's `core/.claude/` distribution approach (old F39–F42): the CC
 plugin (F47) is the cleaner native vehicle and serves Goal 1 (distribute) + Goal 4 (ride the platform).
+
+---
+
+## SIDECAR COVERAGE VERIFICATION (all 53 features) — 2026-06-21
+
+Recommendation: **sidecar-by-default + opt-in embed.** All 53 features are covered. Breakdown:
+
+| Class | Features | Note |
+|---|---|---|
+| Covered as-is | F8–F12, F14–F21, F24–F37, F47–F53 | read/write the Atlas; never needed in-file text |
+| Mechanism shifts (file → Atlas) | **F1, F2, F3, F13, F22, F23** | same capability, declaration lives in the Atlas; embed (F51) restores in-file form |
+| Sidecar *improves* | **F4** (uniform coverage of ALL file types), **F38** (mega-PR migration vanishes — scan just builds the Atlas) | — |
+| Opt-in edit if wanted literal | **F43** (CLAUDE.md pointer), **F45** (workflow-contract field), **F46** (PRD field) | become opt-in adapters under zero-touch |
+
+**F22 semantics change (noted):** the CI gate shifts from "did a human write frontmatter?" to "is any
+file unmapped/unconfirmed in the Atlas?" — a better gate, but not the same gate.
+
+## EDGE CASES — must-nail list (red-team pass)
+
+🔴 = load-bearing design decision; 🟡 = important; 🟢 = handle-but-minor.
+
+1. 🔴 **Atlas committed vs regenerated** — commit → staleness + merge conflicts; regenerate → must be
+   deterministic. Lean: commit a deterministically-ordered, **per-file-sharded** Atlas (rare conflicts, reviewable diffs).
+2. 🔴 **Scan scope** — gitignore-aware + skip vendored/build/binary via `.lodestarignore`, else coverage lies.
+3. 🔴 **Secrets/privacy** — scanner reads file contents; LLM derivation can leak secrets → heuristic-first, secret-gated, local-inference option.
+4. 🔴 **Multi-language dependency edges (F16)** — pluggable per-language extractors + LLM fallback. Hardest piece.
+5. 🟡 **Rename/move/delete reconciliation** — content-hash per entry → detect moves, not delete+add.
+6. 🟡 **Scale/monorepo** — incremental hash-diff re-scan, parallelism, capped with honest "N deferred" logging.
+7. 🟡 **Inference cost/quality** — heuristic-first; LLM only on low-confidence files.
+8. 🟡 **Trend/history (F34)** — read git log of the Atlas or periodic snapshots.
+9. 🟢 **`goals.yml` near-dependency** — scaffold from README; TODO stub if thin (never fail).
+10. 🟢 **CLAUDE.md pointer (F43) is an edit** — keep opt-in; default surfaces via command.
+11. 🟢 **Confidence display** — inferred vs confirmed visibly distinct everywhere.
+12. 🟢 **Uninstall contract** — repo byte-identical after removing `.lodestar/` + `goals.yml`.
+
+## INSTALL / BOOTSTRAP SCAN (existing-project onboarding)
+
+`/lodestar scan` — runs on install, then incrementally on every change:
+
+```
+1. WALK      enumerate files; gitignore-aware; apply .lodestarignore; skip binaries/vendored
+2. CLASSIFY  code / config / doc / test / asset → derivation strategy per type
+3. DERIVE    purpose per file: heuristic-first (path, name, docstring, imports, README);
+             LLM only for low-confidence (secret-gated)
+4. GRAPH     parse import/call edges per language → build the Constellation (dependency graph)
+5. ANCHOR    load/scaffold goals.yml → propose a goal per file  [inferred · unconfirmed]
+6. PERSIST   write the Atlas, with a content-hash per file (drift + rename tracking)
+7. REPORT    coverage %, low-confidence/unmapped list for human confirm
+8. WATCH     wire plugin hook + CI for incremental re-scan on change
+```
+
+Safety invariant: the scan **only ever writes the Atlas** — host files are read, never modified.
 
 ---
 
