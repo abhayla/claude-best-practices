@@ -156,6 +156,35 @@ Direction tags: **↑** bottom-up · **↓** top-down · **↔** both.
 | F52 | **Layered architecture: standalone core + optional adapters** that activate only when present (registry, trust-score, workflow-contracts, PRD) — preserves independence while keeping deep integration | S28 |
 | F53 | **Goal-vocabulary scaffolder** — generates a starter `goals.yml` from README/prompt (the one near-dependency), so install stays near-zero-touch | S25,S19 |
 
+### K. Steering control loop — make Atlas STEER, not just map (↔) — added 2026-06-21
+The 8-stage control loop (sense→goal-model→gap→prioritize→steer→drift→converge→close-loop). N1–N7 are
+MVP-CORE in the contract; N5/N8/N9/N10 are v0.2. Full detail: `atlas-mvp.md` §4c + §5.
+| ID | Feature | Stage |
+|----|---------|-------|
+| N1 | Rich goal model — machine-checkable Definition-of-Done, priority, status per goal (the keystone) | goal-model |
+| N2 | Goal % done + gap vs DoD | gap |
+| N3 | Prioritization engine — rank next-actions (priority × gap × bus-factor × blast-radius) | prioritize |
+| N4 | Task-feed to the executor — `.atlas/next.json` queue + goal-intent injection at SubagentStart/file-open | steer |
+| N5 | Real-time drift-interrupt hook (v0.2) | drift |
+| N6 | Convergence ledger — per-goal velocity / trend / ETA / stall | converge |
+| N7 | Work→goal attribution — commit/PR advances the goal's % done | close-loop |
+| N8 | Graduated steering-action policy (v0.2) | steer |
+| N9 | Goal-health dashboard (v0.2) | converge |
+| N10 | Trust-score `goal_delivery_confidence` integration (v0.2) | close-loop |
+
+### L. Atlas-Intelligence roadmap — strategic enhancements S1–S28 (↔) — added 2026-06-21
+Owner-approved. **S1 is MVP-CORE** (measured DoD); S2–S10 = v0.2; S11–S22 = v0.3 "Foresight"; S23–S28 =
+v0.4 "Moonshot". Full list + tiers + which stage each strengthens: `atlas-mvp.md` §4d. Summary:
+| Tier | IDs | Theme |
+|----|---------|-------|
+| CORE | S1 | machine-checkable DoD → measured (not inferred) % done |
+| v0.2 | S2–S10 | dependency graph · active-learning · anti-goals · confidence-decay · Notifier alerts · NL Q&A · goal-aware review · test↔goal map · hub integration |
+| v0.3 | S11–S22 | project DoD bar · auto-goal-discovery · pre-edit blast-radius · drift root-cause · issue-tracker sync · health score · effort×impact · templates · RACI · what-if · rotting-goal alarm · grouped release notes |
+| v0.4 | S23–S28 | goal-driven scaffolding · predictive drift · trade-off mediation · cross-project learning · live co-pilot · ROI weighting |
+
+> **Doc roles:** this catalog is the COMPLETE master feature list (F1–F53 + N1–N10 + S1–S28). The contract
+> (`atlas-mvp.md`) is the BUILD-SCOPED view — what's in v0.1 vs deferred — and is authoritative for scope.
+
 ---
 
 ## ARCHITECTURAL DECISION — Embedded vs Sidecar (the load-bearing fork)
