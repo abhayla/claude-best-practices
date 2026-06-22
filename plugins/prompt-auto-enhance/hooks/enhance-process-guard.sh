@@ -1,38 +1,35 @@
 #!/usr/bin/env bash
 # enhance-process-guard.sh — Stop hook (PLUGIN version)
 #
-# Enforces ONLY that the prompt-auto-enhance FULL PROCESS was rendered on a substantive
-# turn — its own self-governance. Two settings-gated blocking classes:
-#   A. reviewer-card missing  (enforce.reviewer_card = block|telemetry|off)
-#   B. card present but diagnose->fix substance missing (enforce.diagnosis_substance = ...)
-# Plus non-blocking telemetry (enforce.telemetry).
+# Enforces ONLY that the prompt-improver's full process was shown on a substantive turn —
+# its own self-check, governed by `make_sure_steps_were_shown` (strict|relaxed|off):
+#   * strict  -> block (stop and redo) when the score-table/review or fix-details are missing
+#   * relaxed -> don't block; just keep a quiet log
+#   * off     -> no check
+# DELIBERATELY NOT PORTED (hub-wide governance, excluded by design): decide-don't-ask,
+# narrate-and-stop, plan-before-coding, role routing.
 #
-# DELIBERATELY NOT PORTED (hub-wide governance, excluded from this plugin per design D4):
-# over-ask / decide-don't-ask, narrate-and-stop, keepgoing cap, plan-before-coding, role
-# routing. Those live in the hub's own hook, not here.
-#
-# Settings read FRESH each turn (project override else plugin default). Requires jq.
+# Settings read FRESH each turn (precedence: env > project > global ~/.claude > default). Requires jq.
 exec 2>/dev/null
 input=$(cat)
 command -v jq >/dev/null || exit 0
 
 plugin_root="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-override="$root/.claude/enhance-settings.json"
 settings="$plugin_root/enhance-settings.default.json"
-[ -f "$override" ] && settings="$override"
+[ -f "$HOME/.claude/enhance-settings.json" ] && settings="$HOME/.claude/enhance-settings.json"
+[ -f "$root/.claude/enhance-settings.json" ] && settings="$root/.claude/enhance-settings.json"
 [ -n "$ENHANCE_SETTINGS_FILE" ] && [ -f "$ENHANCE_SETTINGS_FILE" ] && settings="$ENHANCE_SETTINGS_FILE"
 getj() { jq -r "$1 // empty" "$settings" 2>/dev/null; }
 
-# Master switch + run_mode gates: no enforcement when the pipeline isn't rendering.
-# (raw read: jq's `// empty` would collapse boolean false to empty)
+# No enforcement when the improver isn't running / isn't displaying.
 [ "$(jq -r '.enabled' "$settings" 2>/dev/null)" = "false" ] && exit 0
-mode="$(getj '.run_mode')"; case "$mode" in ask|silent|off) exit 0 ;; esac
+mode="$(getj '.when_to_run')"; case "$mode" in ask_first|off) exit 0 ;; esac
+[ "$(jq -r '.display.show_the_process' "$settings" 2>/dev/null)" = "false" ] && exit 0
 
 tp=$(printf '%s' "$input" | jq -r '.transcript_path // ""')
 [ -z "$tp" ] || [ ! -f "$tp" ] && exit 0
 
-# Aggregate this turn's assistant text (everything after the last real user prompt).
 last_text=$(jq -r '
   if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
   then "@@TURN@@"
@@ -42,12 +39,11 @@ last_text=$(jq -r '
 [ -z "$last_text" ] && exit 0
 full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 
-subchars="$(getj '.triggers.substantive_output_chars')"; case "$subchars" in ''|*[!0-9]*) subchars=300 ;; esac
+subchars="$(getj '.when_to_enhance.min_response_size_to_check_characters')"; case "$subchars" in ''|*[!0-9]*) subchars=300 ;; esac
 [ "${#last_text}" -lt "$subchars" ] && exit 0
 
-# Trivial-declaration exemption (a short "ran as-is" turn).
 trivial=""
-printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement" && [ "${#last_text}" -lt 600 ] && trivial="1"
+printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement|already strong" && [ "${#last_text}" -lt 600 ] && trivial="1"
 [ -n "$trivial" ] && exit 0
 
 card=""
@@ -57,26 +53,29 @@ printf '%s' "$full" | grep -qE "diagnosis:|changes applied|missing_role|missing_
 
 block() { jq -nc --arg r "$1" '{decision:"block", reason:$r}'; exit 0; }
 
-# A. reviewer-card enforcement. If the user turned the independent reviewer OFF, there is no
-# card to demand — disable this block (else we'd loop-block a turn for omitting a disabled component).
-mode_card="$(getj '.enforce.reviewer_card')"; [ -z "$mode_card" ] && mode_card="block"
-[ "$(jq -r '.run.independent_reviewer' "$settings" 2>/dev/null)" = "false" ] && mode_card="off"
+# Self-check strictness. strict -> block; relaxed/off -> don't block.
+strictness="$(getj '.make_sure_steps_were_shown')"; [ -z "$strictness" ] && strictness="strict"
+enforce="off"; [ "$strictness" = "strict" ] && enforce="block"
+# Adaptive display modes legitimately render a one-liner/compact (no full table) -> don't block.
+case "$(getj '.display.how_much_to_show')" in only_for_weak_prompts|scale_to_prompt_quality) enforce="off" ;; esac
+
+# A. require the score-table + second-opinion review (unless that component is off).
+mode_card="$enforce"
+[ "$(jq -r '.display.show.second_opinion_review' "$settings" 2>/dev/null)" = "false" ] && mode_card="off"
 if [ -z "$card" ] && [ "$mode_card" = "block" ]; then
-  block "STOP BLOCKED (prompt-auto-enhance: full process not rendered). This substantive turn shows no independent-reviewer 'Reviewer-after' per-dimension card. Render the FULL process UP FRONT: *Enhanced banner + transcript + grade card WITH the Reviewer-after column + Original->Final prompt + Role line. If the prompt was trivial, make the first line '*Enhanced: no change — ran your input as-is*'."
+  block "STOP BLOCKED (prompt-auto-enhance: full process not shown). This substantive turn shows no second-opinion 'Reviewer-after' score table. Render the FULL process UP FRONT: *Enhanced summary + step log + score table WITH the Reviewer-after column + Original->Improved prompt + Role line. If the prompt was trivial, make the first line '*Enhanced: no change — ran your input as-is*'."
 fi
 
-# B. diagnose->fix substance enforcement. Decoupled from the card (so it still fires when the
-# reviewer is off) — gated instead on the diagnosis/grade-card components being expected.
-mode_sub="$(getj '.enforce.diagnosis_substance')"; [ -z "$mode_sub" ] && mode_sub="block"
+# B. require fix-details (gated on the diagnosis/score-table being expected).
 want_sub=""
-{ [ "$(getj '.show.grade_card')" = "true" ] || [ "$(getj '.show.diagnosis')" = "true" ]; } && want_sub="1"
-if [ -n "$want_sub" ] && [ -z "$substance" ] && [ "$mode_sub" = "block" ]; then
-  block "STOP BLOCKED (prompt-auto-enhance: per-step substance missing). The card shows scores but not the diagnose->fix substance — add a 'Diagnosis:' block, a per-dimension Fix column, and a 'Changes Applied' list (taxonomy: VAGUE_INTENT, MISSING_CONTEXT, UNDER_CONSTRAINED, MISSING_OUTPUT_SPEC, MISSING_ROLE...)."
+{ [ "$(getj '.display.show.score_table')" = "true" ] || [ "$(getj '.display.show.whats_wrong')" = "true" ]; } && want_sub="1"
+if [ -n "$want_sub" ] && [ -z "$substance" ] && [ "$enforce" = "block" ]; then
+  block "STOP BLOCKED (prompt-auto-enhance: fix-details missing). The score table shows numbers but not the diagnose->fix detail — add a 'Diagnosis:' block, a per-dimension Fix column, and a 'Changes Applied' list (taxonomy: VAGUE_INTENT, MISSING_CONTEXT, UNDER_CONSTRAINED, MISSING_OUTPUT_SPEC, MISSING_ROLE...)."
 fi
 
-# C. Telemetry (non-blocking)
-if [ "$(getj '.enforce.telemetry')" = "true" ]; then
+# C. Quiet log (non-blocking)
+if [ "$(getj '.keep_a_quiet_log')" = "true" ]; then
   log="$root/.claude/.enhance-plugin-misses.log"
-  [ -z "$card" ] && printf '%s\treviewer-card-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$log" 2>/dev/null
+  [ -z "$card" ] && printf '%s\treview-table-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$log" 2>/dev/null
 fi
 exit 0
