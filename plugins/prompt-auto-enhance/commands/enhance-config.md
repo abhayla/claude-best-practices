@@ -21,20 +21,23 @@ asks to change just the current project.
 ## Behavior
 - **No argument** → read the effective settings and render the current state as a friendly grouped table,
   using each setting's `_help` line as its description. Groups:
-  `enabled | when_to_run | after_improving | when_to_enhance.* | display.show_the_process |
-  display.show_when (+ weak_prompt_score_below) | display.show.* (the checkboxes) | improving.* |
-  scoring_criteria | ask_clarifying_questions.* | quality_checks.* | context_levels`.
+  `enabled | when_to_run | after_improving | enhance_slash_commands | when_to_enhance.* |
+  display.show_the_process | display.how_much_to_show (+ weak_prompt_score_below) |
+  display.show_step_log_only_for_multipart | display.show.* (the checkboxes) | improving.* |
+  scoring_criteria | ask_clarifying_questions.* | make_sure_steps_were_shown | keep_a_quiet_log | background_research`.
   Show each as ON/OFF or its value. End with a one-line hint of example edits.
 - **Preset args** for the display checkboxes:
   - `render all` → set every `display.show.*` to true.
   - `render none` → set every `display.show.*` to false.
 - **A setting/value arg** (e.g. `display.show.second_opinion_review off`, `after_improving let_me_review_first`,
-  `display.show_when only_weak_prompts`, `when_to_enhance.skip_short_prompts.minimum 6`, `enabled off`) → apply it:
+  `display.how_much_to_show scale_to_prompt_quality`, `enhance_slash_commands on`, `enabled off`) → apply it:
   1. If `~/.claude/enhance-settings.json` does not exist, copy the plugin default there first (global by default).
   2. Use `jq` to set the requested setting, validating the path exists and the value type matches:
      booleans for on/off toggles; string choices for `when_to_run` ∈ {automatic,ask_first,off},
-     `after_improving` ∈ {run_immediately,let_me_review_first}, `display.show_when` ∈ {every_time,only_weak_prompts},
-     `quality_checks.*` ∈ {block,warn,off}; numbers for thresholds.
+     `after_improving` ∈ {run_immediately,let_me_review_first},
+     `display.how_much_to_show` ∈ {every_time,scale_to_prompt_quality,only_for_weak_prompts},
+     `improving.dont_rewrite_if_prompt_is_already` ∈ {excellent,good_or_better,never},
+     `make_sure_steps_were_shown` ∈ {strict,relaxed,off}, `background_research` ∈ {light,normal,deep}; numbers for thresholds.
   3. `scoring_criteria` weights must still sum to 1.0 — reject an edit that breaks that and explain.
   4. Confirm the new value (quote the matching `_help` line) and note it takes effect next message.
 

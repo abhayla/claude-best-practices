@@ -1,24 +1,30 @@
 {
-  "_comment": "Settings for the prompt-auto-enhance plugin. Everything is ON by default, so a fresh install gives you the full prompt-improver. To change anything: copy this file to <your-project>/.claude/enhance-settings.json and edit it (or run /enhance-config). Changes take effect on your NEXT message — no reinstall. The _help section below explains every setting in plain English.",
+  "_comment": "Settings for the prompt-auto-enhance plugin. Everything is ON by default, so a fresh install gives you the full prompt-improver. To change anything: copy this file to <your-project>/.claude/enhance-settings.json (per-project) OR ~/.claude/enhance-settings.json (global, applies to ALL projects), or run /enhance-config. Changes take effect on your NEXT message. The _help section explains every setting in plain English.",
 
   "_help": {
     "enabled": "Master switch for the whole prompt-improver. false = turn everything off.",
-    "when_to_run": "automatic = improve every real prompt; ask_first = only improve when you reply 'enhance'; off = never improve (but the plugin stays installed).",
-    "after_improving": "run_immediately = improve the prompt and answer in one go; let_me_review_first = improve the prompt, show it to you, then STOP and wait for you to approve/edit/run it.",
-    "when_to_enhance.skip_short_prompts": "Don't bother improving tiny prompts. count_by words or characters; minimum = the cutoff below which a prompt is skipped.",
+    "when_to_run": "automatic = improve every real prompt; ask_first = only improve when you reply 'enhance'; off = never improve (plugin stays installed).",
+    "after_improving": "run_immediately = improve the prompt and answer in one go; let_me_review_first = improve the prompt, show it, then STOP and wait for you to approve/edit/run it.",
+    "enhance_slash_commands": "false (default) = NEVER improve a /command or saved custom prompt (whether you made it or Anthropic provided it) — run it exactly as-is, any size. true = treat them like normal prompts.",
+    "when_to_enhance.skip_short_prompts": "Don't improve tiny prompts. count_by words or characters; minimum = the cutoff below which a prompt is skipped.",
     "when_to_enhance.skip_these_phrases": "Exact replies that are just continuations (yes/ok/thanks...) and shouldn't be improved.",
     "when_to_enhance.skip_phrases_starting_with": "Short prompts that begin with these (now do.../also...) are follow-ups, not new tasks — skip them.",
-    "when_to_enhance.min_response_size_to_check_characters": "Only judge an answer 'substantial' (worth quality-checking) once it passes this many characters.",
+    "when_to_enhance.skip_if_just_a_question": "true = if you're only ASKING a fact (not asking for a task), just answer — don't rewrite the question.",
+    "when_to_enhance.skip_tip_for_simple_tasks": "true = don't add the 'better phrasing' suggestion for obvious tasks (fix a typo, what-does-this-do).",
+    "when_to_enhance.also_check_when_short_prompt_makes_big_work": "true = even a very short prompt gets the full treatment if it triggers a lot of work.",
+    "when_to_enhance.min_response_size_to_check_characters": "Only treat an answer as 'substantial' (worth quality-checking) once it passes this many characters.",
     "display.show_the_process": "true = show you the improvement steps; false = improve silently and just answer.",
-    "display.show_when": "every_time = always show the steps; only_weak_prompts = show the full steps only when your prompt scored poorly, otherwise a one-liner.",
-    "display.weak_prompt_score_below": "With only_weak_prompts: a prompt scoring below this number is treated as weak (and gets the full display).",
-    "display.show": "Checkboxes for WHICH parts you see. Turn any combination on/off (presets: /enhance-config render all | render none).",
-    "improving.skip_if_already_grade": "Don't rewrite a prompt that already scores this grade or better (A = leave great prompts alone).",
-    "improving.add_role_when_score_below": "If the prompt's role/framing scores below this, add an 'Act as ...' persona.",
+    "display.how_much_to_show": "every_time = always show the full steps; scale_to_prompt_quality = great prompt -> short note, okay -> compact, weak -> full; only_for_weak_prompts = full steps only for weak prompts, else a one-liner. A prompt is 'weak' when it scores below weak_prompt_score_below.",
+    "display.weak_prompt_score_below": "The score (out of 10) under which a prompt counts as 'weak'.",
+    "display.show_step_log_only_for_multipart": "true = only show the step-by-step log when your request has several distinct parts.",
+    "display.show": "Checkboxes for WHICH parts you see. Any combination on/off (presets: /enhance-config render all | render none).",
+    "improving.dont_rewrite_if_prompt_is_already": "Leave an already-good prompt alone. excellent = only skip rewriting truly excellent prompts; good_or_better = also skip good ones; never = always rewrite.",
+    "improving.always_add_a_role": "true = always add an 'Act as ...' role to the prompt, regardless of its score.",
     "scoring_criteria": "The rubric used to score a prompt. Each criterion has a weight; the weights must add up to 1.0.",
-    "ask_clarifying_questions": "Whether to ask you a question when the request is ambiguous. ask_until_confidence = how sure it must be before proceeding; max_questions 0 = no limit.",
-    "quality_checks": "Self-checks that the improvement steps were actually shown. block = stop and re-do; warn = just log; off = ignore.",
-    "context_levels": "Which background-context levels to gather before answering."
+    "ask_clarifying_questions": "Whether to ask you a question when the request is ambiguous. method = which skill it uses (grill-me asks one question at a time). ask_until_confidence = how sure it must be before proceeding; max_questions 0 = no limit.",
+    "make_sure_steps_were_shown": "The plugin's self-check that it actually showed its work. strict = stop and redo if a step is missing; relaxed = just keep a note; off = don't check.",
+    "keep_a_quiet_log": "true = quietly record whenever a step got skipped, so you can review later.",
+    "background_research": "How much surrounding info (your project files, settings, history) to read before answering. light / normal / deep."
   },
 
   "enabled": true,
@@ -27,17 +33,23 @@
 
   "after_improving": "run_immediately",
 
+  "enhance_slash_commands": false,
+
   "when_to_enhance": {
     "skip_short_prompts":          { "enabled": true, "count_by": "words", "minimum": 4 },
     "skip_these_phrases":          { "enabled": true, "list": ["yes","ok","okay","thanks","thank you","sure","got it","sounds good","proceed","continue","go","go ahead","go on","next","done","good","yes please","yes, please"] },
     "skip_phrases_starting_with":  { "enabled": true, "list": ["now do ","also ","same for ","and ","then ","next "], "only_if_under_characters": 40 },
+    "skip_if_just_a_question": true,
+    "skip_tip_for_simple_tasks": true,
+    "also_check_when_short_prompt_makes_big_work": true,
     "min_response_size_to_check_characters": 300
   },
 
   "display": {
     "show_the_process": true,
-    "show_when": "every_time",
+    "how_much_to_show": "every_time",
     "weak_prompt_score_below": 7,
+    "show_step_log_only_for_multipart": false,
     "show": {
       "summary_line": true,
       "step_by_step_log": true,
@@ -51,8 +63,8 @@
   },
 
   "improving": {
-    "skip_if_already_grade": "A",
-    "add_role_when_score_below": 7
+    "dont_rewrite_if_prompt_is_already": "excellent",
+    "always_add_a_role": true
   },
 
   "scoring_criteria": [
@@ -65,15 +77,14 @@
 
   "ask_clarifying_questions": {
     "enabled": true,
+    "method": "grill-me",
     "ask_until_confidence": 0.95,
     "max_questions": 0
   },
 
-  "quality_checks": {
-    "require_review_table": "block",
-    "require_fix_details": "block",
-    "log_misses": true
-  },
+  "make_sure_steps_were_shown": "strict",
 
-  "context_levels": [1, 2, 3, 4, 5]
+  "keep_a_quiet_log": true,
+
+  "background_research": "normal"
 }

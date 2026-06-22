@@ -174,7 +174,18 @@ Owner liked #1, #6; #2 = "make it fully configurable"; asked HOW for #3, #7.
   conversation before asking a clarification. Shared mechanism, built once.
 - Deferred from tier-2: R-enforcement-false-positives (#4), R-self-grade-calibration (#5).
 
-## PROPOSED UNIFIED SETTINGS CATALOG (2026-06-22 — awaiting owner decisions on the 6 NEW vars)
+## BUILT (2026-06-22) — all owner decisions implemented + verified (1583 tests green)
+The 6 NEW triggers + revisions are LIVE in the plugin (deterministic where possible, model-guided otherwise):
+- enhance_slash_commands (default OFF, deterministic /command skip); skip_if_just_a_question (T1);
+  skip_tip_for_simple_tasks (T2); also_check_when_short_prompt_makes_big_work (T4, kept for short non-slash);
+  display.how_much_to_show adds scale_to_prompt_quality (T3); show_step_log_only_for_multipart (T5);
+  always_add_a_role replaces the removed below-7 threshold (T6).
+- Plain-English renames: quality_checks→make_sure_steps_were_shown(strict|relaxed|off)+keep_a_quiet_log;
+  context_levels→background_research(light|normal|deep); skip_if_already_grade→dont_rewrite_if_prompt_is_already
+  (excellent|good_or_better|never); ask_clarifying_questions.method=grill-me. _help defines "weak" = below cutoff.
+- 33 plugin tests cover each. CAVEAT still open: verify the hook receives raw "/command" text in a live install.
+
+## PROPOSED UNIFIED SETTINGS CATALOG (2026-06-22 — superseded by BUILT above; kept for history)
 Top-down order (master first, nested when ON). NEW = the model-judged triggers T1–T6 proposed as switches.
 1. enabled (master, ON)
 2. when_to_run (automatic | ask_first | off)

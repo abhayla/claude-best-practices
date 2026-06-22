@@ -43,21 +43,30 @@ explains each one in one line. Quick reference:
 | `enabled` | Master on/off for the whole prompt-improver |
 | `when_to_run` = `automatic` \| `ask_first` \| `off` | Improve every prompt / only when you reply `enhance` / never |
 | `after_improving` = `run_immediately` \| `let_me_review_first` | Run the improved prompt right away, or show it and **wait for you** to approve/edit/trigger |
+| `enhance_slash_commands` | `false` (default) = never improve a `/command` or saved custom prompt (yours or Anthropic's) — run as-is |
 | `when_to_enhance.skip_short_prompts` (count_by, minimum) | Don't bother improving tiny prompts |
 | `when_to_enhance.skip_these_phrases` / `skip_phrases_starting_with` | Don't improve continuations like "yes" / "now do …" |
+| `when_to_enhance.skip_if_just_a_question` | Just answer plain fact-questions; don't rewrite them |
+| `when_to_enhance.skip_tip_for_simple_tasks` | Don't add the "better phrasing" tip for obvious tasks |
+| `when_to_enhance.also_check_when_short_prompt_makes_big_work` | Even a short prompt gets the full treatment if it triggers big work |
 | `display.show_the_process` | `false` = improve silently and just answer |
-| `display.show_when` = `every_time` \| `only_weak_prompts` (+ `weak_prompt_score_below`) | Always show the steps, or only when the prompt scored poorly |
+| `display.how_much_to_show` = `every_time` \| `scale_to_prompt_quality` \| `only_for_weak_prompts` (+ `weak_prompt_score_below`) | Always full / great→short·okay→compact·weak→full / full only for weak prompts. A prompt is "weak" when it scores below the cutoff (default 7/10) |
+| `display.show_step_log_only_for_multipart` | Show the step log only when the request has several parts |
 | `display.show.{summary_line, step_by_step_log, whats_wrong, score_table, second_opinion_review, list_of_fixes, improved_prompt, assigned_role}` | **Checkboxes** for what you SEE. `second_opinion_review` fires AND shows the blind re-grade. Presets: `/enhance-config render all` / `render none` |
-| `improving.{skip_if_already_grade, add_role_when_score_below}` | When to leave a good prompt alone / add a persona |
+| `improving.dont_rewrite_if_prompt_is_already` = `excellent` \| `good_or_better` \| `never` | Leave an already-good prompt alone |
+| `improving.always_add_a_role` | Always add an "Act as …" role, regardless of score |
 | `scoring_criteria[]` (weights sum to 1.0) | The rubric used to score a prompt |
-| `ask_clarifying_questions.{enabled, ask_until_confidence, max_questions}` | Whether/how much to ask when the request is ambiguous |
-| `quality_checks.{require_review_table, require_fix_details}` = block\|warn\|off, `log_misses` | The improver's own self-checks |
-| `context_levels` | Which background-context levels to gather |
+| `ask_clarifying_questions.{enabled, method, ask_until_confidence, max_questions}` | Ask via **grill-me** (one question at a time) when the request is ambiguous |
+| `make_sure_steps_were_shown` = `strict` \| `relaxed` \| `off`, `keep_a_quiet_log` | The improver's own self-check that it showed its work |
+| `background_research` = `light` \| `normal` \| `deep` | How much project context to read first |
 
-**Enforced where:** the hooks deterministically enforce `enabled`, `when_to_run`, `after_improving`,
-`when_to_enhance.*`, `display.*`, and `quality_checks.*`. The rest (`improving.*`,
-`scoring_criteria[]` weights, `ask_clarifying_questions.ask_until_confidence`/`max_questions`,
-`context_levels`) are **model-directed** — read by the skill, not the hooks.
+**Deterministic vs guided:** the hooks deterministically enforce `enabled`, `when_to_run`,
+`enhance_slash_commands`, the `skip_*` length/phrase rules, `display.show_the_process`/`how_much_to_show`/`show.*`,
+and `make_sure_steps_were_shown`. The intent-based ones (`skip_if_just_a_question`,
+`skip_tip_for_simple_tasks`, `also_check_when_short_prompt_makes_big_work`, `show_step_log_only_for_multipart`,
+`always_add_a_role`, `improving.*`, `scoring_criteria`, `ask_clarifying_questions.*`, `background_research`)
+are **guided** — the hook injects the instruction and the model follows it (a bash hook can't tell if a
+prompt is "just a question" or has "3 parts").
 
 ## Scope (important)
 
