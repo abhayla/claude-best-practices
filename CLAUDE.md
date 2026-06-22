@@ -231,6 +231,7 @@ Invoke via the `/skill-evaluator` skill: `/skill-evaluator full <skill-path>` (m
 Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when editing matching files. Rule files:
 
 - `.claude/rules/claude-behavior.md` — task approach, self-improvement, git hygiene, code quality, scope discipline
+- `.claude/rules/claude-docs-cache.md` — check `docs/claude-references/` before fetching code.claude.com / Anthropic docs; save every fetched page there (`Source:` + `Fetched:` headers)
 - `.claude/rules/context-management.md` — progressive disclosure, scratchpad usage, subagent delegation, compaction survival
 - `.claude/rules/product-incubation.md` — hub-as-factory operating model: product code incubates in an isolated sibling folder (own `.git`, outside the hub tree), graduates to its own repo once a trigger fires; classify product-vs-factory-R&D before placing code
 - `.claude/rules/prompt-auto-enhance.md` — Tier 1/2 context gathering, grade pipeline, clarification gate, resource CRUD detection
