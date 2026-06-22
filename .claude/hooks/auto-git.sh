@@ -44,14 +44,32 @@ if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
   fi
 fi
 
-# Guardrail 1b: don't stack NEW work onto an already-MERGED branch — its PR is closed, so
-# commits here can never land cleanly (gap G4). Carry the work to a fresh branch off latest main.
-if command -v gh >/dev/null 2>&1 && [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
-  if gh pr view "$branch" --json state --jq '.state' 2>/dev/null | grep -q MERGED; then
-    git fetch origin main >/dev/null 2>&1 || true
+# Guardrail 1b: don't stack NEW work onto an already-MERGED branch — once its PR squash-merges
+# (and GitHub deletes the remote), commits here can never land cleanly (gap G4). Detect this two
+# ways, because `gh pr view <branch>` often CANNOT resolve a branch whose remote was pruned:
+#   (a) gh still reports the PR as MERGED, OR
+#   (b) the branch has commits ahead of origin/main by SHA but ZERO net content diff — the
+#       signature of a squash-merge whose content already landed on main. This signal is
+#       network-independent and catches the pruned-remote case (a) misses.
+# Both are true-merged signals (content is provably/authoritatively on main), so rotating the
+# new work onto a fresh branch cut from latest main is always safe. A fresh branch has 0 commits
+# ahead, so it never false-triggers.
+if [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
+  git fetch origin main >/dev/null 2>&1 || true
+  merged=""
+  if command -v gh >/dev/null 2>&1 \
+     && gh pr view "$branch" --json state --jq '.state' 2>/dev/null | grep -q MERGED; then
+    merged="gh-reports-MERGED"
+  elif git rev-parse --verify -q origin/main >/dev/null 2>&1; then
+    ahead="$(git rev-list --count origin/main..HEAD 2>/dev/null || echo 0)"
+    if [ "${ahead:-0}" -gt 0 ] && git diff --quiet origin/main..HEAD 2>/dev/null; then
+      merged="content-already-on-main (squash-merged)"
+    fi
+  fi
+  if [ -n "$merged" ]; then
     newb="auto/work-$(date '+%Y%m%d-%H%M%S')"
     if git checkout -b "$newb" origin/main >/dev/null 2>&1 || git checkout -b "$newb" >/dev/null 2>&1; then
-      log "branch '$branch' is already merged; moved new work onto fresh '$newb' off main"
+      log "branch '$branch' already merged ($merged); moved new work onto fresh '$newb' off main"
       branch="$newb"
     fi
   fi
