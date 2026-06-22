@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- Last audited against live repo: 2026-06-19 (registry 268==268, git/workflow-map/scripts/hooks verified accurate); 2026-06-20 addendum on feat/trust-score-mvp: documented trust-score/walk-phase subsystem (PR #163, registry now 270) — trust-score scope only, not a full re-audit -->
+<!-- Last audited against live repo: 2026-06-19 (registry 268==268, git/workflow-map/scripts/hooks verified accurate); 2026-06-20 addendum on feat/trust-score-mvp: documented trust-score/walk-phase subsystem (PR #163) — trust-score scope only, not a full re-audit; 2026-06-22: G6 plugin section refreshed for PR #195. NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
 
 ## Critical: Two `.claude/` Directories
 
