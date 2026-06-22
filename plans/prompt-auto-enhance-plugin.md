@@ -111,13 +111,27 @@ Tier 1 (patterns/CLAUDE.md/git) always; Tiers 4-5 conditional (rule "Context tie
   plugin STILL strengthens the prompt and executes the improved version; it just renders nothing.
   Determined by owner's words: "only the final enhanced prompt should run automatically in the background."
 
-## OPEN DESIGN DECISIONS (need owner input)
-1. **Length unit**: switch A1 to **words** (owner-stated) — confirm default value (e.g. ≥ 5 words?).
-2. **Silent mode semantics**: in `silent`, do we still RUN the strengthening internally and
-   answer the *strengthened* prompt (compute cost, better answer) — or skip strengthening
-   entirely (zero cost, raw answer)? Materially different.
-3. **Independent reviewer by default**: it's the biggest token cost. Default ON (quality) or
-   OFF (cheap), with opt-in? 
-4. **Settings UI**: JSON file only, or also an interactive `/enhance-config` setup command?
-5. **Plugin home**: in-tree G6 factory artifact, or incubated sibling per product-incubation rule?
-6. **Governance tail**: bundle into this plugin (toggleable) or keep it a separate concern?
+- **D4 — Scope & toggle model (2026-06-22, OWNER-DECIDED + CORRECTED): ONE plugin containing
+  EVERYTHING that belongs to prompt-auto-enhance** — the enhancement pipeline + **prompt-auto-enhance's
+  OWN self-governance ONLY** (reviewer-card + diagnosis-substance enforcement, banner/MANDATORY-OUTPUT
+  discipline, enhance telemetry, the clarification/confidence gate). A **master on/off switch defaulting
+  ON**, plus an **individual on/off toggle for every criterion** (inventory groups A–E + G), **all
+  default ON** → a fresh install reproduces today's enhance behavior; user switches OFF what they don't want.
+  - **EXCLUDED — hub-wide governance is NOT shipped** (owner correction 2026-06-22): decide-don't-ask /
+    over-ask (E3), narrate-and-stop (E4) + keepgoing cap (E5), plan-before-coding, role routing /
+    engineering-roles, and the standalone grill-when-unsure governance line. These come from
+    `decision-authority.md` / `plan-before-coding.md` / `engineering-roles.md` (hub engineering
+    discipline, independent of prompt enhancement) and STAY hub-only.
+  - **Build impact:** `no-overask-guard.sh` is double-duty today; porting SPLITS it — the plugin's
+    Stop hook gets only enhance-process enforcement (reviewer-card + diagnosis-substance + telemetry);
+    over-ask/narrate-and-stop/plan/role logic stays in the hub's own hook, unshipped.
+- **D5 — Independent reviewer (2026-06-22): a per-criterion toggle, default ON** (follows D4's
+  default-ON principle; installers can switch it OFF to cut the token cost).
+- **D6 — Trigger length gate (2026-06-22): toggle default ON; unit configurable (chars|words),
+  default `words`** (owner-stated); default threshold a tunable setting (start ~4 words ≈ current
+  ≤15-char behavior). All other trigger lists (continuation phrases/prefixes) are editable too.
+- **D7 — Settings UX (2026-06-22): `enhance-settings.json` is the SSOT** (read fresh each turn),
+  with a friendly **`/enhance-config` command** to view/flip toggles and inline set-commands
+  (`enhance <key> on|off`) extending today's `enhance auto|ask|off`.
+
+## STATUS: all design decisions resolved (D1–D7). Remaining = the build itself (owner-gated G6).
