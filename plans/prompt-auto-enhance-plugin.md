@@ -174,6 +174,20 @@ Owner liked #1, #6; #2 = "make it fully configurable"; asked HOW for #3, #7.
   conversation before asking a clarification. Shared mechanism, built once.
 - Deferred from tier-2: R-enforcement-false-positives (#4), R-self-grade-calibration (#5).
 
+## MODEL-JUDGED TRIGGERS not yet configurable (audit 2026-06-22 — candidates for future switches)
+These live in the SKILL (decided by model judgment), not the deterministic hooks, so they are NOT
+yet on/off switches. Listed for completeness; turning any into a knob is owner-gated future work.
+- **T1 — pure-knowledge-question skip:** if the prompt only ASKS a fact (not a do-something task),
+  skip strengthening, just answer (SKILL.md:702). [highest-value candidate switch]
+- **T2 — simple-task skip:** skip the skill-hint on direct/mechanical/bug-fix/lookup/documentation prompts (rule:94).
+- **T3 — compact-vs-full by grade:** Grade A = skip strengthen but still show; Grade B = compact (1-2 fixes);
+  weak = full makeover (SKILL.md:128-129,700). Finer than the plugin's binary `display.show_when`. [high-value candidate]
+- **T4 — output-blast-radius firing ("/init class"):** fire on how big the OUTPUT is, not how short the
+  prompt was (SKILL.md:11-14). Plugin's Stop guard partly does this via min_response_size; no explicit knob.
+- **T5 — "3+ distinct parts" transcript gate:** show the step-by-step log only for multi-part requests (SKILL.md:288).
+- **T6 — cap-exempt role fix at every grade:** add the `Act as …` role line even when otherwise skipping,
+  whenever role/framing is weak (SKILL.md:128,369,937). Partly covered by `improving.add_role_when_score_below`.
+
 ## v0.2 PROGRESS (2026-06-22, on branch — verified green, not yet merged)
 - **R2 DONE** — `execute_mode`→`after_improving` (run_immediately | let_me_review_first); adaptive
   display condition (`display.show_when` = every_time | only_weak_prompts); render master + per-part
