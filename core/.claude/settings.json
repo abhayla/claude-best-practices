@@ -16,15 +16,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/prompt-enhance-reminder.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/ba-usecase-discovery-reminder.sh\""
           }
         ]

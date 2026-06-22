@@ -31,15 +31,22 @@ def _guard() -> str:
 
 
 def _reminder() -> str:
-    return (CORE / REMINDER).read_text(encoding="utf-8")
+    # The reminder hook is hub-only as of 2026-06-22 (the distributable copy graduated to
+    # the prompt-auto-enhance plugin; core/ no longer carries it). Read the hub copy.
+    return (HUB / REMINDER).read_text(encoding="utf-8")
 
 
-def test_both_hooks_present_and_hub_matches_core():
-    for h in (GUARD, REMINDER):
-        assert (CORE / h).exists() and (HUB / h).exists(), f"missing {h}"
-        assert (HUB / h).read_text(encoding="utf-8") == (CORE / h).read_text(encoding="utf-8"), (
-            f"hub {h} drifted from core"
-        )
+def test_guard_present_and_hub_matches_core():
+    # no-overask-guard.sh stays dual-home synced (hub == core).
+    assert (CORE / GUARD).exists() and (HUB / GUARD).exists(), f"missing {GUARD}"
+    assert (HUB / GUARD).read_text(encoding="utf-8") == (CORE / GUARD).read_text(encoding="utf-8"), (
+        f"hub {GUARD} drifted from core"
+    )
+    # prompt-enhance-reminder.sh is now hub-only (distributable copy lives in the plugin).
+    assert (HUB / REMINDER).exists(), f"missing hub {REMINDER}"
+    assert not (CORE / REMINDER).exists(), (
+        f"{REMINDER} was retired from core/ (now plugin-distributed) — it must not reappear"
+    )
 
 
 def test_card_block_is_decoupled_from_banner_shape():
@@ -116,6 +123,8 @@ def test_registry_hashes_in_sync():
         c = fp.read_text(encoding="utf-8")
         return hashlib.sha256(re.sub(r"  +", " ", "\n".join(l.strip() for l in c.splitlines())).encode()).hexdigest()
 
-    for name, fp in [("no-overask-guard", CORE / GUARD), ("prompt-enhance-reminder", CORE / REMINDER)]:
+    # prompt-enhance-reminder is no longer a core/registry hook (graduated to the plugin);
+    # only no-overask-guard remains dual-home with a registry hash to keep in sync.
+    for name, fp in [("no-overask-guard", CORE / GUARD)]:
         assert reg[name]["type"] == "hook"
         assert reg[name]["hash"] == h(fp), f"{name} registry hash drifted — resync it"

@@ -28,7 +28,6 @@ synced:
     - five-advisors
     - github
     - grill-me
-    - prompt-auto-enhance
     - reddit
     - save-session
     - skill-evaluator
@@ -42,7 +41,6 @@ synced:
   hooks:
     - ba-usecase-discovery-reminder.sh
     - no-overask-guard.sh
-    - prompt-enhance-reminder.sh
     - prompt-logger.sh
     - session-governance-status.sh
     - verifier-edge-guard.sh
@@ -61,6 +59,7 @@ divergent:
     auto-git.sh: "hub calls scripts/dedup_check.py --secret-scan; core is genericized (pluggable SECRET_SCAN_CMD -> gitleaks) + generic commit trailer"
     auto-pr.sh: "core documents the GitHub branch-protection prerequisite + AUTO_MERGE opt-out generically (hub comment names its own checks)"
   skills:
+    prompt-auto-enhance: "RETIRED as a distributable (2026-06-22): core/ is a thin pointer to the installable plugin (single SSOT); the hub keeps its full operational copy in .claude/. Intentional divergence — do NOT sync."
     brainstorm: "pre-existing variant — hub and distributable copies differ; review whether the divergence is intentional"
     claude-guardian: "pre-existing variant — core is the fuller distributable form; review whether intentional"
     writing-plans: "pre-existing variant; review whether intentional"
