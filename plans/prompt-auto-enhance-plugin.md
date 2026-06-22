@@ -174,6 +174,19 @@ Owner liked #1, #6; #2 = "make it fully configurable"; asked HOW for #3, #7.
   conversation before asking a clarification. Shared mechanism, built once.
 - Deferred from tier-2: R-enforcement-false-positives (#4), R-self-grade-calibration (#5).
 
+## v0.2 PROGRESS (2026-06-22, on branch — verified green, not yet merged)
+- **R2 DONE** — `execute_mode`→`after_improving` (run_immediately | let_me_review_first); adaptive
+  display condition (`display.show_when` = every_time | only_weak_prompts); render master + per-part
+  checkboxes consolidated under `display.show.*`; Stop-hook block-loop guarded in adaptive/reviewer-off modes.
+- **Plain-English rename + `_help` DONE** (owner ask) — every jargon key renamed to novice terms
+  (run_mode→when_to_run, render→display, enforce→quality_checks, triggers→when_to_enhance, …) with an
+  embedded `_help` guide explaining each setting.
+- **Global settings tier DONE** (owner ask) — precedence env > project `.claude/` > **global `~/.claude/`** >
+  plugin default; inline `enhance …` edits + `/enhance-config` write the global file so one config
+  applies to all projects; project file overrides per-project.
+- 25 plugin tests + full suite green (1575 passed). R1/R3/R4 (real reviewer, effectiveness telemetry,
+  learning/context module) remain on the roadmap above, not yet built.
+
 ## STATUS: BUILT & VERIFIED (2026-06-22)
 - All files created under `plugins/prompt-auto-enhance/` + marketplace at `plugins/.claude-plugin/marketplace.json`.
 - 19 plugin tests + full suite green (1569 passed, 137 skipped, 1 xfailed); dedup/secret-scan/quality-gate all pass.

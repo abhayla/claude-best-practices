@@ -17,32 +17,47 @@ A fresh install reproduces the full enhancement behavior (all switches ON). Swit
 
 ## Customize
 
-- Run `/enhance-config` to view all switches, or `/enhance-config <key> <value>` to flip one
-  (e.g. `/enhance-config run_mode silent`, `/enhance-config show.reviewer_column off`).
-- Or copy `settings.json` to `<project>/.claude/enhance-settings.json` and edit it directly — the
-  override file wins over the plugin default and is re-read every turn.
-- Inline shortcuts in any prompt: `enhance off` / `enhance on` (master), `enhance mode auto|ask|silent|off`,
-  bare `enhance` (one-shot re-run of the previous prompt through the full pipeline).
+**Set it once, globally — it applies to every project.** Config precedence (highest wins):
+1. `ENHANCE_SETTINGS_FILE` env var (power users / tests)
+2. **Project** `<project>/.claude/enhance-settings.json` (optional per-project override)
+3. **Global** `~/.claude/enhance-settings.json` — your one config for **all projects**
+4. Plugin default (everything ON)
+
+- Run `/enhance-config` to view all switches, or `/enhance-config <setting> <value>` to flip one
+  (e.g. `/enhance-config after_improving let_me_review_first`,
+  `/enhance-config display.show.second_opinion_review off`,
+  `/enhance-config display.show_when only_weak_prompts`). Presets: `/enhance-config render all` / `render none`.
+  These write your **global** config by default, so the change follows you into every project.
+- Or copy `enhance-settings.default.json` to `~/.claude/enhance-settings.json` (global) and edit it
+  directly — every setting has a one-line explanation in its `_help` section. Drop a copy in a
+  project's `.claude/` only when you want that project to differ. Both are re-read every turn.
+- Inline shortcuts in any prompt: `enhance off` / `enhance on` (master), `enhance mode auto|ask|off`,
+  bare `enhance` — these update your global config.
 
 ### What each switch controls
-| Group | Keys | Effect |
-|---|---|---|
-| Master | `enabled` | Whole plugin on/off |
-| Triggers | `triggers.length_gate` (unit chars\|words, min), `continuation_phrases`, `continuation_prefixes`, `substantive_output_chars` | Which prompts/turns get enhanced |
-| Run mode | `run_mode` = `auto` \| `ask` \| `silent` \| `off` | `silent` = strengthen internally + answer, render nothing |
-| Verbosity | `show.{banner,transcript,diagnosis,grade_card,reviewer_column,changes_applied,final_prompt,role_line}` | What you SEE of the process |
-| Reviewer | `run.independent_reviewer`, `run.reviewer_min_gap` | The blind re-grade (biggest token cost) |
-| Strengthen | `strengthen.skip_at_grade`, `strengthen.role_threshold` | When to strengthen / inject a persona |
-| Grade | `grade.dimensions[]` (weights sum to 1.0) | Rubric dimensions + weights |
-| Clarify | `clarify.{on,confidence_threshold,max_questions}` | The clarification/confidence gate |
-| Enforce | `enforce.{reviewer_card,diagnosis_substance}` = block\|telemetry\|off, `enforce.telemetry` | The workflow's own self-enforcement |
-| Context | `context.tiers` | Which context tiers to gather |
+Every setting has a plain-English name, and the settings file carries a `_help` section that
+explains each one in one line. Quick reference:
 
-**Enforced where:** the hooks deterministically enforce `enabled`, `triggers.*`, `run_mode`,
-`show.*`, `run.independent_reviewer`, and `enforce.*`. The remaining keys (`strengthen.*`,
-`grade.dimensions[]` weights, `clarify.confidence_threshold`/`max_questions`,
-`run.reviewer_min_gap`, `context.tiers`) are **model-directed** — read by the skill, not the
-hooks — so changing them steers the model but isn't deterministically gated.
+| Setting | Plain meaning |
+|---|---|
+| `enabled` | Master on/off for the whole prompt-improver |
+| `when_to_run` = `automatic` \| `ask_first` \| `off` | Improve every prompt / only when you reply `enhance` / never |
+| `after_improving` = `run_immediately` \| `let_me_review_first` | Run the improved prompt right away, or show it and **wait for you** to approve/edit/trigger |
+| `when_to_enhance.skip_short_prompts` (count_by, minimum) | Don't bother improving tiny prompts |
+| `when_to_enhance.skip_these_phrases` / `skip_phrases_starting_with` | Don't improve continuations like "yes" / "now do …" |
+| `display.show_the_process` | `false` = improve silently and just answer |
+| `display.show_when` = `every_time` \| `only_weak_prompts` (+ `weak_prompt_score_below`) | Always show the steps, or only when the prompt scored poorly |
+| `display.show.{summary_line, step_by_step_log, whats_wrong, score_table, second_opinion_review, list_of_fixes, improved_prompt, assigned_role}` | **Checkboxes** for what you SEE. `second_opinion_review` fires AND shows the blind re-grade. Presets: `/enhance-config render all` / `render none` |
+| `improving.{skip_if_already_grade, add_role_when_score_below}` | When to leave a good prompt alone / add a persona |
+| `scoring_criteria[]` (weights sum to 1.0) | The rubric used to score a prompt |
+| `ask_clarifying_questions.{enabled, ask_until_confidence, max_questions}` | Whether/how much to ask when the request is ambiguous |
+| `quality_checks.{require_review_table, require_fix_details}` = block\|warn\|off, `log_misses` | The improver's own self-checks |
+| `context_levels` | Which background-context levels to gather |
+
+**Enforced where:** the hooks deterministically enforce `enabled`, `when_to_run`, `after_improving`,
+`when_to_enhance.*`, `display.*`, and `quality_checks.*`. The rest (`improving.*`,
+`scoring_criteria[]` weights, `ask_clarifying_questions.ask_until_confidence`/`max_questions`,
+`context_levels`) are **model-directed** — read by the skill, not the hooks.
 
 ## Scope (important)
 
