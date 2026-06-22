@@ -1,0 +1,59 @@
+{
+  "_comment": "DEFAULT enhance-settings for the prompt-auto-enhance plugin. Every criterion defaults ON, so a fresh install reproduces the full enhancement behavior. To customize: copy this file to <project>/.claude/enhance-settings.json and flip any switch (or run /enhance-config). The hooks re-read the effective settings every turn, so edits auto-adjust with no reinstall. Override file wins over this default.",
+
+  "enabled": true,
+
+  "triggers": {
+    "length_gate":            { "on": true, "unit": "words", "min": 4 },
+    "continuation_phrases":   { "on": true, "list": ["yes","ok","okay","thanks","thank you","sure","got it","sounds good","proceed","continue","go","go ahead","go on","next","done","good","yes please","yes, please"] },
+    "continuation_prefixes":  { "on": true, "list": ["now do ","also ","same for ","and ","then ","next "], "max_len": 40 },
+    "substantive_output_chars": 300
+  },
+
+  "run_mode": "auto",
+
+  "show": {
+    "banner": true,
+    "transcript": true,
+    "diagnosis": true,
+    "grade_card": true,
+    "reviewer_column": true,
+    "changes_applied": true,
+    "final_prompt": true,
+    "role_line": true
+  },
+
+  "run": {
+    "independent_reviewer": true,
+    "reviewer_min_gap": 0
+  },
+
+  "strengthen": {
+    "skip_at_grade": "A",
+    "role_threshold": 7
+  },
+
+  "grade": {
+    "dimensions": [
+      { "name": "task_clarity",  "weight": 0.25 },
+      { "name": "context",       "weight": 0.25 },
+      { "name": "role_framing",  "weight": 0.20 },
+      { "name": "output",        "weight": 0.15 },
+      { "name": "verifiability", "weight": 0.15 }
+    ]
+  },
+
+  "clarify": {
+    "on": true,
+    "confidence_threshold": 0.95,
+    "max_questions": 0
+  },
+
+  "enforce": {
+    "reviewer_card": "block",
+    "diagnosis_substance": "block",
+    "telemetry": true
+  },
+
+  "context": { "tiers": [1, 2, 3, 4, 5] }
+}

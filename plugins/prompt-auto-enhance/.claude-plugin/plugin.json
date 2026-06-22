@@ -1,0 +1,9 @@
+{
+  "name": "prompt-auto-enhance",
+  "version": "0.1.0",
+  "description": "Fully-customizable prompt auto-enhancement: diagnose -> strengthen -> (optionally) show the process, before the prompt runs. Every entry criterion, every output component, the independent reviewer, the clarification gate, and the workflow's own self-enforcement are individual on/off switches (master switch + per-criterion, all default ON). Settings live in enhance-settings.json and are re-read every turn, so changes auto-adjust with no reinstall. Ships ONLY prompt-auto-enhance's own governance; hub-wide engineering governance (decide-don't-ask, plan-before-coding, role routing) is intentionally NOT included. Auto-loaded rule is delivered via the hooks at runtime + shipped as an optional copy-in (no plugin-native rules concept, issue #187).",
+  "author": { "name": "Abhay Kumar" },
+  "keywords": ["prompt-engineering", "prompt-enhancement", "customizable", "claude-code", "goal-6"],
+  "hooks": "./hooks/hooks.json",
+  "commands": "./commands"
+}

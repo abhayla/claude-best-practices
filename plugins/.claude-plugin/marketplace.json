@@ -1,0 +1,15 @@
+{
+  "name": "claude-best-practices",
+  "owner": { "name": "Abhay Kumar" },
+  "metadata": {
+    "description": "Claude Best Practices Hub — capabilities packaged as installable Claude Code plugins (Goal 6). Install a plugin into any project and update it centrally from this marketplace.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "prompt-auto-enhance",
+      "source": "./prompt-auto-enhance",
+      "description": "Diagnose-and-strengthen the user's prompt before it runs, with a fully toggleable enhancement pipeline (triggers, verbosity, grade card, independent reviewer, clarification gate) plus the workflow's own self-enforcement. Every criterion is an on/off switch, all default ON; edit enhance-settings.json and behavior auto-adjusts next turn."
+    }
+  ]
+}
