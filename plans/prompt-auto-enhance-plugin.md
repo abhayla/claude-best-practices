@@ -90,6 +90,23 @@ Tier 1 (patterns/CLAUDE.md/git) always; Tiers 4-5 conditional (rule "Context tie
 - Inline set-commands (like today's `enhance auto|ask|off`) extended to common knobs.
 - Plugin ships sane defaults = current hub behavior, so installing changes nothing until tuned.
 
+## DECISIONS LOG
+- **D1 — Plugin home (2026-06-22): In-tree monorepo marketplace.** `plugins/prompt-auto-enhance/`
+  under a hub `plugins/.claude-plugin/marketplace.json` (git-subdir source); hub = single source
+  of truth, plugin skills/hooks generated from `core/.claude/`. Rationale: requirement demands an
+  *installable cross-project* plugin (rules out no-marketplace) that the hub keeps maintaining
+  (own-repo is premature graduation for a tightly-coupled wrapper). Matches Anthropic's
+  `claude-plugins-official` monorepo + the reverted G6 pilot layout. Graduation to own repo later
+  is non-breaking (flip marketplace `source` git-subdir→url). Differs from Atlas (own repo) because
+  Atlas was a large independent product that earned graduation; this is a small hub-authored wrapper.
+
+- **D2 — Settings mechanism (2026-06-22): single `enhance-settings.json`** read fresh by both
+  hooks every invocation (generalizes the existing `.claude/.enhance-mode` flag-file). Editing it
+  changes behavior next turn, no reinstall. Determined by the "edit later → auto-adjust" requirement.
+- **D3 — Silent-mode semantics (2026-06-22): run-internally.** In `silent`/background mode the
+  plugin STILL strengthens the prompt and executes the improved version; it just renders nothing.
+  Determined by owner's words: "only the final enhanced prompt should run automatically in the background."
+
 ## OPEN DESIGN DECISIONS (need owner input)
 1. **Length unit**: switch A1 to **words** (owner-stated) — confirm default value (e.g. ≥ 5 words?).
 2. **Silent mode semantics**: in `silent`, do we still RUN the strengthening internally and
