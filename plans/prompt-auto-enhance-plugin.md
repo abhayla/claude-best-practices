@@ -151,6 +151,29 @@ Tier 1 (patterns/CLAUDE.md/git) always; Tiers 4-5 conditional (rule "Context tie
    PRE-STEP: verify `collect_signals.py` writes to the per-project ledger the 30-run bar counts
    (`trust-score/ledgers/atlas.jsonl`), not just `calibration-ledger.jsonl`.
 
+## v0.2 IMPROVEMENT ROADMAP (owner-approved directions 2026-06-22; NOT yet built)
+Owner liked #1, #6; #2 = "make it fully configurable"; asked HOW for #3, #7.
+
+- **R1 (was #1) — real, conditional blind reviewer.** Today the "Reviewer-after" column is self-reported
+  (hook only checks the *token*). Fix: dispatch an actual context-blind sub-agent to re-grade, but ONLY
+  when warranted (see R2's render-full condition) so cost is paid where it buys integrity. Or, if not
+  dispatched, drop the "independent/blind" claim. Highest-integrity fix.
+- **R2 (was #2) — expand config toggles.** Add/confirm switches: full card, transcript, grade card,
+  reviewer firing, **render-full condition** (e.g. only when grade < N or strengthening changed a lot),
+  **when-to-strengthen** vs not, and NEW **`execute_mode: auto | review-first`** — auto-run the
+  strengthened prompt, OR present it and WAIT for the user to approve/edit/trigger. All per-criterion, default ON.
+- **R3 (was #3) — effectiveness measurement (falsifiable).** `.claude/.enhance-telemetry.jsonl` row per turn
+  {grade_before/after, strengthened?, rendered_full?, reviewer_fired?, execute_mode, was_control?}. A
+  correction-detector (UserPromptSubmit hook reads transcript) marks the prior turn `corrected_next` when the
+  new prompt is a redirect ("no/actually/not what I meant"). Configurable `measure.holdout_pct` skips
+  enhancement on X% (control) via `$RANDOM`. `/enhance-stats` reports correction-rate enhanced-vs-control +
+  grade delta. Trust-score philosophy: prove enhancement helps, don't assume.
+- **R4 (was #6 + #7) — ONE accumulating-context module, two scopes.** Session-scoped store
+  `.claude/.enhance-session-context.jsonl` = resolved clarifications (don't re-ask within session, #7);
+  persisted store = recurring weak-spot diagnoses across sessions (#6). Plus a SKILL directive: scan the
+  conversation before asking a clarification. Shared mechanism, built once.
+- Deferred from tier-2: R-enforcement-false-positives (#4), R-self-grade-calibration (#5).
+
 ## STATUS: BUILT & VERIFIED (2026-06-22)
 - All files created under `plugins/prompt-auto-enhance/` + marketplace at `plugins/.claude-plugin/marketplace.json`.
 - 19 plugin tests + full suite green (1569 passed, 137 skipped, 1 xfailed); dedup/secret-scan/quality-gate all pass.
