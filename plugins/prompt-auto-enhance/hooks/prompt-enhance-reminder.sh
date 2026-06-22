@@ -70,7 +70,10 @@ fi
 
 # ── Skip slash-command / saved custom prompts (deterministic) ──
 # enhance_slash_commands=false → a prompt that is a /command (user-made OR Anthropic-provided)
-# is run as-is, any size. CAVEAT: only catches commands whose raw "/..." text reaches this hook.
+# is run as-is, any size. VERIFIED 2026-06-22 (empirically, via this hub's prompt-logger history):
+# UserPromptSubmit fires for slash commands and .prompt holds the RAW "/command args" text
+# (e.g. /init, /grill-me, /save-session, /loop all logged raw). Pure client-side built-ins like
+# /clear /exit are intercepted upstream and never reach this hook — correct, they aren't prompts.
 if [ "$(jq -r '.enhance_slash_commands' "$settings" 2>/dev/null)" = "false" ]; then
   case "$trimmed" in /*) exit 0 ;; esac
 fi

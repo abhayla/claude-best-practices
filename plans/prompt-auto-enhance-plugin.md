@@ -183,7 +183,13 @@ The 6 NEW triggers + revisions are LIVE in the plugin (deterministic where possi
 - Plain-English renames: quality_checks→make_sure_steps_were_shown(strict|relaxed|off)+keep_a_quiet_log;
   context_levels→background_research(light|normal|deep); skip_if_already_grade→dont_rewrite_if_prompt_is_already
   (excellent|good_or_better|never); ask_clarifying_questions.method=grill-me. _help defines "weak" = below cutoff.
-- 33 plugin tests cover each. CAVEAT still open: verify the hook receives raw "/command" text in a live install.
+- 33 plugin tests cover each. CAVEAT RESOLVED (2026-06-22, VERIFIED): the slash-detection is sound —
+  empirical proof from this hub's own `.claude/tasks/prompts.md` (written by a UserPromptSubmit hook)
+  shows /init, /grill-me, /save-session, /loop etc. all logged with their RAW "/command args" text, so
+  UserPromptSubmit DOES fire for slash commands and .prompt holds the literal command. (Pure client
+  built-ins like /clear/exit are intercepted upstream and never reach the hook — fine, not prompts.)
+  NOTE: the claude-code-guide agent claimed the opposite (a `UserPromptExpansion` hook) — refuted by
+  the empirical log; that API appears hallucinated. Trust the local evidence.
 
 ## PROPOSED UNIFIED SETTINGS CATALOG (2026-06-22 — superseded by BUILT above; kept for history)
 Top-down order (master first, nested when ON). NEW = the model-judged triggers T1–T6 proposed as switches.
