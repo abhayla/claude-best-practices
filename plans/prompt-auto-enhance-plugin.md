@@ -174,6 +174,21 @@ Owner liked #1, #6; #2 = "make it fully configurable"; asked HOW for #3, #7.
   conversation before asking a clarification. Shared mechanism, built once.
 - Deferred from tier-2: R-enforcement-false-positives (#4), R-self-grade-calibration (#5).
 
+## PROPOSED UNIFIED SETTINGS CATALOG (2026-06-22 — awaiting owner decisions on the 6 NEW vars)
+Top-down order (master first, nested when ON). NEW = the model-judged triggers T1–T6 proposed as switches.
+1. enabled (master, ON)
+2. when_to_run (automatic | ask_first | off)
+3. WHICH PROMPTS: skip_short_prompts; skip_these_phrases; skip_phrases_starting_with;
+   skip_if_just_a_question [NEW T1, ON]; skip_tip_for_simple_tasks [NEW T2, ON];
+   also_check_when_short_prompt_makes_big_work [NEW T4, ON]
+4. after_improving (run_immediately | let_me_review_first)
+5. DISPLAY: show_the_process; how_much_to_show (every_time | scale_to_prompt_quality [NEW T3] | only_for_weak_prompts);
+   weak_prompt_score_below; show_log_only_for_multipart_requests [NEW T5, OFF];
+   display.show.{summary_line,step_by_step_log,whats_wrong,score_table,second_opinion_review,list_of_fixes,improved_prompt,assigned_role} (all ON)
+6. IMPROVING: skip_if_already_grade (A); add_role_when_score_below (7); always_add_role_if_missing [NEW T6, ON]
+7. scoring_criteria; ask_clarifying_questions; quality_checks.{require_review_table,require_fix_details,log_misses}; context_levels
+DECISION NEEDED from owner: accept/reject each of the 6 NEW vars + confirm their defaults before building.
+
 ## MODEL-JUDGED TRIGGERS not yet configurable (audit 2026-06-22 — candidates for future switches)
 These live in the SKILL (decided by model judgment), not the deterministic hooks, so they are NOT
 yet on/off switches. Listed for completeness; turning any into a knob is owner-gated future work.
