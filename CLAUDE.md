@@ -147,7 +147,7 @@ The legacy `core/.claude/agents/<workflow>-master-agent.md` files are `deprecate
 
 The `project-manager-agent` runs the full PRD-to-Production pipeline and MUST run at T0 — it invokes the 8 workflow skills via `Skill("/<workflow>")`. Keep it at T0 by the same single-level convention: PRD-to-Production orchestration stays flat and predictable rather than nesting from a dispatched worker.
 
-`loop-engineering` (PRs #75–77) is a 9th distributable skill-at-T0 workflow (`core/.claude/skills/loop-engineering/SKILL.md`, spec at `docs/specs/loop-engineering-spec.md`) — a standalone autonomous self-* meta-loop. It is NOT part of the PRD-to-Production pipeline, which is why the count of workflow skills the `project-manager-agent` invokes remains 8 (the 8 logical workflows above — testing-pipeline is still one of them, now served by `/test-pipeline`). The legacy `<workflow>-master-agent.md` files are now 7 (testing-pipeline-master-agent retired 2026-06-19).
+`loop-engineering` (PRs #75–77) is a 9th distributable skill-at-T0 workflow (`core/.claude/skills/loop-engineering/SKILL.md`, spec at `docs/specs/loop-engineering-spec.md`) — a standalone autonomous self-* meta-loop. It is NOT part of the PRD-to-Production pipeline, which is why the count of workflow skills the `project-manager-agent` invokes remains 8 (the 8 logical workflows above — testing-pipeline is still one of them, now served by `/test-pipeline`).
 
 Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2.
 
