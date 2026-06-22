@@ -189,6 +189,20 @@ Top-down order (master first, nested when ON). NEW = the model-judged triggers T
 7. scoring_criteria; ask_clarifying_questions; quality_checks.{require_review_table,require_fix_details,log_misses}; context_levels
 DECISION NEEDED from owner: accept/reject each of the 6 NEW vars + confirm their defaults before building.
 
+### OWNER REVISIONS (2026-06-22) — applied to the catalog above:
+- **NEW `enhance_slash_commands` (default OFF):** never enhance a `/command` or saved custom prompt
+  (user-built OR Anthropic-provided) — run as-is at any size. CAVEAT: verify the UserPromptSubmit hook
+  receives the `/command` text (vs. Claude Code expanding it first) during build.
+- **Removed `add_role_when_score_below` threshold** → single `always_add_a_role` (default ON); a role is
+  always added regardless of score.
+- **`ask_clarifying_questions` uses the grill-me skill** (one question at a time).
+- **Plain-English renames for the confusing settings:**
+  - `quality_checks.{require_review_table,require_fix_details}` → ONE knob `make_sure_steps_were_shown`
+    = strict | relaxed | off (default strict); `log_misses` → `keep_a_quiet_log` (default on).
+  - `context_levels [1-5]` → `background_research` = light | normal | deep (default normal).
+  - `skip_if_already_grade A/B` → `dont_rewrite_if_prompt_is_already` = excellent | good_or_better | never.
+  - Help text must DEFINE "weak prompt" = scored below the cutoff (default 7/10).
+
 ## MODEL-JUDGED TRIGGERS not yet configurable (audit 2026-06-22 — candidates for future switches)
 These live in the SKILL (decided by model judgment), not the deterministic hooks, so they are NOT
 yet on/off switches. Listed for completeness; turning any into a knob is owner-gated future work.
