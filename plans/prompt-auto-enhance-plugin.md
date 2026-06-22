@@ -151,4 +151,13 @@ Tier 1 (patterns/CLAUDE.md/git) always; Tiers 4-5 conditional (rule "Context tie
    PRE-STEP: verify `collect_signals.py` writes to the per-project ledger the 30-run bar counts
    (`trust-score/ledgers/atlas.jsonl`), not just `calibration-ledger.jsonl`.
 
-## STATUS: all design decisions resolved (D1–D7). Remaining = the build itself (owner-gated G6).
+## STATUS: BUILT & VERIFIED (2026-06-22)
+- All files created under `plugins/prompt-auto-enhance/` + marketplace at `plugins/.claude-plugin/marketplace.json`.
+- 19 plugin tests + full suite green (1569 passed, 137 skipped, 1 xfailed); dedup/secret-scan/quality-gate all pass.
+- Independent code review (code-reviewer-agent): CHANGES-REQUIRED → both majors fixed (dead `independent_reviewer`
+  switch + block-loop; shipped the copy-in rule file) + valuable minors (default renamed `enhance-settings.default.json`,
+  reviewer-off decouples block B, whitespace-robust set-commands, README hook-enforced-vs-model-only legend). Re-verified green.
+- Functional bug caught+fixed by tests: jq `// empty` collapsed boolean `false`, so the master switch never fired — now raw-read.
+- G5: one honest calibration run recorded (`--project atlas`, score 85, no hard gate, ESCALATE/shadow) → ledger 12 → 13.
+- FOLLOW-UPS (owner-governed, NOT done here): goals.yml G6 DoD + CLAUDE.md "G6 = 0%/orphan, no files exist" are now stale —
+  updating what counts toward G6 is an owner call on the host-owned goal SSOT.
