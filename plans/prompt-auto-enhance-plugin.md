@@ -174,6 +174,18 @@ Owner liked #1, #6; #2 = "make it fully configurable"; asked HOW for #3, #7.
   conversation before asking a clarification. Shared mechanism, built once.
 - Deferred from tier-2: R-enforcement-false-positives (#4), R-self-grade-calibration (#5).
 
+## CROSS-PROJECT VALIDATION (2026-06-22) — tested FROM IPODhan, real second project
+- Faithful install-simulation: IPODhan (`D:/Abhay/VibeCoding/IPODhan`, a real Next.js repo) as the
+  working dir, config at the global tier, exact Claude Code hook stdin contract, full settings matrix.
+- Harness: `.claude/ipodhan-integration-test.sh` (gitignored, reusable). **RESULT: 26/26 pass** —
+  every run_mode, display mode, slash-skip (on/off), review-first, each skip directive, the Stop-hook
+  enforcement, and global-config-applies-to-IPODhan all verified. NO pollution written into IPODhan.
+- One issue found + fixed: a TEST-HARNESS artifact (Git-Bash/MSYS rewrote a leading "/" in a prompt
+  passed as a jq --arg). Fixed by feeding the prompt via --rawfile. **Plugin logic needed NO change** —
+  real Claude Code delivers the prompt via stdin JSON (no arg conversion), confirmed by direct repro.
+- REMAINING (needs owner, live): the actual `/plugin marketplace add` + `/plugin install` wiring in a
+  live IPODhan Claude Code session — the one bit only an interactive install can confirm.
+
 ## BUILT (2026-06-22) — all owner decisions implemented + verified (1583 tests green)
 The 6 NEW triggers + revisions are LIVE in the plugin (deterministic where possible, model-guided otherwise):
 - enhance_slash_commands (default OFF, deterministic /command skip); skip_if_just_a_question (T1);
