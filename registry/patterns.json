@@ -6381,7 +6381,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-20",
-    "total_patterns": 271
+    "total_patterns": 272
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6781,6 +6781,27 @@
     "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
+    "tier": "nice-to-have"
+  },
+  "claude-docs-cache": {
+    "hash": "bda775ec342bda41ece7b6fdb50bae59694e8afc2dd47a5f78361f921479b649",
+    "type": "rule",
+    "category": "core",
+    "version": "1.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-22",
+    "last_updated": "2026-06-22",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Check docs/claude-references/ for a saved Claude/Anthropic docs page before fetching it, and save every fetched code.claude.com / docs.claude.com / docs.anthropic.com page there (Source: + Fetched: headers) so projects cache and cite a stable snapshot instead of re-fetching.",
+    "tags": [
+      "documentation",
+      "caching",
+      "claude-code",
+      "web-fetch",
+      "reference"
+    ],
+    "changelog": "v1.1.0 (2026-06-22): promoted hub-only -> distributable (core/) so downstream projects inherit the docs-cache convention; dual-home synced with the hub copy. v1.0.0: hub-only rule.",
     "tier": "nice-to-have"
   }
 }
