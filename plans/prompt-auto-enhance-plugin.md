@@ -91,7 +91,11 @@ Tier 1 (patterns/CLAUDE.md/git) always; Tiers 4-5 conditional (rule "Context tie
 - Plugin ships sane defaults = current hub behavior, so installing changes nothing until tuned.
 
 ## DECISIONS LOG
-- **D1 — Plugin home (2026-06-22): In-tree monorepo marketplace.** `plugins/prompt-auto-enhance/`
+- **D1 — Plugin home (2026-06-22, OWNER-APPROVED): In-tree monorepo marketplace.**
+  Consistency note vs Atlas (own repo): same rule, opposite ends — Atlas was a new/large/independent
+  product with no hub source to couple to and had crossed product-incubation graduation triggers
+  (own repo required); this is a small, tightly-coupled repackaging of existing hub artifacts
+  (in-tree, generate-from-`core/.claude/`). `plugins/prompt-auto-enhance/`
   under a hub `plugins/.claude-plugin/marketplace.json` (git-subdir source); hub = single source
   of truth, plugin skills/hooks generated from `core/.claude/`. Rationale: requirement demands an
   *installable cross-project* plugin (rules out no-marketplace) that the hub keeps maintaining
