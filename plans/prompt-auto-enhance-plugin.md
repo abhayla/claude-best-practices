@@ -134,4 +134,21 @@ Tier 1 (patterns/CLAUDE.md/git) always; Tiers 4-5 conditional (rule "Context tie
   with a friendly **`/enhance-config` command** to view/flip toggles and inline set-commands
   (`enhance <key> on|off`) extending today's `enhance auto|ask|off`.
 
+## BUILD PLAN (owner-gated G6 — do NOT start until owner gives go-ahead)
+1. Scaffold `plugins/.claude-plugin/marketplace.json` + `plugins/prompt-auto-enhance/.claude-plugin/plugin.json`.
+2. Port the skill from `core/.claude/skills/prompt-auto-enhance/` into the plugin `skills/` (generated-from-hub SSOT).
+3. SPLIT-port the 2 hooks → plugin gets enhance-process enforcement ONLY (reviewer-card + diagnosis-substance
+   + telemetry + banner/clarify); over-ask/narrate-and-stop/plan/role stay in the hub's own hook (D4). Ship `hooks/hooks.json`.
+4. Hooks read `enhance-settings.json`: master gate + per-criterion gates; default file = all ON ⇒ identical to today.
+5. `/enhance-config` command + inline `enhance <key> on|off` set-commands.
+6. README + default `settings.json`.
+7. Tests: settings parse, each gate honored, "all-ON == current behavior" regression, silent-mode runs-internally.
+8. Register + validate: registry entry, `marketplace.json`, full local CI.
+9. **G5 accrual (honest):** record ONE honest calibration run per completed, verified sub-task via
+   `collect_signals.py` (real signals only). Expectation: ~8 sub-tasks → +6–8 runs, 12/30 → ~18–20 —
+   ADVANCES graduation, does NOT complete it (30 needs more tasks + calibration honesty analysis +
+   owner's shadow-mode→auto flip). NO ledger padding — a red/unverified sub-task is not recorded clean.
+   PRE-STEP: verify `collect_signals.py` writes to the per-project ledger the 30-run bar counts
+   (`trust-score/ledgers/atlas.jsonl`), not just `calibration-ledger.jsonl`.
+
 ## STATUS: all design decisions resolved (D1–D7). Remaining = the build itself (owner-gated G6).
