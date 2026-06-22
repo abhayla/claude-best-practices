@@ -2,6 +2,25 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-22 — Never delete an untracked file I didn't author; don't `git add -A` blindly
+
+**Surfaced during:** the prompt-auto-enhance core-retirement migration. I ran `git add -A`, which swept up
+`docs/claude-references/create-plugins.md` — a file **Mahi** had created untracked in the working tree. I then
+`rm -f`'d it (and `rmdir`'d the folder), wrongly asserting it was a "stray artifact from the research
+subagent I dispatched." That subagent (`web-research-specialist-agent`) has **no Write tool** and could not
+have created any file — the assumption was false on its face. The file was never committed, so it is
+**unrecoverable from git**; the only faithful copy is whatever remains in Mahi's IDE buffer.
+
+**Why it's wrong:** Deleting a file I did not create, without verifying provenance, destroys someone else's
+work. Standing guidance: before deleting/overwriting, look at the target — if I didn't create it, surface it
+instead of proceeding.
+
+**Rules:** (a) Prefer scoped staging (`git add <paths>`) over `git add -A`; if using `-A`, review the staged
+set and treat any unexpected file as STOP-and-surface, not auto-clean. (b) Before `rm`/`git rm` on a file I
+didn't author this session, run `git log -- <path>` to check tracked/untracked state and surface it to the
+user rather than deleting unilaterally. (c) "Stray artifact" only justifies deletion if I can prove a
+Write-capable actor I control created it — a read-only agent (no Write tool) cannot have written files.
+
 ## 2026-06-19 — Don't let YAGNI become "don't test"; the transition itself can BE the concrete need
 
 **Surfaced during:** the platform-migration close-out. I twice labeled Phase 4.2-C5 (nested-dispatch pilot)
