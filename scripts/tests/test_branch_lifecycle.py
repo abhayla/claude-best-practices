@@ -88,6 +88,22 @@ def test_auto_git_protects_main_and_merged_branches():
     assert "MERGED" in body, "must not stack new work onto an already-merged branch (G4)"
 
 
+def test_auto_git_detects_merged_branch_without_gh():
+    # Guardrail 1b must NOT rely on `gh pr view` alone — once a branch's PR squash-merges
+    # and the remote is pruned, gh often can't resolve it. The network-independent signal
+    # (commits ahead of origin/main by SHA + zero net content diff) must back it up, or the
+    # post-merge-commit gap (this session's incident) silently regresses.
+    body = _read(AUTO_GIT)
+    assert "git diff --quiet origin/main..HEAD" in body, (
+        "guardrail 1b must detect a squash-merged branch by content (zero net diff), "
+        "not by `gh pr view` alone — see the pruned-remote gap"
+    )
+    assert "rev-list --count origin/main..HEAD" in body, (
+        "the content-diff signal must be gated on commits-ahead>0 so a fresh branch "
+        "(0 ahead, identical to main) never false-triggers a rotation"
+    )
+
+
 # ---- no dangerous git anywhere in the new automation ----------------------
 
 @pytest.mark.parametrize("hook", [AUTO_GIT, AUTO_PR])
