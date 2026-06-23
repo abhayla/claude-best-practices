@@ -1,76 +1,67 @@
 #!/usr/bin/env bash
-# run_agent_team.sh — run an agent-team task FULLY AUTONOMOUSLY on Windows.
+# run_agent_team.sh — run an agent-team task FULLY AUTONOMOUSLY on Windows via psmux.
 #
-# Agent teams are an interactive feature: headless `claude -p` forms NO real team, and the
-# only PTY available here is `winpty` (no util-linux `script`). A winpty-wrapped `claude`
-# with a prompt arg forms a real team and SELF-EXITS on stdin-EOF once the team finishes —
-# but winpty's console allocation is FLAKY (~half the launches fail fast with
-# "stdin is not a tty"). This launcher makes it reliable: retry-on-flaky + verify a REAL
-# team via the durable activity-log signal (TaskCompleted by=<teammate>, NOT lead/unattributed)
-# + extract the lead's final synthesis. No terminal interaction required.
+# Agent teams need an interactive TTY (headless `claude -p` forms none). On Windows the reliable
+# way to give claude a TTY from a plain shell is **psmux** — a native ConPTY tmux clone (Rust),
+# installed without WSL or admin (winget `psmux`, scoop, or the portable zip from
+# github.com/psmux/psmux; this repo uses C:\Users\itsab\.local\psmux\psmux.exe). winpty is
+# UNRELIABLE here (degraded to 0%); psmux is reliable — VERIFIED 2026-06-23 forming real teams
+# (TaskCompleted by=<teammate>) driven entirely headlessly.
 #
-# PLATFORM CAVEAT (measured 2026-06-23): winpty PTY allocation is UNRELIABLE inside the
-# Claude Code Bash-tool sandbox on Windows — it worked ~twice then degraded to 0% across
-# every invocation pattern (foreground, `timeout`-wrapped, backgrounded subshell). This
-# launcher is therefore the CORRECT design but only reliable where a REAL/clean PTY exists:
-# a util-linux `script -qec` host (Linux/WSL/macOS) or a fresh interactive terminal. On a
-# WSL distro, swap the winpty line for: script -qec "claude --settings ... '<prompt>'" /dev/null
-# Headless `claude -p` forms NO team, so a PTY is mandatory. See
-# docs/contracts/2026-06-23-agent-teams-readonly-validation-attempt.md for the full finding.
+# CRITICAL: do NOT redirect claude's stdout (e.g. `claude ... > file`) — a redirected stdout is
+# non-tty and claude falls back to non-team mode. Let claude write to the psmux pane; read it with
+# `capture-pane`. The ground-truth signal that a REAL team formed is a NEW
+# `TaskCompleted by=<teammate>` line in .claude/.team-activity.log (NOT by=lead/unattributed).
 #
-# Usage: run_agent_team.sh "<team prompt>" [label] [max_retries] [timeout_sec]
+# Usage: run_agent_team.sh "<team prompt>" [label] [timeout_sec]
 set -u
 
 HUB="D:/Abhay/VibeCoding/claude-best-practices"
-SETTINGS="$HUB/.claude/.team-demo/settings.json"
+SETTINGS_WIN='D:\Abhay\VibeCoding\claude-best-practices\.claude\.team-demo\settings.json'
+CLAUDE_WIN='C:\Users\itsab\.local\bin\claude.exe'
+PSMUX="$(command -v psmux 2>/dev/null || echo /c/Users/itsab/.local/psmux/psmux.exe)"
 LOG="$HUB/.claude/.team-activity.log"
 PROMPT="${1:?need a team prompt}"
 LABEL="${2:-team}"
-MAX="${3:-5}"
-TIMEOUT="${4:-300}"
+TIMEOUT="${3:-300}"
+export TMUX_TMPDIR=/tmp
 cd "$HUB" || exit 3
+[ -x "$PSMUX" ] || { echo "psmux not found at $PSMUX — install: winget install psmux (or portable zip)"; exit 2; }
 
-# Pick the PTY provider: prefer util-linux `script` (reliable; Linux/WSL/macOS) over winpty
-# (Windows-only, unreliable in the MINGW64 sandbox). This makes the launcher TURNKEY the moment
-# a script-capable env exists (e.g. after `wsl --install`) — no further edits needed.
-if command -v script >/dev/null 2>&1; then PTY="script"; else PTY="winpty"; fi
-echo "PTY provider: $PTY"
-
-teammate_completions() {  # count of REAL teammate-attributed completions
+teammate_completions() {
   grep "TaskCompleted" "$LOG" 2>/dev/null | grep -v "by=lead/unattributed" | grep -c "by=" || echo 0
 }
 
-echo "=== run_agent_team [$LABEL] : up to $MAX attempts, ${TIMEOUT}s each ==="
-for attempt in $(seq 1 "$MAX"); do
-  before=$(teammate_completions)
-  out="$HUB/.claude/.team-run-${LABEL}-${attempt}.out"
-  echo "--- attempt $attempt: launching claude via $PTY (before=$before) ---"
-  # IMPORTANT: the PTY provider must run in a BACKGROUNDED subshell (proven pattern) — a `timeout`
-  # wrapper or foreground run detaches stdin and winpty fails "stdin is not a tty".
-  if [ "$PTY" = "script" ]; then
-    ( script -qec "claude --settings '$SETTINGS' --permission-mode bypassPermissions '$PROMPT'" /dev/null > "$out" 2>&1 ) &
-  else
-    ( winpty claude --settings "$SETTINGS" --permission-mode bypassPermissions "$PROMPT" > "$out" 2>&1 ) &
-  fi
-  pid=$!
-  waited=0
-  while kill -0 "$pid" 2>/dev/null && [ "$waited" -lt "$TIMEOUT" ]; do sleep 5; waited=$((waited+5)); done
-  kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
-  rc=0
-  after=$(teammate_completions)
-  echo "    rc=$rc  teammate_completions: $before -> $after"
-  if [ "$after" -gt "$before" ]; then
-    echo "RESULT: REAL TEAM FORMED + completed on attempt $attempt (label=$LABEL)"
-    echo "NEW teammate-attributed completions:"
-    grep "TaskCompleted" "$LOG" | grep -v "by=lead/unattributed" | grep "by=" | tail -n $((after-before))
+# Write the launcher .cmd (NO stdout redirect — that would defeat claude's tty).
+CMDFILE="$HUB/.claude/.team-cmd-${LABEL}.cmd"
+printf '@echo off\r\ncd /d "D:\\Abhay\\VibeCoding\\claude-best-practices"\r\n"%s" --settings "%s" --permission-mode bypassPermissions "%s"\r\n' \
+  "$CLAUDE_WIN" "$SETTINGS_WIN" "$PROMPT" > "$CMDFILE"
+
+before=$(teammate_completions)
+sess="t_${LABEL}"
+"$PSMUX" kill-session -t "$sess" 2>/dev/null
+echo "=== run_agent_team [$LABEL]: launching claude in psmux (before=$before, timeout=${TIMEOUT}s) ==="
+"$PSMUX" new-session -d -s "$sess" -x 220 -y 50 "cmd /c \"$(cygpath -w "$CMDFILE")\"" \
+  || { echo "psmux new-session failed"; exit 2; }
+
+waited=0
+while [ "$waited" -lt "$TIMEOUT" ]; do
+  sleep 6; waited=$((waited+6))
+  now=$(teammate_completions)
+  alive=$("$PSMUX" ls 2>/dev/null | grep -c "^${sess}:")
+  if [ "$now" -gt "$before" ]; then
+    echo "RESULT: REAL TEAM FORMED ($((now-before)) teammate-attributed completions) for [$LABEL]"
+    grep "TaskCompleted" "$LOG" | grep -v "by=lead/unattributed" | grep "by=" | tail -n $((now-before))
+    sleep 10  # allow the lead to finish synthesizing
+    "$PSMUX" capture-pane -t "$sess" -p 2>/dev/null | tr -d '\000' > "$HUB/.claude/.team-out-${LABEL}.txt"
+    echo "synthesis captured -> .claude/.team-out-${LABEL}.txt"
+    "$PSMUX" kill-session -t "$sess" 2>/dev/null
     exit 0
   fi
-  if grep -q "stdin is not a tty" "$out" 2>/dev/null; then
-    echo "    flaky winpty PTY allocation failed (stdin is not a tty) — retrying"
-    continue
-  fi
-  echo "    no real team formed (lead-only or other). out tail:"
-  tail -4 "$out" 2>/dev/null | tr -d '\000' | grep -avE '^[[:space:]]*$'
+  [ "$alive" -eq 0 ] && { echo "psmux session ended before a real team formed"; break; }
 done
-echo "RESULT: FAILED to form a real team for [$LABEL] after $MAX attempts"
+echo "--- last pane content (diagnostic) ---"
+"$PSMUX" capture-pane -t "$sess" -p 2>/dev/null | tr -d '\000' | grep -avE '^[[:space:]]*$' | tail -15
+"$PSMUX" kill-session -t "$sess" 2>/dev/null
+echo "RESULT: FAILED to form a real team for [$LABEL] within ${TIMEOUT}s"
 exit 1
