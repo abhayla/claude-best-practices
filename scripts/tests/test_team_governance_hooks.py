@@ -145,18 +145,32 @@ def test_completed_empty_payload_no_block(tmp_path):
 
 @needs_bash
 @needs_jq
-def test_completed_missing_team_fields_anchors_on_session_id(tmp_path):
+def test_completed_missing_team_fields_logs_session_without_fabrication(tmp_path):
     """Schema variance (verified live): when the lead completes a task, teammate_name and
-    team_name are ABSENT. The audit line must still be complete — team derived from
-    session_id (session-<first8>) and a labelled 'by', never a bare '?'."""
+    team_name are ABSENT. The audit line must (a) anchor on the real session_id, (b) show
+    team=- rather than a FABRICATED name (the firing session id != the lead session the team
+    is named after — proven live in Run #2), (c) label the missing teammate, (d) no bare '?'."""
     (tmp_path / ".claude").mkdir()
-    p = '{"hook_event_name":"TaskCompleted","session_id":"6e3e29ca-293a-4668-86eb-9bb2887dbc2a","task_id":"1","task_subject":"DX-lens trade-off analysis","task_description":"x"}'
+    p = '{"hook_event_name":"TaskCompleted","session_id":"6fdc1b66-1111-2222-3333-444455556666","task_id":"1","task_subject":"DX-lens trade-off analysis","task_description":"x"}'
     res = _run(COMPLETED, p, cwd=tmp_path)
     assert res.returncode == 0
     log = (tmp_path / ".claude" / ".team-activity.log").read_text(encoding="utf-8")
-    assert "team=session-6e3e29ca" in log, "team must be derived from session_id when team_name absent"
+    assert "session=6fdc1b66" in log, "must anchor on the real session_id"
+    assert "team=-" in log, "must NOT fabricate a team name from session_id"
+    assert "session-6fdc1b66" not in log, "must not invent a team name from the firing session id"
     assert "by=lead/unattributed" in log, "missing teammate_name must be labelled, not '?'"
     assert "team=?" not in log and "by=?" not in log, "audit line must never contain a bare '?'"
+
+
+@needs_bash
+@needs_jq
+def test_completed_with_team_fields_uses_them(tmp_path):
+    """When team_name/teammate_name ARE present, use them verbatim (no '-'/fallback)."""
+    (tmp_path / ".claude").mkdir()
+    p = '{"hook_event_name":"TaskCompleted","session_id":"5e89ede9-x","task_id":"2","task_subject":"arch lens","teammate_name":"arch-analyst","team_name":"session-4a3e63c9"}'
+    _run(COMPLETED, p, cwd=tmp_path)
+    log = (tmp_path / ".claude" / ".team-activity.log").read_text(encoding="utf-8")
+    assert "team=session-4a3e63c9" in log and "by=arch-analyst" in log
 
 
 # --------------------------------------------------- TeammateIdle (audit logger, loop-safe)

@@ -31,14 +31,15 @@ if command -v jq >/dev/null 2>&1 && [ -n "$PAYLOAD" ]; then
   team="$(printf     '%s' "$PAYLOAD" | jq -r '(.team_name // "")'     2>/dev/null)"
   sid="$(printf      '%s' "$PAYLOAD" | jq -r '(.session_id // "")'    2>/dev/null)"
 fi
-# Anchor on session_id (always present) if team_name is absent — same robustness as the
-# TaskCompleted hook, since the schema can omit team_name.
-[ -z "$team" ] && [ -n "$sid" ] && team="session-$(printf '%s' "$sid" | cut -c1-8)"
+# Anchor on session_id (always present) under its own field; show the real team_name when
+# present (it is, for TeammateIdle) else "-". Do NOT fabricate a team name from session_id
+# (the firing session id != the lead session the team is named after — proven live).
+sid8="$(printf '%s' "$sid" | cut -c1-8)"
 
 base="${CLAUDE_PROJECT_DIR:-$PWD}"
 if [ -d "$base/.claude" ]; then
   ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '?')"
-  printf '%s\tTeammateIdle\tteam=%s\tteammate=%s\n' \
-    "$ts" "${team:-unknown}" "${teammate:-unknown}" >> "$base/.claude/.team-activity.log" 2>/dev/null || true
+  printf '%s\tTeammateIdle\tsession=%s\tteam=%s\tteammate=%s\n' \
+    "$ts" "${sid8:-?}" "${team:--}" "${teammate:-unknown}" >> "$base/.claude/.team-activity.log" 2>/dev/null || true
 fi
 exit 0

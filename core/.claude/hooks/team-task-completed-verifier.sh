@@ -32,16 +32,18 @@ fi
 
 # The TaskCompleted payload schema VARIES: when the lead marks a task complete on a
 # teammate's behalf, teammate_name/team_name are absent (verified live 2026-06-23). Anchor
-# on session_id (always present) so the audit line is never a bare "?". The team name is
-# `session-` + the first 8 chars of the lead session id (matches ~/.claude/teams/<name>).
-[ -z "$team" ] && [ -n "$sid" ] && team="session-$(printf '%s' "$sid" | cut -c1-8)"
+# the line on session_id (always present) under its own `session=` field — do NOT fabricate
+# a team name from it: the payload's session_id is the FIRING session, which is NOT the lead
+# session the team is named after (a live run proved session-<firing-id> != the real team).
+# So team= shows the real team_name when present, else "-". No invented values.
+sid8="$(printf '%s' "$sid" | cut -c1-8)"
 by="${teammate:-lead/unattributed}"
 
 base="${CLAUDE_PROJECT_DIR:-$PWD}"
 if [ -d "$base/.claude" ]; then
   ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '?')"
-  printf '%s\tTaskCompleted\tteam=%s\ttask=%s\tby=%s\tsubject=%s\n' \
-    "$ts" "${team:-unknown}" "${task_id:-?}" "$by" "${subject:-?}" \
+  printf '%s\tTaskCompleted\tsession=%s\tteam=%s\ttask=%s\tby=%s\tsubject=%s\n' \
+    "$ts" "${sid8:-?}" "${team:--}" "${task_id:-?}" "$by" "${subject:-?}" \
     >> "$base/.claude/.team-activity.log" 2>/dev/null || true
 fi
 exit 0
