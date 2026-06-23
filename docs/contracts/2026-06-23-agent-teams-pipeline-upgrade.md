@@ -1,13 +1,20 @@
 # Contract: upgrade the build pipeline's workflows to agent-team-ready
 
-**Executor:** `claude --bg` background session (a full autonomous conversation that CAN form agent teams).
-**NOT** headless `/goal` / `claude -p` — **probe-confirmed 2026-06-23 that headless does NOT form teams**
-(0 team dirs / 0 hook payloads), while `--bg` forms them (verified 3× this session).   ·   **Created:** 2026-06-23
-**Status:** A2/A3/A4 RESOLVED + goal-creator-compliant (cited paths verified). **Blocker B RESOLVED
-(probe 2026-06-23):** headless `/goal` forms NO team → **executor retargeted to `claude --bg`** (proven to
-form teams). Pending ONLY: (1) confirm a single `claude --bg` session can drive the full multi-stage
-contract to completion (residual — `--bg` team-formation + autonomy are both proven; the multi-stage drive
-is the one unconfirmed piece), and (2) owner final go-ahead. Do NOT run until BOTH clear.
+**Executor:** `claude --bg` background session — **NOT** headless `/goal` / `claude -p` (probe-confirmed
+2026-06-23: headless forms NO team). **CRITICAL — each team-stage runs as its OWN single-stage `claude --bg`
+session** (one team = one session = one stage). A single session **cycling** teammates across stages was
+probe-confirmed UNRELIABLE 2026-06-23 — it spawned ZERO teammates and **narrated a fake team**. The only
+reliable unit is single-stage `--bg` (verified 3×). The top-level run orchestrates: per team-stage it
+launches a fresh `--bg` session, **verifies the team actually formed (ground-truth gate below)**, then proceeds.
+·   **Created:** 2026-06-23
+**Status:** A2/A3/A4 RESOLVED + goal-creator-compliant. **Probes 2026-06-23:** headless `/goal` forms NO
+team; single-stage `--bg` DOES (3×); **a single `--bg` session running MULTI-stage team work is UNRELIABLE —
+it spawned 0 teammates and narrated a FAKE team (1×)**. → Contract restructured: **each team-stage = its own
+single-stage `--bg` session**, with a hard **team-actually-formed ground-truth gate** (members>1 + hooks) that
+fails any fake-team stage. **KNOWN RISK:** autonomous team-spawning is **non-deterministic** (the model
+sometimes does the work solo and fabricates team activity) — so the **first run MUST be SUPERVISED** (a human
+verifies the per-stage team-formed ground truth), not fully unattended. Pending: (1) owner decision to run
+SUPERVISED, and (2) ideally a per-stage-session orchestration validation. NOT yet safe for fully-unattended launch.
 **Mission:** Upgrade EVERY workflow the standard build pipeline requires to be *agent-team-ready*
 at the resource level (each skill/agent/rule per the §12 inventory), **baking in Anthropic's
 documented multi-agent best practices** (no concurrent same-file edits, no inter-agent conflict,
@@ -185,6 +192,7 @@ and each is a per-stage verification gate — an upgrade that does not satisfy i
 | **Doer≠checker ladder** | `multi-agent-best-practices.md` §H2 | A read-only reviewer (fresh context) verifies each builder's output and SHOWS evidence, not assertions; flags only correctness gaps | every team build output |
 | **Supervisor verification** | `supervisor-verification.md` | Reproduce the claimed gate + inspect substance; drive any UI a workflow renders | every team/worker output |
 | **Blind test verification** | `independent-test-verification.md` | Every test verdict re-checked by a SEPARATE context-blind agent (doer≠checker) | any test verdict (non-skippable) |
+| **Team ACTUALLY formed (anti-fake-team)** | `~/.claude/teams/<name>/config.json` `members` + hook payloads | A stage is FAILED unless ground truth shows **>1 member** (real teammates joined, not just the lead) AND `TaskCreated`/`Completed` hooks fired. The model narrating "teammates" with `members==[team-lead]` + 0 hooks is a FAKE team — never accept it (probe-confirmed failure mode 2026-06-23) | every team stage, BEFORE accepting its output |
 | **Honest team audit** | this contract | The `team-*` hook audit log shows real `session=`/`team=` values, never fabricated/`?` (regression guard for the calibrated hooks) | every team stage |
 | **Bug-triage discipline** | `bug-triage-discipline.md` | Each fixed workflow bug carries "why was this missed?" + sibling-class audit | any bug-fix |
 | **DoD verbs** | `dod-verbs.md` | Every DoD criterion states ACTION + COMPLETENESS BAR | DoD authored |
@@ -229,6 +237,9 @@ the run worktree's evidence dir and `ls`-confirm each exists.
 - NEVER dispatch a deprecated `*-master-agent`.
 - NEVER regress the calibrated `team-*` hooks (honest audit, real schema).
 - NEVER use headless `-p` for a team step — always `claude --bg`.
+- NEVER accept a stage whose team config shows ONLY the lead (`members==[team-lead]`) + 0 hook events — that
+  is the model NARRATING a fake team (probe-confirmed 2026-06-23). Treat it as a FAILED stage and re-run it
+  as a fresh single-stage `--bg` session; NEVER cycle teammates across stages within one session.
 
 ## Final report (what the closing report must contain)
 - What shipped, per stage, with commit SHAs.
