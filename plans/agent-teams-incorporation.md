@@ -218,3 +218,9 @@ and re-enable strict mode with confidence.
   (wrong field path; two hooks repurposed to audit loggers since the payload lacks
   work-product/pending-count; an eval injection/spaces bug). Tests rewritten to real
   schema (13 green). Hooks now match reality.
+- **2026-06-23** — Iterate-until-flawless loop. Run #1 exposed a 5th issue: the
+  `TaskCompleted` payload schema VARIES — when the lead completes a task, `teammate_name`
+  and `team_name` are ABSENT, so the audit line showed bare `?`. Fixed both audit hooks to
+  anchor on the always-present `session_id` (team = `session-<first8>`, which matches the
+  real team dir) and label a missing teammate as `lead/unattributed`. Regression test added
+  (14 green). Re-running live to confirm a flawless run.
