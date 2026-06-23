@@ -82,6 +82,7 @@ class TestNoDuplicateRules:
     # - .claude/ copy: active version for this hub repo
     ALLOWED_SHARED = {
         "claude-behavior.md",
+        "claude-docs-cache.md",
         "context-management.md",
         "workflow.md",
     }
@@ -112,6 +113,7 @@ class TestHubRulesAreLean:
         "workflow.md",
         "prompt-auto-enhance.md",
         "product-incubation.md",  # hub-as-factory operating model (always-on global guardrail)
+        "claude-docs-cache.md",   # docs/claude-references/ cache convention (distributable; dual-home synced)
     }
 
     def test_hub_rules_are_approved_set(self):
@@ -134,12 +136,14 @@ class TestHubRulesAreLean:
             )
 
     def test_hub_rules_total_lines_under_budget(self):
-        """Total hub rules should be under 250 lines to minimize context load."""
+        """Total hub rules should stay lean to minimize context load.
+        Budget raised 250 -> 320 (2026-06-22) to admit the distributable
+        claude-docs-cache.md always-on rule."""
         total = 0
         for rule in _hub_rule_files():
             total += len(rule.read_text(encoding="utf-8").splitlines())
-        assert total <= 250, (
-            f"Hub rules total {total} lines (budget: 250). "
+        assert total <= 320, (
+            f"Hub rules total {total} lines (budget: 320). "
             f"Move verbose content to skills for on-demand loading."
         )
 

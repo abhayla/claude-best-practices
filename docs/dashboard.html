@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-21 05:40 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-23 01:43 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">273</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">202</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">276</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">205</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">71</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">36</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">3</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">15</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">52</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">167</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">36</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">3</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">17</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">53</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">167</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -120,6 +120,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>orchestration, agents, constraints</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>agent-team-selection</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>orchestration, agent-teams, selection, constraints</td>
             </tr>
             <tr data-type="skill" data-category="need-basis">
                 <td>ai-gemini-api</td>
@@ -314,7 +323,7 @@ tr:hover { background: var(--primary-light); }
                 <td>auto-git</td>
                 <td><span class="badge badge-hook">hook</span></td>
                 <td>core</td>
-                <td>1.0.0</td>
+                <td>1.1.1</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
@@ -453,6 +462,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>—</td>
+            </tr>
+            <tr data-type="rule" data-category="core">
+                <td>claude-docs-cache</td>
+                <td><span class="badge badge-rule">rule</span></td>
+                <td>core</td>
+                <td>1.1.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>documentation, caching, claude-code, web-fetch, reference</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>claude-guardian</td>
@@ -1745,28 +1763,10 @@ tr:hover { background: var(--primary-light); }
                 <td>prompt-auto-enhance</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>3.7.0</td>
+                <td>4.0.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>writing-skills, claude-guardian, skill-author</td>
                 <td>prompt-enhancement, prompt-strengthening, prompt-scoring, xml-tags, context-gathering, resource-management, automation, workflow, format-locking</td>
-            </tr>
-            <tr data-type="rule" data-category="core">
-                <td>prompt-auto-enhance-rule</td>
-                <td><span class="badge badge-rule">rule</span></td>
-                <td>core</td>
-                <td>3.1.0</td>
-                <td>hub:abhayla/claude-best-practices</td>
-                <td>prompt-auto-enhance</td>
-                <td>prompt-enhancement, prompt-strengthening, global-rule, context-gathering, automation</td>
-            </tr>
-            <tr data-type="hook" data-category="core">
-                <td>prompt-enhance-reminder</td>
-                <td><span class="badge badge-hook">hook</span></td>
-                <td>core</td>
-                <td>2.1.0</td>
-                <td>hub:abhayla/claude-best-practices</td>
-                <td>—</td>
-                <td>hook, prompt-enhance, deterministic</td>
             </tr>
             <tr data-type="hook" data-category="core">
                 <td>prompt-logger</td>
@@ -2217,6 +2217,33 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>tdd, testing</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>team-task-completed-verifier</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>agent-teams, governance, hook, TaskCompleted, verification</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>team-task-created-deliverable</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>agent-teams, governance, hook, TaskCreated</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>team-teammate-idle-drain</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>agent-teams, governance, hook, TeammateIdle</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>test-data-management</td>

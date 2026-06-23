@@ -3953,20 +3953,20 @@
     }
   },
   "prompt-auto-enhance": {
-    "hash": "b3b826ced1eb0cb4058c3b5771e9ffa5e2160179c1ca25922dd1930c00be244b",
+    "hash": "350a5edf3257f9dbb397e613016c811dc00f50c92371fe10d940058b79a4c02e",
     "type": "skill",
     "category": "core",
-    "version": "3.7.0",
+    "version": "4.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-06-21",
+    "last_updated": "2026-06-22",
     "dependencies": [
       "writing-skills",
       "claude-guardian",
       "skill-author"
     ],
     "visibility": "public",
-    "description": "Grade and strengthen non-trivial prompts using a 6-dimension rubric, then diagnose weak dimensions against 11 failure categories with severity-prioritized fixes and 3 guardrails. v3.6: transcription normalization (STEP 0-pre), evidence-override lane, post-rewrite re-grade with proof-of-lift (STEP 3.6), blind re-grade audit, role routing (STEP 4.7), execute-under-decision-authority + git stages (5/6). Also handles resource CRUD batch approval and prompt reliability scoring.",
+    "description": "Pointer: the prompt-auto-enhance capability now ships as the installable plugin prompt-auto-enhance@claude-best-practices (single source of truth). This core/ stub redirects provisioning to /plugin install instead of copying a template that drifts.",
     "tags": [
       "prompt-enhancement",
       "prompt-strengthening",
@@ -3978,7 +3978,7 @@
       "workflow",
       "format-locking"
     ],
-    "changelog": "v3.2.0: Replace STEP 4.7 Execution Mode menu with one-line skill hint (lighter advisory, never gating). v3.1.1: Execution Mode Selection Gate. v3.0.0: Mandatory step transcript + final prompt preview rendering, no upper limit on Clarification Gate. v2.0.0: Step 0 prompt grading (6 weighted dimensions), 11 failure categories, 3 guardrails. | v3.6.0: Promoted firekaro v3.3-v3.6 battle-tested upgrades (4 verification campaigns): cap-exempt grade-independent role fix, half-open grade bands, role tie-break, STEP 3.6 re-grade + lift gate, STEP 0-pre transcription normalization, evidence-override lane, blind re-grade audit, enhance-misses telemetry loop",
+    "changelog": "v4.0.0 (2026-06-22): RETIRED the core/ distributable copy in favor of the installable plugin (G6); core/ is now a thin pointer. Removed the duplicated rule + hook registry entries (plugin owns them downstream; hub keeps its operational copy in .claude/). | v3.2.0: Replace STEP 4.7 Execution Mode menu with one-line skill hint (lighter advisory, never gating). v3.1.1: Execution Mode Selection Gate. v3.0.0: Mandatory step transcript + final prompt preview rendering, no upper limit on Clarification Gate. v2.0.0: Step 0 prompt grading (6 weighted dimensions), 11 failure categories, 3 guardrails. | v3.6.0: Promoted firekaro v3.3-v3.6 battle-tested upgrades (4 verification campaigns): cap-exempt grade-independent role fix, half-open grade bands, role tie-break, STEP 3.6 re-grade + lift gate, STEP 0-pre transcription normalization, evidence-override lane, blind re-grade audit, enhance-misses telemetry loop",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3986,55 +3986,6 @@
       "sample_size": 3,
       "last_updated": "2026-06-20"
     }
-  },
-  "prompt-auto-enhance-rule": {
-    "hash": "f1935dc5ae2f86dcd9cc4bf412f7db84afeb5d7e368b8f1dc1b1173bfc3de52d",
-    "type": "rule",
-    "category": "core",
-    "version": "3.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-17",
-    "last_updated": "2026-06-18",
-    "dependencies": [
-      "prompt-auto-enhance"
-    ],
-    "visibility": "public",
-    "description": "Global rule that auto-enhances every prompt with context gathering and prompt grading. Delegates to /prompt-auto-enhance skill for the full pipeline. Contains the Clarification Gate and CRUD detection trigger.",
-    "tags": [
-      "prompt-enhancement",
-      "prompt-strengthening",
-      "global-rule",
-      "context-gathering",
-      "automation"
-    ],
-    "changelog": "v3.0.0: Replaced CRITICAL RULES with Pipeline Rules listing load-bearing contracts. Clarification Gate now has no upper limit on questions (ask until confident). Mandatory step transcript + final prompt preview render every time. v2.0.0: Slim from 97 to 48 lines. Lean trigger delegating to /prompt-auto-enhance skill. | v3.1.0: MANDATORY OUTPUT (format A), unified 0-6 pipeline table with governance tail, tiered Clarification+Confidence gate, output-blast-radius unconditional indicator | v3.1.0 patch (2026-06-17): Clarification Gate — one question per turn, each with a recommended option + why alternatives are weaker, sequenced on prior answers (kept within the ≤100-line lean budget).",
-    "tier": "must-have",
-    "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0,
-      "error_prevention_rate": 1.0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
-    }
-  },
-  "prompt-enhance-reminder": {
-    "hash": "586f816e9b77e2394234aa3a49155aba0cc514190d8c958c9dcfd1bb5380f277",
-    "type": "hook",
-    "category": "core",
-    "version": "2.1.0",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-19",
-    "last_updated": "2026-06-21",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "UserPromptSubmit hook that injects a deterministic reminder for the Enhanced indicator on every user prompt. v2: deterministic trigger gate filters trivial prompts and known continuation phrases at the hook layer.",
-    "tags": [
-      "hook",
-      "prompt-enhance",
-      "deterministic"
-    ],
-    "changelog": "v2.0.0: Add deterministic trigger gate — hook itself filters prompts ≤15 chars and known continuation phrases (yes/ok/proceed/continue/etc.) so the strengthening pipeline never runs on trivial prompts. Moves the skip-for-direct-instructions rule from the model layer to the deterministic hook layer. v1.0.0: Initial release — deterministic Enhanced indicator reminder. | v2.1.0: governance-tail reminders (format-A mandatory output, role, plan-before-coding, decide-dont-ask, grill-when-unsure, dont-narrate-and-stop) + per-turn .keepgoing-count reset for no-overask-guard",
-    "tier": "must-have"
   },
   "prompt-logger": {
     "hash": "9e8af3ce108efc9acb61ff6126c7abd64c2a034b8d2239f92d7f1f08e35bc1d2",
@@ -6429,8 +6380,8 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-06-20",
-    "total_patterns": 273
+    "last_updated": "2026-06-23",
+    "total_patterns": 276
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6830,6 +6781,108 @@
     "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
+    "tier": "nice-to-have"
+  },
+  "claude-docs-cache": {
+    "hash": "bda775ec342bda41ece7b6fdb50bae59694e8afc2dd47a5f78361f921479b649",
+    "type": "rule",
+    "category": "core",
+    "version": "1.1.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-22",
+    "last_updated": "2026-06-22",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Check docs/claude-references/ for a saved Claude/Anthropic docs page before fetching it, and save every fetched code.claude.com / docs.claude.com / docs.anthropic.com page there (Source: + Fetched: headers) so projects cache and cite a stable snapshot instead of re-fetching.",
+    "tags": [
+      "documentation",
+      "caching",
+      "claude-code",
+      "web-fetch",
+      "reference"
+    ],
+    "changelog": "v1.1.0 (2026-06-22): promoted hub-only -> distributable (core/) so downstream projects inherit the docs-cache convention; dual-home synced with the hub copy. v1.0.0: hub-only rule.",
+    "tier": "nice-to-have"
+  },
+  "agent-team-selection": {
+    "hash": "11a0652d5c4742f5ee14f26b9801664fc96dfa79137bb9f3752bd19a33eec6f5",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-23",
+    "last_updated": "2026-06-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Decision rule (loads when editing agents/skills): when to reach for an agent TEAM (peer Claude Code sessions that message + self-coordinate, experimental/~4-7x tokens) vs a SUBAGENT (flat worker that reports back, the default) vs a git WORKTREE (parallel file edits). Complements agent-orchestration.md; enforces opt-in/measure-first adoption and the one-team/no-nested-teams/no-resumption constraints.",
+    "tags": [
+      "orchestration",
+      "agent-teams",
+      "selection",
+      "constraints"
+    ],
+    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
+    "tier": "nice-to-have"
+  },
+  "team-task-created-deliverable": {
+    "hash": "02f34dfcec1c5f81b4fd51a79d6a85083d6b16b34a992f687f9c6f1d1d0af1e2",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-23",
+    "last_updated": "2026-06-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "TaskCreated hook for agent teams: hard-gates deliverable-less tasks (reads the real task_subject+task_description fields). Fail-open by default; blocks (exit 2) with stderr feedback under TEAM_GOVERNANCE_STRICT=1 when subject+description name no clear deliverable.",
+    "tags": [
+      "agent-teams",
+      "governance",
+      "hook",
+      "TaskCreated"
+    ],
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
+    "tier": "nice-to-have"
+  },
+  "team-task-completed-verifier": {
+    "hash": "6271d071436a01797f0d8aabebef9dfcf9427456588e891a5f36f2083c5048d1",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-23",
+    "last_updated": "2026-06-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "TaskCompleted hook for agent teams: completion AUDIT logger. The live-captured payload carries no work-product/result field, so payload-based evidence-gating is infeasible — true verification stays with the lead reproducing the gate. Records completions (task, teammate, team) to .claude/.team-activity.log; never blocks.",
+    "tags": [
+      "agent-teams",
+      "governance",
+      "hook",
+      "TaskCompleted",
+      "verification"
+    ],
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
+    "tier": "nice-to-have"
+  },
+  "team-teammate-idle-drain": {
+    "hash": "ca7cab7cddd5a56da00b35369056e58988c9d0bb95b494a26d5263d730d76333",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-23",
+    "last_updated": "2026-06-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "TeammateIdle hook for agent teams: idle AUDIT logger + loop-safe stub. The live-captured payload carries no pending-task count, so it never re-engages blindly (loop-safe). Records idle events to .claude/.team-activity.log. Future: read ~/.claude/tasks/{team_name}/ via the payload team_name to count pending work and re-engage under TEAM_GOVERNANCE_STRICT=1.",
+    "tags": [
+      "agent-teams",
+      "governance",
+      "hook",
+      "TeammateIdle"
+    ],
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
     "tier": "nice-to-have"
   }
 }
