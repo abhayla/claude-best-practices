@@ -287,6 +287,11 @@ different things per type:
   (wrong field path; two hooks repurposed to audit loggers since the payload lacks
   work-product/pending-count; an eval injection/spaces bug). Tests rewritten to real
   schema (13 green). Hooks now match reality.
+- **2026-06-23** — `/brainstorm` converged the team-readiness DIRECTION: end-goal =
+  measure-first (C); win bar = reliable end-to-end completion first, cost-bounded quality
+  second (D>B); experiment = staged (read-only mechanism proof → real build); reliability
+  bar = ≥2/3 runs no-rescue. Captured in `docs/specs/agent-teams-measure-first-experiment-spec.md`.
+  The §12 tracker work is GATED on that experiment passing — not started until then.
 - **2026-06-23** — Added §12: pipeline resource inventory → team-readiness tracker.
   Mapped every Claude resource the 6-step build pipeline uses (verified by reading
   `core/.claude/` files), deduplicated to a unique master list, tagged each with a
