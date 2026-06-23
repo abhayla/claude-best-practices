@@ -29,7 +29,12 @@ cd "$HUB" || exit 3
 [ -x "$PSMUX" ] || { echo "psmux not found at $PSMUX — install: winget install psmux (or portable zip)"; exit 2; }
 
 teammate_completions() {
-  grep "TaskCompleted" "$LOG" 2>/dev/null | grep -v "by=lead/unattributed" | grep -c "by=" || echo 0
+  # Count REAL teammate-attributed events. Two durable signals: `TaskCompleted by=<teammate>`
+  # (task-driven modes) AND `TeammateIdle teammate=<name>` (message-driven modes like brainstorm,
+  # where teammates communicate via messages rather than marking tasks complete). Excludes the
+  # lead's own/unattributed completions.
+  grep -E "(TaskCompleted.*\bby=)|(TeammateIdle.*\bteammate=)" "$LOG" 2>/dev/null \
+    | grep -v "by=lead/unattributed" | grep -c . || echo 0
 }
 
 # Write the launcher .cmd (NO stdout redirect — that would defeat claude's tty).
