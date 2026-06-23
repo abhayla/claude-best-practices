@@ -1,7 +1,9 @@
 # Contract: upgrade the build pipeline's workflows to agent-team-ready
 
 **Executor:** /goal (built-in autonomous run)   ·   **Created:** 2026-06-23
-**Status:** DRAFT — owner refines over several rounds before execution. Do NOT run yet.
+**Status:** Refinement points A2/A3/A4 RESOLVED (owner-confirmed 2026-06-23); goal-creator-compliant
+(all cited paths verified). Pending ONLY: (1) the `/goal`-can-form-`claude --bg`-teams probe (Blocker B —
+the one unverified load-bearing assumption), and (2) owner go-ahead. Do NOT run until BOTH clear.
 **Mission:** Upgrade EVERY workflow the standard build pipeline requires to be *agent-team-ready*
 at the resource level (each skill/agent/rule per the §12 inventory), **baking in Anthropic's
 documented multi-agent best practices** (no concurrent same-file edits, no inter-agent conflict,
@@ -17,13 +19,14 @@ a small validation run; results recorded. **NO product/app is built by this cont
 >   complete, it builds a TODO tracker USING the upgraded workflows as a real-world VALIDATION
 >   HARNESS — and when that build surfaces a workflow defect, it fixes the workflow and continues.
 >   That work is OUT of this contract (tracked in `docs/specs/agent-teams-measure-first-experiment-spec.md`).
-> ## DRAFT refinement points (current decisions, most likely to change)
-> - **A2 — Reliability bar:** a team completes each validation run end-to-end on **≥2 of 3 runs, no rescue**.
-> - **A3 — Workflow set:** Clarify(`brainstorm`,`research-mode`), Execute(`development-loop`,`executing-plans`,
+> ## Refinement points — RESOLVED (owner-confirmed 2026-06-23)
+> - **A2 — Reliability bar [CONFIRMED]:** a team completes each validation run end-to-end on **≥2 of 3 runs, no rescue**.
+> - **A3 — Workflow set [CONFIRMED]:** Clarify(`brainstorm`,`research-mode`), Execute(`development-loop`,`executing-plans`,
 >   `implement`,`tdd`,`fix-loop` + `plan-executor-agent`,`planner-researcher-agent`), Verify(`auto-verify`+
->   `tester-agent`, `code-review-workflow`/`review-gate` + `code-reviewer-agent`/`security-auditor-agent`).
->   Plan/Commit made team-COMPATIBLE only.
-> - **A4 — Per-stage token ceiling:** 400k output tokens/stage; halt-and-report a stage that exceeds it.
+>   `tester-agent`, `code-review-workflow`/`review-gate` + `code-reviewer-agent`/`security-auditor-agent`)
+>   actively USE teams. Plan/Commit made team-COMPATIBLE only (not forced to spawn a team).
+> - **A4 — Token ceilings [RESOLVED]:** **400k output tokens/stage** halt-and-report, AND a **hard total-run cap
+>   of 1.5M output tokens** (adjustable) — exceeding the total halts the whole run with a continuation note.
 
 ## §0.1 Worktree isolation
 > **First action of the run, before §0.2 and any stage. Non-negotiable.** This run MUST execute in a
@@ -188,7 +191,8 @@ the run worktree's evidence dir and `ls`-confirm each exists.
 ## Failure-recovery budget
 - **Per-task fix budget:** ~15 attempts (≈5 inline → `/fix-loop` → `/systematic-debugging`) → then DEFER the task and continue; do NOT halt the whole run.
 - **Tool-hang recovery (browser/MCP/`--bg` team):** 3 cycles — (1) wait + retry; (2) `claude stop` + respawn the team session; (3) kill + restart any background process (captured PID) + retry. All 3 fail → log DEFERRED + `completed (deferred)` + continue.
-- **Per-stage token ceiling (A4):** 400k output tokens/stage → halt-and-report that stage; do not silently overrun.
+- **Token ceilings (A4):** 400k output tokens/stage → halt-and-report that stage; AND a hard **total-run cap of
+  1.5M output tokens** → halt the whole run with a continuation note when reached. Do not silently overrun either.
 - **Hard halt ONLY:** dependency install failure; a decision contradiction in this contract; irrecoverable build break after the full fix budget; OS permission denial; missing required credential. Context-budget anxiety is NOT a halt — hand off via a one-line continuation note, never fake-complete.
 
 ## Commit + push policy
