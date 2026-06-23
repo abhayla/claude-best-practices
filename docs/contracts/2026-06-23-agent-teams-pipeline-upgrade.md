@@ -242,7 +242,9 @@ the run worktree's evidence dir and `ls`-confirm each exists.
 
 ## References (load transitively)
 - `docs/claude-references/multi-agent-best-practices.md` (THE bake-in standard)
-- `core/.claude/rules/{supervisor-verification, independent-test-verification, output-plausibility-verification, dod-verbs, bug-triage-discipline, testing, git-worktrees, git-collaboration, agent-orchestration, agent-team-selection, product-incubation, learnings-routing}`
+- `core/.claude/rules/{supervisor-verification, independent-test-verification, output-plausibility-verification, dod-verbs, bug-triage-discipline, testing, git-collaboration, agent-orchestration, agent-team-selection, learnings-routing}`
+- `core/.claude/skills/git-worktrees` (SKILL — worktree isolation mechanism, not a rule)
+- `.claude/rules/product-incubation.md` (HUB-ONLY rule — present in this repo; not in `core/`)
 - `plans/agent-teams-incorporation.md` (§11 schema, §12 tracker/ledger)
 - `docs/specs/agent-teams-measure-first-experiment-spec.md` (staged plan, win bar, §3a provisioning, two-phase architecture)
 - `docs/claude-references/agent-teams.md` (feature mechanics)
