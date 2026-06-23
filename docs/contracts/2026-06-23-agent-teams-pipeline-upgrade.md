@@ -94,23 +94,38 @@ and each is a per-stage verification gate — an upgrade that does not satisfy i
 1. **Task shaping (A,E):** the orchestrator spawns self-contained tasks with objective + output format +
    out-of-scope, sized ~5–6/teammate. Verified by: the `team-task-created-deliverable` hook (`TaskCreated`)
    rejecting deliverable-less tasks (already built) + a test asserting the workflow emits shaped tasks.
-2. **File/work partitioning — NO concurrent same-file edits (B):** the build orchestrator partitions work
-   so each teammate owns a disjoint file set; no two teammates write the same file. Verified by: a
-   partition manifest the orchestrator produces + a post-run assertion that no file was written by 2+
-   teammates (git-blame / claim-file check), zero unresolved collisions.
+2. **File/work partitioning — NO concurrent same-file edits (B, §H1):** the build orchestrator partitions
+   work so each teammate owns a disjoint file set AND each parallel-editing teammate runs in its own **git
+   worktree** (`isolation: worktree` on the build subagents / `claude --worktree` per session — teammates are
+   NOT isolated by default). Verified by: a partition manifest + a post-run assertion that no file was written
+   by 2+ teammates (git-blame / claim-file check) + worktree-lock evidence, zero unresolved collisions. A
+   coupled cross-file change goes to ONE teammate, never split.
 3. **Anti-conflict / no fighting (C):** division-of-labor heuristics in the spawn prompts; the lead WAITS
    (does not implement while teammates work); task dependencies enforce ordering. Verified by: review of
    the spawn prompts + a run showing no duplicated/contradictory edits.
-4. **Cross-agent verification — doer ≠ checker (D):** a teammate's output is verified by a DIFFERENT
-   teammate/agent, never self-attested. Verified by: the workflow wiring a separate verifier teammate +
-   the `independent-test-verification` / `supervisor-verification` rules applied at the teammate boundary.
-5. **Quality-gate hooks (E):** the workflow runs with `TaskCreated` (scope gate), `TaskCompleted`
-   (definition-of-done gate), `TeammateIdle` (quality backstop) active; plan-approval-for-teammates where
-   the work writes code. Verified by: the honest-team-audit log showing the hooks fired with real values.
-6. **Context passing (G):** all task context is in the spawn prompt (teammates inherit no history); large
-   outputs handed off as artifact references, not piped through the lead. Verified by: spawn-prompt review.
-7. **Team sizing & cost (F):** 3–5 teammates; cheaper models for workers where viable; teams used ONLY for
-   team-shaped work (Plan/Commit stay non-team). Verified by: the `agent-team-selection` rule routing.
+4. **Cross-agent verification — doer ≠ checker (D, §H2):** a teammate's output is verified by a DIFFERENT
+   agent, never self-attested, via the verification LADDER (in-prompt check → `/goal` condition → Stop hook →
+   verification subagent). The verifier is a **read-only reviewer** (`tools: Read, Grep, Glob, Bash` only) in a
+   fresh context, told to flag ONLY correctness/requirement gaps, and it must **show evidence (test output /
+   command + result), not assertions**. Verified by: a separate verifier wired into the workflow +
+   `independent-test-verification` / `supervisor-verification` applied at the teammate boundary.
+5. **Quality-gate hooks (E, §H3):** the workflow runs with `TaskCreated` (scope gate), `TaskCompleted`
+   (definition-of-done gate), `TeammateIdle` (quality backstop) active; plan-approval-for-teammates where the
+   work writes code. Hooks honor the exit-code contract (exit 2 = block + stderr feedback; don't mix exit-2
+   with JSON). Verified by: the honest-team-audit log showing the hooks fired with real values.
+6. **Context passing (G, §H4):** all task context is in the spawn prompt (teammates inherit no history);
+   the long-run plan is saved to a markdown file before the run (survives compaction); the upgrade accounts
+   for `skills`/`mcpServers` frontmatter being DROPPED for teammates and Explore/Plan skipping CLAUDE.md.
+   Verified by: spawn-prompt review.
+7. **Team sizing & cost (F, §H5/H6):** 3–5 teammates; cheaper models per worker via `model`/`effort`
+   frontmatter where viable; teams used ONLY for team-shaped work (Plan/Commit stay non-team); spend gauged
+   on a small slice first. Verified by: the `agent-team-selection` rule routing + per-run token record.
+8. **Teammate-readiness audit (§H4):** each agent used as a teammate is audited — no `skills`/`mcpServers`
+   reliance, a sufficient `tools` allowlist, a specific auto-delegation `description`, and the session-restart
+   pinning is honored (new/edited agent files reload only on restart). Verified by: a frontmatter audit per agent.
+
+> **Full mechanism detail for every item lives in `docs/claude-references/multi-agent-best-practices.md`
+> §A–§H** (the bake-in standard) — this contract names the requirements; the standard carries the how.
 
 ## Stages
 ### Stage A: Harness + provisioning + the upgrade standard (hub)
@@ -158,7 +173,8 @@ and each is a per-stage verification gate — an upgrade that does not satisfy i
 | Gate | Hub rule / mechanism | What it gates | Fires when |
 |---|---|---|---|
 | **Best-practice compliance** | `docs/claude-references/multi-agent-best-practices.md` (items 1–7 above) | Each team-mode upgrade satisfies the applicable task-shaping / partitioning / anti-conflict / cross-verification / hook / context / sizing items | every workflow upgrade |
-| **No-collision** | git-blame / claim-file check | No file written by 2+ teammates in a team build run; zero unresolved collisions | every Execute team run |
+| **No-collision (worktree-isolated)** | `isolation: worktree` + git-blame / claim-file check | Each parallel-editing teammate runs in its own worktree; no file written by 2+ teammates; zero unresolved collisions | every Execute team run |
+| **Doer≠checker ladder** | `multi-agent-best-practices.md` §H2 | A read-only reviewer (fresh context) verifies each builder's output and SHOWS evidence, not assertions; flags only correctness gaps | every team build output |
 | **Supervisor verification** | `supervisor-verification.md` | Reproduce the claimed gate + inspect substance; drive any UI a workflow renders | every team/worker output |
 | **Blind test verification** | `independent-test-verification.md` | Every test verdict re-checked by a SEPARATE context-blind agent (doer≠checker) | any test verdict (non-skippable) |
 | **Honest team audit** | this contract | The `team-*` hook audit log shows real `session=`/`team=` values, never fabricated/`?` (regression guard for the calibrated hooks) | every team stage |
@@ -184,7 +200,10 @@ the run worktree's evidence dir and `ls`-confirm each exists.
 ## Definition of Done (ACTION + COMPLETENESS BAR — load-bearing)
 - [ ] **Upgrade** every §A3 required workflow + its resources to team-ready, EACH verified by a passing unit test or a small validation run; §12 status reflects every one as done-with-evidence.
 - [ ] **Bake in** the multi-agent best practices (items 1–7) into every team-mode upgrade; the best-practice-compliance checklist is filled per workflow with evidence (not a single example — every team-mode workflow).
-- [ ] **Verify** the team-correctness properties on a real team run: zero concurrent same-file collisions, no duplicated/contradictory edits, doer≠checker verification wired, hooks fire with honest audit — each asserted, not assumed.
+- [ ] **Verify** the team-correctness properties on a real team run: parallel-editing teammates are
+  worktree-isolated, zero concurrent same-file collisions, no duplicated/contradictory edits, a read-only
+  doer≠checker reviewer verified each builder's output SHOWING evidence (not assertions), hooks fired with
+  honest audit — each asserted, not assumed.
 - [ ] **Flip** the 4 team patterns to `must-have` + the rule self-gates + hooks ship pre-wired-but-inert; full hub local CI green (4 validators + pytest).
 - [ ] **Reliability:** every team validation run met ≥2/3 no-rescue; rescues/failures recorded.
 - [ ] **Measure + declare:** the report records the best-practice-compliance checklist + reliability + token cost vs the flat-subagent baseline; the goal is declared COMPLETE.
