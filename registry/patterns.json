@@ -6825,7 +6825,7 @@
     "tier": "nice-to-have"
   },
   "team-task-created-deliverable": {
-    "hash": "7cd4fda2273dccc449e9273e41fc4749a405dfa919fdd1afc6904857ccb2261b",
+    "hash": "b21cf634fd414d9aa8c18c54f7e7c2a3138ea8d1c8df3ea32c5a344321825336",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",

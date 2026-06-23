@@ -120,7 +120,28 @@ single-context `/five-advisors` (cheaper) and record the negative result here.
 - Whether `TeammateIdle` exit-2 reliably re-engages a teammate in v2.1.186.
 - Real token multiplier on hub-shaped work (the 4–7× figure is community-reported).
 
+## 9. Testing
+
+Two tiers:
+
+- **Tier 1 — deterministic (DONE, CI-gating):** `scripts/tests/test_team_governance_hooks.py`
+  (19 tests) drives each hook via subprocess and pins the safety properties — fail-open by
+  default, strict-mode hard-block **with stderr feedback**, evidence detection, idle
+  **loop-safety** (never re-engage on an empty/unknown queue), malformed/empty-payload
+  fail-open, registry registration, and a regression guard that the hooks never
+  blanket-redirect stderr. `jq`-dependent assertions skip cleanly where `jq` is absent
+  (the hooks correctly no-op/fail-open without it).
+- **Tier 2 — live integration (SPEND-GATED, pending):** a real run with
+  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` to confirm (a) the hooks actually FIRE on the
+  `TaskCreated`/`TaskCompleted`/`TeammateIdle` events, and (b) the real stdin payload field
+  names match the defensive guesses in the hooks (§7). Needs the experimental flag + token
+  spend, so it runs alongside the five-advisors pilot (§6), not before. Until then the hooks
+  ship **unwired**; tighten the jq field paths the moment a live payload is captured.
+
 ## 8. Changelog
 
 - **2026-06-23** — Guide created. Built items 1 (rule) + 2 (3 governance hooks); pilot
   runbook (item 3) documented; items 4 deferred. Cache refreshed to v2.1.186 status.
+- **2026-06-23** — Added Tier-1 deterministic hook tests (19, all green); fixed a defect
+  where `exec 2>/dev/null` swallowed exit-2 stderr feedback; corrected a misleading
+  "grep fallback" comment. Live Tier-2 confirmation remains spend-gated (§9).

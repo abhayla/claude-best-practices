@@ -21,7 +21,8 @@
 
 PAYLOAD="$(cat 2>/dev/null || true)"
 
-# Pull a task description/title with jq if available; fall back to a grep heuristic.
+# Pull a task description/title with jq when available. If jq is absent, desc stays
+# empty and the hook fails open (no-op) — consistent with the fail-open contract above.
 desc=""
 if command -v jq >/dev/null 2>&1 && [ -n "$PAYLOAD" ]; then
   desc="$(printf '%s' "$PAYLOAD" | jq -r '
