@@ -84,7 +84,13 @@ un-wired vs. wired-but-inert in the shipped `settings.json`). Part of the gated 
 
 The work splits into two cleanly-separated phases:
 
-**Phase 1 — the goal contract (autonomous `/goal`, separate session).** Upgrades EVERY
+> **Executor finding (probe 2026-06-23):** headless `/goal` (`claude -p "/goal …"`) does **NOT** form
+> agent teams (0 team dirs / 0 hook payloads — it silently uses subagents); a **`claude --bg` background
+> session DOES** form teams (verified 3×). So Phase 1's executor is a **`claude --bg`** session, not headless
+> `/goal`. One residual to confirm before launch: that a single `--bg` session can drive the full multi-stage
+> contract to completion (`--bg` team-formation + autonomy are both proven; the multi-stage drive is unconfirmed).
+
+**Phase 1 — the goal contract (autonomous `claude --bg` session, separate from your interactive session).** Upgrades EVERY
 build-pipeline-required workflow to agent-team-ready at the resource level, **bakes in
 Anthropic's documented multi-agent best practices** (no concurrent same-file edits, no
 inter-agent conflict, properly-shaped tasks, doer≠checker cross-verification — sourced to

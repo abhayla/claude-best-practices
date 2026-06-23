@@ -1,9 +1,13 @@
 # Contract: upgrade the build pipeline's workflows to agent-team-ready
 
-**Executor:** /goal (built-in autonomous run)   ·   **Created:** 2026-06-23
-**Status:** Refinement points A2/A3/A4 RESOLVED (owner-confirmed 2026-06-23); goal-creator-compliant
-(all cited paths verified). Pending ONLY: (1) the `/goal`-can-form-`claude --bg`-teams probe (Blocker B —
-the one unverified load-bearing assumption), and (2) owner go-ahead. Do NOT run until BOTH clear.
+**Executor:** `claude --bg` background session (a full autonomous conversation that CAN form agent teams).
+**NOT** headless `/goal` / `claude -p` — **probe-confirmed 2026-06-23 that headless does NOT form teams**
+(0 team dirs / 0 hook payloads), while `--bg` forms them (verified 3× this session).   ·   **Created:** 2026-06-23
+**Status:** A2/A3/A4 RESOLVED + goal-creator-compliant (cited paths verified). **Blocker B RESOLVED
+(probe 2026-06-23):** headless `/goal` forms NO team → **executor retargeted to `claude --bg`** (proven to
+form teams). Pending ONLY: (1) confirm a single `claude --bg` session can drive the full multi-stage
+contract to completion (residual — `--bg` team-formation + autonomy are both proven; the multi-stage drive
+is the one unconfirmed piece), and (2) owner final go-ahead. Do NOT run until BOTH clear.
 **Mission:** Upgrade EVERY workflow the standard build pipeline requires to be *agent-team-ready*
 at the resource level (each skill/agent/rule per the §12 inventory), **baking in Anthropic's
 documented multi-agent best practices** (no concurrent same-file edits, no inter-agent conflict,
@@ -13,8 +17,9 @@ resources is team-ready, best-practice-compliant, and CI-green in the hub, each 
 a small validation run; results recorded. **NO product/app is built by this contract.**
 
 > ## Scope split (read this first — it changed 2026-06-23)
-> - **THIS contract** (autonomous `/goal`, separate session): upgrade + test + declare-done the
->   workflows ONLY. It does NOT build any application.
+> - **THIS contract** (autonomous **`claude --bg`** background session, separate from your interactive
+>   session): upgrade + test + declare-done the workflows ONLY. It does NOT build any application.
+>   (Launched via `claude --bg`, NOT headless `/goal` — see the Executor note; headless forms no teams.)
 > - **The monitoring session** (the owner's interactive session): after this goal is declared
 >   complete, it builds a TODO tracker USING the upgraded workflows as a real-world VALIDATION
 >   HARNESS — and when that build surfaces a workflow defect, it fixes the workflow and continues.
