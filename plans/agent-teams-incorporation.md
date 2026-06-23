@@ -220,7 +220,11 @@ and re-enable strict mode with confidence.
   schema (13 green). Hooks now match reality.
 - **2026-06-23** — Iterate-until-flawless loop. Run #1 exposed a 5th issue: the
   `TaskCompleted` payload schema VARIES — when the lead completes a task, `teammate_name`
-  and `team_name` are ABSENT, so the audit line showed bare `?`. Fixed both audit hooks to
-  anchor on the always-present `session_id` (team = `session-<first8>`, which matches the
-  real team dir) and label a missing teammate as `lead/unattributed`. Regression test added
-  (14 green). Re-running live to confirm a flawless run.
+  and `team_name` are ABSENT, so the audit line showed bare `?`. Run #2 then exposed a 6th:
+  my first fix *fabricated* `team=session-<first8 of session_id>`, but the payload's
+  `session_id` is the FIRING session, NOT the lead session the team is named after — so the
+  derived name (`session-6fdc1b66`) did not match the real team (`session-446a161e`): a
+  plausible-but-wrong value, worse than `?`. Honest fix: never fabricate — log the real
+  `session_id` under its own `session=` field and show `team=-` when `team_name` is absent
+  (it is present + correct for `TeammateIdle`). Tests corrected to assert no fabrication
+  (15 green). Re-running (Run #3) to confirm flawless.
