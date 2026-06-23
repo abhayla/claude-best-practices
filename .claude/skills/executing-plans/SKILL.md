@@ -143,6 +143,14 @@ If the plan includes a project-level verification command (e.g., `npm install`, 
 
 Process tasks wave by wave. Within each wave, determine whether tasks can be parallelized.
 
+> **`--team` mode (optional, parallel file edits).** When a wave's tasks edit **disjoint file
+> sets**, the wave MAY run as a real agent team instead of flat subagents — but ONLY under the
+> partition + worktree-isolation + zero-collision discipline canonically documented in
+> `development-loop` **STEP 4-TEAM** (partition by disjoint ownership → each editing teammate in
+> its own git worktree → lead waits → a read-only verifier teammate checks each builder → assert
+> NO file written by 2+ teammates). Self-gates on `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; a wave
+> with shared-file or dependency-coupled tasks stays on the flat path (best-practice §C). Requires
+> the same anti-fake-team + zero-collision hard gates before accepting the wave's output.
 
 **Read:** `references/execute-tasks.md` for detailed step 3: execute tasks reference material.
 

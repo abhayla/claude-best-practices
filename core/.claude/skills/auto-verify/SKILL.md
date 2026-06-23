@@ -162,6 +162,15 @@ backend unit tests — a false verdict.
 
 ## STEP 2: Execute Tests (via tester-agent)
 
+> **`--team` mode (optional, read-only).** For a large suite that splits into **independent test
+> areas** (e.g. by package / layer / suite), the execution MAY fan out as a real agent team — each
+> teammate runs a disjoint test area and they share results, rather than one sequential runner.
+> Read-only (no source edits → no file partition; item B N/A). A teammate's verdict is NOT
+> self-accepted: a separate read-only verifier (or the lead) re-runs/inspects the raw output per
+> `independent-test-verification` (doer≠checker at the teammate boundary). Self-gates on
+> `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` + the anti-fake-team ground-truth check; else use the flat
+> `tester-agent` path below (cheaper, the default). A small or coupled suite stays flat.
+
 **Fallback if `tester-agent` is not installed:** Run tests directly using the
 project's test runner (detect from CLAUDE.md, pyproject.toml, package.json, or
 build.gradle — scoped to the changed sub-package per "Monorepo runner scoping"

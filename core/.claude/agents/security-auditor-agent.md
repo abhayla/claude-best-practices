@@ -74,6 +74,13 @@ Use the `code-reviewer-agent` agent instead for general code quality reviews tha
 
 For a comprehensive multi-step audit, invoke the `/security-audit` skill which provides an 8-step guided workflow including Semgrep integration, differential review, and false-positive gating.
 
+> **Teammate-readiness (agent-teams):** when this agent runs as a *teammate* (not a flat
+> subagent), the `/security-audit` skill is NOT available — teammates do not inherit `skills`
+> and this agent's `tools` allowlist has no `Skill` tool. As a teammate, perform the inline
+> OWASP review (steps 1–5 above) directly and report findings; the `/security-audit` escalation
+> is the dual-mode / interactive path only. All review context must arrive in the spawn task
+> (teammates inherit no conversation history).
+
 ## Output Format
 
 ```markdown

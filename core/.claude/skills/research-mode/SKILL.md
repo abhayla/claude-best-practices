@@ -77,6 +77,14 @@ Agent(subagent_type="web-research-specialist-agent", prompt="Research {topic}: f
 
 Collect results from all subagents before proceeding.
 
+> **`--team` mode (optional, read-only).** For broad deep research where sources benefit from
+> cross-examination, the parallel breadth-search MAY run as a real agent team instead of flat
+> subagents — each teammate searches a different modality (codebase / web / docs / prior-art) and
+> they share + challenge findings (flag contradictions, dedup) before synthesis, rather than each
+> returning blind to the lead. Read-only, so no file partition (best-practice item B N/A). Self-gates
+> on `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; else the flat parallel-subagent dispatch above is the
+> default (cheaper). Same anti-fake-team gate (members>1 + hooks) before trusting the team's sources.
+
 **CRITICAL:** At the end of this step, you MUST have at least one primary source.
 If you found zero sources, state this explicitly and do NOT proceed to fabricate
 claims. Instead, report: "Insufficient sources found. Here is what I searched
