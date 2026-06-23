@@ -131,12 +131,45 @@ Two tiers:
   fail-open, registry registration, and a regression guard that the hooks never
   blanket-redirect stderr. `jq`-dependent assertions skip cleanly where `jq` is absent
   (the hooks correctly no-op/fail-open without it).
-- **Tier 2 — live integration (SPEND-GATED, pending):** a real run with
-  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` to confirm (a) the hooks actually FIRE on the
-  `TaskCreated`/`TaskCompleted`/`TeammateIdle` events, and (b) the real stdin payload field
-  names match the defensive guesses in the hooks (§7). Needs the experimental flag + token
-  spend, so it runs alongside the five-advisors pilot (§6), not before. Until then the hooks
-  ship **unwired**; tighten the jq field paths the moment a live payload is captured.
+- **Tier 2 — live integration (PARTIALLY RUN 2026-06-23):**
+  - **Finding A — headless `claude -p` does NOT form a real agent team.** A child session
+    launched with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` + the demo settings *claimed* in
+    its text to "spawn 2 teammates," but ground truth disproved it: **no `~/.claude/teams/`
+    directory, no hook payloads captured, no `session-xxxxxxxx` task dir**. The model did the
+    analysis in-context and narrated teams (shape-not-substance). Conclusion: **agent teams
+    is an interactive-terminal feature** (the teammate panel you arrow-select, sessions you
+    watch open/close) — it does not form under non-interactive `-p`.
+  - **Finding B — multi-session open/close IS drivable via agent-VIEW** (the related
+    feature). `claude --bg --name demo-alpha/--name demo-beta` spawned two real, independent
+    Claude Code sessions (separate PIDs); `claude agents --json` showed them go
+    dispatched → idle; `claude stop` + `claude rm` closed them (0 remaining). Verified live.
+  - **Still pending — the hook payload schema (§7) is UNCAPTURED** because no team formed
+    headlessly. It needs an **interactive** team run (see §6/§10). Hooks stay **unwired**
+    until then; tighten the jq field paths the moment a real payload lands in
+    `.claude/.team-demo/payloads.log`.
+
+## 10. Interactive demo + payload-capture (the part that needs a human terminal)
+
+Headless can't form a team, so the real team demo runs in an interactive terminal. A ready
+harness lives in `.claude/.team-demo/` (gitignored): `settings.json` (enables the flag +
+`teammateMode: in-process` + wires a payload-capture logger AND the three real governance
+hooks) and `capture.sh` (logs each event's raw stdin to `payloads.log`).
+
+**Run it (new terminal, this repo dir):**
+```bash
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude --settings .claude/.team-demo/settings.json
+```
+Then paste a read-only team prompt, e.g.: *"Spawn 2 teammates to analyze the trade-offs of
+a CLI TODO-comment tracker — one DX lens, one architecture lens; read-only; create a shared
+task each, return 3 bullets, then synthesize."*
+
+**What you'll see:** an agent panel below the prompt input listing the teammates; ↑/↓ selects
+one, Enter opens its transcript, Esc interrupts. Teammates open as they're spawned and close
+when shut down / the session ends. On Windows use `in-process` mode (split panes need tmux/iTerm2).
+
+**After one run**, `.claude/.team-demo/payloads.log` holds the real `TaskCreated` /
+`TaskCompleted` / `TeammateIdle` payloads → then tighten the hooks' jq field paths to match
+and re-enable strict mode with confidence.
 
 ## 8. Changelog
 
@@ -145,3 +178,7 @@ Two tiers:
 - **2026-06-23** — Added Tier-1 deterministic hook tests (19, all green); fixed a defect
   where `exec 2>/dev/null` swallowed exit-2 stderr feedback; corrected a misleading
   "grep fallback" comment. Live Tier-2 confirmation remains spend-gated (§9).
+- **2026-06-23** — Ran Tier-2 live probe: confirmed headless `-p` does NOT form a team
+  (Finding A) and that multi-session open/close is drivable via agent-view `claude --bg`
+  (Finding B). Built the interactive demo harness (`.claude/.team-demo/`, gitignored) +
+  §10. Real hook payload schema still needs one interactive team run to capture.
