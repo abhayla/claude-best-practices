@@ -51,24 +51,34 @@ Any stage FAIL → stop, record why; do **not** invest in tracker work on an unp
 
 ## 3a. Optionality — agent teams is fully optional for BOTH hub and downstream (Must)
 
-Agent teams MUST be a **default-OFF, fully optional** capability, controlled at two
-independent layers, symmetric for the hub and downstream projects:
+Agent teams MUST be a **default-OFF capability that is ALWAYS SHIPPED but DORMANT** —
+controlled by a **single master switch** (the platform env var), symmetric for the hub and
+downstream. (Owner decision 2026-06-23: ship must-have, gate on the env var — simpler than
+a provisioning opt-in; one mental model; activating teams is a flag-flip, no re-provisioning.)
 
 | Layer | Controls | Mechanism | Default |
 |---|---|---|---|
-| **Provisioning** | Whether a project *receives* the resources | Agent-team patterns (`agent-team-selection` rule, `team-*` hooks, future team skills) = a **tagged optional bundle**; `synthesize-project` / `recommend.py` offer it as an opt-in selection. Unselected → files never copied. | Not auto-included |
-| **Activation — platform** | Whether teams *form* | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. Without it, no team forms; all team resources are inert. | OFF |
-| **Activation — workflow** | Whether the *default path* uses teams | Team-variant workflows are opt-in per call (`--team`) or a project config flag; default stays flat-subagent even with the platform flag on. | Non-team |
+| **Provisioning** | Whether a project *receives* the resources | Agent-team patterns ship as **must-have** → always provisioned to every downstream project (and present in the hub). Files are always available. | Always shipped (dormant) |
+| **Activation — platform (MASTER)** | Whether teams *form* at all | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. Without it, no team forms; the `team-*` hooks **physically never fire** (their events only exist when a team exists). The single on/off. | OFF |
+| **Activation — workflow** | Whether the *default path* uses teams (when master is ON) | Team-variant workflows are opt-in per call (`--team`); default stays flat-subagent even with the master on. | Non-team |
 
-**Invariant:** when off (the default), there is **zero token cost, zero merge risk, zero
-hook firing** — the project behaves exactly as if agent teams did not exist. Same opt-out
-pattern as the hub's existing `AUTO_MERGE=0` / pluggable `SECRET_SCAN_CMD`.
+**Why "shipped but dormant" is safe (verified):** the 3 hooks fire only on
+`TaskCreated`/`TaskCompleted`/`TeammateIdle`, which cannot occur without a team, which cannot
+form without the env var. So with the master OFF there is **zero token cost, zero merge risk,
+zero hook firing** — identical to agent teams not existing. Same dormant-by-default pattern as
+the hub's `AUTO_MERGE=0` / pluggable `SECRET_SCAN_CMD`.
 
-**Hub symmetry:** the hub keeps the resources in `.claude/`/`core/` but teams are off unless
-a hub session opts in — identical control to downstream. The hub can dogfood teams or not.
+**Required tweak for clean must-have shipping:** the `agent-team-selection` rule is
+glob-scoped, so as must-have it would load into every downstream project's context. It MUST
+open with a self-gating line — *"only relevant if `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`;
+otherwise ignore"* — so it doesn't advise a dormant capability. (Hooks need no such tweak.)
 
-This reinforces measure-first: off everywhere by default until the experiment proves value,
-then any project (or the hub) flips it on.
+**Hub symmetry:** the hub holds the same always-present resources; teams are off unless a hub
+session sets the env var. Hub can dogfood teams or not, identically to downstream.
+
+**Pending implementation action (gated, not done):** flip the 4 team patterns' registry tier
+`nice-to-have → must-have` + add the rule's self-gating line + decide hook-wiring (ship
+un-wired vs. wired-but-inert in the shipped `settings.json`). Part of the gated rollout.
 
 ## 4. What we measure (per run → calibration note / trust-score ledger)
 - **Reliability (D, primary):** completed end-to-end? rescues needed? hook errors?
@@ -104,8 +114,12 @@ then any project (or the hub) flips it on.
 - **Toggle granularity (§3a):** is the platform env var enough as the activation master, or
   add a hub/project config flag (e.g. `agent_teams: enabled`) on top? [proposed: env var as
   master + per-call `--team` opt-in; a config flag is a Nice add]
-- **Provisioning default:** ship the resources to all downstream as inert-but-present, or
-  only when opted in at provision time? [proposed: opt-in to receive AND off-by-default once received]
+- ~~**Provisioning default:**~~ **RESOLVED (owner, 2026-06-23):** ship **must-have** (always
+  present, dormant) + env var as the single master switch. See §3a.
+- **Hook-wiring sub-decision (open):** when shipped must-have, do the `team-*` hooks come
+  pre-wired in the downstream `settings.json` (inert until a team event, which needs the flag)
+  or ship un-wired (the project wires them when enabling teams)? [proposed: pre-wired — they're
+  provably inert when off, and pre-wiring makes the env-var flip the *only* step to go live]
 
 ## 7. Success criteria (the bet pays off if…)
 - **Stage 1 passes** → the team+hooks mechanism is reliable (D satisfied for read-only).
