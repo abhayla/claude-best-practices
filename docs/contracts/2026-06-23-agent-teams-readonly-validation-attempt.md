@@ -118,6 +118,40 @@ form real teams — `-p` doesn't, but a winpty-wrapped interactive launch does. 
 the identical, now-proven team mechanism; the reliable way to finish them is the user driving the
 slash command in a real teams-enabled terminal, or retrying the flaky harness.
 
+## FULLY-AUTONOMOUS attempt — verdict: blocked by a platform limitation (2026-06-23, session 2)
+
+Goal: run the `--team` modes with ZERO manual terminal steps. Built a retrying launcher
+(`scripts/run_agent_team.sh`: backgrounded-subshell winpty + real-team verification via the
+durable activity-log signal + result extraction). Measured result: **winpty degraded to 0%** —
+after ~2 early successes it failed every subsequent launch (`0/5`, then `0/4`) with
+`stdin is not a tty`, across foreground / `timeout`-wrapped / backgrounded-subshell patterns.
+
+**Root cause (evidenced, not guessed):** agent teams are an **interactive-TTY feature** (no
+headless team API; `claude -p` forms no team — confirmed). The only PTY shim in the Claude Code
+Bash-tool sandbox is `winpty`, whose console allocation is unreliable/exhausting here. There is
+**no util-linux `script`** and **no installed WSL distro** to provide a reliable PTY.
+
+**Conclusion:** reliable **fully-autonomous** agent-team execution is **NOT achievable from inside
+the Claude Code Bash sandbox on this Windows box.** This is a platform/environment limit, not a hub
+defect. The modes themselves WORK (research-mode validated end-to-end with a real team).
+
+**The genuinely autonomous options (each a real decision):**
+1. **WSL distro** (`wsl --install -d Ubuntu` + claude in WSL) → util-linux `script -qec` = a
+   reliable PTY → `run_agent_team.sh` (winpty line swapped for `script`) runs teams autonomously.
+   One-time setup (admin + reboot); then reliable + unattended.
+2. **A real-TTY host** (Linux/mac box, cloud VM, or a persistent console/daemon) running scheduled
+   `claude` team jobs; the hub triggers teams there.
+3. **Accept the platform reality (RECOMMENDED, measure-first + KISS):** keep agent teams
+   **interactive-only, default-OFF** (as shipped) and use **flat subagents** for ALL headless/
+   autonomous parallelism (the hub's existing default). Rationale: teams cost ~4–7× (research-mode
+   = 4.0M tokens for a small task), can't be made reliably headless on this platform, and flat
+   subagents already cover unattended parallel work. Reserve teams for interactive human-driven
+   sessions (where the human IS the terminal and teams' cross-challenge shines).
+
+This is the measure-first verdict the experiment was designed to reach: the autonomous ROI of
+agent teams is not proven on this platform; the cost + the TTY requirement argue against wiring
+them into the autonomous factory. Owner decision required to pick 1 / 2 / 3.
+
 ## Status
 
 - 4 read-only modes: **NOT yet live-validated** (boundary above).
