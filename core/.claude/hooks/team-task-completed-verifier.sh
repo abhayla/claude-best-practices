@@ -21,20 +21,27 @@
 
 PAYLOAD="$(cat 2>/dev/null || true)"
 
-task_id="" ; subject="" ; teammate="" ; team=""
+task_id="" ; subject="" ; teammate="" ; team="" ; sid=""
 if command -v jq >/dev/null 2>&1 && [ -n "$PAYLOAD" ]; then
   task_id="$(printf  '%s' "$PAYLOAD" | jq -r '(.task_id // "")'       2>/dev/null)"
   subject="$(printf  '%s' "$PAYLOAD" | jq -r '(.task_subject // "")'  2>/dev/null)"
   teammate="$(printf '%s' "$PAYLOAD" | jq -r '(.teammate_name // "")' 2>/dev/null)"
   team="$(printf     '%s' "$PAYLOAD" | jq -r '(.team_name // "")'     2>/dev/null)"
+  sid="$(printf      '%s' "$PAYLOAD" | jq -r '(.session_id // "")'    2>/dev/null)"
 fi
 
-# Append to a project-local audit trail when a .claude dir is present; else no-op.
+# The TaskCompleted payload schema VARIES: when the lead marks a task complete on a
+# teammate's behalf, teammate_name/team_name are absent (verified live 2026-06-23). Anchor
+# on session_id (always present) so the audit line is never a bare "?". The team name is
+# `session-` + the first 8 chars of the lead session id (matches ~/.claude/teams/<name>).
+[ -z "$team" ] && [ -n "$sid" ] && team="session-$(printf '%s' "$sid" | cut -c1-8)"
+by="${teammate:-lead/unattributed}"
+
 base="${CLAUDE_PROJECT_DIR:-$PWD}"
 if [ -d "$base/.claude" ]; then
   ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '?')"
   printf '%s\tTaskCompleted\tteam=%s\ttask=%s\tby=%s\tsubject=%s\n' \
-    "$ts" "${team:-?}" "${task_id:-?}" "${teammate:-?}" "${subject:-?}" \
+    "$ts" "${team:-unknown}" "${task_id:-?}" "$by" "${subject:-?}" \
     >> "$base/.claude/.team-activity.log" 2>/dev/null || true
 fi
 exit 0

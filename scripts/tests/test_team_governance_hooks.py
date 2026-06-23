@@ -143,6 +143,22 @@ def test_completed_empty_payload_no_block(tmp_path):
     assert _run(COMPLETED, "", strict=True, cwd=tmp_path).returncode == 0
 
 
+@needs_bash
+@needs_jq
+def test_completed_missing_team_fields_anchors_on_session_id(tmp_path):
+    """Schema variance (verified live): when the lead completes a task, teammate_name and
+    team_name are ABSENT. The audit line must still be complete — team derived from
+    session_id (session-<first8>) and a labelled 'by', never a bare '?'."""
+    (tmp_path / ".claude").mkdir()
+    p = '{"hook_event_name":"TaskCompleted","session_id":"6e3e29ca-293a-4668-86eb-9bb2887dbc2a","task_id":"1","task_subject":"DX-lens trade-off analysis","task_description":"x"}'
+    res = _run(COMPLETED, p, cwd=tmp_path)
+    assert res.returncode == 0
+    log = (tmp_path / ".claude" / ".team-activity.log").read_text(encoding="utf-8")
+    assert "team=session-6e3e29ca" in log, "team must be derived from session_id when team_name absent"
+    assert "by=lead/unattributed" in log, "missing teammate_name must be labelled, not '?'"
+    assert "team=?" not in log and "by=?" not in log, "audit line must never contain a bare '?'"
+
+
 # --------------------------------------------------- TeammateIdle (audit logger, loop-safe)
 @needs_bash
 @needs_jq

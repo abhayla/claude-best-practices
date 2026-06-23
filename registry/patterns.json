@@ -6845,7 +6845,7 @@
     "tier": "nice-to-have"
   },
   "team-task-completed-verifier": {
-    "hash": "e4a4d6c3f8f64bf7996d81a192c2a9cc3443e8e985f7b4ced2a1dbaba53e844d",
+    "hash": "67749ca1647d1c88c64be4a39386a79ce34cb909211645ce081d38c6df14f840",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",
@@ -6866,7 +6866,7 @@
     "tier": "nice-to-have"
   },
   "team-teammate-idle-drain": {
-    "hash": "d0206eb49daaa6b7f0523b3c851f02d8a1c5e99d64abae54660479152484e1fc",
+    "hash": "208abe7dbf7ec0117e4a7dad6865699f612c0b75c426148b7fa90d8650a2b9dd",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",
