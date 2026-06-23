@@ -232,9 +232,29 @@ different things per type:
 | 5 Verify | skills `auto-verify`, `code-review-workflow`, `review-gate`, `code-quality-gate`, `architecture-fitness`, `security-audit`, `change-risk-scoring`, `regression-test`; agents `tester-agent`, `code-reviewer-agent`, `security-auditor-agent`; rules `independent-test-verification`, `supervisor-verification`, `output-plausibility-verification` |
 | 6 Commit | hooks `auto-git`, `auto-pr`; skills `post-fix-pipeline`, `request-code-review`, `receive-code-review`; agent `git-manager-agent`; rule `git-collaboration` |
 
+### Per-upgrade acceptance standard (the bar every 🟢/🟠 upgrade is ticked against)
+
+> **Recorded by Stage A of the pipeline-upgrade contract (`docs/contracts/2026-06-23-agent-teams-pipeline-upgrade.md`).**
+> Source of the full mechanism: `docs/claude-references/multi-agent-best-practices.md` §A–§H.
+> An upgrade is NOT done until it satisfies every item APPLICABLE to its tier, each verified by a
+> test or a real validation run (not asserted). The item numbers below are the contract's items 1–8.
+
+| # | Best-practice item | Applies to | How it's verified (gate) |
+|---|---|---|---|
+| 1 | **Task shaping (A,E)** — self-contained tasks: objective + output format + out-of-scope, ~5–6/teammate, effort-scaling in the orchestrator prompt | 🟢🟠 orchestrators | `team-task-created-deliverable` (`TaskCreated`) rejects deliverable-less tasks + a test asserting shaped tasks |
+| 2 | **File/work partitioning (B,§H1)** — disjoint file ownership; each parallel-editing teammate in its OWN git worktree; a coupled cross-file change goes to ONE teammate | 🟠 execute only | partition manifest + post-run assertion no file written by 2+ teammates (git-blame/claim-file) + worktree-lock evidence |
+| 3 | **Anti-conflict (C)** — division-of-labor heuristics in spawn prompts; the lead WAITS; task dependencies order the work | 🟢🟠 | spawn-prompt review + a run showing no duplicated/contradictory edits |
+| 4 | **Cross-agent verification (D,§H2)** — doer≠checker: a SEPARATE read-only reviewer (`Read,Grep,Glob,Bash` only), fresh context, flags only correctness gaps, SHOWS evidence not assertions | 🟢🟠 all team output | verifier wired into the workflow + `independent-test-verification`/`supervisor-verification` at the teammate boundary |
+| 5 | **Quality-gate hooks (E,§H3)** — `TaskCreated`/`TaskCompleted`/`TeammateIdle` active; plan-approval-for-teammates when work writes code; exit-code contract honored | 🟢🟠 | honest-team-audit log showing the hooks fired with real values |
+| 6 | **Context passing (G,§H4)** — all task context in the spawn prompt; long-run plan saved to a markdown file; account for `skills`/`mcpServers` DROPPED for teammates + Explore/Plan skipping CLAUDE.md | 🟢🟠 | spawn-prompt review |
+| 7 | **Team sizing & cost (F,§H5/H6)** — 3–5 teammates; cheaper per-worker models where viable; teams ONLY for team-shaped work; spend gauged on a small slice first | 🟢🟠 | `agent-team-selection` routing + per-run token record |
+| 8 | **Teammate-readiness audit (§H4)** — each teammate agent: no `skills`/`mcpServers` reliance, sufficient `tools` allowlist, specific auto-delegation `description`, session-restart pinning honored | agents used as teammates | per-agent frontmatter audit |
+
 ### Master tracker (unique resources)
 
 **✅ Already team-ready (built this session):** `agent-team-selection` (rule), `team-task-created-deliverable` / `team-task-completed-verifier` / `team-teammate-idle-drain` (hooks). These ARE the team-boundary scaffolding.
+
+**Stage A (pipeline-upgrade contract, 2026-06-23):** the 4 scaffolding patterns above flipped `nice-to-have → must-have` (dormant by default — §3a env-var master switch); the rule carries the `EXPERIMENTAL_AGENT_TEAMS` self-gate line; the 3 `team-*` hooks wired pre-but-inert in `core/.claude/settings.json` (`TaskCreated`/`TaskCompleted`/`TeammateIdle`). The acceptance standard above is now recorded. ✅
 
 | Resource | Type | Step | Tier | Work to make team-ready | Status |
 |---|---|---|---|---|---|

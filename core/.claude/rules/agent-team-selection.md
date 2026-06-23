@@ -5,6 +5,13 @@ globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 
 # Agent Team vs Subagent vs Worktree — selection rule
 
+> **SELF-GATE — only relevant if `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; otherwise ignore.**
+> Agent teams are experimental and default-OFF. Without that env var no team can form (the
+> `team-*` hooks physically never fire), so this rule advises a dormant capability — fall back
+> to the SUBAGENT default in `agent-orchestration.md`. This rule ships as a `must-have` pattern
+> (always provisioned) precisely so the guidance is present-but-dormant the moment a project
+> flips the switch; until then, treat agent-team advice below as inactive.
+
 > Loads when editing agents/skills (the places that orchestrate). Companion to
 > `agent-orchestration.md` (which governs single-level subagent dispatch). Feature
 > reference: `docs/claude-references/agent-teams.md`.

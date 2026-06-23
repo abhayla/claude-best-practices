@@ -38,6 +38,10 @@ CLAUDE.local.md
 # goal-run scratch logs (per docs/goals contracts)
 docs/goals/.run/
 
+# agent-teams pipeline-upgrade run: worktree lock + per-run progress log (contract §0.1/§0.3)
+.run-active.lock
+docs/contracts/.run/
+
 # Playwright MCP scratch (screenshots, console logs, page/ARIA snapshots) — ephemeral verification artifacts
 .playwright-mcp/
 

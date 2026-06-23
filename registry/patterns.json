@@ -6805,7 +6805,7 @@
     "tier": "nice-to-have"
   },
   "agent-team-selection": {
-    "hash": "11a0652d5c4742f5ee14f26b9801664fc96dfa79137bb9f3752bd19a33eec6f5",
+    "hash": "48fc3cbdc6ae1219f0174bb6f2d9f1d07ddebd254469ec8ddf7bf3ac589938a5",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6821,8 +6821,8 @@
       "selection",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks); v1.1.0: flipped to must-have (dormant) + added EXPERIMENTAL_AGENT_TEAMS self-gate line (§3a)",
+    "tier": "must-have"
   },
   "team-task-created-deliverable": {
     "hash": "02f34dfcec1c5f81b4fd51a79d6a85083d6b16b34a992f687f9c6f1d1d0af1e2",
@@ -6841,8 +6841,8 @@
       "hook",
       "TaskCreated"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
+    "tier": "must-have"
   },
   "team-task-completed-verifier": {
     "hash": "6271d071436a01797f0d8aabebef9dfcf9427456588e891a5f36f2083c5048d1",
@@ -6862,8 +6862,8 @@
       "TaskCompleted",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
+    "tier": "must-have"
   },
   "team-teammate-idle-drain": {
     "hash": "ca7cab7cddd5a56da00b35369056e58988c9d0bb95b494a26d5263d730d76333",
@@ -6882,7 +6882,7 @@
       "hook",
       "TeammateIdle"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
+    "tier": "must-have"
   }
 }
