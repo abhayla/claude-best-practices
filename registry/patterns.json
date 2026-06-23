@@ -2025,7 +2025,7 @@
     }
   },
   "e2e-best-practices": {
-    "hash": "f60ebead91c8eb23fc9f50e8956b7ed44b6086c12683f989b667f10217a24f4b",
+    "hash": "3a61db8c34ed220b79830cde28a1b6a386aa429ae243ffdbff47b5b85bbb3f99",
     "type": "skill",
     "category": "core",
     "version": "1.1.0",
@@ -5441,7 +5441,7 @@
     }
   },
   "ui-ux-pro-max": {
-    "hash": "e894964879a06795b91e0721da111829136607985123007d82a1e9e6977eb747",
+    "hash": "d8b57a775d8a5200b6a31a6f2d51f84d3ffbdbbd5b5ebbe1e8165daa24b07f65",
     "type": "skill",
     "category": "core",
     "version": "2.1.0",
@@ -6771,7 +6771,7 @@
     "tier": "nice-to-have"
   },
   "git-branch-lifecycle": {
-    "hash": "e51c9bc6a51321ff39ad59ad9d475f5e1f5df705caad5c88a4f095d452c0ef25",
+    "hash": "0e7ca91f6b32154d8e86229bce9d3881be8333502996b50dfe02b4128385f9f2",
     "type": "skill",
     "version": "1.1.0",
     "description": "Model-driven control layer over the auto-git/auto-pr hooks: status, work (worktree parallel isolation), finish (agent review then merge), cleanup (reconcile every branch — merged prune, unmerged auto-PR+merge-on-green, escalate only CI-red/strategic).",
