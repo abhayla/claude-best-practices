@@ -30,6 +30,12 @@ MAX="${3:-5}"
 TIMEOUT="${4:-300}"
 cd "$HUB" || exit 3
 
+# Pick the PTY provider: prefer util-linux `script` (reliable; Linux/WSL/macOS) over winpty
+# (Windows-only, unreliable in the MINGW64 sandbox). This makes the launcher TURNKEY the moment
+# a script-capable env exists (e.g. after `wsl --install`) — no further edits needed.
+if command -v script >/dev/null 2>&1; then PTY="script"; else PTY="winpty"; fi
+echo "PTY provider: $PTY"
+
 teammate_completions() {  # count of REAL teammate-attributed completions
   grep "TaskCompleted" "$LOG" 2>/dev/null | grep -v "by=lead/unattributed" | grep -c "by=" || echo 0
 }
@@ -38,10 +44,14 @@ echo "=== run_agent_team [$LABEL] : up to $MAX attempts, ${TIMEOUT}s each ==="
 for attempt in $(seq 1 "$MAX"); do
   before=$(teammate_completions)
   out="$HUB/.claude/.team-run-${LABEL}-${attempt}.out"
-  echo "--- attempt $attempt: launching winpty claude (before=$before) ---"
-  # IMPORTANT: winpty must run in a BACKGROUNDED subshell (proven pattern) — a `timeout`
+  echo "--- attempt $attempt: launching claude via $PTY (before=$before) ---"
+  # IMPORTANT: the PTY provider must run in a BACKGROUNDED subshell (proven pattern) — a `timeout`
   # wrapper or foreground run detaches stdin and winpty fails "stdin is not a tty".
-  ( winpty claude --settings "$SETTINGS" --permission-mode bypassPermissions "$PROMPT" > "$out" 2>&1 ) &
+  if [ "$PTY" = "script" ]; then
+    ( script -qec "claude --settings '$SETTINGS' --permission-mode bypassPermissions '$PROMPT'" /dev/null > "$out" 2>&1 ) &
+  else
+    ( winpty claude --settings "$SETTINGS" --permission-mode bypassPermissions "$PROMPT" > "$out" 2>&1 ) &
+  fi
   pid=$!
   waited=0
   while kill -0 "$pid" 2>/dev/null && [ "$waited" -lt "$TIMEOUT" ]; do sleep 5; waited=$((waited+5)); done
