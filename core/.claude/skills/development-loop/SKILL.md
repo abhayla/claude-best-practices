@@ -54,7 +54,7 @@ suggest `/implement` directly. Proceed with the full cycle only on confirmation.
 ```
 /development-loop <feature description | issue URL | spec file path>
                   [--skip-ideate] [--skip-plan]
-                  [--research] [--no-commit]
+                  [--research] [--no-commit] [--team]
 ```
 
 | Flag | Default | Meaning |
@@ -63,6 +63,7 @@ suggest `/implement` directly. Proceed with the full cycle only on confirmation.
 | `--skip-plan` | auto (Simple only) | Skip STEP 3 PLAN; go straight from ideate to execute |
 | `--research` | off | Dispatch `planner-researcher-agent` during IDEATE for deep research before brainstorming |
 | `--no-commit` | off | Stop after STEP 5 VERIFY; do not run STEP 6 COMMIT |
+| `--team` | off | Run STEP 4 EXECUTE as a real **agent team** building disjoint file-partitions in PARALLEL (each teammate worktree-isolated), instead of one sequential plan-executor. Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (else self-gates to the flat path). ONLY for genuinely parallelizable plans — see STEP 4-TEAM. |
 
 ---
 
@@ -204,6 +205,49 @@ Capture return contract; increment `dispatches_used` by 1.
 
 If `gate: BLOCKED` or `FAILED` → abort with structured BLOCKED verdict; go to
 STEP 7 REPORT without STEP 5 or STEP 6.
+
+---
+
+## STEP 4-TEAM: PARALLEL BUILD TEAM (optional, `--team` flag)
+
+> **The risky tier — parallel FILE EDITS.** Use a team here ONLY when the plan is genuinely
+> parallelizable into **disjoint file sets** (e.g. frontend / backend / tests, or independent
+> modules). Sequential, same-file, or dependency-heavy plans stay on the flat STEP 4 path —
+> a team there only fights itself (best-practice §C: "NOT for sequential / same-file / dependency-heavy").
+>
+> **SELF-GATE:** requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; else fall back to flat STEP 4.
+
+**Procedure (bakes in best-practice items A, B, C, D — `docs/claude-references/multi-agent-best-practices.md`):**
+
+1. **Partition by disjoint file ownership (item B / §H1 — the load-bearing rule).** The lead
+   splits the plan so **each teammate OWNS a non-overlapping file set**; write a partition
+   manifest (`teammate → files`). A coupled change that spans files goes to ONE teammate, never
+   split. NO two teammates may write the same file — this is the property the whole stage gates on.
+2. **Worktree isolation per editing teammate (item B / §H1).** Teammates are NOT isolated by
+   default (they inherit the session CWD). Each parallel-editing teammate MUST run in its own
+   git worktree (`isolation: worktree` on the build subagent, or a per-session `claude --worktree`);
+   Claude `git worktree lock`s it for the run. Background sessions auto-isolate (`worktree.bgIsolation`).
+   This physically prevents concurrent same-file collisions even if the partition has a gap.
+3. **Shaped build tasks (item A).** Each task: objective + the OWNED file set + out-of-scope (the
+   other teammates' files) + the test it must make pass + "commit your slice; do not touch files you
+   don't own." `~5–6` tasks/teammate max. The `TaskCreated` hook rejects deliverable-less tasks.
+4. **Lead WAITS (item C).** The lead does NOT implement while teammates build (a documented failure
+   mode); it assigns, waits, then integrates. Task dependencies order any genuinely-coupled steps.
+5. **Doer ≠ checker (item D).** A SEPARATE verifier teammate (read-only: `Read, Grep, Glob, Bash`)
+   checks each builder's output against its task — runs the tests, SHOWS the output (not assertions),
+   flags only correctness/requirement gaps. A builder never self-attests its slice as done.
+6. **Hooks active (item E):** `TaskCreated`/`TaskCompleted`/`TeammateIdle` (shipped pre-wired-but-inert).
+   Plan-approval-for-teammates: teammate is read-only until the lead approves its plan (since it writes code).
+
+**Hard gates BEFORE accepting the team's build (all must pass — else the run FAILS, not "mostly worked"):**
+- **Anti-fake-team:** `~/.claude/teams/<name>/config.json` `members` > 1 AND the hooks fired (honest audit).
+  `members == [team-lead]` + 0 hooks = a NARRATED fake team — reject it.
+- **ZERO collisions:** assert NO file was written by 2+ teammates (git-blame / claim-file / per-worktree
+  diff). One collision = FAIL. No duplicated or contradictory edits.
+- **Builds + tests pass:** the integrated module compiles and its tests are green (reproduced, not claimed).
+
+**Cost (item F):** ~4–7× tokens; 3–5 teammates; route builders to a cheaper model where the slice allows;
+gauge spend on a small slice first. If the plan isn't cleanly partitionable, the flat path is cheaper AND safer.
 
 ---
 
