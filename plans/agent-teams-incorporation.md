@@ -203,6 +203,75 @@ when shut down / the session ends. On Windows use `in-process` mode (split panes
 `TaskCompleted` / `TeammateIdle` payloads → then tighten the hooks' jq field paths to match
 and re-enable strict mode with confidence.
 
+## 12. Pipeline resource inventory → team-readiness tracker
+
+Goal: uniquely identify every Claude resource the 6-step build pipeline uses, then make each
+one **agent-team-ready** (or explicitly keep it non-team). Inventory built by reading the
+actual `core/.claude/` files (verified 2026-06-23 — no dead references). "Team-ready" means
+different things per type:
+- **Orchestrator skill** → can spawn a real team (not just flat subagents) where it helps, with
+  file-partitioning + the governance hooks wired.
+- **Agent** → works correctly when spawned as a *teammate*: no reliance on `skills`/`mcpServers`
+  frontmatter (NOT applied to teammates), sufficient `tools` allowlist, prompt works as an
+  independently-addressable peer using `SendMessage`/task tools.
+- **Rule** → accounts for the teammate boundary (e.g. the lead reproduces the gate).
+- **Hook** → has a team-event analog (`TaskCreated`/`TaskCompleted`/`TeammateIdle`).
+
+### Readiness tiers
+- 🟢 **SAFE-FIT** — read-only, benefits from peer-challenge/parallel analysis. **Zero merge risk → do first.**
+- 🟠 **RISKY-FIT** — parallel *file edits*; high value but needs partition + merge handling. **Validate after SAFE.**
+- ⚪ **KEEP NON-TEAM** — mechanical or single-coherent-owner; flat subagents / single-context are strictly better.
+
+### Per-step resource map (entry points)
+| Step | Resources (entry → dispatched) |
+|---|---|
+| 1 Clarify | skills `brainstorm`, `grill-me`, `research-mode`, `grill-with-docs`; agent `web-research-specialist-agent` |
+| 2 Plan | skill `writing-plans`; rule `dod-verbs` |
+| 3 Isolate | rule `product-incubation` *(hub-only)*; skills `bootstrap-dogfood-project` *(hub-only)*, `contribute-practice`, `synthesize-hub` |
+| 4 Execute | skills `development-loop`, `executing-plans`, `implement`, `tdd`, `fix-loop`, `learn-n-improve`; agents `plan-executor-agent`, `planner-researcher-agent`; rules `workflow`, `plan-before-coding`, `tdd`, `testing` |
+| 5 Verify | skills `auto-verify`, `code-review-workflow`, `review-gate`, `code-quality-gate`, `architecture-fitness`, `security-audit`, `change-risk-scoring`, `regression-test`; agents `tester-agent`, `code-reviewer-agent`, `security-auditor-agent`; rules `independent-test-verification`, `supervisor-verification`, `output-plausibility-verification` |
+| 6 Commit | hooks `auto-git`, `auto-pr`; skills `post-fix-pipeline`, `request-code-review`, `receive-code-review`; agent `git-manager-agent`; rule `git-collaboration` |
+
+### Master tracker (unique resources)
+
+**✅ Already team-ready (built this session):** `agent-team-selection` (rule), `team-task-created-deliverable` / `team-task-completed-verifier` / `team-teammate-idle-drain` (hooks). These ARE the team-boundary scaffolding.
+
+| Resource | Type | Step | Tier | Work to make team-ready | Status |
+|---|---|---|---|---|---|
+| `code-review-workflow` | skill | 5 | 🟢 | Add a `--team` mode: spawn security/perf/tests/correctness reviewers who share+challenge before the lead synthesizes (Anthropic flagship pattern) | ⬜ not started |
+| `review-gate` | skill | 5 | 🟢 | It already dispatches 3 inline gate agents → convert to a real review team (quality/arch/security as teammates) | ⬜ not started |
+| `code-reviewer-agent` | agent | 5 | 🟢 | Teammate-readiness check: no `skills`/`mcpServers` reliance; tools OK; peer-prompt. Already `dispatched_from: dual-mode` | ⬜ not started |
+| `security-auditor-agent` | agent | 5 | 🟢 | Same teammate-readiness check | ⬜ not started |
+| `tester-agent` | agent | 5 | 🟢 | Teammate-readiness check; fan-out test areas as teammates | ⬜ not started |
+| `auto-verify` | skill | 5 | 🟢 | Optional `--team` to run parallel test-area teammates (no source edits) | ⬜ not started |
+| `brainstorm` | skill | 1 | 🟢 | Advisor-panel mode (multi-lens spec debate, read-only) — overlaps the five-advisors pilot | ⬜ not started |
+| `research-mode` | skill | 1 | 🟢 | Parallel multi-source research teammates | ⬜ not started |
+| `planner-researcher-agent` | agent | 1,4 | 🟢 | Teammate-readiness check (read-only research) | ⬜ not started |
+| `web-research-specialist-agent` | agent | 1 | 🟢 | Teammate-readiness check | ⬜ not started |
+| `code-quality-gate` / `architecture-fitness` / `security-audit` | skills | 5 | 🟢 | Run as review-team members under `review-gate`'s team mode | ⬜ not started |
+| `independent-test-verification` / `supervisor-verification` / `output-plausibility-verification` | rules | 5 | 🟢 | Extend wording to the teammate boundary (lead reproduces the gate) | ⬜ not started |
+| `development-loop` | skill | 4 | 🟠 | `--team` build mode: partition by file ownership (frontend/backend/tests), merge discipline. **The risky core — validate via the test-build first** | ⬜ not started |
+| `executing-plans` | skill | 4 | 🟠 | Partition plan tasks by file ownership across teammates | ⬜ not started |
+| `implement` | skill | 4 | 🟠 | Same partition/merge handling | ⬜ not started |
+| `plan-executor-agent` | agent | 4 | 🟠 | Teammate-readiness + file-partition contract to avoid collisions | ⬜ not started |
+| `grill-me` | skill | 1 | ⚪ | Keep non-team — single interviewer is the point | — |
+| `grill-with-docs` | skill | 1 | ⚪ | Keep non-team | — |
+| `writing-plans` | skill | 2 | ⚪ | Keep non-team — one coherent plan owner (judge-panel via flat subagents at most) | — |
+| `tdd` / `fix-loop` / `learn-n-improve` | skills | 4 | ⚪ | Keep non-team — tight single-thread cycles | — |
+| `dod-verbs` / `workflow` / `plan-before-coding` / `tdd` / `testing` / `git-collaboration` | rules | 2,4,6 | ⚪ | Apply regardless of team/subagent; no change needed | — |
+| `product-incubation` / `bootstrap-dogfood-project` / `contribute-practice` / `synthesize-hub` | rule+skills | 3 | ⚪ | Mechanical config/feedback wiring — keep non-team | — |
+| `change-risk-scoring` / `regression-test` | skills | 5 | ⚪ | Single scoring / targeted run — keep non-team | — |
+| `request-code-review` / `receive-code-review` / `post-fix-pipeline` | skills | 5,6 | ⚪ | PR + commit mechanics, sequential — keep non-team | — |
+| `auto-git` / `auto-pr` / `git-manager-agent` | hooks+agent | 6 | ⚪ | Git mechanics, sequential — keep non-team | — |
+
+### Recommended sequence (lowest-risk first)
+1. **SAFE-FIT review cluster first** — `code-review-workflow --team` + `review-gate` team mode + the 3 review agents' teammate-readiness. Read-only, flagship pattern, reinforces the hub's existing independent-review discipline. *This is the same conclusion as the §3 hub-fit map.*
+2. **SAFE-FIT clarify/research** — `brainstorm` advisor-panel (overlaps the five-advisors pilot) + research agents.
+3. **RISKY-FIT execute** — `development-loop --team` etc. **Only after** the small parallel-edit test-build proves the merge-conflict path. This is the one tier carrying real risk.
+4. Everything ⚪ stays non-team.
+
+> Gap noted: there is **no `TeammateStart` hook**, so the hub's `subagent-governance-inject.sh` (which injects plan-first/root-cause mandates into every subagent) has **no direct teammate analog** — teammate governance must come via the spawn prompt + the `TaskCreated`/`Completed`/`Idle` hooks instead. Tracked as an open item.
+
 ## 8. Changelog
 
 - **2026-06-23** — Guide created. Built items 1 (rule) + 2 (3 governance hooks); pilot
@@ -218,6 +287,11 @@ and re-enable strict mode with confidence.
   (wrong field path; two hooks repurposed to audit loggers since the payload lacks
   work-product/pending-count; an eval injection/spaces bug). Tests rewritten to real
   schema (13 green). Hooks now match reality.
+- **2026-06-23** — Added §12: pipeline resource inventory → team-readiness tracker.
+  Mapped every Claude resource the 6-step build pipeline uses (verified by reading
+  `core/.claude/` files), deduplicated to a unique master list, tagged each with a
+  readiness tier (🟢 safe / 🟠 risky / ⚪ non-team) + the work needed + status. Recommended
+  sequence: SAFE-FIT review cluster first, RISKY execute only after the test-build.
 - **2026-06-23** — Iterate-until-flawless loop. Run #1 exposed a 5th issue: the
   `TaskCompleted` payload schema VARIES — when the lead completes a task, `teammate_name`
   and `team_name` are ABSENT, so the audit line showed bare `?`. Run #2 then exposed a 6th:
