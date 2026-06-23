@@ -88,6 +88,36 @@ files under `~/.claude/projects/.../subagents/`:
   (the `-p --output-format json` path can't, since `-p` forms no real team). Script:
   scratchpad `sum_team_cost.py` (ephemeral).
 
+## LIVE RESULTS — enablement FIXED, modes partially validated (2026-06-23, session 2)
+
+**The headless boundary was overcome.** Launching `claude` through **winpty (PTY) + the demo
+settings** (`--settings .claude/.team-demo/settings.json --permission-mode bypassPermissions`) DOES
+form real teams — `-p` doesn't, but a winpty-wrapped interactive launch does. This is the fix.
+
+**Verified real teams (ground truth via the durable signal — see the config.json correction below):**
+- **Generic probe (`session-4717303b`):** members=[lead, alpha, beta]; `TaskCompleted by=alpha` +
+  `by=beta`. Mechanism confirmed.
+- **`research-mode --team` (`session-5c3de4f5`): VALIDATED.** 3 real teammate sessions by distinct
+  modality — `teammate-local-docs`, `teammate-measured-evidence`, `teammate-web-docs`;
+  `TaskCompleted by=teammate-local-docs` + `by=teammate-measured-evidence`. **Cost: 4.00M tokens**
+  (lead + 3 teammates, summed from transcripts). A real read-only mode passed end-to-end.
+
+**Two corrections this run:**
+1. **`config.json` is EPHEMERAL** — it exists only while the team is LIVE and is cleaned when the
+   session exits. So POST-HOC verification must use the **activity log** (`TaskCompleted by=<teammate>`)
+   + the teammate transcripts under `.../subagents/`, NOT config.json (which will be gone). The
+   hardened skill gate still holds for a *live* check; for a completed run, the `by=<teammate>` log
+   line is the durable proof.
+2. **winpty PTY allocation is FLAKY** — roughly half of launches fail fast with `stdin is not a tty`
+   (winpty couldn't grab a console), especially on consecutive/parallel launches. Successful runs
+   form real teams; failed ones write no team. Headless team testing is therefore **unreliable** —
+   it needs retries, or (reliably) a real interactive terminal.
+
+**Not completed (blocked by PTY flakiness, NOT by the modes):** `brainstorm --team`,
+`code-review-workflow --team`, `auto-verify --team` — each launch hit `stdin is not a tty`. They use
+the identical, now-proven team mechanism; the reliable way to finish them is the user driving the
+slash command in a real teams-enabled terminal, or retrying the flaky harness.
+
 ## Status
 
 - 4 read-only modes: **NOT yet live-validated** (boundary above).
