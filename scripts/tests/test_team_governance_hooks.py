@@ -1,20 +1,28 @@
 """Behavioral + structural tests for the agent-team teammate-governance hooks.
 
-Covers the three hooks shipped with the agent-teams incorporation
-(plans/agent-teams-incorporation.md):
+These tests use the REAL hook payload schema captured from a live in-process agent team
+on 2026-06-23 (see plans/agent-teams-incorporation.md §11):
 
-  - team-task-created-deliverable.sh   (TaskCreated  → reject deliverable-less tasks)
-  - team-task-completed-verifier.sh    (TaskCompleted → block unverified completions)
-  - team-teammate-idle-drain.sh        (TeammateIdle → keep working while queue non-empty)
+  TaskCreated   : { session_id, transcript_path, cwd, hook_event_name,
+                    task_id, task_subject, task_description }
+  TaskCompleted : + teammate_name, team_name   (NO work-product/result field)
+  TeammateIdle  : { ..., permission_mode, teammate_name, team_name }  (NO pending count)
 
-The load-bearing safety properties these tests pin:
-  1. FAIL-OPEN by default — no strict flag ⇒ always exit 0 (never block a teammate).
-  2. Strict mode (TEAM_GOVERNANCE_STRICT=1) hard-blocks (exit 2) ONLY on a real violation,
-     and delivers feedback on STDERR (the agent-teams exit-2 feedback channel).
-  3. The idle hook is LOOP-SAFE — it never re-engages on an empty/unknown queue.
+Because the captured schema lacks a work-product (TaskCompleted) and a pending count
+(TeammateIdle), only the TaskCreated hook can hard-gate. The other two are honest AUDIT
+loggers (never block). Hooks covered:
+
+  - team-task-created-deliverable.sh  (TaskCreated  → reject deliverable-less tasks; strict)
+  - team-task-completed-verifier.sh   (TaskCompleted → audit log; never blocks)
+  - team-teammate-idle-drain.sh       (TeammateIdle → audit log; loop-safe; never blocks)
+
+Pinned safety properties:
+  1. TaskCreated fails open by default; strict-mode block delivers feedback on STDERR.
+  2. TaskCompleted / TeammateIdle NEVER block (exit 0), even in strict mode.
+  3. Multi-word field values are handled safely (regression: an eval-based extractor once
+     ran the second word of a spaced subject as a command).
   4. Malformed / empty payloads fail open.
-  5. The hooks do NOT blanket-redirect stderr (regression guard for the bug where
-     `exec 2>/dev/null` swallowed the exit-2 feedback).
+  5. The hooks do NOT blanket-redirect stderr (regression guard for the swallowed-feedback bug).
 """
 
 import json
@@ -36,16 +44,17 @@ IDLE = HOOKS / "team-teammate-idle-drain.sh"
 BASH = shutil.which("bash")
 JQ = shutil.which("jq")
 needs_bash = pytest.mark.skipif(BASH is None, reason="bash not available")
-# Parse-dependent assertions need jq; without it the hooks correctly no-op (fail open).
 needs_jq = pytest.mark.skipif(JQ is None, reason="jq not available (hooks fail open without it)")
 
 
-def _run(hook: Path, payload: str, strict: bool = False):
+def _run(hook: Path, payload: str, strict: bool = False, cwd: Path = None):
     env = {"PATH": "/usr/bin:/bin:/usr/local/bin"}
     if JQ:
         env["PATH"] = str(Path(JQ).parent) + ":" + env["PATH"]
     if strict:
         env["TEAM_GOVERNANCE_STRICT"] = "1"
+    if cwd is not None:
+        env["CLAUDE_PROJECT_DIR"] = str(cwd)
     return subprocess.run(
         [BASH, str(hook)], input=payload, capture_output=True, text=True, timeout=20, env=env
     )
@@ -58,7 +67,7 @@ def test_all_three_hooks_exist():
 
 
 def test_rule_exists():
-    assert RULE.exists(), "agent-team-selection.md rule must exist"
+    assert RULE.exists()
 
 
 def test_hooks_and_rule_registered():
@@ -69,112 +78,84 @@ def test_hooks_and_rule_registered():
         ("team-teammate-idle-drain", "hook"),
         ("agent-team-selection", "rule"),
     ]:
-        assert name in reg, f"{name} not registered in registry/patterns.json"
-        assert reg[name]["type"] == typ, f"{name} should be type {typ}"
+        assert name in reg and reg[name]["type"] == typ, f"{name} not registered as {typ}"
 
 
 def test_no_blanket_stderr_redirect():
-    """Regression guard: exit-2 feedback is delivered via stderr, so the hooks MUST NOT
-    blanket-redirect stderr to /dev/null (the original bug)."""
+    """Regression guard: exit-2 feedback is delivered via stderr."""
     for h in (CREATED, COMPLETED, IDLE):
-        body = h.read_text(encoding="utf-8")
-        assert "exec 2>/dev/null" not in body, (
-            f"{h.name} must not blanket-redirect stderr — it swallows exit-2 feedback"
-        )
+        assert "exec 2>/dev/null" not in h.read_text(encoding="utf-8"), f"{h.name} must not swallow stderr"
 
 
-def test_hooks_default_fail_open_guard_present():
+def test_no_eval_payload_extraction():
+    """Regression guard: payload fields must NOT be parsed via eval (injection + spaces bug)."""
     for h in (CREATED, COMPLETED, IDLE):
-        body = h.read_text(encoding="utf-8")
-        assert "TEAM_GOVERNANCE_STRICT" in body, f"{h.name} must gate hard-block on the strict flag"
+        assert "eval " not in h.read_text(encoding="utf-8"), f"{h.name} must not eval payload-derived text"
 
 
-# ------------------------------------------------------------------- created-deliverable
+# ------------------------------------------------------- TaskCreated (real schema, gates)
 @needs_bash
-def test_created_thin_task_non_strict_allows():
-    res = _run(CREATED, '{"task":{"description":"fix it"}}', strict=False)
-    assert res.returncode == 0, "non-strict must allow (fail-open)"
+@needs_jq
+def test_created_real_good_task_strict_allows():
+    p = '{"hook_event_name":"TaskCreated","task_id":"1","task_subject":"Analyze TODO CLI — DX lens","task_description":"Read-only analysis of developer-experience trade-offs."}'
+    assert _run(CREATED, p, strict=True).returncode == 0
 
 
 @needs_bash
 @needs_jq
 def test_created_thin_task_strict_blocks_with_feedback():
-    res = _run(CREATED, '{"task":{"description":"fix it"}}', strict=True)
-    assert res.returncode == 2, "strict + thin task must block"
-    assert "deliverable" in res.stderr.lower(), "must deliver feedback on stderr"
+    p = '{"hook_event_name":"TaskCreated","task_id":"9","task_subject":"fix","task_description":"it"}'
+    res = _run(CREATED, p, strict=True)
+    assert res.returncode == 2, "thin subject+description must block in strict mode"
+    assert "deliverable" in res.stderr.lower()
 
 
 @needs_bash
 @needs_jq
-def test_created_good_task_strict_allows():
-    res = _run(CREATED, '{"task":{"description":"Add OAuth refresh-token rotation to the auth service"}}', strict=True)
-    assert res.returncode == 0, "a task with a clear deliverable must pass even in strict mode"
+def test_created_thin_task_non_strict_allows():
+    p = '{"hook_event_name":"TaskCreated","task_subject":"fix","task_description":"it"}'
+    assert _run(CREATED, p, strict=False).returncode == 0
 
 
 @needs_bash
-def test_created_empty_payload_fails_open():
+def test_created_empty_and_malformed_fail_open():
     assert _run(CREATED, "", strict=True).returncode == 0
-
-
-@needs_bash
-def test_created_malformed_json_fails_open():
     assert _run(CREATED, "{not json", strict=True).returncode == 0
 
 
-# -------------------------------------------------------------------- completed-verifier
-@needs_bash
-def test_completed_no_evidence_non_strict_allows():
-    assert _run(COMPLETED, '{"task":{"result":"done, looks good"}}', strict=False).returncode == 0
-
-
+# ------------------------------------------------- TaskCompleted (audit logger, no block)
 @needs_bash
 @needs_jq
-def test_completed_no_evidence_strict_blocks_with_feedback():
-    res = _run(COMPLETED, '{"task":{"result":"done, looks good"}}', strict=True)
-    assert res.returncode == 2, "strict + no evidence must block"
-    assert "evidence" in res.stderr.lower(), "must deliver feedback on stderr"
+def test_completed_never_blocks_and_audits(tmp_path):
+    (tmp_path / ".claude").mkdir()
+    p = '{"hook_event_name":"TaskCompleted","task_id":"2","task_subject":"arch lens analysis","teammate_name":"arch-analyst","team_name":"session-4a3e63c9"}'
+    res = _run(COMPLETED, p, strict=True, cwd=tmp_path)
+    assert res.returncode == 0, "TaskCompleted must never block (no work-product in payload to gate on)"
+    log = (tmp_path / ".claude" / ".team-activity.log").read_text(encoding="utf-8")
+    assert "TaskCompleted" in log and "arch-analyst" in log
+    # regression: a spaced subject must be captured whole, not split into a command
+    assert "arch lens analysis" in log
 
 
+@needs_bash
+def test_completed_empty_payload_no_block(tmp_path):
+    (tmp_path / ".claude").mkdir()
+    assert _run(COMPLETED, "", strict=True, cwd=tmp_path).returncode == 0
+
+
+# --------------------------------------------------- TeammateIdle (audit logger, loop-safe)
 @needs_bash
 @needs_jq
-def test_completed_with_evidence_strict_allows():
-    res = _run(COMPLETED, '{"task":{"result":"ran pytest, 14 passed, gate green"}}', strict=True)
-    assert res.returncode == 0, "completion WITH verification evidence must pass"
+def test_idle_never_blocks_and_audits(tmp_path):
+    (tmp_path / ".claude").mkdir()
+    p = '{"hook_event_name":"TeammateIdle","permission_mode":"auto","teammate_name":"dx-analyst","team_name":"session-4a3e63c9"}'
+    res = _run(IDLE, p, strict=True, cwd=tmp_path)
+    assert res.returncode == 0, "TeammateIdle must be loop-safe — never re-engage on unknown queue state"
+    log = (tmp_path / ".claude" / ".team-activity.log").read_text(encoding="utf-8")
+    assert "TeammateIdle" in log and "dx-analyst" in log
 
 
 @needs_bash
-def test_completed_empty_payload_fails_open():
-    assert _run(COMPLETED, "", strict=True).returncode == 0
-
-
-# ----------------------------------------------------------------------- teammate-idle
-@needs_bash
-@needs_jq
-def test_idle_empty_queue_strict_is_loop_safe():
-    """The critical loop-safety property: never re-engage on an empty queue."""
-    assert _run(IDLE, '{"pending_tasks":0}', strict=True).returncode == 0
-
-
-@needs_bash
-@needs_jq
-def test_idle_pending_work_strict_keeps_working():
-    res = _run(IDLE, '{"pending_tasks":3}', strict=True)
-    assert res.returncode == 2, "strict + pending work must keep the teammate working"
-    assert res.stderr.strip(), "must deliver feedback on stderr"
-
-
-@needs_bash
-@needs_jq
-def test_idle_pending_work_non_strict_allows_idle():
-    assert _run(IDLE, '{"pending_tasks":3}', strict=False).returncode == 0
-
-
-@needs_bash
-def test_idle_no_pending_field_fails_open():
-    assert _run(IDLE, '{"teammate":"researcher"}', strict=True).returncode == 0
-
-
-@needs_bash
-@needs_jq
-def test_idle_non_integer_pending_is_loop_safe():
-    assert _run(IDLE, '{"pending_tasks":"lots"}', strict=True).returncode == 0
+def test_idle_empty_payload_no_block(tmp_path):
+    (tmp_path / ".claude").mkdir()
+    assert _run(IDLE, "", strict=True, cwd=tmp_path).returncode == 0

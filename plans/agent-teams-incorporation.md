@@ -115,10 +115,42 @@ single-context `/five-advisors` (cheaper) and record the negative result here.
 
 ## 7. Open questions / to verify on a live run
 
-- Exact stdin payload schema for `TaskCreated` / `TaskCompleted` / `TeammateIdle` hooks
-  (field names) — the hooks parse defensively until confirmed; confirm then tighten.
-- Whether `TeammateIdle` exit-2 reliably re-engages a teammate in v2.1.186.
+- ~~Exact stdin payload schema for the three hooks~~ — **RESOLVED 2026-06-23, see §11.**
+- Whether `TeammateIdle` exit-2 reliably re-engages a teammate (deferred — payload lacks a
+  pending count; would require reading the on-disk task list, see §11).
 - Real token multiplier on hub-shaped work (the 4–7× figure is community-reported).
+
+## 11. Captured hook payload schema (live, in-process team, 2026-06-23)
+
+A `claude --bg` background session (a full conversation — unlike `-p`, which does NOT form a
+team) formed a real team `session-4a3e63c9` (lead + `dx-analyst` + `arch-analyst`). All three
+hooks fired; the demo capture hook logged these REAL payloads:
+
+```
+TaskCreated   : { session_id, transcript_path, cwd, hook_event_name,
+                  task_id, task_subject, task_description }
+TaskCompleted : { ...same..., task_id, task_subject, task_description,
+                  teammate_name, team_name }          # NO work-product / result field
+TeammateIdle  : { session_id, transcript_path, cwd, permission_mode,
+                  hook_event_name, teammate_name, team_name }   # NO pending-task count
+```
+
+**Bugs this exposed (all fixed 2026-06-23):**
+1. `team-task-created-deliverable` read `.task.description`; real field is top-level
+   `task_description` (+ `task_subject`). Was a silent no-op → now functional.
+2. `team-task-completed-verifier` assumed a result/summary to scan for evidence — **the
+   payload has none.** Repurposed to an honest completion **audit logger** (never blocks);
+   real verification stays with the lead reproducing the gate.
+3. `team-teammate-idle-drain` assumed a `pending_tasks` count — **not present.** Kept
+   loop-safe; repurposed to an idle **audit logger**. Future: read `~/.claude/tasks/{team_name}/`
+   (team_name IS in the payload) to count pending work and re-engage under strict mode.
+4. A regression bug in the first fix: `eval`-based multi-field extraction ran a spaced
+   `task_subject`'s second word as a shell command — replaced with safe per-field
+   `jq` command substitution (also closes an injection vector). Pinned by a test.
+
+Audit hooks append to `${CLAUDE_PROJECT_DIR:-$PWD}/.claude/.team-activity.log` when a
+`.claude` dir is present (else no-op). Tests in `scripts/tests/test_team_governance_hooks.py`
+now use this real schema (13 tests).
 
 ## 9. Testing
 
@@ -180,5 +212,9 @@ and re-enable strict mode with confidence.
   "grep fallback" comment. Live Tier-2 confirmation remains spend-gated (§9).
 - **2026-06-23** — Ran Tier-2 live probe: confirmed headless `-p` does NOT form a team
   (Finding A) and that multi-session open/close is drivable via agent-view `claude --bg`
-  (Finding B). Built the interactive demo harness (`.claude/.team-demo/`, gitignored) +
-  §10. Real hook payload schema still needs one interactive team run to capture.
+  (Finding B). Built the interactive demo harness (`.claude/.team-demo/`, gitignored) + §10.
+- **2026-06-23** — TIER-2 COMPLETE: a `claude --bg` session formed a real team; all three
+  hooks fired; captured the real payload schema (§11). Fixed 4 bugs the schema exposed
+  (wrong field path; two hooks repurposed to audit loggers since the payload lacks
+  work-product/pending-count; an eval injection/spaces bug). Tests rewritten to real
+  schema (13 green). Hooks now match reality.

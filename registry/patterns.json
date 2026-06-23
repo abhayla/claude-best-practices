@@ -6805,7 +6805,7 @@
     "tier": "nice-to-have"
   },
   "agent-team-selection": {
-    "hash": "4e88dda281222c76f15deb833c77a80aa092f5724622baa8910471213a17c751",
+    "hash": "11a0652d5c4742f5ee14f26b9801664fc96dfa79137bb9f3752bd19a33eec6f5",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6825,7 +6825,7 @@
     "tier": "nice-to-have"
   },
   "team-task-created-deliverable": {
-    "hash": "b21cf634fd414d9aa8c18c54f7e7c2a3138ea8d1c8df3ea32c5a344321825336",
+    "hash": "02f34dfcec1c5f81b4fd51a79d6a85083d6b16b34a992f687f9c6f1d1d0af1e2",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",
@@ -6834,18 +6834,18 @@
     "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "TaskCreated hook for agent teams: extends the hub size-tasks-appropriately best practice to the teammate boundary by rejecting shared-list tasks with no clear deliverable. Fail-open by default; hard-blocks (exit 2) only under TEAM_GOVERNANCE_STRICT=1. Ships unwired (teammate-hook payload schema pending live confirmation).",
+    "description": "TaskCreated hook for agent teams: hard-gates deliverable-less tasks (reads the real task_subject+task_description fields). Fail-open by default; blocks (exit 2) with stderr feedback under TEAM_GOVERNANCE_STRICT=1 when subject+description name no clear deliverable.",
     "tags": [
       "agent-teams",
       "governance",
       "hook",
       "TaskCreated"
     ],
-    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
     "tier": "nice-to-have"
   },
   "team-task-completed-verifier": {
-    "hash": "12589541f2a8357350dcd44ae91c06bd88d0e4c26663872f567e613c518ffd0f",
+    "hash": "e4a4d6c3f8f64bf7996d81a192c2a9cc3443e8e985f7b4ced2a1dbaba53e844d",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",
@@ -6854,7 +6854,7 @@
     "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "TaskCompleted hook for agent teams: extends the reproduce-the-gate doctrine (supervisor-verification.md) to the teammate boundary by blocking task completion that carries no verification evidence. Fail-open; hard-blocks (exit 2) only under TEAM_GOVERNANCE_STRICT=1. Ships unwired pending live payload confirmation.",
+    "description": "TaskCompleted hook for agent teams: completion AUDIT logger. The live-captured payload carries no work-product/result field, so payload-based evidence-gating is infeasible — true verification stays with the lead reproducing the gate. Records completions (task, teammate, team) to .claude/.team-activity.log; never blocks.",
     "tags": [
       "agent-teams",
       "governance",
@@ -6862,11 +6862,11 @@
       "TaskCompleted",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
     "tier": "nice-to-have"
   },
   "team-teammate-idle-drain": {
-    "hash": "0be4cb6dd4f05ed20acd9b2f21ebdde9797bf437f04255bb8105f973e1fefa03",
+    "hash": "d0206eb49daaa6b7f0523b3c851f02d8a1c5e99d64abae54660479152484e1fc",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",
@@ -6875,14 +6875,14 @@
     "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "TeammateIdle hook for agent teams: extends decide-dont-ask/drain-the-queue to the teammate boundary by keeping a teammate working while unblocked tasks remain. Loop-safe (only re-engages on a positive pending count) and fail-open; hard-keeps-working (exit 2) only under TEAM_GOVERNANCE_STRICT=1. Ships unwired pending live payload confirmation.",
+    "description": "TeammateIdle hook for agent teams: idle AUDIT logger + loop-safe stub. The live-captured payload carries no pending-task count, so it never re-engages blindly (loop-safe). Records idle events to .claude/.team-activity.log. Future: read ~/.claude/tasks/{team_name}/ via the payload team_name to count pending work and re-engage under TEAM_GOVERNANCE_STRICT=1.",
     "tags": [
       "agent-teams",
       "governance",
       "hook",
       "TeammateIdle"
     ],
-    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
     "tier": "nice-to-have"
   }
 }

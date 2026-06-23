@@ -1,50 +1,40 @@
 #!/usr/bin/env bash
-# TaskCompleted hook (agent teams) — extends the hub's "reproduce the gate before
-# accepting a worker's done-claim" doctrine (supervisor-verification.md /
-# verifier-edge-guard.sh) to the teammate boundary: a teammate may not mark a task
-# COMPLETE without evidence that the work was actually verified.
+# TaskCompleted hook (agent teams) — completion AUDIT logger.
 #
-# Contract (per docs/claude-references/agent-teams.md): TaskCompleted runs when a task
-# is being marked complete; **exit code 2 prevents completion + sends the stderr text
-# back as feedback**. Any other exit code allows completion.
+# ORIGINAL INTENT was to extend the "reproduce the gate before accepting a done-claim"
+# doctrine (supervisor-verification.md) to the teammate boundary by blocking completions
+# that carry no verification evidence. The LIVE-CAPTURED payload (2026-06-23, see
+# plans/agent-teams-incorporation.md §11) proved that infeasible:
 #
-# DESIGN (telemetry-first, fail-open — matches verifier-edge-guard.sh):
-#   - Allow (exit 0) on any parse uncertainty.
-#   - Hard-block (exit 2) ONLY when TEAM_GOVERNANCE_STRICT=1 AND the completion text
-#     carries NO verification evidence. Otherwise emit an advisory note and allow.
-#   - SHIPS UNWIRED. TaskCompleted payload schema unconfirmed on a live run; confirm then
-#     tighten the field list + evidence regex.
+#   TaskCompleted payload = { session_id, transcript_path, cwd, hook_event_name,
+#     task_id, task_subject, task_description, teammate_name, team_name }
 #
-# NOTE: stderr is intentionally NOT redirected — the exit-2 feedback to a teammate is
-# delivered via stderr. Helper-command noise is suppressed inline (2>/dev/null) instead.
+# There is NO work-product / result / summary field — the teammate's actual output is
+# NOT in the payload. So a payload-only evidence gate is impossible; true verification
+# must stay with the lead reproducing the gate (out of band). Rather than pretend to
+# enforce something it cannot see, this hook now serves the honest, still-useful role of
+# an AUDIT TRAIL: it records who completed which task, which is exactly what a later
+# lead/human reproduction needs.
+#
+# Contract: TaskCompleted exit 2 would block completion; this hook NEVER blocks (exit 0).
+# stderr is left un-redirected for consistency with the sibling hooks.
 
 PAYLOAD="$(cat 2>/dev/null || true)"
 
-result=""
+task_id="" ; subject="" ; teammate="" ; team=""
 if command -v jq >/dev/null 2>&1 && [ -n "$PAYLOAD" ]; then
-  result="$(printf '%s' "$PAYLOAD" | jq -r '
-    (.task.result // .task.summary // .result // .summary // .task.completion // "")
-  ' 2>/dev/null)"
-fi
-[ "$result" = "null" ] && result=""
-
-# Evidence signal: test output, an explicit verification verb, a gate/pass marker, or a
-# command/log reference. Conservative — absence of ALL of these is the only block trigger.
-has_evidence=0
-if printf '%s' "$result" | grep -Eiq \
-  'test|pass(ed)?|verif|coverage|gate|assert|reproduc|✓|✅|exit code|stdout|lint|build (ok|green|succeed)'; then
-  has_evidence=1
+  task_id="$(printf  '%s' "$PAYLOAD" | jq -r '(.task_id // "")'       2>/dev/null)"
+  subject="$(printf  '%s' "$PAYLOAD" | jq -r '(.task_subject // "")'  2>/dev/null)"
+  teammate="$(printf '%s' "$PAYLOAD" | jq -r '(.teammate_name // "")' 2>/dev/null)"
+  team="$(printf     '%s' "$PAYLOAD" | jq -r '(.team_name // "")'     2>/dev/null)"
 fi
 
-if [ "${TEAM_GOVERNANCE_STRICT:-0}" = "1" ] && [ -n "$result" ] && [ "$has_evidence" -eq 0 ]; then
-  printf 'TaskCompleted blocked: no verification evidence in the completion summary. ' >&2
-  printf 'A task is not done until its gate is reproduced (supervisor-verification.md). ' >&2
-  printf 'Re-run the relevant tests/checks and include the evidence (command + result), ' >&2
-  printf 'then mark complete. See plans/agent-teams-incorporation.md.' >&2
-  exit 2
-fi
-
-if [ -n "$result" ] && [ "$has_evidence" -eq 0 ]; then
-  printf '[team-governance] note: completion of a task lacks verification evidence.\n'
+# Append to a project-local audit trail when a .claude dir is present; else no-op.
+base="${CLAUDE_PROJECT_DIR:-$PWD}"
+if [ -d "$base/.claude" ]; then
+  ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '?')"
+  printf '%s\tTaskCompleted\tteam=%s\ttask=%s\tby=%s\tsubject=%s\n' \
+    "$ts" "${team:-?}" "${task_id:-?}" "${teammate:-?}" "${subject:-?}" \
+    >> "$base/.claude/.team-activity.log" 2>/dev/null || true
 fi
 exit 0

@@ -46,7 +46,14 @@ globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 
 ## Governance
 
-When a team IS used, the teammate-boundary governance hooks
-(`team-task-created-deliverable`, `team-task-completed-verifier`, `team-teammate-idle-drain`)
-extend the hub's existing subagent governance (plan-first, reproduce-the-gate,
-drain-the-queue) to teammates. They ship fail-open; set `TEAM_GOVERNANCE_STRICT=1` to enforce.
+When a team IS used, three teammate-boundary hooks ship in `core/.claude/hooks/`. Their
+roles were calibrated against the REAL captured payload schema (see
+`plans/agent-teams-incorporation.md` §11):
+- `team-task-created-deliverable` — **hard-gates** thin/deliverable-less tasks; fail-open by
+  default, set `TEAM_GOVERNANCE_STRICT=1` to enforce (the payload carries `task_description`).
+- `team-task-completed-verifier` — **audit logger** only: the `TaskCompleted` payload carries
+  no work-product, so payload-based evidence-gating is infeasible; true verification stays
+  with the lead reproducing the gate. Records completions to `.claude/.team-activity.log`.
+- `team-teammate-idle-drain` — **audit logger + loop-safe**: the `TeammateIdle` payload carries
+  no pending-task count, so it never re-engages blindly (a future version can read the on-disk
+  task list via `team_name`). Records idles to `.claude/.team-activity.log`.
