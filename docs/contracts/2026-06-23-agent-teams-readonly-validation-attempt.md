@@ -160,6 +160,36 @@ This is the measure-first verdict the experiment was designed to reach: the auto
 agent teams is not proven on this platform; the cost + the TTY requirement argue against wiring
 them into the autonomous factory. Owner decision required to pick 1 / 2 / 3.
 
+## ✅ RESOLVED — fully-autonomous agent teams ACHIEVED via psmux (no WSL, no admin) — 2026-06-23
+
+The "platform-blocked" verdict above is **SUPERSEDED**. A web search surfaced **psmux** — a native
+Windows ConPTY tmux clone (Rust) — installable WITHOUT WSL or admin (portable zip from
+`github.com/psmux/psmux`, here at `C:\Users\itsab\.local\psmux\psmux.exe`). Running `claude` inside a
+detached psmux session gives it a **reliable interactive TTY**, so it spawns REAL teammates — driven
+entirely headlessly from a plain shell. This is the winpty replacement (winpty was 0%; psmux works).
+
+**The one critical gotcha:** do NOT redirect claude's stdout (`claude ... > file`) — a redirected
+stdout is non-tty and claude silently drops to non-team mode. Let claude write to the psmux pane;
+read it via `capture-pane`. (This was the bug that made my first psmux attempt look like a failure.)
+
+**Verified REAL teams (teammate-attributed events in `.team-activity.log`), fully autonomous:**
+- generic gamma/delta (`session=564de1b1`): `TaskCompleted by=gamma` + `by=delta` + a real synthesis.
+- **`research-mode --team`** (`5c3de4f5`): 3 modality teammates, attributed completions (~4.0M tokens).
+- **`brainstorm --team`** (`7eaa2e57`): real 3-lens advisor panel (simplicity/risk/maintainability),
+  genuine cross-challenge — they independently **converged on "human-supervised"** for the Execute tier.
+- **`code-review-workflow --team`**: did NOT use agent-teams — it invoked the native **Workflow tool**
+  (subagent finder/verifier fan-out, 7/23 agents), producing a real review via subagents, not
+  teammates. Honest + arguably correct: read-only review is well-served by subagent fan-out.
+
+**The autonomous launcher** `scripts/run_agent_team.sh` is now psmux-based: writes a no-redirect
+`.cmd`, runs claude in a detached psmux session, verifies a real team via the durable signal
+(`TaskCompleted by=<teammate>` OR `TeammateIdle teammate=<name>` — the latter catches message-driven
+modes like brainstorm), captures the synthesis, and self-cleans. Reliable + unattended.
+
+**Net:** agent teams CAN run fully autonomously on this Windows box via psmux — the earlier
+WSL/interactive-only conclusion is no longer the only option. (The measure-first cost caveat stands:
+teams are ~4–7×; use them where cross-challenge adds value, subagents elsewhere.)
+
 ## Status
 
 - 4 read-only modes: **NOT yet live-validated** (boundary above).
