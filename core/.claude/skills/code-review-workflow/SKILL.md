@@ -44,7 +44,7 @@ findings requires explicit user confirmation.
 
 ```
 /code-review-workflow <branch | 'current' | scope description>
-                      [--no-pr] [--auto-fix] [--deep-audit]
+                      [--no-pr] [--auto-fix] [--deep-audit] [--team]
 ```
 
 | Flag | Default | Meaning |
@@ -53,6 +53,7 @@ findings requires explicit user confirmation.
 | `--auto-fix` | off | Attempt auto-fix for blocking findings before escalating to user |
 | `--deep-audit` | off | Dispatch code-reviewer-agent + security-auditor-agent in STEP 2b for agent-level audit beyond the /review-gate skill's checks |
 | `--nested-verify` | off | (Requires `--deep-audit`.) Run STEP 2b dimension audits as **dual-mode nested orchestrators**: each audit spawns one adversarial verifier subagent per finding (depth-2) to refute-or-confirm BEFORE returning, so only confirmed findings reach T0. Default keeps the flat single-level parallel-sibling dispatch. See STEP 2b "Nested-verify mode". |
+| `--team` | off | Run the audit as a real **agent team** (peer reviewers who share + challenge each other before the lead synthesizes), not flat subagents. Read-only; requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (else self-gates to the flat path). See STEP 2-TEAM. |
 
 ---
 
@@ -115,6 +116,57 @@ If blocked AND `--auto-fix` NOT set: surface findings + ask user how to
 proceed. Do NOT proceed to STEP 3 without explicit override.
 
 Capture verdict + deferred items into state.
+
+---
+
+## STEP 2-TEAM: PARALLEL REVIEW TEAM (optional, `--team` flag)
+
+> **Read-only, peer-challenge review.** Use a real agent team (not flat subagents)
+> ONLY here, where reviewers benefit from reading + disputing each other's findings
+> before synthesis (Anthropic's flagship parallel-review pattern). For a single-lens
+> or mechanical check, the flat `--deep-audit` path is cheaper — stay there.
+>
+> **SELF-GATE:** requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. Without it no team
+> forms — fall back to the flat `--deep-audit` path. (Validated live 2026-06-23: a real
+> 3-member team formed via `claude --bg`; `TaskCreated` hooks fired with the real schema.)
+
+**Procedure (bakes in multi-agent best-practice items 1, 4, 5, 6 — `docs/claude-references/multi-agent-best-practices.md`):**
+
+1. **Lead spawns 2–4 peer reviewers as a TEAM, one orthogonal LENS each** (correctness /
+   security / tests / perf — pick by what the diff touches). The lead does NOT review; it
+   waits, then synthesizes (item 3: lead-waits).
+2. **Shaped tasks (item 1):** each spawn task is self-contained — objective + the exact
+   file/scope + **out-of-scope** + a required deliverable shape `(file:hunk → issue → why)`
+   + the rule "**SHOW EVIDENCE (quote the diff hunk / grep result), never bare assertions.**"
+   The `team-task-created-deliverable` hook (`TaskCreated`) rejects a deliverable-less task.
+3. **Partition is by LENS, not by file** — review is read-only, so there are no concurrent
+   same-file edits to isolate (item 2 / worktree isolation is N/A here; it applies to the
+   Execute team, Stage C). A coupled cross-cutting concern goes to ONE reviewer, not split.
+4. **Cross-challenge (the reason it's a team):** after both report, each reviewer READS the
+   other's findings and agrees/disputes with a reason. This is what subagents cannot do.
+5. **Doer ≠ checker (item 4):** the lead's synthesized review is then verified by a SEPARATE
+   read-only reviewer (`tools: Read, Grep, Glob, Bash` only — no Edit/Write/Agent), fresh
+   context, told to flag ONLY correctness/requirement gaps and to SHOW evidence. A teammate
+   never self-attests its own finding as confirmed.
+6. **Context passing (item 6):** ALL task context goes in the spawn prompt — teammates inherit
+   no conversation history, and `skills`/`mcpServers` frontmatter is **NOT applied** to a
+   teammate (it loads skills/MCP from project+user settings). Restate any rule a teammate must
+   follow directly in its spawn task. The long-run review plan is the spawn prompt itself.
+7. **Hooks (item 5):** `TaskCreated` (scope/deliverable gate), `TaskCompleted` (definition-of-done),
+   `TeammateIdle` (quality backstop) are active (shipped pre-wired-but-inert in `settings.json`;
+   they fire only when a team exists). The honest-audit log must show real `session=`/`team=`
+   values — never fabricated/`?`.
+8. **Synthesize:** the lead writes a single consolidated review (per-lens findings + the
+   cross-challenge outcome + a final `APPROVED | APPROVED_WITH_CAVEATS | REJECTED` verdict)
+   into `test-results/review-gate.json` shape, then merges into the STEP 2 verdict flow.
+
+**Anti-fake-team gate (MANDATORY before trusting team output):** verify ground truth —
+`~/.claude/teams/<name>/config.json` `members` MUST show > 1 (real teammates joined, not just
+`team-lead`) AND the `TaskCreated`/`TaskCompleted` hooks MUST have fired. `members == [team-lead]`
++ 0 hook events = the model NARRATING a fake team — reject it, never accept narrated team output.
+
+**Cost (item 7):** a team is ~4–7× tokens vs a single session. Use 2–4 reviewers; route workers
+to a cheaper model where the lens allows; gauge spend on a small diff first.
 
 ---
 

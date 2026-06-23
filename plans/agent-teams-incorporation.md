@@ -256,13 +256,15 @@ different things per type:
 
 **Stage A (pipeline-upgrade contract, 2026-06-23):** the 4 scaffolding patterns above flipped `nice-to-have → must-have` (dormant by default — §3a env-var master switch); the rule carries the `EXPERIMENTAL_AGENT_TEAMS` self-gate line; the 3 `team-*` hooks wired pre-but-inert in `core/.claude/settings.json` (`TaskCreated`/`TaskCompleted`/`TeammateIdle`). The acceptance standard above is now recorded. ✅
 
+**Stage B (Verify cluster, 2026-06-23) — LIVE-VALIDATED with a REAL team:** `code-review-workflow` gained a `--team` parallel-review-team mode (STEP 2-TEAM, baking in best-practice items 1,4,5,6); the 3 review agents passed the teammate-readiness audit (`security-auditor-agent` got a teammate note — no `Skill` tool as a teammate). **Validation run:** one `claude --bg` review team on the real PR #198 diff → ground truth **members=3** (`team-lead` + `correctness` + `tests`), **12 hook events** (2 TaskCreated + 2 TaskCompleted + 8 TeammateIdle, honest real-schema audit), and a **usable synthesized review** with a genuine cross-challenge (the lenses interlocked; correctness reproduced a real false-positive class with live git). Anti-fake-team gate PASSED. Evidence in the run worktree's `docs/contracts/.run/evidence/` (gitignored). `review-gate` team mode = Stage B remainder, still ⬜. ✅
+
 | Resource | Type | Step | Tier | Work to make team-ready | Status |
 |---|---|---|---|---|---|
-| `code-review-workflow` | skill | 5 | 🟢 | Add a `--team` mode: spawn security/perf/tests/correctness reviewers who share+challenge before the lead synthesizes (Anthropic flagship pattern) | ⬜ not started |
-| `review-gate` | skill | 5 | 🟢 | It already dispatches 3 inline gate agents → convert to a real review team (quality/arch/security as teammates) | ⬜ not started |
-| `code-reviewer-agent` | agent | 5 | 🟢 | Teammate-readiness check: no `skills`/`mcpServers` reliance; tools OK; peer-prompt. Already `dispatched_from: dual-mode` | ⬜ not started |
-| `security-auditor-agent` | agent | 5 | 🟢 | Same teammate-readiness check | ⬜ not started |
-| `tester-agent` | agent | 5 | 🟢 | Teammate-readiness check; fan-out test areas as teammates | ⬜ not started |
+| `code-review-workflow` | skill | 5 | 🟢 | Add a `--team` mode: spawn security/perf/tests/correctness reviewers who share+challenge before the lead synthesizes (Anthropic flagship pattern) | ✅ done — `--team` mode added (STEP 2-TEAM); LIVE-VALIDATED 2026-06-23 (real 3-member team, 12 hook events, usable review) |
+| `review-gate` | skill | 5 | 🟢 | It already dispatches 3 inline gate agents → convert to a real review team (quality/arch/security as teammates) | ⬜ not started (Stage B remainder) |
+| `code-reviewer-agent` | agent | 5 | 🟢 | Teammate-readiness check: no `skills`/`mcpServers` reliance; tools OK; peer-prompt. Already `dispatched_from: dual-mode` | ✅ done — audit PASS (no skills/mcpServers frontmatter; tools OK), no edit needed |
+| `security-auditor-agent` | agent | 5 | 🟢 | Same teammate-readiness check | ✅ done — audit PASS + added teammate note (no `Skill` tool as teammate → inline OWASP path) |
+| `tester-agent` | agent | 5 | 🟢 | Teammate-readiness check; fan-out test areas as teammates | ✅ done — audit PASS (no skills/mcpServers frontmatter; `Skill` in tools works for teammates), no edit needed |
 | `auto-verify` | skill | 5 | 🟢 | Optional `--team` to run parallel test-area teammates (no source edits) | ⬜ not started |
 | `brainstorm` | skill | 1 | 🟢 | Advisor-panel mode (multi-lens spec debate, read-only) — overlaps the five-advisors pilot | ⬜ not started |
 | `research-mode` | skill | 1 | 🟢 | Parallel multi-source research teammates | ⬜ not started |

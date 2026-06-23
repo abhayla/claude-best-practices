@@ -1098,13 +1098,13 @@
     }
   },
   "code-review-workflow": {
-    "hash": "1f0eda24242ad846ef0a79ff41564a0e2288aa6f75bf7140287e380af6425139",
+    "hash": "47c145f23d178442fab9a4d7e2589c33b43d120c0d55666744496bf92bae273b",
     "type": "skill",
     "category": "core",
     "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-23",
     "dependencies": [
       "code-reviewer-agent",
       "receive-code-review",
@@ -1120,7 +1120,7 @@
       "workflow",
       "review"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4); added --team parallel-review-team mode (Stage B: bakes in multi-agent best-practice items 1,4,5,6; self-gated on EXPERIMENTAL_AGENT_TEAMS)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4507,18 +4507,18 @@
     }
   },
   "security-auditor-agent": {
-    "hash": "c1ad55000b044ae677dff82e3aee91a2e1b3f2c33eb02b31a01f8b59b6058c60",
+    "hash": "03e54578531d87c1346bc6f96cc89c4de8b484ab9fc81fea22b8830ed94f2998",
     "type": "agent",
     "category": "core",
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Use proactively for security assessments — OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Spawn automatically when changes",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.0.0: Initial registration; added teammate-readiness note (no Skill tool as a teammate -> inline OWASP review path)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
