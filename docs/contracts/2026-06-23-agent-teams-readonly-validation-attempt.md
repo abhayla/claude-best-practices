@@ -65,6 +65,29 @@ Real-team validation needs a **team-enabled interactive session**, which this QA
 Either way the verification rubric is the same: **config.json members > 1 + teammate-attributed
 hook events = real; lead-only + narrated names = fake (reject).**
 
+## First MEASURED real-team cost (the gap, now closed from existing data)
+
+Applied the documented cost method to the prior REAL 4-member build team (lead + `ops`+`stats`+`verify`,
+the mathkit Stage-C run) by summing per-message `usage` across the lead + teammate transcript `.jsonl`
+files under `~/.claude/projects/.../subagents/`:
+
+| Role | Total tokens (in+out+cache) | Output tokens |
+|---|---|---|
+| Lead | 3,111,584 (2.48M cache-read) | 56,913 |
+| 3 teammates | 1,988,077 | 4,099 |
+| **Grand total** | **5,099,661** | — |
+
+- **Teammates added ~64% on top of the lead** (≈**1.64× total tokens** vs the lead's own consumption).
+- This is **well below the 4–7× literature figure** — BUT this was a trivial 3-task build where teammates
+  did little work; the multiplier scales with task/teammate count + context size, so 1.64× is a **floor for
+  a tiny job**, not a refutation of 4–7× for real work. Most teammate cost is cache-reads (each reloading
+  project context — the documented "≈4× at init" effect, smaller here because the job was tiny).
+- Caveat: this is "team total vs the lead's tokens IN the team run," not vs a true solo-build baseline of
+  the same task (no counterfactual captured). It is a real cost-SHAPE data point, not a clean A/B.
+- **The method works** — `sum(usage)` over transcripts is the reliable way to instrument real-team cost
+  (the `-p --output-format json` path can't, since `-p` forms no real team). Script:
+  scratchpad `sum_team_cost.py` (ephemeral).
+
 ## Status
 
 - 4 read-only modes: **NOT yet live-validated** (boundary above).

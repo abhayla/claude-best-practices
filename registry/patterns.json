@@ -1098,7 +1098,7 @@
     }
   },
   "code-review-workflow": {
-    "hash": "47c145f23d178442fab9a4d7e2589c33b43d120c0d55666744496bf92bae273b",
+    "hash": "e6e7dc87715c3aca71a1700cfc79223eeff1a95ed4afe269f811239d683b3567",
     "type": "skill",
     "category": "core",
     "version": "2.3.0",
@@ -1725,7 +1725,7 @@
     }
   },
   "development-loop": {
-    "hash": "371898bb070b052a6cc5b2d56821277768c52540d5aacc29328d33b29c4a4313",
+    "hash": "2bab46dbee9aca0d4548a8b984a05a4a8732623d3552d5498b017cfe9c036c3f",
     "type": "skill",
     "category": "core",
     "version": "2.1.1",

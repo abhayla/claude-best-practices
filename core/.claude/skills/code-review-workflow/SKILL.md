@@ -160,10 +160,15 @@ Capture verdict + deferred items into state.
    cross-challenge outcome + a final `APPROVED | APPROVED_WITH_CAVEATS | REJECTED` verdict)
    into `test-results/review-gate.json` shape, then merges into the STEP 2 verdict flow.
 
-**Anti-fake-team gate (MANDATORY before trusting team output):** verify ground truth —
-`~/.claude/teams/<name>/config.json` `members` MUST show > 1 (real teammates joined, not just
-`team-lead`) AND the `TaskCreated`/`TaskCompleted` hooks MUST have fired. `members == [team-lead]`
-+ 0 hook events = the model NARRATING a fake team — reject it, never accept narrated team output.
+**Anti-fake-team gate (MANDATORY before trusting team output):** the DECISIVE proof is
+`~/.claude/teams/<name>/config.json` EXISTS with `members` > 1 (real teammate sessions joined, not just
+`team-lead`) AND `TaskCompleted` events attributed to a teammate (`by=<name>`, not `lead/unattributed`).
+**Hooks firing is necessary but NOT sufficient** — a lead-only / headless run drives the shared task list
+and fires `TaskCreated`/`TaskCompleted` (and will even NARRATE teammate output) with NO real teammates and
+NO `config.json` members (firsthand-confirmed on CC v2.1.186 — see
+`docs/contracts/2026-06-23-agent-teams-readonly-validation-attempt.md`). Missing `config.json`/`members`,
+or `lead/unattributed` completions = a NARRATED fake team — reject it, never accept narrated team output.
+(Headless `claude -p` forms NO real team; teams need an interactive / `claude agents` session.)
 
 **Cost (item 7):** a team is ~4–7× tokens vs a single session. Use 2–4 reviewers; route workers
 to a cheaper model where the lens allows; gauge spend on a small diff first.
