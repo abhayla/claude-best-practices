@@ -80,6 +80,30 @@ session sets the env var. Hub can dogfood teams or not, identically to downstrea
 `nice-to-have → must-have` + add the rule's self-gating line + decide hook-wiring (ship
 un-wired vs. wired-but-inert in the shipped `settings.json`). Part of the gated rollout.
 
+## 3b. Execution architecture — two phases (owner decision 2026-06-23)
+
+The work splits into two cleanly-separated phases:
+
+**Phase 1 — the goal contract (autonomous `/goal`, separate session).** Upgrades EVERY
+build-pipeline-required workflow to agent-team-ready at the resource level, **bakes in
+Anthropic's documented multi-agent best practices** (no concurrent same-file edits, no
+inter-agent conflict, properly-shaped tasks, doer≠checker cross-verification — sourced to
+`docs/claude-references/multi-agent-best-practices.md`), tests each upgrade, and **declares the
+goal complete**. It builds **no application**. Contract: `docs/contracts/2026-06-23-agent-teams-pipeline-upgrade.md`.
+
+**Phase 2 — the monitoring session (this interactive session), after Phase 1 completes.**
+Monitors the goal run; once it is declared complete, **builds a TODO tracker USING the
+upgraded workflows** as a real-world VALIDATION HARNESS. The build has a dual target:
+(a) complete the TODO app, but frankly (b) **prove the upgraded workflows actually work** —
+teammates don't write the same file concurrently, don't fight/contradict, shape tasks
+correctly, and verify each other's work (doer≠checker). When the build surfaces a workflow
+defect, this session **fixes the workflow and continues**, iterating until both the app works
+and the workflows are defect-free. The TODO app lives in an isolated sibling folder
+(`product-incubation`); it is a throwaway harness, not a shipped product.
+
+This separation is why the best practices must be baked into Phase 1 — Phase 2 then *exercises
+and hardens* them against a real build rather than re-deriving them.
+
 ## 4. What we measure (per run → calibration note / trust-score ledger)
 - **Reliability (D, primary):** completed end-to-end? rescues needed? hook errors?
 - **Cost (B, secondary):** total tokens vs. a flat-subagent/single-context baseline on the same task.
