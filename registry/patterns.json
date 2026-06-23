@@ -6380,8 +6380,8 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-06-20",
-    "total_patterns": 272
+    "last_updated": "2026-06-23",
+    "total_patterns": 276
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6802,6 +6802,87 @@
       "reference"
     ],
     "changelog": "v1.1.0 (2026-06-22): promoted hub-only -> distributable (core/) so downstream projects inherit the docs-cache convention; dual-home synced with the hub copy. v1.0.0: hub-only rule.",
+    "tier": "nice-to-have"
+  },
+  "agent-team-selection": {
+    "hash": "4e88dda281222c76f15deb833c77a80aa092f5724622baa8910471213a17c751",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-23",
+    "last_updated": "2026-06-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Decision rule (loads when editing agents/skills): when to reach for an agent TEAM (peer Claude Code sessions that message + self-coordinate, experimental/~4-7x tokens) vs a SUBAGENT (flat worker that reports back, the default) vs a git WORKTREE (parallel file edits). Complements agent-orchestration.md; enforces opt-in/measure-first adoption and the one-team/no-nested-teams/no-resumption constraints.",
+    "tags": [
+      "orchestration",
+      "agent-teams",
+      "selection",
+      "constraints"
+    ],
+    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
+    "tier": "nice-to-have"
+  },
+  "team-task-created-deliverable": {
+    "hash": "7cd4fda2273dccc449e9273e41fc4749a405dfa919fdd1afc6904857ccb2261b",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-23",
+    "last_updated": "2026-06-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "TaskCreated hook for agent teams: extends the hub size-tasks-appropriately best practice to the teammate boundary by rejecting shared-list tasks with no clear deliverable. Fail-open by default; hard-blocks (exit 2) only under TEAM_GOVERNANCE_STRICT=1. Ships unwired (teammate-hook payload schema pending live confirmation).",
+    "tags": [
+      "agent-teams",
+      "governance",
+      "hook",
+      "TaskCreated"
+    ],
+    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
+    "tier": "nice-to-have"
+  },
+  "team-task-completed-verifier": {
+    "hash": "12589541f2a8357350dcd44ae91c06bd88d0e4c26663872f567e613c518ffd0f",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-23",
+    "last_updated": "2026-06-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "TaskCompleted hook for agent teams: extends the reproduce-the-gate doctrine (supervisor-verification.md) to the teammate boundary by blocking task completion that carries no verification evidence. Fail-open; hard-blocks (exit 2) only under TEAM_GOVERNANCE_STRICT=1. Ships unwired pending live payload confirmation.",
+    "tags": [
+      "agent-teams",
+      "governance",
+      "hook",
+      "TaskCompleted",
+      "verification"
+    ],
+    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
+    "tier": "nice-to-have"
+  },
+  "team-teammate-idle-drain": {
+    "hash": "0be4cb6dd4f05ed20acd9b2f21ebdde9797bf437f04255bb8105f973e1fefa03",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-23",
+    "last_updated": "2026-06-23",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "TeammateIdle hook for agent teams: extends decide-dont-ask/drain-the-queue to the teammate boundary by keeping a teammate working while unblocked tasks remain. Loop-safe (only re-engages on a positive pending count) and fail-open; hard-keeps-working (exit 2) only under TEAM_GOVERNANCE_STRICT=1. Ships unwired pending live payload confirmation.",
+    "tags": [
+      "agent-teams",
+      "governance",
+      "hook",
+      "TeammateIdle"
+    ],
+    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
     "tier": "nice-to-have"
   }
 }

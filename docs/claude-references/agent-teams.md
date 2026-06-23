@@ -1,5 +1,14 @@
 Source: https://code.claude.com/docs/en/agent-teams.md
 Fetched: 2026-06-22
+Currency-checked: 2026-06-23 (latest Claude Code v2.1.186 — still EXPERIMENTAL, gated behind CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1, no GA)
+
+> **Post-v2.1.178 deltas (verified from official changelog, 2026-06-23):**
+> - **v2.1.179** — default `teammateMode` flipped `"auto"` → `"in-process"`; split panes now only on explicit opt-in.
+> - **v2.1.181** — idle teammate rows hide after 30s, reappear on next turn (still running/addressable while hidden). *(already reflected in body below)*
+> - **v2.1.186** — new `teammateMode: "iterm2"` (native iTerm2 split panes, needs `it2` CLI); teammates spawned via tmux/pane backends now inherit the lead's `--effort`.
+> - Constraints UNCHANGED: experimental + default-off, one team/session, no nested teams (teammates can't spawn teammates), no session resumption with in-process teammates, lead fixed for the session's life.
+> - Only official Anthropic blog post: "Building a C compiler with a team of parallel Claudes" (2026-02-05) — 16 parallel Opus agents, ~$20k, compiled Linux 6.9. Establishes the high-cost ceiling.
+> - Practitioner-reported cost: ~4–7× tokens vs a single session (4× at init alone from each teammate reloading project context); merge conflicts + permission bottlenecks the main pain points.
 
 # Orchestrate teams of Claude Code sessions
 
