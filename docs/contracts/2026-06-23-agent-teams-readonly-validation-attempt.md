@@ -131,6 +131,14 @@ headless team API; `claude -p` forms no team — confirmed). The only PTY shim i
 Bash-tool sandbox is `winpty`, whose console allocation is unreliable/exhausting here. There is
 **no util-linux `script`** and **no installed WSL distro** to provide a reliable PTY.
 
+**`tmux` was also tried (2026-06-23, session 2):** installed the native win32 port via
+`winget install arndawg.tmux-windows` (3.6a-win32, user-scope, no admin) — it runs (`tmux -V`) and
+starts a detached server, BUT every pane **dies immediately** when hosting either MSYS `/usr/bin/bash`
+(server gone) or `claude.exe` via `cmd /c` (no output, no team). The win32 tmux build cannot give
+MINGW64 programs a working Unix pty here, so it does NOT solve autonomy on this box. The binary is
+left installed (harmless). Also: **WSL install needs admin + reboot and this account is non-admin**,
+so even Option 1 requires the owner — I cannot stand it up autonomously.
+
 **Conclusion:** reliable **fully-autonomous** agent-team execution is **NOT achievable from inside
 the Claude Code Bash sandbox on this Windows box.** This is a platform/environment limit, not a hub
 defect. The modes themselves WORK (research-mode validated end-to-end with a real team).
