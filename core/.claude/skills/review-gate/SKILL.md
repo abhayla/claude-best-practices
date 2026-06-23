@@ -112,6 +112,15 @@ Sub-skill results will be collected below.
 
 Launch code-quality-gate and architecture-fitness as parallel subagents. These are independent static analysis checks with no side effects.
 
+> **`--team` mode (optional, read-only).** These independent gate-checks (quality / architecture /
+> security) MAY run as a real agent team instead of flat parallel subagents when they benefit from
+> **sharing + challenging** each other's findings before the consolidated verdict (e.g. a security
+> finding that recontextualizes an architecture one) — the same proven discipline as
+> `code-review-workflow` **STEP 2-TEAM** (shaped tasks, a separate read-only verifier for doer≠checker,
+> the `TaskCreated`/`TaskCompleted`/`TeammateIdle` hooks, anti-fake-team ground-truth check). Read-only,
+> so no file partition (item B N/A). Self-gates on `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; otherwise
+> the flat parallel-subagent dispatch below is the default (cheaper). For purely mechanical gates, stay flat.
+
 ```
 Agent(prompt="Run /code-quality-gate on all changed files between $BASE_BRANCH and HEAD. Skip Step 5 (layer validation) — architecture-fitness handles that. Return structured results: status (PASS/WARN/BLOCK), complexity, duplication, SOLID issues, PII leaks, swallowed exceptions, coverage diff, blocking count.")
 

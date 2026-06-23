@@ -51,6 +51,11 @@ the test was green on a path no user actually sees.
   (see `bug-triage-discipline.md`).
 - MUST NOT accept "renders / no console error" as proof a computed value is
   correct — that is a claim about shape, never about substance.
+- **Teammate boundary (agent-teams):** a teammate's computed/returned values get
+  the same plausibility check at the lead — the lead applies the domain bound to a
+  teammate's output before integrating it, never assuming a peer's number is sane
+  because it "looks right." Restate the plausibility bound in the teammate's spawn
+  task (teammates inherit no context).
 
 > **Salience note:** this gate is **advisory-only** — plausibility is semantic, so no
 > deterministic hook can detect a domain-absurd-but-rendering value (unlike the

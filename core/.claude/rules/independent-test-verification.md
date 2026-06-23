@@ -65,3 +65,8 @@ Hub workers stay flat by the single-level convention (`agent-orchestration.md`
 - MUST NOT accept/report a test as passed while the verifier dissents —
   reconcile first. MUST surface any skip verbatim ("independent test
   verification SKIPPED because X"); a skip BLOCKS the verified claim.
+- **Teammate boundary (agent-teams):** a *teammate's* test verdict is no
+  exception — it MUST be re-checked by a SEPARATE context-blind agent (a
+  dedicated read-only verifier teammate, or the lead reproducing the test on the
+  raw evidence). A teammate self-attesting "my tests pass" is the doer==checker
+  trap this rule exists to block; the lead is the supervisor, not a rubber stamp.

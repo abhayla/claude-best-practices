@@ -69,6 +69,13 @@ Before implementing, write or update tests that define the expected behavior:
 3. Keep changes reversible where possible
 4. Add comments only where logic isn't self-evident
 
+> **`--team` mode (optional).** A single focused feature is usually best built by one coherent
+> author — keep it flat. ONLY when the feature genuinely splits into **disjoint file sets** built
+> in parallel should this run as an agent team, and then strictly under the partition +
+> worktree-isolation + zero-collision discipline in `development-loop` **STEP 4-TEAM** (self-gated on
+> `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; same anti-fake-team + zero-collision hard gates). Same-file
+> or sequential work stays flat (best-practice §C).
+
 ## STEP 4: Run Tests
 
 Run the relevant test suite to verify implementation:

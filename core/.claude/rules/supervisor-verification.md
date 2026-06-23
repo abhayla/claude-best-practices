@@ -78,3 +78,9 @@ interaction are the proof.
 - MUST NOT proceed / commit on a worker return until the supervisor gate
   passes; on divergence, return the work or fix at T0.
 - MUST NOT treat delegation as transferring the validation duty.
+- **Teammate boundary (agent-teams):** a teammate is a worker — the lead
+  supervises it identically. The lead MUST reproduce a teammate's claimed gate
+  and inspect its output substance before integrating it; a teammate's "done"
+  is a claim, not proof. For parallel-edit teams also confirm the team actually
+  formed (`~/.claude/teams/<name>/config.json` members > 1 + hooks fired) — a
+  narrated teammate with no real session is the supervisor's first thing to catch.

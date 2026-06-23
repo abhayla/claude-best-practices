@@ -26,6 +26,13 @@ MUST NOT skip scope confirmation (Step 1). MUST NOT begin implementation — thi
 skill produces a plan, not code. For simple tasks (single file, <3 files), suggest
 `/implement` directly.
 
+> **Team-compatibility (agent-teams):** planning stays NON-team — one coherent author owns the
+> plan; splitting it across teammates fragments the very coherence a plan exists to provide. This
+> skill is team-COMPATIBLE, not team-driven: it MAY partition the resulting plan into disjoint-file
+> waves that a later `--team` execute step builds in parallel (see `development-loop` STEP 4-TEAM),
+> and MAY use a flat judge-panel of subagents to pressure-test the plan — but the plan itself is
+> authored by one owner. (best-practice §C: planning is not team-shaped work.)
+
 **Feature:** $ARGUMENTS
 
 ---

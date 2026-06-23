@@ -96,6 +96,16 @@ Present 2-3 distinct approaches. For each, include a one-paragraph description a
 
 **Recommend one approach** with clear reasoning. Explain why the others are worse for this specific situation, not in general.
 
+> **`--team` advisor-panel mode (optional, read-only).** When the approach space is wide and
+> benefits from independent lenses that **challenge each other** before you recommend, this step
+> MAY run as a real agent team: spawn 2–4 advisor teammates (e.g. simplicity / risk / maintainability
+> / user-value lenses), each independently scores the approaches, then they READ + dispute each
+> other's reasoning before you synthesize the recommendation (Anthropic multi-advisor-debate pattern;
+> overlaps `/five-advisors`). Read-only — no file partition needed (best-practice item B is N/A here).
+> Self-gates on `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; else use flat subagents or a single pass.
+> Shaped tasks + the team hooks apply (items 1, 4, 5, 6); verify ground truth (members>1 + hooks)
+> before trusting the panel — a narrated panel is a fake team. For a single obvious approach, stay flat.
+
 Wait for user approval before proceeding. If the user picks a different approach, switch without resistance.
 
 ---

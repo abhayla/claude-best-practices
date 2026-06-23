@@ -232,31 +232,57 @@ different things per type:
 | 5 Verify | skills `auto-verify`, `code-review-workflow`, `review-gate`, `code-quality-gate`, `architecture-fitness`, `security-audit`, `change-risk-scoring`, `regression-test`; agents `tester-agent`, `code-reviewer-agent`, `security-auditor-agent`; rules `independent-test-verification`, `supervisor-verification`, `output-plausibility-verification` |
 | 6 Commit | hooks `auto-git`, `auto-pr`; skills `post-fix-pipeline`, `request-code-review`, `receive-code-review`; agent `git-manager-agent`; rule `git-collaboration` |
 
+### Per-upgrade acceptance standard (the bar every 🟢/🟠 upgrade is ticked against)
+
+> **Recorded by Stage A of the pipeline-upgrade contract (`docs/contracts/2026-06-23-agent-teams-pipeline-upgrade.md`).**
+> Source of the full mechanism: `docs/claude-references/multi-agent-best-practices.md` §A–§H.
+> An upgrade is NOT done until it satisfies every item APPLICABLE to its tier, each verified by a
+> test or a real validation run (not asserted). The item numbers below are the contract's items 1–8.
+
+| # | Best-practice item | Applies to | How it's verified (gate) |
+|---|---|---|---|
+| 1 | **Task shaping (A,E)** — self-contained tasks: objective + output format + out-of-scope, ~5–6/teammate, effort-scaling in the orchestrator prompt | 🟢🟠 orchestrators | `team-task-created-deliverable` (`TaskCreated`) rejects deliverable-less tasks + a test asserting shaped tasks |
+| 2 | **File/work partitioning (B,§H1)** — disjoint file ownership; each parallel-editing teammate in its OWN git worktree; a coupled cross-file change goes to ONE teammate | 🟠 execute only | partition manifest + post-run assertion no file written by 2+ teammates (git-blame/claim-file) + worktree-lock evidence |
+| 3 | **Anti-conflict (C)** — division-of-labor heuristics in spawn prompts; the lead WAITS; task dependencies order the work | 🟢🟠 | spawn-prompt review + a run showing no duplicated/contradictory edits |
+| 4 | **Cross-agent verification (D,§H2)** — doer≠checker: a SEPARATE read-only reviewer (`Read,Grep,Glob,Bash` only), fresh context, flags only correctness gaps, SHOWS evidence not assertions | 🟢🟠 all team output | verifier wired into the workflow + `independent-test-verification`/`supervisor-verification` at the teammate boundary |
+| 5 | **Quality-gate hooks (E,§H3)** — `TaskCreated`/`TaskCompleted`/`TeammateIdle` active; plan-approval-for-teammates when work writes code; exit-code contract honored | 🟢🟠 | honest-team-audit log showing the hooks fired with real values |
+| 6 | **Context passing (G,§H4)** — all task context in the spawn prompt; long-run plan saved to a markdown file; account for `skills`/`mcpServers` DROPPED for teammates + Explore/Plan skipping CLAUDE.md | 🟢🟠 | spawn-prompt review |
+| 7 | **Team sizing & cost (F,§H5/H6)** — 3–5 teammates; cheaper per-worker models where viable; teams ONLY for team-shaped work; spend gauged on a small slice first | 🟢🟠 | `agent-team-selection` routing + per-run token record |
+| 8 | **Teammate-readiness audit (§H4)** — each teammate agent: no `skills`/`mcpServers` reliance, sufficient `tools` allowlist, specific auto-delegation `description`, session-restart pinning honored | agents used as teammates | per-agent frontmatter audit |
+
 ### Master tracker (unique resources)
 
 **✅ Already team-ready (built this session):** `agent-team-selection` (rule), `team-task-created-deliverable` / `team-task-completed-verifier` / `team-teammate-idle-drain` (hooks). These ARE the team-boundary scaffolding.
 
+**Stage A (pipeline-upgrade contract, 2026-06-23):** the 4 scaffolding patterns above flipped `nice-to-have → must-have` (dormant by default — §3a env-var master switch); the rule carries the `EXPERIMENTAL_AGENT_TEAMS` self-gate line; the 3 `team-*` hooks wired pre-but-inert in `core/.claude/settings.json` (`TaskCreated`/`TaskCompleted`/`TeammateIdle`). The acceptance standard above is now recorded. ✅
+
+**Stage B (Verify cluster, 2026-06-23) — LIVE-VALIDATED with a REAL team:** `code-review-workflow` gained a `--team` parallel-review-team mode (STEP 2-TEAM, baking in best-practice items 1,4,5,6); the 3 review agents passed the teammate-readiness audit (`security-auditor-agent` got a teammate note — no `Skill` tool as a teammate). **Validation run:** one `claude --bg` review team on the real PR #198 diff → ground truth **members=3** (`team-lead` + `correctness` + `tests`), **12 hook events** (2 TaskCreated + 2 TaskCompleted + 8 TeammateIdle, honest real-schema audit), and a **usable synthesized review** with a genuine cross-challenge (the lenses interlocked; correctness reproduced a real false-positive class with live git). Anti-fake-team gate PASSED. Evidence in the run worktree's `docs/contracts/.run/evidence/` (gitignored). (`review-gate` + `auto-verify` team modes completed later in this run — see the Stage E note.) ✅
+
+**Stage C (Execute cluster — RISKY parallel edits, 2026-06-23) — LIVE-VALIDATED:** `development-loop` gained the canonical `--team` parallel-build mode (STEP 4-TEAM: disjoint file partition → per-teammate git-worktree isolation → lead-waits → read-only verifier teammate → hard **zero-collision** gate; bakes in items A,B,C,D); `executing-plans` + `implement` point to it; `plan-executor-agent` + `planner-researcher-agent` passed the teammate audit (no edit). **Validation (throwaway `mathkit` build, real `claude --bg` teams):** run-1 CLEAN (members=4, zero same-file collisions, 10 tests pass); run-2 completed zero-collision + 10 pass but the lead **self-recovered** a teammate past an *environmental* blocker (`git worktree add` on a commit-less repo) — counts as a rescue; run-3 (commit-less friction removed) members=4, worktree-isolated. Mechanism proven (zero collisions + tests-green every run); clean-vs-recovered reliability finalized in Stage E. **Found+fixed a real defect:** editing only the `core/` copy of the `synced` `executing-plans` drifted the dual-home gate — root-caused (didn't check dual-home class first) + sibling-class audit done. ✅
+
+**Stage D (remaining workflows → team-ready, 2026-06-23):** `brainstorm` advisor-panel `--team` (read-only multi-lens debate); `research-mode` parallel-research `--team`; `writing-plans` made team-COMPATIBLE (planning stays single-owner); `independent-test-verification` + `supervisor-verification` self-gated to the teammate boundary (lead reproduces the gate; teammate "done" is a claim, not proof). All doc-only / rule edits; CI green. ✅
+
 | Resource | Type | Step | Tier | Work to make team-ready | Status |
 |---|---|---|---|---|---|
-| `code-review-workflow` | skill | 5 | 🟢 | Add a `--team` mode: spawn security/perf/tests/correctness reviewers who share+challenge before the lead synthesizes (Anthropic flagship pattern) | ⬜ not started |
-| `review-gate` | skill | 5 | 🟢 | It already dispatches 3 inline gate agents → convert to a real review team (quality/arch/security as teammates) | ⬜ not started |
-| `code-reviewer-agent` | agent | 5 | 🟢 | Teammate-readiness check: no `skills`/`mcpServers` reliance; tools OK; peer-prompt. Already `dispatched_from: dual-mode` | ⬜ not started |
-| `security-auditor-agent` | agent | 5 | 🟢 | Same teammate-readiness check | ⬜ not started |
-| `tester-agent` | agent | 5 | 🟢 | Teammate-readiness check; fan-out test areas as teammates | ⬜ not started |
-| `auto-verify` | skill | 5 | 🟢 | Optional `--team` to run parallel test-area teammates (no source edits) | ⬜ not started |
-| `brainstorm` | skill | 1 | 🟢 | Advisor-panel mode (multi-lens spec debate, read-only) — overlaps the five-advisors pilot | ⬜ not started |
-| `research-mode` | skill | 1 | 🟢 | Parallel multi-source research teammates | ⬜ not started |
-| `planner-researcher-agent` | agent | 1,4 | 🟢 | Teammate-readiness check (read-only research) | ⬜ not started |
-| `web-research-specialist-agent` | agent | 1 | 🟢 | Teammate-readiness check | ⬜ not started |
-| `code-quality-gate` / `architecture-fitness` / `security-audit` | skills | 5 | 🟢 | Run as review-team members under `review-gate`'s team mode | ⬜ not started |
-| `independent-test-verification` / `supervisor-verification` / `output-plausibility-verification` | rules | 5 | 🟢 | Extend wording to the teammate boundary (lead reproduces the gate) | ⬜ not started |
-| `development-loop` | skill | 4 | 🟠 | `--team` build mode: partition by file ownership (frontend/backend/tests), merge discipline. **The risky core — validate via the test-build first** | ⬜ not started |
-| `executing-plans` | skill | 4 | 🟠 | Partition plan tasks by file ownership across teammates | ⬜ not started |
-| `implement` | skill | 4 | 🟠 | Same partition/merge handling | ⬜ not started |
-| `plan-executor-agent` | agent | 4 | 🟠 | Teammate-readiness + file-partition contract to avoid collisions | ⬜ not started |
+| `code-review-workflow` | skill | 5 | 🟢 | Add a `--team` mode: spawn security/perf/tests/correctness reviewers who share+challenge before the lead synthesizes (Anthropic flagship pattern) | ✅ done — `--team` mode added (STEP 2-TEAM); LIVE-VALIDATED 2026-06-23 (real 3-member team, 12 hook events, usable review) |
+| `review-gate` | skill | 5 | 🟢 | It already dispatches 3 inline gate agents → convert to a real review team (quality/arch/security as teammates) | ✅ done — STEP 1 `--team` note (gate-checks share+challenge → code-review-workflow STEP 2-TEAM discipline) |
+| `code-reviewer-agent` | agent | 5 | 🟢 | Teammate-readiness check: no `skills`/`mcpServers` reliance; tools OK; peer-prompt. Already `dispatched_from: dual-mode` | ✅ done — audit PASS (no skills/mcpServers frontmatter; tools OK), no edit needed |
+| `security-auditor-agent` | agent | 5 | 🟢 | Same teammate-readiness check | ✅ done — audit PASS + added teammate note (no `Skill` tool as teammate → inline OWASP path) |
+| `tester-agent` | agent | 5 | 🟢 | Teammate-readiness check; fan-out test areas as teammates | ✅ done — audit PASS (no skills/mcpServers frontmatter; `Skill` in tools works for teammates), no edit needed |
+| `auto-verify` | skill | 5 | 🟢 | Optional `--team` to run parallel test-area teammates (no source edits) | ✅ done — STEP 2 `--team` note (disjoint test-area teammates, read-only, doer≠checker at teammate boundary) |
+| `brainstorm` | skill | 1 | 🟢 | Advisor-panel mode (multi-lens spec debate, read-only) — overlaps the five-advisors pilot | ✅ done — STEP 3 advisor-panel `--team` note (read-only, self-gated) |
+| `research-mode` | skill | 1 | 🟢 | Parallel multi-source research teammates | ✅ done — STEP 2 parallel-research `--team` note (read-only, self-gated) |
+| `planner-researcher-agent` | agent | 1,4 | 🟢 | Teammate-readiness check (read-only research) | ✅ done — audit PASS (no skills/mcpServers; tools incl. WebFetch/WebSearch work for teammates), no edit |
+| `web-research-specialist-agent` | agent | 1 | 🟢 | Teammate-readiness check | ✅ done — audit PASS (no skills/mcpServers; WebFetch/WebSearch tools work for teammates), no edit |
+| `code-quality-gate` / `architecture-fitness` / `security-audit` | skills | 5 | 🟢 | Run as review-team members under `review-gate`'s team mode | ✅ done — covered as teammates under `review-gate` STEP 1 `--team` mode (no per-skill edit needed) |
+| `independent-test-verification` / `supervisor-verification` / `output-plausibility-verification` | rules | 5 | 🟢 | Extend wording to the teammate boundary (lead reproduces the gate) | ✅ done (3 of 3) — teammate-boundary clause added to all three rules |
+| `development-loop` | skill | 4 | 🟠 | `--team` build mode: partition by file ownership (frontend/backend/tests), merge discipline. **The risky core — validate via the test-build first** | ✅ done — STEP 4-TEAM canonical parallel-build mode; LIVE-VALIDATED 2026-06-23 (real ≥4-member teams, ZERO same-file collisions, tests pass) |
+| `executing-plans` | skill | 4 | 🟠 | Partition plan tasks by file ownership across teammates | ✅ done — `--team` wave note → development-loop STEP 4-TEAM; dual-home (synced) both copies updated |
+| `implement` | skill | 4 | 🟠 | Same partition/merge handling | ✅ done — `--team` note → development-loop STEP 4-TEAM (disjoint-partition only) |
+| `plan-executor-agent` | agent | 4 | 🟠 | Teammate-readiness + file-partition contract to avoid collisions | ✅ done — audit PASS (no skills/mcpServers; read-only coordinator tools), no edit needed |
 | `grill-me` | skill | 1 | ⚪ | Keep non-team — single interviewer is the point | — |
 | `grill-with-docs` | skill | 1 | ⚪ | Keep non-team | — |
-| `writing-plans` | skill | 2 | ⚪ | Keep non-team — one coherent plan owner (judge-panel via flat subagents at most) | — |
+| `writing-plans` | skill | 2 | ⚪ | Keep non-team — one coherent plan owner (judge-panel via flat subagents at most) | ✅ team-compatibility note added (planning stays single-owner; MAY partition for a later `--team` execute) |
 | `tdd` / `fix-loop` / `learn-n-improve` | skills | 4 | ⚪ | Keep non-team — tight single-thread cycles | — |
 | `dod-verbs` / `workflow` / `plan-before-coding` / `tdd` / `testing` / `git-collaboration` | rules | 2,4,6 | ⚪ | Apply regardless of team/subagent; no change needed | — |
 | `product-incubation` / `bootstrap-dogfood-project` / `contribute-practice` / `synthesize-hub` | rule+skills | 3 | ⚪ | Mechanical config/feedback wiring — keep non-team | — |

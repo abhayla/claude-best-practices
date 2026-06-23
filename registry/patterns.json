@@ -729,13 +729,13 @@
     "tier": "must-have"
   },
   "auto-verify": {
-    "hash": "a4908d4d3a65f06b7a4290aa761e9c4b18901b28d84b8b061f5835d1b61835e8",
+    "hash": "eb675305e523e27ba95197b2c2b5a7bc9f1fbf9b6b594bc137109b93fd84937a",
     "type": "skill",
     "category": "core",
     "version": "4.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-06-23",
     "dependencies": [
       "regression-test",
       "tester-agent"
@@ -743,7 +743,7 @@
     "visibility": "public",
     "description": "Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces structured results for pipeline consumption.",
     "tags": [],
-    "changelog": "v4.3.0 (2026-06-15): MINOR — monorepo runner scoping: scope test runner to the changed sub-package, not repo root, in multi-stack monorepos (fixes #53). | v4.2.0 (2026-06-15): MINOR — NO_TESTS_FOR_CHANGE: under --strict-gates a code change that executed 0 tests is FAILED, not a vacuous PASS (fixes #50). | v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured | v2.1.0: split STEP 2.5 sub-content to references/visual-proof-review.md (412 lines, under 500 cap)",
+    "changelog": "v4.3.0 (2026-06-15): MINOR — monorepo runner scoping: scope test runner to the changed sub-package, not repo root, in multi-stack monorepos (fixes #53). | v4.2.0 (2026-06-15): MINOR — NO_TESTS_FOR_CHANGE: under --strict-gates a code change that executed 0 tests is FAILED, not a vacuous PASS (fixes #50). | v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured | v2.1.0: split STEP 2.5 sub-content to references/visual-proof-review.md (412 lines, under 500 cap); added --team note (parallel disjoint test-area teammates; read-only, doer!=checker)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -776,20 +776,20 @@
     }
   },
   "brainstorm": {
-    "hash": "05f2b8e3ac61739e28c42fc64767aa254d5f4222e5257dac55eef40d745f950d",
+    "hash": "9d0f8c8759c2ddef37701891990afa8f22c76880f1fe791d5b3622c11b0735cf",
     "type": "skill",
     "category": "core",
     "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Explore intent through Socratic questioning, propose approaches with trade-offs, and produce a spec document. Use before building anything non-trivial to clarify requirements and evaluate alternatives.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.0.0: Initial registration; added --team advisor-panel mode note (Stage D: read-only multi-lens debate; self-gated)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1098,13 +1098,13 @@
     }
   },
   "code-review-workflow": {
-    "hash": "1f0eda24242ad846ef0a79ff41564a0e2288aa6f75bf7140287e380af6425139",
+    "hash": "47c145f23d178442fab9a4d7e2589c33b43d120c0d55666744496bf92bae273b",
     "type": "skill",
     "category": "core",
     "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-23",
     "dependencies": [
       "code-reviewer-agent",
       "receive-code-review",
@@ -1120,7 +1120,7 @@
       "workflow",
       "review"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4); added --team parallel-review-team mode (Stage B: bakes in multi-agent best-practice items 1,4,5,6; self-gated on EXPERIMENTAL_AGENT_TEAMS)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1725,13 +1725,13 @@
     }
   },
   "development-loop": {
-    "hash": "262a83a25fc7c612781140536344373809651b752473428022739383e96d152a",
+    "hash": "371898bb070b052a6cc5b2d56821277768c52540d5aacc29328d33b29c4a4313",
     "type": "skill",
     "category": "core",
     "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-06-23",
     "dependencies": [
       "auto-verify",
       "brainstorm",
@@ -1748,7 +1748,7 @@
       "workflow",
       "development"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK on missing workers/sub-skills); correct dependencies to real runtime closure (drop deprecated development-loop-master-agent + unused executing-plans; add plan-executor-agent + planner-researcher-agent) | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model | v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK on missing workers/sub-skills); correct dependencies to real runtime closure (drop deprecated development-loop-master-agent + unused executing-plans; add plan-executor-agent + planner-researcher-agent) | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model | v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release; added --team parallel-build mode (STEP 4-TEAM: disjoint file partition + worktree isolation + lead-waits + verifier teammate + zero-collision gate; bakes in best-practice items A,B,C,D)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2183,20 +2183,20 @@
     }
   },
   "executing-plans": {
-    "hash": "14dd076032cc4502937814860ebbec939f878f641f8935235300785ea6fd0772",
+    "hash": "0caedb9135477ff74029cc4da0e701e5c250afecdc4c550a8423701cb714a55c",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Bridge writing-plans to plan-to-issues pipeline with execution tracking",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research; added --team note (parallel waves only when disjoint file sets; points to development-loop STEP 4-TEAM discipline)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2970,13 +2970,13 @@
     }
   },
   "implement": {
-    "hash": "21de16f34efd3f7ebe0022c844daa67b86aee0c09b92b4f312d4a8bfecbd8730",
+    "hash": "f71191c5f9b9149908fc1a4f0ae3d39607e6d1dc9b716c8b921e8fadaa9780d8",
     "type": "skill",
     "category": "core",
     "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-23",
     "dependencies": [
       "fix-loop",
       "post-fix-pipeline",
@@ -2985,7 +2985,7 @@
     "visibility": "public",
     "description": "Implement a feature or fix following a structured workflow: requirements analysis, test creation, implementation, test execution, fix-loop delegation, and verification.",
     "tags": [],
-    "changelog": "v2.2.0: Added triggers, empty-args guard, test-framework fallback, fixed orphaned lines, strengthened CRITICAL RULES; v2.1.0: Enhanced with community patterns; v2.0.0: Initial structured workflow",
+    "changelog": "v2.2.0: Added triggers, empty-args guard, test-framework fallback, fixed orphaned lines, strengthened CRITICAL RULES; v2.1.0: Enhanced with community patterns; v2.0.0: Initial structured workflow; added --team note (disjoint-partition only; points to development-loop STEP 4-TEAM)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4300,13 +4300,13 @@
     }
   },
   "research-mode": {
-    "hash": "909004f127a2a5560d1f7e5a70f494630a26119079a82def89af383b498a99e1",
+    "hash": "c5348e47e1a7d80cad858f2c8a0f2154a6b59dc9ba05fcb1f385a59c7984be0b",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-24",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-06-23",
     "dependencies": [
       "web-research-specialist-agent"
     ],
@@ -4318,7 +4318,7 @@
       "citations",
       "fact-checking"
     ],
-    "changelog": "deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output",
+    "changelog": "deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output; added --team parallel-research note (Stage D: read-only; self-gated)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4328,13 +4328,13 @@
     }
   },
   "review-gate": {
-    "hash": "1ae55f153b7f7507f250dd24a03f6389dc7bf1b0d044d3419dadd568c98f8010",
+    "hash": "065431f8117e4c6f1db94c1028163f86857325666d8ab89c0e07198369bbeecf",
     "type": "skill",
     "category": "core",
     "version": "2.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-23",
     "dependencies": [
       "code-quality-gate",
       "architecture-fitness",
@@ -4350,7 +4350,7 @@
       "orchestration",
       "quality-gate"
     ],
-    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps",
+    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps; added --team note (parallel gate-checks share+challenge; -> code-review-workflow STEP 2-TEAM discipline)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4507,18 +4507,18 @@
     }
   },
   "security-auditor-agent": {
-    "hash": "c1ad55000b044ae677dff82e3aee91a2e1b3f2c33eb02b31a01f8b59b6058c60",
+    "hash": "03e54578531d87c1346bc6f96cc89c4de8b484ab9fc81fea22b8830ed94f2998",
     "type": "agent",
     "category": "core",
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Use proactively for security assessments — OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Spawn automatically when changes",
     "tags": [],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.0.0: Initial registration; added teammate-readiness note (no Skill tool as a teammate -> inline OWASP review path)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5784,20 +5784,20 @@
     }
   },
   "writing-plans": {
-    "hash": "ce9755cb42dfad629c211441cee82a0b708a8d8729257c43987364dad5b2ed23",
+    "hash": "0de2df32153829876f3f21ee42c6b833173384d98fd3afd74426c636cf2339c4",
     "type": "skill",
     "category": "core",
     "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-06-21",
+    "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Structured implementation planning with atomic plan chunks",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research; added team-compatibility note (Stage D: planning stays single-owner/non-team)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5973,13 +5973,13 @@
     }
   },
   "output-plausibility-verification": {
-    "hash": "9ced95187dbd8e5b00342290d187e3e602bdf5d7e52a38f3e4c811beb8ec16e6",
+    "hash": "8279024df37a7d9ad1a64b91d573ba105ed482e8dd12a777264263c2b60335e3",
     "type": "rule",
     "category": "core",
     "version": "1.0.1",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-18",
+    "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Verify user-facing computed values are domain-SANE, not just that they render/persist/pass — the substance axis of verification. Default-path checks, plausibility bounds, shape-locks-are-not-correctness-proofs.",
@@ -5990,7 +5990,7 @@
       "plausibility",
       "workflow"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule; added teammate-boundary clause (lead applies plausibility bound to teammate output)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6000,13 +6000,13 @@
     }
   },
   "independent-test-verification": {
-    "hash": "674c9db709e2bdd349dd970de5d78f8f547678255d561d96b691cace42bac2ca",
+    "hash": "b1332a196464c4de2cd3e5819fa75782061165fbbab04c9a8d459e3e2424152e",
     "type": "rule",
     "category": "core",
     "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
     "description": "Every non-trivial test verdict must be re-checked by a separate, context-blind agent given the same inputs + raw evidence — doer/checker separation (IEEE-1012). Single-level two-wave dispatch.",
@@ -6017,7 +6017,7 @@
       "orchestration",
       "quality"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule; added teammate-boundary clause (Stage D: teammate test verdicts get blind re-check)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6027,13 +6027,13 @@
     }
   },
   "supervisor-verification": {
-    "hash": "57273ebfeff2a961ea771dbdee2760d89700b0567d03844a1639f97aa16a5ba0",
+    "hash": "3e6dcaf49adfb99f11d2a456b7d6149ac1b0e38ccf9ea26da582eb5b0bf6d32c",
     "type": "rule",
     "category": "core",
     "version": "1.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
     "description": "The T0 orchestrator must reproduce a worker's claimed gate and inspect output substance before accepting — reading a return contract is not verifying it. Includes a drive-the-UI loop for rendered changes.",
@@ -6044,7 +6044,7 @@
       "quality",
       "workflow"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule; added teammate-boundary clause (Stage D: lead supervises teammates identically + anti-fake-team)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6805,7 +6805,7 @@
     "tier": "nice-to-have"
   },
   "agent-team-selection": {
-    "hash": "11a0652d5c4742f5ee14f26b9801664fc96dfa79137bb9f3752bd19a33eec6f5",
+    "hash": "48fc3cbdc6ae1219f0174bb6f2d9f1d07ddebd254469ec8ddf7bf3ac589938a5",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6821,8 +6821,8 @@
       "selection",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks); v1.1.0: flipped to must-have (dormant) + added EXPERIMENTAL_AGENT_TEAMS self-gate line (§3a)",
+    "tier": "must-have"
   },
   "team-task-created-deliverable": {
     "hash": "02f34dfcec1c5f81b4fd51a79d6a85083d6b16b34a992f687f9c6f1d1d0af1e2",
@@ -6841,8 +6841,8 @@
       "hook",
       "TaskCreated"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
+    "tier": "must-have"
   },
   "team-task-completed-verifier": {
     "hash": "6271d071436a01797f0d8aabebef9dfcf9427456588e891a5f36f2083c5048d1",
@@ -6862,8 +6862,8 @@
       "TaskCompleted",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
+    "tier": "must-have"
   },
   "team-teammate-idle-drain": {
     "hash": "ca7cab7cddd5a56da00b35369056e58988c9d0bb95b494a26d5263d730d76333",
@@ -6882,7 +6882,7 @@
       "hook",
       "TeammateIdle"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23)",
-    "tier": "nice-to-have"
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
+    "tier": "must-have"
   }
 }
