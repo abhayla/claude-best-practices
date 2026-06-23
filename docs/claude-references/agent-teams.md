@@ -1,6 +1,7 @@
 Source: https://code.claude.com/docs/en/agent-teams.md
 Fetched: 2026-06-22
 Currency-checked: 2026-06-23 (latest Claude Code v2.1.186 — still EXPERIMENTAL, gated behind CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1, no GA)
+Re-verified against the LIVE page (direct WebFetch) 2026-06-23 — content matches this cache; this doc is the canonical best-practices reference for agent teams (see its "Best practices" + "How agent teams work" sections), synthesized further in `multi-agent-best-practices.md`.
 
 > **Post-v2.1.178 deltas (verified from official changelog, 2026-06-23):**
 > - **v2.1.179** — default `teammateMode` flipped `"auto"` → `"in-process"`; split panes now only on explicit opt-in.

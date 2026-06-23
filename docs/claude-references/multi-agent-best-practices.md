@@ -21,7 +21,7 @@ agent-team pipeline-upgrade goal contract bakes in.
 - **Partition files: one teammate owns one set.** The primary documented anti-collision rule.
 - **Assign specializations by orthogonal dimension** (perf / dedup / codegen / docs / review), not just by file, so agents progress on different axes.
 - **File-lock / task-claim pattern:** each agent writes a claim file (`current_tasks/<task>.txt`); git's atomic push forces a conflict if two claim the same task → the loser pulls, merges, picks another. Replaces custom orchestration.
-- **Background-session worktree isolation** (`.claude/worktrees/`) keeps concurrent edits from colliding (agent-view).
+- **Background-session worktree isolation** (`.claude/worktrees/`) keeps concurrent edits from colliding (agent-view). Full mechanism: `worktrees.md` (cached) — `--worktree`/`-w`, subagent `isolation: worktree`, `.worktreeinclude`, base-branch + cleanup.
 
 ## C. Coordination & anti-conflict (no fighting / duplication / contradiction)
 - **Detail task boundaries in the spawn prompt** (objective + output format + tool guidance + out-of-scope). Without this, agents duplicate work even on different tasks.
