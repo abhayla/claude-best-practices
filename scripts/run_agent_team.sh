@@ -40,7 +40,10 @@ teammate_completions() {
 
 # Write the launcher .cmd (NO stdout redirect — that would defeat claude's tty).
 CMDFILE="$HUB/.claude/.team-cmd-${LABEL}.cmd"
-printf '@echo off\r\ncd /d "%s"\r\n"%s" --settings "%s" --permission-mode bypassPermissions "%s"\r\n' \
+# Clear inherited psmux/tmux env so the launched lead does not think it is a NESTED tmux session
+# (psmux sets PSMUX_SESSION/TMUX inside its panes → agent-teams would refuse to nest). The ConPTY
+# TTY remains, so the lead is still interactive and spawns in-process teammates.
+printf '@echo off\r\ncd /d "%s"\r\nset "PSMUX_SESSION="\r\nset "TMUX="\r\nset "TMUX_PANE="\r\n"%s" --settings "%s" --permission-mode bypassPermissions "%s"\r\n' \
   "$WORKDIR_WIN" "$CLAUDE_WIN" "$SETTINGS_WIN" "$PROMPT" > "$CMDFILE"
 
 before=$(teammate_completions)
