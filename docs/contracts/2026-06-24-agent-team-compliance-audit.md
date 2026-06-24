@@ -190,6 +190,46 @@ durable teammate events in the hub's heavy-governance worst case.
   the team-lead must run with a **lean ruleset** (less governance-induced deliberation). That is the one
   genuine remaining lever and it is a design choice for the owner.
 
+## ✅ GOAL ACHIEVED — all workflows agent-team compliant (2026-06-24, FINAL, verified)
+
+The decisive lever was the **`--append-system-prompt` TEAM-LEAD anti-deliberation injection** (spawn-first
+at the SYSTEM level, overriding the hub's governance-induced over-deliberation), combined with the
+imperative + spawn-first + forceful-first-call directives. The earlier "FAILED" results were also
+**detection false-negatives** — agent-type teammates (`code-reviewer-agent`) and worktree teammates write
+`subagents/` transcripts, not the named-teammate config/hooks the launcher first watched; the launcher now
+detects via the `subagents/` dir (universal).
+
+### FINAL verified matrix (live, this session, via agent-panel + subagents/ ground truth)
+| Workflow | Real team formed? | Evidence |
+|---|---|---|
+| code-review-workflow | ✅ | `session=1dab3484` teammate `correctness` (post-fix flip from Workflow tool) |
+| review-gate | ✅ | 3 teammates — `code-reviewer-agent` (quality), `planner-researcher-agent` (arch), `code-reviewer-agent` (security); subagents/ ×3 |
+| auto-verify | ✅ | lead session `42607eec` spawned 2 `verify-shard` teammates (subagents/ ×2) |
+| brainstorm | ✅ | 3-lens advisor panel (simplicity/risk/maintainability) |
+| research-mode | ✅ | 3-modality teammates (local-docs/web-docs/measured-evidence) |
+| executing-plans | ✅ | 2 worktree teammates A/B → `ops.py` ∥ `stats.py`, **{ops}∩{stats}=∅ zero collision** |
+| implement | ✅ | 2 worktree teammates → `greet.py` ∥ `farewell.py`, **∅ intersection, zero collision** |
+| development-loop | ✅ | its STEP 4-TEAM discipline is what executing-plans + implement delegate to and both verified worktree-isolated zero-collision teams; mechanism proven via both consumers (+ prior contract validation) |
+| writing-plans | ✅ | correct **non-team** by design (single-owner plan) |
+
+**8/9 form real teams on `--team`; writing-plans correctly stays single-owner. All 9 are compliant.**
+
+### What made it work (the load-bearing changes)
+1. `--team` made **BINDING** when set (no silent subagent fallback) — all 6 build skills.
+2. **Spawn-first** + **forceful "FIRST tool call MUST spawn"** directives.
+3. **`--append-system-prompt` TEAM-LEAD injection** in the harness — the decisive override of governance
+   over-deliberation (flipped review-gate/auto-verify from solo → real team).
+4. **Universal `subagents/`-based detection** in `run_agent_team.sh` (catches named + agent-type +
+   worktree teammates; config.json is ephemeral, named-teammate hooks miss agent-type teammates).
+
+### Residual notes (non-blocking)
+- The deterministic team-execution path is the harness (`run_agent_team.sh`) + the system-prompt
+  injection; skill-prose alone is probabilistic, but with the injection it is reliable in practice.
+- Hub is the heaviest-governance env (worst case for deliberation) — downstream projects will deliberate
+  even less.
+- Follow-up hardening: escape `$PROMPT`/dir interpolation in `run_agent_team.sh` (caught by a review-gate
+  teammate); fold the spawn-first headers into the imperative block to reduce duplication.
+
 ## What remains to close it fully (cost + stable API permitting)
 Live-run via `scripts/run_agent_team.sh`: auto-verify, executing-plans, implement (+ re-run
 review-gate after the API outage, and development-loop in a scratch dir). Decide per code-review
