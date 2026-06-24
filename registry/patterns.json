@@ -729,7 +729,7 @@
     "tier": "must-have"
   },
   "auto-verify": {
-    "hash": "eb675305e523e27ba95197b2c2b5a7bc9f1fbf9b6b594bc137109b93fd84937a",
+    "hash": "be5e67a0bd2d1302046bac3511f8ccd7ee6cda7709e3ce3253e5df0cc2c33d85",
     "type": "skill",
     "category": "core",
     "version": "4.3.0",
@@ -1098,7 +1098,7 @@
     }
   },
   "code-review-workflow": {
-    "hash": "e6e7dc87715c3aca71a1700cfc79223eeff1a95ed4afe269f811239d683b3567",
+    "hash": "1822b00d9db2fab3bfde9fa8ae959ce6e7417e635637e3592a2f45ebb743ee2e",
     "type": "skill",
     "category": "core",
     "version": "2.3.0",
@@ -1725,7 +1725,7 @@
     }
   },
   "development-loop": {
-    "hash": "2bab46dbee9aca0d4548a8b984a05a4a8732623d3552d5498b017cfe9c036c3f",
+    "hash": "b0b43b00cc9148c4c629a11b8aed2261206b5779ca2db161ba28a90588beb3b7",
     "type": "skill",
     "category": "core",
     "version": "2.1.1",
@@ -2183,7 +2183,7 @@
     }
   },
   "executing-plans": {
-    "hash": "0caedb9135477ff74029cc4da0e701e5c250afecdc4c550a8423701cb714a55c",
+    "hash": "d7444d4e2d450bbb77309de7715d4b5cc8599bedd14efab85d3649be618dbac3",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -2970,7 +2970,7 @@
     }
   },
   "implement": {
-    "hash": "f71191c5f9b9149908fc1a4f0ae3d39607e6d1dc9b716c8b921e8fadaa9780d8",
+    "hash": "cfd0aae0f84684753778bff5382be2e85c16ff43ffdab5527616a408e79dd88c",
     "type": "skill",
     "category": "core",
     "version": "2.2.0",
@@ -4328,7 +4328,7 @@
     }
   },
   "review-gate": {
-    "hash": "065431f8117e4c6f1db94c1028163f86857325666d8ab89c0e07198369bbeecf",
+    "hash": "8f461b2c4138a4d210be52a2b0a80e6723e74a29fd480bfd194066f34378b575",
     "type": "skill",
     "category": "core",
     "version": "2.4.0",

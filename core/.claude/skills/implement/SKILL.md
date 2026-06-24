@@ -75,6 +75,12 @@ Before implementing, write or update tests that define the expected behavior:
 > worktree-isolation + zero-collision discipline in `development-loop` **STEP 4-TEAM** (self-gated on
 > `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; same anti-fake-team + zero-collision hard gates). Same-file
 > or sequential work stays flat (best-practice §C).
+>
+> **`--team` is BINDING when explicitly set:** with the flag passed AND `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+> on a genuinely disjoint-partition feature, you MUST spawn REAL teammate sessions and confirm the anti-fake-team
+> gate (`config.json` `members` > 1 + teammate-attributed events) + zero-collision; you MUST NOT fall back to flat
+> or pause to ask — the flag IS the instruction. Flat applies ONLY when `--team` is absent, the env var is unset,
+> or the feature is genuinely same-file/sequential.
 
 ## STEP 4: Run Tests
 

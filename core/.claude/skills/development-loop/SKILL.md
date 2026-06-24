@@ -216,6 +216,12 @@ STEP 7 REPORT without STEP 5 or STEP 6.
 > a team there only fights itself (best-practice §C: "NOT for sequential / same-file / dependency-heavy").
 >
 > **SELF-GATE:** requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; else fall back to flat STEP 4.
+>
+> **`--team` is BINDING when explicitly set (env on) on a parallelizable plan:** you MUST spawn REAL
+> teammate sessions (each in its own git worktree) and confirm the anti-fake-team gate
+> (`config.json` `members` > 1 + teammate-attributed events) + the zero-collision hard gate; you MUST NOT
+> fall back to flat subagents or pause to ask — the flag IS the instruction. Flat STEP 4 is the default
+> ONLY when `--team` is absent, the env var is unset, or the plan is genuinely sequential/same-file.
 
 **Procedure (bakes in best-practice items A, B, C, D — `docs/claude-references/multi-agent-best-practices.md`):**
 

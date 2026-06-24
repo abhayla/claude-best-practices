@@ -120,6 +120,12 @@ Launch code-quality-gate and architecture-fitness as parallel subagents. These a
 > the `TaskCreated`/`TaskCompleted`/`TeammateIdle` hooks, anti-fake-team ground-truth check). Read-only,
 > so no file partition (item B N/A). Self-gates on `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; otherwise
 > the flat parallel-subagent dispatch below is the default (cheaper). For purely mechanical gates, stay flat.
+>
+> **`--team` is BINDING when explicitly set:** with the flag passed AND `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`,
+> you MUST spawn REAL teammate sessions and confirm the anti-fake-team gate (`~/.claude/teams/<session>/config.json`
+> `members` > 1 + `TaskCompleted by=<teammate>` / `TeammateIdle teammate=<name>`); you MUST NOT fall back to flat
+> subagents or pause to ask how to run — the flag IS the instruction. The flat default applies ONLY when `--team`
+> is absent or the env var is unset (no team can form).
 
 ```
 Agent(prompt="Run /code-quality-gate on all changed files between $BASE_BRANCH and HEAD. Skip Step 5 (layer validation) — architecture-fitness handles that. Return structured results: status (PASS/WARN/BLOCK), complexity, duplication, SOLID issues, PII leaks, swallowed exceptions, coverage diff, blocking count.")

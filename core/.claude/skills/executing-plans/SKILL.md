@@ -151,6 +151,12 @@ Process tasks wave by wave. Within each wave, determine whether tasks can be par
 > NO file written by 2+ teammates). Self-gates on `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; a wave
 > with shared-file or dependency-coupled tasks stays on the flat path (best-practice §C). Requires
 > the same anti-fake-team + zero-collision hard gates before accepting the wave's output.
+>
+> **`--team` is BINDING when explicitly set:** with the flag passed AND `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+> on a disjoint-partition wave, you MUST spawn REAL teammate sessions (each worktree-isolated) and confirm the
+> anti-fake-team gate (`config.json` `members` > 1 + teammate-attributed events) + zero-collision; you MUST NOT
+> fall back to flat subagents or pause to ask — the flag IS the instruction. Flat applies ONLY when `--team` is
+> absent, the env var is unset, or the wave is genuinely shared-file/dependency-coupled (not parallelizable).
 
 **Read:** `references/execute-tasks.md` for detailed step 3: execute tasks reference material.
 

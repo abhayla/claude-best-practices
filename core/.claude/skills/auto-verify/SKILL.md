@@ -170,6 +170,12 @@ backend unit tests — a false verdict.
 > `independent-test-verification` (doer≠checker at the teammate boundary). Self-gates on
 > `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` + the anti-fake-team ground-truth check; else use the flat
 > `tester-agent` path below (cheaper, the default). A small or coupled suite stays flat.
+>
+> **`--team` is BINDING when explicitly set:** with the flag passed AND `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`,
+> you MUST spawn REAL teammate sessions and confirm the anti-fake-team gate (`~/.claude/teams/<session>/config.json`
+> `members` > 1 + `TaskCompleted by=<teammate>` / `TeammateIdle teammate=<name>`); you MUST NOT fall back to flat/
+> background subagents or pause to ask how to run — the flag IS the instruction. The flat default applies ONLY when
+> `--team` is absent or the env var is unset.
 
 **Fallback if `tester-agent` is not installed:** Run tests directly using the
 project's test runner (detect from CLAUDE.md, pyproject.toml, package.json, or

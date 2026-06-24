@@ -129,6 +129,13 @@ Capture verdict + deferred items into state.
 > **SELF-GATE:** requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. Without it no team
 > forms — fall back to the flat `--deep-audit` path. (Validated live 2026-06-23: a real
 > 3-member team formed via `claude --bg`; `TaskCreated` hooks fired with the real schema.)
+>
+> **`--team` is BINDING when explicitly set (env on):** you MUST spawn REAL teammate sessions for the
+> review lenses and confirm the anti-fake-team gate (`~/.claude/teams/<session>/config.json` `members` > 1
+> + `TaskCompleted by=<teammate>` / `TeammateIdle teammate=<name>`). You MUST NOT satisfy `--team` by
+> running the native **Workflow** tool or flat `Agent()` subagents, and MUST NOT pause to ask how to run —
+> the flag IS the instruction. (The Workflow/`--deep-audit` subagent path is the DEFAULT only when `--team`
+> is absent or the env var is unset.)
 
 **Procedure (bakes in multi-agent best-practice items 1, 4, 5, 6 — `docs/claude-references/multi-agent-best-practices.md`):**
 
