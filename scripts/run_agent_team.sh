@@ -22,6 +22,12 @@ CLAUDE_WIN='C:\Users\itsab\.local\bin\claude.exe'
 PSMUX="$(command -v psmux 2>/dev/null || echo /c/Users/itsab/.local/psmux/psmux.exe)"
 LOG="$HUB/.claude/.team-activity.log"
 PROMPT="${1:?need a team prompt}"
+# Hardening (flagged in the 2026-06-24 audit): $PROMPT is interpolated into a generated .cmd inside a
+# double-quoted arg. This launcher is internal tooling — pass TRUSTED prompts only. Fail closed on the
+# one metacharacter that would break/escape the .cmd arg (a double-quote); rephrase without it.
+case "$PROMPT" in
+  *'"'*) echo "ERROR: prompt contains a double-quote — unsupported (would break the generated .cmd). Rephrase without quotes."; exit 4 ;;
+esac
 LABEL="${2:-team}"
 TIMEOUT="${3:-600}"
 WORKDIR_WIN="${4:-D:\\Abhay\\VibeCoding\\claude-best-practices}"  # cwd the claude lead runs in
