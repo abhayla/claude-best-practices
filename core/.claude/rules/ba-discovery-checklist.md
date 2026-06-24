@@ -67,19 +67,24 @@ away. A scalar mental model is how every "simple thing" gets missed.
 
 ## Two product-acceptance gates after discovery (present substance, get an explicit yes)
 
-After discovery and BEFORE building, the BA MUST pause for two explicit user approvals — each
-presents the concrete artifact and waits, never infers approval from silence:
+After discovery and BEFORE building, the BA MUST pause for these explicit user approvals — each
+presents the concrete artifact and waits, never infers approval from silence. An early
+tech/approach sign-off (form factor + stack) does NOT satisfy the feature-set or UI/UX gates —
+they are SEPARATE gates and the feature-set gate comes AFTER discovery enumerates the features:
 
-1. **BA approach approval** — present the RECOMMENDED solution approach + scope (what's IN, what's
-   explicitly OUT) and get the user's explicit approval. Running the discovery is NOT enough; the
-   user signs off on the approach the BA recommends before any design or build.
-2. **UI/UX design approval** — present the user-facing design (screens/layout for visual apps;
-   command surface + output formatting for a CLI) and get explicit approval. This is the G1 design
-   gate (`human-approval-gates.md`) — a data/storage/technical-design sign-off does NOT count as
-   UI/UX approval; they are different gates.
+1. **FEATURE-SET / scope approval** — after BA discovery produces the per-actor must-have features,
+   the task/usage lifecycle, and the explicit OUT-of-scope list, PRESENT that feature set and get
+   the user's explicit discussion + approval. Running the discovery (or approving the tech
+   approach) is NOT enough — the user signs off on WHAT THE APP DOES (the features) before any
+   design. Never jump from discovery to UI/UX mockups without this approval.
+2. **UI/UX design approval** — only after the feature set is approved, present the user-facing
+   design (screens/layout for visual apps; command surface + output formatting for a CLI) and get
+   explicit approval. This is the G1 design gate (`human-approval-gates.md`) — a data/storage/
+   technical-design sign-off does NOT count as UI/UX approval; they are different gates.
 
-Sequence: form-factor → discovery → BA-approach approval → UI/UX design approval → build. These
-pauses are required clarification, exempt from the decide-don't-ask ban (`decision-authority.md`).
+Sequence: requirements → recommend+approve form-factor/tech → BA discovery → **FEATURE-SET
+approval** → UI/UX design approval → build. These pauses are required clarification, exempt from the
+decide-don't-ask ban (`decision-authority.md`).
 
 ## Independent completeness audit BEFORE G1 (the anti-recurrence gate)
 
@@ -96,9 +101,11 @@ converts "the BA should remember" (unreliable) into "an independent check enforc
 - MUST gather requirements (what + purpose · users + how many · devices/environments · constraints)
   FIRST, then RECOMMEND the form factor + technology with rationale — never ask the form factor cold,
   assume it, or carry it over from a prior build. The form factor is a derived recommendation.
-- MUST get explicit user approval of (a) the recommended BA APPROACH + scope and (b) the UI/UX
-  DESIGN — as two separate gates, presenting the concrete artifact each time — before building. A
-  technical/storage design sign-off is NOT a UI/UX approval.
+- MUST get explicit user approval of (a) the recommended form-factor/tech, (b) the discovered
+  FEATURE SET + scope (after discovery — per-actor features, lifecycle, OUT list), and (c) the UI/UX
+  DESIGN — as SEPARATE gates, presenting the concrete artifact each time — before building. An early
+  tech/approach sign-off does NOT satisfy the feature-set gate; never jump from discovery to UI/UX
+  without approving the features. A technical/storage design sign-off is NOT a UI/UX approval.
 - MUST complete all six checklist items (actors · value-per-actor · lifecycle ·
   component×actor matrix · variants · aha-outputs), with research, before leaving
   discovery for questions/UI/build.
