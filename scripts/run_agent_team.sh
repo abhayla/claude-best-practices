@@ -23,7 +23,7 @@ PSMUX="$(command -v psmux 2>/dev/null || echo /c/Users/itsab/.local/psmux/psmux.
 LOG="$HUB/.claude/.team-activity.log"
 PROMPT="${1:?need a team prompt}"
 LABEL="${2:-team}"
-TIMEOUT="${3:-300}"
+TIMEOUT="${3:-600}"
 WORKDIR_WIN="${4:-D:\\Abhay\\VibeCoding\\claude-best-practices}"  # cwd the claude lead runs in
 export TMUX_TMPDIR=/tmp
 cd "$HUB" || exit 3

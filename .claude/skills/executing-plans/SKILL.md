@@ -157,6 +157,10 @@ Process tasks wave by wave. Within each wave, determine whether tasks can be par
 > anti-fake-team gate (`config.json` `members` > 1 + teammate-attributed events) + zero-collision; you MUST NOT
 > fall back to flat subagents or pause to ask — the flag IS the instruction. Flat applies ONLY when `--team` is
 > absent, the env var is unset, or the wave is genuinely shared-file/dependency-coupled (not parallelizable).
+>
+> **Spawn-first (no deliberation):** spawning the wave's teammates is your FIRST action — do NOT spend
+> turns planning or ground-truthing the team mechanism before spawning. Spawn the worktree-isolated
+> teammates immediately, let them build their partitions, then verify the anti-fake-team + zero-collision gates AFTER.
 
 **Read:** `references/execute-tasks.md` for detailed step 3: execute tasks reference material.
 

@@ -222,6 +222,10 @@ STEP 7 REPORT without STEP 5 or STEP 6.
 > (`config.json` `members` > 1 + teammate-attributed events) + the zero-collision hard gate; you MUST NOT
 > fall back to flat subagents or pause to ask — the flag IS the instruction. Flat STEP 4 is the default
 > ONLY when `--team` is absent, the env var is unset, or the plan is genuinely sequential/same-file.
+>
+> **Spawn-first (no deliberation):** spawning the builder teammates is your FIRST action — do NOT spend
+> turns planning or ground-truthing the team mechanism before spawning. Spawn the worktree-isolated
+> partition teammates immediately, let them build, then verify the anti-fake-team + zero-collision gates AFTER.
 
 **Procedure (bakes in best-practice items A, B, C, D — `docs/claude-references/multi-agent-best-practices.md`):**
 

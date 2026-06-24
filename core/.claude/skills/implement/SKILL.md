@@ -81,6 +81,10 @@ Before implementing, write or update tests that define the expected behavior:
 > gate (`config.json` `members` > 1 + teammate-attributed events) + zero-collision; you MUST NOT fall back to flat
 > or pause to ask — the flag IS the instruction. Flat applies ONLY when `--team` is absent, the env var is unset,
 > or the feature is genuinely same-file/sequential.
+>
+> **Spawn-first (no deliberation):** spawning the builder teammates is your FIRST action — do NOT spend
+> turns planning or ground-truthing the team mechanism before spawning. Spawn the worktree-isolated
+> teammates immediately, let them build, then verify the anti-fake-team + zero-collision gates AFTER.
 
 ## STEP 4: Run Tests
 

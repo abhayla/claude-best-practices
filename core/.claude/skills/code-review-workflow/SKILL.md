@@ -136,6 +136,11 @@ Capture verdict + deferred items into state.
 > running the native **Workflow** tool or flat `Agent()` subagents, and MUST NOT pause to ask how to run —
 > the flag IS the instruction. (The Workflow/`--deep-audit` subagent path is the DEFAULT only when `--team`
 > is absent or the env var is unset.)
+>
+> **Spawn-first (no deliberation):** spawning the reviewer teammates is your FIRST action — do NOT spend
+> turns planning, ground-truthing the team mechanism, or invoking the Workflow tool/launcher before
+> spawning. Spawn the shaped lens teammates immediately, let them review, then verify the anti-fake-team
+> gate AFTER they return.
 
 **Procedure (bakes in multi-agent best-practice items 1, 4, 5, 6 — `docs/claude-references/multi-agent-best-practices.md`):**
 

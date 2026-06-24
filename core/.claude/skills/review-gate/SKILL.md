@@ -126,6 +126,10 @@ Launch code-quality-gate and architecture-fitness as parallel subagents. These a
 > `members` > 1 + `TaskCompleted by=<teammate>` / `TeammateIdle teammate=<name>`); you MUST NOT fall back to flat
 > subagents or pause to ask how to run — the flag IS the instruction. The flat default applies ONLY when `--team`
 > is absent or the env var is unset (no team can form).
+>
+> **Spawn-first (no deliberation):** spawning the reviewer teammates is your FIRST action — do NOT spend
+> turns planning, ground-truthing the team mechanism, or invoking any launcher before spawning. Spawn the
+> shaped teammates immediately, let them work, then verify the anti-fake-team gate AFTER they return.
 
 ```
 Agent(prompt="Run /code-quality-gate on all changed files between $BASE_BRANCH and HEAD. Skip Step 5 (layer validation) — architecture-fitness handles that. Return structured results: status (PASS/WARN/BLOCK), complexity, duplication, SOLID issues, PII leaks, swallowed exceptions, coverage diff, blocking count.")

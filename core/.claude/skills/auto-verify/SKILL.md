@@ -176,6 +176,10 @@ backend unit tests — a false verdict.
 > `members` > 1 + `TaskCompleted by=<teammate>` / `TeammateIdle teammate=<name>`); you MUST NOT fall back to flat/
 > background subagents or pause to ask how to run — the flag IS the instruction. The flat default applies ONLY when
 > `--team` is absent or the env var is unset.
+>
+> **Spawn-first (no deliberation):** spawning the test-area teammates is your FIRST action — do NOT spend
+> turns planning or ground-truthing the team mechanism before spawning. Spawn the shaped teammates
+> immediately, let them run their areas, then verify the anti-fake-team gate AFTER they return.
 
 **Fallback if `tester-agent` is not installed:** Run tests directly using the
 project's test runner (detect from CLAUDE.md, pyproject.toml, package.json, or
