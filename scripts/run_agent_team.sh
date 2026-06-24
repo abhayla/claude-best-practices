@@ -49,18 +49,29 @@ printf '@echo off\r\ncd /d "%s"\r\nset "PSMUX_SESSION="\r\nset "TMUX="\r\nset "T
 before=$(teammate_completions)
 sess="t_${LABEL}"
 "$PSMUX" kill-session -t "$sess" 2>/dev/null
-echo "=== run_agent_team [$LABEL]: launching claude in psmux (before=$before, timeout=${TIMEOUT}s) ==="
+# Snapshot existing team dirs BEFORE launch — a NEW dir with members>1 is this run's real team.
+# (Session-scoped: avoids the false-positive of a shared global event counter. RUN SEQUENTIALLY
+# for clean attribution — concurrent runs would each see all new dirs.)
+pre_dirs=$(ls ~/.claude/teams 2>/dev/null | sort)
+echo "=== run_agent_team [$LABEL]: launching claude in psmux (timeout=${TIMEOUT}s) ==="
 "$PSMUX" new-session -d -s "$sess" -x 220 -y 50 "cmd /c \"$(cygpath -w "$CMDFILE")\"" \
   || { echo "psmux new-session failed"; exit 2; }
+
+real_team_dir() {  # echo "<newdir>:<members>" for a NEW team dir whose config.json has members>1
+  local d m
+  for d in $(comm -13 <(echo "$pre_dirs") <(ls ~/.claude/teams 2>/dev/null | sort)); do
+    m=$(python -c "import json;print(len(json.load(open(r'$HOME/.claude/teams/$d/config.json')).get('members',[])))" 2>/dev/null || echo 0)
+    [ "$m" -gt 1 ] 2>/dev/null && { echo "$d:$m"; return; }
+  done
+}
 
 waited=0
 while [ "$waited" -lt "$TIMEOUT" ]; do
   sleep 6; waited=$((waited+6))
-  now=$(teammate_completions)
+  hit=$(real_team_dir)
   alive=$("$PSMUX" ls 2>/dev/null | grep -c "^${sess}:")
-  if [ "$now" -gt "$before" ]; then
-    echo "RESULT: REAL TEAM FORMED ($((now-before)) teammate-attributed completions) for [$LABEL]"
-    grep "TaskCompleted" "$LOG" | grep -v "by=lead/unattributed" | grep "by=" | tail -n $((now-before))
+  if [ -n "$hit" ]; then
+    echo "RESULT: REAL TEAM FORMED — new team dir ${hit%%:*} has ${hit##*:} members (session-scoped) for [$LABEL]"
     sleep 10  # allow the lead to finish synthesizing
     "$PSMUX" capture-pane -t "$sess" -p 2>/dev/null | tr -d '\000' > "$HUB/.claude/.team-out-${LABEL}.txt"
     echo "synthesis captured -> .claude/.team-out-${LABEL}.txt"
