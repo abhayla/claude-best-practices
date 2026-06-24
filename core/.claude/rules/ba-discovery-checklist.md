@@ -16,14 +16,23 @@ This is the operational SSOT for BA completeness. It composes with `engineering-
 (PM mandate — the WHO/WHEN), `full-space-first.md` (the cross-stage principle), and
 `human-approval-gates.md` (G1). Those state the principle; THIS is the checklist.
 
-## Step 0 — establish the FORM FACTOR first (before any other question)
+## Step 0 — understand the PROBLEM before recommending a SOLUTION
 
-The FIRST BA question on any new app/product MUST establish the **form factor / platform**:
-**web app · mobile app · desktop app · CLI · browser extension · something else** — and give the
-user ALL the options to choose from. MUST NOT assume it, and MUST NOT carry it over from a prior
-build or a sibling project. Everything downstream (UI/UX, stack, deployment, the checklist below)
-depends on this answer, so it cannot be deferred or guessed. Only after the form factor is fixed do
-you work basic → specific (platform → actors → value → lifecycle → matrix → variants → aha-outputs).
+Do NOT ask the user the form factor / technology cold — that is a SOLUTION decision the architect
+RECOMMENDS, not an opening question. FIRST gather the requirements, one question at a time
+(`engineering-roles.md` engagement style):
+
+- **What** they want to build + its **purpose/goal** (the problem it solves).
+- **Who** the target users are and roughly **how many**.
+- **Where/how** it will be used — the **devices and environments** (phone on-the-go, desktop at a
+  desk, terminal, shared/offline, etc.).
+- Key **constraints** — budget, timeline, offline/privacy, existing stack, must-integrate-with.
+
+THEN, as the architect, **RECOMMEND the form factor + technology + approach**, with the rationale
+tied explicitly to those requirements (and a recommended option per `engineering-roles.md`), and
+get the user's approval on the recommendation. MUST NOT assume or impose a form factor, and MUST NOT
+carry one over from a prior build. Only after the recommended form factor is approved do you work
+through the checklist below (actors → value → lifecycle → matrix → variants → aha-outputs).
 
 ## The completeness checklist — answer ALL before leaving discovery
 
@@ -84,8 +93,9 @@ converts "the BA should remember" (unreliable) into "an independent check enforc
 
 ## CRITICAL RULES
 
-- MUST establish the FORM FACTOR (web · mobile · desktop · CLI · extension · other, user picks
-  from ALL options) as the FIRST question — never assume it or carry it over from a prior build.
+- MUST gather requirements (what + purpose · users + how many · devices/environments · constraints)
+  FIRST, then RECOMMEND the form factor + technology with rationale — never ask the form factor cold,
+  assume it, or carry it over from a prior build. The form factor is a derived recommendation.
 - MUST get explicit user approval of (a) the recommended BA APPROACH + scope and (b) the UI/UX
   DESIGN — as two separate gates, presenting the concrete artifact each time — before building. A
   technical/storage design sign-off is NOT a UI/UX approval.
