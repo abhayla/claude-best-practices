@@ -57,11 +57,14 @@ echo "=== run_agent_team [$LABEL]: launching claude in psmux (timeout=${TIMEOUT}
 "$PSMUX" new-session -d -s "$sess" -x 220 -y 50 "cmd /c \"$(cygpath -w "$CMDFILE")\"" \
   || { echo "psmux new-session failed"; exit 2; }
 
-real_team_dir() {  # echo "<newdir>:<members>" for a NEW team dir whose config.json has members>1
-  local d m
+real_team_dir() {  # echo a NEW session that has DURABLE teammate-attributed events (config.json is
+  # ephemeral — cleaned on exit — so verify via the persistent dir name + the activity log instead).
+  local d sid
   for d in $(comm -13 <(echo "$pre_dirs") <(ls ~/.claude/teams 2>/dev/null | sort)); do
-    m=$(python -c "import json;print(len(json.load(open(r'$HOME/.claude/teams/$d/config.json')).get('members',[])))" 2>/dev/null || echo 0)
-    [ "$m" -gt 1 ] 2>/dev/null && { echo "$d:$m"; return; }
+    sid="${d#session-}"; sid="${sid:0:8}"
+    if grep -E "session=$sid" "$LOG" 2>/dev/null | grep -v "by=lead/unattributed" | grep -qE "(by=)|(teammate=)"; then
+      echo "$d"; return
+    fi
   done
 }
 
@@ -71,7 +74,7 @@ while [ "$waited" -lt "$TIMEOUT" ]; do
   hit=$(real_team_dir)
   alive=$("$PSMUX" ls 2>/dev/null | grep -c "^${sess}:")
   if [ -n "$hit" ]; then
-    echo "RESULT: REAL TEAM FORMED — new team dir ${hit%%:*} has ${hit##*:} members (session-scoped) for [$LABEL]"
+    echo "RESULT: REAL TEAM FORMED — new session $hit has durable teammate-attributed events (session-scoped) for [$LABEL]"
     sleep 10  # allow the lead to finish synthesizing
     "$PSMUX" capture-pane -t "$sess" -p 2>/dev/null | tr -d '\000' > "$HUB/.claude/.team-out-${LABEL}.txt"
     echo "synthesis captured -> .claude/.team-out-${LABEL}.txt"

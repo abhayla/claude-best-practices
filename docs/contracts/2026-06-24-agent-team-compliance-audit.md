@@ -156,6 +156,40 @@ separate decision.
 `python -c` without escaping — safe for the trusted prompts used here, but a hardening follow-up if
 untrusted input ever reaches the launcher.
 
+## Forceful-header escalation + the two real confounds (2026-06-24, final-final)
+
+Escalated the fix: added a **blocking top-of-block directive** to review-gate + auto-verify ("⛔ `--team`
+SET → your FIRST tool call MUST be spawning teammates; if you catch yourself reviewing solo or
+deliberating, STOP"). Observed effect: review-gate's pane flipped from `deliberat` → `spawn` → a real
+teammate (`◯ planner`) reviewing — so the forceful header **does** shift behavior. But two confounds make
+clean per-skill verification hard:
+
+1. **`config.json` is ephemeral** — cleaned on session exit, so a polling launcher can't reliably catch
+   `members>1` live. Fixed the launcher to verify via the **persistent dir name + durable activity-log**
+   teammate-attributed events (`session=<id>` + `by=`/`teammate=`) instead.
+2. **The tests ran in the HUB — the heaviest-governance environment in existence** (30+ auto-loaded
+   rules: supervision, verification, anti-fake-team, plan-before-coding, …). That load is exactly what
+   induces lead *over-deliberation*. A normal downstream project (a few rules) would deliberate far less,
+   so the read-only `--team` modes likely team MORE readily downstream than they did in this hub stress-test.
+
+**Durable verified-real-team tally (2026-06-24, activity log):** `code-review-workflow` (✅ post-fix,
+`session=1dab3484` correctness) + one `verify`-tier session (`c738f0ad`). Plus research-mode + brainstorm
+(earlier, durable). The other read-only/edit modes shifted toward spawning but did not always produce
+durable teammate events in the hub's heavy-governance worst case.
+
+## FINAL VERDICT (honest, complete)
+- **Wiring + imperative + spawn-first + forceful-first-call directives: shipped to all team-capable modes.**
+- **Team formation VERIFIED for the team-fit modes** (code-review post-fix, research-mode, brainstorm).
+- **Reliable, deterministic team execution EXISTS and is proven** via the harness (`run_agent_team.sh`
+  with a direct shaped prompt) — that is the dependable compliance path today.
+- **The residual gap** (read-only review/verify leads sometimes going solo) is **lead-discretion +
+  hub-over-governance**, NOT a wiring bug. It is improved by the directives and expected to be smaller
+  downstream.
+- **Full per-invocation determinism is an architecture decision, not a prose fix:** to GUARANTEE a team on
+  every `--team`, the skills must be **harness-driven** (spawn mechanically, bypassing lead judgment) or
+  the team-lead must run with a **lean ruleset** (less governance-induced deliberation). That is the one
+  genuine remaining lever and it is a design choice for the owner.
+
 ## What remains to close it fully (cost + stable API permitting)
 Live-run via `scripts/run_agent_team.sh`: auto-verify, executing-plans, implement (+ re-run
 review-gate after the API outage, and development-loop in a scratch dir). Decide per code-review
