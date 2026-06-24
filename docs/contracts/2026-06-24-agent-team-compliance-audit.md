@@ -46,6 +46,48 @@ pipeline-upgrade goal delivered. But "fully compliant" implies every `--team` mo
 a real team, and that is **not** established: 2/9 live-proven, 1 diverges to subagents, 1 inconclusive
 (API), 4 unverified-live, 1 correctly non-team.
 
+## COMPLETED live sweep (2026-06-24, API restored) — final results
+
+Ran the 4 deferred modes via the psmux harness (read-only in the hub; executing-plans + implement in
+an isolated scratch git repo). **All 4 FAILED to spawn real teammates** (zero new teammate-attributed
+events; scratch repo got no files):
+
+- **review-gate** — the lead asked a Sync-check ("subagents vs real teammate sessions?") and used the
+  flat path; no team.
+- **auto-verify** — the lead ran **3 background SUBAGENTS** (explicitly noting "subagents ≠ teams"),
+  not peer teammates; no team.
+- **executing-plans** / **implement** — no real team formed, no partitioned files created.
+
+### Important methodological caveat (honest)
+These "no team" outcomes are partly **by design + environment**, not pure failure:
+1. The skills themselves frame `--team` as an **opt-in path with flat subagents as the DEFAULT**
+   ("self-gates to the flat path", "cheaper, the default", "stay flat"). A lead following the skill
+   faithfully picks flat unless strongly forced to teams.
+2. The test leads also **read this very audit + the agent-teams docs** ("subagents ≠ teams",
+   "code-review diverges", "Execute autonomy 1/3") and reasonably chose the safer flat/subagent path
+   or paused to confirm. My own documentation biased the subjects toward NOT teaming.
+
+So the result is better stated as: **`--team` does NOT reliably auto-produce a real team** — only
+research-mode + brainstorm did (their framing + prompt aligned to spawning teammates). The rest treat
+flat subagents as the default and only team up under stronger, unambiguous direction.
+
+### FINAL verdict (all 9, empirical)
+| Workflow | Forms a REAL team live? |
+|---|---|
+| research-mode | ✅ yes |
+| brainstorm | ✅ yes |
+| code-review-workflow | ❌ no — Workflow/subagent fan-out |
+| review-gate | ❌ no — flat subagents (lead chose) |
+| auto-verify | ❌ no — background subagents |
+| executing-plans | ❌ no — no team formed |
+| implement | ❌ no — no team formed |
+| development-loop | ⚠️ prior partial only (1/3 autonomous; not re-tested) |
+| writing-plans | ✅ correct non-team (by design) |
+
+**Bottom line: 2/9 reliably form real teams; 5 `--team` modes fall back to flat subagents; 1 partial;
+1 correctly non-team. NOT "fully agent-team compliant" in the live sense — wiring exists everywhere,
+but flat-subagent is the de-facto default for most modes.**
+
 ## What remains to close it fully (cost + stable API permitting)
 Live-run via `scripts/run_agent_team.sh`: auto-verify, executing-plans, implement (+ re-run
 review-gate after the API outage, and development-loop in a scratch dir). Decide per code-review
