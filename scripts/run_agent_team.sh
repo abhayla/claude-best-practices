@@ -48,25 +48,25 @@ CMDFILE="$HUB/.claude/.team-cmd-${LABEL}.cmd"
 printf '@echo off\r\ncd /d "%s"\r\nset "PSMUX_SESSION="\r\nset "TMUX="\r\nset "TMUX_PANE="\r\n"%s" --settings "%s" --permission-mode bypassPermissions --append-system-prompt "TEAM-LEAD MODE: this session runs an agent-team task. When the task uses --team, your VERY FIRST tool call MUST spawn the teammates. Do NOT deliberate, plan, ground-truth the team mechanism, run checks yourself, or review solo before spawning - the --team flag already decided a team is warranted. Spawn immediately; verify and synthesize only AFTER teammates return." "%s"\r\n' \
   "$WORKDIR_WIN" "$CLAUDE_WIN" "$SETTINGS_WIN" "$PROMPT" > "$CMDFILE"
 
-before=$(teammate_completions)
 sess="t_${LABEL}"
 "$PSMUX" kill-session -t "$sess" 2>/dev/null
-# Snapshot existing team dirs BEFORE launch — a NEW dir with members>1 is this run's real team.
-# (Session-scoped: avoids the false-positive of a shared global event counter. RUN SEQUENTIALLY
-# for clean attribution — concurrent runs would each see all new dirs.)
-pre_dirs=$(ls ~/.claude/teams 2>/dev/null | sort)
+# UNIVERSAL durable detection: a real team writes a `subagents/` dir with >=2 teammate transcripts under
+# the lead session's transcript dir — this catches BOTH named in-process teammates (alpha/correctness)
+# AND agent-type teammates (code-reviewer-agent/planner-researcher-agent), unlike config.json (ephemeral)
+# or the named-only team hooks. Snapshot the lead's project transcript dir before launch; the NEW session
+# dir with subagents/>=2 is this run's real team. RUN SEQUENTIALLY for clean attribution.
+PROJDIR="$HOME/.claude/projects/$(echo "$WORKDIR_WIN" | sed 's#[:\\/]#-#g')"
+pre_sessions=$(ls "$PROJDIR" 2>/dev/null | grep -E '\.jsonl$' | sort)
 echo "=== run_agent_team [$LABEL]: launching claude in psmux (timeout=${TIMEOUT}s) ==="
 "$PSMUX" new-session -d -s "$sess" -x 220 -y 50 "cmd /c \"$(cygpath -w "$CMDFILE")\"" \
   || { echo "psmux new-session failed"; exit 2; }
 
-real_team_dir() {  # echo a NEW session that has DURABLE teammate-attributed events (config.json is
-  # ephemeral — cleaned on exit — so verify via the persistent dir name + the activity log instead).
-  local d sid
-  for d in $(comm -13 <(echo "$pre_dirs") <(ls ~/.claude/teams 2>/dev/null | sort)); do
-    sid="${d#session-}"; sid="${sid:0:8}"
-    if grep -E "session=$sid" "$LOG" 2>/dev/null | grep -v "by=lead/unattributed" | grep -qE "(by=)|(teammate=)"; then
-      echo "$d"; return
-    fi
+real_team_dir() {  # echo "<session>:<teammates>" for a NEW lead session with a subagents/ dir of >=2
+  local f sid n
+  for f in $(comm -13 <(echo "$pre_sessions") <(ls "$PROJDIR" 2>/dev/null | grep -E '\.jsonl$' | sort)); do
+    sid="${f%.jsonl}"
+    n=$(ls "$PROJDIR/$sid/subagents/" 2>/dev/null | grep -c '\.jsonl$')
+    [ "$n" -ge 2 ] 2>/dev/null && { echo "$sid:$n"; return; }
   done
 }
 
@@ -76,7 +76,7 @@ while [ "$waited" -lt "$TIMEOUT" ]; do
   hit=$(real_team_dir)
   alive=$("$PSMUX" ls 2>/dev/null | grep -c "^${sess}:")
   if [ -n "$hit" ]; then
-    echo "RESULT: REAL TEAM FORMED — new session $hit has durable teammate-attributed events (session-scoped) for [$LABEL]"
+    echo "RESULT: REAL TEAM FORMED — lead session ${hit%%:*} spawned ${hit##*:} teammate sessions (subagents/) for [$LABEL]"
     sleep 10  # allow the lead to finish synthesizing
     "$PSMUX" capture-pane -t "$sess" -p 2>/dev/null | tr -d '\000' > "$HUB/.claude/.team-out-${LABEL}.txt"
     echo "synthesis captured -> .claude/.team-out-${LABEL}.txt"
