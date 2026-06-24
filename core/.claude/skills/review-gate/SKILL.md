@@ -112,6 +112,11 @@ Sub-skill results will be collected below.
 
 Launch code-quality-gate and architecture-fitness as parallel subagents. These are independent static analysis checks with no side effects.
 
+> **⛔ `--team` SET → your FIRST tool call MUST be spawning the teammates.** Before reading any file,
+> running any gate-check, or assessing whether a team is warranted (the flag already decided that), spawn
+> the quality/architecture/security teammates. If you catch yourself reviewing solo or deliberating about
+> the mechanism, STOP — that violates `--team`. Spawn first; analyze via the teammates; synthesize after.
+>
 > **`--team` mode (optional, read-only).** These independent gate-checks (quality / architecture /
 > security) MAY run as a real agent team instead of flat parallel subagents when they benefit from
 > **sharing + challenging** each other's findings before the consolidated verdict (e.g. a security

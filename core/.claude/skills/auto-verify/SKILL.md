@@ -162,6 +162,11 @@ backend unit tests — a false verdict.
 
 ## STEP 2: Execute Tests (via tester-agent)
 
+> **⛔ `--team` SET → your FIRST tool call MUST be spawning the teammates.** Before running any test
+> yourself or assessing whether a team is warranted (the flag already decided that), spawn the test-area
+> teammates. If you catch yourself running the suite solo or deliberating about the mechanism, STOP —
+> that violates `--team`. Spawn first; let teammates run their areas; reconcile after.
+>
 > **`--team` mode (optional, read-only).** For a large suite that splits into **independent test
 > areas** (e.g. by package / layer / suite), the execution MAY fan out as a real agent team — each
 > teammate runs a disjoint test area and they share results, rather than one sequential runner.

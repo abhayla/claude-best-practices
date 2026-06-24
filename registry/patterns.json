@@ -729,7 +729,7 @@
     "tier": "must-have"
   },
   "auto-verify": {
-    "hash": "ac8282fdea73bcbdb11502f1c56f687cbc5e698c0c63dfd1be3ef35662c66abc",
+    "hash": "4596f2f154ed76942fb2882210d096e80700d51d1747b4400b6c8a07f78ce617",
     "type": "skill",
     "category": "core",
     "version": "4.3.0",
@@ -4328,7 +4328,7 @@
     }
   },
   "review-gate": {
-    "hash": "c91f6453ca00b55115d3a11633e7561ef538f39277a151759de0859c4bd06a9b",
+    "hash": "61d5df4ee8ade8cfe1d19c1ce5df2dfeff88595e94ccd46d3f71374175511d5d",
     "type": "skill",
     "category": "core",
     "version": "2.4.0",
