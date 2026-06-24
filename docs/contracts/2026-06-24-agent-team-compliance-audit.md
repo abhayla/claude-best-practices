@@ -88,6 +88,34 @@ flat subagents as the default and only team up under stronger, unambiguous direc
 1 correctly non-team. NOT "fully agent-team compliant" in the live sense — wiring exists everywhere,
 but flat-subagent is the de-facto default for most modes.**
 
+## POST-FIX outcome (2026-06-24) — imperative `--team` shipped; understanding fixed, completion still flaky
+
+**Fix shipped (commit ef33d13):** the `--team` blocks of code-review-workflow, review-gate, auto-verify,
+executing-plans, implement, development-loop were made **BINDING** — when `--team` is set + teams on, the
+skill MUST spawn real teammates (+ anti-fake-team gate) and MUST NOT fall back to flat/Workflow subagents
+or ask. Registry resynced; full CI green (1592 passed).
+
+**Re-verification (honest):** the fix **changed lead behavior as intended** — in the re-test the lead read
+the imperative and stated *"--team is binding... I MUST spawn REAL teammate sessions... must NOT fake it
+with flat subagents,"* then began spawning correctness+tests teammates (before the fix it diverted to the
+Workflow tool). **But it still did not COMPLETE a real team within 300s** — the lead spent its budget
+*ground-truthing the mechanism / over-deliberating* (partly induced by the very anti-fake-team + caveat
+docs) and timed out. Two harness confounds also surfaced and were fixed in the launcher: nested-psmux env
+leak (clear `PSMUX_SESSION`/`TMUX` in the cmd) and a new-folder trust prompt (edit-tier scratch).
+
+**Honest conclusion:** the imperative fix is correct + shipped, and it fixed the *understanding* gap
+(leads no longer silently fall back to subagents). But **skill-invoked `--team` modes still do not reliably
+COMPLETE a real team autonomously** — they over-deliberate and time out. By contrast, **direct shaped team
+prompts complete reliably** (gamma/delta, research-mode, brainstorm all finished). So the dependable
+autonomous-team path is a **direct shaped spawn prompt** (as `run_agent_team.sh` issues), not a heavyweight
+skill invocation that makes the lead reason about gates/launchers first.
+
+**Net compliance verdict (unchanged in substance):** wiring + imperative present everywhere; **only
+research-mode + brainstorm reliably complete real teams; the heavier skill-invoked modes understand the
+mandate but time out**. Recommended next step (deferred — diminishing returns this session): give the
+skill `--team` paths a *pre-shaped, low-deliberation* spawn template (like the gamma/delta prompt) so the
+lead spawns immediately instead of re-deriving the mechanism, and raise the harness timeout to ~600s.
+
 ## What remains to close it fully (cost + stable API permitting)
 Live-run via `scripts/run_agent_team.sh`: auto-verify, executing-plans, implement (+ re-run
 review-gate after the API outage, and development-loop in a scratch dir). Decide per code-review
