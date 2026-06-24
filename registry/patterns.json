@@ -6381,7 +6381,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-23",
-    "total_patterns": 276
+    "total_patterns": 277
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6883,6 +6883,27 @@
       "TeammateIdle"
     ],
     "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
+    "tier": "must-have"
+  },
+  "continuous-improvement": {
+    "hash": "444df3aa5b34c0de83488ec02a0534c5dd493cab75e3c59a24a9898424d508c5",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "user-directive:abhay-2026-06-25",
+    "discovered": "2026-06-24",
+    "last_updated": "2026-06-24",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "After every mistake/issue/correction, capture the learning and make a concrete improvement to BOTH self (behaviour/rules/memory) and the system (code/tooling/process) wherever feasible; prefer a deterministic gate over prose; proactive and continuous.",
+    "tags": [
+      "self-improvement",
+      "learning",
+      "governance",
+      "continuous-improvement",
+      "workflow"
+    ],
+    "changelog": "v1.0.0: Added per owner standing directive (2026-06-25) — continuous learn-and-improve self + system.",
     "tier": "must-have"
   }
 }
