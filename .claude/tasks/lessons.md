@@ -573,3 +573,13 @@ not on `main`; let the auto-pr SessionEnd flow PR + land it (or `/git-branch-lif
 auto-PRs unmerged branches instead of deleting them). Only delete after `gh` confirms its PR MERGED.
 
 - **Dual-home edits (2026-06-23):** before editing a `core/.claude/` pattern, grep `config/dual-home-resources.yml` — if classified `synced`, edit BOTH the `core/` and `.claude/` copies (or run `sync_dual_home.py`), else `test_dual_home_sync` fails CI. Caught editing only core/ of `executing-plans`.
+
+## 2026-06-25 — Build-team "green but wrong output" (continuous-improvement)
+**Pattern:** a parallel-edit build team can leave a default scaffold file (e.g. Next.js `app/page.tsx`
+boilerplate) untouched while still passing `tsc --noEmit` and `npm run build` — green, but the page
+renders the wrong content. The `run_agent_team_build.sh` done-file check is SIZE-based (>200 bytes),
+so a default boilerplate file counts as "complete."
+**Fix/Rule:** ALWAYS verify UI-changing build output by DRIVING the app (screenshot + interaction),
+never trust tsc/build-green alone (`supervisor-verification.md` + `output-plausibility-verification.md`).
+**System follow-up:** make the build-team prompt require the lead to render & screenshot the actual
+route before declaring done; optionally content-check done-files (not just size).
