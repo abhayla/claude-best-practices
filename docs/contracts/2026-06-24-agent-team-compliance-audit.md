@@ -116,6 +116,46 @@ mandate but time out**. Recommended next step (deferred — diminishing returns 
 skill `--team` paths a *pre-shaped, low-deliberation* spawn template (like the gamma/delta prompt) so the
 lead spawns immediately instead of re-deriving the mechanism, and raise the harness timeout to ~600s.
 
+## POST-spawn-first results + the FUNDAMENTAL CEILING (2026-06-24, final)
+
+After the imperative + **spawn-first** fix (commits ef33d13, then the spawn-first commit) and a
+**session-scoped** launcher (verify a NEW team dir with `members>1`, not a shared global counter — the
+earlier concurrent batch was a FALSE POSITIVE caught and discarded):
+
+| Workflow | Post-fix live result |
+|---|---|
+| research-mode | ✅ real team |
+| brainstorm | ✅ real team |
+| **code-review-workflow** | ✅ **real team after the fix** (was diverging to Workflow before; `cr_v3` → `session=1dab3484` teammate `correctness`). The spawn-first fix flipped it. |
+| review-gate | ⚠️ lead did a thorough **SOLO** review (no team) on the small diff — *lead discretion* |
+| auto-verify | ⚠️ lead **deliberated**, did not spawn — *lead discretion* |
+| development-loop / executing-plans / implement | wired + imperative; team formation remains lead-discretionary |
+| writing-plans | ✅ correct non-team |
+
+### The honest ceiling (why this is "as compliant as prose can make it")
+Whether a skill's `--team` actually spawns a team is a **non-deterministic runtime judgment of the lead
+LLM.** The fixes (imperative flag + spawn-first + anti-fake gate) **measurably improved** it — code-review
+flipped from subagent-divergence to a real team — and it is reliable for **genuine team-fit modes**
+(code-review, research, brainstorm). But read-only review/verify leads (review-gate, auto-verify) still
+frequently judge a **solo / subagent** pass sufficient and deliberate instead of spawning, *even with
+spawn-first*. No amount of skill-prose wording deterministically forces an LLM lead to spawn — re-running
+the same mode just samples the lead's variance.
+
+**Therefore "fully agent-team compliant" in the strict deterministic sense (every `--team` invocation
+ALWAYS spawns a team) is NOT achievable via skill wording.** What IS done: wiring everywhere; imperative
++ spawn-first directives; a working autonomous psmux harness; real teams verified for the team-fit modes.
+The residual is lead discretion — an LLM-agent property, not a wiring bug.
+
+**The only way to make it deterministic** is architectural, not prose: have the **harness** spawn the
+teammates directly (as `run_agent_team.sh` does for a direct shaped prompt) rather than delegating the
+spawn decision to the skill's lead. That is a different design (harness-driven, not skill-driven) and a
+separate decision.
+
+### Bug found during this audit (by a review-gate solo run — real value)
+`scripts/run_agent_team.sh` interpolates `$PROMPT` into the generated `.cmd` and a dir name into
+`python -c` without escaping — safe for the trusted prompts used here, but a hardening follow-up if
+untrusted input ever reaches the launcher.
+
 ## What remains to close it fully (cost + stable API permitting)
 Live-run via `scripts/run_agent_team.sh`: auto-verify, executing-plans, implement (+ re-run
 review-gate after the API outage, and development-loop in a scratch dir). Decide per code-review
