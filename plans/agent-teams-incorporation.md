@@ -1,7 +1,12 @@
 # Agent Teams → this hub: research + incorporation guide
 
+> **⚠️ §12 ✅ marks = WIRING + partial validation, NOT full live proof.** Empirical compliance audit
+> (2026-06-24): `docs/contracts/2026-06-24-agent-team-compliance-audit.md`. Live truth: only
+> research-mode + brainstorm are proven to spawn REAL teammates; code-review-workflow `--team` diverges
+> to the Workflow/subagent path at runtime; review-gate inconclusive (API outage); the rest unverified
+> live; writing-plans correctly non-team. Autonomous test harness: `scripts/run_agent_team.sh` (psmux).
 > **Status:** LIVING DOCUMENT — keep updating as the feature evolves and as the hub
-> adopts/measures more of it. Last updated: 2026-06-23.
+> adopts/measures more of it. Last updated: 2026-06-24.
 > **Owner-approved scope (2026-06-23):** build the selection rule + teammate governance
 > hooks + a hub-only five-advisors pilot, and maintain this as the implementation guide.
 > **Source of truth for the feature itself:** `docs/claude-references/agent-teams.md`
