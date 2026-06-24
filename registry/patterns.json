@@ -6679,7 +6679,7 @@
     "tier": "nice-to-have"
   },
   "cross-project-context-capture": {
-    "hash": "b7b7e1d294864f6961bd910c38785a8a90de3880e52ed91574dfe77efcec60b9",
+    "hash": "27e7b91c6c44f45d6c4f94aeca0cb79bc656da64bee75fccf74305796608d181",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
