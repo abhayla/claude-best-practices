@@ -729,7 +729,7 @@
     "tier": "must-have"
   },
   "auto-verify": {
-    "hash": "eb675305e523e27ba95197b2c2b5a7bc9f1fbf9b6b594bc137109b93fd84937a",
+    "hash": "4596f2f154ed76942fb2882210d096e80700d51d1747b4400b6c8a07f78ce617",
     "type": "skill",
     "category": "core",
     "version": "4.3.0",
@@ -1098,7 +1098,7 @@
     }
   },
   "code-review-workflow": {
-    "hash": "47c145f23d178442fab9a4d7e2589c33b43d120c0d55666744496bf92bae273b",
+    "hash": "76f6aac83c28298d34716c9ef1f9687e354cf8280d12a6740d3934896550ec62",
     "type": "skill",
     "category": "core",
     "version": "2.3.0",
@@ -1725,7 +1725,7 @@
     }
   },
   "development-loop": {
-    "hash": "371898bb070b052a6cc5b2d56821277768c52540d5aacc29328d33b29c4a4313",
+    "hash": "81077d78637bbde36ce3a5a8acd2dca40f3b8a7b4bb6b63af5efb4985de1f238",
     "type": "skill",
     "category": "core",
     "version": "2.1.1",
@@ -2025,7 +2025,7 @@
     }
   },
   "e2e-best-practices": {
-    "hash": "f60ebead91c8eb23fc9f50e8956b7ed44b6086c12683f989b667f10217a24f4b",
+    "hash": "3a61db8c34ed220b79830cde28a1b6a386aa429ae243ffdbff47b5b85bbb3f99",
     "type": "skill",
     "category": "core",
     "version": "1.1.0",
@@ -2183,7 +2183,7 @@
     }
   },
   "executing-plans": {
-    "hash": "0caedb9135477ff74029cc4da0e701e5c250afecdc4c550a8423701cb714a55c",
+    "hash": "f3fa3a42e8935b436c04aa7ecc5598f2cd29b35128789e6e502d111c1892098a",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -2970,7 +2970,7 @@
     }
   },
   "implement": {
-    "hash": "f71191c5f9b9149908fc1a4f0ae3d39607e6d1dc9b716c8b921e8fadaa9780d8",
+    "hash": "1260e7c145d745b248e235abbacd5d9ed4dc2f733e937703ecaa9aa62d4e5eb6",
     "type": "skill",
     "category": "core",
     "version": "2.2.0",
@@ -4328,7 +4328,7 @@
     }
   },
   "review-gate": {
-    "hash": "065431f8117e4c6f1db94c1028163f86857325666d8ab89c0e07198369bbeecf",
+    "hash": "61d5df4ee8ade8cfe1d19c1ce5df2dfeff88595e94ccd46d3f71374175511d5d",
     "type": "skill",
     "category": "core",
     "version": "2.4.0",
@@ -5441,7 +5441,7 @@
     }
   },
   "ui-ux-pro-max": {
-    "hash": "e894964879a06795b91e0721da111829136607985123007d82a1e9e6977eb747",
+    "hash": "d8b57a775d8a5200b6a31a6f2d51f84d3ffbdbbd5b5ebbe1e8165daa24b07f65",
     "type": "skill",
     "category": "core",
     "version": "2.1.0",
@@ -6771,7 +6771,7 @@
     "tier": "nice-to-have"
   },
   "git-branch-lifecycle": {
-    "hash": "e51c9bc6a51321ff39ad59ad9d475f5e1f5df705caad5c88a4f095d452c0ef25",
+    "hash": "0e7ca91f6b32154d8e86229bce9d3881be8333502996b50dfe02b4128385f9f2",
     "type": "skill",
     "version": "1.1.0",
     "description": "Model-driven control layer over the auto-git/auto-pr hooks: status, work (worktree parallel isolation), finish (agent review then merge), cleanup (reconcile every branch — merged prune, unmerged auto-PR+merge-on-green, escalate only CI-red/strategic).",

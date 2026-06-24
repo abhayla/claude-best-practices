@@ -152,6 +152,12 @@ The `project-manager-agent` runs the full PRD-to-Production pipeline and MUST ru
 
 Canonical references: `core/.claude/agents/workflow-master-template.md` v2.0.0, `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2.
 
+### Agent Teams vs Subagents (orchestration primitives)
+
+Beyond flat `Agent()` subagents, the hub distributes an **agent-team** primitive (PR #202) — peer Claude Code sessions that message each other and share a task list, gated behind `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (must-have-but-dormant: shipped, default-OFF). Pick the **cheapest sufficient** primitive (KISS/YAGNI): subagent (low cost, reports back only) → git worktree (isolated parallel edits, disk-only) → team (~4–7× tokens, a full instance per teammate). Selection rule: `core/.claude/rules/agent-team-selection.md` (companion to `agent-orchestration.md`); feature reference: `docs/claude-references/agent-teams.md`.
+
+Distributable build workflows carry self-gated `--team` modes (`code-review-workflow`, `review-gate`, `auto-verify`, `development-loop`, `executing-plans`, `implement`, `brainstorm`, `research-mode`, `writing-plans`), enforced by three `team-*` hooks wired (pre-but-inert) in `core/.claude/settings.json` (`TaskCreated`/`TaskCompleted`/`TeammateIdle`). **Reliability finding (carried from the 2026-06-23 pipeline-upgrade run):** read-only review/research teams are safe unsupervised once ground-truth-verified, but parallel-edit (**Execute tier**) autonomous end-to-end completion measured **1/3 — below the ≥2/3 bar — so the Execute tier stays human-supervised** until the integration step is hardened. Plan + evidence: `plans/agent-teams-incorporation.md`, `docs/contracts/2026-06-23-agent-teams-pipeline-upgrade.md`.
+
 ### Key Scripts
 
 - **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Defines `STACK_DETECTORS` and `DEP_PATTERN_MAP`. Calls `third_party_skills.py` during provisioning for third-party agent skill detection

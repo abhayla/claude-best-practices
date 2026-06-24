@@ -112,6 +112,11 @@ Sub-skill results will be collected below.
 
 Launch code-quality-gate and architecture-fitness as parallel subagents. These are independent static analysis checks with no side effects.
 
+> **⛔ `--team` SET → your FIRST tool call MUST be spawning the teammates.** Before reading any file,
+> running any gate-check, or assessing whether a team is warranted (the flag already decided that), spawn
+> the quality/architecture/security teammates. If you catch yourself reviewing solo or deliberating about
+> the mechanism, STOP — that violates `--team`. Spawn first; analyze via the teammates; synthesize after.
+>
 > **`--team` mode (optional, read-only).** These independent gate-checks (quality / architecture /
 > security) MAY run as a real agent team instead of flat parallel subagents when they benefit from
 > **sharing + challenging** each other's findings before the consolidated verdict (e.g. a security
@@ -120,6 +125,16 @@ Launch code-quality-gate and architecture-fitness as parallel subagents. These a
 > the `TaskCreated`/`TaskCompleted`/`TeammateIdle` hooks, anti-fake-team ground-truth check). Read-only,
 > so no file partition (item B N/A). Self-gates on `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; otherwise
 > the flat parallel-subagent dispatch below is the default (cheaper). For purely mechanical gates, stay flat.
+>
+> **`--team` is BINDING when explicitly set:** with the flag passed AND `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`,
+> you MUST spawn REAL teammate sessions and confirm the anti-fake-team gate (`~/.claude/teams/<session>/config.json`
+> `members` > 1 + `TaskCompleted by=<teammate>` / `TeammateIdle teammate=<name>`); you MUST NOT fall back to flat
+> subagents or pause to ask how to run — the flag IS the instruction. The flat default applies ONLY when `--team`
+> is absent or the env var is unset (no team can form).
+>
+> **Spawn-first (no deliberation):** spawning the reviewer teammates is your FIRST action — do NOT spend
+> turns planning, ground-truthing the team mechanism, or invoking any launcher before spawning. Spawn the
+> shaped teammates immediately, let them work, then verify the anti-fake-team gate AFTER they return.
 
 ```
 Agent(prompt="Run /code-quality-gate on all changed files between $BASE_BRANCH and HEAD. Skip Step 5 (layer validation) — architecture-fitness handles that. Return structured results: status (PASS/WARN/BLOCK), complexity, duplication, SOLID issues, PII leaks, swallowed exceptions, coverage diff, blocking count.")

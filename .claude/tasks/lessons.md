@@ -571,3 +571,5 @@ working-tree copy had already reverted on a branch switch), so I **lost the less
 branch is the auto-git safety net — treat it like any unmerged branch: NEVER hard-delete one with content
 not on `main`; let the auto-pr SessionEnd flow PR + land it (or `/git-branch-lifecycle cleanup`, which
 auto-PRs unmerged branches instead of deleting them). Only delete after `gh` confirms its PR MERGED.
+
+- **Dual-home edits (2026-06-23):** before editing a `core/.claude/` pattern, grep `config/dual-home-resources.yml` — if classified `synced`, edit BOTH the `core/` and `.claude/` copies (or run `sync_dual_home.py`), else `test_dual_home_sync` fails CI. Caught editing only core/ of `executing-plans`.

@@ -162,6 +162,11 @@ backend unit tests — a false verdict.
 
 ## STEP 2: Execute Tests (via tester-agent)
 
+> **⛔ `--team` SET → your FIRST tool call MUST be spawning the teammates.** Before running any test
+> yourself or assessing whether a team is warranted (the flag already decided that), spawn the test-area
+> teammates. If you catch yourself running the suite solo or deliberating about the mechanism, STOP —
+> that violates `--team`. Spawn first; let teammates run their areas; reconcile after.
+>
 > **`--team` mode (optional, read-only).** For a large suite that splits into **independent test
 > areas** (e.g. by package / layer / suite), the execution MAY fan out as a real agent team — each
 > teammate runs a disjoint test area and they share results, rather than one sequential runner.
@@ -170,6 +175,16 @@ backend unit tests — a false verdict.
 > `independent-test-verification` (doer≠checker at the teammate boundary). Self-gates on
 > `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` + the anti-fake-team ground-truth check; else use the flat
 > `tester-agent` path below (cheaper, the default). A small or coupled suite stays flat.
+>
+> **`--team` is BINDING when explicitly set:** with the flag passed AND `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`,
+> you MUST spawn REAL teammate sessions and confirm the anti-fake-team gate (`~/.claude/teams/<session>/config.json`
+> `members` > 1 + `TaskCompleted by=<teammate>` / `TeammateIdle teammate=<name>`); you MUST NOT fall back to flat/
+> background subagents or pause to ask how to run — the flag IS the instruction. The flat default applies ONLY when
+> `--team` is absent or the env var is unset.
+>
+> **Spawn-first (no deliberation):** spawning the test-area teammates is your FIRST action — do NOT spend
+> turns planning or ground-truthing the team mechanism before spawning. Spawn the shaped teammates
+> immediately, let them run their areas, then verify the anti-fake-team gate AFTER they return.
 
 **Fallback if `tester-agent` is not installed:** Run tests directly using the
 project's test runner (detect from CLAUDE.md, pyproject.toml, package.json, or

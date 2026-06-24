@@ -216,6 +216,16 @@ STEP 7 REPORT without STEP 5 or STEP 6.
 > a team there only fights itself (best-practice §C: "NOT for sequential / same-file / dependency-heavy").
 >
 > **SELF-GATE:** requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; else fall back to flat STEP 4.
+>
+> **`--team` is BINDING when explicitly set (env on) on a parallelizable plan:** you MUST spawn REAL
+> teammate sessions (each in its own git worktree) and confirm the anti-fake-team gate
+> (`config.json` `members` > 1 + teammate-attributed events) + the zero-collision hard gate; you MUST NOT
+> fall back to flat subagents or pause to ask — the flag IS the instruction. Flat STEP 4 is the default
+> ONLY when `--team` is absent, the env var is unset, or the plan is genuinely sequential/same-file.
+>
+> **Spawn-first (no deliberation):** spawning the builder teammates is your FIRST action — do NOT spend
+> turns planning or ground-truthing the team mechanism before spawning. Spawn the worktree-isolated
+> partition teammates immediately, let them build, then verify the anti-fake-team + zero-collision gates AFTER.
 
 **Procedure (bakes in best-practice items A, B, C, D — `docs/claude-references/multi-agent-best-practices.md`):**
 
@@ -240,8 +250,11 @@ STEP 7 REPORT without STEP 5 or STEP 6.
    Plan-approval-for-teammates: teammate is read-only until the lead approves its plan (since it writes code).
 
 **Hard gates BEFORE accepting the team's build (all must pass — else the run FAILS, not "mostly worked"):**
-- **Anti-fake-team:** `~/.claude/teams/<name>/config.json` `members` > 1 AND the hooks fired (honest audit).
-  `members == [team-lead]` + 0 hooks = a NARRATED fake team — reject it.
+- **Anti-fake-team:** the DECISIVE check is `~/.claude/teams/<name>/config.json` EXISTS with `members` > 1
+  AND `TaskCompleted` attributed `by=<teammate>` (not `lead/unattributed`). Hooks firing is necessary but
+  NOT sufficient — a lead-only / headless run fires the task hooks with NO real teammates (firsthand-confirmed,
+  CC v2.1.186; see `docs/contracts/2026-06-23-agent-teams-readonly-validation-attempt.md`). Missing
+  `config.json`/`members`, or `lead/unattributed` completions = a NARRATED fake team — reject it.
 - **ZERO collisions:** assert NO file was written by 2+ teammates (git-blame / claim-file / per-worktree
   diff). One collision = FAIL. No duplicated or contradictory edits.
 - **Builds + tests pass:** the integrated module compiles and its tests are green (reproduced, not claimed).

@@ -1,8 +1,8 @@
 ---
 name: git-branch-lifecycle
 description: >
-  The model-driven control layer over the autonomous branch automation (auto-git.sh +
-  auto-pr.sh hooks). Use to start an isolated parallel workstream in its own git worktree
+  Orchestrate the autonomous branch automation (auto-git.sh + auto-pr.sh hooks) from a
+  model-driven control layer. Use to start an isolated parallel workstream in its own git worktree
   (`work`), to finish a branch NOW with an agent code-review before arming auto-merge
   (`finish`), to RECONCILE every branch (`cleanup` — merged→prune, unmerged→auto-PR+merge-on-green,
   escalate only CI-red/strategic), or to see the live branch/PR/merge state (`status`). The
