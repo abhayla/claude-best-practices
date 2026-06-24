@@ -43,7 +43,9 @@ CMDFILE="$HUB/.claude/.team-cmd-${LABEL}.cmd"
 # Clear inherited psmux/tmux env so the launched lead does not think it is a NESTED tmux session
 # (psmux sets PSMUX_SESSION/TMUX inside its panes → agent-teams would refuse to nest). The ConPTY
 # TTY remains, so the lead is still interactive and spawns in-process teammates.
-printf '@echo off\r\ncd /d "%s"\r\nset "PSMUX_SESSION="\r\nset "TMUX="\r\nset "TMUX_PANE="\r\n"%s" --settings "%s" --permission-mode bypassPermissions "%s"\r\n' \
+# --append-system-prompt injects an anti-deliberation TEAM-LEAD directive at the system level (read
+# first, always) — stronger than skill prose at overriding governance-induced over-deliberation.
+printf '@echo off\r\ncd /d "%s"\r\nset "PSMUX_SESSION="\r\nset "TMUX="\r\nset "TMUX_PANE="\r\n"%s" --settings "%s" --permission-mode bypassPermissions --append-system-prompt "TEAM-LEAD MODE: this session runs an agent-team task. When the task uses --team, your VERY FIRST tool call MUST spawn the teammates. Do NOT deliberate, plan, ground-truth the team mechanism, run checks yourself, or review solo before spawning - the --team flag already decided a team is warranted. Spawn immediately; verify and synthesize only AFTER teammates return." "%s"\r\n' \
   "$WORKDIR_WIN" "$CLAUDE_WIN" "$SETTINGS_WIN" "$PROMPT" > "$CMDFILE"
 
 before=$(teammate_completions)
