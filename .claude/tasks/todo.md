@@ -14,18 +14,19 @@ Contract STOP rule read literally: any team-capable stage that fails to form a r
 
 **Phase 0 — Setup & gates**
 - [x] 0.1 Write this plan to `.claude/tasks/todo.md` (no team — mechanical)
-- [ ] 0.2 ⛔ BA-discovery gate — present offer, STOP for user choice (TEAM if opt-in: multi-actor BA)
-- [ ] 0.3 Recreate `../todo` git + pre-trust (fwd-slash key) + confirm psmux/rig (no team)
-- [ ] 0.4 Ground-truth probe, verify `taskKind:in_process_teammate`; team fails → literal STOP (TEAM)
+- [x] 0.2 ⛔ BA-discovery gate — user opted IN; ran REAL 3-actor BA team `session-db564b04` (enduser/owner/skeptic); brief in `.claude/.ba-todo/ba-brief.md`; surfaced P0 crash-safe atomic save
+- [x] 0.3 Recreate `../todo` git + pre-trust (fwd-slash key) + confirm psmux/rig
+- [x] 0.4 Downstream probe = design team formed in `../todo` (folded into Phase 1) — `taskKind:in_process_teammate` verified
 
 **Phase 1 — Clarify/design (TEAM: designer + planner)**
-- [ ] 1 Design data + CLI from BA output; ground-truth verify team
+- [x] 1 REAL team `session-b1bb63ed` (designer+planner); design adds persisted next_id + atomic save; files `design-data.md`/`design-cli.md`
 
 **Phase 2 — ⛔ Design human-approval gate**
-- [ ] 2 Present 2–3 design options; STOP for user pick (no team)
+- [x] 2 User APPROVED: crash-safe atomic-JSON design, global `~/.todo/tasks.json` default
 
 **Phase 3 — Plan + ⛔ check-in**
-- [ ] 3 Write impl plan (frozen interface + disjoint files); STOP to confirm before code (no team)
+- [x] 3a Wrote impl plan `../todo/PLAN.md` (frozen interface + disjoint partition, no team)
+- [ ] 3b ⛔ CHECK-IN — confirm plan with user before build
 
 **Phase 4 — Build (TEAM: data + cli, parallel-edit)**
 - [ ] 4a Test-first (failing tests before impl)
