@@ -24,6 +24,7 @@ LOG="$HUB/.claude/.team-activity.log"
 PROMPT="${1:?need a team prompt}"
 LABEL="${2:-team}"
 TIMEOUT="${3:-300}"
+WORKDIR_WIN="${4:-D:\\Abhay\\VibeCoding\\claude-best-practices}"  # cwd the claude lead runs in
 export TMUX_TMPDIR=/tmp
 cd "$HUB" || exit 3
 [ -x "$PSMUX" ] || { echo "psmux not found at $PSMUX — install: winget install psmux (or portable zip)"; exit 2; }
@@ -39,8 +40,8 @@ teammate_completions() {
 
 # Write the launcher .cmd (NO stdout redirect — that would defeat claude's tty).
 CMDFILE="$HUB/.claude/.team-cmd-${LABEL}.cmd"
-printf '@echo off\r\ncd /d "D:\\Abhay\\VibeCoding\\claude-best-practices"\r\n"%s" --settings "%s" --permission-mode bypassPermissions "%s"\r\n' \
-  "$CLAUDE_WIN" "$SETTINGS_WIN" "$PROMPT" > "$CMDFILE"
+printf '@echo off\r\ncd /d "%s"\r\n"%s" --settings "%s" --permission-mode bypassPermissions "%s"\r\n' \
+  "$WORKDIR_WIN" "$CLAUDE_WIN" "$SETTINGS_WIN" "$PROMPT" > "$CMDFILE"
 
 before=$(teammate_completions)
 sess="t_${LABEL}"
