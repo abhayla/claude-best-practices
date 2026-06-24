@@ -5,6 +5,42 @@
 
 ## Current Task
 
+### TODO app rebuild — FULL process compliance via REAL agent teams — 2026-06-25 — ⏳ ACTIVE
+
+Goal: rebuild the throwaway TODO tracker in isolated sibling `../todo`, honoring EVERY defined
+gate literally (no exceptions). Agent teams used selectively per `agent-team-selection.md`
+(team where multi-perspective/parallel-edit adds value; direct execution for mechanical steps).
+Contract STOP rule read literally: any team-capable stage that fails to form a real team → halt + report.
+
+**Phase 0 — Setup & gates**
+- [x] 0.1 Write this plan to `.claude/tasks/todo.md` (no team — mechanical)
+- [ ] 0.2 ⛔ BA-discovery gate — present offer, STOP for user choice (TEAM if opt-in: multi-actor BA)
+- [ ] 0.3 Recreate `../todo` git + pre-trust (fwd-slash key) + confirm psmux/rig (no team)
+- [ ] 0.4 Ground-truth probe, verify `taskKind:in_process_teammate`; team fails → literal STOP (TEAM)
+
+**Phase 1 — Clarify/design (TEAM: designer + planner)**
+- [ ] 1 Design data + CLI from BA output; ground-truth verify team
+
+**Phase 2 — ⛔ Design human-approval gate**
+- [ ] 2 Present 2–3 design options; STOP for user pick (no team)
+
+**Phase 3 — Plan + ⛔ check-in**
+- [ ] 3 Write impl plan (frozen interface + disjoint files); STOP to confirm before code (no team)
+
+**Phase 4 — Build (TEAM: data + cli, parallel-edit)**
+- [ ] 4a Test-first (failing tests before impl)
+- [ ] 4b Parallel-edit build team; verify real team + zero collision; team fails → literal STOP
+- [ ] 4c Independent verification: run pytest myself; fix-loop to green
+
+**Phase 5 — Verify (TEAM: correctness + tests + quality)**
+- [ ] 5a Review team writes findings; ground-truth verify; team fails → literal STOP
+- [ ] 5b Apply fixes; re-verify green; exercise app end-to-end
+
+**Phase 6 — Document & commit**
+- [ ] 6a Documentation pass (every file built)
+- [ ] 6b ⛔ Resource-CRUD approval if any new hub resource needed
+- [ ] 6c Commit app (own git) + hub evidence + RESULTS + handoff
+
 ### Karpathy-advisor skill + agent — 2026-06-20 — ⏳ ACTIVE
 
 Goal: Research Andrej Karpathy thoroughly → understanding doc → distributable `karpathy-advisor`
