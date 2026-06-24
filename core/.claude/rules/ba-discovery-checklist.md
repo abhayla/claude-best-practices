@@ -2,7 +2,7 @@
 
 # BA Discovery Completeness Checklist — the matrix discipline that stops "simple misses"
 
-version: "1.0.0"
+version: "1.1.0"
 
 The recurring failure: the BA discovers a NARROW slice, ships it, the user spots an
 obvious hole, we patch it — then the SAME class of hole reappears next time from a
@@ -15,6 +15,15 @@ class is caught before build — not discovered by the user later.
 This is the operational SSOT for BA completeness. It composes with `engineering-roles.md`
 (PM mandate — the WHO/WHEN), `full-space-first.md` (the cross-stage principle), and
 `human-approval-gates.md` (G1). Those state the principle; THIS is the checklist.
+
+## Step 0 — establish the FORM FACTOR first (before any other question)
+
+The FIRST BA question on any new app/product MUST establish the **form factor / platform**:
+**web app · mobile app · desktop app · CLI · browser extension · something else** — and give the
+user ALL the options to choose from. MUST NOT assume it, and MUST NOT carry it over from a prior
+build or a sibling project. Everything downstream (UI/UX, stack, deployment, the checklist below)
+depends on this answer, so it cannot be deferred or guessed. Only after the form factor is fixed do
+you work basic → specific (platform → actors → value → lifecycle → matrix → variants → aha-outputs).
 
 ## The completeness checklist — answer ALL before leaving discovery
 
@@ -47,6 +56,22 @@ actor B) ARE the product's differentiated value, not an afterthought. Any axis o
 you cannot fill is an OPEN discovery question — research it; do NOT silently assume it
 away. A scalar mental model is how every "simple thing" gets missed.
 
+## Two product-acceptance gates after discovery (present substance, get an explicit yes)
+
+After discovery and BEFORE building, the BA MUST pause for two explicit user approvals — each
+presents the concrete artifact and waits, never infers approval from silence:
+
+1. **BA approach approval** — present the RECOMMENDED solution approach + scope (what's IN, what's
+   explicitly OUT) and get the user's explicit approval. Running the discovery is NOT enough; the
+   user signs off on the approach the BA recommends before any design or build.
+2. **UI/UX design approval** — present the user-facing design (screens/layout for visual apps;
+   command surface + output formatting for a CLI) and get explicit approval. This is the G1 design
+   gate (`human-approval-gates.md`) — a data/storage/technical-design sign-off does NOT count as
+   UI/UX approval; they are different gates.
+
+Sequence: form-factor → discovery → BA-approach approval → UI/UX design approval → build. These
+pauses are required clarification, exempt from the decide-don't-ask ban (`decision-authority.md`).
+
 ## Independent completeness audit BEFORE G1 (the anti-recurrence gate)
 
 Self-review does not catch what the BA never thought to look for. So before G1, a
@@ -59,6 +84,11 @@ converts "the BA should remember" (unreliable) into "an independent check enforc
 
 ## CRITICAL RULES
 
+- MUST establish the FORM FACTOR (web · mobile · desktop · CLI · extension · other, user picks
+  from ALL options) as the FIRST question — never assume it or carry it over from a prior build.
+- MUST get explicit user approval of (a) the recommended BA APPROACH + scope and (b) the UI/UX
+  DESIGN — as two separate gates, presenting the concrete artifact each time — before building. A
+  technical/storage design sign-off is NOT a UI/UX approval.
 - MUST complete all six checklist items (actors · value-per-actor · lifecycle ·
   component×actor matrix · variants · aha-outputs), with research, before leaving
   discovery for questions/UI/build.
