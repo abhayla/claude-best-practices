@@ -5,6 +5,43 @@
 
 ## Current Task
 
+### TODO app rebuild — FULL process compliance via REAL agent teams — 2026-06-25 — ⏳ ACTIVE
+
+Goal: rebuild the throwaway TODO tracker in isolated sibling `../todo`, honoring EVERY defined
+gate literally (no exceptions). Agent teams used selectively per `agent-team-selection.md`
+(team where multi-perspective/parallel-edit adds value; direct execution for mechanical steps).
+Contract STOP rule read literally: any team-capable stage that fails to form a real team → halt + report.
+
+**Phase 0 — Setup & gates**
+- [x] 0.1 Write this plan to `.claude/tasks/todo.md` (no team — mechanical)
+- [x] 0.2 ⛔ BA-discovery gate — user opted IN; ran REAL 3-actor BA team `session-db564b04` (enduser/owner/skeptic); brief in `.claude/.ba-todo/ba-brief.md`; surfaced P0 crash-safe atomic save
+- [x] 0.3 Recreate `../todo` git + pre-trust (fwd-slash key) + confirm psmux/rig
+- [x] 0.4 Downstream probe = design team formed in `../todo` (folded into Phase 1) — `taskKind:in_process_teammate` verified
+
+**Phase 1 — Clarify/design (TEAM: designer + planner)**
+- [x] 1 REAL team `session-b1bb63ed` (designer+planner); design adds persisted next_id + atomic save; files `design-data.md`/`design-cli.md`
+
+**Phase 2 — ⛔ Design human-approval gate**
+- [x] 2 User APPROVED: crash-safe atomic-JSON design, global `~/.todo/tasks.json` default
+
+**Phase 3 — Plan + ⛔ check-in**
+- [x] 3a Wrote impl plan `../todo/PLAN.md` (frozen interface + disjoint partition, no team)
+- [ ] 3b ⛔ CHECK-IN — confirm plan with user before build
+
+**Phase 4 — Build (TEAM: data + cli, parallel-edit)**
+- [ ] 4a Test-first (failing tests before impl)
+- [ ] 4b Parallel-edit build team; verify real team + zero collision; team fails → literal STOP
+- [ ] 4c Independent verification: run pytest myself; fix-loop to green
+
+**Phase 5 — Verify (TEAM: correctness + tests + quality)**
+- [ ] 5a Review team writes findings; ground-truth verify; team fails → literal STOP
+- [ ] 5b Apply fixes; re-verify green; exercise app end-to-end
+
+**Phase 6 — Document & commit**
+- [ ] 6a Documentation pass (every file built)
+- [ ] 6b ⛔ Resource-CRUD approval if any new hub resource needed
+- [ ] 6c Commit app (own git) + hub evidence + RESULTS + handoff
+
 ### Karpathy-advisor skill + agent — 2026-06-20 — ⏳ ACTIVE
 
 Goal: Research Andrej Karpathy thoroughly → understanding doc → distributable `karpathy-advisor`

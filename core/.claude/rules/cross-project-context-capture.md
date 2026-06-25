@@ -2,7 +2,7 @@
 
 # Cross-Project Context Capture — one home for facts that outlive a single repo
 
-version: "1.0.0"
+version: "1.1.0"
 
 Some facts are bigger than the repo you discover them in — a shared vendor account, a
 registration number, an API tenant, a contact, a compliance string, a cross-cutting
@@ -35,6 +35,13 @@ speculatively (YAGNI). When they exist, they are the SSOT for that class of fact
   changes a cross-project fact, UPDATE the right global file in the same turn: fits an
   existing section → edit in place (correct, don't duplicate); new topic → append a new
   section. Bump any "last updated" marker the file keeps.
+- **User INPUTS & PREFERENCES are captureable facts too — save them on sight, at every
+  stage.** When the user states a preference, choice, or input at ANY stage (design /
+  colour / UI-UX, working-style, tooling, product direction, a reference they provide),
+  capture the GENERIC, reusable ones to the global context file the same turn — so future
+  sessions and other projects REUSE them instead of re-asking. A provided reference asset
+  (image, link) is saved to a stable cross-project path and referenced by that path.
+  Product-specific choices stay in that project's own docs (`design-ssot.md`), not the global file.
 - **Route by sensitivity:** secret/credential → the global secrets file; everything else
   → the global context file. NEVER put a secret in the context file, and never put
   prose/preferences in the secrets file.
@@ -54,6 +61,10 @@ speculatively (YAGNI). When they exist, they are the SSOT for that class of fact
 
 - MUST capture a cross-project fact to the workspace global file in the SAME session it
   surfaces or changes — fits a section → edit in place; new topic → append.
+- MUST capture the user's stated INPUTS / PREFERENCES (design, UI-UX, colour, working-style,
+  tooling, product direction, provided references) to the global context file on sight, at
+  every stage — so they are reused, never re-asked. Generic/cross-project → global file
+  (assets → a stable cross-project path, referenced by path); project-specific → that project's docs.
 - MUST route by sensitivity: secrets → the global secrets file (per
   `security-baseline.md`); non-secret facts/preferences → the global context file. NEVER
   cross the two.

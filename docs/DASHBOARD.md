@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-23 10:56 UTC (auto-generated)
+> Last updated: 2026-06-24 09:26 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 276 |
-| Core (universal) | 205 |
+| Total Patterns | 277 |
+| Core (universal) | 206 |
 | Stack-specific | 71 |
 | Agents | 36 |
 | Configs | 3 |
 | Hooks | 17 |
-| Rules | 53 |
+| Rules | 54 |
 | Skills | 167 |
 
 ## Pattern Inventory
@@ -61,6 +61,7 @@
 | context-window-statusline | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | context-window-statusline-hook | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | continue | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
+| continuous-improvement | rule | 1.0.0 | user-directive:abhay-2026-06-25 | — |
 | contribute-practice | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | coverage-analysis | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | create-github-issue | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
