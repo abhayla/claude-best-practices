@@ -65,6 +65,22 @@ Identify the project so the injection method is correct:
    already present, switch to **audit mode** — confirm the property is
    one-per-site, events fire, consent is wired, then jump to STEP 6 (verify).
 
+**Already-deployed site, no source rebuild available?** A "dynamic" app is NOT a
+barrier to analytics — only your *method* is. When you can't (or won't) rebuild
+from source, inject server-side WITHOUT touching the app:
+- **Static webroot** (`root /var/www/X`): edit the live `index.html` directly
+  (backup first). A Next.js **static export** (`*.html` per route) needs the
+  snippet in EVERY route HTML, not just `index.html`, or deep-link landings miss.
+- **Dynamic/proxied app** (`proxy_pass http://127.0.0.1:PORT`): inject at nginx
+  with **`sub_filter`** — host the GA logic as a static `.js` file and add
+  `sub_filter '</head>' '<script src="/ga/x.js"></script></head>'` plus
+  `proxy_set_header Accept-Encoding ""` (so upstream HTML is uncompressed, else
+  sub_filter no-ops) to the proxy `location`; **`nginx -t` before reload** (shared
+  host). Edge injection (Cloudflare Workers) is the same idea one layer out.
+- These server-side edits are **non-durable** — lost on the next source redeploy.
+  Also update the SOURCE for persistence; if both are present, remove one to avoid
+  double-tagging. SMOKE-TEST OVER HTTPS (`:80` redirects), and verify a real hit.
+
 State the detected stack and chosen loader before editing anything.
 
 ## STEP 2: Confirm the GA4 Property + Measurement ID
