@@ -107,7 +107,7 @@ alerts + missed-heartbeat watchdog), per `notifier-integration.md`. Confirm — 
 - the gateway is reachable (`curl -fsS "$NOTIFIER_URL/health"`) and the app sets `NOTIFIER_URL` +
   `NOTIFIER_KEY` (the project has a `projects.<name>` block in Notifier's `config.yaml`);
 - a thin client is wired with the canonical detectors (signup, unhandled-5xx, DB-down, boot-env) and
-  the app POSTs a periodic `/heartbeat`.
+  the app POSTs a periodic heartbeat to `$NOTIFIER_URL/heartbeat`.
 
 If the app is NOT yet onboarded, onboard it as part of this deploy (`Notifier/docs/ONBOARDING.md` —
 ~5 min, no gateway code change): register the project + `pm2 reload notifier`, drop a thin client, set

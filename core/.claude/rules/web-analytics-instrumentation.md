@@ -40,6 +40,14 @@ ever referenced inside a fenced block below, never inline).
   **click** — measure it explicitly. The actual **conversion** (account funded)
   is owned by the affiliate partner's dashboard and reconciled there; GA4 sees
   the click, not the funded account — do NOT claim GA4 measures conversions.
+- **Blanket every-button/link tracking is OPTIONAL (opt-in).** When the owner
+  wants which of ALL buttons/links visitors click — not just CTAs — add a single
+  `ui_click` event (GTM "All Elements" trigger, or a `data-track` attribute + one
+  delegated listener). Noisier than named events, so keep explicit CTA events for
+  revenue paths; the schema lives in `/analytics-setup` STEP 4b.
+- **Non-web apps use the same GA4 backend** (out of this web rule's scope): mobile
+  via Firebase Analytics, desktop/Electron via the GA4 Measurement Protocol — see
+  `/analytics-setup` for the per-platform procedure.
 
 ## Consent & Privacy (India DPDP-aware)
 
