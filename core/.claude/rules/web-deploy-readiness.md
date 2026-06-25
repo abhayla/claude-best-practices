@@ -1,5 +1,5 @@
 ---
-description: Web ship-readiness DoD — a web app is not "done" until it is visually verified at mobile/tablet/laptop breakpoints, static hosting sets cache headers (HTML revalidate, hashed assets immutable), every serving host/origin is added to the auth provider's authorized domains, and a shared-host deploy is gated on a config-validity check that leaves co-located sites untouched.
+description: Web ship-readiness DoD — a web app is not "done" until it is visually verified at mobile/tablet/laptop breakpoints, static hosting sets cache headers (HTML revalidate, hashed assets immutable), every serving host/origin is added to the auth provider's authorized domains, a shared-host deploy is gated on a config-validity check that leaves co-located sites untouched, and owner-alerting + an uptime heartbeat are wired through the Notifier gateway.
 globs: ["**/*.html", "**/*.tsx", "**/*.jsx", "**/*.vue", "**/*.svelte", "**/*.astro", "**/app/**", "**/pages/**", "**/firebase.json", "**/nginx*.conf", "**/*.nginx", "**/sites-available/**"]
 version: "1.0.0"
 ---
@@ -8,11 +8,12 @@ version: "1.0.0"
 
 A web app that builds, passes unit/functional tests, and renders on the developer's laptop can
 still be broken for real users — crushed on a phone, serving a stale bundle, locked out of sign-in
-on its new domain, or having quietly taken down a co-located site. These four gates are the
-ship-readiness DoD. They are REACTIVE (each codifies a real shipped-then-caught miss), and they
-COMPOSE with — never duplicate — the verification rules: `supervisor-verification.md` (drive the
-running UI), `independent-test-verification.md` (blind re-check), `e2e-persistence-verification.md`
-(backend read-back), `decision-authority.md` (the deploy gate is the user's), and the `/vps-deploy`
+on its new domain, quietly taking down a co-located site, or failing silently in production with no
+owner-alert. These five gates are the ship-readiness DoD. They are REACTIVE (each codifies a real
+shipped-then-caught miss), and they COMPOSE with — never duplicate — the verification rules:
+`supervisor-verification.md` (drive the running UI), `independent-test-verification.md` (blind
+re-check), `e2e-persistence-verification.md` (backend read-back), `decision-authority.md` (the deploy
+gate is the user's), `notifier-integration.md` (the owner-alerting contract), and the `/vps-deploy`
 skill (the deploy mechanics).
 
 ## Gate 1 — Visual responsive verification at real breakpoints (NOT just functional)
@@ -63,13 +64,27 @@ When a target host serves multiple sites (a shared VPS), a careless deploy can t
 - MUST confirm the co-located sites still serve (smoke each) after the deploy — and TLS for the new
   host (Let's Encrypt) plus DNS are part of the same checklist.
 
-## Definition of DONE (all four — none optional)
+## Gate 5 — Owner-alerting + uptime wired through Notifier (or a production break is silent)
+
+A deployed app with no owner-alerting fails silently — a 5xx spike, a dead datastore, or the whole
+process dying goes unnoticed until a user complains. Every production deploy MUST report through the
+shared **Notifier** gateway.
+
+- MUST onboard the app to Notifier (register the project + a thin client + `NOTIFIER_URL` /
+  `NOTIFIER_KEY`) and emit at least the canonical detectors — signup (P1), unhandled-5xx (P1),
+  DB-down (P0), boot-env (P0) — plus a periodic `/heartbeat` for dead-man's-switch coverage. The
+  contract is `notifier-integration.md`; the recipe is `Notifier/docs/ONBOARDING.md`.
+- MUST be fail-open (unset env → no-op, 2s timeout, never awaited, never throws) and carry NO
+  end-user PII; MUST NOT wire healthchecks.io / UptimeRobot / any external pinger instead.
+
+## Definition of DONE (all five — none optional)
 
 A web app's deploy is DONE only when: (1) it is visually verified at 390/768/1280; (2) cache headers
 are set AND verified live; (3) every serving origin is in the auth provider's authorized domains AND
 a real SSO/magic-link sign-in is verified from it; (4) a shared-host deploy left co-located sites
-serving, behind a `-t`-gated reload, with TLS + DNS confirmed. A green build + functional suite is
-NOT proof of any of the four.
+serving, behind a `-t`-gated reload, with TLS + DNS confirmed; (5) owner-alerting + a heartbeat are
+wired through the Notifier gateway (Gate 5). A green build + functional suite is NOT proof of any of
+the five.
 
 ## CRITICAL RULES
 
@@ -81,5 +96,8 @@ NOT proof of any of the four.
   SSO/magic-link sign-in from the new host — never ship auth verified only by password.
 - MUST gate a shared-host web-server reload on a config-validity check and confirm co-located sites
   still serve; MUST NOT deploy in a way that can disrupt them.
+- MUST wire owner-alerting + a heartbeat through the Notifier gateway (Gate 5) before "done" — a VPS
+  deploy with no owner-alerting is not shippable; MUST NOT substitute an external uptime pinger.
 - MUST cross-reference (never duplicate) `supervisor-verification.md`, `independent-test-verification.md`,
-  `decision-authority.md`, `firebase.md`, and the `/vps-deploy` skill (`configuration-ssot.md`).
+  `decision-authority.md`, `firebase.md`, `notifier-integration.md`, and the `/vps-deploy` skill
+  (`configuration-ssot.md`).

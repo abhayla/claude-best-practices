@@ -100,15 +100,31 @@ into the webroot, `nginx -t` + reload (or `pm2 reload`), and re-smoke. Emit
 `{"result":"FAILED","rolled_back":true,...}` and escalate via /incident-response if
 the rollback itself does not restore a healthy live URL.
 
-## STEP 6: Report
+## STEP 6: Notifier wiring check (deploy DoD — owner alerts + uptime)
+
+A production deploy is not DONE until the app is onboarded to the shared **Notifier** gateway (owner
+alerts + missed-heartbeat watchdog), per `notifier-integration.md`. Confirm — do not assume:
+- the gateway is reachable (`curl -fsS "$NOTIFIER_URL/health"`) and the app sets `NOTIFIER_URL` +
+  `NOTIFIER_KEY` (the project has a `projects.<name>` block in Notifier's `config.yaml`);
+- a thin client is wired with the canonical detectors (signup, unhandled-5xx, DB-down, boot-env) and
+  the app POSTs a periodic `/heartbeat`.
+
+If the app is NOT yet onboarded, onboard it as part of this deploy (`Notifier/docs/ONBOARDING.md` —
+~5 min, no gateway code change): register the project + `pm2 reload notifier`, drop a thin client, set
+the two env vars. Never ship a VPS app with no owner-alerting. Fail-open is mandatory (unset env →
+no-op, 2s timeout, never awaited, never throws) so this can never break the deploy or the app. Do NOT
+wire healthchecks.io / UptimeRobot / any external pinger instead — Notifier supersedes them.
+
+## STEP 7: Report
 
 Write `test-results/vps-deploy.json`:
 ```json
 { "result": "PASSED|FAILED", "url": "<DEPLOY_URL>", "host": "<DEPLOY_HOST>",
-  "vhost": "<DEPLOY_VHOST|null>", "rolled_back": false,
+  "vhost": "<DEPLOY_VHOST|null>", "rolled_back": false, "notifier_wired": true,
   "backup": "<path>", "smoke_status": 200, "evidence": "<marker matched>" }
 ```
-`result=PASSED` only when the smoke check confirmed the new release on the live URL.
+`result=PASSED` only when the smoke check confirmed the new release on the live URL AND the deployed
+app is wired to Notifier (`notifier_wired: true`).
 
 ## CRITICAL RULES
 
@@ -126,3 +142,7 @@ Write `test-results/vps-deploy.json`:
   checking blindly in a way that persists.
 - MUST treat the production deploy as a G3 human-approval gate — invoked with
   explicit user go, never self-triggered.
+- MUST onboard the deployed app to the shared Notifier gateway (owner alerts +
+  heartbeat) per `notifier-integration.md` and report `notifier_wired: true` — a
+  VPS deploy with no owner-alerting is NOT done; MUST NOT wire healthchecks.io /
+  UptimeRobot / any external pinger instead.
