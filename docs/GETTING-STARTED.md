@@ -33,7 +33,7 @@ curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bo
 |-----------|-------|-------------|
 | Agents | 36 | Specialized sub-agents for code review, debugging, testing, etc. |
 | Skills | 167 | Slash-command workflows like `/implement`, `/fix-loop`, `/status` |
-| Rules | 54 | Scoped coding rules that activate based on file paths |
+| Rules | 55 | Scoped coding rules that activate based on file paths |
 | Hooks | 17 | Example hooks you can adapt (see `hooks/README.md`) |
 
 ## Customization

@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-24 09:26 UTC (auto-generated)
+> Last updated: 2026-06-25 12:55 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 277 |
+| Total Patterns | 278 |
 | Core (universal) | 206 |
-| Stack-specific | 71 |
+| Stack-specific | 72 |
 | Agents | 36 |
 | Configs | 3 |
 | Hooks | 17 |
-| Rules | 54 |
+| Rules | 55 |
 | Skills | 167 |
 
 ## Pattern Inventory
