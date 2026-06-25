@@ -240,6 +240,18 @@ router's after-each hook.
 ordinary outbound-link tracking — GA4 enhanced measurement already covers outbound
 links and downloads; `ui_click` is for the INTERNAL buttons/links it misses.
 
+**Owner-readable labels (plain simple English — NOT codes).** Everything an owner
+SEES in GA reports must read as plain English. GA4 forces event *names* to be
+`snake_case` (a Google constraint), so keep the name technical-but-clear
+(`ui_click`) and put the human-readable label in a *parameter value*: prefer the
+element's **visible text** (`link_text`), and when annotating with `data-track`,
+use a plain-English value (`data-track="Open a Zerodha account"`, not
+`data-track="cta_zmphzc"`). Also register the surfaced parameters as GA4 **custom
+dimensions with friendly display names** ("Button label", "Link destination") so
+the report columns read in plain English too. The GA4 **property displayName** is
+free-form — name it the way the owner thinks of the site ("Real Fuel Prices
+India"), never a slug.
+
 ## STEP 5: Configure Google Consent Mode v2 Defaults
 
 Set Consent Mode defaults BEFORE GTM/GA tags fire (place above the GTM head

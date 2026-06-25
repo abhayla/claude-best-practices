@@ -6606,7 +6606,7 @@
     "last_updated": "2026-06-25"
   },
   "analytics-setup": {
-    "hash": "838ddfe5531cda8d15c492b9d4e8a2f4854e1074341c2ee094d55f908c54bdbd",
+    "hash": "fe944f664af79239aae7561c7b8c5e519627eabcf51af75c943968a5a71d1301",
     "type": "skill",
     "category": "need-basis",
     "version": "1.1.0",
@@ -6652,7 +6652,7 @@
     "tier": "nice-to-have"
   },
   "vps-deploy": {
-    "hash": "b63d471b12d55d66b5c176be66262ebd464c6bd5e3cebd8c9ba899cc85417167",
+    "hash": "43784cba3e0af1c225895648d2ef6c321d7df3d66d0293ba896ae1b4101f4aa3",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
