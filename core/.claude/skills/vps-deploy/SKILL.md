@@ -109,9 +109,10 @@ alerts + missed-heartbeat watchdog), per `notifier-integration.md`. Confirm — 
 - a thin client is wired with the canonical detectors (signup, unhandled-5xx, DB-down, boot-env) and
   the app POSTs a periodic heartbeat to `$NOTIFIER_URL/heartbeat`.
 
-If the app is NOT yet onboarded, onboard it as part of this deploy (`Notifier/docs/ONBOARDING.md` —
-~5 min, no gateway code change): register the project + `pm2 reload notifier`, drop a thin client, set
-the two env vars. Never ship a VPS app with no owner-alerting. Fail-open is mandatory (unset env →
+If the app is NOT yet onboarded, onboard it as part of this deploy: run Notifier's idempotent CLI on
+the VPS — `cd /root/notifier && npm run onboard -- --name <app> --chat-id <id>` (registers the project,
+generates the key, validates, `pm2 reload`s, prints the app's `NOTIFIER_URL`/`NOTIFIER_KEY`) — then
+drop a thin client into the app and set those two env vars (`Notifier/docs/ONBOARDING.md`). Never ship a VPS app with no owner-alerting. Fail-open is mandatory (unset env →
 no-op, 2s timeout, never awaited, never throws) so this can never break the deploy or the app. Do NOT
 wire healthchecks.io / UptimeRobot / any external pinger instead — Notifier supersedes them.
 
