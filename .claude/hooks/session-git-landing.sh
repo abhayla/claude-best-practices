@@ -20,6 +20,27 @@ set -u
 
 _guard() { command -v gh >/dev/null 2>&1; }   # gh present (AUTO_MERGE gates only the *arm*, below)
 
+_sync_local_after_merge() {
+  # ROOT-CAUSE fix for "the branch looks unmerged locally after /end-session": land --wait merged
+  # the PR REMOTELY but never reconciled the LOCAL clone, leaving the caller ON the now-dead branch
+  # with a stale local `main` and an un-pruned local branch. (Squash-merge compounds it: the local
+  # commits are not ancestors of origin/main, so `git branch -d`/`merge-base` both say "unmerged".)
+  # Called ONLY after the caller has CONFIRMED the PR state is MERGED, so pruning is safe.
+  # Skips on a dirty tree so it can never clobber uncommitted work.
+  local merged_branch="$1"
+  case "$merged_branch" in main|master|HEAD|"") return 0;; esac
+  if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+    echo "  (local NOT reconciled: working tree dirty — switch to main + prune '$merged_branch' manually)"; return 0
+  fi
+  git checkout main >/dev/null 2>&1 || { echo "  (local NOT reconciled: could not checkout main)"; return 0; }
+  git fetch origin main >/dev/null 2>&1
+  git merge --ff-only origin/main >/dev/null 2>&1
+  # -D (not -d): a squash merge means the local branch is not an ancestor of main, so -d would
+  # refuse. Safe because the caller already confirmed the PR is MERGED (content is on main).
+  git branch -D "$merged_branch" >/dev/null 2>&1
+  echo "  (local reconciled: on main, fast-forwarded to origin/main, pruned '$merged_branch')"
+}
+
 land() {
   local wait_mode="${1:-}"
   _guard || { echo "land: skipped (no gh)"; return 0; }
@@ -42,7 +63,7 @@ land() {
     sleep 10; i=$((i + 1))
   done
   case "$st" in
-    MERGED) echo "merged '$branch' -> main and CLOSED the branch (required CI passed)";;
+    MERGED) echo "merged '$branch' -> main and CLOSED the branch (required CI passed)"; _sync_local_after_merge "$branch";;
     CLOSED) echo "NOT closed cleanly: the PR for '$branch' was closed without merging — investigate";;
     *)      echo "NOT CLOSED: '$branch' is still OPEN after waiting — the required check is failing or stuck; investigate and re-run, do NOT declare the session closed";;
   esac
@@ -82,9 +103,13 @@ reconcile() {
   return 0
 }
 
-case "${1:-}" in
-  land)      shift; land "$@";;
-  reconcile) reconcile;;
-  merge-one) shift; merge_one "$@";;
-  *) echo "usage: session-git-landing.sh {land [--wait]|reconcile|merge-one <branch>}" >&2; exit 2;;
-esac
+# Only dispatch when EXECUTED, not when SOURCED (tests source this file to call the helpers
+# directly, e.g. _sync_local_after_merge, without triggering the usage/exit path).
+if [ "${BASH_SOURCE[0]:-$0}" = "$0" ]; then
+  case "${1:-}" in
+    land)      shift; land "$@";;
+    reconcile) reconcile;;
+    merge-one) shift; merge_one "$@";;
+    *) echo "usage: session-git-landing.sh {land [--wait]|reconcile|merge-one <branch>}" >&2; exit 2;;
+  esac
+fi
