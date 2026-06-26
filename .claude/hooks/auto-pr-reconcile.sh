@@ -48,20 +48,9 @@ git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads/ 2>/de
 
 [ "${AUTO_MERGE:-1}" = "0" ] && { log "AUTO_MERGE=0 — prune only, no arming"; exit 0; }
 
-# 2. Arm auto-merge on every open, non-draft PR that lacks it — except the current branch.
-#    `--auto` makes GitHub wait for the required checks, so arming a still-pending PR is safe;
-#    a conflicted/blocked PR simply won't merge and is logged for a human.
-gh pr list --state open --json number,headRefName,isDraft,autoMergeRequest \
-    --jq '.[] | select(.isDraft==false) | select(.autoMergeRequest==null) | .headRefName' 2>/dev/null \
-  | while read -r branch; do
-      [ -z "$branch" ] && continue
-      [ "$branch" = "$current" ] && { log "skipped current branch '$branch' (active work)"; continue; }
-      [ "$branch" = "main" ] || [ "$branch" = "master" ] && continue
-      if gh pr merge "$branch" --auto --squash >/dev/null 2>&1; then
-        log "armed auto-merge (squash) for orphaned PR on '$branch' — lands when CI is green"
-      else
-        log "could not arm '$branch' (CI-red, conflicted, or no required checks pending) — left for human"
-      fi
-    done
+# 2. Reconcile leftover PRs via the shared SSOT (.claude/hooks/session-git-landing.sh): arm native
+#    auto-merge on every open, non-draft PR EXCEPT the current branch (CI-gated). Same single source
+#    of truth that /start-session STEP 0 and /end-session use — the landing logic lives in ONE place.
+log "$(bash "$ROOT/.claude/hooks/session-git-landing.sh" reconcile 2>&1)"
 
 exit 0

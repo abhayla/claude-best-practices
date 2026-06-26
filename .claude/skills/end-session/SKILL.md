@@ -16,7 +16,7 @@ triggers:
   - checkpoint
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "[session-name]"
-version: "2.1.0"
+version: "2.2.0"
 ---
 
 # End Session — Round Up & Close
@@ -168,25 +168,12 @@ Skip silently if `gh` is unavailable, the repo has no GitHub remote, on `main`/`
 HEAD, or `AUTO_MERGE=0`.
 
 ```bash
-command -v gh >/dev/null 2>&1 && [ "${AUTO_MERGE:-1}" != "0" ] && {
-  branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-  case "$branch" in main|master|HEAD|"") branch="";; esac
-  [ -n "$branch" ] && {
-    git push -u origin "HEAD:$branch" >/dev/null 2>&1
-    gh pr view "$branch" >/dev/null 2>&1 || gh pr create --base main --head "$branch" --fill >/dev/null 2>&1
-    checks="$(gh pr checks "$branch" 2>&1)"
-    if echo "$checks" | grep -qiE "no checks|no commit statuses"; then
-      gh pr merge "$branch" --squash --delete-branch >/dev/null 2>&1 && echo "merged '$branch' -> main (no CI checks) — branch CLOSED"
-    elif timeout 900 gh pr checks "$branch" --watch --fail-fast >/dev/null 2>&1; then
-      # --watch BLOCKS until the required checks finish (through queue + run, ~1-3 min), so the
-      # merge below actually closes the branch before this step returns.
-      gh pr merge "$branch" --squash --delete-branch >/dev/null 2>&1 && echo "merged '$branch' -> main (CI passed) — branch CLOSED"
-    else
-      gh pr merge "$branch" --auto --squash >/dev/null 2>&1   # fallback so it still lands if fixed later
-      echo "NOT CLOSED: CI did not pass for '$branch' — auto-merge armed as a fallback. The session is NOT cleanly closeable until the failing check is fixed and it lands."
-    fi
-  }
-}
+# Single source of truth for the landing logic: .claude/hooks/session-git-landing.sh
+# (shared with /start-session's reconcile and the auto-pr hooks — fix landing in ONE place).
+# `land --wait` arms GitHub's native auto-merge (gated on the REQUIRED checks only) and then BLOCKS
+# until the PR is MERGED, so the branch is genuinely CLOSED before this step returns. It prints one
+# of: "merged ... CLOSED" / "NOT CLOSED ..." / "skipped ...". Report that verbatim in STEP 6.
+bash "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/hooks/session-git-landing.sh" land --wait
 ```
 
 MUST NOT force-merge past failing CI, and MUST NOT report the session as closed while the branch is
@@ -224,5 +211,5 @@ After saving, present:
 - MUST read the session template from `references/session-template.md` when available
 - MUST automatically purge session files older than 5 days — no user confirmation required
 - MUST NOT log or display individual file deletions during purge — silent cleanup only
-- MUST, in STEP 5, **WAIT for the required CI checks to conclude (`gh pr checks --watch`) and THEN merge + delete the branch** — so the branch is genuinely CLOSED when the skill returns, not armed-and-left-open. A fresh PR is never `CLEAN` at push time, so checking merge-state without waiting always leaves the branch open (the root cause).
+- MUST, in STEP 5, **arm GitHub native auto-merge (gated on the REQUIRED checks only) and WAIT for the PR to reach `MERGED`** — so the branch is genuinely CLOSED when the skill returns, not armed-and-left-open. A fresh PR is never `CLEAN` at push time, so checking merge-state (or returning) without waiting leaves the branch open (the root cause). MUST NOT gate on ALL checks (e.g. `--watch --fail-fast`) — a noisy non-required workflow would false-fail while the required `validate` passes.
 - MUST NOT force-merge past failing CI, and MUST NOT declare the session "closed/closeable" while its branch is still open. If CI fails, arm as a fallback, report "NOT closed" + the failing check, and do NOT claim the session is cleanly closeable. Skip on `main`/detached HEAD/no-`gh`/no-remote/`AUTO_MERGE=0`.

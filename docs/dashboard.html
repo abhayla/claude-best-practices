@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-26 05:29 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-26 06:29 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">279</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">280</div><div class="label">Total Patterns</div></div>
     <div class="stat-card"><div class="number">207</div><div class="label">Core</div></div>
-    <div class="stat-card"><div class="number">72</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">36</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">3</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">17</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">55</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">168</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">73</div><div class="label">Stack-specific</div></div>
+    <div class="stat-card"><div class="number">36</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">3</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">18</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">55</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">168</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -935,7 +935,7 @@ tr:hover { background: var(--primary-light); }
                 <td>end-session</td>
                 <td><span class="badge badge-skill">skill</span></td>
                 <td>core</td>
-                <td>2.0.0</td>
+                <td>2.2.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>session, context, continuity</td>
@@ -2026,7 +2026,7 @@ tr:hover { background: var(--primary-light); }
                 <td>core</td>
                 <td>2.1.1</td>
                 <td>hub:abhayla/claude-best-practices</td>
-                <td>handover, save-session, session-summarizer-agent, start-session, workflow-contracts</td>
+                <td>handover, end-session, session-summarizer-agent, start-session, workflow-contracts</td>
                 <td>orchestration, workflow, session</td>
             </tr>
             <tr data-type="agent" data-category="core">
@@ -2037,6 +2037,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>orchestration, workflow, session</td>
+            </tr>
+            <tr data-type="hook" data-category="need-basis">
+                <td>session-git-landing</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>need-basis</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>git, auto-merge, session-lifecycle, dry, hook</td>
             </tr>
             <tr data-type="hook" data-category="core">
                 <td>session-governance-status</td>
@@ -2143,7 +2152,7 @@ tr:hover { background: var(--primary-light); }
                 <td>core</td>
                 <td>1.2.0</td>
                 <td>hub:abhayla/claude-best-practices</td>
-                <td>save-session</td>
+                <td>end-session</td>
                 <td>session, context, continuity</td>
             </tr>
             <tr data-type="skill" data-category="core">

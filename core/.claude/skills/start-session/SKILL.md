@@ -34,23 +34,13 @@ a finished, CI-green PR otherwise sits open until some later session sweeps it.
 Skip silently if `gh` is unavailable, the repo has no GitHub remote, or `AUTO_MERGE=0`.
 **Never touch the current HEAD branch** (active work must not be merged out from under you).
 
-```bash
-command -v gh >/dev/null 2>&1 && [ "${AUTO_MERGE:-1}" != "0" ] && {
-  cur="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-  gh pr list --state open --json number,headRefName,isDraft,mergeStateStatus \
-    --jq '.[] | select(.isDraft==false) | "\(.number) \(.headRefName) \(.mergeStateStatus)"' 2>/dev/null \
-  | while read -r num branch mss; do
-      [ "$branch" = "$cur" ] && continue                 # never the active branch
-      if [ "$mss" = "CLEAN" ]; then
-        gh pr merge "$num" --squash --delete-branch >/dev/null 2>&1 && echo "landed #$num ($branch, was green)"
-      else
-        gh pr merge "$num" --auto --squash >/dev/null 2>&1 && echo "armed #$num ($branch — lands when CI greens)"
-      fi
-    done
-}
+# Single source of truth for the landing logic: .claude/hooks/session-git-landing.sh
+# (shared with /end-session's STEP 5 and the auto-pr hooks). `reconcile` arms native auto-merge on
+# every open, non-draft PR EXCEPT the current branch — each lands when its required CI passes.
+bash "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/hooks/session-git-landing.sh" reconcile
 ```
 
-Report what landed / armed (or "no leftover PRs"). Then continue to restore the session.
+Report what it armed (or "no leftover PRs"). Then continue to restore the session.
 
 ---
 

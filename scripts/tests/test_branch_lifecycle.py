@@ -16,6 +16,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 AUTO_GIT = ROOT / ".claude" / "hooks" / "auto-git.sh"
 AUTO_PR = ROOT / ".claude" / "hooks" / "auto-pr.sh"
+LANDING = ROOT / ".claude" / "hooks" / "session-git-landing.sh"  # shared landing SSOT
 SETTINGS = ROOT / ".claude" / "settings.json"
 SKILL = ROOT / ".claude" / "skills" / "git-branch-lifecycle" / "SKILL.md"
 
@@ -56,15 +57,17 @@ def test_auto_pr_has_off_switches():
 
 
 def test_auto_pr_never_targets_main():
-    body = _read(AUTO_PR)
-    # guards that prevent opening a PR / merging from main itself
-    assert 'branch" = "main"' in body and 'branch" = "master"' in body
+    # auto-pr.sh delegates landing to the shared SSOT, which holds the main/master/HEAD skip.
+    assert "session-git-landing.sh" in _read(AUTO_PR), "auto-pr.sh must delegate to the shared landing lib"
+    assert "main|master|HEAD" in _read(LANDING), "the landing lib must skip main/master/HEAD"
 
 
 def test_auto_pr_uses_ci_gated_auto_merge_squash():
-    body = _read(AUTO_PR)
-    assert "--auto" in body, "merge must be CI-gated via --auto"
-    assert "--squash" in body, "feature->main must squash-merge (git-collaboration.md)"
+    # The CI-gated auto-merge now lives in the shared SSOT that auto-pr.sh delegates to.
+    assert "session-git-landing.sh" in _read(AUTO_PR), "auto-pr.sh must delegate to the shared landing lib"
+    lib = _read(LANDING)
+    assert "--auto" in lib, "merge must be CI-gated via --auto"
+    assert "--squash" in lib, "feature->main must squash-merge (git-collaboration.md)"
 
 
 def test_auto_pr_prunes_only_after_merged_confirmation():

@@ -46,46 +46,11 @@ git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads/ 2>/de
       fi
     done
 
-branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" || exit 0
-if [ "$branch" = "main" ] || [ "$branch" = "master" ] || [ "$branch" = "HEAD" ]; then
-  log "on '$branch' (no task branch); nothing to PR"
-  exit 0
-fi
-
-# The branch must exist on origin before a PR can reference it. auto-git normally pushes it;
-# push here too so SessionEnd is self-sufficient even if the last turn's push was skipped.
-if git remote get-url origin >/dev/null 2>&1; then
-  git push -u origin "HEAD:$branch" >/dev/null 2>&1 || log "push of '$branch' failed (creds/network?) — continuing"
-fi
-
-# Idempotent PR: reuse an existing open PR for this branch, else create one.
-if gh pr view "$branch" --json number >/dev/null 2>&1; then
-  log "PR already exists for '$branch'"
-else
-  if gh pr create --base main --head "$branch" --fill >/dev/null 2>&1; then
-    log "opened PR for '$branch'"
-  else
-    log "could not open PR for '$branch' (no commits ahead of main, or gh error); skipping merge-arm"
-    exit 0
-  fi
-fi
-
-# Arm native auto-merge: GitHub merges when the required CI checks pass, then deletes the branch
-# (delete_branch_on_merge is enabled repo-side). Squash keeps main's history one-commit-per-PR.
-if [ "${AUTO_MERGE:-1}" = "0" ]; then
-  log "AUTO_MERGE=0 — PR left open for manual merge of '$branch'"
-  exit 0
-fi
-
-# Merge NOW if the PR is already green + mergeable (CLEAN); otherwise arm native auto-merge
-# (GitHub lands it when the required checks pass). Either way it stays CI-gated.
-mss="$(gh pr view "$branch" --json mergeStateStatus --jq '.mergeStateStatus' 2>/dev/null)"
-if [ "$mss" = "CLEAN" ] && gh pr merge "$branch" --squash --delete-branch >/dev/null 2>&1; then
-  log "merged '$branch' immediately (was CLEAN/green)"
-elif gh pr merge "$branch" --auto --squash >/dev/null 2>&1; then
-  log "armed auto-merge (squash) for '$branch' — will land when CI is green"
-else
-  log "could not merge/arm '$branch' (already merged, or no required checks pending) — PR left open"
-fi
+# Land the current branch via the shared SSOT (.claude/hooks/session-git-landing.sh): push +
+# open PR + arm native auto-merge, all CI-gated. SessionEnd must NOT block, so this arms and
+# RETURNS (no --wait) — GitHub merges when the required CI passes. The lib handles the main/master/
+# detached-HEAD skip and the AUTO_MERGE=0 off-switch. Keeps the landing logic in ONE place
+# (shared with /end-session STEP 5 + /start-session reconcile).
+log "$(bash "$ROOT/.claude/hooks/session-git-landing.sh" land 2>&1)"
 
 exit 0

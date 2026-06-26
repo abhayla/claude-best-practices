@@ -4414,10 +4414,10 @@
     }
   },
   "end-session": {
-    "hash": "87438c8a79a3d59d0b4e5856b93a75bc7dc8e02160341f2dbc87dcbb33fd9584",
+    "hash": "5c5dac61c3583d8f35f280ceb84b7e504c4f1740660f3eb8f3f29bd615640adc",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
     "last_updated": "2026-06-26",
@@ -4939,7 +4939,7 @@
     }
   },
   "start-session": {
-    "hash": "d0677b5a2fb99b9e4d4296c49fd66a683f304cbf41d8721d2d19ca18b5eef78d",
+    "hash": "0215d2f2b54579a8e9ddad45b4f69788f0655fd8e7e3f747bccf0b5638e61a0c",
     "type": "skill",
     "category": "core",
     "version": "1.2.0",
@@ -6408,7 +6408,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-25",
-    "total_patterns": 279
+    "total_patterns": 280
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6787,7 +6787,7 @@
     "tier": "nice-to-have"
   },
   "auto-pr": {
-    "hash": "e487bd8e6827bf62939f40cdbda3d616bde39d3431650ce8d9c4d23dfd47e4e2",
+    "hash": "694f920e5222c84fc5b44befdb88cb191b18c7a04584ce6f1516bd768ff99a8d",
     "type": "hook",
     "version": "1.0.0",
     "description": "SessionEnd hook: opens a PR for the task branch and arms native CI-gated auto-merge (squash), prunes gh-confirmed-MERGED branches. Lands work on session close without touching git.",
@@ -6798,6 +6798,27 @@
     "dependencies": [],
     "visibility": "public",
     "tier": "nice-to-have"
+  },
+  "session-git-landing": {
+    "hash": "13e83b3787999247da9eeaebac600c78937af7e84ed314b9aaf327bb2ee59800",
+    "type": "hook",
+    "category": "need-basis",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-26",
+    "last_updated": "2026-06-26",
+    "dependencies": [],
+    "visibility": "public",
+    "tier": "must-have",
+    "description": "Shared SSOT for session git-landing: land [--wait] (arm native auto-merge gated on required checks, optionally wait for MERGED) + reconcile (sweep leftover PRs). Called by /end-session, /start-session, auto-pr.sh, auto-pr-reconcile.sh \u2014 DRY single source of truth.",
+    "tags": [
+      "git",
+      "auto-merge",
+      "session-lifecycle",
+      "dry",
+      "hook"
+    ],
+    "changelog": "v1.0.0 (2026-06-26): extracted duplicated landing logic from 2 session skills + 2 hooks into one SSOT."
   },
   "git-branch-lifecycle": {
     "hash": "0e7ca91f6b32154d8e86229bce9d3881be8333502996b50dfe02b4128385f9f2",
