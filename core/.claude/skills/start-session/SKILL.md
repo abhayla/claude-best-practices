@@ -19,7 +19,7 @@ version: "1.2.0"
 
 # Start Session — Restore a Saved Checkpoint
 
-Load a session file created by `/save-session` and restore working context for seamless resumption.
+Load a session file created by `/end-session` and restore working context for seamless resumption.
 
 **Key distinction:** `/start-session` restores file-level context from a structured checkpoint. `/continue` gives a lightweight git-state briefing without session files. Use `/start-session` when you have a saved session; use `/continue` for a quick orientation.
 
@@ -28,7 +28,7 @@ Load a session file created by `/save-session` and restore working context for s
 ## STEP 0: Reconcile + Land Leftover PRs (catch-up — runs first)
 
 Before restoring, sweep open PRs so any PRIOR session's green work lands now. This is the
-catch-up for sessions that ended without `/save-session` (the unreliable SessionEnd path):
+catch-up for sessions that ended without `/end-session` (the unreliable SessionEnd path):
 a finished, CI-green PR otherwise sits open until some later session sweeps it.
 
 Skip silently if `gh` is unavailable, the repo has no GitHub remote, or `AUTO_MERGE=0`.
@@ -62,7 +62,7 @@ Determine which session to load based on the argument:
 ```bash
 ls -lt .claude/sessions/*.md 2>/dev/null
 ```
-Present a numbered list of available sessions with dates and names. Ask the user to pick one. If no sessions exist, inform the user and suggest running `/save-session` first.
+Present a numbered list of available sessions with dates and names. Ask the user to pick one. If no sessions exist, inform the user and suggest running `/end-session` first.
 
 ### If a session name is provided:
 Look for `.claude/sessions/{name}.md`. If not found:
@@ -76,7 +76,7 @@ Load the most recent session file (by filesystem modification time):
 ```bash
 ls -t .claude/sessions/*.md 2>/dev/null | head -1
 ```
-If no sessions exist, inform the user and suggest `/save-session`.
+If no sessions exist, inform the user and suggest `/end-session`.
 
 ---
 
@@ -160,4 +160,4 @@ Present a structured briefing — do NOT auto-start any work.
 - MUST handle missing files gracefully — warn and continue, do not fail
 - MUST limit file reads to 10 maximum to avoid context overload
 - MUST handle missing sections in session files without errors
-- MUST inform the user if no sessions exist and suggest `/save-session`
+- MUST inform the user if no sessions exist and suggest `/end-session`

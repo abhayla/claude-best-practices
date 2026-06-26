@@ -77,6 +77,7 @@ workflows:
         - code-reviewer-agent
         - plan-executor-agent
       rules:
+        - continuous-improvement
         - independent-test-verification
         - learnings-routing
         - plan-before-coding
@@ -168,6 +169,7 @@ workflows:
         - tdd-rule
         - testing
         - vue-e2e
+        - web-deploy-readiness
 
   debugging-loop:
     description: "Targeted bug diagnosis and structured resolution."
@@ -212,12 +214,15 @@ workflows:
         - session-summarizer-agent
       rules:
         - context-management
+        - continuous-improvement
+        - web-deploy-readiness
 
   session-continuity:
     description: "Start, save, resume, and hand over between sessions."
     seeds:
       skills:
         - continue
+        - end-session
         - handover
         - mcp-server-builder
         - save-session
@@ -254,6 +259,8 @@ workflows:
         - skill-authoring-master-agent
         - workflow-master-template
       rules:
+        - agent-team-selection
+        - claude-docs-cache
         - pattern-portability
         - pattern-self-containment
         - pattern-structure

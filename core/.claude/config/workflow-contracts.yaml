@@ -281,7 +281,7 @@ workflows:
     sub_orchestrators: []
     steps:
       - id: save
-        skill: save-session
+        skill: end-session
         depends_on: []
         artifacts_out:
           session_file: { path: ".claude/sessions/<session-id>.json", schema: session_v1 }
