@@ -85,7 +85,11 @@ with an owner choice. Guardrail 1 ("never commit to main") stays as the backstop
   reaper with mixed green/red branches.
 - Full local CI (dedup, secret-scan, pattern-gate, pytest) before PR.
 
-## Open (recommended defaults applied unless owner overrides)
+## Follow-ups (built after owner flagged the goal was only partially met)
 
-- Concurrency → worktree for 2nd session (vs hard-refuse).
-- Reaper timing → session-start-only (vs scheduled cloud agent later).
+- ✅ **PreToolUse enforcement** — `branch-choice-gate.sh` (Edit|Write|MultiEdit) re-injects the menu
+  reminder at the exact first edit, marker-gated, non-blocking. Closes the "SessionStart nudge can rot" gap.
+- ✅ **Concurrency guard** — `session-concurrency-guard.sh` (SessionStart) warns when another session
+  (by `session_id`, lock-file heuristic, < `CONCURRENCY_STALE_MIN`) shares the working tree → recommends a worktree.
+- ⏳ **Reaper-as-scheduler (#7)** — firing the 24h reaper with NO session opened needs a scheduled
+  cloud agent = RECURRING SPEND → owner decision, NOT built. (Session-start-only remains the default.)

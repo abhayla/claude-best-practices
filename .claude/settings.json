@@ -24,6 +24,16 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/branch-choice-gate.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -91,6 +101,10 @@
           {
             "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/auto-pr-reconcile.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/session-concurrency-guard.sh\""
           },
           {
             "type": "command",

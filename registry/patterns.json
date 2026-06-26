@@ -6504,7 +6504,7 @@
     "tier": "must-have"
   },
   "notifier-integration": {
-    "hash": "8ee056a5d215e0b15aa2c5c55d9c2bee76e5eb25fbfad0a2108500a433be99d0",
+    "hash": "0c5aaf3c4f7e722c034d3e3e37bdaed9cfe1b9bee8ba67cf44b3661e5e8d3911",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
