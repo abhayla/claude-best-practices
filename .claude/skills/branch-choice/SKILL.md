@@ -20,10 +20,11 @@ triggers:
 # Branch Choice — owner-driven, once-per-session
 
 A Stop-hook shell script cannot pause for an interactive answer, so the branch decision lives
-at the model layer (this skill). The companion hooks are the unattended safety net: `auto-git.sh`
-still refuses to commit onto `main` (carries work to a fresh branch as a backstop), and
-`stale-branch-reaper.sh` (SessionStart) clears the per-session marker + reports stale branches and
-prints a `BRANCH-CHOICE:` nudge so you run this skill before the first edit.
+at the model layer (this skill). Four companion hooks form the unattended safety net:
+- `auto-git.sh` still refuses to commit onto `main` (carries work to a fresh branch as a backstop).
+- `stale-branch-reaper.sh` (SessionStart) clears the per-session marker + reports stale branches + prints the `BRANCH-CHOICE:` nudge.
+- `branch-choice-gate.sh` (PreToolUse Edit|Write|MultiEdit) re-injects this reminder at the EXACT first file edit (deterministic — survives a long session where the SessionStart nudge rots), non-blocking, silent once the marker exists.
+- `session-concurrency-guard.sh` (SessionStart) warns when another session shares the working tree and recommends a worktree (two sessions = one checked-out branch = collisions).
 
 ## STEP 1: Gate — ask ONCE per session
 
