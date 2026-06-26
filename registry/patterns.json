@@ -4414,7 +4414,7 @@
     }
   },
   "end-session": {
-    "hash": "91cab72d5b7ec8f91574cd607313c14d03895b6f35cb048e8fd4a24bdaffcd8e",
+    "hash": "cfdae74cb61e221285f5e838c913aa7f0f5eced99c6f9e4fcb322043f527697b",
     "type": "skill",
     "category": "core",
     "version": "2.0.0",

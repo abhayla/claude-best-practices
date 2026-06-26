@@ -26,7 +26,7 @@ work** (so "session ended" = "merged when green"), and confirm the session can b
 Renamed from `/save-session` (clearer pairing with `/start-session`); `/save-session` still works
 as a deprecated alias. Restore later with `/start-session`.
 
-**Key distinction:** `/save-session` captures file-level working state for exact resumption. `/handover` produces a narrative handoff document for broader context transfer. `/continue` is a lightweight git-state briefing. These serve different needs — use all three as appropriate.
+**Key distinction:** `/end-session` captures file-level working state for exact resumption. `/handover` produces a narrative handoff document for broader context transfer. `/continue` is a lightweight git-state briefing. These serve different needs — use all three as appropriate.
 
 ---
 
@@ -112,7 +112,7 @@ Only include docs that are directly relevant to the work in this session.
 
 ## STEP 3: Generate Session File
 
-1. Read the template from the skill's references directory. If running from a project that copied this skill, the template is at `.claude/skills/save-session/references/session-template.md`. If the template is not found, use the structure from memory (the template format is documented in this skill).
+1. Read the template from the skill's references directory. If running from a project that copied this skill, the template is at `.claude/skills/end-session/references/session-template.md`. If the template is not found, use the structure from memory (the template format is documented in this skill).
 
 2. Populate the template with gathered context from Step 2.
 
