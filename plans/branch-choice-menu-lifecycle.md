@@ -37,9 +37,11 @@ Grounded in trunk-based development: one logical change = one short-lived branch
 A Stop-hook shell script (`auto-git.sh`) runs **non-interactively** — it CANNOT show a menu and
 wait for the owner. Therefore the **ASK lives at the model/rule layer**, not in the shell:
 
-- **A new rule** (`.claude/rules/branch-choice.md`, `# Scope: global`) instructs Claude: before the
-  first file edit of a session, if no branch-choice marker exists, present the menu, act on the
-  answer, then write a session-scoped marker `.claude/.branch-choice-<sessionid>` (gitignored).
+- **A hub-only SKILL** (`.claude/skills/branch-choice/SKILL.md`) holds the menu + reaper-approval
+  procedure. (Hub rules are capped to a lean approved set of 6 by `test_rule_organization.py`;
+  verbose procedure belongs in a skill, same as `git-branch-lifecycle`.) The reaper prints a
+  `BRANCH-CHOICE:` SessionStart nudge so the model runs the skill before the first edit; the skill
+  gates on the marker `.claude/.branch-choice-active` (gitignored) for once-per-session.
 - **`auto-git.sh` changes:** stop the silent Guardrail-1b rotation; instead RESPECT the branch the
   model selected. KEEP Guardrail 1 ("never commit to main") as a pure safety net — if the model
   ever forgets to ask and we're on main, it still creates a branch rather than dirtying main.
@@ -49,16 +51,19 @@ wait for the owner. Therefore the **ASK lives at the model/rule layer**, not in 
 
 ## Files to change
 
-| File | Change |
-|---|---|
-| `.claude/rules/branch-choice.md` | NEW — the model-layer "ask at first edit" + reaper-approval rule |
-| `.claude/hooks/auto-git.sh` | Remove silent 1b rotation; respect model's branch choice; keep main-safety net; read session marker |
-| `.claude/hooks/stale-branch-reaper.sh` | NEW — list branches with last-commit-age >24h + metadata (read-only report) |
-| `.claude/hooks/session-git-landing.sh` | Add a `merge-one <branch>` path used by option 4 + reaper (re-checks CI-green vs current main) |
-| `.claude/skills/start-session/SKILL.md` | STEP 0: also surface the reaper report for approval |
-| `.gitignore` | ignore `.claude/.branch-choice-*` markers |
-| `.claude/settings.json` | wire `stale-branch-reaper.sh` at SessionStart |
-| registry/patterns.json + tests | register the new rule/hook; add unit tests |
+| File | Change | Done |
+|---|---|---|
+| `.claude/skills/branch-choice/SKILL.md` | NEW — model-layer "ask at first edit" menu + reaper-approval procedure (hub-only skill) | ✅ |
+| `.claude/hooks/stale-branch-reaper.sh` | NEW — SessionStart: reset marker + `BRANCH-CHOICE:` nudge + read-only report of branches idle >24h with metadata | ✅ |
+| `.claude/hooks/session-git-landing.sh` (+ core synced copy) | Add a `merge-one <branch>` path (CI-gated) used by option 4 + reaper approvals | ✅ |
+| `.gitignore` | ignore `.claude/.branch-choice-active` marker | ✅ |
+| `.claude/settings.json` | wire `stale-branch-reaper.sh` at SessionStart | ✅ |
+| registry/patterns.json | resync `session-git-landing` hash + last_updated (reaper + skill are hub-only → not registered, per the `auto-pr-reconcile` precedent) | ✅ |
+| `scripts/tests/test_stale_branch_reaper.py` | NEW — 16 guards (report-only, marker reset, 24h threshold, off-switch, skill once-per-session/new-from-main/approval, merge-one CI-gated, core-synced) | ✅ |
+
+**auto-git.sh left unchanged** (KISS): its Guardrail-1b only rotates off *already-merged* branches
+(always safe), and the skill now front-runs the branch decision, so the silent path never conflicts
+with an owner choice. Guardrail 1 ("never commit to main") stays as the backstop.
 
 ## Edge cases + rulings (from adversarial review)
 
