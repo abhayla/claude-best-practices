@@ -10,11 +10,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent.parent
 HOOK = ROOT / ".claude" / "hooks" / "auto-pr-reconcile.sh"
+LIB = ROOT / ".claude" / "hooks" / "session-git-landing.sh"  # shared landing SSOT it delegates to
 SETTINGS = ROOT / ".claude" / "settings.json"
 
 
 def _hook() -> str:
     return HOOK.read_text(encoding="utf-8")
+
+
+def _lib() -> str:
+    return LIB.read_text(encoding="utf-8")
 
 
 def test_hook_exists():
@@ -33,10 +38,14 @@ def test_wired_into_session_start():
 
 
 def test_excludes_current_branch():
-    """The reconcile MUST NOT arm the current HEAD branch — that would merge active work."""
-    body = _hook()
-    assert 'current="$(git rev-parse --abbrev-ref HEAD' in body
-    assert '"$branch" = "$current"' in body, (
+    """The reconcile MUST NOT arm the current HEAD branch — that would merge active work.
+    The reconcile logic lives in the shared SSOT that the hook delegates to."""
+    assert "session-git-landing.sh" in _hook() and "reconcile" in _hook(), (
+        "auto-pr-reconcile.sh must delegate to the shared landing lib's reconcile"
+    )
+    lib = _lib()
+    assert 'cur="$(git rev-parse --abbrev-ref HEAD' in lib
+    assert '"$br" = "$cur"' in lib, (
         "reconcile must skip the current branch so active work is never auto-merged"
     )
 
@@ -48,13 +57,12 @@ def test_honors_off_switches():
 
 
 def test_is_fail_safe():
-    body = _hook()
-    assert "exit 0" in body, "hook must be fail-safe (always exit 0 so it never blocks session start)"
-    # Only arms via native --auto, so GitHub still gates the real merge on required checks.
-    assert "--auto --squash" in body, "must arm native CI-gated auto-merge, not force a merge"
+    assert "exit 0" in _hook(), "hook must be fail-safe (always exit 0 so it never blocks session start)"
+    # Only arms via native --auto, so GitHub still gates the real merge on required checks (in the lib).
+    assert "--auto --squash" in _lib(), "must arm native CI-gated auto-merge, not force a merge"
 
 
 def test_skips_draft_and_already_armed_prs():
-    body = _hook()
-    assert "isDraft==false" in body, "must skip draft PRs"
-    assert "autoMergeRequest==null" in body, "must skip PRs that already have auto-merge armed"
+    lib = _lib()  # the draft/already-armed filtering lives in the shared landing lib
+    assert "isDraft==false" in lib, "must skip draft PRs"
+    assert "autoMergeRequest==null" in lib, "must skip PRs that already have auto-merge armed"

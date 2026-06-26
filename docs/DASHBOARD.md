@@ -1,15 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-26 05:29 UTC (auto-generated)
+> Last updated: 2026-06-26 06:29 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 279 |
+| Total Patterns | 280 |
 | Core (universal) | 207 |
-| Stack-specific | 72 |
+| Stack-specific | 73 |
 | Agents | 36 |
 | Configs | 3 |
-| Hooks | 17 |
+| Hooks | 18 |
 | Rules | 55 |
 | Skills | 168 |
 
@@ -91,7 +91,7 @@
 | e2e-readiness-signal | rule | 1.0.0 | project:firekaro-planner | — |
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
 | e2e-visual-run | skill | 5.1.0 | hub:abhayla/claude-best-practices | fix-loop, serialize-fixes, test-healer-agent, test-scout-agent, tester-agent, verify-screenshots, visual-inspector-agent |
-| end-session | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
+| end-session | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | engineering-roles | rule | 1.7.0 | project:firekaro-planner | — |
 | environment-validation | rule | 1.0.0 | project:firekaro-planner | — |
 | error-handling | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
@@ -176,7 +176,7 @@
 | security-baseline | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | serialize-fixes | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
-| session-continuity | skill | 2.1.1 | hub:abhayla/claude-best-practices | handover, save-session, session-summarizer-agent, start-session, workflow-contracts |
+| session-continuity | skill | 2.1.1 | hub:abhayla/claude-best-practices | handover, end-session, session-summarizer-agent, start-session, workflow-contracts |
 | session-continuity-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | session-governance-status | hook | 1.0.0 | project:firekaro-planner | no-overask-guard |
 | session-reminder | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -188,7 +188,7 @@
 | skill-factory | skill | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-master | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ssot-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | configuration-ssot |
-| start-session | skill | 1.2.0 | hub:abhayla/claude-best-practices | save-session |
+| start-session | skill | 1.2.0 | hub:abhayla/claude-best-practices | end-session |
 | status | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | subagent-driven-dev | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |

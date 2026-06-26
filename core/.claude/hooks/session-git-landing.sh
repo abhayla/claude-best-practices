@@ -57,8 +57,8 @@ reconcile() {
     [ -z "$num" ] && continue
     [ "$br" = "$cur" ] && continue                # never the active branch
     gh pr merge "$num" --auto --squash --delete-branch >/dev/null 2>&1 && { echo "armed #$num ($br — lands when required CI passes)"; any=1; }
-  done < <(gh pr list --state open --json number,headRefName,isDraft \
-            --jq '.[] | select(.isDraft==false) | "\(.number) \(.headRefName)"' 2>/dev/null)
+  done < <(gh pr list --state open --json number,headRefName,isDraft,autoMergeRequest \
+            --jq '.[] | select(.isDraft==false) | select(.autoMergeRequest==null) | "\(.number) \(.headRefName)"' 2>/dev/null)
   [ "$any" = 0 ] && echo "reconcile: no leftover PRs to land"
   return 0
 }

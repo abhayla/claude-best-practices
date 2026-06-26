@@ -6800,7 +6800,7 @@
     "tier": "nice-to-have"
   },
   "session-git-landing": {
-    "hash": "51e272a8d3b9b75e2e3d3d12f29fb8939596da2f63f75a86f5cc0d461ba1216a",
+    "hash": "13e83b3787999247da9eeaebac600c78937af7e84ed314b9aaf327bb2ee59800",
     "type": "hook",
     "category": "need-basis",
     "version": "1.0.0",
