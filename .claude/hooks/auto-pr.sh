@@ -77,10 +77,15 @@ if [ "${AUTO_MERGE:-1}" = "0" ]; then
   exit 0
 fi
 
-if gh pr merge "$branch" --auto --squash >/dev/null 2>&1; then
+# Merge NOW if the PR is already green + mergeable (CLEAN); otherwise arm native auto-merge
+# (GitHub lands it when the required checks pass). Either way it stays CI-gated.
+mss="$(gh pr view "$branch" --json mergeStateStatus --jq '.mergeStateStatus' 2>/dev/null)"
+if [ "$mss" = "CLEAN" ] && gh pr merge "$branch" --squash --delete-branch >/dev/null 2>&1; then
+  log "merged '$branch' immediately (was CLEAN/green)"
+elif gh pr merge "$branch" --auto --squash >/dev/null 2>&1; then
   log "armed auto-merge (squash) for '$branch' — will land when CI is green"
 else
-  log "could not arm auto-merge for '$branch' (already merged, or no required checks pending) — PR left open"
+  log "could not merge/arm '$branch' (already merged, or no required checks pending) — PR left open"
 fi
 
 exit 0
