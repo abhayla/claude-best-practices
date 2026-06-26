@@ -4638,7 +4638,7 @@
     "last_updated": "2026-06-15",
     "dependencies": [
       "handover",
-      "save-session",
+      "end-session",
       "session-summarizer-agent",
       "start-session",
       "workflow-contracts"
@@ -4947,7 +4947,7 @@
     "discovered": "2026-03-19",
     "last_updated": "2026-06-26",
     "dependencies": [
-      "save-session"
+      "end-session"
     ],
     "visibility": "public",
     "description": "Restore a previously saved session checkpoint, loading working files into context and presenting a structured briefing for seamless resumption",
