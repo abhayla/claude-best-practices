@@ -14,7 +14,7 @@ triggers:
   - list sessions
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[session-name | --list]"
-version: "1.1.0"
+version: "1.2.0"
 ---
 
 # Start Session — Restore a Saved Checkpoint
@@ -22,6 +22,35 @@ version: "1.1.0"
 Load a session file created by `/save-session` and restore working context for seamless resumption.
 
 **Key distinction:** `/start-session` restores file-level context from a structured checkpoint. `/continue` gives a lightweight git-state briefing without session files. Use `/start-session` when you have a saved session; use `/continue` for a quick orientation.
+
+---
+
+## STEP 0: Reconcile + Land Leftover PRs (catch-up — runs first)
+
+Before restoring, sweep open PRs so any PRIOR session's green work lands now. This is the
+catch-up for sessions that ended without `/save-session` (the unreliable SessionEnd path):
+a finished, CI-green PR otherwise sits open until some later session sweeps it.
+
+Skip silently if `gh` is unavailable, the repo has no GitHub remote, or `AUTO_MERGE=0`.
+**Never touch the current HEAD branch** (active work must not be merged out from under you).
+
+```bash
+command -v gh >/dev/null 2>&1 && [ "${AUTO_MERGE:-1}" != "0" ] && {
+  cur="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+  gh pr list --state open --json number,headRefName,isDraft,mergeStateStatus \
+    --jq '.[] | select(.isDraft==false) | "\(.number) \(.headRefName) \(.mergeStateStatus)"' 2>/dev/null \
+  | while read -r num branch mss; do
+      [ "$branch" = "$cur" ] && continue                 # never the active branch
+      if [ "$mss" = "CLEAN" ]; then
+        gh pr merge "$num" --squash --delete-branch >/dev/null 2>&1 && echo "landed #$num ($branch, was green)"
+      else
+        gh pr merge "$num" --auto --squash >/dev/null 2>&1 && echo "armed #$num ($branch — lands when CI greens)"
+      fi
+    done
+}
+```
+
+Report what landed / armed (or "no leftover PRs"). Then continue to restore the session.
 
 ---
 
@@ -124,7 +153,8 @@ Present a structured briefing — do NOT auto-start any work.
 
 ## CRITICAL RULES
 
-- MUST NOT modify any files — this skill is strictly read-only
+- MUST NOT modify any local files — the restore path (STEP 1+) is strictly read-only. The ONLY write is STEP 0's CI-gated PR landing (a remote git op, never a local file change)
+- MUST reconcile + land leftover green PRs in STEP 0 (merge if `CLEAN`, else arm auto-merge), but MUST NOT touch the current HEAD branch, and MUST skip silently on no-`gh`/no-remote/`AUTO_MERGE=0`
 - MUST NOT auto-start work after presenting the briefing — wait for user direction
 - MUST warn if the current branch differs from the session's branch
 - MUST handle missing files gracefully — warn and continue, do not fail

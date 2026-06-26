@@ -4414,13 +4414,13 @@
     }
   },
   "save-session": {
-    "hash": "84968a24254301d21b202d8ce0816c2e96f5424737cf1c895876f70fa8f207ce",
+    "hash": "71d9e145e012070df5a3dc3c008d1e121423632670eb47d98dbad994961931e7",
     "type": "skill",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-04-03",
+    "last_updated": "2026-06-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Save a structured session checkpoint capturing working files, git state, key decisions, and task progress for later resumption via /start-session",
@@ -4912,13 +4912,13 @@
     }
   },
   "start-session": {
-    "hash": "6671b604f5d244122080be82c6b5cfb9a41e16477a2980ba605a3e09b8e3480e",
+    "hash": "750ac196b8943bb5b198161f24e6b6d834d6b049c93d876378f662ea208feec6",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-04-03",
+    "last_updated": "2026-06-26",
     "dependencies": [
       "save-session"
     ],
@@ -6760,14 +6760,14 @@
     "tier": "nice-to-have"
   },
   "auto-pr": {
-    "hash": "f2fe41d19642caea0ab08c182d2f27f188fee6c3a7d2970ad6481539704430c8",
+    "hash": "e487bd8e6827bf62939f40cdbda3d616bde39d3431650ce8d9c4d23dfd47e4e2",
     "type": "hook",
     "version": "1.0.0",
     "description": "SessionEnd hook: opens a PR for the task branch and arms native CI-gated auto-merge (squash), prunes gh-confirmed-MERGED branches. Lands work on session close without touching git.",
     "category": "core",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-21",
-    "last_updated": "2026-06-21",
+    "last_updated": "2026-06-26",
     "dependencies": [],
     "visibility": "public",
     "tier": "nice-to-have"

@@ -15,7 +15,7 @@ triggers:
   - session checkpoint
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "[session-name]"
-version: "1.2.0"
+version: "1.3.0"
 ---
 
 # Save Session — Checkpoint Your Progress
@@ -148,11 +148,44 @@ MUST NOT prompt the user or log individual deletions. If no expired sessions exi
 
 ---
 
-## STEP 5: Post-Save Summary
+## STEP 5: Land the Session's Work (CI-gated)
+
+Saving a session should also LAND its work — so "session saved" means "merged once CI is green,"
+not "PR left open until some future session sweeps it" (the gap that leaves a branch + PR always
+hanging around after a completed session). This runs on the CURRENT branch (the one thing
+`/start-session` STEP 0 deliberately skips).
+
+Skip silently if `gh` is unavailable, the repo has no GitHub remote, on `main`/`master`/detached
+HEAD, or `AUTO_MERGE=0`.
+
+```bash
+command -v gh >/dev/null 2>&1 && [ "${AUTO_MERGE:-1}" != "0" ] && {
+  branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+  case "$branch" in main|master|HEAD|"") branch="";; esac
+  [ -n "$branch" ] && {
+    git push -u origin "HEAD:$branch" >/dev/null 2>&1
+    gh pr view "$branch" >/dev/null 2>&1 || gh pr create --base main --head "$branch" --fill >/dev/null 2>&1
+    mss="$(gh pr view "$branch" --json mergeStateStatus --jq '.mergeStateStatus' 2>/dev/null)"
+    if [ "$mss" = "CLEAN" ]; then
+      gh pr merge "$branch" --squash --delete-branch >/dev/null 2>&1 && echo "landed '$branch' (CI green) -> main"
+    else
+      gh pr merge "$branch" --auto --squash >/dev/null 2>&1 && echo "armed auto-merge on '$branch' (lands when CI greens)"
+    fi
+  }
+}
+```
+
+MUST NOT force-merge past failing CI — only a `CLEAN` (green + mergeable) PR merges immediately;
+anything else is armed and stays CI-gated. Report which happened in STEP 6.
+
+---
+
+## STEP 6: Post-Save Summary
 
 After saving, present:
 
 1. **Confirmation:** "Session saved to `.claude/sessions/{name}.md`"
+1b. **Landing:** what STEP 5 did — "merged '<branch>' to main (CI green)", "armed auto-merge (lands when CI greens)", or "skipped (why)".
 2. **Gitignore suggestion:** If `.claude/sessions/` is not in `.gitignore`, suggest adding it:
    ```
    # Session files (local working state)
@@ -175,3 +208,5 @@ After saving, present:
 - MUST read the session template from `references/session-template.md` when available
 - MUST automatically purge session files older than 5 days — no user confirmation required
 - MUST NOT log or display individual file deletions during purge — silent cleanup only
+- MUST land the session's work CI-gated in STEP 5 (merge the current branch's PR if `mergeStateStatus` is `CLEAN`, else arm native auto-merge) — so "saved" means "merged when green," not a PR left hanging
+- MUST NOT force-merge past failing/pending CI — only a `CLEAN` PR merges immediately; everything else is armed and stays gated. Skip on `main`/detached HEAD/no-`gh`/`AUTO_MERGE=0`
