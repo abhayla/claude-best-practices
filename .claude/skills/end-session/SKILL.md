@@ -16,7 +16,7 @@ triggers:
   - checkpoint
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "[session-name]"
-version: "2.0.0"
+version: "2.1.0"
 ---
 
 # End Session — Round Up & Close
@@ -152,12 +152,17 @@ MUST NOT prompt the user or log individual deletions. If no expired sessions exi
 
 ---
 
-## STEP 5: Land the Session's Work (CI-gated)
+## STEP 5: Land the Session's Work — WAIT for CI, then merge (CLOSE the branch)
 
-Saving a session should also LAND its work — so "session saved" means "merged once CI is green,"
-not "PR left open until some future session sweeps it" (the gap that leaves a branch + PR always
-hanging around after a completed session). This runs on the CURRENT branch (the one thing
-`/start-session` STEP 0 deliberately skips).
+"Session ended" must mean "the work is merged and the branch is **CLOSED**" — not "a PR was armed
+and left open." So this step **waits for the required CI checks to conclude, then merges
+synchronously**. This runs on the CURRENT branch (the one thing `/start-session` STEP 0 skips).
+
+**Why the wait is the whole point (the root cause it fixes):** a freshly-pushed PR's CI has not run
+yet, so its `mergeStateStatus` is never `CLEAN` at push time. A naive "if CLEAN merge, else arm"
+check therefore ALWAYS arms-and-returns — leaving the branch open while the merge happens
+*asynchronously, after* `/end-session` already declared the session closed. Waiting for CI to finish
+is what makes the close real and synchronous.
 
 Skip silently if `gh` is unavailable, the repo has no GitHub remote, on `main`/`master`/detached
 HEAD, or `AUTO_MERGE=0`.
@@ -169,18 +174,24 @@ command -v gh >/dev/null 2>&1 && [ "${AUTO_MERGE:-1}" != "0" ] && {
   [ -n "$branch" ] && {
     git push -u origin "HEAD:$branch" >/dev/null 2>&1
     gh pr view "$branch" >/dev/null 2>&1 || gh pr create --base main --head "$branch" --fill >/dev/null 2>&1
-    mss="$(gh pr view "$branch" --json mergeStateStatus --jq '.mergeStateStatus' 2>/dev/null)"
-    if [ "$mss" = "CLEAN" ]; then
-      gh pr merge "$branch" --squash --delete-branch >/dev/null 2>&1 && echo "landed '$branch' (CI green) -> main"
+    checks="$(gh pr checks "$branch" 2>&1)"
+    if echo "$checks" | grep -qiE "no checks|no commit statuses"; then
+      gh pr merge "$branch" --squash --delete-branch >/dev/null 2>&1 && echo "merged '$branch' -> main (no CI checks) — branch CLOSED"
+    elif timeout 900 gh pr checks "$branch" --watch --fail-fast >/dev/null 2>&1; then
+      # --watch BLOCKS until the required checks finish (through queue + run, ~1-3 min), so the
+      # merge below actually closes the branch before this step returns.
+      gh pr merge "$branch" --squash --delete-branch >/dev/null 2>&1 && echo "merged '$branch' -> main (CI passed) — branch CLOSED"
     else
-      gh pr merge "$branch" --auto --squash >/dev/null 2>&1 && echo "armed auto-merge on '$branch' (lands when CI greens)"
+      gh pr merge "$branch" --auto --squash >/dev/null 2>&1   # fallback so it still lands if fixed later
+      echo "NOT CLOSED: CI did not pass for '$branch' — auto-merge armed as a fallback. The session is NOT cleanly closeable until the failing check is fixed and it lands."
     fi
   }
 }
 ```
 
-MUST NOT force-merge past failing CI — only a `CLEAN` (green + mergeable) PR merges immediately;
-anything else is armed and stays CI-gated. Report which happened in STEP 6.
+MUST NOT force-merge past failing CI, and MUST NOT report the session as closed while the branch is
+still open — STEP 5 either merges+closes the branch (after CI passes) or surfaces the CI failure.
+Report which happened in STEP 6.
 
 ---
 
@@ -189,7 +200,7 @@ anything else is armed and stays CI-gated. Report which happened in STEP 6.
 After saving, present:
 
 1. **Confirmation:** "Session saved to `.claude/sessions/{name}.md`"
-1b. **Landing:** what STEP 5 did — "merged '<branch>' to main (CI green)", "armed auto-merge (lands when CI greens)", or "skipped (why)".
+1b. **Landing:** what STEP 5 did — "merged '<branch>' → main and CLOSED the branch (CI passed)", "NOT closed — CI failed (armed as fallback); investigate <check>", or "skipped (why — e.g. on main / no remote)".
 2. **Gitignore suggestion:** If `.claude/sessions/` is not in `.gitignore`, suggest adding it:
    ```
    # Session files (local working state)
@@ -198,7 +209,7 @@ After saving, present:
    Note: Teams that want to share session state can skip this.
 3. **Resume command:** "To restore this session later, run: `/start-session {name}`"
 4. **Quick stats:** Number of working files captured, completed/in-progress/blocked counts
-5. **Session closeable:** state the session goal + whether it was met (distinguish PARKED external blockers from PENDING work), and confirm "the session is complete and can be closed." If the goal is NOT met, say what remains rather than declaring closeable.
+5. **Session closeable:** state the session goal + whether it was met (distinguish PARKED external blockers from PENDING work). Confirm "the session is complete and can be closed" ONLY if STEP 5 actually merged + closed the branch (or cleanly skipped). If STEP 5 reported "NOT closed" (CI failed), the session is NOT cleanly closeable — say so and name the failing check; do not declare it closed with an open branch.
 
 ---
 
@@ -213,5 +224,5 @@ After saving, present:
 - MUST read the session template from `references/session-template.md` when available
 - MUST automatically purge session files older than 5 days — no user confirmation required
 - MUST NOT log or display individual file deletions during purge — silent cleanup only
-- MUST land the session's work CI-gated in STEP 5 (merge the current branch's PR if `mergeStateStatus` is `CLEAN`, else arm native auto-merge) — so "saved" means "merged when green," not a PR left hanging
-- MUST NOT force-merge past failing/pending CI — only a `CLEAN` PR merges immediately; everything else is armed and stays gated. Skip on `main`/detached HEAD/no-`gh`/`AUTO_MERGE=0`
+- MUST, in STEP 5, **WAIT for the required CI checks to conclude (`gh pr checks --watch`) and THEN merge + delete the branch** — so the branch is genuinely CLOSED when the skill returns, not armed-and-left-open. A fresh PR is never `CLEAN` at push time, so checking merge-state without waiting always leaves the branch open (the root cause).
+- MUST NOT force-merge past failing CI, and MUST NOT declare the session "closed/closeable" while its branch is still open. If CI fails, arm as a fallback, report "NOT closed" + the failing check, and do NOT claim the session is cleanly closeable. Skip on `main`/detached HEAD/no-`gh`/no-remote/`AUTO_MERGE=0`.
