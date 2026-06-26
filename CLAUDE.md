@@ -100,6 +100,7 @@ The hub manages its own git branches end-to-end so the user never touches git (P
 - **`docs/workflows/`** — Auto-generated workflow docs. Do not edit manually — regenerate after pattern changes
 - **`docs/WORKFLOW-DIAGRAM.md`** — Visual reference for the skill-at-T0 workflow orchestration model. Read alongside the "Workflow Orchestration (skill-at-T0)" section below
 - **`internet-sources/`** — Pending and archived sources for `scan_web.py` (`pending/`, `archived/`)
+- **`plugins/`** — In-tree G6 plugin monorepo + marketplace (`plugins/.claude-plugin/marketplace.json`). First plugin: `prompt-auto-enhance/` (the capability that graduated from a `core/` template to plugin-as-SSOT; see the G6 state under "Goal Vocabulary" above). New installable plugins are built here one-at-a-time, owner-approved.
 - **`plans/`** — Durable implementation plans for multi-session initiatives. Write a plan here when work spans sessions or needs cross-subagent handoff; use in-session plan mode for single-session tasks.
 - **`.claude/tasks/`** — `todo.md` (current task checklist per `claude-behavior.md` rule 14) and `lessons.md` (correction patterns accumulated across sessions). Read `lessons.md` at session start; append after corrections.
 - **`.claude/sessions/`** — `/end-session` checkpoints; `/start-session` and `/continue` restore from here
