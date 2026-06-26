@@ -4,18 +4,23 @@
 
 Every response starts with `*Enhanced: <what was checked>*` (under 15 words).
 
-The hook (`prompt-enhance-reminder.sh`) gates triggering: prompts ≤15 chars and known
-continuation phrases skip injection at the deterministic layer, so the strengthening
-pipeline only runs on substantive prompts.
+The hook (`prompt-enhance-reminder.sh`) gates triggering: slash-command prompts, prompts ≤15
+chars, and known continuation phrases skip injection at the deterministic layer, so the
+strengthening pipeline only runs on substantive free-text prompts.
 
-**The indicator is unconditional on substantive OUTPUT — even when the hook stayed
-silent.** The hook gates on PROMPT shape; short / slash-command / continuation prompts
-still spawn substantive work, and the discipline fires on the output's blast radius,
-not the prompt's shape. Whenever a turn produces substantive output (real analysis,
-multi-step answer, tool edits/commits), self-apply the banner + full process (transcript
-+ grade card + final prompt) + `Role:` line + governance tail even with no reminder injected. The Stop hook `no-overask-guard.sh`
-logs substantive turns missing the banner to `.claude/.enhance-misses.log` (telemetry,
-non-blocking). Genuinely trivial turns (`yes`/`go ahead`) are exempt.
+**Slash commands are NEVER enhanced.** A `/command` — user-made OR Anthropic-provided (`/init`,
+`/end-session`, …) — runs EXACTLY as-is, any size, never routed through the pipeline. Setting
+default `enhance_slash_commands: false`: `prompt-enhance-reminder.sh` skips `/*`-prompts and
+`enhance-process-guard.sh` exempts slash-command turns. Set `true` to treat them as normal prompts.
+
+**For free-text prompts, the indicator is unconditional on substantive OUTPUT — even when the
+hook stayed silent.** The hook gates on PROMPT shape; a short / continuation free-text prompt can
+still spawn substantive work, and the discipline fires on the output's blast radius, not the
+prompt's shape. Whenever a (non-slash-command) turn produces substantive output (real analysis,
+multi-step answer, tool edits/commits), self-apply the banner + full process (transcript + grade
+card + final prompt) + `Role:` line + governance tail even with no reminder injected. The Stop hook
+(`enhance-process-guard.sh`) keeps a quiet log of substantive turns missing the process (telemetry,
+non-blocking). Genuinely trivial turns (`yes`/`go ahead`) and slash-command turns are exempt.
 
 ## MANDATORY OUTPUT — always SHOW the full enhancement process (default ON)
 

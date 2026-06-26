@@ -37,6 +37,20 @@ last_text=$(jq -r '
   then ((.message.content[]? | select(.type=="text") | .text) + "\n")
   else empty end' "$tp" 2>/dev/null | awk 'BEGIN{RS="@@TURN@@"} END{printf "%s", $0}')
 [ -z "$last_text" ] && exit 0
+
+# Slash-command exemption — mirror the UserPromptSubmit hook: when enhance_slash_commands is not
+# true (default false), a /command (user-made OR Anthropic-provided) is run as-is and is NEVER
+# enhanced. This guard only enforces the enhance process, so a slash-command turn exits entirely.
+if [ "$(getj '.enhance_slash_commands')" != "true" ]; then
+  last_user=$(jq -rc '
+    if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
+    then {t:(if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)}
+    else empty end' "$tp" 2>/dev/null | tail -1)
+  case "$last_user" in
+    *'<command-name>'*|*'"t":"/'*|*'"t":" /'*) exit 0 ;;
+  esac
+fi
+
 full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 
 subchars="$(getj '.when_to_enhance.min_response_size_to_check_characters')"; case "$subchars" in ''|*[!0-9]*) subchars=300 ;; esac

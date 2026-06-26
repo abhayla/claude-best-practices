@@ -4,18 +4,28 @@
 
 Every response starts with `*Enhanced: <what was checked>*` (under 15 words).
 
-The hook (`prompt-enhance-reminder.sh`) gates triggering: prompts ≤15 chars and known
-continuation phrases skip injection at the deterministic layer, so the strengthening
-pipeline only runs on substantive prompts.
+The hook (`prompt-enhance-reminder.sh`) gates triggering: slash-command prompts, prompts
+≤15 chars, and known continuation phrases skip injection at the deterministic layer, so the
+strengthening pipeline only runs on substantive free-text prompts.
 
-**The indicator is unconditional on substantive OUTPUT — even when the hook stayed
-silent.** The hook gates on PROMPT shape; short / slash-command / continuation prompts
-still spawn substantive work, and the discipline fires on the output's blast radius,
-not the prompt's shape. Whenever a turn produces substantive output (real analysis,
+**Slash commands are NEVER enhanced.** A `/command` — user-made OR Anthropic-provided
+(`/init`, `/end-session`, `/grill-me`, …) — is run EXACTLY as-is, any size, and is never routed
+through the strengthening pipeline. This is the canonical plugin default `enhance_slash_commands:
+false` (SSOT: `plugins/prompt-auto-enhance/enhance-settings.default.json`); the hub's operational
+`prompt-enhance-reminder.sh` skips `/*`-prompts and the Stop hook `no-overask-guard.sh` exempts
+slash-command turns from the enhance-card / diagnosis enforcement. There is nothing to "strengthen"
+in a fixed command invocation, so the banner + grade card are suppressed for it. The **governance
+tail** (plan-before-coding, decide-don't-ask, grill-when-unsure, narrate-and-stop, git) still
+applies to slash-command turns — it is not part of the enhancement process.
+
+**For free-text prompts, the indicator is unconditional on substantive OUTPUT — even when the
+hook stayed silent.** The hook gates on PROMPT shape; a short / continuation free-text prompt can
+still spawn substantive work, and the discipline fires on the output's blast radius, not the
+prompt's shape. Whenever a (non-slash-command) turn produces substantive output (real analysis,
 multi-step answer, tool edits/commits), self-apply the banner + full process (transcript
 + grade card + final prompt) + `Role:` line + governance tail even with no reminder injected. The Stop hook `no-overask-guard.sh`
 logs substantive turns missing the banner to `.claude/.enhance-misses.log` (telemetry,
-non-blocking). Genuinely trivial turns (`yes`/`go ahead`) are exempt.
+non-blocking). Genuinely trivial turns (`yes`/`go ahead`) and slash-command turns are exempt.
 
 ## MANDATORY OUTPUT — always SHOW the full enhancement process (default ON)
 

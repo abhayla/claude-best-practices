@@ -21,12 +21,14 @@
 # Plus one NON-BLOCKING telemetry class (the output-side backstop):
 #   C. ENHANCE-BANNER MISS — a substantive assistant turn (>=300 chars) that does
 #      NOT open with the *Enhanced:* governance banner. WHY: prompt-enhance-reminder.sh
-#      gates on PROMPT shape, so it stays silent on short/command/continuation prompts
-#      that still spawn real work (the /init class). The banner should fire on OUTPUT
-#      blast-radius, not prompt shape — the prompt hook can't see output, this Stop
-#      hook can. We LOG the miss to .claude/.enhance-misses.log (telemetry first —
-#      escalate to a block only if the log shows it's frequent). The behavioral fix
-#      is the rule wording in prompt-auto-enhance-rule.md.
+#      gates on PROMPT shape, so it stays silent on short/continuation prompts that
+#      still spawn real work. The banner should fire on OUTPUT blast-radius, not prompt
+#      shape — the prompt hook can't see output, this Stop hook can. We LOG the miss to
+#      .claude/.enhance-misses.log (telemetry first — escalate to a block only if the log
+#      shows it's frequent). The behavioral fix is the rule wording in prompt-auto-enhance-rule.md.
+#      EXCEPTION: a slash-command turn ($is_slash) is exempt from ALL of class C and the
+#      enhance-card/diagnosis blocks — a /command (user- or Anthropic-made) is run as-is and
+#      never enhanced (enhance_slash_commands=false, the canonical plugin default).
 exec 2>/dev/null
 input=$(cat)
 command -v jq >/dev/null || exit 0
@@ -46,6 +48,24 @@ last_text=$(jq -r '
   then ((.message.content[]? | select(.type=="text") | .text) + "\n")
   else empty end' "$tp" 2>/dev/null | awk 'BEGIN{RS="@@TURN@@"} END{printf "%s", $0}')
 [ -z "$last_text" ] && exit 0
+
+# ── Slash-command exemption (enhance side only) ──
+# A /command — user-made OR Anthropic-provided (/init, /end-session, /grill-me, …) — is run
+# EXACTLY as-is and is NEVER routed through the prompt-enhancement pipeline (enhance_slash_commands
+# =false, the canonical plugin default; SSOT plugins/prompt-auto-enhance/enhance-settings.default.json).
+# So the enhance-card / diagnosis-substance blocks + enhance telemetry below MUST NOT fire on a
+# slash-command turn. The over-ask + narrate-and-stop GOVERNANCE guards further down still apply.
+# Detect by inspecting the LAST real user entry: a harness slash invocation carries a
+# <command-name> tag; a raw client prompt is the literal "/command args" text.
+is_slash=""
+last_user=$(jq -rc '
+  if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
+  then {t:(if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)}
+  else empty end' "$tp" 2>/dev/null | tail -1)
+case "$last_user" in
+  *'<command-name>'*) is_slash="1" ;;
+  *'"t":"/'*|*'"t":" /'*) is_slash="1" ;;
+esac
 
 # Drop leading blank lines: the turn-aggregate starts with the newline that
 # followed the @@TURN@@ sentinel; head -1 on a blank line would re-create the
@@ -78,7 +98,7 @@ printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — 
 card=""
 printf '%s' "$full" | grep -qE "reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
 # G7: block on substantive + not-trivial + NO card, regardless of banner shape.
-if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
   rc="$root/.claude/.reviewcard-count"
   rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
@@ -106,7 +126,7 @@ fi
 # (.diagnosis-count, reset per turn by prompt-enhance-reminder.sh), cap 4.
 substance=""
 printf '%s' "$full" | grep -qE "diagnosis:|changes applied|missing_role|missing_context|missing_output|vague_intent|under_constrained|missing_structure|missing_example|missing_constraint|grade: a|grade a[^a-z]|0 fix|no fix|zero fix" && substance="1"
-if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ]; then
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ]; then
   dc="$root/.claude/.diagnosis-count"
   dn=$(cat "$dc" 2>/dev/null || echo 0); case "$dn" in ''|*[!0-9]*) dn=0 ;; esac
   printf '%s\tdiagnosis-substance-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((dn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
@@ -153,14 +173,14 @@ fi
 # "*enhanced" (case-insensitive). Log-only; never blocks, never sets $flag.
 # Limitation (v1, KISS): a short message that nonetheless made tool edits is not
 # caught by the length proxy — revisit with a tool_use scan if the log warrants.
-if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && ! printf '%s' "$full" | head -1 | grep -qE '^\*enhanced'; then
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && ! printf '%s' "$full" | head -1 | grep -qE '^\*enhanced'; then
   printf '%s\tenhance-banner-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.enhance-misses.log" 2>/dev/null
 fi
 # Block-miss: substantive turn that HAS the banner but shows NEITHER the
 # enhanced-prompt block ("final prompt"/"what changed") NOR the trivial "ran as-is"
 # one-liner → the user can't see what was enhanced. Non-blocking telemetry (the
 # behavioral fix is the MANDATORY OUTPUT section in prompt-auto-enhance-rule.md).
-if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' && ! printf '%s' "$full" | grep -qE "final prompt|what changed|ran (your )?input as-is|ran as-is|no change — ran|no enhancement"; then
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' && ! printf '%s' "$full" | grep -qE "final prompt|what changed|ran (your )?input as-is|ran as-is|no change — ran|no enhancement"; then
   printf '%s\tenhance-block-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.enhance-misses.log" 2>/dev/null
 fi
 # Role-miss (R1 persona): a final-prompt block whose text lacks "act as" — the R1 role
@@ -168,7 +188,7 @@ fi
 # Selection Guide: mandatory when the Role dimension scores < 7, at EVERY grade incl. A).
 # Limitation (v1, telemetry-only): role-sufficient prompts (Role >= 7) legitimately lack
 # it, so this LOGS, never blocks — escalate to a block only if the log shows it stays frequent.
-if [ "$emode" = "auto" ] && [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | grep -qE "final (strengthened )?prompt" && ! printf '%s' "$full" | grep -qE "act as"; then
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | grep -qE "final (strengthened )?prompt" && ! printf '%s' "$full" | grep -qE "act as"; then
   printf '%s\trole-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.enhance-misses.log" 2>/dev/null
 fi
 

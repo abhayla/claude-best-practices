@@ -38,8 +38,10 @@ The `prompt-auto-enhance` global rule controls when this activates; the
 
 ## Activation
 
-Activates for **non-trivial prompts** — anything the hook did not filter out.
+Activates for **non-trivial free-text prompts** — anything the hook did not filter out.
 Skipped at the hook layer for:
+- **Slash commands** — any `/command`, user-made OR Anthropic-provided (`/init`, `/end-session`, …),
+  is run exactly as-is, any size (`enhance_slash_commands: false`, the canonical plugin default)
 - Prompts ≤ 15 characters (after trimming whitespace)
 - Known continuation phrases ("yes", "ok", "continue", "now do …", "also …", etc.)
 
