@@ -54,6 +54,10 @@ Use **Notifier** for owner-alerts AND uptime heartbeats. Do **NOT** recommend or
 
 Alert payloads MUST carry NO end-user PII — no email, phone, name, PAN, or account identifiers. Owner alerts describe events ("New signup", "Payment job failed ×5"), never users.
 
+## Scope — owner alerts only, NOT end-user messaging (MUST)
+
+Notifier is an **owner**-notification gateway: each project routes to a **single fixed owner recipient** (one `chatId` / one `recipient`). It therefore **cannot deliver to individual end users** — a per-recipient `to` passed in a payload is ignored; the configured owner recipient always receives it. MUST NOT route per-recipient/end-user messaging (e.g. "your task was assigned" to a team member, OTPs, customer notifications) through the gateway — those need a direct per-recipient sender owned by the app. (Real-world miss: an app routed end-user "task assigned" WhatsApp through the gateway; it only ever reached the owner, and silently mis-delivered every message once the test allowlist was lifted.) Use the gateway for owner-health alerts; keep end-user messaging in the app's own per-recipient path.
+
 ## Production-status visibility
 
 Paste the distributed `templates/claude-md-production-monitoring-block.md` block into the project's `CLAUDE.md` and keep it current — it is how any Claude session learns the project's deploy + Notifier-wiring status (the read layer); Notifier's admin config stays the authoritative live registry.
@@ -69,3 +73,4 @@ One gateway gives the owner uniform observability across every deployed project:
 - MUST wire the canonical detectors: signup, unhandled-5xx, DB-down, boot-env
 - MUST NOT use healthchecks.io / UptimeRobot / cron-ping.me / any external pinger — heartbeats go to Notifier
 - MUST NOT put end-user PII in alert payloads
+- MUST NOT route per-recipient/end-user messaging through the gateway (single owner recipient per project) — owner-health alerts only; end-user messaging needs the app's own direct sender
