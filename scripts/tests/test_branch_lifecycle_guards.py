@@ -17,6 +17,7 @@ import pytest
 ROOT = Path(__file__).parent.parent.parent
 GATE = ROOT / ".claude" / "hooks" / "branch-choice-gate.sh"
 GUARD = ROOT / ".claude" / "hooks" / "session-concurrency-guard.sh"
+AUTOPR = ROOT / ".claude" / "hooks" / "auto-pr.sh"
 SETTINGS = ROOT / ".claude" / "settings.json"
 
 
@@ -129,6 +130,33 @@ def test_guard_execution_warns_on_second_session_only(tmp_path):
     assert "CONCURRENCY" not in same.stdout, "the SAME session re-running must not warn itself"
 
 
+def test_guard_suppresses_warning_on_resume_and_clear():
+    body = _read(GUARD)
+    assert ".source" in body, "guard must read the SessionStart source field"
+    assert '"resume"' in body and '"clear"' in body, (
+        "guard must suppress the concurrency warning on resume/clear (same operator, not a 2nd session)"
+    )
+
+
+@pytest.mark.skipif(not (shutil.which("bash") and shutil.which("git")), reason="needs bash+git")
+def test_guard_warns_on_startup_but_not_resume(tmp_path):
+    bash, git = shutil.which("bash"), shutil.which("git")
+    repo = tmp_path / "r"; repo.mkdir(); (repo / ".claude").mkdir()
+    subprocess.run([git, "init", "-q"], cwd=repo)
+
+    def run(sid, src):
+        return subprocess.run(
+            [bash, str(GUARD)], cwd=repo, input=json.dumps({"session_id": sid, "source": src}),
+            capture_output=True, text=True,
+        )
+
+    run("A", "startup")                              # first session claims the lock
+    resumed = run("B", "resume")                     # resuming must NOT warn (the bug we fixed)
+    assert "CONCURRENCY" not in resumed.stdout, "resume must not trigger a concurrency warning"
+    startup2 = run("C", "startup")                   # a genuine new startup still warns
+    assert "CONCURRENCY" in startup2.stdout, "a fresh startup over a live lock must still warn"
+
+
 @pytest.mark.skipif(not (shutil.which("bash") and shutil.which("git")), reason="needs bash+git")
 def test_guard_makes_no_git_mutations(tmp_path):
     bash, git = shutil.which("bash"), shutil.which("git")
@@ -145,3 +173,36 @@ def test_guard_makes_no_git_mutations(tmp_path):
     subprocess.run([bash, str(GUARD)], cwd=repo, input='{"session_id":"x"}', capture_output=True, text=True, env=env)
     after = g("for-each-ref", "--format=%(refname) %(objectname)").stdout + g("rev-parse", "HEAD").stdout
     assert before == after, "concurrency guard must not change any git ref or HEAD"
+
+
+# ---- auto-pr.sh fast-exit on clean main (the "Hook cancelled" mitigation) --
+
+def test_autopr_has_main_only_fast_exit():
+    body = _read(AUTOPR)
+    assert "fast-exit" in body, "auto-pr.sh must fast-exit on main with no other local branches"
+    assert "for-each-ref" in body and "refs/heads/" in body, (
+        "fast-exit must be a pure-local branch check (no network) before the slow git fetch/gh calls"
+    )
+
+
+@pytest.mark.skipif(not (shutil.which("bash") and shutil.which("git")), reason="needs bash+git")
+def test_autopr_fast_exits_on_main_only_repo(tmp_path):
+    """On a repo whose only branch is main, auto-pr.sh must exit 0 and mutate nothing — it should
+    NOT do the slow network work that races SessionEnd shutdown and surfaces 'Hook cancelled'."""
+    bash, git = shutil.which("bash"), shutil.which("git")
+    repo = tmp_path / "r"; repo.mkdir(); (repo / ".claude").mkdir()
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull)
+
+    def g(*a):
+        return subprocess.run([git, *a], cwd=repo, capture_output=True, text=True, env=env)
+
+    g("init", "-q", "-b", "main")
+    g("config", "user.email", "t@t.test"); g("config", "user.name", "t")
+    (repo / "a.txt").write_text("x", encoding="utf-8"); g("add", "-A"); g("commit", "-qm", "i")
+    before = g("for-each-ref", "--format=%(refname) %(objectname)").stdout
+
+    r = subprocess.run([bash, str(AUTOPR)], cwd=repo, capture_output=True, text=True, env=env)
+    assert r.returncode == 0, "auto-pr.sh must be fail-safe (exit 0)"
+    after = g("for-each-ref", "--format=%(refname) %(objectname)").stdout
+    assert before == after, "fast-exit must not create branches/refs on a clean main-only repo"
+    assert g("rev-parse", "--abbrev-ref", "HEAD").stdout.strip() == "main", "must stay on main"

@@ -18,12 +18,16 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 input="$(cat 2>/dev/null || true)"
 sid="$(printf '%s' "$input" | jq -r '.session_id // empty' 2>/dev/null || true)"
 [ -z "$sid" ] && sid="unknown"
+# SessionStart `source`: startup | resume | clear. Resuming or /clear is the SAME operator
+# continuing in the SAME terminal — NOT a second concurrent session. Only a fresh `startup`
+# (e.g. a new terminal) can be a genuine collision, so only `startup` is allowed to warn.
+src="$(printf '%s' "$input" | jq -r '.source // empty' 2>/dev/null || true)"
 
 LOCK="$ROOT/.claude/.session-active.lock"   # matches the gitignored `.claude/*.lock` pattern
 STALE_MIN="${CONCURRENCY_STALE_MIN:-30}"
 now="$(date +%s)"
 
-if [ -f "$LOCK" ]; then
+if [ -f "$LOCK" ] && [ "$src" != "resume" ] && [ "$src" != "clear" ]; then
   prev_sid="$(awk 'NR==1{print $1}' "$LOCK" 2>/dev/null)"
   prev_ts="$(awk 'NR==1{print $2}' "$LOCK" 2>/dev/null)"
   case "$prev_ts" in ''|*[!0-9]*) prev_ts=0;; esac

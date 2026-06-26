@@ -32,6 +32,18 @@ log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] auto-pr: $*" >> "$LOG" 2>/dev/null;
 
 command -v gh >/dev/null 2>&1 || { log "gh not installed; skipping"; exit 0; }
 
+# Fast-exit: if we're on main/master AND it's the ONLY local branch, there is nothing to land or
+# prune — skip the slow network I/O (git fetch + gh calls). This is the common "ended the session on
+# main, everything already merged" case; doing network work there only races the SessionEnd shutdown
+# window and surfaces a benign "Hook cancelled". Anything genuinely pending is still swept by
+# auto-pr-reconcile.sh at the reliably-firing SessionStart. (Pure local check — no network.)
+_cur="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+if [ "$_cur" = "main" ] || [ "$_cur" = "master" ]; then
+  _other="$(git for-each-ref --format='%(refname:short)' refs/heads/ 2>/dev/null \
+            | grep -vxE 'main|master' | head -1)"
+  [ -z "$_other" ] && { log "on '$_cur', no other local branches — nothing to land/prune; fast-exit"; exit 0; }
+fi
+
 # Prune merged branches so they never accumulate. `fetch --prune` drops stale remote refs (safe);
 # a LOCAL branch is hard-deleted ONLY when gh confirms its PR is MERGED — its content is already on
 # main, so this can never lose work (squash-merge hides it from `git branch -d`, hence the gh check).
