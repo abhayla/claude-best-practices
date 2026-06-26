@@ -2,6 +2,27 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-26 — Branch off the CURRENT HEAD, not `origin/main`, when uncommitted-looking work is actually committed on the active branch
+
+**Surfaced during:** landing the session-git-landing DRY refactor. The auto-git hook had already
+**committed** the complete refactor (new lib + 4 refactored callers + tests) onto the active
+`auto/work-…` branch. I then ran `git checkout -b refactor/… origin/main` to "start a clean PR
+branch" — but branching off `origin/main` (which lacks those commits) reset the working tree's
+*tracked* files to main's versions: the new lib vanished, both hooks reverted to their inline form,
+and the new branch carried only 3 stray files. It looked like catastrophic loss.
+
+**Why it's wrong:** `git checkout -b NEW origin/main` only preserves *uncommitted* changes. Work the
+auto-git hook already committed to the current branch does NOT follow you to a branch based on a
+different start-point — it stays on the old branch and the working tree reverts. I assumed the
+refactor was sitting as uncommitted edits; it was committed.
+
+**Root cause → rule:** before creating a new branch, run `git log --oneline origin/main..HEAD` to see
+what is *already committed* on the current branch. If the work I want is there, branch off **HEAD**
+(`git checkout -b NEW`) or just keep using the current branch / its existing PR — never off
+`origin/main`. The work was fully recoverable (it was on the prior branch + its PR #211 all along);
+reuse the existing branch/PR instead of spawning a fresh one. Verify with `git diff --name-only
+origin/main...HEAD` that the new branch actually carries the full change set before pushing.
+
 ## 2026-06-22 — Never delete an untracked file I didn't author; don't `git add -A` blindly
 
 **Surfaced during:** the prompt-auto-enhance core-retirement migration. I ran `git add -A`, which swept up
