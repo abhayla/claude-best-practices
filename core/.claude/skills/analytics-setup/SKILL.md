@@ -11,7 +11,7 @@ description: >
   /monitoring-setup.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[site-url-or-path] [--ga G-XXXXXXXXXX] [--gtm GTM-XXXXXXX]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 triggers:
   - analytics setup
@@ -51,6 +51,10 @@ Identify the project so the injection method is correct:
    - `nuxt.config.*` → **Nuxt**; `vue` + `vite.config.*` → **Vue SPA**
    - `astro.config.*` → **Astro**; `svelte.config.*` → **SvelteKit**
    - bare `index.html` with no build tool → **pure-static HTML**
+   - **Non-web** — `pubspec.yaml` (Flutter), `android/` Gradle, RN/Expo, or an
+     `electron`/desktop app → this web GTM path does NOT apply; follow
+     `references/cross-platform.md` (Firebase Analytics for mobile, GA4
+     Measurement Protocol for desktop — same GA4 backend) and skip to its steps.
 2. Decide the loader:
    - Default to **GTM** (a `GTM-XXXXXXX` container) for every framework and for
      static sites that can edit a shared layout/`<head>`.
@@ -60,6 +64,22 @@ Identify the project so the injection method is correct:
    `googletagmanager.com/gtm.js`, `gtag(`, `G-`, and `GTM-`. If GA4/GTM is
    already present, switch to **audit mode** — confirm the property is
    one-per-site, events fire, consent is wired, then jump to STEP 6 (verify).
+
+**Already-deployed site, no source rebuild available?** A "dynamic" app is NOT a
+barrier to analytics — only your *method* is. When you can't (or won't) rebuild
+from source, inject server-side WITHOUT touching the app:
+- **Static webroot** (`root /var/www/X`): edit the live `index.html` directly
+  (backup first). A Next.js **static export** (`*.html` per route) needs the
+  snippet in EVERY route HTML, not just `index.html`, or deep-link landings miss.
+- **Dynamic/proxied app** (`proxy_pass http://127.0.0.1:PORT`): inject at nginx
+  with **`sub_filter`** — host the GA logic as a static `.js` file and add
+  `sub_filter '</head>' '<script src="/ga/x.js"></script></head>'` plus
+  `proxy_set_header Accept-Encoding ""` (so upstream HTML is uncompressed, else
+  sub_filter no-ops) to the proxy `location`; **`nginx -t` before reload** (shared
+  host). Edge injection (Cloudflare Workers) is the same idea one layer out.
+- These server-side edits are **non-durable** — lost on the next source redeploy.
+  Also update the SOURCE for persistence; if both are present, remove one to avoid
+  double-tagging. SMOKE-TEST OVER HTTPS (`:80` redirects), and verify a real hit.
 
 State the detected stack and chosen loader before editing anything.
 
@@ -178,6 +198,75 @@ without `'unsafe-inline'` — if the site ships a CSP (it should), bind the hand
 in JS (`addEventListener`) instead of the inline attribute shown above. Every
 revenue-bearing CTA on the site gets one — sweep the codebase for affiliate
 links and instrument each.
+
+## STEP 4b: Blanket Interaction Tracking (OPT-IN — "every button & link")
+
+STEP 4 covers the revenue-bearing CTAs explicitly. When the owner wants to know
+**which of ALL buttons/links visitors click** (not just CTAs), add blanket
+interaction tracking. This is **opt-in** — it is noisier than explicit events, so
+enable it only when broad interaction insight is wanted, and keep STEP 4's named
+events for anything revenue-bearing (you want clean, intent-named events there).
+
+Two interchangeable mechanisms — pick ONE per site:
+
+**A. GTM "All Elements" click trigger (no per-element code — preferred for GTM sites).**
+In GTM: create a **Click trigger → All Elements**, then a single **GA4 Event tag**
+(event name `ui_click`) firing on it, mapping GTM's built-in click variables to
+parameters: `link_text → {{Click Text}}`, `link_url → {{Click URL}}`,
+`element_id → {{Click ID}}`, `element_classes → {{Click Classes}}`. One tag now
+records every click site-wide. Enable the **Clicks → All Elements** built-in
+variables first (Variables → Configure). Refine later with a trigger condition
+(e.g. only `Click Element matches CSS a, button, [role="button"]`) to drop noise.
+
+**B. Data-attribute + delegated listener (for gtag-fallback / code-controlled SPAs).**
+Annotate elements declaratively and capture with ONE delegated listener — no
+per-button wiring, CSP-safe (bound in JS, not inline):
+
+```html
+<button data-track="signup" data-section="hero">Sign Up</button>
+<a href="/pricing" data-track="nav_pricing">Pricing</a>
+```
+
+```js
+// one listener for the whole document — survives SPA re-renders
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-track], a, button, [role="button"]');
+  if (!el) return;
+  const payload = {
+    event: 'ui_click',
+    interaction_id: el.dataset.track || null,        // explicit name when annotated
+    link_text: (el.textContent || '').trim().slice(0, 100),
+    link_url: el.getAttribute('href') || null,
+    element_id: el.id || null,
+    page_section: el.dataset.section || null,
+  };
+  // GTM path → dataLayer; gtag fallback → gtag('event','ui_click',payload)
+  (window.dataLayer = window.dataLayer || []).push(payload);
+}, { capture: true });
+```
+
+For SPAs, also push a `page_view` on every client route change (client navigations
+do not reload the page, so GA4 enhanced measurement misses them) — wire it into the
+router's after-each hook.
+
+**Standard event schema (keep consistent across ALL sites — snake_case):**
+`event: ui_click` · `interaction_id` · `link_text` · `link_url` · `element_id` ·
+`page_section`. Verify a blanket click the same way as STEP 6 (assert an
+`en=ui_click` collect request fires on an ordinary button). Do NOT also hand-roll
+ordinary outbound-link tracking — GA4 enhanced measurement already covers outbound
+links and downloads; `ui_click` is for the INTERNAL buttons/links it misses.
+
+**Owner-readable labels (plain simple English — NOT codes).** Everything an owner
+SEES in GA reports must read as plain English. GA4 forces event *names* to be
+`snake_case` (a Google constraint), so keep the name technical-but-clear
+(`ui_click`) and put the human-readable label in a *parameter value*: prefer the
+element's **visible text** (`link_text`), and when annotating with `data-track`,
+use a plain-English value (`data-track="Open a Zerodha account"`, not
+`data-track="cta_zmphzc"`). Also register the surfaced parameters as GA4 **custom
+dimensions with friendly display names** ("Button label", "Link destination") so
+the report columns read in plain English too. The GA4 **property displayName** is
+free-form — name it the way the owner thinks of the site ("Real Fuel Prices
+India"), never a slug.
 
 ## STEP 5: Configure Google Consent Mode v2 Defaults
 

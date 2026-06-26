@@ -6584,7 +6584,7 @@
     "tier": "nice-to-have"
   },
   "web-analytics-instrumentation": {
-    "hash": "7ec5ebe5ad5e405bb835688d4ab1d5d9e868336e203ae45169fcd2ab7d5cec90",
+    "hash": "d7c304d79a19080bba3542e7baf4b02cb21f23c0f34711ba3ccd68eaf538c7a8",
     "type": "rule",
     "category": "need-basis",
     "version": "1.0.0",
@@ -6602,13 +6602,14 @@
       "affiliate-tracking"
     ],
     "changelog": "v1.0.0 (2026-06-18): Initial - web analytics instrumentation standard (GA4 one-property-per-site via GTM, verified CTA/affiliate events, Consent Mode v2, Search Console).",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "last_updated": "2026-06-25"
   },
   "analytics-setup": {
-    "hash": "9a67823cbe4bb20e0c29be81146014d2e32fdc48e72298887870f12211b1d6cc",
+    "hash": "9d4658db78ec9019ba14ae5653f68700adc7afe895b578bc491e8c11d4a387e5",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-18",
     "dependencies": [
@@ -6626,7 +6627,8 @@
       "affiliate-tracking"
     ],
     "changelog": "v1.0.0 (2026-06-18): Initial - GA4+GTM+Search Console setup with explicit CTA/affiliate events, Consent Mode v2, and mandatory hit verification.",
-    "tier": "nice-to-have"
+    "tier": "nice-to-have",
+    "last_updated": "2026-06-25"
   },
   "verifier-edge-guard": {
     "hash": "fcc86a43da26db7a7b275b64b41fa58bb72cf4edd5c0394041ca0b12242b9cdd",
@@ -6650,7 +6652,7 @@
     "tier": "nice-to-have"
   },
   "vps-deploy": {
-    "hash": "e1c432ccb3c0de85cbc651b76a8666e43eb0240ab17d90577f280740d48518e6",
+    "hash": "43784cba3e0af1c225895648d2ef6c321d7df3d66d0293ba896ae1b4101f4aa3",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -6907,7 +6909,7 @@
     "tier": "must-have"
   },
   "web-deploy-readiness": {
-    "hash": "f5509796ccff44f981a46425c1896331b415e35965b06a10942ff8c70e97bff8",
+    "hash": "0672f511930082fb8040b863f3e84c8477d7ddd94859314b7dc72a452367ecd4",
     "type": "rule",
     "category": "need-basis",
     "version": "1.0.0",
