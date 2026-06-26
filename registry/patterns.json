@@ -17,7 +17,7 @@
       "html",
       "transparency"
     ],
-    "changelog": "v1.0.0 (2026-06-17): Initial \u2014 per-project behind-the-scenes provenance report (timeline, roles, patterns used, agents, gates, done-vs-open, loophole audit). | v1.1.0 (2026-06-17): require a featured INTERACTIVE inline-SVG process-flow diagram (actual stages + labeled loops + gate markers; clickable nodes \u2192 per-stage roles/skills/agents/hooks/rules/gate/outputs).",
+    "changelog": "v1.0.0 (2026-06-17): Initial — per-project behind-the-scenes provenance report (timeline, roles, patterns used, agents, gates, done-vs-open, loophole audit). | v1.1.0 (2026-06-17): require a featured INTERACTIVE inline-SVG process-flow diagram (actual stages + labeled loops + gate markers; clickable nodes → per-stage roles/skills/agents/hooks/rules/gate/outputs).",
     "tier": "nice-to-have"
   },
   "full-space-first": {
@@ -30,7 +30,7 @@
     "last_updated": "2026-06-18",
     "dependencies": [],
     "visibility": "public",
-    "description": "Cross-cutting global rule: at EVERY SDLC + loop-engineering stage, discover the full relevant space from the consumer's perspective (research / web-search when unknown) BEFORE acting \u2014 never execute only the narrow literal input. Per-stage manifestations (BA use-cases, design options, build code-paths, test coverage, bug sibling-sweep, deploy failure modes, loop DISCOVER) point to existing SSOTs; verify completeness before done.",
+    "description": "Cross-cutting global rule: at EVERY SDLC + loop-engineering stage, discover the full relevant space from the consumer's perspective (research / web-search when unknown) BEFORE acting — never execute only the narrow literal input. Per-stage manifestations (BA use-cases, design options, build code-paths, test coverage, bug sibling-sweep, deploy failure modes, loop DISCOVER) point to existing SSOTs; verify completeness before done.",
     "tags": [
       "global-rule",
       "completeness",
@@ -38,7 +38,7 @@
       "workflow",
       "verification"
     ],
-    "changelog": "v1.0.0 (2026-06-17): Initial \u2014 generalizes the BA use-case-first learning into a cross-cutting full-space-first principle applied to every stage via per-stage pointers.",
+    "changelog": "v1.0.0 (2026-06-17): Initial — generalizes the BA use-case-first learning into a cross-cutting full-space-first principle applied to every stage via per-stage pointers.",
     "tier": "nice-to-have"
   },
   "ba-usecase-discovery-reminder": {
@@ -51,7 +51,7 @@
     "last_updated": "2026-06-18",
     "dependencies": [],
     "visibility": "public",
-    "description": "UserPromptSubmit hook that, on a build/extend/work-on prompt for a product/feature/domain surface, injects a *Sync-check:* OFFER to run full BA discovery / deep research first (actors, value-per-actor, the full economic LIFECYCLE, the ACTORS x COMPONENTS x LIFECYCLE matrix per ba-discovery-checklist.md) \u2014 recommended-on for domain/user-facing builds, declinable for throwaway work. Salience layer (deterministic trigger, advisory); completeness is enforced by the rule + independent review, not the hook.",
+    "description": "UserPromptSubmit hook that, on a build/extend/work-on prompt for a product/feature/domain surface, injects a *Sync-check:* OFFER to run full BA discovery / deep research first (actors, value-per-actor, the full economic LIFECYCLE, the ACTORS x COMPONENTS x LIFECYCLE matrix per ba-discovery-checklist.md) — recommended-on for domain/user-facing builds, declinable for throwaway work. Salience layer (deterministic trigger, advisory); completeness is enforced by the rule + independent review, not the hook.",
     "tags": [
       "hook",
       "user-prompt-submit",
@@ -59,7 +59,7 @@
       "use-case-discovery",
       "governance"
     ],
-    "changelog": "v1.3.0 (2026-06-18): mandate -> OFFER (asks the user whether to run BA/deep research, recommended-on); broadened keyword gate (add/extend/work-on/i-need/help-me + finance/tax/pricing/decision-tool domain signals) to stop common build phrasings silently missing; now also wired into the hub .claude/. v1.0.0 (2026-06-17): Initial \u2014 fires the BA use-case-discovery-first order on build/feature prompts.",
+    "changelog": "v1.3.0 (2026-06-18): mandate -> OFFER (asks the user whether to run BA/deep research, recommended-on); broadened keyword gate (add/extend/work-on/i-need/help-me + finance/tax/pricing/decision-tool domain signals) to stop common build phrasings silently missing; now also wired into the hub .claude/. v1.0.0 (2026-06-17): Initial — fires the BA use-case-discovery-first order on build/feature prompts.",
     "tier": "nice-to-have"
   },
   "human-approval-gates": {
@@ -72,14 +72,14 @@
     "last_updated": "2026-06-18",
     "dependencies": [],
     "visibility": "public",
-    "description": "Three mandatory human product-approval gates in an idea\u2192production pipeline: G1 UI-mockup before build, G2 feature acceptance before release, G3 production deploy. Complements decision-authority.md (autonomy over reversible detail) \u2014 these are product-acceptance pauses the pipeline MUST stop for; present the artifact, never infer approval from a green automated check.",
+    "description": "Three mandatory human product-approval gates in an idea→production pipeline: G1 UI-mockup before build, G2 feature acceptance before release, G3 production deploy. Complements decision-authority.md (autonomy over reversible detail) — these are product-acceptance pauses the pipeline MUST stop for; present the artifact, never infer approval from a green automated check.",
     "tags": [
       "pipeline",
       "approval-gates",
       "human-in-the-loop",
       "delivery"
     ],
-    "changelog": "v1.0.0 (2026-06-17): Initial creation \u2014 names the three product-approval pauses (UI mockup, feature acceptance, production deploy) for the idea\u2192production pipeline; supports README goal #3.",
+    "changelog": "v1.0.0 (2026-06-17): Initial creation — names the three product-approval pauses (UI mockup, feature acceptance, production deploy) for the idea→production pipeline; supports README goal #3.",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -108,7 +108,7 @@
       "axe-core",
       "Lighthouse"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d axe-core, Lighthouse a11y, WCAG checklist",
+    "changelog": "v1.0.0: Initial release â€” axe-core, Lighthouse a11y, WCAG checklist",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -134,7 +134,7 @@
       "ADR",
       "decisions"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Michael Nygard template, lifecycle management, index generation",
+    "changelog": "v1.0.0: Initial release â€” Michael Nygard template, lifecycle management, index generation",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -208,7 +208,7 @@
       "agents",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d Anthropic-aligned orchestration constraints | 2026-06-19: PLATFORM UPDATE banner \u2014 nested subagents GA (Claude Code v2.1.172, <=5 levels); single-level model marked over-conservative pending cascade (plans/skill-at-t0-doctrine-relaxation.md) | 2026-06-20 (v1.5.0): S2 native-Workflow-tool A/B measured on test-pipeline 3-lane \u2014 wall-clock + correctness identical to skill-at-T0, KEEP skill-at-T0 (no benefit for fixed fan-out; tool viable for dynamic DAGs only)",
+    "changelog": "v1.0.0: Initial creation â€” Anthropic-aligned orchestration constraints | 2026-06-19: PLATFORM UPDATE banner — nested subagents GA (Claude Code v2.1.172, <=5 levels); single-level model marked over-conservative pending cascade (plans/skill-at-t0-doctrine-relaxation.md) | 2026-06-20 (v1.5.0): S2 native-Workflow-tool A/B measured on test-pipeline 3-lane — wall-clock + correctness identical to skill-at-T0, KEEP skill-at-T0 (no benefit for fixed fan-out; tool viable for dynamic DAGs only)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -326,7 +326,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Android Gradle build failure diagnostics \u00e2\u20ac\u201d 10 common issue categories with solutions",
+    "description": "Android Gradle build failure diagnostics â€” 10 common issue categories with solutions",
     "tags": [
       "android",
       "gradle",
@@ -336,7 +336,7 @@
       "hilt",
       "room"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d adapted from TaeseongYun build-fixer agent",
+    "changelog": "v1.0.0: Initial â€” adapted from TaeseongYun build-fixer agent",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -355,7 +355,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use this agent for Compose UI work \u2014 building screens, fixing UI bugs, implementing design system changes, or reviewing Compose code for performance and correctness. Scoped to the presentation layer.",
+    "description": "Use this agent for Compose UI work — building screens, fixing UI bugs, implementing design system changes, or reviewing Compose code for performance and correctness. Scoped to the presentation layer.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have",
@@ -429,7 +429,7 @@
       "coding-style",
       "testing"
     ],
-    "changelog": "v1.0.1: Add pointer to error-handling.md for CancellationException rule | v1.0.0: Initial \u00e2\u20ac\u201d consolidated from 4 kotlin rule files in everything-claude-code",
+    "changelog": "v1.0.1: Add pointer to error-handling.md for CancellationException rule | v1.0.0: Initial â€” consolidated from 4 kotlin rule files in everything-claude-code",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -457,7 +457,7 @@
       "coroutines",
       "kmp"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d adapted from everything-claude-code kotlin-reviewer",
+    "changelog": "v1.0.0: Initial â€” adapted from everything-claude-code kotlin-reviewer",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -476,7 +476,7 @@
     "last_updated": "2026-03-13",
     "dependencies": [],
     "visibility": "public",
-    "description": "MVI feature scaffolder \u00e2\u20ac\u201d generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
+    "description": "MVI feature scaffolder â€” generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
     "tags": [
       "android",
       "kotlin",
@@ -485,7 +485,7 @@
       "compose",
       "architecture"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d consolidated from ChrisWW + TaeseongYun repos",
+    "changelog": "v1.0.0: Initial â€” consolidated from ChrisWW + TaeseongYun repos",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.5,
@@ -567,7 +567,7 @@
       "turbine",
       "mockk"
     ],
-    "changelog": "v1.0.0: Initial \u00e2\u20ac\u201d JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns",
+    "changelog": "v1.0.0: Initial â€” JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -593,7 +593,7 @@
       "patterns",
       "agents"
     ],
-    "changelog": "v1.0.0: Initial creation \u00e2\u20ac\u201d comprehensive orchestration reference",
+    "changelog": "v1.0.0: Initial creation â€” comprehensive orchestration reference",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -623,7 +623,7 @@
       "production",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial creation \u2014 8 principles, evaluation methodology, production patterns from Anthropic research",
+    "changelog": "v1.0.0: Initial creation — 8 principles, evaluation methodology, production patterns from Anthropic research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -652,7 +652,7 @@
       "quality",
       "proactive"
     ],
-    "changelog": "v1.0.0: Initial creation \u2014 principle compliance audit, evaluation gap detection, production readiness check",
+    "changelog": "v1.0.0: Initial creation — principle compliance audit, evaluation gap detection, production readiness check",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -678,7 +678,7 @@
       "Swagger",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-framework OpenAPI generation, validation, CI integration",
+    "changelog": "v1.0.0: Initial release â€” multi-framework OpenAPI generation, validation, CI integration",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -704,7 +704,7 @@
       "coupling",
       "dependencies"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d dependency direction, circular deps, coupling, ADR review",
+    "changelog": "v1.0.0: Initial release â€” dependency direction, circular deps, coupling, ADR review",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -743,7 +743,7 @@
     "visibility": "public",
     "description": "Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces structured results for pipeline consumption.",
     "tags": [],
-    "changelog": "v4.3.0 (2026-06-15): MINOR \u2014 monorepo runner scoping: scope test runner to the changed sub-package, not repo root, in multi-stack monorepos (fixes #53). | v4.2.0 (2026-06-15): MINOR \u2014 NO_TESTS_FOR_CHANGE: under --strict-gates a code change that executed 0 tests is FAILED, not a vacuous PASS (fixes #50). | v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured | v2.1.0: split STEP 2.5 sub-content to references/visual-proof-review.md (412 lines, under 500 cap); added --team note (parallel disjoint test-area teammates; read-only, doer!=checker)",
+    "changelog": "v4.3.0 (2026-06-15): MINOR — monorepo runner scoping: scope test runner to the changed sub-package, not repo root, in multi-stack monorepos (fixes #53). | v4.2.0 (2026-06-15): MINOR — NO_TESTS_FOR_CHANGE: under --strict-gates a code change that executed 0 tests is FAILED, not a vacuous PASS (fixes #50). | v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured | v2.1.0: split STEP 2.5 sub-content to references/visual-proof-review.md (412 lines, under 500 cap); added --team note (parallel disjoint test-area teammates; read-only, doer!=checker)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -881,14 +881,14 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Quantified change risk score (files \u00c3\u0192\u00e2\u20ac\u201d complexity \u00c3\u0192\u00e2\u20ac\u201d inverse coverage) for deploy go/no-go decisions with hotspot analysis",
+    "description": "Quantified change risk score (files Ãƒâ€” complexity Ãƒâ€” inverse coverage) for deploy go/no-go decisions with hotspot analysis",
     "tags": [
       "risk",
       "change-management",
       "deploy",
       "metrics"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d composite risk scoring, hotspot analysis",
+    "changelog": "v1.0.0: Initial release â€” composite risk scoring, hotspot analysis",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -914,7 +914,7 @@
       "conventional-commits",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d CHANGELOG + CONTRIBUTING generation",
+    "changelog": "v1.0.0: Initial release â€” CHANGELOG + CONTRIBUTING generation",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -940,7 +940,7 @@
       "failure-injection",
       "circuit-breaker"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d failure injection, degradation verification, gameday",
+    "changelog": "v1.0.0: Initial release â€” failure injection, degradation verification, gameday",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -985,7 +985,7 @@
     "visibility": "public",
     "description": "Universal behavioral rules for Claude including mandatory failure response pipeline",
     "tags": [],
-    "changelog": "v1.3.0: Add rule 23 (Standing Directives Override Scope Instinct) \u2014 preserve hub-private rule that was missing in core. Same class of bug as the prompt-auto-enhance hub\u2192core drift. | v1.2.0: Add rule 21 (YAGNI) + rule 22 (Measure Before You Optimize); label rule 16 with KISS | v1.1.0: Rule 15 strengthened to MANDATORY with /learn-n-improve chaining",
+    "changelog": "v1.3.0: Add rule 23 (Standing Directives Override Scope Instinct) — preserve hub-private rule that was missing in core. Same class of bug as the prompt-auto-enhance hub→core drift. | v1.2.0: Add rule 21 (YAGNI) + rule 22 (Measure Before You Optimize); label rule 16 with KISS | v1.1.0: Rule 15 strengthened to MANDATORY with /learn-n-improve chaining",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1035,7 +1035,7 @@
       "refactoring",
       "logging"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d complexity, duplication, SOLID, logging, refactor, layer checks",
+    "changelog": "v1.0.0: Initial release â€” complexity, duplication, SOLID, logging, refactor, layer checks",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1086,7 +1086,7 @@
       "review",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 code review orchestration with defense-in-depth model | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.4)",
+    "changelog": "v1.0.0: Initial release — code review orchestration with defense-in-depth model | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.4)",
     "tier": "nice-to-have",
     "deprecated": true,
     "deprecated_by": "code-review-workflow",
@@ -1120,7 +1120,7 @@
       "workflow",
       "review"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR \u2014 add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4); added --team parallel-review-team mode (Stage B: bakes in multi-agent best-practice items 1,4,5,6; self-gated on EXPERIMENTAL_AGENT_TEAMS)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4); added --team parallel-review-team mode (Stage B: bakes in multi-agent best-practice items 1,4,5,6; self-gated on EXPERIMENTAL_AGENT_TEAMS)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1192,7 +1192,7 @@
       "CLAUDE.md",
       "architecture"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d four-layer model, anti-duplication rules, pointer pattern, migration guide",
+    "changelog": "v1.0.0: Initial release â€” four-layer model, anti-duplication rules, pointer pattern, migration guide",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1331,7 +1331,7 @@
       "API",
       "consumer-driven"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Pact consumer/provider, broker, CI integration",
+    "changelog": "v1.0.0: Initial release â€” Pact consumer/provider, broker, CI integration",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1496,7 +1496,7 @@
       "nuclei",
       "fuzzing"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ZAP, Nuclei, headers, sessions, fuzzing, CI",
+    "changelog": "v1.0.0: Initial release â€” ZAP, Nuclei, headers, sessions, fuzzing, CI",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1526,7 +1526,7 @@
       "Django",
       "TypeORM"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-ORM migration with safety rules",
+    "changelog": "v1.0.0: Initial release â€” multi-ORM migration with safety rules",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1603,7 +1603,7 @@
       "workflow",
       "debugging"
     ],
-    "changelog": "v2.1.1 (2026-06-15): PATCH \u2014 fix stale step numbers in --skip-verify/--skip-learn flag descriptions (VERIFY=STEP4, LEARN=STEP5). | v2.1.0 (2026-06-15): MINOR \u2014 add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR \u2014 skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
+    "changelog": "v2.1.1 (2026-06-15): PATCH — fix stale step numbers in --skip-verify/--skip-learn flag descriptions (VERIFY=STEP4, LEARN=STEP5). | v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1629,7 +1629,7 @@
       "debugging",
       "diagnosis"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 debugging loop with scientific method approach | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.3) \u2014 superseded by /debugging-loop skill-at-T0",
+    "changelog": "v1.0.0: Initial release — debugging loop with scientific method approach | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.3) — superseded by /debugging-loop skill-at-T0",
     "tier": "nice-to-have",
     "deprecated": true,
     "deprecated_by": "debugging-loop",
@@ -1662,7 +1662,7 @@
       "zero-downtime",
       "PRR"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d GitOps, canary, blue-green, DB migration ordering, PRR",
+    "changelog": "v1.0.0: Initial release â€” GitOps, canary, blue-green, DB migration ordering, PRR",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1748,7 +1748,7 @@
       "workflow",
       "development"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR \u2014 add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK on missing workers/sub-skills); correct dependencies to real runtime closure (drop deprecated development-loop-master-agent + unused executing-plans; add plan-executor-agent + planner-researcher-agent) | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model | v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release; added --team parallel-build mode (STEP 4-TEAM: disjoint file partition + worktree isolation + lead-waits + verifier teammate + zero-collision gate; bakes in best-practice items A,B,C,D)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK on missing workers/sub-skills); correct dependencies to real runtime closure (drop deprecated development-loop-master-agent + unused executing-plans; add plan-executor-agent + planner-researcher-agent) | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model | v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release; added --team parallel-build mode (STEP 4-TEAM: disjoint file partition + worktree isolation + lead-waits + verifier teammate + zero-collision gate; bakes in best-practice items A,B,C,D)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1774,7 +1774,7 @@
       "development",
       "planning"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 development loop orchestration with complexity detection | v1.0.1 (2026-04-24): DEPRECATED (Phase 3.2) \u2014 superseded by /development-loop skill-at-T0; kept for 2-version-cycle window",
+    "changelog": "v1.0.0: Initial release — development loop orchestration with complexity detection | v1.0.1 (2026-04-24): DEPRECATED (Phase 3.2) — superseded by /development-loop skill-at-T0; kept for 2-version-cycle window",
     "tier": "nice-to-have",
     "deprecated": true,
     "deprecated_by": "development-loop",
@@ -1795,14 +1795,14 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Organize documentation using the Di\u00c3\u0192\u00c2\u00a1taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
+    "description": "Organize documentation using the DiÃƒÂ¡taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
     "tags": [
       "documentation",
       "Diataxis",
       "tutorials",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d Di\u00c3\u0192\u00c2\u00a1taxis categorization, templates, migration",
+    "changelog": "v1.0.0: Initial release â€” DiÃƒÂ¡taxis categorization, templates, migration",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1833,7 +1833,7 @@
       "RTO",
       "RPO"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d RTO/RPO, backup, restore, failover, DR drills",
+    "changelog": "v1.0.0: Initial release â€” RTO/RPO, backup, restore, failover, DR drills",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1852,14 +1852,14 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Detect documentation that has drifted from the codebase \u00e2\u20ac\u201d stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
+    "description": "Detect documentation that has drifted from the codebase â€” stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
     "tags": [
       "documentation",
       "staleness",
       "drift-detection",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d file/symbol/command/link staleness detection, severity-prioritized report",
+    "changelog": "v1.0.0: Initial release â€” file/symbol/command/link staleness detection, severity-prioritized report",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1886,7 +1886,7 @@
       "pipeline-stages",
       "folder-management"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d stage-based folder structure, pattern + content classification, git mv + ref updates",
+    "changelog": "v1.0.0: Initial release â€” stage-based folder structure, pattern + content classification, git mv + ref updates",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1929,7 +1929,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use this agent for documentation updates \u2014 continuation prompts, requirement traceability, testing docs, and generated documentation. Referenced by post-fix-pipeline skill.",
+    "description": "Use this agent for documentation updates — continuation prompts, requirement traceability, testing docs, and generated documentation. Referenced by post-fix-pipeline skill.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "nice-to-have",
@@ -1990,7 +1990,7 @@
       "workflow",
       "documentation"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR \u2014 add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2041,7 +2041,7 @@
       "best-practices",
       "cross-framework"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 10 sections covering gaps across existing E2E skills",
+    "changelog": "v1.0.0: Initial release â€” 10 sections covering gaps across existing E2E skills",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2066,7 +2066,7 @@
       "config",
       "pipeline"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d externalized DAG for e2e-conductor-agent",
+    "changelog": "v1.0.0: Initial release â€” externalized DAG for e2e-conductor-agent",
     "tier": "nice-to-have"
   },
   "e2e-test-writing": {
@@ -2087,7 +2087,7 @@
       "testing",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d globs-scoped pointer to e2e-best-practices",
+    "changelog": "v1.0.0: Initial release â€” globs-scoped pointer to e2e-best-practices",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2123,7 +2123,7 @@
       "accessibility",
       "playwright"
     ],
-    "changelog": "v5.1.0 (2026-06-15): MINOR \u2014 add STEP 1.5 PREFLIGHT dependency-closure gate (parity with the other orchestrator workflows). | deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing. | v5.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as independent skill-at-T0 orchestrator; no longer dispatches deprecated e2e-conductor-agent; dispatches scout/tester/visual-inspector/healer workers directly from T0",
+    "changelog": "v5.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (parity with the other orchestrator workflows). | deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing. | v5.0.0 (2026-04-24): MAJOR — full body rewrite as independent skill-at-T0 orchestrator; no longer dispatches deprecated e2e-conductor-agent; dispatches scout/tester/visual-inspector/healer workers directly from T0",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2301,7 +2301,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use this agent for database tasks \u2014 PostgreSQL queries, Alembic migrations, schema questions, model import rules, or diagnosing query issues.",
+    "description": "Use this agent for database tasks — PostgreSQL queries, Alembic migrations, schema questions, model import rules, or diagnosing query issues.",
     "tags": [],
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have",
@@ -2409,7 +2409,7 @@
       "toggles",
       "gradual-rollout"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d flag types, implementation patterns, cleanup",
+    "changelog": "v1.0.0: Initial release â€” flag types, implementation patterns, cleanup",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2436,7 +2436,7 @@
       "multi-perspective",
       "stress-test"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 5 advisor lenses (Contrarian, Strategist, Operator, Customer, Realist) with anonymous peer review and chairman synthesis. Adapted from Andrej Karpathy's LLM Council methodology.",
+    "changelog": "v1.0.0: Initial release â€” 5 advisor lenses (Contrarian, Strategist, Operator, Customer, Realist) with anonymous peer review and chairman synthesis. Adapted from Andrej Karpathy's LLM Council methodology.",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2461,7 +2461,7 @@
       "auth",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in KKB + cric patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in KKB + cric patterns",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2587,7 +2587,7 @@
       "bug-fix",
       "workflow"
     ],
-    "changelog": "v3.0.0: Renamed from fix-issue \u2192 fix-github-issue (MAJOR \u2014 invocation surface change). Old name preserved as deprecation stub for 2 version cycles. | v2.6.0: prior history under former name fix-issue",
+    "changelog": "v3.0.0: Renamed from fix-issue → fix-github-issue (MAJOR — invocation surface change). Old name preserved as deprecation stub for 2 version cycles. | v2.6.0: prior history under former name fix-issue",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2640,7 +2640,7 @@
       "dart",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in cric repo patterns",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2665,7 +2665,7 @@
       "dart",
       "mobile"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in cric repo patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in cric repo patterns",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 0.67,
@@ -2740,7 +2740,7 @@
       "pull-requests",
       "collaboration"
     ],
-    "changelog": "v1.0.1: Review feedback \u2014 tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2809,7 +2809,7 @@
       "search",
       "discovery"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d repo search, code search, deep inspect modes",
+    "changelog": "v1.0.0: Initial release â€” repo search, code search, deep inspect modes",
     "tier": "skip",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2936,7 +2936,7 @@
       "demo",
       "Nielsen"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d single-file prototypes with heuristic validation",
+    "changelog": "v1.0.0: Initial release â€” single-file prototypes with heuristic validation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3141,7 +3141,7 @@
       "workflow",
       "learning"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR \u2014 add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3219,7 +3219,7 @@
       "branching",
       "post-merge"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d strategy matrix, pre/post-merge checklists",
+    "changelog": "v1.0.0: Initial release â€” strategy matrix, pre/post-merge checklists",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3369,7 +3369,7 @@
       "react",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in BestDematAccount + IPODhan patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in BestDematAccount + IPODhan patterns",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3388,7 +3388,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Node.js backends: Express, Hono, ElysiaJS \u00e2\u20ac\u201d routing, middleware, DB, auth, WebSocket",
+    "description": "Node.js backends: Express, Hono, ElysiaJS â€” routing, middleware, DB, auth, WebSocket",
     "tags": [
       "nodejs",
       "backend",
@@ -3396,7 +3396,7 @@
       "hono",
       "elysia"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + BestDematAccount + cric patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + BestDematAccount + cric patterns",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3512,7 +3512,7 @@
       "portability",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core; v1.1.0: added Templates-with-Wire-Contracts section (null-vs-absent serialization, receiver validator semantics, cross-language payload equivalence, mandatory independent review)",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core; v1.1.0: added Templates-with-Wire-Contracts section (null-vs-absent serialization, receiver validator semantics, cross-language payload equivalence, mandatory independent review)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3537,7 +3537,7 @@
       "self-containment",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3562,7 +3562,7 @@
       "structure",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core | 2026-04-25: append Agent registry session-pinning subsection documenting Claude Code platform behavior + skill-author implications | 2026-06-19: PLATFORM UPDATE banner \u2014 nested subagents GA (Claude Code v2.1.172, <=5 levels); single-level model marked over-conservative pending cascade (plans/skill-at-t0-doctrine-relaxation.md)",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core | 2026-04-25: append Agent registry session-pinning subsection documenting Claude Code platform behavior + skill-author implications | 2026-06-19: PLATFORM UPDATE banner — nested subagents GA (Claude Code v2.1.172, <=5 levels); single-level model marked over-conservative pending cascade (plans/skill-at-t0-doctrine-relaxation.md)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3861,7 +3861,7 @@
       "IEEE-830",
       "parser"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d multi-format PRD parsing and normalization",
+    "changelog": "v1.0.0: Initial release â€” multi-format PRD parsing and normalization",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3915,7 +3915,7 @@
       "DAG",
       "agent"
     ],
-    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill \u00e2\u20ac\u201d orchestration logic now lives in the agent | 2026-04-25 (Phase 3.9): add explicit T0-only guardrail; retire tiered-nesting rule text",
+    "changelog": "v1.0.0: Extracted from pipeline-orchestrator skill â€” orchestration logic now lives in the agent | 2026-04-25 (Phase 3.9): add explicit T0-only guardrail; retire tiered-nesting rule text",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3943,7 +3943,7 @@
       "12-factor",
       "security-baseline"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d covers Python, Node/TS, Android, Go, Rust",
+    "changelog": "v1.0.0: Initial release â€” covers Python, Node/TS, Android, Go, Rust",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4004,7 +4004,7 @@
       "session-history",
       "audit"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 append-only Markdown log via UserPromptSubmit hook. Gitignored live log; seed template ships via provisioning.",
+    "changelog": "v1.0.0: Initial release — append-only Markdown log via UserPromptSubmit hook. Gitignored live log; seed template ships via provisioning.",
     "tier": "must-have"
   },
   "pytest-dev": {
@@ -4123,7 +4123,7 @@
       "react",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d replaces placeholder",
+    "changelog": "v1.0.0: Initial release â€” replaces placeholder",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4318,7 +4318,7 @@
       "citations",
       "fact-checking"
     ],
-    "changelog": "deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release \u00e2\u20ac\u201d 3 anti-hallucination constraints, structured research brief output; added --team parallel-research note (Stage D: read-only; self-gated)",
+    "changelog": "deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output; added --team parallel-research note (Stage D: read-only; self-gated)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4379,7 +4379,7 @@
       "quality-gate",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4404,7 +4404,7 @@
       "rule-authoring",
       "pattern-governance"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d distributed from hub-only to core",
+    "changelog": "v1.0.0: Initial release â€” distributed from hub-only to core",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4485,7 +4485,7 @@
       "migration",
       "data-modeling"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d ER design, PII, evolution, API alignment",
+    "changelog": "v1.0.0: Initial release â€” ER design, PII, evolution, API alignment",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4543,7 +4543,7 @@
     "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use proactively for security assessments \u2014 OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Spawn automatically when changes",
+    "description": "Use proactively for security assessments — OWASP Top 10 scanning, threat modeling, vulnerability analysis, and security posture reviews. Spawn automatically when changes",
     "tags": [],
     "changelog": "v1.0.0: Initial registration; added teammate-readiness note (no Skill tool as a teammate -> inline OWASP review path)",
     "tier": "must-have",
@@ -4570,7 +4570,7 @@
       "baseline",
       "owasp"
     ],
-    "changelog": "v1.0.1: Review feedback \u2014 tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
+    "changelog": "v1.0.1: Review feedback — tighter wording | v1.0.0: Initial release - universal coding standard distilled from OWASP / Fowler / Uncle Bob / DORA research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4650,7 +4650,7 @@
       "workflow",
       "session"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR \u2014 add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4702,7 +4702,7 @@
       "hooks",
       "reminder"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d counter-based session save reminder",
+    "changelog": "v1.0.0: Initial release â€” counter-based session save reminder",
     "tier": "must-have"
   },
   "session-summarizer-agent": {
@@ -4746,7 +4746,7 @@
       "agent",
       "patterns"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d routes pattern creation to appropriate authoring workflows with quality validation",
+    "changelog": "v1.0.0: Initial release â€” routes pattern creation to appropriate authoring workflows with quality validation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4771,7 +4771,7 @@
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.8 \u2014 final workflow-master retirement)",
+    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.8 — final workflow-master retirement)",
     "tier": "nice-to-have",
     "deprecated": true,
     "deprecated_by": "skill-authoring-workflow",
@@ -4804,7 +4804,7 @@
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR \u2014 add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 \u2014 final workflow-master retirement)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 — final workflow-master retirement)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4929,7 +4929,7 @@
       "duplication",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d 6-step audit workflow, cross-layer duplication detection, health scoring",
+    "changelog": "v1.0.0: Initial release â€” 6-step audit workflow, cross-layer duplication detection, health scoring",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4956,7 +4956,7 @@
       "context",
       "continuity"
     ],
-    "changelog": "v1.1.0: Add triggers for natural language discoverability | v1.0.0: Initial release \u00e2\u20ac\u201d session restoration with priority-ordered file loading",
+    "changelog": "v1.1.0: Add triggers for natural language discoverability | v1.0.0: Initial release â€” session restoration with priority-ordered file loading",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5099,7 +5099,7 @@
       "css",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in AlgoChanakya + IPODhan patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in AlgoChanakya + IPODhan patterns",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5124,7 +5124,7 @@
       "tdd",
       "workflow"
     ],
-    "changelog": "v1.0.1: Registry sync \u2014 hash, version, description, tags | v1.0.0: Initial release",
+    "changelog": "v1.0.1: Registry sync — hash, version, description, tags | v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5223,9 +5223,9 @@
     "last_updated": "2026-04-24",
     "dependencies": [],
     "visibility": "public",
-    "description": "Use proactively to diagnose test failures \u2014 reads test output, classifies by root cause, and suggests targeted fixes. Spawn automatically whenever tests fail to provide immediate",
+    "description": "Use proactively to diagnose test failures — reads test output, classifies by root cause, and suggests targeted fixes. Spawn automatically whenever tests fail to provide immediate",
     "tags": [],
-    "changelog": "v2.3.0: REQ-S004 \u2014 recommended_action now config-driven via auto_heal: block in test-pipeline.yml (was LLM-recalled from spec). Adds explicit read procedure, ALLOWED enum (AUTO_HEAL/AUTO_HEAL_WITH_FLAG/ISSUE_ONLY/QUARANTINE/RETRY_INFRA), and fail-safe fallback to ISSUE_ONLY on missing/invalid config. Backward compatible for callers.",
+    "changelog": "v2.3.0: REQ-S004 — recommended_action now config-driven via auto_heal: block in test-pipeline.yml (was LLM-recalled from spec). Adds explicit read procedure, ALLOWED enum (AUTO_HEAL/AUTO_HEAL_WITH_FLAG/ISSUE_ONLY/QUARANTINE/RETRY_INFRA), and fail-safe fallback to ISSUE_ONLY on missing/invalid config. Backward compatible for callers.",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5342,7 +5342,7 @@
       "pipeline",
       "verification"
     ],
-    "changelog": "deps corrected to real runtime closure (drop deprecated test-pipeline-agent; add the 6 dispatched worker agents + escalation-report/pipeline-fix-pr/serialize-fixes) so the closure co-provisions downstream \u2014 sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release \u00e2\u20ac\u201d preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR \u2014 full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a \u2014 CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap | v2.1.1 (2026-04-24): PATCH \u2014 budget key names aligned with actual config (budgets.* \u2192 budget.*; added retry.global_budget). PR #26 schema gate correctly detected the mismatch at run-time on the testbed. | v2.2.0 (2026-04-25): MINOR \u2014 auto-injection fixes (user-goal description + 20 triggers); STEP 1 CONFIG_MISSING + PIPELINE_IN_PROGRESS + arg-validation gates; STEP 2 empty-suite early exit + stack runner fallback; STEP 3 partial-execution check + granular dispatch events; STEP 4 checkpoint flag ownership contract + single-signal cap doc link; STEP 6 budget pre-check (dispatches_used+chunk_size) + recommended-action dispatch matrix (all 6 action types); STEP 7 deterministic affected-subset algorithm + max_verify_affected_tests cap; STEP 8 regression re-entry with counter continuation; STEP 9 error handling + always-write finalized_at + lock release; dispatch counter accounting docs (explains the 4-vs-5 observation); artifact path conventions; --only-issues flag expansion; 8 new CRITICAL RULES | v2.3.0 (2026-04-25): MINOR \u2014 STEP 1 sub-step 2b WORKER_REGISTRY_PROBE gate; fail-fast BLOCKED with WORKER_REGISTRY_NOT_LOADED + restart remediation when newly-synced workers are not in Claude Code runtime registry; closes the 2026-04-25 FIREKaro-Vue downstream validation finding",
+    "changelog": "deps corrected to real runtime closure (drop deprecated test-pipeline-agent; add the 6 dispatched worker agents + escalation-report/pipeline-fix-pr/serialize-fixes) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a — CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap | v2.1.1 (2026-04-24): PATCH — budget key names aligned with actual config (budgets.* → budget.*; added retry.global_budget). PR #26 schema gate correctly detected the mismatch at run-time on the testbed. | v2.2.0 (2026-04-25): MINOR — auto-injection fixes (user-goal description + 20 triggers); STEP 1 CONFIG_MISSING + PIPELINE_IN_PROGRESS + arg-validation gates; STEP 2 empty-suite early exit + stack runner fallback; STEP 3 partial-execution check + granular dispatch events; STEP 4 checkpoint flag ownership contract + single-signal cap doc link; STEP 6 budget pre-check (dispatches_used+chunk_size) + recommended-action dispatch matrix (all 6 action types); STEP 7 deterministic affected-subset algorithm + max_verify_affected_tests cap; STEP 8 regression re-entry with counter continuation; STEP 9 error handling + always-write finalized_at + lock release; dispatch counter accounting docs (explains the 4-vs-5 observation); artifact path conventions; --only-issues flag expansion; 8 new CRITICAL RULES | v2.3.0 (2026-04-25): MINOR — STEP 1 sub-step 2b WORKER_REGISTRY_PROBE gate; fail-fast BLOCKED with WORKER_REGISTRY_NOT_LOADED + restart remediation when newly-synced workers are not in Claude Code runtime registry; closes the 2026-04-25 FIREKaro-Vue downstream validation finding",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5389,7 +5389,7 @@
     "visibility": "public",
     "description": "Senior QA engineer specializing in comprehensive testing and quality assurance. For UI tests, orchestrates per-test screenshot verification where the screenshot",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured | v2.2.0 (2026-04-24): Playwright ARIA snapshot capture alongside screenshot \u2014 lifts visual-inspector-agent confidence MEDIUM\u2192HIGH (dual-signal per spec v2.2 \u00a73.2)",
+    "changelog": "v2.0.0: Genericized and restructured | v2.2.0 (2026-04-24): Playwright ARIA snapshot capture alongside screenshot — lifts visual-inspector-agent confidence MEDIUM→HIGH (dual-signal per spec v2.2 §3.2)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5429,7 +5429,7 @@
     "last_updated": "2026-04-02",
     "dependencies": [],
     "visibility": "public",
-    "description": "Validate distributed traces with OpenTelemetry and Tracetest by asserting on spans instead of just HTTP responses \u2014 verify downstream calls, latency per span, error propagation, and correlation ID flow. Use when testing microservice integration and observability.",
+    "description": "Validate distributed traces with OpenTelemetry and Tracetest by asserting on spans instead of just HTTP responses — verify downstream calls, latency per span, error propagation, and correlation ID flow. Use when testing microservice integration and observability.",
     "tags": [
       "testing",
       "workflow"
@@ -5505,7 +5505,7 @@
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured | v1.1.0 (2026-04-24): sync shipped configs from core/.claude/config/; promoted tier=must-have to fix Phase 3.1 downstream sync gap | v1.2.0 (2026-04-25): MINOR \u2014 STEP 5 tracks newly-added agents; STEP 5.5 prints prominent RESTART REQUIRED banner before STEP 6 when new agents synced; closes the 2026-04-25 platform finding (Claude Code agent registry session-pinning)",
+    "changelog": "v2.0.0: Genericized and restructured | v1.1.0 (2026-04-24): sync shipped configs from core/.claude/config/; promoted tier=must-have to fix Phase 3.1 downstream sync gap | v1.2.0 (2026-04-25): MINOR — STEP 5 tracks newly-added agents; STEP 5.5 prints prominent RESTART REQUIRED banner before STEP 6 when new agents synced; closes the 2026-04-25 platform finding (Claude Code agent registry session-pinning)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5582,7 +5582,7 @@
       "testing",
       "vite"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya + IPODhan patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya + IPODhan patterns",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5607,7 +5607,7 @@
       "frontend",
       "rule"
     ],
-    "changelog": "v1.0.0: Initial release \u00e2\u20ac\u201d grounded in FIREKaro + AlgoChanakya patterns",
+    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + AlgoChanakya patterns",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5801,7 +5801,7 @@
       "template",
       "skill-at-t0"
     ],
-    "changelog": "v1.0.0 (2026-03-30): initial release \u2014 6 protocols for the legacy workflow-master agent pattern. v2.0.0 (2026-04-24): complete rewrite for skill-at-T0 pattern after 2026-04-24 platform finding that subagents cannot dispatch further subagents; 7 protocols including a migration appendix for legacy workflow-master agents.",
+    "changelog": "v1.0.0 (2026-03-30): initial release — 6 protocols for the legacy workflow-master agent pattern. v2.0.0 (2026-04-24): complete rewrite for skill-at-T0 pattern after 2026-04-24 platform finding that subagents cannot dispatch further subagents; 7 protocols including a migration appendix for legacy workflow-master agents.",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5983,7 +5983,7 @@
       "plan-to-issues"
     ],
     "visibility": "public",
-    "description": "Synthesize a PRD from current conversation context and codebase understanding (no interview). Looks for deep-module opportunities during module sketching. Inverse direction of /prd-parser (parse) \u2014 this is the synthesize direction.",
+    "description": "Synthesize a PRD from current conversation context and codebase understanding (no interview). Looks for deep-module opportunities during module sketching. Inverse direction of /prd-parser (parse) — this is the synthesize direction.",
     "tags": [
       "prd",
       "planning",
@@ -6009,7 +6009,7 @@
     "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Verify user-facing computed values are domain-SANE, not just that they render/persist/pass \u2014 the substance axis of verification. Default-path checks, plausibility bounds, shape-locks-are-not-correctness-proofs.",
+    "description": "Verify user-facing computed values are domain-SANE, not just that they render/persist/pass — the substance axis of verification. Default-path checks, plausibility bounds, shape-locks-are-not-correctness-proofs.",
     "tags": [
       "verification",
       "testing",
@@ -6017,7 +6017,7 @@
       "plausibility",
       "workflow"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 global verification/governance rule; added teammate-boundary clause (lead applies plausibility bound to teammate output)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule; added teammate-boundary clause (lead applies plausibility bound to teammate output)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6036,7 +6036,7 @@
     "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "Every non-trivial test verdict must be re-checked by a separate, context-blind agent given the same inputs + raw evidence \u2014 doer/checker separation (IEEE-1012). Single-level two-wave dispatch.",
+    "description": "Every non-trivial test verdict must be re-checked by a separate, context-blind agent given the same inputs + raw evidence — doer/checker separation (IEEE-1012). Single-level two-wave dispatch.",
     "tags": [
       "verification",
       "testing",
@@ -6044,7 +6044,7 @@
       "orchestration",
       "quality"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 global verification/governance rule; added teammate-boundary clause (Stage D: teammate test verdicts get blind re-check)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule; added teammate-boundary clause (Stage D: teammate test verdicts get blind re-check)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6063,7 +6063,7 @@
     "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "The T0 orchestrator must reproduce a worker's claimed gate and inspect output substance before accepting \u2014 reading a return contract is not verifying it. Includes a drive-the-UI loop for rendered changes.",
+    "description": "The T0 orchestrator must reproduce a worker's claimed gate and inspect output substance before accepting — reading a return contract is not verifying it. Includes a drive-the-UI loop for rendered changes.",
     "tags": [
       "verification",
       "orchestration",
@@ -6071,7 +6071,7 @@
       "quality",
       "workflow"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 global verification/governance rule; added teammate-boundary clause (Stage D: lead supervises teammates identically + anti-fake-team)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule; added teammate-boundary clause (Stage D: lead supervises teammates identically + anti-fake-team)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6097,7 +6097,7 @@
       "decision-making",
       "autonomy"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 global verification/governance rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6124,7 +6124,7 @@
       "product",
       "workflow"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 substantive-criterion governance rule complementing decision-authority",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — substantive-criterion governance rule complementing decision-authority",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6151,7 +6151,7 @@
       "workflow",
       "triage"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 global verification/governance rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6178,7 +6178,7 @@
       "fail-fast",
       "boot"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 global verification/governance rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — global verification/governance rule",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6197,7 +6197,7 @@
     "last_updated": "2026-06-10",
     "dependencies": [],
     "visibility": "public",
-    "description": "E2E tests wait on an explicit app-emitted readiness signal after navigation, never a fixed delay \u2014 the positive pattern behind the no-sleep prohibition. Framework-agnostic.",
+    "description": "E2E tests wait on an explicit app-emitted readiness signal after navigation, never a fixed delay — the positive pattern behind the no-sleep prohibition. Framework-agnostic.",
     "tags": [
       "testing",
       "e2e",
@@ -6205,7 +6205,7 @@
       "playwright",
       "cypress"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 path-scoped E2E verification/governance rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — path-scoped E2E verification/governance rule",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6224,7 +6224,7 @@
     "last_updated": "2026-06-10",
     "dependencies": [],
     "visibility": "public",
-    "description": "E2E tests that create records must verify actual persistence (per iteration in loops) plus the final reloaded UI \u2014 never trust a closed dialog or end-of-loop count as success.",
+    "description": "E2E tests that create records must verify actual persistence (per iteration in loops) plus the final reloaded UI — never trust a closed dialog or end-of-loop count as success.",
     "tags": [
       "testing",
       "e2e",
@@ -6232,7 +6232,7 @@
       "flakiness",
       "verification"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 path-scoped E2E verification/governance rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — path-scoped E2E verification/governance rule",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6258,7 +6258,7 @@
       "acceptance-criteria",
       "workflow"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) \u2014 Tier 2 quick-win meta-rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 2 quick-win meta-rule",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6285,7 +6285,7 @@
       "workflow",
       "governance"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) \u2014 Tier 2 quick-win meta-rule",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 2 quick-win meta-rule",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6312,7 +6312,7 @@
       "api",
       "stack:hono"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) \u2014 Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6339,7 +6339,7 @@
       "typescript",
       "stack:prisma"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) \u2014 Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6367,7 +6367,7 @@
       "testing",
       "stack:vue"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) \u2014 Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — Tier 3 stack rule; dep-gated via DEP_PATTERN_MAP",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6386,7 +6386,7 @@
     "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
-    "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops \u2014 never runs the executor, never commits.",
+    "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
     "tags": [
       "goal-creator",
       "autonomous",
@@ -6396,7 +6396,7 @@
       "unattended",
       "self-improvement"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) \u2014 Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation); v2.0.0: renamed back to goal-creator (restoring the original firekaro-planner skill name per owner request)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation); v2.0.0: renamed back to goal-creator (restoring the original firekaro-planner skill name per owner request)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6427,7 +6427,7 @@
       "workflow",
       "root-cause"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) \u2014 SSOT for the plan-first discipline",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized, de-project-specific) — SSOT for the plan-first discipline",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6446,14 +6446,14 @@
     "last_updated": "2026-06-21",
     "dependencies": [],
     "visibility": "public",
-    "description": "Autonomous role router: infer the engineering role from the task signal, state `Role: <name> \u2014 <why>`, and dispatch the role's named agents/skills (routing layer, no capability duplication). Includes router table, condensed mandates, canonical multi-role sequences with a mandatory independent-reviewer edge, and a routing feedback loop.",
+    "description": "Autonomous role router: infer the engineering role from the task signal, state `Role: <name> — <why>`, and dispatch the role's named agents/skills (routing layer, no capability duplication). Includes router table, condensed mandates, canonical multi-role sequences with a mandatory independent-reviewer edge, and a routing feedback loop.",
     "tags": [
       "governance",
       "roles",
       "routing",
       "orchestration"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns) | v1.1.0 (2026-06-17): Product Manager mandate \u2014 research the domain BEFORE asking; decide domain/math/best-practice matters yourself (overridable assumptions), never ask the user a verifiable fact or a question premised on an unverified domain assumption. | v1.2.0 (2026-06-17): PM mandate \u2014 articulate the value proposition (primary user + why) and map the FULL use-case/combination space before building; expand scope to maximize benefit; challenge the build if no concrete benefit. | v1.2.1 (2026-06-17): PM mandate \u2014 pin the ORDER: discover the full use-case space FIRST (domain + user perspective; web search to enumerate) -> THEN clarifying questions -> THEN UI -> THEN build; never backfill use-case discovery.",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized: project-stage block templated, domain-analyst made project-specific guidance, dispatch targets retargeted to hub patterns) | v1.1.0 (2026-06-17): Product Manager mandate — research the domain BEFORE asking; decide domain/math/best-practice matters yourself (overridable assumptions), never ask the user a verifiable fact or a question premised on an unverified domain assumption. | v1.2.0 (2026-06-17): PM mandate — articulate the value proposition (primary user + why) and map the FULL use-case/combination space before building; expand scope to maximize benefit; challenge the build if no concrete benefit. | v1.2.1 (2026-06-17): PM mandate — pin the ORDER: discover the full use-case space FIRST (domain + user perspective; web search to enumerate) -> THEN clarifying questions -> THEN UI -> THEN build; never backfill use-case discovery.",
     "tier": "nice-to-have",
     "effectiveness": {
       "error_prevention_rate": 1.0,
@@ -6478,7 +6478,7 @@
       "stop-discipline",
       "telemetry"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) \u2014 includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses",
     "tier": "must-have"
   },
   "session-governance-status": {
@@ -6521,7 +6521,7 @@
       "alerting",
       "heartbeat"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 generalized from FireKaro's proven owner-notify.ts integration; notifier-integration rule + owner-notify templates + production-monitoring CLAUDE.md block",
+    "changelog": "v1.0.0: Initial release — generalized from FireKaro's proven owner-notify.ts integration; notifier-integration rule + owner-notify templates + production-monitoring CLAUDE.md block",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6572,7 +6572,7 @@
       "writing-plans"
     ],
     "visibility": "public",
-    "description": "Autonomous DISCOVER\u2192PLAN\u2192EXECUTE(maker)\u2192VERIFY(checker)\u2192SHIP|FEEDBACK loop as a skill-at-T0 orchestrator. Self-verifying (maker plan-executor-agent \u2260 checker code-reviewer-agent), self-healing (/fix-loop, /debugging-loop), self-learning (/learn-n-improve each cycle), self-feedback (/escalation-report + triage inbox on budget exhaustion). Emits hub-linked telemetry (hub_pattern_link) on every terminal signal so the weekly aggregate_telemetry cron monitors downstream defects/effectiveness. Composes existing hub workflows under hard budgets; creates no new engine.",
+    "description": "Autonomous DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker)→SHIP|FEEDBACK loop as a skill-at-T0 orchestrator. Self-verifying (maker plan-executor-agent ≠ checker code-reviewer-agent), self-healing (/fix-loop, /debugging-loop), self-learning (/learn-n-improve each cycle), self-feedback (/escalation-report + triage inbox on budget exhaustion). Emits hub-linked telemetry (hub_pattern_link) on every terminal signal so the weekly aggregate_telemetry cron monitors downstream defects/effectiveness. Composes existing hub workflows under hard budgets; creates no new engine.",
     "tags": [
       "orchestration",
       "workflow",
@@ -6580,7 +6580,7 @@
       "self-healing",
       "loop-engineering"
     ],
-    "changelog": "v1.1.0 (2026-06-17): MINOR \u2014 hub-ward monitoring: emit a hub-linked .claude/learnings.json entry (hub_pattern_link: loop-engineering) on every terminal signal (preflight_blocked / escalated / healed / shipped) so the existing weekly aggregate_telemetry cron surfaces downstream defects + effectiveness in the registry, no new pipeline. Spec \u00a75.1. | v1.0.0 (2026-06-16): Initial release \u2014 distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker\u2260checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
+    "changelog": "v1.1.0 (2026-06-17): MINOR — hub-ward monitoring: emit a hub-linked .claude/learnings.json entry (hub_pattern_link: loop-engineering) on every terminal signal (preflight_blocked / escalated / healed / shipped) so the existing weekly aggregate_telemetry cron surfaces downstream defects + effectiveness in the registry, no new pipeline. Spec §5.1. | v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6607,7 +6607,7 @@
       "ba",
       "verification"
     ],
-    "changelog": "v1.0.0 (2026-06-18): Initial \u2014 enumerated BA completeness checklist + matrix discipline + independent pre-G1 audit, after three repeated incompleteness misses (actors, lifecycle costs, component-by-actor benefits).",
+    "changelog": "v1.0.0 (2026-06-18): Initial — enumerated BA completeness checklist + matrix discipline + independent pre-G1 audit, after three repeated incompleteness misses (actors, lifecycle costs, component-by-actor benefits).",
     "tier": "nice-to-have"
   },
   "web-analytics-instrumentation": {
@@ -6644,7 +6644,7 @@
       "verify-screenshots"
     ],
     "visibility": "public",
-    "description": "Set up GA4 (one property per site) via GTM, add explicit GA4 events for CTAs and affiliate links, configure Consent Mode v2, verify per-domain Search Console, and verify a real collect hit before marking done. Use for web visitor/marketing measurement (GA4/GTM/conversion/affiliate tracking) \u2014 not app/infra observability (that is monitoring-setup).",
+    "description": "Set up GA4 (one property per site) via GTM, add explicit GA4 events for CTAs and affiliate links, configure Consent Mode v2, verify per-domain Search Console, and verify a real collect hit before marking done. Use for web visitor/marketing measurement (GA4/GTM/conversion/affiliate tracking) — not app/infra observability (that is monitoring-setup).",
     "tags": [
       "analytics",
       "ga4",
@@ -6675,7 +6675,7 @@
       "governance",
       "salience"
     ],
-    "changelog": "v1.0.1 (2026-06-18): independent-review fixes \u2014 project MultiEdit edits[0].file_path (was a silent false-negative); guard the last-real-user index against a null subtraction so the zero-real-user branch actually keeps the whole transcript. v1.0.0 (2026-06-18): Initial \u2014 telemetry-first verifier-edge miss detector (Phase 2 of BA-gate/fragile-governance hardening).",
+    "changelog": "v1.0.1 (2026-06-18): independent-review fixes — project MultiEdit edits[0].file_path (was a silent false-negative); guard the last-real-user index against a null subtraction so the zero-real-user branch actually keeps the whole transcript. v1.0.0 (2026-06-18): Initial — telemetry-first verifier-edge miss detector (Phase 2 of BA-gate/fragile-governance hardening).",
     "tier": "nice-to-have"
   },
   "vps-deploy": {
@@ -6704,7 +6704,7 @@
       "rollback",
       "smoke-test"
     ],
-    "changelog": "v1.0.0: Initial release \u2014 SSH+rsync static/PM2 deploy to a self-managed Linux VPS; nginx -t gated reload, live-URL smoke, backup+rollback, G3 human-approval gate. Closes idea-to-deploy-readiness Unit 3 (the deploy=finish-line gap).",
+    "changelog": "v1.0.0: Initial release — SSH+rsync static/PM2 deploy to a self-managed Linux VPS; nginx -t gated reload, live-URL smoke, backup+rollback, G3 human-approval gate. Closes idea-to-deploy-readiness Unit 3 (the deploy=finish-line gap).",
     "tier": "nice-to-have"
   },
   "cross-project-context-capture": {
@@ -6725,7 +6725,7 @@
       "secrets",
       "workflow"
     ],
-    "changelog": "v1.0.0: New hub rule \u2014 capture-on-sight of cross-project facts to workspace global files (secret vs non-secret routing), distributable to downstream projects",
+    "changelog": "v1.0.0: New hub rule — capture-on-sight of cross-project facts to workspace global files (secret vs non-secret routing), distributable to downstream projects",
     "tier": "must-have"
   },
   "karpathy-advisor": {
@@ -6777,7 +6777,7 @@
     "hash": "b1e88d25bb9b0a62aaa610cf47ff16cb5b6b88f10f6c18be08a89fe21e69d46e",
     "type": "hook",
     "version": "1.1.1",
-    "description": "SessionStart+Stop hook: autonomous git handler \u2014 commits + pushes each turn's work to a task branch, keeps main clean, never stacks onto a merged branch; pluggable secret-scan gate. Companion to auto-pr.",
+    "description": "SessionStart+Stop hook: autonomous git handler — commits + pushes each turn's work to a task branch, keeps main clean, never stacks onto a merged branch; pluggable secret-scan gate. Companion to auto-pr.",
     "category": "core",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-21",
@@ -6800,7 +6800,7 @@
     "tier": "nice-to-have"
   },
   "session-git-landing": {
-    "hash": "13e83b3787999247da9eeaebac600c78937af7e84ed314b9aaf327bb2ee59800",
+    "hash": "7a11ffa8205c0bee12a2fc54d4a5313d5d8fd45bec9ec5cc42de736fcc11334c",
     "type": "hook",
     "category": "need-basis",
     "version": "1.0.0",
@@ -6810,7 +6810,7 @@
     "dependencies": [],
     "visibility": "public",
     "tier": "must-have",
-    "description": "Shared SSOT for session git-landing: land [--wait] (arm native auto-merge gated on required checks, optionally wait for MERGED) + reconcile (sweep leftover PRs). Called by /end-session, /start-session, auto-pr.sh, auto-pr-reconcile.sh \u2014 DRY single source of truth.",
+    "description": "Shared SSOT for session git-landing: land [--wait] (arm native auto-merge gated on required checks, optionally wait for MERGED) + reconcile (sweep leftover PRs). Called by /end-session, /start-session, auto-pr.sh, auto-pr-reconcile.sh — DRY single source of truth.",
     "tags": [
       "git",
       "auto-merge",
@@ -6824,7 +6824,7 @@
     "hash": "0e7ca91f6b32154d8e86229bce9d3881be8333502996b50dfe02b4128385f9f2",
     "type": "skill",
     "version": "1.1.0",
-    "description": "Model-driven control layer over the auto-git/auto-pr hooks: status, work (worktree parallel isolation), finish (agent review then merge), cleanup (reconcile every branch \u2014 merged prune, unmerged auto-PR+merge-on-green, escalate only CI-red/strategic).",
+    "description": "Model-driven control layer over the auto-git/auto-pr hooks: status, work (worktree parallel isolation), finish (agent review then merge), cleanup (reconcile every branch — merged prune, unmerged auto-PR+merge-on-green, escalate only CI-red/strategic).",
     "category": "core",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-21",
@@ -6871,7 +6871,7 @@
       "selection",
       "constraints"
     ],
-    "changelog": "v1.0.0: Initial creation \u2014 agent-teams incorporation (rule + teammate governance hooks); v1.1.0: flipped to must-have (dormant) + added EXPERIMENTAL_AGENT_TEAMS self-gate line (\u00a73a)",
+    "changelog": "v1.0.0: Initial creation — agent-teams incorporation (rule + teammate governance hooks); v1.1.0: flipped to must-have (dormant) + added EXPERIMENTAL_AGENT_TEAMS self-gate line (§3a)",
     "tier": "must-have"
   },
   "team-task-created-deliverable": {
@@ -6891,7 +6891,7 @@
       "hook",
       "TaskCreated"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; \u00a73a env-var master switch)",
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
     "tier": "must-have"
   },
   "team-task-completed-verifier": {
@@ -6904,7 +6904,7 @@
     "last_updated": "2026-06-23",
     "dependencies": [],
     "visibility": "public",
-    "description": "TaskCompleted hook for agent teams: completion AUDIT logger. The live-captured payload carries no work-product/result field, so payload-based evidence-gating is infeasible \u2014 true verification stays with the lead reproducing the gate. Records completions (task, teammate, team) to .claude/.team-activity.log; never blocks.",
+    "description": "TaskCompleted hook for agent teams: completion AUDIT logger. The live-captured payload carries no work-product/result field, so payload-based evidence-gating is infeasible — true verification stays with the lead reproducing the gate. Records completions (task, teammate, team) to .claude/.team-activity.log; never blocks.",
     "tags": [
       "agent-teams",
       "governance",
@@ -6912,7 +6912,7 @@
       "TaskCompleted",
       "verification"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; \u00a73a env-var master switch)",
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
     "tier": "must-have"
   },
   "team-teammate-idle-drain": {
@@ -6932,7 +6932,7 @@
       "hook",
       "TeammateIdle"
     ],
-    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; \u00a73a env-var master switch)",
+    "changelog": "v1.0.0: Initial creation; calibrated to the real captured payload schema (2026-06-23); v1.1.0: flipped nice-to-have->must-have (dormant by default; §3a env-var master switch)",
     "tier": "must-have"
   },
   "continuous-improvement": {
@@ -6953,7 +6953,7 @@
       "continuous-improvement",
       "workflow"
     ],
-    "changelog": "v1.0.0: Added per owner standing directive (2026-06-25) \u2014 continuous learn-and-improve self + system.",
+    "changelog": "v1.0.0: Added per owner standing directive (2026-06-25) — continuous learn-and-improve self + system.",
     "tier": "must-have"
   },
   "web-deploy-readiness": {

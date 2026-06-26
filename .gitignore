@@ -61,6 +61,10 @@ trust-score/calibration-ledger.jsonl
 
 # Auto-git hook runtime log
 .claude/.auto-git.log
+
+# Branch-choice per-session marker (stale-branch-reaper.sh clears it each SessionStart;
+# branch-choice.md rule writes it once the owner picks a branch — enforces ask-once-per-session)
+.claude/.branch-choice-active
 trust-score/sim-ledger.jsonl
 trust-score/ledgers/
 

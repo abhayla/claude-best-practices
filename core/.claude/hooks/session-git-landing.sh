@@ -48,6 +48,25 @@ land() {
   esac
 }
 
+merge_one() {
+  # Land ONE specific branch — invoked by the branch-choice SKILL (option 4 "merge then new", and
+  # the owner-approved landing of a reaper-reported stale branch). The current branch IS a valid
+  # target (option 4 merges the branch you're on, then cuts a fresh one). Arms GitHub NATIVE
+  # auto-merge, so the merge is still CI-GATED on the required checks (a red/stale branch can never
+  # sneak in). Never switches the working tree. NOTE: the reaper hook never calls this — only the skill does.
+  local br="${1:-}"
+  _guard || { echo "merge-one: skipped (no gh)"; return 0; }
+  [ -z "$br" ] && { echo "merge-one: no branch given"; return 0; }
+  case "$br" in main|master) echo "merge-one: refusing to merge '$br' into itself"; return 0;; esac
+  [ "${AUTO_MERGE:-1}" = "0" ] && { echo "merge-one: skipped (AUTO_MERGE=0)"; return 0; }
+  gh pr view "$br" >/dev/null 2>&1 || { echo "merge-one: no PR for '$br' (push/open it first)"; return 0; }
+  if gh pr merge "$br" --auto --squash --delete-branch >/dev/null 2>&1; then
+    echo "armed auto-merge on '$br' (lands when its REQUIRED CI passes; red/stale never merges)"
+  else
+    echo "merge-one: could not arm '$br' (already merged/closed, or no perms)"
+  fi
+}
+
 reconcile() {
   _guard || { echo "reconcile: skipped (no gh)"; return 0; }
   [ "${AUTO_MERGE:-1}" = "0" ] && { echo "reconcile: skipped (AUTO_MERGE=0)"; return 0; }
@@ -66,5 +85,6 @@ reconcile() {
 case "${1:-}" in
   land)      shift; land "$@";;
   reconcile) reconcile;;
-  *) echo "usage: session-git-landing.sh {land [--wait]|reconcile}" >&2; exit 2;;
+  merge-one) shift; merge_one "$@";;
+  *) echo "usage: session-git-landing.sh {land [--wait]|reconcile|merge-one <branch>}" >&2; exit 2;;
 esac
