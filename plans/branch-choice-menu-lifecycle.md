@@ -91,5 +91,8 @@ with an owner choice. Guardrail 1 ("never commit to main") stays as the backstop
   reminder at the exact first edit, marker-gated, non-blocking. Closes the "SessionStart nudge can rot" gap.
 - ✅ **Concurrency guard** — `session-concurrency-guard.sh` (SessionStart) warns when another session
   (by `session_id`, lock-file heuristic, < `CONCURRENCY_STALE_MIN`) shares the working tree → recommends a worktree.
-- ⏳ **Reaper-as-scheduler (#7)** — firing the 24h reaper with NO session opened needs a scheduled
-  cloud agent = RECURRING SPEND → owner decision, NOT built. (Session-start-only remains the default.)
+- ✅ **Reaper-as-scheduler (#7) — RESOLVED (owner decided 2026-06-26): DECLINED.** Do NOT fire the
+  24h sweep from outside a Claude session. It runs ONLY from a session (SessionStart) and therefore
+  stays free — no scheduled cloud agent, no recurring spend. This is the final, intended behavior.
+
+## Status: COMPLETE. All agreed parts built + merged (#217, #218); #7 is an explicit owner decision, not a gap.
