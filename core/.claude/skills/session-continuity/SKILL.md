@@ -6,7 +6,7 @@ description: >
   remediation). The skill body IS the orchestrator — runs in the user's
   T0 session. Modes: save (ending session), restore (starting session),
   handover (produce handover doc from saved session). Invokes sub-skills
-  (/save-session, /start-session, /continue, /handover) via Skill();
+  (/end-session, /start-session, /continue, /handover) via Skill();
   optionally dispatches session-summarizer-agent via Agent() at T0 for
   deep session analysis when the save/handover needs it.
 type: workflow
@@ -79,7 +79,7 @@ AND dispatchable. Pattern provisioning copies by tier and may not resolve a
 skill's full closure, so a project can have this skill without its workers — a
 silent inline run or a mid-dispatch crash is the failure this gate prevents.
 
-- **Required sub-skills** (invoked via `Skill()`): `save-session`, `start-session`, `handover`. Check each exists at
+- **Required sub-skills** (invoked via `Skill()`): `end-session`, `start-session`, `handover`. Check each exists at
   `.claude/skills/<name>/SKILL.md` (only those on the path you will actually run).
 - **Required worker agents** (dispatched via `Agent()`): `session-summarizer-agent` (when deep summarization runs). File presence
   (`.claude/agents/<name>.md`) is necessary but NOT sufficient — the agent registry
@@ -98,10 +98,10 @@ Only when the required closure is present and dispatchable, continue.
 ## STEP 2: SAVE (mode == save)
 
 ```
-Skill("/save-session", args="<optional session name>")
+Skill("/end-session", args="<optional session name>")
 ```
 
-`/save-session` captures working files, git state, key decisions, task
+`/end-session` captures working files, git state, key decisions, task
 progress. Writes to `.claude/sessions/{run_id}.md` (or json; format per
 skill). MUST NOT overwrite existing file without `--force`.
 

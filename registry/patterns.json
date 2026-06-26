@@ -3093,7 +3093,7 @@
     }
   },
   "learn-n-improve": {
-    "hash": "3d9ccf5a56cbcdc4cb6499173f7765f0a7e1724aff9c38efa117722f9446c6eb",
+    "hash": "d420451fcca4e789a1a5c3151db434d7be92b32f14efeb131aad8626422ba2b2",
     "type": "skill",
     "category": "core",
     "version": "2.3.0",
@@ -4413,17 +4413,17 @@
       "last_updated": "2026-06-20"
     }
   },
-  "save-session": {
-    "hash": "71d9e145e012070df5a3dc3c008d1e121423632670eb47d98dbad994961931e7",
+  "end-session": {
+    "hash": "91cab72d5b7ec8f91574cd607313c14d03895b6f35cb048e8fd4a24bdaffcd8e",
     "type": "skill",
     "category": "core",
-    "version": "1.3.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
     "last_updated": "2026-06-26",
     "dependencies": [],
     "visibility": "public",
-    "description": "Save a structured session checkpoint capturing working files, git state, key decisions, and task progress for later resumption via /start-session",
+    "description": "End and close a session: round up + save a resumable checkpoint + land work (CI-gated) + confirm closeable. Renamed from save-session; pairs with start-session.",
     "tags": [
       "session",
       "context",
@@ -4437,6 +4437,33 @@
       "sample_size": 3,
       "last_updated": "2026-06-20"
     }
+  },
+  "save-session": {
+    "hash": "cdacccfd0be50123897d0d0bca220c68d51e9f84cb4435eede968e4b4af84358",
+    "type": "skill",
+    "category": "core",
+    "version": "2.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-03-19",
+    "last_updated": "2026-06-26",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "DEPRECATED alias of end-session (renamed). Forwards to /end-session.",
+    "tags": [
+      "session",
+      "context",
+      "continuity"
+    ],
+    "changelog": "v1.2.0: Add triggers for natural language discoverability | v1.1.0: Add triggers, registry version sync | v1.0.0: Initial release",
+    "tier": "must-have",
+    "effectiveness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 3,
+      "last_updated": "2026-06-20"
+    },
+    "deprecated": true,
+    "deprecated_by": "end-session"
   },
   "schema-designer": {
     "hash": "9c1d65b7a56face0d0d8b39ff3d5f86b5033851f0ce20250c3689013d3b1eb0d",
@@ -4602,7 +4629,7 @@
     }
   },
   "session-continuity": {
-    "hash": "31d4e288bf81c5529134bedcedf1d01fb0065abdbd06c6a09967a8c7d5739091",
+    "hash": "fabb7d5ade305336cfd103d730eb8c6ec12b6438030e3fa0920849054668125c",
     "type": "skill",
     "category": "core",
     "version": "2.1.1",
@@ -4912,7 +4939,7 @@
     }
   },
   "start-session": {
-    "hash": "750ac196b8943bb5b198161f24e6b6d834d6b049c93d876378f662ea208feec6",
+    "hash": "d0677b5a2fb99b9e4d4296c49fd66a683f304cbf41d8721d2d19ca18b5eef78d",
     "type": "skill",
     "category": "core",
     "version": "1.2.0",

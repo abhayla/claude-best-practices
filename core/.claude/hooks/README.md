@@ -83,7 +83,7 @@ Both options integrate with your existing `context-management` rules and `contex
 
 ### Session Reminder (`session-reminder.sh`)
 
-PostToolUse hook on `*` (all tools) that reminds Claude to checkpoint progress via `/save-session` at configurable intervals. Uses a counter-based approach: counts tool invocations per session and emits a non-blocking reminder at the threshold. Complements `context-window-monitor.sh` — session-reminder fires first (default: 40 tool uses) as a save prompt, then context-monitor fires later (default: 50) for handover/compaction. Always exits 0 (non-blocking, advisory only).
+PostToolUse hook on `*` (all tools) that reminds Claude to checkpoint progress via `/end-session` at configurable intervals. Uses a counter-based approach: counts tool invocations per session and emits a non-blocking reminder at the threshold. Complements `context-window-monitor.sh` — session-reminder fires first (default: 40 tool uses) as a save prompt, then context-monitor fires later (default: 50) for handover/compaction. Always exits 0 (non-blocking, advisory only).
 
 ```json
 {

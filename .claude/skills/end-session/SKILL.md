@@ -1,26 +1,30 @@
 ---
-name: save-session
+name: end-session
 description: >
-  Save a structured session checkpoint capturing working files, git state, key decisions,
-  and task progress. Creates a resumable session file in .claude/sessions/ that
-  /start-session can restore in a future conversation. Use when pausing work, before
-  long breaks, or when the session-reminder hook fires.
+  End and close a work session — round up everything: state the session goal + assess it,
+  save a resumable checkpoint (working files, git state, decisions, task progress), LAND the
+  work (CI-gated auto-merge), and confirm the session is closeable. Use when finishing, wrapping
+  up, or closing a session (also covers a mid-work "save my progress" checkpoint).
 type: workflow
 triggers:
+  - end session
+  - close session
+  - wrap up
+  - finish session
+  - round up and close
   - save session
   - checkpoint
-  - save progress
-  - pause work
-  - save my work
-  - session checkpoint
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "[session-name]"
-version: "1.3.0"
+version: "2.0.0"
 ---
 
-# Save Session — Checkpoint Your Progress
+# End Session — Round Up & Close
 
-Capture the current working state into a structured session file for later resumption via `/start-session`.
+Close out a work session cleanly: round up everything into a resumable checkpoint, **land the
+work** (so "session ended" = "merged when green"), and confirm the session can be closed.
+Renamed from `/save-session` (clearer pairing with `/start-session`); `/save-session` still works
+as a deprecated alias. Restore later with `/start-session`.
 
 **Key distinction:** `/save-session` captures file-level working state for exact resumption. `/handover` produces a narrative handoff document for broader context transfer. `/continue` is a lightweight git-state briefing. These serve different needs — use all three as appropriate.
 
@@ -194,6 +198,7 @@ After saving, present:
    Note: Teams that want to share session state can skip this.
 3. **Resume command:** "To restore this session later, run: `/start-session {name}`"
 4. **Quick stats:** Number of working files captured, completed/in-progress/blocked counts
+5. **Session closeable:** state the session goal + whether it was met (distinguish PARKED external blockers from PENDING work), and confirm "the session is complete and can be closed." If the goal is NOT met, say what remains rather than declaring closeable.
 
 ---
 

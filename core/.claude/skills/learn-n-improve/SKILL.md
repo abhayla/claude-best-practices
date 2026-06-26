@@ -5,7 +5,7 @@ description: >
   skill-gaps) for continuous self-improvement. Four modes: session, deep, meta, test-run.
   Use when a session ends, after a fix succeeds, or when reviewing learning effectiveness.
   For full learning cycles (capture + pattern detection + skill proposals), use
-  /learning-self-improvement instead. For one-off session saves, use /save-session.
+  /learning-self-improvement instead. For one-off session saves, use /end-session.
   For full handover docs, use /handover.
 type: workflow
 triggers:
