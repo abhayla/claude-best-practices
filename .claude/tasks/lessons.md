@@ -2,6 +2,30 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-06-27 — Explain hub system behavior from the SSOT/source, never from inference
+
+**Mistake:** Asked "why do `/init` and `/end-session` get prompt-enhanced?", I answered twice from
+inference — claiming it was "working as designed" and that slash commands "arrive expanded to ~6000
+chars so the length skip can't catch them." Both were wrong. The user corrected me: the docs clearly
+state slash commands (user- OR Anthropic-made) must NEVER be enhanced.
+
+**Root cause:** I reasoned about the hooks' behavior from what I'd read in passing instead of opening
+the canonical SSOT first. The plugin SSOT (`plugins/prompt-auto-enhance/enhance-settings.default.json`)
+sets `enhance_slash_commands: false` with the exact wording "NEVER improve a /command … run as-is",
+and the plugin hook implements `case "$trimmed" in /*) exit 0`. The real cause of the symptom was
+that the **hub's operational `.claude/` copy had drifted** and never adopted that skip — a bug, not a
+design choice.
+
+**Rule:** Before explaining *why* a hub mechanism behaves a certain way, READ its SSOT/source
+(config defaults, the actual hook, the rule file) and cite it. If a symptom contradicts the
+documented default, suspect drift between the canonical artifact and an operational copy — don't
+rationalize the symptom as intended. Inference about system internals is "**Unverified:**" until the
+source confirms it.
+
+**Fix shipped:** ported `enhance_slash_commands=false` skip into the hub layer (reminder hook +
+no-overask-guard + synced core copy) and the plugin's process-guard; aligned all rule/skill docs.
+PR on `fix/enhance-skip-slash-commands`.
+
 ## 2026-06-26 — Branch off the CURRENT HEAD, not `origin/main`, when uncommitted-looking work is actually committed on the active branch
 
 **Surfaced during:** landing the session-git-landing DRY refactor. The auto-git hook had already

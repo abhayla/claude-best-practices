@@ -123,6 +123,22 @@ case "$lower" in
     exit 0 ;;
 esac
 
+# Skip 0: slash-command / saved custom prompts (deterministic) — run them EXACTLY as-is.
+# enhance_slash_commands=false is the canonical plugin default (SSOT:
+# plugins/prompt-auto-enhance/enhance-settings.default.json): a prompt that is a /command —
+# user-made OR Anthropic-provided (/init, /end-session, /grill-me, …) — is NEVER routed through
+# the strengthening pipeline, any size. VERIFIED 2026-06-22: UserPromptSubmit fires for slash
+# commands and .prompt holds the RAW "/command args" text. Placed AFTER the `enhance …` set-
+# commands and the bare-`enhance`/`/enhance` one-shot above (so those still register) and BEFORE
+# the length/continuation skips. We still emit the governance tail — only the ENHANCE block is
+# suppressed (plan/decide/grill/narrate-and-stop stay active on every turn, incl. slash commands).
+case "$trimmed" in
+  /*)
+    emit_governance_tail
+    exit 0
+    ;;
+esac
+
 # Skip 1: empty or short prompts (≤15 chars trimmed)
 if [ "${#trimmed}" -le 15 ]; then
   exit 0
