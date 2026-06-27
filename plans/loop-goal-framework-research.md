@@ -450,5 +450,41 @@ no raw Reddit/HN thread text was directly retrievable in this pass (search-index
   in a vertical. Value for the brainstorm = evidence the loop pattern generalizes to domain apps, and
   a citable academic grounding (QuantAgent) for the self-critique-and-retest mechanism.)_
 
+#### L5 · @0x_rody tweet → X article "How to Move From Writing Code to Orchestrating Agents" (sent 2026-06-27; tweet dated 2026-06-26)
+
+- **Link as sent:** https://x.com/i/status/2070440208248496260
+- **The tweet** (via syndication): author **@0x_rody** ("rody", blue-verified), 2026-06-26, t.co link to
+  the X **article** **"How to Move From Writing Code to Orchestrating Agents (Full Breakdown Inside)"**
+  (`x.com/i/article/2070435793785532416`). Preview: *"The best engineers barely write code by hand
+  anymore… They moved up a level. Now they direct agents that write it, and just verify what comes back."*
+- **Article body:** login-walled (402); substance recovered via search (capture, not verbatim) — the
+  richest verification/stop-condition articulation in the set so far:
+  - **The shift**: "the bottleneck shifts from authorship to orchestration. When the model can write the
+    code, the scarce skill is designing the cycle that keeps it correct and pointed at the goal."
+  - **Engineer's new role**: "define the task, provide context, set boundaries, create checks, review the
+    work, decide the next move" — evaluate whether the agent solved the RIGHT problem + prevent
+    architectural drift + orchestrate how multiple agent-built components fit.
+  - **Verification is the fastest-growing sub-theme** (after Steinberger's tweet): *"Half of loop
+    engineering is design; the other half is something that can say no. A loop that writes → runs →
+    reads the result → corrects is what actually works in production."*
+  - **Convergent recipe for long unattended agents** (quote): *"specify the desired end state, the
+    evidence required to prove success, the constraints that must not be violated, and a hard ceiling on
+    turns or budget. The agent stays the executor; you write the acceptance test it has to pass before it
+    is allowed to claim done."*
+  - _(Flag for the user: paste the article text for exact wording.)_
+- **Higher-signal sources surfaced (queued — better than the blog explainers):**
+  **O'Reilly Radar — "Loop Engineering"** (https://www.oreilly.com/radar/loop-engineering/);
+  **Thoughtworks — "Supervisory engineering: orchestrating software's 'middle loop'"**
+  (https://www.thoughtworks.com/insights/blog/agile-engineering-practices/supervisory-engineering-orchestrating-software-middle-loop);
+  **Arize — "Closing the Loop: Coding Agents, Telemetry, and the Path to Self-Improving Software"**
+  (https://arize.com/blog/closing-the-loop-coding-agents-telemetry-and-the-path-to-self-improving-software/);
+  **LangChain — "Agentic Engineering"** (https://www.langchain.com/blog/agentic-engineering-redefining-software-engineering).
+
+  _(NB — capture, not judgment: the "end state · evidence · constraints · hard turn/budget ceiling ·
+  acceptance-test-before-done" recipe is, almost line-for-line, the hub's `goal-creator` contract +
+  `dod-verbs.md` (ACTION + COMPLETENESS BAR) + `output-plausibility-verification.md` +
+  `supervisor-verification.md` + `--max-cycles`/retry budgets. "Something that can say no" = the hub's
+  maker≠checker. This is the densest external corroboration of the hub's design — flagged for the brainstorm.)_
+
 _(append further user links below)_
 
