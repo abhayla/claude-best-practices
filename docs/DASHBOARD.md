@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-27 05:11 UTC (auto-generated)
+> Last updated: 2026-06-27 05:44 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 281 |
-| Core (universal) | 208 |
+| Total Patterns | 285 |
+| Core (universal) | 212 |
 | Stack-specific | 73 |
 | Agents | 36 |
 | Configs | 3 |
-| Hooks | 18 |
+| Hooks | 21 |
 | Rules | 55 |
-| Skills | 169 |
+| Skills | 170 |
 
 ## Pattern Inventory
 
@@ -40,6 +40,8 @@
 | ba-usecase-discovery-reminder | hook | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | brainstorm | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
+| branch-choice | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| branch-choice-gate | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | branching | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | bug-triage-discipline | rule | 1.0.0 | project:firekaro-planner | — |
 | bun-elysia | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -176,6 +178,7 @@
 | security-baseline | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | serialize-fixes | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
+| session-concurrency-guard | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | session-continuity | skill | 2.1.1 | hub:abhayla/claude-best-practices | handover, end-session, session-summarizer-agent, start-session, workflow-contracts |
 | session-continuity-master-agent | agent | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | session-governance-status | hook | 1.0.0 | project:firekaro-planner | no-overask-guard |
@@ -188,6 +191,7 @@
 | skill-factory | skill | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-master | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ssot-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | configuration-ssot |
+| stale-branch-reaper | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | start-session | skill | 1.2.0 | hub:abhayla/claude-best-practices | end-session |
 | status | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | strategic-architect | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
