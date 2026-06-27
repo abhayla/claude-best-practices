@@ -188,8 +188,12 @@ Decisions to make *with* the user — not pre-decided here:
 **Authoritative (cached official docs — cite these first):**
 - `docs/claude-references/goal.md` — Source: https://code.claude.com/docs/en/goal (fetched 2026-06-23)
 - `docs/claude-references/scheduled-tasks.md` — Source: https://code.claude.com/docs/en/scheduled-tasks (fetched 2026-06-23)
-- Related cached pages to mine next if needed: `auto-mode-config`, `routines`, `hooks-guide`,
-  `permission-modes`, `headless`.
+- `docs/claude-references/permission-modes.md` — auto/acceptEdits/plan/dontAsk/bypass modes, the auto-mode classifier + default block-list + 3-in-a-row/20-total fallback + protected paths (fetched 2026-06-27)
+- `docs/claude-references/auto-mode-config.md` — `autoMode.environment`/`allow`/`soft_deny`/`hard_deny` config + four-tier precedence (fetched 2026-06-27)
+- `docs/claude-references/routines.md` — the durable cloud tier: schedule/API/GitHub triggers, `/schedule`, ≥1-hr min, no permission picker (fetched 2026-06-27)
+- `docs/claude-references/model-config.md` — small-fast-model (Haiku) for the evaluator/classifier, effort levels + `ultracode`, Fable-5+`/goal` pairing, auto-mode model floors (fetched 2026-06-27)
+- `docs/claude-references/headless.md`, `docs/claude-references/hooks-guide.md` — already cached (prior sessions).
+- All seven above proactively cached so the framework's full surface is captured before processing the user's incoming links.
 
 **Community / secondary (framing + sentiment — treat as opinion, not spec):**
 - sabrina.dev — "AI Loop Engineering: Build Autonomous Agents with Claude Code /goal + Routines":
@@ -210,3 +214,16 @@ Decisions to make *with* the user — not pre-decided here:
 - `/batch` as a native command is **unverified** — only community-claimed.
 - Official docs are 4 days old (2026-06-23 cache); refresh `goal.md`/`scheduled-tasks.md` before
   finalizing any implementation if exactness matters.
+
+---
+
+## 7. Raw link captures (append-only — neutral, not yet judged)
+
+> Each link the user sends is logged here verbatim/neutrally: URL · fetched date · extracted
+> content/claims, with NO accept/reject judgment (analysis happens in our later discussion).
+> Claude/Anthropic docs pages are additionally cached under `docs/claude-references/`.
+> New entries appended at the bottom.
+
+_(Awaiting the user's links — none captured yet. The four official pages cached on 2026-06-27,
+listed in §6, were proactively pulled by me, not user-supplied.)_
+
