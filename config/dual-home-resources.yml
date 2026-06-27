@@ -23,6 +23,7 @@ synced:
     - web-research-specialist-agent.md
   skills:
     - anthropic-multi-agent-research-system-skill
+    - branch-choice
     - continue
     - executing-plans
     - five-advisors
@@ -43,10 +44,13 @@ synced:
     - workflow.md
   hooks:
     - ba-usecase-discovery-reminder.sh
+    - branch-choice-gate.sh
     - no-overask-guard.sh
     - prompt-logger.sh
+    - session-concurrency-guard.sh
     - session-git-landing.sh
     - session-governance-status.sh
+    - stale-branch-reaper.sh
     - verifier-edge-guard.sh
 
 # shared: mostly-shared resources. The non-fenced SKELETON must be identical across both copies

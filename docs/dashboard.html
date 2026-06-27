@@ -45,13 +45,13 @@ tr:hover { background: var(--primary-light); }
     <h1>Claude Best Practices Hub</h1>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
-<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-27 05:11 UTC (auto-generated)</p>
+<p style="margin-bottom:1rem;opacity:0.7">Last updated: 2026-06-27 05:44 UTC (auto-generated)</p>
 
 <div class="stats">
-    <div class="stat-card"><div class="number">281</div><div class="label">Total Patterns</div></div>
-    <div class="stat-card"><div class="number">208</div><div class="label">Core</div></div>
+    <div class="stat-card"><div class="number">285</div><div class="label">Total Patterns</div></div>
+    <div class="stat-card"><div class="number">212</div><div class="label">Core</div></div>
     <div class="stat-card"><div class="number">73</div><div class="label">Stack-specific</div></div>
-    <div class="stat-card"><div class="number">36</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">3</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">18</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">55</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">169</div><div class="label">Skills</div></div>
+    <div class="stat-card"><div class="number">36</div><div class="label">Agents</div></div><div class="stat-card"><div class="number">3</div><div class="label">Configs</div></div><div class="stat-card"><div class="number">21</div><div class="label">Hooks</div></div><div class="stat-card"><div class="number">55</div><div class="label">Rules</div></div><div class="stat-card"><div class="number">170</div><div class="label">Skills</div></div>
 </div>
 
 <div id="patterns-section">
@@ -381,6 +381,24 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>—</td>
                 <td>workflow</td>
+            </tr>
+            <tr data-type="skill" data-category="core">
+                <td>branch-choice</td>
+                <td><span class="badge badge-skill">skill</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>git, branch, session-lifecycle, workflow</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>branch-choice-gate</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>hook, pre-tool-use, git, branch, governance</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>branching</td>
@@ -2020,6 +2038,15 @@ tr:hover { background: var(--primary-light); }
                 <td>—</td>
                 <td>testing-pipeline, git, diff, serialization</td>
             </tr>
+            <tr data-type="hook" data-category="core">
+                <td>session-concurrency-guard</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>hook, session-start, git, worktree, concurrency</td>
+            </tr>
             <tr data-type="skill" data-category="core">
                 <td>session-continuity</td>
                 <td><span class="badge badge-skill">skill</span></td>
@@ -2145,6 +2172,15 @@ tr:hover { background: var(--primary-light); }
                 <td>hub:abhayla/claude-best-practices</td>
                 <td>configuration-ssot</td>
                 <td>SSOT, audit, configuration, duplication, quality</td>
+            </tr>
+            <tr data-type="hook" data-category="core">
+                <td>stale-branch-reaper</td>
+                <td><span class="badge badge-hook">hook</span></td>
+                <td>core</td>
+                <td>1.0.0</td>
+                <td>hub:abhayla/claude-best-practices</td>
+                <td>—</td>
+                <td>hook, session-start, git, branch, governance</td>
             </tr>
             <tr data-type="skill" data-category="core">
                 <td>start-session</td>

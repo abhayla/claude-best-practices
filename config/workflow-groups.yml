@@ -221,6 +221,7 @@ workflows:
     description: "Start, save, resume, and hand over between sessions."
     seeds:
       skills:
+        - branch-choice
         - continue
         - end-session
         - handover

@@ -23,6 +23,12 @@ downstream projects INTO the hub). Read `docs/HUB-CORE-SYNC.md` for the scoping 
 - Verify the pattern currently lives ONLY in `.claude/` (not already in `core/.claude/`).
 - Confirm it's portable: no reference to hub-only scripts (`dedup_check.py`, `collate.py`, …),
   `registry/`, `core/`, or hub-only paths. If it depends on those, it is machinery — stop.
+- **Check for companion patterns.** If the skill references HOOKS (or other skills/agents) that
+  are NOT yet in `core/`, the promotion is a BUNDLE: promote those companions too, or the
+  distributed skill points at machinery that doesn't exist downstream. Each companion hook runs
+  the same copy→register→dual-home pipeline AND must be wired into `core/.claude/settings.json`
+  (STEP 3 — copy the hook + add its entry to the right event block in `core/.claude/settings.json`,
+  matching the hub's wiring). Verify with: `comm -23 <(grep -o '[a-z-]*\.sh' SKILL.md|sort -u) <(ls core/.claude/hooks)`.
 - Choose `tier`: `must-have` (core dev workflow) | `nice-to-have` (useful utility) | `skip`.
 
 ## STEP 2: Bring the pattern file up to the registered standard

@@ -6408,7 +6408,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-27",
-    "total_patterns": 281
+    "total_patterns": 285
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6999,6 +6999,89 @@
       "media"
     ],
     "changelog": "v1.0.0 (2026-06-27): Initial — captions->yt-dlp subtitles->Whisper ASR fallback transcript extractor; promoted from hub-only to distributable core.",
+    "tier": "nice-to-have"
+  },
+  "branch-choice": {
+    "hash": "bc3d0cc99ce1c8f1e52b38bc6b5d0e834b3b73bbef6d3392e51930261bfb3ce6",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-27",
+    "last_updated": "2026-06-27",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Present the once-per-session branch menu at the FIRST file edit of a session (new from main / keep existing / switch / merge-then-new / stash) and handle owner-approved landing of stale (>24h) branches reported by the stale-branch reaper. Use before the first file change of a session, or when the reaper reports STALE_BRANCH lines needing approval.",
+    "tags": [
+      "git",
+      "branch",
+      "session-lifecycle",
+      "workflow"
+    ],
+    "changelog": "v1.0.0 (2026-06-27): Initial — owner-driven once-per-session branch menu + stale-branch approval; promoted to core with its 3 companion hooks.",
+    "tier": "nice-to-have"
+  },
+  "stale-branch-reaper": {
+    "hash": "fe1ce32bd40434176c34e26668a75232617deee12a8a138453fb6dd6ea80d61f",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-27",
+    "last_updated": "2026-06-27",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "SessionStart hook for the branch-choice lifecycle: clears the per-session branch-choice marker (so each session re-asks), reports branches idle past STALE_BRANCH_HOURS (default 24h) as STALE_BRANCH lines for owner-approved landing, and prints the BRANCH-CHOICE nudge. Pairs with the branch-choice skill.",
+    "tags": [
+      "hook",
+      "session-start",
+      "git",
+      "branch",
+      "governance"
+    ],
+    "changelog": "v1.0.0 (2026-06-27): Initial — promoted to core alongside the branch-choice skill.",
+    "tier": "nice-to-have"
+  },
+  "branch-choice-gate": {
+    "hash": "510e9f67cc5b65b23e0f1a2ba945d7e75eca7090c1eb80906c433d85182c41ce",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-27",
+    "last_updated": "2026-06-27",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "PreToolUse (Edit|Write|MultiEdit) hook that deterministically re-injects the once-per-session branch-choice reminder at the EXACT first file edit of a session, surviving long sessions where the SessionStart nudge rots. Non-blocking; silent once the per-session marker exists. Pairs with the branch-choice skill.",
+    "tags": [
+      "hook",
+      "pre-tool-use",
+      "git",
+      "branch",
+      "governance"
+    ],
+    "changelog": "v1.0.0 (2026-06-27): Initial — promoted to core alongside the branch-choice skill.",
+    "tier": "nice-to-have"
+  },
+  "session-concurrency-guard": {
+    "hash": "2cfac74ea6f8a7606e96528bc9c3ecc52c378b25d826d88d35759a9aee094a9b",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-06-27",
+    "last_updated": "2026-06-27",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "SessionStart hook that warns when another session shares the same working tree (two sessions = one checked-out branch = collisions) and recommends using a git worktree for true parallel isolation. Companion to the branch-choice lifecycle.",
+    "tags": [
+      "hook",
+      "session-start",
+      "git",
+      "worktree",
+      "concurrency"
+    ],
+    "changelog": "v1.0.0 (2026-06-27): Initial — promoted to core alongside the branch-choice skill.",
     "tier": "nice-to-have"
   }
 }
