@@ -102,6 +102,58 @@ files), **Desktop scheduled tasks** (local machine, local files), and **GitHub A
 trigger). The hub's own durable crons (scan-internet, aggregate-telemetry) correctly stay on GitHub
 Actions for exactly this reason.
 
+### 2.5b Known gotchas / limitations (practitioner-reported — capture, not yet judged)
+
+Recurring cautions across community write-ups (treat as reported, verify against official docs
+before relying on any one):
+
+- **No native per-goal token budget cap.** A long `/goal` run can consume an order of magnitude
+  more tokens than expected; it runs until the condition is met or `Ctrl+C`/`/goal clear`. Simplest
+  mitigation = a **turn/time clause in the condition** ("…or stop after 20 turns"). *(Maps onto the
+  hub's `--max-cycles` + global retry budget in `/loop-engineering`.)*
+- **Context-window compaction mid-run.** Long sessions summarize earlier work to stay in the window,
+  so early context can be compressed/lost. *(Note: this is also how a stated auto-mode boundary can
+  be dropped — see `permission-modes.md`.)*
+- **Evaluator blind spots.** The evaluator only reads the transcript (no tool calls), so a vague
+  condition ("until the code is clean") leaves it guessing — it churns or quietly declares done.
+  Conditions must flip from a "no" to a "yes" on something **Claude's own output demonstrates**.
+- **Don't leave an open-ended goal running overnight without Auto mode.** Without auto mode a `/goal`
+  run stalls waiting for per-write approvals; **Auto mode + `/goal` is the combination that makes
+  unattended runs practical** (auto mode = per-tool approval, `/goal` = per-turn). For scheduled/
+  headless work use `claude -p`.
+- **Compound objectives overwhelm it.** "Redesign auth, add OAuth, write tests, update docs" is too
+  much for one goal — break into **sequential goals**, each with its own verifiable end state.
+
+### 2.5c Origin / notable framing (capture, not yet judged)
+
+- **Lineage (the real origin chain):** **Ralph Loop** (Geoffrey Huntley, mid-2025) — a bare bash
+  loop `while :; do cat PROMPT.md | claude-code ; done` that re-ran a prompt with NO stop condition,
+  working because each iteration inherited file state + git history. Huntley's maxim: **"sit on the
+  loop, not in it"** (supervise from above). → June 2026 Anthropic **productized it** into native
+  `/loop`+`/goal` with proper stop conditions + tooling. `/goal` is described as **"the Ralph loop,
+  built in."**
+- **"Loop engineering"** the name was coined by **Addy Osmani (Google)** — the hub's
+  `/loop-engineering` already cites his "a loop running unattended is a loop making mistakes
+  unattended" line.
+- **Boris Cherny (creator of Claude Code):** *"I'm not prompting Claude anymore. I'm building
+  loops"* — claims 100% of his recent contributions came via Claude Code loops, no hand-editing
+  since November (community-quoted; primary source not yet verified).
+- **Recommended patterns (community consensus):** persistent `CLAUDE.md` as memory (record mistakes
+  so the loop stops repeating them); 3–5 git worktrees each with its own session; **adversarial
+  verification** (agents whose only job is to find faults, so the loop can't game weak conditions);
+  structure work around **verifiable goals** (tests pass, lint clean, e2e checks) not prompt-perfecting.
+- **Criticisms / risks (capture):** *"A loop is exactly as good as the success condition you can
+  write."* — verification problem; **self-deception/gaming** (satisfies the letter, not the spirit,
+  of a weak condition → mitigation: genuinely strong tests + adversarial review); **scope** (loops
+  shine on mechanically-checkable work — migrations, upgrades, test suites — and struggle on
+  underspecified, taste-driven work); **model-vs-method** (stronger models, Opus 4.8 / Fable 5,
+  reduce iteration need, so some credit is capability not loop philosophy). The thesis: the
+  appreciating skill is now **verification-harness design**, not prompt craft.
+  *(NB: this independently validates the hub's `/loop-engineering` maker≠checker + verifiable-DoD +
+  worktree design — a convergence to capture for the brainstorm, not yet a decision.)*
+- **Predecessor tool:** `github.com/jthack/claude-goal` — a "Codex-style `/goal` command for Claude
+  Code" built before the native command shipped (historical; not yet inspected).
+
 ### 2.5 `/batch` (adjacent, community-cited — unverified against official docs)
 
 Community articles list **`/batch`** alongside `/goal`/`/loop` as "manages large-scale refactors by
@@ -224,6 +276,38 @@ Decisions to make *with* the user — not pre-decided here:
 > Claude/Anthropic docs pages are additionally cached under `docs/claude-references/`.
 > New entries appended at the bottom.
 
-_(Awaiting the user's links — none captured yet. The four official pages cached on 2026-06-27,
-listed in §6, were proactively pulled by me, not user-supplied.)_
+_(The four official pages cached 2026-06-27 + the community sources below were proactively pulled
+by me; the user's own links are still awaited and will be appended here as they arrive.)_
+
+### C1 · Community sweep (proactive, 2026-06-27) — Reddit/HN/blog sentiment + gotchas
+
+Captured neutrally. Practitioner content is mostly vendor/blog explainers + a few opinion pieces;
+no raw Reddit/HN thread text was directly retrievable in this pass (search-indexed only).
+
+- **Webcoda — "The Loop People Were Right: Anthropic Shipped Their Argument as a Feature"**
+  (https://ai-checker.webcoda.com.au/articles/loop-driven-development-claude-code-loops-goals-2026):
+  best single history. Ralph Loop (Huntley, mid-2025) → native June 2026. `/loop` = scheduler (state
+  in files+git, no stop logic); `/goal` = evaluator ("the Ralph loop, built in"). Patterns: CLAUDE.md
+  memory, 3–5 worktrees, adversarial verification, verifiable goals. Criticisms: "a loop is exactly
+  as good as the success condition you can write"; gaming/self-deception; mechanical-task scope;
+  model-vs-method. Thesis: verification-harness design is the new core skill. (Key claims folded into
+  §2.5b/§2.5c above.)
+- **MindStudio blog series** (multiple URLs) — explainers on `/goal`+`/loop` for autonomous long-
+  running tasks; the "second smaller model reads the transcript, yes/no" evaluator description.
+- **xda-developers — "I finally understood Claude Code's /goal command after realizing I was using it
+  completely wrong"** (https://www.xda-developers.com/finally-understood-claude-code-goal-command/) —
+  the "vague condition = loop guessing / churns or quietly quits" gotcha.
+- **Apiyi blog — "goal mode: 6 key points"** (https://help.apiyi.com/en/claude-code-goal-mode-keep-working-until-done-guide-en.html).
+- **DeskTheory — "When to use /goal vs /loop"** (https://desktheory.com/workflows/goal-vs-loop-claude-code) —
+  `/goal` = get something done; `/loop` = keep an eye on something.
+- **Avi Chawla — "Claude Code's /goal Command"** (https://blog.dailydoseofds.com/p/claude-codes-goal-command).
+- **Jason Croucher — "Claude Code /goal: A Field Guide with Games"** (https://medium.com/@jason.croucher/claude-code-goal-a-field-guide-with-games-f6f3b617ce5b).
+- **aifromthefield — "I spent a full day saying keep going"** (https://aifromthefield.substack.com/p/i-spent-a-full-day-saying-keep-going) — `/goal` vs the manual "keep going" nudge, Claude vs Codex.
+- **Threads not yet inspected (queued for deeper pass if wanted):** `github.com/jthack/claude-goal`
+  (predecessor repo); Geoffrey Huntley's original Ralph write-up; primary sources for the Osmani
+  "loop engineering" coinage + the Boris Cherny quotes.
+
+### User-supplied links
+
+_(none yet — append below as the user sends them)_
 
