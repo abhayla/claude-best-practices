@@ -363,6 +363,7 @@ workflows:
         - web-scraper
         - websocket-patterns
         - xml-to-compose
+        - youtube-transcript
         - zoom-out
       agents:
         - parallel-worktree-orchestrator-agent
