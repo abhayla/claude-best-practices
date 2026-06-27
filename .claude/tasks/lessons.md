@@ -628,3 +628,20 @@ so a default boilerplate file counts as "complete."
 never trust tsc/build-green alone (`supervisor-verification.md` + `output-plausibility-verification.md`).
 **System follow-up:** make the build-team prompt require the lead to render & screenshot the actual
 route before declaring done; optionally content-check done-files (not just size).
+
+---
+**Lesson (2026-06-27): Stop-hook false-positive loop on genuinely-terminal turns.**
+**Mistake:** After a task completed (owner decided "keep .txt, close the .md follow-up"; decision
+recorded in memory + session + verified absent from SKILL.md), the `no-overask-guard.sh` Stop hook
+looped — alternately flagging "enhance: full process not rendered" and "over-ask/narrate-and-stop"
+on every closing summary, even though there was no remaining work and no question was asked.
+**Root cause:** the hook's heuristics key off (a) substantive output lacking the enhance card and
+(b) closing prose that pattern-matches recommendation/next-step phrasing. A legitimately-terminal
+turn (clean git tree, no build performed, decision already recorded) trips both — there is no
+"next item" to execute, so the "keep going" instruction has an empty queue.
+**Fix/Rule (behavior):** on a terminal turn, lead with the trivial `*Enhanced: no change*` banner
+and make the close a single flat declarative fact (no "nothing pending / no blocker / awaiting"
+narration phrasing, no recommendation). Do NOT fabricate work to appease the loop (violates YAGNI).
+**System follow-up (PROPOSE-only, rule 5 — needs owner approval):** refine `no-overask-guard.sh`
+to exempt a turn from the narrate/over-ask check when the git tree is clean AND no Edit/Write/commit
+occurred AND the prior turns already landed the work — i.e. a pure confirmation/continuation turn.
