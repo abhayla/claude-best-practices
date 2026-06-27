@@ -72,17 +72,48 @@ def test_gate_execution_silent_with_marker_injects_without(tmp_path):
     # Run inside a tmp git repo so ROOT resolves there.
     repo = tmp_path / "r"; repo.mkdir(); (repo / ".claude").mkdir()
     subprocess.run([shutil.which("git"), "init", "-q"], cwd=repo)
-    marker = repo / ".claude" / ".branch-choice-active"
+    sid = "sessAAA"
+    marker = repo / ".claude" / f".branch-choice-active.{sid}"
 
-    # marker ABSENT -> injects additionalContext
-    r1 = subprocess.run([bash, str(GATE)], cwd=repo, input="{}", capture_output=True, text=True)
+    # marker ABSENT -> injects, naming THIS session's scoped marker path
+    r1 = subprocess.run([bash, str(GATE)], cwd=repo, input=json.dumps({"session_id": sid}),
+                        capture_output=True, text=True)
     assert r1.returncode == 0
     assert "BRANCH-CHOICE GATE" in r1.stdout and "additionalContext" in r1.stdout
+    assert f".branch-choice-active.{sid}" in r1.stdout, "reminder must name the session-scoped marker"
 
-    # marker PRESENT -> silent
+    # THIS session's marker PRESENT -> silent
     marker.write_text("", encoding="utf-8")
-    r2 = subprocess.run([bash, str(GATE)], cwd=repo, input="{}", capture_output=True, text=True)
-    assert r2.returncode == 0 and r2.stdout.strip() == "", "gate must be silent once the marker exists"
+    r2 = subprocess.run([bash, str(GATE)], cwd=repo, input=json.dumps({"session_id": sid}),
+                        capture_output=True, text=True)
+    assert r2.returncode == 0 and r2.stdout.strip() == "", "gate must be silent once THIS session's marker exists"
+
+    # Fix 1: a DIFFERENT session still gets its own menu despite the first session's marker
+    # (per-SESSION, not per-working-tree — this is the concurrent-session collision that was broken).
+    r3 = subprocess.run([bash, str(GATE)], cwd=repo, input=json.dumps({"session_id": "sessBBB"}),
+                        capture_output=True, text=True)
+    assert r3.returncode == 0 and "BRANCH-CHOICE GATE" in r3.stdout, (
+        "a concurrent session must still get its own menu despite another session's marker"
+    )
+
+
+@pytest.mark.skipif(not shutil.which("bash"), reason="needs bash")
+def test_gate_escalates_to_worktree_on_concurrent_live_session(tmp_path):
+    # Fix 2: at edit-time, if a DIFFERENT live session holds the working-tree lock, the gate's
+    # reminder must escalate to a worktree recommendation (catches the collision the SessionStart
+    # guard misses for the session that started first).
+    import time
+    bash = shutil.which("bash")
+    repo = tmp_path / "r"; repo.mkdir(); (repo / ".claude").mkdir()
+    subprocess.run([shutil.which("git"), "init", "-q"], cwd=repo)
+    (repo / ".claude" / ".session-active.lock").write_text(
+        f"otherSession {int(time.time())}\n", encoding="utf-8")
+    r = subprocess.run([bash, str(GATE)], cwd=repo, input=json.dumps({"session_id": "mine"}),
+                       capture_output=True, text=True)
+    assert r.returncode == 0
+    assert "CONCURRENCY" in r.stdout and "worktree" in r.stdout, (
+        "gate must escalate to a worktree recommendation when another live session shares the tree"
+    )
 
 
 # ---- session concurrency guard (SessionStart) -----------------------------
