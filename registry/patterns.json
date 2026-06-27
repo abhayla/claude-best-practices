@@ -7002,7 +7002,7 @@
     "tier": "nice-to-have"
   },
   "branch-choice": {
-    "hash": "bc3d0cc99ce1c8f1e52b38bc6b5d0e834b3b73bbef6d3392e51930261bfb3ce6",
+    "hash": "543cb0117f92f7ed53701fc684fad57f29d7e2f9201d884eb160debdaed7b2a1",
     "type": "skill",
     "category": "core",
     "version": "1.0.0",
@@ -7022,7 +7022,7 @@
     "tier": "nice-to-have"
   },
   "stale-branch-reaper": {
-    "hash": "fe1ce32bd40434176c34e26668a75232617deee12a8a138453fb6dd6ea80d61f",
+    "hash": "d7a847acc91ad4e2f0ef3c1ddb30a2f2d9a67e2351dac743c75c9e85ab38899d",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",
@@ -7043,7 +7043,7 @@
     "tier": "nice-to-have"
   },
   "branch-choice-gate": {
-    "hash": "510e9f67cc5b65b23e0f1a2ba945d7e75eca7090c1eb80906c433d85182c41ce",
+    "hash": "70ae89a775ffce98e10fc0f2727d5f1d8842d6a5d4d2610101a7980c619d58f1",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",

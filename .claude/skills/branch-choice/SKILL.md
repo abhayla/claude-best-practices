@@ -30,11 +30,17 @@ at the model layer (this skill). Four companion hooks form the unattended safety
 ## STEP 1: Gate — ask ONCE per session
 
 Before the FIRST `Edit`/`Write`/`MultiEdit` of a session (read-only / question / analysis turns
-NEVER trigger this), check the marker `.claude/.branch-choice-active`:
+NEVER trigger this), check THIS session's marker `.claude/.branch-choice-active.<session_id>` — the
+gate hook (`branch-choice-gate.sh`) prints the exact path in its reminder. The marker is keyed by
+session id so concurrent sessions sharing one working tree never silence each other's menu:
 
-- **Marker present** → a choice was already made this session. Proceed on the current branch; do NOT re-ask.
-- **Marker absent** → run STEP 2, then create the marker: `touch .claude/.branch-choice-active`
-  (gitignored). `stale-branch-reaper.sh` deletes it at every SessionStart, so each new session re-asks.
+- **This session's marker present** → a choice was already made this session. Proceed on the current branch; do NOT re-ask.
+- **Marker absent** → run STEP 2, then create it: `touch .claude/.branch-choice-active.<session_id>`
+  (gitignored) using the exact filename from the gate's reminder. A new session has a new id, so it
+  re-asks automatically; `stale-branch-reaper.sh` GCs old markers.
+- **Gate flags another live session** (its reminder carries a `CONCURRENCY:` note) → two sessions
+  share ONE checked-out branch and WILL collide. Isolate this work in a git worktree first
+  (`/git-branch-lifecycle work <name>`), then pick the branch there.
 
 ## STEP 2: Present the menu
 
@@ -74,8 +80,9 @@ Merging stale work to `main` is consequential → it is ALWAYS owner-approved, n
 
 ## CRITICAL RULES
 
-- MUST present the menu at the first file-edit of a session when `.claude/.branch-choice-active`
-  is absent; MUST then create the marker so it is asked ONCE per session.
+- MUST present the menu at the first file-edit of a session when THIS session's
+  `.claude/.branch-choice-active.<session_id>` marker is absent; MUST then create it so it is asked ONCE per session.
+- MUST, when the gate flags a concurrent live session, isolate in a git worktree rather than two sessions sharing one checked-out branch.
 - MUST cut every NEW branch from fresh `origin/main` (fetch first), never from another feature branch.
 - MUST hide "keep existing" when that branch is already merged.
 - MUST NOT trigger on read-only / question / analysis turns — only on a real file change.

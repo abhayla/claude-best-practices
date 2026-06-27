@@ -22,10 +22,15 @@ set -uo pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 cd "$ROOT" || exit 0
 
-# (1) Always: new session => clear the once-per-session marker + nudge the branch menu.
-rm -f "$ROOT/.claude/.branch-choice-active" 2>/dev/null || true
+# (1) Always: nudge the once-per-session branch menu. Markers are now per-SESSION
+# (.claude/.branch-choice-active.<session_id>), so a new session re-asks automatically (its marker
+# does not exist yet) — no shared marker to wipe. We only GC stale per-session markers so they do
+# not accumulate, plus clear any legacy bare marker left from before session-scoping.
+rm -f "$ROOT/.claude/.branch-choice-active" 2>/dev/null || true   # legacy bare marker (pre session-scoping)
+find "$ROOT/.claude" -maxdepth 1 -type f -name '.branch-choice-active.*' -mmin "+$(( ${STALE_BRANCH_HOURS:-24} * 60 ))" -delete 2>/dev/null || true
 echo "BRANCH-CHOICE: before your FIRST file edit this session, run the branch-choice skill"
-echo "  (.claude/skills/branch-choice/SKILL.md) to pick the branch — unless .claude/.branch-choice-active exists."
+echo "  (.claude/skills/branch-choice/SKILL.md) to pick the branch — unless this session's"
+echo "  .claude/.branch-choice-active.<session_id> marker exists."
 
 # (2) The staleness LISTING is the part the off-switch silences.
 [ "${STALE_REAPER_DISABLE:-0}" = "1" ] && exit 0
