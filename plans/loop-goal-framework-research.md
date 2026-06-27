@@ -309,5 +309,57 @@ no raw Reddit/HN thread text was directly retrievable in this pass (search-index
 
 ### User-supplied links
 
-_(none yet — append below as the user sends them)_
+#### L1 · @Raytar tweet → X article "Stop Being the Loop" (sent 2026-06-27; tweet dated 2026-06-23)
+
+- **Link as sent:** https://x.com/i/status/2069212188619805179
+- **The tweet itself** (via X syndication endpoint): author **@Raytar** ("Raytar"), 2026-06-23, body is
+  just a t.co link to an X long-form **article**: **"Stop Being the Loop. Here's How to Make Claude
+  Work While You Sleep"** (`x.com/i/article/2052792872672415744`). Preview line: *"The person who
+  built Claude Code at Anthropic stopped prompting Claude. His name is Boris Cherny."* (318 likes, 2
+  replies at capture).
+- **Article body:** NOT retrievable — X long-form articles are login-walled (HTTP 402). Captured the
+  title + preview + the primary sources it traces to (below) instead. _(Flag for the user: paste the
+  article text if you want its exact wording captured.)_
+
+**Primary sources this article traces to** (fetched directly, since the article was walled):
+
+- **Addy Osmani — "Loop Engineering"** (https://addyosmani.com/blog/loop-engineering/ — the canonical
+  coinage). Verbatim definition: *"Loop engineering is replacing yourself as the person who prompts
+  the agent. You design the system that does it instead."* Quotes **Peter Steinberger** (June 8 2026):
+  *"You shouldn't be prompting coding agents anymore. You should be designing loops that prompt your
+  agents."* and **Boris Cherny**: *"I don't prompt Claude anymore. I have loops running that prompt
+  Claude and figuring out what to do. My job is to write loops."* **Five components:** (1) Automations
+  (scheduled discovery/triage), (2) Worktrees (parallel isolation), (3) Skills (`SKILL.md` codified
+  knowledge), (4) Plugins/Connectors (MCP), (5) Sub-agents (separate verification, anti self-grading)
+  — plus persistent **state** (markdown/Linear) since models forget between runs. Maps to CC: `/loop`
+  (cadence), `/goal` (runs until a verifiable condition; a different model grades), `git worktree`,
+  `.claude/agents/`. **Three warnings:** verification burden stays yours (unattended loops make
+  unattended mistakes); comprehension debt grows; cognitive-surrender temptation. Closer: *"Build the
+  loop. But build it like someone who intends to stay the engineer, not just the person who presses go."*
+- **"How Boris Uses Claude Code"** (https://howborisusesclaudecode.com/) — concrete practices:
+  - **Verification is #1:** *"give Claude a way to verify its work. If Claude has that feedback loop,
+    it will 2-3x the quality."* (frontend → Chrome extension; backend → Claude starts + tests the
+    server e2e).
+  - **`/loop`** for recurring unattended tasks running **up to 3 days locally** — e.g. *"babysit all
+    my PRs. Auto-fix build issues and when comments come in, use a worktree agent to fix them"*; every
+    5 min for code review, 30-min cycles for feedback.
+  - **`/goal`** sets completion conditions that prevent premature exit (test suite passes, lint clean).
+  - **`/loop` + `/goal` + `/schedule`** paired: `/schedule` = cloud recurring (survives laptop close),
+    `/goal` = hard completion bar, `/loop` = local shorter intervals.
+  - **Budget:** caps token spend in the prompt itself — *"use 50k tokens"*; runs `/usage` to find which
+    skills/MCPs over-consume on long runs.
+  - **"Write it down":** *"Every single time Claude makes a mistake, I don't tell it to do it
+    differently. I tell it to write it to the CLAUDE.md"* (compounds across sessions).
+  - **Context minimalism:** abandoned plan mode for 4.6+ models (*"The newer models don't actually need
+    a planning step"* — auto mode handles implicit planning); minimal system prompts, Claude fetches
+    context via files/MCP on demand.
+  - **Nested subagents** (depth up to 5) to keep parent contexts clean.
+
+  _(NB for the brainstorm — capture, not judgment: several of these touch hub conventions to discuss —
+  the hub's `plan-before-coding.md` vs Boris's "no plan step on 4.6+"; the hub's single-level-dispatch
+  convention vs Boris's depth-5 nesting; "write it down to CLAUDE.md" vs the hub's `learnings-routing.md`
+  + lessons.md; budget-in-prompt vs the hub's `--max-cycles`/retry budgets. Osmani's 5 components ≈ the
+  hub's existing loop-engineering spine. NOT decided — flagged for our discussion.)_
+
+_(append further user links below)_
 
