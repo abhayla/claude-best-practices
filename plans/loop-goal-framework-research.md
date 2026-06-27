@@ -424,5 +424,31 @@ no raw Reddit/HN thread text was directly retrievable in this pass (search-index
   skill (DISCOVER→PLAN→EXECUTE→VERIFY→SHIP|FEEDBACK, maker≠checker, `/learn-n-improve` each cycle).
   Strong external convergence with what the hub already built — flagged, not decided.)_
 
+#### L4 · @RohOnChain tweet → X article "How To Use Loop Engineering To Build A Self-Improving Quant Trading System" (sent 2026-06-27; tweet dated 2026-06-22)
+
+- **Link as sent:** https://x.com/i/status/2069056530960490835
+- **The tweet** (via syndication): author **@RohOnChain** ("Roan"), 2026-06-22, t.co link to the X
+  **article** **"How To Use Loop Engineering To Build A Self-Improving Quant Trading System"**
+  (`x.com/i/article/2067524770175057920`). Preview: *"I will break down exactly how to build the loops
+  that run an entire quant trading system on their own…"*
+- **Article body:** login-walled (402); substance recovered via search (capture, not verbatim) — note
+  this is a **domain-application** piece, thinner on new framework theory:
+  - Loop engineering applied to a vertical: a **self-improving, autonomous system via a ~six-part
+    architecture** running an "entire quant trading system on their own," framed as the shift from
+    manual prompting to loop engineering.
+  - **Self-improvement loop instance**: the agent **critiques its own prompts/strategies and retests
+    within a controlled simulator** — i.e. the simulator IS the verifier (a domain instance of L3's
+    "build the verifier first, separate from the agent").
+  - "Own the full loop from idea to live capital" with risk discipline between signal and execution.
+  - _(Flag for the user: paste the article text for exact wording.)_
+- **Academic anchor surfaced (real research, not blog — queued):** **QuantAgent** — "Seeking Holy Grail
+  in Trading by Self-Improving Large Language Model" (https://arxiv.org/pdf/2402.03755) — self-improvement
+  loops that critique prompts + strategies and retest in a simulator. (Also generic LLM-agent-loop
+  survey material: self-debug / self-correct / self-refine within a single task.)
+
+  _(NB — capture, not judgment: same self-improve + simulator-as-verifier pattern as L3, instantiated
+  in a vertical. Value for the brainstorm = evidence the loop pattern generalizes to domain apps, and
+  a citable academic grounding (QuantAgent) for the self-critique-and-retest mechanism.)_
+
 _(append further user links below)_
 
