@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-26 06:29 UTC (auto-generated)
+> Last updated: 2026-06-27 05:11 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 280 |
-| Core (universal) | 207 |
+| Total Patterns | 281 |
+| Core (universal) | 208 |
 | Stack-specific | 73 |
 | Agents | 36 |
 | Configs | 3 |
 | Hooks | 18 |
 | Rules | 55 |
-| Skills | 168 |
+| Skills | 169 |
 
 ## Pattern Inventory
 
@@ -225,6 +225,7 @@
 | workflow-master-template | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | writing-plans | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | writing-skills | skill | 2.8.0 | hub:abhayla/claude-best-practices | skill-evaluator |
+| youtube-transcript | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | zoom-out | skill | 1.0.0 | upstream:mattpocock/skills@engineering/zoom-out | — |
 
 ## Research & References
