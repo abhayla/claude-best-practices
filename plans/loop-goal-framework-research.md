@@ -396,5 +396,33 @@ no raw Reddit/HN thread text was directly retrievable in this pass (search-index
   (https://cobusgreyling.substack.com/p/loop-engineering), Lushbinary
   (https://lushbinary.com/blog/loop-engineering-ai-coding-agents-guide/).
 
+#### L3 · @vicky_grok tweet → X article "How to Build Self-Improving AI Agents with Loop Engineering" (sent 2026-06-27; tweet dated 2026-06-23)
+
+- **Link as sent:** https://x.com/i/status/2069392437337018445
+- **The tweet** (via syndication): author **@vicky_grok** ("Vikas gupta"), 2026-06-23, t.co link to the
+  X **article** **"How to Build Self-Improving AI Agents with Loop Engineering"**
+  (`x.com/i/article/2069386620164567040`). Preview: *"Most AI agents do not fail because the model is
+  weak. They fail because the system around the model is weak."* (67 likes, 5 replies at capture).
+- **Article body:** login-walled (402); substance recovered via search (capture, not verbatim):
+  - **Loop engineering** = "building small automated control systems — loops — that drive AI coding
+    agents on your behalf, instead of prompting turn by turn."
+  - **Self-improving loop**: "does its task, checks its own result, learns from what happened, writes
+    down useful lessons, stores them in memory, and applies them next time."
+  - **The system around the model**: control structures, validation gates, state management; closed-loop
+    cycles named **Discover → Plan → Execute → Verify → Iterate**.
+  - **Foundational rule**: *"Build the verifier first, separate from the agent. This is the part most
+    beginners skip and the part that prevents silent failures."*
+  - _(Flag for the user: paste the article text for exact wording.)_
+- **Adjacent source surfaced (queued):** Plaban Nayak — "Loop Engineering: Building Self-Improving AI
+  Agents with **Four Nested Loops**" (https://nayakpplaban.medium.com/loop-engineering-building-self-improving-ai-agents-with-four-nested-loops-c0f4a1437d4f)
+  — a more elaborate structural model worth a look for the brainstorm. Others: Analytics Vidhya,
+  Codersarts ("self-running AI coding agents 2026 guide").
+
+  _(NB for the brainstorm — capture, not judgment: this article's **Discover→Plan→Execute→Verify→
+  Iterate** cycle + **"build the verifier first, separate from the agent"** + **self-improving
+  (learn→store→apply)** are an almost exact description of the hub's existing `/loop-engineering`
+  skill (DISCOVER→PLAN→EXECUTE→VERIFY→SHIP|FEEDBACK, maker≠checker, `/learn-n-improve` each cycle).
+  Strong external convergence with what the hub already built — flagged, not decided.)_
+
 _(append further user links below)_
 
