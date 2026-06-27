@@ -307,6 +307,50 @@ no raw Reddit/HN thread text was directly retrievable in this pass (search-index
   (predecessor repo); Geoffrey Huntley's original Ralph write-up; primary sources for the Osmani
   "loop engineering" coinage + the Boris Cherny quotes.
 
+### C2 · Higher-signal sources deep pass (proactive, 2026-06-27)
+
+The authoritative (non-blogspam) sources flagged across L1–L5, fetched and captured neutrally.
+
+- **O'Reilly Radar — "Loop Engineering"** (https://www.oreilly.com/radar/loop-engineering/) — the fuller
+  Osmani version. Definition: *"a loop here can be thought of as a recursive goal where you define a
+  purpose and the AI iterates until complete."* The **5 components** (Automations/Discovery+Triage →
+  the `/goal` runs-until-true; Worktrees; Skills `SKILL.md`; Plugins/Connectors via MCP; Subagents =
+  verification split "prevents grading their own homework") + a **Memory layer** (markdown/Linear). Notes
+  **both Codex app and Claude Code provide all five** → loops are **tool-agnostic**. Risks: verification
+  stays human (*"Your job is to ship code you confirmed works"*); **comprehension debt**; **"cognitive
+  surrender"** = *"the accelerant"* for bypassing engineering judgment; token costs vary (token-rich vs
+  token-poor). Closer: *"Build the loop. But build it like someone who intends to stay the engineer, not
+  just the person who presses go."*
+- **Thoughtworks — "Supervisory engineering: orchestrating software's 'middle loop'"**
+  (https://www.thoughtworks.com/insights/blog/agile-engineering-practices/supervisory-engineering-orchestrating-software-middle-loop)
+  — a **distinct structural model worth the brainstorm**. **Three loops:** *Inner* (was human typing;
+  now AI agents iterate until it compiles), *Outer* (DevOps/CI-CD/deploy), and a newly-emergent
+  ***Middle* loop** = *"the human engineer evaluates whether the agent actually solved the right
+  problem"* + architectural coherence across multiple agent outputs. The new discipline =
+  **supervisory engineering** (not passive: *"The surface area of engineering responsibility hasn't
+  shrunk; it has expanded"*). **Three pillars: Directing** (codify constraints/specs/patterns),
+  **Evaluating** (catch *"plausible, beautifully indented code"* with logical flaws / deprecated APIs),
+  **Correcting** (stitch parallel agent outputs into a coherent whole). Thesis: *"human judgment
+  managing machine velocity."* Bottleneck shifted from code-generation speed → **verification speed**.
+- **LangChain — "Agentic Engineering: How Swarms of AI Agents Are Redefining Software Engineering"**
+  (https://www.langchain.com/blog/agentic-engineering-redefining-software-engineering) — a **multi-agent
+  swarm** model (vs the single-agent loop). **Worker agents** (execute within boundaries, *"validate
+  outcomes to ensure correctness and completeness"*) + **Leader agents** (coordinate, hold *"long-term
+  memory for the swarm"* + *"global observability"*); *"separating execution from coordination preserves
+  autonomy at the edges while maintaining coherence at scale."* Four-stage cycle: intent analysis →
+  planning+notifications → execution w/ state tracking (LangGraph checkpointing) → validation closure.
+  **Metrics (their pilot):** 93% reduction in debug time-to-root-cause, 65% reduction in dev execution
+  time, 200+ engineering hours saved over 512 sessions/month — gains from *"compressing downstream
+  testing — not code generation."* Noted: human-in-the-loop PR review became *"the bottleneck."*
+
+  _(NB — capture, not judgment, for the brainstorm: two NEW structural frames beyond Osmani's
+  5-component list — Thoughtworks' **inner/middle/outer + Directing/Evaluating/Correcting** maps onto the
+  hub's role router (`engineering-roles.md`) + supervisor/independent-verification rules; LangChain's
+  **Worker/Leader swarm** is the agent-teams lead/teammate model the hub already gates behind
+  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` (`agent-team-selection.md`). "Verification speed is the new
+  bottleneck" + "tool-agnostic loops" + "memory layer" are the recurring through-lines across ALL
+  sources — flagged, not decided.)_
+
 ### User-supplied links
 
 #### L1 · @Raytar tweet → X article "Stop Being the Loop" (sent 2026-06-27; tweet dated 2026-06-23)
