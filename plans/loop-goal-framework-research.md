@@ -361,5 +361,40 @@ no raw Reddit/HN thread text was directly retrievable in this pass (search-index
   + lessons.md; budget-in-prompt vs the hub's `--max-cycles`/retry budgets. Osmani's 5 components ≈ the
   hub's existing loop-engineering spine. NOT decided — flagged for our discussion.)_
 
+#### L2 · @AnatoliKopadze tweet → X article "Loops explained: Claude, GPT, Mira and what actually works" (sent 2026-06-27; tweet dated 2026-06-20)
+
+- **Link as sent:** https://x.com/i/status/2068328135611822149
+- **The tweet** (via syndication): author **@AnatoliKopadze** ("Anatoli Kopadze"), 2026-06-20, body is a
+  t.co link to the X **article** **"Loops explained: Claude, GPT, Mira and what actually works"**
+  (`x.com/i/article/2068024770029932544`). Preview: *"AI has been in everyone's hands for years. Most
+  people who use it every day still use it the slowest way there is: type a request, wait, fix it, ask
+  again, all by hand…"* (4,973 likes, 145 replies at capture).
+- **Article body:** login-walled (HTTP 402); the YouMind tracker mirror 404'd. Substance recovered via
+  search (capture, not verbatim):
+  - **AI loop = plan → execute → verify**: "an agent looks at the current state, chooses the next
+    action, does it, checks the result, and decides what to do next."
+  - **The shift framing**: *"ChatGPT answers, Mira acts. You do not ask it to write the email, you tell
+    it to send the email. You do not get a draft ticket, you get a real one in Linear with the owner
+    assigned."* (loops/agents as actors, not responders).
+  - Repeats the Boris Cherny *"my job is to write loops"* thesis; covers technical implementation, cost
+    management, and applications across models (Claude / GPT / Mira).
+  - _(Flag for the user: paste the article text if you want its exact wording.)_
+
+- **Notable adjacent posts by the same author** (surfaced in search; capture-worthy quotes, primary
+  X sources login-walled so quotes are as-reported):
+  - *"Anthropic engineers just showed how they build a full app from scratch, using a loop of agents —
+    40 minutes from the team behind Claude Code. They used three agents: one to plan, one to build, one
+    to judge, cycling until the app actually works."* (`x.com/AnatoliKopadze/status/2068690663919530207`)
+    — the **plan→build→judge** loop = the hub's maker≠checker pattern with an explicit planner.
+  - **Boris Cherny:** *"Every night I have hundreds, sometimes thousands of agents running in loops for
+    5, 10, 20 hours straight. This is just how engineering is done now."*
+    (`x.com/AnatoliKopadze/status/2069433889278288126`)
+  - **Jensen Huang (NVIDIA CEO):** *"Nobody writes prompts anymore. The new job is to write and handle
+    loops."* (`x.com/AnatoliKopadze/status/2068360095562420529`)
+- **Additional primary sources on "loop engineering" surfaced (not yet fetched — queued):**
+  Louis Bouchard (https://www.louisbouchard.ai/loop-engineering/), Cobus Greyling
+  (https://cobusgreyling.substack.com/p/loop-engineering), Lushbinary
+  (https://lushbinary.com/blog/loop-engineering-ai-coding-agents-guide/).
+
 _(append further user links below)_
 
