@@ -1,0 +1,8 @@
+{
+  "name": "auto-google-analytics",
+  "version": "0.1.0",
+  "description": "Autonomous Google Analytics 4 for any project: when enabled, /auto-google-analytics detects the stack & hosting type, provisions the GA4 property + web stream via a service-account key (no browser login), injects the gtag + Consent Mode v2 + blanket ui_click snippet into source, verifies a real hit reaches GA4 browser-free (Measurement Protocol + realtime), and records the Measurement ID in a project-local inventory. Bundles the proven analytics-setup skill + instrumentation rule + cross-platform reference so it works with NO other hub files. The one-time service-account key is the only human prerequisite (Google blocks automation login); without it it falls back to guided manual setup. Toggleable via auto-google-analytics-settings.json (master switch + per-feature, re-read each session).",
+  "author": { "name": "Abhay Kumar" },
+  "keywords": ["analytics", "ga4", "google-analytics", "gtag", "tag-injection", "claude-code", "goal-6"],
+  "hooks": "./hooks/hooks.json"
+}
