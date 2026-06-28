@@ -26,8 +26,15 @@ Google blocks automation-browser login, so a service account must be created **o
 1. In Google Cloud, create a service account and download its JSON key.
 2. Grant it the `analytics.edit` scope and **Administrator at the GA *account* level** (GA Admin →
    Account Access Management).
-3. Point the plugin at the key: set `sa_key_path` in `auto-analytics-settings.json` (or the
+3. Enable the two Google APIs once in that GCP project (provisioning + browser-free verification):
+   ```
+   gcloud services enable analyticsadmin.googleapis.com analyticsdata.googleapis.com --project=<your-project>
+   ```
+4. Point the plugin at the key: set `sa_key_path` in `auto-analytics-settings.json` (or the
    `GA_PROVISION_SA_KEY` env var). Never commit the key.
+
+The scripts auto-handle the GA4 **User Data Collection Acknowledgement** (required before a
+property can collect data / mint Measurement-Protocol secrets) — no manual GA-UI step needed.
 
 After that, **every project under that Google account is zero-touch.** Without a key, the skill
 falls back to **guided manual** setup (you paste Measurement IDs); it never fabricates IDs.
