@@ -4,7 +4,7 @@
 Productization of the proven hub injector. Handles the autonomous, reversible case:
 static HTML files (a webroot index.html, a built `dist/`, an exported static site). For
 FRAMEWORK source (Next.js `<head>`/`app/layout`, Nuxt config, Astro/Svelte layout) the
-auto-analytics SKILL performs the framework-specific edit — this script is the static path.
+auto-google-analytics SKILL performs the framework-specific edit — this script is the static path.
 
 Safe by construction: writes a `<file>.pre-ga.bak` before changing anything, is idempotent
 (skips a file already tagged with this ID or any gtag), and supports --dry-run.
@@ -23,7 +23,7 @@ import sys
 
 SNIP = (
     '<!-- Google Analytics 4 (gtag) + Consent Mode v2 + blanket click tracking '
-    '(auto-analytics plugin) -->\n'
+    '(auto-google-analytics plugin) -->\n'
     "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
     "gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',"
     "ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});"

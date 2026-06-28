@@ -29,7 +29,7 @@ DATA = "https://analyticsdata.googleapis.com/v1beta"
 MP = "https://www.google-analytics.com"
 SCOPES = ["https://www.googleapis.com/auth/analytics.edit",
           "https://www.googleapis.com/auth/analytics.readonly"]
-EVENT = "auto_analytics_verify"
+EVENT = "auto_google_analytics_verify"
 
 
 def _die(code, msg):
@@ -78,12 +78,25 @@ def api(method, url, tok, body=None):
         _die(3, f"API {method} {url} -> {e.code}: {e.read().decode()[:400]}")
 
 
+ACK_TEXT = (
+    "I acknowledge that I have the necessary privacy disclosures and rights from my end users "
+    "for the collection and processing of their data, including the association of such data with "
+    "the visitation information Google Analytics collects from my site and/or app property."
+)
+
+
+def ack_user_data_collection(prop, tok):
+    """Attest the User Data Collection Acknowledgement (required before MP secrets can be
+    created). Idempotent — safe to call on an already-acknowledged property."""
+    api("POST", f"{ADMIN}/{prop}:acknowledgeUserDataCollection", tok, {"acknowledgement": ACK_TEXT})
+
+
 def ensure_mp_secret(stream, tok):
     url = f"{ADMIN}/{stream}/measurementProtocolSecrets"
     for s in api("GET", url, tok).get("measurementProtocolSecrets", []):
         if s.get("secretValue"):
             return s["secretValue"]
-    return api("POST", url, tok, {"displayName": "auto-analytics verify"}).get("secretValue")
+    return api("POST", url, tok, {"displayName": "auto-google-analytics verify"}).get("secretValue")
 
 
 def send_mp(measurement_id, secret, client_id):
@@ -106,12 +119,24 @@ def send_mp(measurement_id, secret, client_id):
 
 def poll_realtime(prop, tok, tries=10, delay=3):
     url = f"{DATA}/{prop}:runRealtimeReport"
-    body = {"dimensions": [{"name": "eventName"}], "metrics": [{"name": "eventCount"}]}
+    payload = json.dumps(
+        {"dimensions": [{"name": "eventName"}], "metrics": [{"name": "eventCount"}]}).encode()
     for n in range(tries):
-        rep = api("POST", url, tok, body)
+        req = urllib.request.Request(url, data=payload, method="POST", headers={
+            "Authorization": "Bearer " + tok, "Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req) as resp:
+                rep = json.loads(resp.read() or "{}")
+        except urllib.error.HTTPError as e:
+            body = e.read().decode()
+            if e.code == 403 and ("SERVICE_DISABLED" in body or "has not been used" in body):
+                _die(2, "DATA_API_DISABLED: enable the Google Analytics Data API once for this "
+                        "project, then re-run:\n  gcloud services enable analyticsdata.googleapis.com "
+                        "--project=<your-gcp-project>\n(The test event WAS sent and accepted; only "
+                        "realtime confirmation needs the Data API.)")
+            _die(3, f"realtime API -> {e.code}: {body[:300]}")
         for row in rep.get("rows", []):
-            dv = (row.get("dimensionValues") or [{}])[0].get("value")
-            if dv == EVENT:
+            if (row.get("dimensionValues") or [{}])[0].get("value") == EVENT:
                 return True
         time.sleep(delay)
     return False
@@ -140,6 +165,7 @@ def main():
         _die(2, "MISSING_TARGET: need --property + --stream + --id, or --from-inventory.")
 
     tok = mint_token(args.key)
+    ack_user_data_collection(prop, tok)
     secret = ensure_mp_secret(stream, tok)
     if not secret:
         _die(3, "MP_SECRET_FAILED: could not create/read a Measurement Protocol secret.")
