@@ -1,10 +1,10 @@
-# auto-analytics
+# auto-google-analytics
 
-**Autonomous Google Analytics 4 for any project.** Install it, enable it, run `/auto-analytics`, and
+**Autonomous Google Analytics 4 for any project.** Install it, enable it, run `/auto-google-analytics`, and
 the plugin instruments the project end-to-end with **zero hand-holding** — detect → provision →
 inject → verify → record — and only ever needs one human action, once.
 
-## What it does (`/auto-analytics`)
+## What it does (`/auto-google-analytics`)
 
 1. **Detect** the stack (Next / Nuxt / Vue / Astro / SvelteKit / static / non-web) and hosting type.
 2. **Provision** a GA4 property + web data stream via a Google **service-account key** (no browser
@@ -26,8 +26,19 @@ Google blocks automation-browser login, so a service account must be created **o
 1. In Google Cloud, create a service account and download its JSON key.
 2. Grant it the `analytics.edit` scope and **Administrator at the GA *account* level** (GA Admin →
    Account Access Management).
-3. Point the plugin at the key: set `sa_key_path` in `auto-analytics-settings.json` (or the
-   `GA_PROVISION_SA_KEY` env var). Never commit the key.
+3. Enable the two Google APIs once in that GCP project (provisioning + browser-free verification):
+   ```
+   gcloud services enable analyticsadmin.googleapis.com analyticsdata.googleapis.com --project=<your-project>
+   ```
+4. Make the key discoverable. Either set `sa_key_path` in `auto-google-analytics-settings.json`
+   (or the `GA_PROVISION_SA_KEY` env var) per project — **or**, for a shared multi-project setup,
+   put `GA_PROVISION_SA_KEY=<path>` (and optionally `GA_PROVISION_SA_EMAIL` / `GA_PROVISION_TZ` /
+   `GA_PROVISION_CURRENCY`) once in a **GLOBAL.env** above your repos: the plugin walks up from the
+   project, finds it, and reads those vars automatically, so every project under the same account
+   is zero-config. Never commit the key.
+
+The scripts auto-handle the GA4 **User Data Collection Acknowledgement** (required before a
+property can collect data / mint Measurement-Protocol secrets) — no manual GA-UI step needed.
 
 After that, **every project under that Google account is zero-touch.** Without a key, the skill
 falls back to **guided manual** setup (you paste Measurement IDs); it never fabricates IDs.
@@ -39,9 +50,9 @@ falls back to **guided manual** setup (you paste Measurement IDs); it never fabr
 - `gh`/network only for the optional commit step — provisioning + verification use the Google APIs
   directly via stdlib `urllib`.
 
-## Settings (`auto-analytics-settings.json`)
+## Settings (`auto-google-analytics-settings.json`)
 
-Copy `auto-analytics-settings.default.json` to `<project>/.claude/auto-analytics-settings.json`
+Copy `auto-google-analytics-settings.default.json` to `<project>/.claude/auto-google-analytics-settings.json`
 (or `~/.claude/` for a global default). Re-read every session — no reinstall. A pre-set env var
 always wins.
 
@@ -55,7 +66,7 @@ always wins.
 
 ## Components
 
-- `skills/auto-analytics/` — the autonomous orchestrator.
+- `skills/auto-google-analytics/` — the autonomous orchestrator.
 - `skills/analytics-setup/` — the bundled instrumentation engine (framework detail, consent/event
   contract). Self-contained; works with no other hub files.
 - `rules/web-analytics-instrumentation.md` — the "every web project must have GA4" mandate. There
@@ -68,5 +79,5 @@ always wins.
 
 ## Off switches
 
-`enabled: false` in settings, or env `AUTO_ANALYTICS_DISABLE=1`; silence only the nudge with
-`AUTO_ANALYTICS_REMINDER_DISABLE=1`.
+`enabled: false` in settings, or env `AUTO_GOOGLE_ANALYTICS_DISABLE=1`; silence only the nudge with
+`AUTO_GOOGLE_ANALYTICS_REMINDER_DISABLE=1`.

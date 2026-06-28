@@ -1,11 +1,11 @@
 ---
-name: auto-analytics
+name: auto-google-analytics
 description: >
   Autonomously instrument THIS project with Google Analytics 4 end-to-end — detect stack &
   hosting type, provision the GA4 property + web stream (service-account, no browser login),
   inject the gtag + Consent Mode v2 + blanket ui_click snippet into source, verify a real hit
   reaches GA4 browser-free, and record the IDs in a project-local inventory. Use when setting
-  up or auditing web analytics on a project that has the auto-analytics plugin installed, or
+  up or auditing web analytics on a project that has the auto-google-analytics plugin installed, or
   when a site is shipping with no measurement. The one-time service-account key is the only
   human prerequisite; without it the skill falls back to guided manual setup.
 type: workflow
@@ -19,7 +19,7 @@ triggers:
   - add ga4
 ---
 
-# auto-analytics — zero-touch GA4 for any project
+# auto-google-analytics — zero-touch GA4 for any project
 
 The autonomous orchestrator. It wraps the bundled **analytics-setup** engine (the instrumentation
 SSOT — read `skills/analytics-setup/SKILL.md` for per-framework detail and the consent/event
@@ -33,8 +33,8 @@ server-side injection). Snippet-on-page is NOT done.
 
 ## STEP 0 — Preflight (settings + credential)
 
-1. The hooks export settings from `auto-analytics-settings.json` (see `_settings.sh`). If
-   `enabled` is false, stop: "auto-analytics disabled in settings."
+1. The hooks export settings from `auto-google-analytics-settings.json` (see `_settings.sh`). If
+   `enabled` is false, stop: "auto-google-analytics disabled in settings."
 2. Locate the service-account key: `GA_PROVISION_SA_KEY` env (set from settings `sa_key_path`).
    - **Present** → fully autonomous path (STEP 1+).
    - **Absent** → GUIDED-MANUAL fallback: print the one-time setup from the README ("create a

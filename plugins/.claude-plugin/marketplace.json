@@ -12,9 +12,9 @@
       "description": "Diagnose-and-strengthen the user's prompt before it runs, with a fully toggleable enhancement pipeline (triggers, verbosity, grade card, independent reviewer, clarification gate) plus the workflow's own self-enforcement. Every criterion is an on/off switch, all default ON; edit enhance-settings.json and behavior auto-adjusts next turn."
     },
     {
-      "name": "auto-analytics",
-      "source": "./auto-analytics",
-      "description": "Autonomous Google Analytics 4 for any project: /auto-analytics detects the stack, provisions the GA4 property + web stream via a service-account key (no browser login), injects the gtag + Consent Mode v2 + blanket ui_click snippet into source, verifies a real hit browser-free, and records the Measurement ID in a project-local inventory. Bundles the analytics-setup engine so it works standalone. One-time service-account key is the only human step; falls back to guided manual without it."
+      "name": "auto-google-analytics",
+      "source": "./auto-google-analytics",
+      "description": "Autonomous Google Analytics 4 for any project: /auto-google-analytics detects the stack, provisions the GA4 property + web stream via a service-account key (no browser login), injects the gtag + Consent Mode v2 + blanket ui_click snippet into source, verifies a real hit browser-free, and records the Measurement ID in a project-local inventory. Bundles the analytics-setup engine so it works standalone. One-time service-account key is the only human step; falls back to guided manual without it."
     }
   ]
 }

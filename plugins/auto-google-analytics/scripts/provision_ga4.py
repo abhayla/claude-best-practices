@@ -31,6 +31,11 @@ import urllib.request
 
 ADMIN = "https://analyticsadmin.googleapis.com/v1beta"
 SCOPE = "https://www.googleapis.com/auth/analytics.edit"
+ACK_TEXT = (
+    "I acknowledge that I have the necessary privacy disclosures and rights from my end users "
+    "for the collection and processing of their data, including the association of such data with "
+    "the visitation information Google Analytics collects from my site and/or app property."
+)
 
 
 def _die(code, msg):
@@ -129,6 +134,8 @@ def main():
                 "parent": account, "displayName": name,
                 "timeZone": args.tz, "currencyCode": args.cur})["name"]
             print(f"+ {name}: created property {prop}")
+        # Attest User Data Collection (required before data collection / MP secrets; idempotent).
+        api("POST", f"/{prop}:acknowledgeUserDataCollection", tok, {"acknowledgement": ACK_TEXT})
         streams = api("GET", f"/{prop}/dataStreams", tok).get("dataStreams", [])
         web = next((s for s in streams if s.get("type") == "WEB_DATA_STREAM"), None)
         if not web:
