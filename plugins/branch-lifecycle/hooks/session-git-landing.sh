@@ -18,6 +18,14 @@
 # - Honors AUTO_MERGE=0 (off-switch) and skips on main/master/detached HEAD / no gh / no remote.
 set -u
 
+# Map branch-lifecycle-settings.json -> env off-switches (so AUTO_MERGE=0 from settings is honored
+# even when this lib is called standalone). A pre-set env var still wins. Safe to source.
+SELFDIR="${CLAUDE_PLUGIN_ROOT:+$CLAUDE_PLUGIN_ROOT/hooks}"
+SELFDIR="${SELFDIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)}"
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+# shellcheck source=/dev/null
+[ -f "$SELFDIR/_settings.sh" ] && . "$SELFDIR/_settings.sh"
+
 _guard() { command -v gh >/dev/null 2>&1; }   # gh present (AUTO_MERGE gates only the *arm*, below)
 
 _sync_local_after_merge() {

@@ -35,7 +35,10 @@ _bl_read_json() {
   local file="$1" key="$2" out=""
   [ -f "$file" ] || { printf '%s' ""; return 0; }
   if command -v jq >/dev/null 2>&1; then
-    out="$(jq -r --arg k "$key" '.[$k] // empty' "$file" 2>/dev/null)" || out=""
+    # `.[$k] | values` keeps a boolean false (drops only null/absent); `// empty` would
+    # WRONGLY collapse `false` to empty (jq treats false as falsy for //), breaking every
+    # boolean-off switch.
+    out="$(jq -r --arg k "$key" '.[$k] | values' "$file" 2>/dev/null)" || out=""
   elif command -v python3 >/dev/null 2>&1; then
     out="$(python3 -c 'import json,sys
 try:

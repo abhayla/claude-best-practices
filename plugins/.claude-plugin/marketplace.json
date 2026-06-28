@@ -10,6 +10,11 @@
       "name": "prompt-auto-enhance",
       "source": "./prompt-auto-enhance",
       "description": "Diagnose-and-strengthen the user's prompt before it runs, with a fully toggleable enhancement pipeline (triggers, verbosity, grade card, independent reviewer, clarification gate) plus the workflow's own self-enforcement. Every criterion is an on/off switch, all default ON; edit enhance-settings.json and behavior auto-adjusts next turn."
+    },
+    {
+      "name": "branch-lifecycle",
+      "source": "./branch-lifecycle",
+      "description": "Hands-off git branch lifecycle for any repo: pick a branch once per session, auto-commit + push off main each turn, open a PR, arm CI-gated auto-merge on session close, prune merged branches, and warn when a second session shares the working tree. Bundles the branch-choice + git-branch-lifecycle control skills and the session save/restore skills (start-session/end-session/continue). Fully self-contained — every hook and skill works with no other hub files present; all behavior toggleable via branch-lifecycle-settings.json."
     }
   ]
 }
