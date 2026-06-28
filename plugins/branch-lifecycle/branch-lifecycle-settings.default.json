@@ -1,0 +1,21 @@
+{
+  "_comment": "branch-lifecycle plugin settings. Copy to <project>/.claude/branch-lifecycle-settings.json (or ~/.claude/ for a global default) and edit. Re-read every session — no reinstall needed. Each key maps to the env off-switch the hooks already honor; the settings-shim exports them before the hooks run.",
+
+  "enabled": true,
+
+  "auto_commit_and_push": true,
+  "auto_push": true,
+
+  "auto_open_pr": true,
+  "auto_merge": true,
+
+  "branch_choice_menu": true,
+  "stale_branch_report": true,
+  "stale_branch_hours": 24,
+
+  "concurrency_guard": true,
+  "concurrency_stale_minutes": 30,
+
+  "secret_scan_cmd": "",
+  "_secret_scan_cmd_help": "Leave empty to use the bundled grep-based secret scan (zero dependencies). Set to e.g. 'gitleaks protect --staged --no-banner' to use your own scanner. A non-clean result aborts the commit."
+}
