@@ -280,19 +280,24 @@ non-blocking for info/lead-gen sites:
   function gtag(){dataLayer.push(arguments);}
   gtag('consent','default',{
     ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied',
-    analytics_storage:'denied', wait_for_update:500
+    analytics_storage:'granted', wait_for_update:500
   });
 </script>
 ```
 
-**Default `analytics_storage:'denied'`** (privacy-correct): Consent Mode v2's
-cookieless **modeling** still preserves basic, aggregate measurement while no
-cookie is set, so you do NOT lose visibility by denying-by-default. Call
-`gtag('consent','update',{analytics_storage:'granted'})` when the user accepts.
-Flipping the default to `'granted'` is a **per-jurisdiction judgment the owner
-must confirm** (e.g. an info/lead-gen site under a permissive reading) — do NOT
-bake `granted`-by-default silently. IP handling stays on GA4 defaults — add no
-bespoke IP logging.
+**Default `analytics_storage:'granted'`** (corrected 2026-06-29): GA4 only counts
+real visitors when analytics consent is granted. The earlier `'denied'`-by-default
+(with **no** banner/auto-grant to ever flip it) was a silent failure — Consent Mode
+v2 "cookieless modeling" does **NOT** populate standard reports at low/normal traffic,
+so every site recorded ~0 users/pageviews despite real traffic (the 2026-06-29
+incident across all PIFS sites). For Abhay's India-focused sites (no GDPR; DPDP
+satisfied with a privacy-policy line) we grant analytics by default; **ad_storage
+stays denied.** For an **EU/UK audience**, instead keep `analytics_storage:'denied'`
+and add a real consent banner that calls
+`gtag('consent','update',{analytics_storage:'granted'})` on accept. Either way,
+**always VERIFY by behaviour** (STEP 6 — the collect hit must show `gcs=G1x1`, i.e.
+analytics granted), never assume the tag is collecting just because it's installed.
+IP handling stays on GA4 defaults — add no bespoke IP logging.
 
 ## STEP 6: VERIFY a Real Hit (do NOT skip)
 
