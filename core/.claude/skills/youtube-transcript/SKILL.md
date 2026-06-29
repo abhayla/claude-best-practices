@@ -2,9 +2,9 @@
 name: youtube-transcript
 description: Extract the full transcript (and optional metadata) of ANY YouTube video — short, long, or Shorts — given just its link. Tries clean captions first, falls back to yt-dlp subtitle download, and finally to audio + Whisper speech-to-text when a video has NO captions at all. Use whenever the user pastes a YouTube URL and wants the spoken content as text, or asks to summarize / analyze / search a video.
 type: workflow
-version: 1.0.0
+version: 1.0.1
 allowed-tools: Bash, Read, Write
-argument-hint: "<youtube-url> [--out file.txt] [--meta]"
+argument-hint: "<youtube-url> [--out file.md] [--meta]"
 ---
 
 # YouTube Transcript Extractor
@@ -17,8 +17,10 @@ form (`watch?v=`, `youtu.be/`, `/shorts/`, `/live/`, or a bare 11-char id). The 
 
 Take the YouTube URL (or id) from the user. Decide where the text should go:
 - to the chat → run plain (stdout),
-- to a file → pass `--out <file>`. If the user asks for "filename = video name", first read
-  the title (`--meta --json`), strip Windows-illegal characters `<>:"/\|?*`, and use that.
+- to a file → pass `--out <file>`. Save transcripts with a **`.md`** extension (Markdown —
+  reads cleanly in editors and previews, and is the project default). If the user asks for
+  "filename = video name", first read the title (`--meta --json`), strip Windows-illegal
+  characters `<>:"/\|?*`, and append `.md`.
 - **Save transcript files OUTSIDE the project's git tree** (e.g. a sibling `transcripts/`
   folder) so deliverables don't pollute the repo.
 
@@ -28,8 +30,8 @@ Take the YouTube URL (or id) from the user. Decide where the text should go:
 # clean text to stdout
 python .claude/skills/youtube-transcript/yt_transcript.py "<URL>"
 
-# save to a file, include title/channel/duration
-python .claude/skills/youtube-transcript/yt_transcript.py "<URL>" --meta --out transcript.txt
+# save to a file (use a .md extension), include title/channel/duration
+python .claude/skills/youtube-transcript/yt_transcript.py "<URL>" --meta --out transcript.md
 
 # machine-readable: transcript + which method won + per-layer attempts
 python .claude/skills/youtube-transcript/yt_transcript.py "<URL>" --json
