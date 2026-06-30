@@ -62,6 +62,10 @@ printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — 
 
 card=""
 printf '%s' "$full" | grep -qE "reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
+# The card MUST close with an Overall/total row (weighted sum + letter-grade transition); a
+# per-dimension table with no total is an incomplete card (regression guard for the dropped total row).
+overall=""
+printf '%s' "$full" | grep -qE "overall|[a-f] *(→|->) *[a-f]|weighted total" && overall="1"
 substance=""
 printf '%s' "$full" | grep -qE "diagnosis:|changes applied|missing_role|missing_context|missing_output|vague_intent|under_constrained|missing_structure|missing_constraint|grade: a|grade a[^a-z]|0 fix|no fix|zero fix" && substance="1"
 
@@ -76,8 +80,8 @@ case "$(getj '.display.how_much_to_show')" in only_for_weak_prompts|scale_to_pro
 # A. require the score-table + second-opinion review (unless that component is off).
 mode_card="$enforce"
 [ "$(jq -r '.display.show.second_opinion_review' "$settings" 2>/dev/null)" = "false" ] && mode_card="off"
-if [ -z "$card" ] && [ "$mode_card" = "block" ]; then
-  block "STOP BLOCKED (prompt-auto-enhance: full process not shown). This substantive turn shows no second-opinion 'Reviewer-after' score table. Render the FULL process UP FRONT: *Enhanced summary + step log + score table WITH the Reviewer-after column + Original->Improved prompt + Role line. If the prompt was trivial, make the first line '*Enhanced: no change — ran your input as-is*'."
+if [ "$mode_card" = "block" ] && { [ -z "$card" ] || [ -z "$overall" ]; }; then
+  block "STOP BLOCKED (prompt-auto-enhance: full process not shown). This substantive turn is missing the second-opinion 'Reviewer-after' score table and/or its closing 'Overall' total row. Render the FULL process UP FRONT: *Enhanced summary + step log + score table WITH the Reviewer-after column AND an Overall row (weighted total per column + letter-grade transition, e.g. F -> B) + Original->Improved prompt + Role line. If the prompt was trivial, make the first line '*Enhanced: no change — ran your input as-is*'."
 fi
 
 # B. require fix-details (gated on the diagnosis/score-table being expected).
@@ -91,5 +95,6 @@ fi
 if [ "$(getj '.keep_a_quiet_log')" = "true" ]; then
   log="$root/.claude/.enhance-plugin-misses.log"
   [ -z "$card" ] && printf '%s\treview-table-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$log" 2>/dev/null
+  [ -n "$card" ] && [ -z "$overall" ] && printf '%s\toverall-total-row-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$log" 2>/dev/null
 fi
 exit 0

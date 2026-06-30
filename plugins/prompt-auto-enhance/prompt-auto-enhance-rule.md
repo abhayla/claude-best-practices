@@ -29,10 +29,10 @@ every substantive turn. Render FULL mode (not the compact block):
 
 - **Non-trivial prompt:** after the banner, render in this order:
   1. **Pipeline transcript** — per-step counts/deltas (skill STEP 4.5)
-  2. **Before→after card + independent reviewer (EVERY turn, no threshold, no bypass)** — per-dim
-     before/after scores + Changes Applied. A context-blind `Agent()` reviewer (fresh instance; sees
-     only the two prompts + rubric, never the pipeline's scores) re-grades both prompts; the card shows
-     its PER-DIMENSION scores (visible Reviewer-after column, not just an overall) — BLIND wins (STEP 3.6).
+  2. **Before→after card + independent reviewer (EVERY turn, no bypass)** — per-dim before/after scores + Changes
+     Applied. A context-blind `Agent()` reviewer (sees only the two prompts + rubric, never the pipeline's scores) re-grades both.
+     The card shows its per-dim Reviewer-after column AND a closing **mandatory `Overall` row** (weighted total per column + `F → B` grade) — per-dim rows without the total are an incomplete card; the blind Overall WINS the lift.
+     Under the table, print the `Independent reviewer (ran this turn …)` provenance line + the self-vs-blind divergence (flag if > 1.0).
   3. **Original → Final Strengthened Prompt**, fenced blocks (skill STEP 4.6); the Final
      block MUST open with the R1 `Act as …` persona whenever Role & Framing scored < 7
   4. **`Role: <name> — <why>`** line (R2, stage 4.7) — never a substitute for the R1 persona

@@ -24,7 +24,7 @@ input=$(cat)
 
 emit_full() {
   echo "REMINDER: Start your response with *Enhanced: <what context was checked>* (under 15 words)."
-  echo "Run the Grade -> Diagnose -> Fix prompt-auto-enhance pipeline and render the FULL process UP FRONT: (1) *Enhanced:* summary line; (2) step-by-step log; (3) before->after score table WITH the second-opinion 'Reviewer-after' per-dimension column; (4) Original->Improved prompt (Improved opens with 'Act as ...' when role/framing < threshold); (5) 'Role: <name> — <why>'. Clarification gate: ask one question at a time until intent is clear."
+  echo "Run the Grade -> Diagnose -> Fix prompt-auto-enhance pipeline and render the FULL process UP FRONT: (1) *Enhanced:* summary line; (2) step-by-step log; (3) before->after score table WITH the second-opinion 'Reviewer-after' per-dimension column AND a closing 'Overall' total row (weighted sum per column + letter-grade transition, e.g. F -> B); (4) Original->Improved prompt (Improved opens with 'Act as ...' when role/framing < threshold); (5) 'Role: <name> — <why>'. Clarification gate: ask one question at a time until intent is clear."
 }
 if ! command -v jq >/dev/null; then emit_full; exit 0; fi
 
