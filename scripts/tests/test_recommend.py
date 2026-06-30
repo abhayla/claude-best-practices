@@ -373,7 +373,7 @@ class TestTierResource:
         assert tier_resource("pytest-dev", "skill", []) == "nice-to-have"
 
     def test_skip_always_skip_list(self):
-        assert tier_resource("twitter-x", "skill", []) == "skip"
+        assert tier_resource("mcp-server-builder", "skill", []) == "skip"
         assert tier_resource("obsidian", "skill", []) == "skip"
 
     def test_skip_wrong_stack(self):
@@ -1572,7 +1572,7 @@ class TestTierResourceWithDeps:
         """Without dep_promoted, behavior is same as before."""
         assert tier_resource("tdd", "skill", []) == "must-have"
         assert tier_resource("vitest-dev", "skill", []) == "nice-to-have"
-        assert tier_resource("twitter-x", "skill", []) == "skip"
+        assert tier_resource("obsidian", "skill", []) == "skip"
 
     def test_dep_overrides_wrong_stack(self):
         """Dep-promoted patterns bypass wrong-stack check."""
