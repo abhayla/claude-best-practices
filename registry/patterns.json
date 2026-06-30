@@ -2800,7 +2800,7 @@
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-30",
     "dependencies": [],
     "visibility": "public",
     "description": "GitHub search and discovery: search repos, search code, deep-inspect repositories",
@@ -2810,7 +2810,7 @@
       "discovery"
     ],
     "changelog": "v1.0.0: Initial release â€” repo search, code search, deep inspect modes",
-    "tier": "skip",
+    "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
@@ -4188,7 +4188,7 @@
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-30",
     "dependencies": [],
     "visibility": "public",
     "description": "Comprehensive Reddit skill: read, compose, analyze, search, post, monitor",
@@ -4197,7 +4197,7 @@
       "social"
     ],
     "changelog": "v1.0.0: Initial registry entry",
-    "tier": "skip",
+    "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
@@ -5459,7 +5459,7 @@
       "social"
     ],
     "changelog": "v1.0.2: STEP 1 fallback ladder (ADHX->fxtwitter->Jina->browser) + WebFetch-402 note + browser fallback for threads; description+triggers expanded so the skill fires on any shared x.com/twitter.com link or X/Twitter mention",
-    "tier": "skip",
+    "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
@@ -6986,7 +6986,7 @@
     "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-27",
-    "last_updated": "2026-06-29",
+    "last_updated": "2026-06-30",
     "dependencies": [],
     "visibility": "public",
     "description": "Extract the full transcript (and optional metadata) of ANY YouTube video — short, long, or Shorts — given just its link. Tries clean captions first, falls back to yt-dlp subtitle download, and finally to audio + Whisper speech-to-text when a video has NO captions at all. Use whenever the user pastes a YouTube URL and wants the spoken content as text, or asks to summarize / analyze / search a video.",
@@ -6999,7 +6999,7 @@
       "media"
     ],
     "changelog": "v1.0.1 (2026-06-29): Default transcript output to .md (Markdown) instead of .txt — updated argument-hint, example, and STEP 1 filename guidance.\nv1.0.0 (2026-06-27): Initial — captions->yt-dlp subtitles->Whisper ASR fallback transcript extractor; promoted from hub-only to distributable core.",
-    "tier": "nice-to-have"
+    "tier": "must-have"
   },
   "branch-choice": {
     "hash": "543cb0117f92f7ed53701fc684fad57f29d7e2f9201d884eb160debdaed7b2a1",

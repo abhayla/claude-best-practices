@@ -4,6 +4,10 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-30 — Promote discovery/research search skills to must-have
+
+- **updated** tier `skip → must-have` for skills `twitter-x`, `reddit`, `github`, and `nice-to-have → must-have` for `youtube-transcript` (`registry/patterns.json`) — owner directive to make social-media + external-discovery search skills universal essentials provisioned to every downstream project (`research-mode` and `anthropic-multi-agent-research-system-skill` were already must-have, completing the discovery+research bundle). Pattern FILE content is unchanged, so content hashes are unaffected; only the `tier` + `last_updated` fields changed. Updated two now-stale `tier_resource("twitter-x", …) == "skip"` example assertions in `scripts/tests/test_recommend.py` to `mcp-server-builder`/`obsidian` (genuine `ALWAYS_SKIP` members) so the tests still exercise skip behavior. Docs regenerated.
+
 ### 2026-06-21 — Rename skill `autonomous-contract` → `goal-creator` (restore original name)
 
 - **renamed** skill `autonomous-contract` → `goal-creator` (`core/.claude/skills/goal-creator/SKILL.md`, 1.2.0 → 2.0.0 MAJOR — name change). Restores the original firekaro-planner skill name it was promoted from (commit `1895e06` had renamed it during Tier-4 promotion); owner requested the original name back. Registry key + hash resynced; cross-references updated in `decision-authority`, `engineering-roles`, `plan-before-coding`, `writing-plans`, and `config/workflow-groups.yml`; spec doc renamed `autonomous-contract-skill-spec.md` → `goal-creator-skill-spec.md`. The skill's PURPOSE is unchanged — it authors a zero-open-questions contract for the built-in `/goal` executor. No deprecation stub left: registry adoption `sample_size: 1` (hub-internal only) and all references are internal + updated, so a stub would protect nothing.

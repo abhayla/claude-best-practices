@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-06-27 05:44 UTC (auto-generated)
+> Last updated: 2026-06-30 16:34 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -229,7 +229,7 @@
 | workflow-master-template | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | writing-plans | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | writing-skills | skill | 2.8.0 | hub:abhayla/claude-best-practices | skill-evaluator |
-| youtube-transcript | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| youtube-transcript | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | zoom-out | skill | 1.0.0 | upstream:mattpocock/skills@engineering/zoom-out | — |
 
 ## Research & References
