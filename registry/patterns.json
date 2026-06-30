@@ -5444,21 +5444,21 @@
     }
   },
   "twitter-x": {
-    "hash": "b6e63e1484238a3dd0c28f73dd5608035d1e4c1441d5a3a2309ad8934651e4d2",
+    "hash": "b819d12c21b19de2005fca3d0c5dd822519f0a3aa6af6e9e863507fa36a59c7e",
     "type": "skill",
     "category": "third-party",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-06-30",
     "dependencies": [],
     "visibility": "public",
-    "description": "Comprehensive Twitter/X skill: read, compose, score, search, post, monitor",
+    "description": "Comprehensive Twitter/X skill: read/capture, compose, score, search, post, monitor — fires on any shared x.com/twitter.com link or X/Twitter mention",
     "tags": [
       "twitter",
       "social"
     ],
-    "changelog": "v1.0.0: Initial registry entry",
+    "changelog": "v1.0.2: STEP 1 fallback ladder (ADHX->fxtwitter->Jina->browser) + WebFetch-402 note + browser fallback for threads; description+triggers expanded so the skill fires on any shared x.com/twitter.com link or X/Twitter mention",
     "tier": "skip",
     "effectiveness": {
       "adoption_rate": 0.0,

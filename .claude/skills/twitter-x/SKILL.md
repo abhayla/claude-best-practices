@@ -1,15 +1,30 @@
 ---
 name: twitter-x
 description: >
-  Manage Twitter/X interactions: read posts, compose tweets and threads, post via API,
-  search and discover, analyze viral potential, grow audience, monitor keywords, and
-  plan content strategy. Use when interacting with Twitter/X for reading, posting,
-  analyzing, or monitoring.
+  Read, capture, compose, analyze, or post Twitter/X content. ALWAYS use this skill the moment a
+  Twitter/X link is shared or mentioned — any x.com or twitter.com URL (a tweet/status, thread,
+  profile, or X-native article), or any reference to a tweet, thread, retweet, DM, X post, or a
+  Twitter @handle. Also use for every Twitter/X task: reading or summarizing a post, capturing a
+  tweet's text + images, composing tweets/threads, scoring viral potential, searching/discovering,
+  monitoring keywords, posting or engaging via API, growing an audience, and content strategy.
+  If the user shares an x.com / twitter.com link with no other instruction, default to reading and
+  capturing it with this skill.
 triggers:
   - x.com
   - twitter.com
+  - x.com link
+  - twitter link
+  - shared a tweet
+  - read tweet
+  - summarize tweet
+  - summarize this thread
+  - capture tweet
   - tweet
   - thread
+  - retweet
+  - x post
+  - x article
+  - "@handle"
   - viral
   - post to x
   - post to twitter
@@ -23,7 +38,7 @@ triggers:
   - twitter monitor
 allowed-tools: "Bash Read Write Edit Grep Glob WebFetch WebSearch Agent"
 argument-hint: "<action> [options] — e.g., 'read https://x.com/user/status/123', 'compose tweet about AI', 'score my tweet', 'search AI agents', 'post Hello world'"
-version: "1.0.1"
+version: "1.0.2"
 type: workflow
 ---
 
@@ -75,6 +90,16 @@ curl -s -H "Authorization: Bearer $JINA_API_KEY" \
 ```
 
 Returns plain-text extraction including author, timestamp, text, images, and thread replies.
+
+### Fallback order & limits
+
+Direct `WebFetch` of an `x.com` URL returns **HTTP 402** (login wall) — never rely on it for X. Try, in order:
+1. **ADHX (Option A)** — best first choice; structured JSON incl. full `article.content` for X-native long-form articles.
+2. **fxtwitter / fixupx mirror** — `api.fxtwitter.com/{user}/status/{id}` for text + media; direct media at `d.fxtwitter.com/{user}/status/{id}/photo/N.jpg`, text-only at `t.fxtwitter.com`.
+3. **Jina Reader (Option B)** — `r.jina.ai/<url>` for clean extraction incl. thread replies.
+4. **Logged-in browser** (Claude-in-Chrome / Playwright) — the only fully reliable path for multi-tweet **threads** and anything steps 1–3 truncate (mirrors often return only the root tweet); use when the others come back incomplete.
+
+For a NON-X public article, prefer Jina Reader (`r.jina.ai/<url>`) or plain `WebFetch` — ADHX/fxtwitter are X-only. Images in a post still need vision OCR after download; treat OCR as best-effort, not character-exact.
 
 After fetching, do whatever the user asked: summarize, analyze, extract key points, translate, etc.
 
