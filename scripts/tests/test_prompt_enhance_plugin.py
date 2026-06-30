@@ -253,8 +253,17 @@ def test_stop_blocks_when_table_missing(tmp_path):
 
 @pytestmark_fn
 def test_stop_passes_with_full_process(tmp_path):
-    text = _LONG + " Diagnosis: VAGUE_INTENT. Reviewer-after column present. Changes Applied: [1] fix."
+    text = _LONG + (" Diagnosis: VAGUE_INTENT. Reviewer-after column present. "
+                    "Overall row 2.0 -> 8.0 F -> B. Changes Applied: [1] fix.")
     assert _run_stop(text, tmp_path).strip() == ""
+
+
+@pytestmark_fn
+def test_stop_blocks_when_overall_row_missing(tmp_path):
+    # Reviewer-after column present but NO Overall/total row -> incomplete card -> block.
+    # Regression guard for the dropped grade-card total row.
+    text = _LONG + " Diagnosis: VAGUE_INTENT. Reviewer-after column present. Changes Applied: [1] fix."
+    assert '"block"' in _run_stop(text, tmp_path)
 
 
 @pytestmark_fn

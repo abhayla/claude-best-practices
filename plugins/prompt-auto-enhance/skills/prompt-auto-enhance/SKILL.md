@@ -467,7 +467,10 @@ EVERY turn (STEP 3.6); its `Reviewer-after` column IS its grade card. The BLIND
 overall is the rendered Overall-after (self-after shown only for comparison), and
 ALWAYS print the "Independent reviewer" line stating who it is and what it did.
 The Reviewer-after column is NOT optional — omitting it (showing only the
-reviewer's overall) is the exact gap this format closes.
+reviewer's overall) is the exact gap this format closes. The closing `Overall`
+row is ALSO mandatory: every column (Before / Self-after / Reviewer-after) must
+sum to a single weighted total, with the `F → B` letter-grade transition shown —
+per-dimension rows without that total row are an incomplete card.
 ```
 Prompt Grade Card (before → after — self vs independent reviewer):
 ┌────────────────────────┬────────┬────────────┬────────────────┬────────┬───────┐

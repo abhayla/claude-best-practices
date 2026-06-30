@@ -37,7 +37,12 @@ every substantive turn. Render FULL mode (not the compact block):
   2. **Before→after card + independent reviewer (EVERY turn, no threshold, no bypass)** — per-dim
      before/after scores + Changes Applied. A context-blind `Agent()` reviewer (fresh instance; sees
      only the two prompts + rubric, never the pipeline's scores) re-grades both prompts; the card shows
-     its PER-DIMENSION scores (visible Reviewer-after column, not just an overall) — BLIND wins (STEP 3.6).
+     its PER-DIMENSION scores (visible Reviewer-after column) AND a closing **`Overall` row that sums
+     each column to a single weighted total** (Before / Self-after / Reviewer-after) plus the
+     letter-grade transition (e.g. `F → B`). The Overall row is MANDATORY — per-dimension rows without
+     the total are an incomplete card. The blind Reviewer-after Overall WINS the rendered lift.
+     Directly under the table, print the **`Independent reviewer (ran this turn …)` provenance line**
+     stating who re-graded (context-blind subagent) and the self-vs-blind divergence (flag if > 1.0).
   3. **Original → Final Strengthened Prompt**, fenced blocks (skill STEP 4.6); the Final
      block MUST open with the R1 `Act as …` persona whenever Role & Framing scored < 7
   4. **`Role: <name> — <why>`** line (R2, stage 4.7) — never a substitute for the R1 persona
