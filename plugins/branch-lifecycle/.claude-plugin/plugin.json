@@ -1,6 +1,6 @@
 {
   "name": "branch-lifecycle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Hands-off git branch lifecycle for any repo: pick a branch once per session, auto-commit + push each turn off main, open a PR, arm CI-gated auto-merge on session close, prune merged branches, and warn when a second session shares the working tree. Bundles the branch-choice + git-branch-lifecycle control skills and the session save/restore skills (start-session/end-session/continue) so one install covers the whole session+branch flow. Fully self-contained — every hook and skill works with NO other hub files present; all behavior is toggleable via branch-lifecycle-settings.json (master switch + per-feature off-switches, re-read every session, no reinstall).",
   "author": { "name": "Abhay Kumar" },
   "keywords": ["git", "branch", "auto-merge", "session", "claude-code", "goal-6"],
