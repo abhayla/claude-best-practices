@@ -31,7 +31,10 @@ def test_marketplace_lists_the_plugin():
 def test_plugin_manifest_valid():
     pj = _load(PLUGIN / ".claude-plugin" / "plugin.json")
     assert pj["name"] == "prompt-auto-enhance"
-    assert pj["hooks"] == "./hooks/hooks.json"
+    # The manifest must NOT declare "hooks": the standard hooks/hooks.json is auto-loaded by
+    # Claude Code, so referencing it here causes a "Duplicate hooks file detected" load error.
+    # manifest.hooks is only for ADDITIONAL (non-default) hook files. (regression guard)
+    assert "hooks" not in pj, "manifest must not reference the auto-loaded hooks/hooks.json"
 
 
 def test_required_files_exist():
