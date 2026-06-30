@@ -78,6 +78,48 @@ The hub's `marketplace.json` lives under `plugins/`, not the repo root, so the G
 and add the local `plugins/` path, or add a root-level marketplace pointer (a separate hub
 enhancement, not yet done).
 
+## Updating a plugin — why a source edit may not take effect (the install cache)
+
+**Installed plugins are NOT loaded live from the marketplace source.** On install, Claude Code
+copies each plugin into a *versioned cache*:
+
+```
+~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/
+  e.g. C:\Users\<you>\.claude\plugins\cache\claude-best-practices\prompt-auto-enhance\0.1.1\
+```
+
+Claude Code parses **that cached `plugin.json`**, not the live file under `plugins/…` — even when
+the marketplace is a local `directory` source pointing at the hub working tree. So **editing the
+hub source alone does not fix an installed plugin.** To propagate a change:
+
+1. **Bump the plugin's `version`** in `.claude-plugin/plugin.json`, then run `/plugin update <name>`
+   in the downstream project. Updates only flow on a **version bump** (or, if no `version` is set,
+   a new git commit SHA) — a same-version source edit is ignored by `/plugin update`.
+2. **Or reinstall:** `/plugin uninstall <name>@claude-best-practices` then `/plugin install …` —
+   this always re-copies the current source regardless of version.
+3. **Emergency hotfix:** edit the cached `plugin.json` under `~/.claude/plugins/cache/…` directly
+   (it is the file actually loaded). Reinstall/update will later overwrite it from source, so fix
+   the source too.
+
+Plugin load errors are evaluated at **session start** — fully restart the downstream session (not
+just reopen `/plugin`) for any change to take effect, then check `/plugin` → **Errors**.
+
+## Authoring gotcha — do NOT declare `hooks` in the manifest
+
+A plugin's `plugin.json` MUST NOT set `"hooks": "./hooks/hooks.json"`. Claude Code **auto-loads**
+the standard `hooks/hooks.json` from the plugin root; declaring it again in the manifest double-
+loads the same file and fails the whole plugin with:
+
+```
+Failed to load hooks ... Duplicate hooks file detected: ./hooks/hooks.json resolves to an
+already-loaded file ... The standard hooks/hooks.json is loaded automatically, so manifest.hooks
+should only reference ADDITIONAL hook files.
+```
+
+Only set `manifest.hooks` when pointing at *extra*, non-default hook files. The standard
+`hooks/hooks.json` needs no declaration. (All three hub plugins hit this — fixed in PR #244;
+regression-guarded by `scripts/tests/test_prompt_enhance_plugin.py::test_plugin_manifest_valid`.)
+
 ## See also
 
 - `docs/claude-references/create-plugins.md` — authoring plugins (cached upstream doc)
