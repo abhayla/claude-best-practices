@@ -1,6 +1,6 @@
 ---
 name: plugin-lifecycle
-description: Create and maintain plugins in the hub's plugins/ monorepo end-to-end. On CREATE, scaffolds every required file and registers the plugin in the marketplace. On FIX/UPDATE, edits the source, tests locally FIRST, bumps the version so the install cache actually propagates, lands CI-gated, then verifies the installed plugin. Use when the user says "create a plugin", "fix/update a plugin", "maintain a plugin", or reports a plugin defect.
+description: Create and maintain plugins in the hub's plugins/ monorepo end-to-end. Wraps the generic plugin-dev:* authoring skills and adds the hub-specific lifecycle they lack — the marketplace.json registration and the version→install-cache propagation contract. On CREATE, scaffolds every required file and registers the marketplace entry. On FIX/UPDATE, edits the source, tests locally FIRST, bumps the version so the install cache actually propagates, lands CI-gated, then verifies the installed plugin. Use when the user says "create a plugin in the hub", "fix/update/maintain a plugin", or reports a plugin defect; not for installing an existing plugin or authoring a standalone .claude/ skill.
 type: workflow
 version: 1.0.0
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Skill, Agent
@@ -39,8 +39,16 @@ Determine the mode from the argument and confirm the ground truth before touchin
 - Read the plugin's `.claude-plugin/plugin.json` — note the current `version` (the propagation anchor).
 - Confirm you are on a fresh branch off `main` (not an already-merged branch); the branch-choice /
   auto-git hooks handle this — if the current branch already has a merged PR, branch off `main` first.
-- For `audit`: report `{files present, plugin.json version, marketplace entry present?, hooks declared in
-  plugin.json? (must be NO), rule copy in sync?}` and STOP — audit is read-only.
+- For `audit`: emit this locked report and STOP — audit is read-only:
+
+```
+plugin-lifecycle audit: <name>
+  files present    : plugin.json[y/n] skills[n] hooks[n] agents[n] README[y/n]
+  plugin.json ver  : <version>   (marketplace entry: present[y/n])
+  hooks in plugin.json : NO (expected) | YES ← FIX: move to hooks/hooks.json
+  dual-home rule sync  : in-sync | DRIFT: <plugin rule> vs <.claude/ copy>
+  verdict          : healthy | needs: <one-line list>
+```
 
 ## STEP 2: Scaffold the plugin (CREATE)
 
@@ -122,13 +130,15 @@ waiting on the merge — the fix is already proven live on disk (STEP 5).
 
 ## STEP 8: Test the INSTALLED plugin (BOTH)
 
-Source-tested ≠ installed-tested. Close the loop on the actual install:
+Source-tested ≠ installed-tested. Close the loop on the actual install via the `/plugin` manager:
 
-- `claude plugin update <name>` (pulls the new version from the marketplace), then `claude plugin list`
-  MUST show the new version — if it still shows the old one, the update did not take.
-- Invoke the skill/command in a project that has the plugin installed and confirm the fix is live.
-- This is the step that would have answered "did you fix it on the other session?" — the hub source can
-  be fixed while every installed copy is still pinned to the old version until this runs.
+- **FIX path:** in a project that has the plugin installed, run `/plugin` → update `<name>` (or
+  `/plugin update <name>`), confirm the manager now shows the NEW version — if it still shows the old
+  one the update did not take — then invoke the skill/command and confirm the fix is live.
+- **CREATE path:** nothing is installed yet, so the installed-test is a FIRST `/plugin install <name>`
+  in a test project (or a `--plugin-dir ./plugins/<name>` acceptance run), then invoke and confirm.
+- This is the step that answers "did you fix it on the other session?" — the hub source can be fixed
+  while every installed copy stays pinned to the old version until this runs.
 
 ## STEP 9: Capture the lesson (FIX)
 
