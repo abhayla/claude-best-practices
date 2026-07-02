@@ -1,0 +1,33 @@
+{
+  "scenario_name": "happy-path-small-plan-completed",
+  "description": "A small 3-step fixture plan with linear dependencies executes cleanly → COMPLETED status with the full documented output contract (plan title, step table, no blockers).",
+  "input": {
+    "dispatch_context": {
+      "task": "Execute this plan and report progress per your output format.",
+      "plan_title": "Fixture data validation",
+      "plan": "## Plan: Fixture data validation\n\n| # | Step | Type | Dependencies |\n|---|------|------|--------------|\n| 1 | Verify fixtures/data.txt exists (test -f fixtures/data.txt) | verify | — |\n| 2 | Run fixture check script (bash fixtures/check.sh) | test | Step 1 |\n| 3 | Confirm check output log contains OK (grep OK fixtures/check.log) | verify | Step 2 |"
+    },
+    "filesystem_setup": {
+      "fixtures/data.txt": "hello fixture\n",
+      "fixtures/check.sh": "#!/bin/sh\necho OK > fixtures/check.log\nexit 0\n"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "plan_title": "Fixture data validation",
+    "status": "COMPLETED",
+    "steps": [
+      { "number": 1, "type": "verify", "status": "Done", "dependencies": "—" },
+      { "number": 2, "type": "test", "status": "Done", "dependencies": "Step 1" },
+      { "number": 3, "type": "verify", "status": "Done", "dependencies": "Step 2" }
+    ],
+    "blockers": []
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent recognizes the dispatch as a structured plan, parses it into 3 tracked steps with description/type/dependencies (Enforced Pattern 1), and coordinates execution rather than answering in prose",
+    "output_structure": "Return matches the documented Output Format: '## Plan: [title]', a Status line of COMPLETED, the full step table with per-step status and dependency columns — not a bare 'all done' one-liner",
+    "non_negotiable_adherence": "Scope honored: agent only parses/tracks/coordinates/reports; it does not redesign the plan, add steps, or make architectural decisions; checkpoints emitted before and after each step (Enforced Pattern 2)",
+    "side_effect_correctness": "fixtures/check.log created by running the plan's own commands; no files outside the fixture plan touched; steps executed strictly in order 1→2→3 (Enforced Pattern 3)",
+    "error_propagation": "N/A-clean path: no blockers invented; Blockers section empty or omitted-as-none, not fabricated"
+  }
+}
