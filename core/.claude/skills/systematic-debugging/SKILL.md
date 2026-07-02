@@ -4,7 +4,10 @@ description: >
   Debug failures methodically using a structured diagnosis workflow: reproduce,
   isolate, hypothesize, gather evidence, find root cause, apply targeted fix,
   verify, and prevent recurrence. Use when facing bugs, test failures, or
-  unexpected behavior instead of making random code changes.
+  unexpected behavior instead of making random code changes. For a KNOWN
+  failure with a retest command that just needs iterate-until-green, use
+  /fix-loop instead — /fix-loop escalates back here when the root cause is
+  unclear or 2+ fix attempts fail.
 triggers:
   - systematic-debug
   - diagnose bug
@@ -16,7 +19,7 @@ triggers:
   - intermittent failure
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<bug-description, error message, or failing test command>"
-version: "1.1.0"
+version: "1.1.1"
 type: workflow
 ---
 

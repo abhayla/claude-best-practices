@@ -5068,20 +5068,20 @@
     }
   },
   "systematic-debugging": {
-    "hash": "937d25537aa4932215fdbf2ac4b85dc95794e0eeecb9a333d622514d1ca3c19f",
+    "hash": "01ee7613461b0c3b11195a681b003015036ebd7f6efec40178334e8548f1e7d4",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-03",
     "dependencies": [
       "test-knowledge"
     ],
     "visibility": "public",
-    "description": "Debug failures methodically using a structured diagnosis workflow: reproduce, isolate, hypothesize, gather evidence, find root cause, apply targeted fix, verify, and prevent recurrence.",
+    "description": "Debug failures methodically using a structured diagnosis workflow: reproduce, isolate, hypothesize, gather evidence, find root cause, apply targeted fix, verify, and prevent recurrence. For a KNOWN failure with a retest command that just needs iterate-until-green, use /fix-loop instead.",
     "tags": [],
-    "changelog": "v1.1.0: Fix orphaned code blocks, add inline step summaries, improve triggers, add preamble constraints, fix step reference, sync registry description",
+    "changelog": "1.1.1: reciprocal routing boundary to /fix-loop in description (companion to fix-loop v1.6.0 escalation fix; deferred item from the fix-loop eval).\nv1.1.0: Fix orphaned code blocks, add inline step summaries, improve triggers, add preamble constraints, fix step reference, sync registry description",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
