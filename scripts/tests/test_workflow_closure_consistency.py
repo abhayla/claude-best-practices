@@ -108,12 +108,12 @@ def test_loop_engineering_emits_hub_linked_telemetry():
     """The loop must emit hub-linked learnings so the weekly aggregator
     (aggregate_telemetry.compute_error_prevention_rate keys on `hub_pattern_link`)
     can monitor downstream defects/effectiveness. Guards that the monitoring wiring
-    — and all four terminal signals — can't be silently dropped from the skill."""
+    — and all five terminal signals — can't be silently dropped from the skill."""
     body = (HUB / "core" / ".claude" / "skills" / "loop-engineering" / "SKILL.md").read_text(encoding="utf-8")
     assert 'hub_pattern_link' in body and 'loop-engineering' in body, (
         "loop-engineering SKILL.md must wire hub_pattern_link telemetry for hub monitoring"
     )
-    for signal in ("preflight_blocked", "escalated", "healed", "shipped"):
+    for signal in ("preflight_blocked", "escalated", "healed", "shipped", "clean_exit"):
         assert signal in body, (
             f"loop-engineering must emit the '{signal}' telemetry signal — it is a "
             f"downstream feedback/defect signal the hub aggregator monitors"

@@ -23,7 +23,7 @@ triggers:
   - discover plan execute verify loop
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.2.0"
+version: "1.2.1"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -92,16 +92,24 @@ cannot terminate — `dod-verbs.md`).
      "cycle": 0,
      "max_cycles": 5,
      "argument_unit_consumed": false,
-     "budget": { "global_retry_budget": 15, "retries_used": 0, "dispatches_used": 0 },
+     "merged_this_cycle": false,
+     "units_shipped": 0,
+     "heals": 0,
+     "budget": { "global_retry_budget": 15, "max_retries_per_step": 3, "retries_used": 0, "step_retries": {}, "dispatches_used": 0 },
      "step_status": { "INIT": "done" },
-     "artifacts": {},
+     "artifacts": { "commits": [] },
      "triage_inbox": ".workflows/loop-engineering/triage-inbox.md"
    }
    ```
    The template's budget values are DEFAULTS: `--max-cycles N` overrides
    `max_cycles`, and when the contracts config was read in 1.2 its `defaults`
    (`global_retry_budget: 15`, `max_retries_per_step: 3`, optional wall-clock
-   cap) override the template values.
+   cap) override the template values. These caps are ENFORCED, not advisory:
+   every FEEDBACK re-entry increments `budget.step_retries[<failing step>]`,
+   and a step exceeding `max_retries_per_step` triggers the STEP 6 ESCALATE
+   arm even with global budget left; when a wall-clock cap is configured,
+   check elapsed time against `started_at` at every STEP 2 entry and every
+   FEEDBACK re-entry — exceeded → ESCALATE.
 5. **Append INIT event** to `events.jsonl`.
 
 ---
@@ -122,15 +130,17 @@ inline run (the 2026-04-24 failure mode).
      agent list, e.g. in the Agent tool's system context), assert BOTH names
      appear in it — the authoritative zero-dispatch probe.
    - If no such listing is introspectable, fall back to the file-existence
-     check and record the RESIDUAL RISK in the run log: an agent file added
+     check and record the RESIDUAL RISK as an event in `events.jsonl` (the
+     run log): an agent file added
      after session start passes the file check yet fails dispatch. To close
      that gap, treat a dispatch-time "agent type not found" error at STEP 4/5
      as a retroactive PREFLIGHT BLOCK — emit `preflight_blocked` with the same
      remediation below and STOP; NEVER fall back to inline execution.
    Probes and failed dispatches do NOT count against `dispatches_used`.
 2. **Required sub-skills** (via `Skill()`): `auto-verify`, `fix-loop`,
-   `learn-n-improve` (always); `brainstorm`, `writing-plans`, `debugging-loop`,
-   `systematic-debugging`, `post-fix-pipeline`, `escalation-report` (conditionally).
+   `learn-n-improve` (always); `status`, `brainstorm`, `writing-plans`,
+   `debugging-loop`, `systematic-debugging`, `post-fix-pipeline`,
+   `escalation-report` (conditionally).
    Check each exists in `.claude/skills/<name>/SKILL.md`.
 3. **MAKER ≠ CHECKER invariant.** Resolve the maker and checker `subagent_type`s
    from the contracts DAG read in STEP 1.2 — the `dispatch:` fields of the
@@ -153,7 +163,9 @@ inline run (the 2026-04-24 failure mode).
    Write the BLOCKED verdict to `test-results/loop-engineering-verdict.json`
    using the STEP 8 schema with `result: "BLOCKED"`, plus
    `reason: "WORKER_REGISTRY_NOT_LOADED"`, `missing: [<names>]`,
-   `cycles_run: 0`, `units_shipped: 0`, and `finalized_at`;
+   `cycles_run: 0`, `units_shipped: 0`, and `finalized_at` (a RETROACTIVE
+   block at STEP 4/5 writes the actual current `cycle` and `units_shipped`
+   counts, not 0);
    `emit_signal("preflight_blocked", ["loop-engineering","preflight_blocked",<missing-name>], "<gap>")`
    (see Monitoring — this is the #1 downstream defect and MUST reach the hub),
    and STOP. Do NOT proceed.
@@ -179,12 +191,17 @@ Find the next actionable unit of work toward the DoD. Source order:
   "DoD met / nothing actionable")` so an always-clean project is still visible to
   the hub aggregator, write `result: "PASSED"` verdict, REPORT, STOP. This is a
   valid, common exit.
-- `--discover-only` → REPORT the triage and STOP.
+- `--discover-only` (work WAS found — the nothing-actionable exit above fires
+  first when it wasn't) →
+  `emit_signal("clean_exit", ["loop-engineering","clean_exit","discover-only"], "triage-only run")`,
+  write a `result: "PASSED"` verdict (`cycles_run: 0`, `units_shipped: 0`),
+  REPORT the triage, STOP. Never emit twice on one exit.
 - Otherwise select the highest-value item by `goal-anchored-decisions.md` (primary
   persona + documented priority order; correctness/safety errors rank high
   regardless of fix size) and continue.
 
-Increment `cycle`. If `cycle > max_cycles` → ESCALATE (STEP 6 budget arm).
+Increment `cycle` and reset `merged_this_cycle: false`. If `cycle > max_cycles`
+→ ESCALATE (STEP 6 budget arm).
 
 ---
 
@@ -203,8 +220,11 @@ map (`plan-before-coding.md`) into the maker dispatch.
 
 ## STEP 4: EXECUTE — the MAKER (isolated)
 
-Dispatch the maker as a flat worker from T0, in its own worktree so parallel
-cycles cannot collide:
+First record `pre_merge_sha = git rev-parse HEAD` into state — captured BEFORE
+dispatch so it is defined on EVERY exit from this step (merge success, merge
+conflict, or maker failure); every later diff/recompute uses it. Then dispatch
+the maker as a flat worker from T0, in its own worktree so parallel cycles
+cannot collide:
 
 ```
 Agent(subagent_type="plan-executor-agent", isolation="worktree", prompt="""
@@ -228,24 +248,32 @@ Return contract: {
 ```
 
 Capture the return; increment `dispatches_used`. If `gate` is `BLOCKED`/`FAILED`
-→ go to STEP 6 FEEDBACK (do not VERIFY a non-result).
+→ STEP 4b is SKIPPED (no merge happens): discard the maker's self-reported
+`changed_files` (an unmerged claim is never handed to a reviewer) and go to
+STEP 6 FEEDBACK, **maker-failed entry** (do not VERIFY a non-result).
 
 **4b. INTEGRATE the maker's worktree (mandatory before VERIFY).** The maker's
 commits live on its worktree branch — NOT in this tree. Nothing downstream may
 run against an unmerged tree (it would verify unchanged code: false green or
 false red, and SHIP would commit nothing):
 
-1. Record `pre_merge_sha = git rev-parse HEAD`, then merge the returned branch
-   into the run's working tree: `git merge --no-ff <worktree_branch>`.
-2. On merge CONFLICT: abort the merge (`git merge --abort`) and treat it as a
-   FAILED gate → STEP 6 FEEDBACK with the conflict context.
-3. Recompute the authoritative changed-file set from the merged tree:
+1. Merge the returned branch into the run's working tree:
+   `git merge --no-ff <worktree_branch>` (`pre_merge_sha` was recorded at
+   dispatch).
+2. On merge CONFLICT: abort the merge (`git merge --abort`; HEAD is back at
+   `pre_merge_sha`, the maker's commits remain only on the unmerged
+   `worktree_branch`) → STEP 6 FEEDBACK, **merge-conflict entry**, with the
+   conflict context.
+3. On success set `merged_this_cycle: true`, then recompute the authoritative
+   changed-file set from the merged tree:
    `git diff --name-only <pre_merge_sha>..HEAD` → overwrite `changed_files` in
    state (the maker's self-reported list is a claim; the merged diff is proof).
 4. **Operative-tree rule:** from here on, STEP 5 VERIFY (mechanical gate,
    reviewer inputs, supervisor reproduction) and STEP 6 SHIP
    (`/post-fix-pipeline` commit) ALL operate on THIS tree — the T0 working
-   tree post-merge — never on the maker's worktree.
+   tree post-merge — never on the maker's worktree. STEP 5 and SHIP are
+   UNREACHABLE while `merged_this_cycle` is false: no path may enter VERIFY
+   without a successful 4b merge for the current unit.
 
 ---
 
@@ -259,18 +287,26 @@ Two independent gates, neither run by the maker:
    ```
    Read `test-results/auto-verify.json`.
 2. **Independent review gate** — dispatch a DIFFERENT agent than the maker, given
-   the maker's RAW diff (not its self-assessment), prompted adversarially:
+   the maker's RAW merged diff (not its self-assessment), prompted adversarially.
+   Build the dispatch context from the merged tree: capture
+   `git diff <pre_merge_sha>..HEAD` and include the diff text in the prompt (if
+   it exceeds the prompt budget, write it to
+   `.workflows/loop-engineering/cycle-<n>.diff` and pass that path instead):
    ```
    Agent(subagent_type="code-reviewer-agent", prompt="""
-   ## Adversarially review the maker's changed_files for run <run_id> cycle <n>.
-   ## Inputs: changed_files=<paths>, DoD=<...>, plan=<path>
+   ## Adversarially review the maker's merged diff for run <run_id> cycle <n>.
+   ## Inputs: DoD=<...>, plan=<path>, changed_files=<paths>,
+   ##         diff_range=<pre_merge_sha>..HEAD
+   ## RAW MERGED DIFF (output of `git diff <pre_merge_sha>..HEAD`):
+   <diff text — or the .diff file path when oversized>
    Judge: is this the ROOT-cause fix across ALL surfaces (not a one-symptom patch)?
    Correctness, security-of-the-change, scope honored, no out-of-brief files?
    Return {gate: PASSED|FAILED, blocking_findings:[...], summary}.
    """)
    ```
    Increment `dispatches_used` for the checker dispatch too — the STEP 8
-   dashboard counts every `Agent()` call, not just the maker's.
+   dashboard counts every completed worker dispatch (maker + checker);
+   preflight probes and failed dispatches stay excluded (STEP 1.5).
    This reviewer — a fresh agent given only the RAW merged diff (never the
    maker's self-assessment) — plus the T0 supervisor reproduction below
    TOGETHER realize the spec §3 "blind test verify" layer
@@ -290,46 +326,78 @@ dissent → STEP 6 FEEDBACK.
 
 ## STEP 6: GATE → SHIP or FEEDBACK
 
-**PASS** (and not `--no-ship`):
+**PASS** (and not `--no-ship`): if this passing VERIFY resolved a FEEDBACK
+heal, FIRST increment `heals` and
+`emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what healed>")`
+— the FAIL arm's pending emit fires here, where the outcome is known. Then:
 ```
 Skill("/post-fix-pipeline", args="<run_id>, test-results/auto-verify.json")
 ```
 Captures docs update + commit (on the T0 tree the maker's branch was merged
-into at STEP 4b). Record `state.artifacts.commit_sha`. → STEP 7 LEARN.
+into at STEP 4b). APPEND the sha to `state.artifacts.commits`. → STEP 7 LEARN.
 
 **PASS with `--no-ship` (TERMINAL branch):** skip `/post-fix-pipeline` entirely;
-record `state.artifacts.commit_sha = "SKIPPED"`; still run STEP 7 LEARN for its
-learning capture but emit `clean_exit` (tags
-`["loop-engineering","clean_exit","no-ship-terminal"]`) INSTEAD of `shipped` —
-nothing was committed, and the `shipped` metric must stay honest. Then go
-directly to STEP 8 REPORT with `result: "PASSED"` and `Commits: SKIPPED`. The
-run STOPS after its first verified unit — it does NOT loop back to DISCOVER
-(verified-but-uncommitted work must not pile up under later merges).
+record `state.artifacts.commits = ["SKIPPED"]` and leave `units_shipped` at 0 —
+nothing was committed, and the `shipped` metric must stay honest. Run the
+learning capture inline HERE (`/learn-n-improve` with args `session`) — the
+run does NOT enter STEP 7 (no `shipped` emit, no loop-back); emit
+`clean_exit` (tags `["loop-engineering","clean_exit","no-ship-terminal"]`)
+INSTEAD of `shipped` (a resolved heal still emits `healed` first, as above).
+Then go directly to STEP 8 REPORT with `result: "PASSED"` and
+`Commits: SKIPPED`. The run STOPS after its first verified unit — it does NOT
+loop back to DISCOVER (verified-but-uncommitted work must not pile up under
+later merges).
 
-**FAIL — self-heal (bounded):** pick the healer by root-cause clarity. The heal
-runs inline at T0 and edits the SAME post-merge tree; before returning to
-STEP 5 VERIFY, recompute `changed_files` so the reviewer sees the healed diff —
-`git diff --name-only <pre_merge_sha>..HEAD` plus any uncommitted heal edits
-from `git status --porcelain` — then re-enter STEP 5 and increment
-`retries_used`. When a heal subsequently PASSES VERIFY,
-`emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what healed>")`:
+**FAIL — self-heal (bounded).** FEEDBACK has three entry modes. Every re-entry
+to STEP 5 VERIFY requires `merged_this_cycle: true` (a successful 4b merge for
+the current unit) — VERIFY is unreachable otherwise. Each heal/redo increments
+`retries_used` AND `budget.step_retries[<failing step>]`:
 
-```
-# clear root cause:
-Skill("/fix-loop", args="<failure context>")
-# unclear root cause OR 2+ failed cycles on the same unit (does diagnose→fix→verify→learn):
-Skill("/debugging-loop", args="<failure context>")
-```
+1. **VERIFY dissent** (merge succeeded). The heal runs inline at T0 and edits
+   the SAME post-merge tree; before re-entering STEP 5, recompute
+   `changed_files` so the reviewer sees the healed diff —
+   `git diff --name-only <pre_merge_sha>..HEAD` plus any uncommitted heal edits
+   from `git status --porcelain`. Pick the healer by root-cause clarity:
+   ```
+   # clear root cause:
+   Skill("/fix-loop", args="<failure context>")
+   # unclear root cause OR 2+ failed cycles on the same unit (does diagnose→fix→verify→learn):
+   Skill("/debugging-loop", args="<failure context>")
+   ```
+2. **Merge-conflict entry** (4b aborted; HEAD == `pre_merge_sha`; the maker's
+   commits sit only on the unmerged `worktree_branch`). The heal IS the
+   integration: re-run `git merge --no-ff <worktree_branch>`, resolve the
+   conflicts inline at T0, commit the resolution — that completes 4b (set
+   `merged_this_cycle: true`; recompute `changed_files` from
+   `git diff --name-only <pre_merge_sha>..HEAD`) — then enter STEP 5 VERIFY.
+   If the conflicts are not resolvable, abort again, abandon the branch
+   (record it in `events.jsonl`), and re-dispatch the maker (STEP 4) with the
+   conflict context — NEVER VERIFY a tree that lacks the maker's work.
+3. **Maker-failed entry** (`gate: FAILED|BLOCKED`; 4b was skipped; the tree is
+   still at `pre_merge_sha`). Nothing is integrated, so there is nothing to
+   heal in the T0 tree — do NOT run a healer against it. Re-dispatch the maker
+   (STEP 4) with the failure/blocker context appended to the plan context; the
+   failed attempt's worktree branch is abandoned (record it in `events.jsonl`).
+   VERIFY is reached only after the redo's 4b merge succeeds.
+
+The `healed` emit for any of these fires at the PASS arm, when the heal's
+re-VERIFY passes.
 
 **Budget exhausted** (`retries_used >= global_retry_budget` OR
-`cycle > max_cycles`):
+`cycle > max_cycles` OR any `step_retries[<step>] > max_retries_per_step` OR
+the configured wall-clock cap exceeded):
 ```
 Skill("/escalation-report", args="<run_id>")
 ```
 Append the unresolved unit to `state.triage_inbox` with what was tried,
-`emit_signal("escalated", ["loop-engineering","escalated",<unit-class>], "<unit + what was tried>")`,
-then STOP with `result: "ESCALATED"`. NEVER loop unbounded — a loop running
-unattended is a loop making mistakes unattended (Osmani).
+`emit_signal("escalated", ["loop-engineering","escalated",<unit-class>], "<unit + what was tried>")`.
+When the capped unit was never attempted (a clean run that hit `max_cycles`
+with one more unit discovered), say so explicitly — message
+`"<unit> — not attempted: max_cycles reached"`, what-was-tried = `"nothing —
+cycle cap"`. Then go to STEP 8 REPORT with `result: "ESCALATED"` (write the
+verdict + dashboard + handoff — ESCALATED terminates through STEP 8, same as
+PASSED). NEVER loop unbounded — a loop running unattended is a loop making
+mistakes unattended (Osmani).
 
 ---
 
@@ -340,15 +408,16 @@ Skill("/learn-n-improve", args="session")
 ```
 Captures the discover→plan→make→check→ship pattern (and any heal) into
 `.claude/learnings.json`, typed GENERIC vs PRODUCT-SPECIFIC (`learnings-routing.md`).
-Then directly `emit_signal("shipped", ["loop-engineering","shipped",<unit-class>],
-"<unit>")` for hub monitoring — this is the SINGLE emit site for `shipped`
-(exactly one entry per shipped unit; STEP 6 SHIP emits nothing, and do NOT rely
-on `/learn-n-improve` to set the link — see Monitoring). Under `--no-ship` the
-`clean_exit` emit from STEP 6 replaces it. Mark the unit consumed: if it was the
-`$ARGUMENTS`-named unit, set `state.argument_unit_consumed: true` so DISCOVER
-never re-selects it. Then loop back to STEP 2 DISCOVER for the next unit, until
-DISCOVER finds nothing actionable or a budget caps the run (`--no-ship` runs
-already terminated at STEP 6).
+Then directly increment `units_shipped` and
+`emit_signal("shipped", ["loop-engineering","shipped",<unit-class>], "<unit>")`
+for hub monitoring — this is the SINGLE emit site for `shipped` (exactly one
+entry per shipped unit; STEP 6 SHIP emits nothing, and do NOT rely on
+`/learn-n-improve` to set the link — see Monitoring). Mark the unit consumed:
+if it was the `$ARGUMENTS`-named unit, set `state.argument_unit_consumed: true`
+so DISCOVER never re-selects it. Then loop back to STEP 2 DISCOVER for the next
+unit, until DISCOVER finds nothing actionable or a budget caps the run.
+(`--no-ship` runs never reach this step — their learning capture ran inline at
+STEP 6 and `clean_exit` replaced `shipped`.)
 
 ---
 
@@ -415,11 +484,13 @@ Use a STABLE `tags` signature per defect class (e.g. the failing test id or the
 missing-closure name) — the aggregator counts a class that recurs across runs as
 "recurring despite the pattern" (lower effectiveness), and a one-off as addressed.
 
-Emit points (each signal has exactly ONE emit site; each writes exactly one entry):
-- **STEP 1.5 BLOCK** → `emit_signal("preflight_blocked", ["loop-engineering","preflight_blocked",<missing-name>], "<closure gap or maker==checker>")`.
-- **STEP 2 clean exit / STEP 6 `--no-ship` terminal** → `emit_signal("clean_exit", ["loop-engineering","clean_exit",<"no-actionable-work"|"no-ship-terminal">], "<why>")`.
+Emit points (exactly ONE entry per triggering outcome — a single outcome never
+emits the same signal twice; where a signal lists more than one site, the
+sites are mutually exclusive at runtime):
+- **STEP 1.5 BLOCK (incl. retroactive at STEP 4/5)** → `emit_signal("preflight_blocked", ["loop-engineering","preflight_blocked",<missing-name>], "<closure gap or maker==checker>")`.
+- **STEP 2 clean exit / STEP 2 `--discover-only` / STEP 6 `--no-ship` terminal** → `emit_signal("clean_exit", ["loop-engineering","clean_exit",<"no-actionable-work"|"discover-only"|"no-ship-terminal">], "<why>")`.
 - **STEP 7 LEARN** → `emit_signal("shipped", ["loop-engineering","shipped",<unit-class>], "<unit>")` — the SINGLE `shipped` emit site; STEP 6 SHIP emits nothing (a second emit would double-count the spec §5.1 effectiveness metric).
-- **STEP 6 FEEDBACK after a successful heal** → `emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what was healed>")`.
+- **STEP 6 PASS arm, when the passing VERIFY resolved a heal** → `emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what was healed>")`.
 - **STEP 6 budget exhaustion / ESCALATE** → `emit_signal("escalated", ["loop-engineering","escalated",<unit-class>], "<unresolved unit + what was tried>")`.
 
 The DIRECT `emit_signal` path above is **authoritative for all five signals**. Do
@@ -438,16 +509,22 @@ hub-ward signal (same constraint as all error-prevention telemetry).
 
 - MUST emit a hub-linked `.claude/learnings.json` entry (`hub_pattern_link:
   "loop-engineering"`) on every terminal outcome — `preflight_blocked`,
-  `escalated`, `healed`, `shipped`, `clean_exit` — from each signal's SINGLE
-  emit site, so the hub's weekly aggregator can monitor this pattern's
-  downstream defects/effectiveness without double counting. The defect signals
+  `escalated`, `healed`, `shipped`, `clean_exit` — from its defined emit
+  point (one entry per triggering outcome, never two for the same outcome),
+  so the hub's weekly aggregator can monitor this pattern's downstream
+  defects/effectiveness without double counting. The defect signals
   (`preflight_blocked`, `escalated`) MUST NOT be skipped — they are the whole
   point of downstream monitoring.
 - MUST integrate the maker's worktree branch into the run's working tree
-  (STEP 4b merge, conflicts → FEEDBACK) BEFORE VERIFY — verifying or shipping
-  an unmerged tree is a false gate (false green/red, empty commit); and MUST
-  recompute `changed_files` from the merged tree (and again after every heal)
-  so the reviewer never grades a stale diff.
+  (STEP 4b merge) BEFORE VERIFY — verifying or shipping an unmerged tree is a
+  false gate (false green/red, empty commit). STEP 5 VERIFY and SHIP are
+  UNREACHABLE while `merged_this_cycle` is false: a merge CONFLICT or a maker
+  `FAILED|BLOCKED` return enters FEEDBACK's merge-conflict / maker-failed
+  modes (complete the integration or re-dispatch the maker) — never VERIFY.
+  MUST recompute `changed_files` from the merged tree via `pre_merge_sha`
+  (captured at STEP 4 dispatch, so it is always defined) — and again after
+  every heal — so the reviewer never grades a stale diff, and MUST hand the
+  checker the RAW merged diff itself, not a path list.
 - MUST run STEP 1.5 PREFLIGHT before any dispatch and BLOCK with
   `WORKER_REGISTRY_NOT_LOADED` if a worker/sub-skill is missing OR maker==checker.
   Provisioning does not resolve closures — a downstream project can have this skill
