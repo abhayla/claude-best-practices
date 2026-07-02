@@ -2,8 +2,10 @@
 name: learn-n-improve
 description: >
   Analyze session outcomes and update memory topics (testing-lessons, fix-patterns,
-  skill-gaps) for continuous self-improvement. Four modes: session, deep, meta, test-run.
-  Use when a session ends, after a fix succeeds, or when reviewing learning effectiveness.
+  success-patterns, skill-gaps) for continuous self-improvement. Captures both failure
+  lessons (error→fix→lesson) and success patterns (what worked + when to reuse it). Four
+  modes: session, deep, meta, test-run. Use when a session ends, after a fix succeeds,
+  after a verified success worth repeating, or when reviewing learning effectiveness.
   For full learning cycles (capture + pattern detection + skill proposals), use
   /learning-self-improvement instead. For one-off session saves, use /end-session.
   For full handover docs, use /handover.
@@ -15,10 +17,12 @@ triggers:
   - session reflection
   - what did we learn
   - improve from mistakes
+  - capture what worked
+  - record a success pattern
   - learn-n-improve
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: session|deep|meta|test-run>"
-version: "2.4.0"
+version: "2.5.0"
 ---
 
 # Learn & Improve — Session Reflection
@@ -73,10 +77,19 @@ Categorize session work using this decision table:
 |----------------|----------|--------|
 | `git revert` in log | **Failure** | Record what was reverted and why |
 | test-results `FAILED` | **Failure** | Extract root cause from failure entries |
-| test-results `PASSED` after prior `FAILED` | **Success** | Record the fix pattern |
+| test-results `PASSED` after prior `FAILED` | **Fix Success** | Record the fix pattern (STEP 3) |
+| test-results `PASSED` with no prior failure, on a genuinely new/verified capability | **Success Pattern** | Record what worked + when to reuse it (STEP 3.5) |
+| A verified approach/tool/sequence that clearly outperformed the alternative (e.g. an authoritative preflight probe, a reusable checkpoint strategy) | **Success Pattern** | Record what worked + when to reuse it (STEP 3.5) |
 | Fix-loop iterations > 1 | **Workaround** | Check if the fix was minimal or structural |
 | New files created with no test coverage | **Knowledge gap** | Flag for test creation |
 | Repeated Grep/Read on same area | **Knowledge gap** | Record as area needing documentation |
+
+**Capture triggers (not only "after a fix succeeds"):** run this analysis after ANY verified
+success worth repeating — not just after fixing a failure. Concretely: a pilot/loop run that
+shipped clean (zero heals), a tool/technique that proved reliable enough to become the default
+next time, or a verified outcome the session would want to repeat as-is. See the `session` mode
+row in the Modes table above — "after completing work" includes a clean, fix-free success, not
+only a post-fix capture.
 
 ## STEP 3: Build Error→Fix→Lesson Database
 
@@ -138,6 +151,65 @@ For each error→fix pair from the session:
 3. If new, append with next sequential ID
 4. Tag generously for future searchability
 
+## STEP 3.5: Build Success-Pattern Database (memory of wins)
+
+Failures aren't the only thing worth remembering — a win that isn't captured evaporates just
+as fast, and gets rediscovered (or missed) next time instead of reused. This step mirrors
+STEP 3's error→fix→lesson triple with a success-pattern equivalent: **what was attempted →
+what worked → why it worked → when to apply it again**.
+
+For each success signal identified in STEP 2 (a verified, genuinely successful outcome — a
+clean pilot run, a technique that proved reliably better than the alternative, a checkpoint
+strategy that avoided rework), record a structured entry in the SAME `.claude/learnings.json`
+file, under a `success_patterns` array (one canonical home per `learnings-routing.md` — success
+patterns are learnings too, not a parallel system):
+
+```json
+{
+  "success_patterns": [
+    {
+      "id": "S001",
+      "date": "2026-07-03",
+      "type": "GENERIC",
+      "attempted": "Verifying an agent is dispatchable before relying on it mid-pipeline",
+      "worked": "Listed the live agent registry (`.claude/agents/*.md` scan) as the preflight probe, instead of assuming a named agent exists because its file is on disk",
+      "mechanism": "Claude Code loads the agent registry at session start, not per-call — a file existing on disk does not guarantee it's dispatchable this session (see pattern-structure.md 'Agent registry session-pinning'). An explicit registry-listing probe catches the gap file-existence checks miss.",
+      "reuse_trigger": "Before any pipeline dispatches a named worker agent it did not just create/sync itself in-session — probe the live registry first, not just the filesystem",
+      "evidence": "noter-app loop pilot: 1 cycle, 0 heals, agent dispatch never failed after adopting the registry-listing preflight",
+      "tags": ["agent-dispatch", "preflight", "loop-engineering"],
+      "reuse_count": 0,
+      "hub_pattern_link": "pattern-structure"
+    }
+  ]
+}
+```
+
+### Schema fields
+
+| Field | Meaning |
+|---|---|
+| `attempted` | What was tried (the situation/approach at hand) |
+| `worked` | The concrete technique/sequence/tool that succeeded |
+| `mechanism` | WHY it worked — the causal reason, not just the observation (mirrors STEP 3's `fix.description`) |
+| `reuse_trigger` | The condition under which to apply this again — a future session must be able to pattern-match on this |
+| `evidence` | The verified outcome that proves this was a real success, not a guess (a passing pilot, a metric, a clean run) |
+| `type` | `GENERIC` (true regardless of this product — process/tooling/craft) or `PRODUCT-SPECIFIC` (true only for this codebase's domain). Classify per `learnings-routing.md` BEFORE filing — a product-specific win filed as generic pollutes every project that reuses this skill's patterns |
+
+### Typing and routing (do not skip)
+
+1. **Type first.** Decide GENERIC vs PRODUCT-SPECIFIC per `learnings-routing.md` before writing
+   the entry. GENERIC success patterns are eligible for the same Hub Pattern Linkage step used
+   for failure learnings (suggest a `hub_pattern_link` by tag overlap, same 50% threshold, same
+   user-confirms flow as STEP 3's Hub Pattern Linkage). PRODUCT-SPECIFIC success patterns are
+   recorded here for this project's own reuse but MUST NOT be proposed as a hub pattern link.
+2. **Dedup first.** Search `success_patterns` for a similar `attempted`/`worked` pair (by tags,
+   by mechanism) before appending — if one exists, increment its `reuse_count` and refine the
+   `reuse_trigger` if this occurrence sharpens it, same discipline as STEP 3.
+3. **Reuse count feeds STEP 5.5.** A success pattern with `reuse_count >= 2` is eligible for the
+   SAME active-constraint-injection flow as a failure lesson (STEP 5.5) — a proven win can be
+   proposed as a positive constraint ("prefer X because...") in the skill it relates to, gated by
+   the same explicit-approval requirement.
+
 ## STEP 4: Update Memory Topics
 
 Update files in the project's memory directory:
@@ -146,8 +218,9 @@ Update files in the project's memory directory:
 |------|---------|
 | `fix-patterns.md` | Recurring fix patterns with file references |
 | `testing-lessons.md` | Testing insights and fixture knowledge |
+| `success-patterns.md` | Reusable wins — what worked + when to reuse it (human-readable digest of Step 3.5) |
 | `skill-gaps.md` | Areas where skills need improvement |
-| `.claude/learnings.json` | Structured error→fix→lesson database (Step 3) |
+| `.claude/learnings.json` | Structured error→fix→lesson database (Step 3) + success-pattern database (Step 3.5) |
 
 For each update:
 1. Read existing file
@@ -199,13 +272,12 @@ active constraints into the specific skills they relate to. This converts
 passive knowledge (recorded in `learnings.json`) into active prevention
 (embedded in skill CRITICAL RULES).
 
-**Trigger**: Only activates when a learning has `reuse_count >= 2` — proven
-recurring, not a one-off. Skip this step entirely if no learnings meet the
-threshold.
+**Trigger**: Only activates when a learning OR a success pattern has `reuse_count >= 2` —
+proven recurring, not a one-off. Skip this step entirely if nothing meets the threshold.
 
-### 5.5.1 Map Learnings to Skills
+### 5.5.1 Map Learnings (and Success Patterns) to Skills
 
-For each learning with `reuse_count >= 2`, identify the target skill:
+For each learning OR success pattern with `reuse_count >= 2`, identify the target skill:
 
 | Learning Signal | Target Skill | Match Method |
 |---|---|---|
@@ -215,14 +287,17 @@ For each learning with `reuse_count >= 2`, identify the target skill:
 | No skill match found | Skip | Record as general learning, do not force-fit |
 
 ```bash
-# Find learnings eligible for constraint injection
+# Find learnings + success patterns eligible for constraint injection
 python3 -c "
 import json
-learnings = json.load(open('.claude/learnings.json'))
-eligible = [l for l in learnings.get('learnings', []) if l.get('reuse_count', 0) >= 2]
-for l in eligible:
+data = json.load(open('.claude/learnings.json'))
+eligible_failures = [l for l in data.get('learnings', []) if l.get('reuse_count', 0) >= 2]
+eligible_successes = [s for s in data.get('success_patterns', []) if s.get('reuse_count', 0) >= 2]
+for l in eligible_failures:
     print(f\"  {l['id']}: reuse={l['reuse_count']} tags={l.get('tags', [])} lesson={l['lesson'][:80]}\")
-print(f'Total eligible: {len(eligible)}')
+for s in eligible_successes:
+    print(f\"  {s['id']}: reuse={s['reuse_count']} tags={s.get('tags', [])} worked={s['worked'][:80]}\")
+print(f'Total eligible: {len(eligible_failures) + len(eligible_successes)} ({len(eligible_failures)} failures, {len(eligible_successes)} successes)')
 "
 ```
 
@@ -288,8 +363,11 @@ Learning Update:
   Mode: [session/deep/meta/test-run]
   New learnings: N (error→fix→lesson triples)
   Updated learnings: M (reuse_count incremented)
+  New success patterns: P (what-worked→why→reuse-trigger entries)
+  Updated success patterns: Q (reuse_count incremented)
   Topics affected: [list]
   Total learnings in database: X
+  Total success patterns in database: Y
 
   Pattern alerts (if any):
   - "null-handling" detected in 40% of learnings — consider project-wide fix
@@ -350,6 +428,9 @@ This keeps learning semi-automatic — the hook reminds Claude to run the skill 
 - MUST cross-reference with existing patterns before adding — Why: duplicate entries inflate frequency counts and produce false pattern alerts
 - MUST NOT write any files in `test-run` mode — Why: test-run is for previewing changes without side effects; writing defeats its purpose
 - MUST NOT inject constraints into skills without explicit user approval (Step 5.5.3) — Why: unsolicited skill modifications break trust and may conflict with user intent
-- MUST NOT inject constraints from learnings with `reuse_count < 2` — Why: one-off errors are noise, not patterns; premature injection creates brittle rules
-- MUST record injection metadata in the learning entry to prevent re-proposing (Step 5.5.4) — Why: without tracking, the same constraint gets proposed every session
+- MUST NOT inject constraints from learnings OR success patterns with `reuse_count < 2` — Why: one-off occurrences are noise, not patterns; premature injection creates brittle rules
+- MUST record injection metadata in the learning/success-pattern entry to prevent re-proposing (Step 5.5.4) — Why: without tracking, the same constraint gets proposed every session
 - MUST default to `session` mode when $ARGUMENTS is empty — Why: asking for mode selection adds friction when the common case is always "session"
+- MUST capture success patterns in the SAME `.claude/learnings.json` file as failure learnings, under `success_patterns` (Step 3.5) — Why: one canonical home per `learnings-routing.md`; a parallel success-tracking file would duplicate infrastructure and fragment reuse
+- MUST type every success pattern GENERIC or PRODUCT-SPECIFIC before filing (Step 3.5) — Why: an untyped or mistyped entry either pollutes hub-pattern suggestions with product-specific noise, or buries a reusable craft lesson in product-only docs (`learnings-routing.md`)
+- MUST record a success pattern's `mechanism` (why it worked) and `reuse_trigger` (when to apply it again), not just the observation that it worked — Why: "it worked" without the causal reason and the reuse condition is not reusable knowledge, it's a fact nobody can act on

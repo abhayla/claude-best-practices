@@ -3103,23 +3103,23 @@
     }
   },
   "learn-n-improve": {
-    "hash": "d420451fcca4e789a1a5c3151db434d7be92b32f14efeb131aad8626422ba2b2",
+    "hash": "7cbe9e449f7812e1e0c90e4473216a4485695abebac2e762928aaf18987d27b0",
     "type": "skill",
     "category": "core",
-    "version": "2.3.0",
+    "version": "2.5.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-03",
     "dependencies": [],
     "visibility": "public",
-    "description": "Analyze session outcomes, build error-fix-lesson database, detect patterns, and inject proven learnings as active constraints into skills. Four modes: session, deep, meta, test-run.",
+    "description": "Analyze session outcomes, build error-fix-lesson AND success-pattern databases, detect patterns, and inject proven learnings/wins as active constraints into skills. Four modes: session, deep, meta, test-run.",
     "tags": [
       "learning",
       "self-improvement",
       "session",
       "patterns"
     ],
-    "changelog": "v2.3.0: Add triggers, preamble constraints, strengthen RULES to CRITICAL RULES with MUST/MUST NOT, registry sync | v2.1.0: Enhanced with community patterns",
+    "changelog": "v2.5.0 (2026-07-03): MINOR — add STEP 3.5 success-pattern capture (what-worked/why/reuse-trigger/evidence, typed GENERIC/PRODUCT-SPECIFIC per learnings-routing.md, filed under success_patterns in the same learnings.json), wire success signals into STEP 2's decision table and capture triggers, extend STEP 4/5.5/6 to cover success patterns alongside failure learnings (loop-engineering-adoption plan item 4.1) | v2.3.0: Add triggers, preamble constraints, strengthen RULES to CRITICAL RULES with MUST/MUST NOT, registry sync | v2.1.0: Enhanced with community patterns",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
