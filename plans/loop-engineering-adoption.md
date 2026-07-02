@@ -84,6 +84,6 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 - [x] 2.5 — telemetry round-trip CONFIRMED 2026-07-02: `aggregate_telemetry.py --local` (against a temp read-only worktree of the pilot's run branch) wrote `loop-engineering` effectiveness (error_prevention_rate 1.0, 7 linked entries) to `config/telemetry-aggregates.json` + registry effectiveness field
 - [x] 3.1 — DONE (spec §3.5 three rings, PR #255 merged)
 - [x] 3.2 — DONE (SKILL.md §3.5 pointer, v1.1.1, registry hash resynced; full local CI green — validators PASS + 1631 pytest passed 2026-07-02). Note: loop-engineering skill is core-only (no dual-home entry), so `test_dual_home_sync.py` has nothing to compare — the pytest run covers it
-- [ ] 4.1 — PR #___
+- [x] 4.1 — DONE 2026-07-03: /learn-n-improve v2.5.0 adds success-pattern capture (success_patterns array in the same learnings.json, schema attempted/worked/mechanism/reuse_trigger/evidence, GENERIC vs PRODUCT-SPECIFIC typed per learnings-routing.md, reuses the reuse_count>=2 constraint-injection pipeline + approval gate); mini-eval 6/6 PASS (evals/2026-07-03-eval-report.md)
 - [x] 5.1 — DONE (docs/loop-vocabulary.md + spec pointer; supervisor-verified 33/33 cited paths; landed via the docs/loop-vocabulary PR 2026-07-02)
 - [ ] 5.2 — BLOCKED on owner approval (G6 gate)
