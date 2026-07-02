@@ -645,3 +645,8 @@ narration phrasing, no recommendation). Do NOT fabricate work to appease the loo
 **System follow-up (PROPOSE-only, rule 5 — needs owner approval):** refine `no-overask-guard.sh`
 to exempt a turn from the narrate/over-ask check when the git tree is clean AND no Edit/Write/commit
 occurred AND the prior turns already landed the work — i.e. a pure confirmation/continuation turn.
+
+## 2026-07-02 — Stop-hook enhance guards: trivial banner needs <600-char reply; /init dodges slash exemption
+- **Mistake**: Replied to enhance-guard STOP blocks with the trivial banner + a full restated summary (>600 chars) — blocked 3×.
+- **Root cause**: `no-overask-guard.sh:95` + plugin `enhance-process-guard.sh:60` only honor the "no change — ran your input as-is" first line when total reply <600 chars. Also built-in commands like /init reach hooks as expanded prompt text, so the slash-command exemption never matches.
+- **Rule**: When an enhance guard blocks a slash-command/trivial turn, reply with the banner + a reply UNDER 600 chars (don't restate the summary). Hook fix candidate: detect built-in command turns via <command-name> tag / raise the trivial cap.
