@@ -11,6 +11,13 @@ skipped for non-UI tests unless `--capture-proof` is enabled.
 **Output:** Writes `test-evidence/{run_id}/visual-review.json` and influences
 STEP 3's verdict via overrides.
 
+## Contents
+
+- [2.5.1 Read Manifest](#251-read-manifest)
+- [2.5.2 Review All Screenshots](#252-review-all-screenshots)
+- [2.5.3 Write Visual Review Results](#253-write-visual-review-results)
+- [2.5.4 Gate Impact](#254-gate-impact)
+
 ---
 
 ## 2.5.1 Read Manifest
@@ -92,6 +99,7 @@ Write `test-evidence/{run_id}/visual-review.json`:
     {
       "test": "test_dashboard_loads",
       "original_result": "PASSED",
+      "verdict_source": "screenshot",
       "visual_verdict": "FAILED",
       "reason": "Dashboard shows empty table — no data rows visible despite test asserting element presence",
       "screenshot": "screenshots/test_dashboard_loads.pass.png"
@@ -101,6 +109,7 @@ Write `test-evidence/{run_id}/visual-review.json`:
     {
       "test": "test_login_timeout",
       "original_result": "FAILED",
+      "verdict_source": "exit_code",
       "visual_observation": "Screenshot shows successful login page — possible timing/flaky issue",
       "screenshot": "screenshots/test_login_timeout.fail.png"
     }
