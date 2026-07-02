@@ -79,9 +79,9 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 - [ ] 1.4 — /fix-loop half DONE (eval verdict FIX -> v1.6.0 fixes landed incl. the MAJOR escalation-to-/systematic-debugging gap; targeted trigger recheck 14/14; deferred: reciprocal boundary in systematic-debugging frontmatter). /auto-verify half not started (serialized)
 - [x] 2.1 — pilot CONFIRMED by owner 2026-07-02: noter-app (local folder `D:\Abhay\VibeCoding	eamtodo`, remote github.com/abhayla/noter-app)
 - [x] 2.2 — DONE (loop-engineering + 12-item dependency closure + workflow-contracts.yaml copied into the pilot's .claude/; committed locally in pilot repo a968e64, not pushed). PREFLIGHT green check happens at the pilot session start (registry pins at session start)
-- [ ] 2.3 — contract DRAFTED + committed in pilot (`docs/contracts/2026-07-02-loop-pilot-reports-csv-export.md`, goal: admin CSV export on /reports, no-deploy scope) — AWAITING owner approval of the goal
-- [ ] 2.4 — pilot run signal: ___
-- [ ] 2.5 — telemetry confirmed: ___
+- [x] 2.3 — contract approved by owner 2026-07-02 (owner ran the pilot on it): `docs/contracts/2026-07-02-loop-pilot-reports-csv-export.md`, admin CSV export on /reports, no-deploy scope
+- [x] 2.4 — PILOT RUN **DONE** 2026-07-02: verdict PASSED, 1 cycle of 3, 0 heals, 2 dispatches, 0/15 retries. Terminal signals `shipped` + `clean_exit` in pilot's `.claude/learnings.json` (commit 475de79 on local `feat/reports-csv-export`) with `hub_pattern_link: loop-engineering` + 5 learnings L001-L005. All DoD boxes met (10==10 Firestore row match, byte-exact RFC-4180 round-trip, 390/768/1280 screenshots, verify-all 24/24, no push/deploy). Maker plan-executor-agent (worktree) != checker code-reviewer-agent; T0 reproduced every gate. Owner NEXT: review + land the branch, deploy via owner-gated path
+- [x] 2.5 — telemetry round-trip CONFIRMED 2026-07-02: `aggregate_telemetry.py --local` (against a temp read-only worktree of the pilot's run branch) wrote `loop-engineering` effectiveness (error_prevention_rate 1.0, 7 linked entries) to `config/telemetry-aggregates.json` + registry effectiveness field
 - [x] 3.1 — DONE (spec §3.5 three rings, PR #255 merged)
 - [x] 3.2 — DONE (SKILL.md §3.5 pointer, v1.1.1, registry hash resynced; full local CI green — validators PASS + 1631 pytest passed 2026-07-02). Note: loop-engineering skill is core-only (no dual-home entry), so `test_dual_home_sync.py` has nothing to compare — the pytest run covers it
 - [ ] 4.1 — PR #___
