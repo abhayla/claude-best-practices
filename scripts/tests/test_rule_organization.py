@@ -114,6 +114,7 @@ class TestHubRulesAreLean:
         "prompt-auto-enhance.md",
         "product-incubation.md",  # hub-as-factory operating model (always-on global guardrail)
         "claude-docs-cache.md",   # docs/claude-references/ cache convention (distributable; dual-home synced)
+        "model-routing.md",       # cheapest-sufficient-model dispatch table (owner directive 2026-07-03)
     }
 
     def test_hub_rules_are_approved_set(self):
