@@ -23,7 +23,7 @@ triggers:
   - unattended feedback cycle
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.1.0"
+version: "1.1.1"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -37,7 +37,10 @@ checker, defeating independent verification).
 **What it is:** the autonomous *meta-loop* — it DISCOVERS work, PLANS it, EXECUTEs
 with a maker, VERIFIEs with an INDEPENDENT checker, then SHIPs or FEEDBACK-loops
 to self-heal, learning each cycle. It composes existing hub assets; it does not
-re-implement them. Canonical design: `docs/specs/loop-engineering-spec.md`.
+re-implement them. Canonical design: `docs/specs/loop-engineering-spec.md` — including
+§3.5 "The three rings": this loop is Ring 1 (machine, minutes); the owner's contract
+revisions + gate approvals are Ring 2 (hours); user feedback entering DISCOVER is Ring 3
+(days). Escalations exit to Ring 2 for a CONTRACT fix, never for babysitting the build.
 
 **Self-\* spine (composed, not built):** healing = `/fix-loop` · `/debugging-loop`
 · `/systematic-debugging`; verification = maker≠checker

@@ -6549,13 +6549,13 @@
     "tier": "must-have"
   },
   "loop-engineering": {
-    "hash": "abd226089e27a7860ae8db7b877c521202f7a3aa0a1ff4a8e49f2e436bd8ff8f",
+    "hash": "8b93160d151eba1c769e879630f57a5a435cdeb740d731f315142774ade3b2bd",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-16",
-    "last_updated": "2026-06-17",
+    "last_updated": "2026-07-02",
     "dependencies": [
       "auto-verify",
       "brainstorm",
@@ -6580,7 +6580,7 @@
       "self-healing",
       "loop-engineering"
     ],
-    "changelog": "v1.1.0 (2026-06-17): MINOR — hub-ward monitoring: emit a hub-linked .claude/learnings.json entry (hub_pattern_link: loop-engineering) on every terminal signal (preflight_blocked / escalated / healed / shipped) so the existing weekly aggregate_telemetry cron surfaces downstream defects + effectiveness in the registry, no new pipeline. Spec §5.1. | v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
+    "changelog": "v1.1.1 (2026-07-02): PATCH - point the canonical-design reference at spec 3.5 three rings (machine/developer/external) with the context-advantage escalation rule. | v1.1.0 (2026-06-17): MINOR — hub-ward monitoring: emit a hub-linked .claude/learnings.json entry (hub_pattern_link: loop-engineering) on every terminal signal (preflight_blocked / escalated / healed / shipped) so the existing weekly aggregate_telemetry cron surfaces downstream defects + effectiveness in the registry, no new pipeline. Spec §5.1. | v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
