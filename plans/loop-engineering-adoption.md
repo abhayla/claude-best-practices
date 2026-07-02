@@ -73,7 +73,7 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 
 ## Progress ledger
 
-- [ ] 1.1 — scenarios authored + landed (5 files, supervisor-verified); scored `/agent-evaluator` run is the remaining gate before this ticks
+- [x] 1.1 — DONE (PR #254 + scored eval PASS 5/5, aggregate 4.88/5.0, per-scenario disk-evidence verified 2026-07-02). Follow-up nits: add a NON-NEGOTIABLE block to plan-executor-agent.md; make Enforced-Pattern-2 checkpoints observable in the final report
 - [ ] 1.2 — 6 scenarios authored + landed (supervisor-verified); scored `/agent-evaluator` run is the remaining gate. Worker findings: code-reviewer-agent.md lacks a NON-NEGOTIABLE block, JSON return contract, and explicit anti-sycophancy/sibling-sweep mandate — agent-body hardening candidates
 - [ ] 1.3 — PR #___
 - [ ] 1.4 — PR #___
@@ -84,5 +84,5 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 - [ ] 2.5 — telemetry confirmed: ___
 - [ ] 3.1 — spec §3.5 "three rings" landed (PR pending merge); 3.2 SKILL.md pointer sync still open
 - [ ] 4.1 — PR #___
-- [ ] 5.1 — PR #___
+- [x] 5.1 — DONE (docs/loop-vocabulary.md + spec pointer; supervisor-verified 33/33 cited paths; landed via the docs/loop-vocabulary PR 2026-07-02)
 - [ ] 5.2 — BLOCKED on owner approval (G6 gate)

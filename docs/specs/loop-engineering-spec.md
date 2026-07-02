@@ -98,6 +98,9 @@ Ring 2 with the human fixing the CONTRACT, not the build; Ring-3 signals enter a
 DISCOVER inputs, never mid-cycle. This section names the model; the gate mechanics stay
 owned by their SSOTs (`decision-authority.md`, `human-approval-gates.md`) — no duplication.
 
+Shared loop-pattern vocabulary (the 20 loop design patterns, Karpathy's 9 harness rules, the
+Ralph loop, Willison's brakes → the hub asset owning each): `docs/loop-vocabulary.md`.
+
 ## 4. Autonomy guarantees (the parts loops leak at)
 
 - **Bounded** — inherits `global_retry_budget: 15` + `max_retries_per_step: 3`
