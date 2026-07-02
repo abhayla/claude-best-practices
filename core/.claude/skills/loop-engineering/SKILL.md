@@ -9,9 +9,10 @@ description: >
   through /fix-loop or /debugging-loop under hard budgets. Self-verifying
   (maker≠checker), self-healing (feedback arm), self-learning (/learn-n-improve
   each cycle), self-feedback (/escalation-report on budget exhaustion). Use to
-  run unattended work to a Definition of Done — triggered by /loop, /goal, cron,
-  or a PR. For a single feature use /development-loop; for one bug use
-  /debugging-loop; this is the autonomous meta-loop that ROUTES into them.
+  run unattended work to a Definition of Done — triggered by /loop, a
+  /goal-creator contract, cron, or a PR. For a single feature use
+  /development-loop; for one bug use /debugging-loop; this is the autonomous
+  meta-loop that ROUTES into them.
 type: workflow
 triggers:
   - autonomous loop
@@ -20,10 +21,9 @@ triggers:
   - self-healing loop
   - maker checker loop
   - discover plan execute verify loop
-  - unattended feedback cycle
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.1.1"
+version: "1.2.0"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -77,9 +77,10 @@ cannot terminate — `dod-verbs.md`).
    stateable, STOP and ask — an autonomous loop satisfies the *weakest* reading of
    a vague goal.
 2. **Read config.** `Read .claude/config/workflow-contracts.yaml` (hub repo:
-   `config/workflow-contracts.yaml`; if absent, use the inline DAG below — this
-   skill is self-contained) → `workflows.loop-engineering`. Pull the step DAG,
-   gates, and budgets. `master_agent` should be null; `sub_orchestrators` empty.
+   `config/workflow-contracts.yaml`; if absent, execute the numbered STEPs 1–8
+   of this skill as the DAG — this skill is self-contained) →
+   `workflows.loop-engineering`. Pull the step DAG, gates, and budgets.
+   `master_agent` should be null; `sub_orchestrators` empty.
 3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
 4. **Initialize state + budgets.** `Write .workflows/loop-engineering/state.json`:
    ```json
@@ -90,12 +91,17 @@ cannot terminate — `dod-verbs.md`).
      "dod": "<one-sentence DoD>",
      "cycle": 0,
      "max_cycles": 5,
+     "argument_unit_consumed": false,
      "budget": { "global_retry_budget": 15, "retries_used": 0, "dispatches_used": 0 },
      "step_status": { "INIT": "done" },
      "artifacts": {},
      "triage_inbox": ".workflows/loop-engineering/triage-inbox.md"
    }
    ```
+   The template's budget values are DEFAULTS: `--max-cycles N` overrides
+   `max_cycles`, and when the contracts config was read in 1.2 its `defaults`
+   (`global_retry_budget: 15`, `max_retries_per_step: 3`, optional wall-clock
+   cap) override the template values.
 5. **Append INIT event** to `events.jsonl`.
 
 ---
@@ -111,14 +117,28 @@ inline run (the 2026-04-24 failure mode).
    `code-reviewer-agent` (CHECKER). A file-existence check
    (`.claude/agents/<name>.md`) is necessary but NOT sufficient — Claude Code pins
    the agent registry at session start (`pattern-structure.md` → "registry
-   session-pinning"). Probe runtime dispatchability early.
+   session-pinning"). **Probe mechanism, in order:**
+   - If the session surfaces an available-agent-types listing (the harness's
+     agent list, e.g. in the Agent tool's system context), assert BOTH names
+     appear in it — the authoritative zero-dispatch probe.
+   - If no such listing is introspectable, fall back to the file-existence
+     check and record the RESIDUAL RISK in the run log: an agent file added
+     after session start passes the file check yet fails dispatch. To close
+     that gap, treat a dispatch-time "agent type not found" error at STEP 4/5
+     as a retroactive PREFLIGHT BLOCK — emit `preflight_blocked` with the same
+     remediation below and STOP; NEVER fall back to inline execution.
+   Probes and failed dispatches do NOT count against `dispatches_used`.
 2. **Required sub-skills** (via `Skill()`): `auto-verify`, `fix-loop`,
    `learn-n-improve` (always); `brainstorm`, `writing-plans`, `debugging-loop`,
    `systematic-debugging`, `post-fix-pipeline`, `escalation-report` (conditionally).
    Check each exists in `.claude/skills/<name>/SKILL.md`.
-3. **MAKER ≠ CHECKER invariant.** Assert the resolved maker `subagent_type` and
-   checker `subagent_type` are DIFFERENT. If a project remapped them to the same
-   agent, BLOCK — independent verification is the whole point.
+3. **MAKER ≠ CHECKER invariant.** Resolve the maker and checker `subagent_type`s
+   from the contracts DAG read in STEP 1.2 — the `dispatch:` fields of the
+   `execute` and `verify_review` steps (fall back to the defaults named in
+   item 1 only when the config is absent). Assert the two RESOLVED values are
+   DIFFERENT — comparing the literals in STEPs 4/5 cannot detect a project
+   remap. If they resolve to the same agent, BLOCK — independent verification
+   is the whole point.
 4. **On any missing/undispatchable dependency OR maker==checker → BLOCK** with
    verdict `WORKER_REGISTRY_NOT_LOADED`, listing the gap, and emit verbatim:
    ```
@@ -130,7 +150,10 @@ inline run (the 2026-04-24 failure mode).
           pinned at session start), then re-run /loop-engineering.
    ============================================================
    ```
-   Write the BLOCKED verdict to `test-results/loop-engineering-verdict.json`,
+   Write the BLOCKED verdict to `test-results/loop-engineering-verdict.json`
+   using the STEP 8 schema with `result: "BLOCKED"`, plus
+   `reason: "WORKER_REGISTRY_NOT_LOADED"`, `missing: [<names>]`,
+   `cycles_run: 0`, `units_shipped: 0`, and `finalized_at`;
    `emit_signal("preflight_blocked", ["loop-engineering","preflight_blocked",<missing-name>], "<gap>")`
    (see Monitoring — this is the #1 downstream defect and MUST reach the hub),
    and STOP. Do NOT proceed.
@@ -143,12 +166,19 @@ Only when the closure is present, dispatchable, and maker≠checker, continue.
 
 Find the next actionable unit of work toward the DoD. Source order:
 
-1. If `$ARGUMENTS` names a concrete task/issue → that is the unit; skip scanning.
+1. If `$ARGUMENTS` names a concrete task/issue AND `state.argument_unit_consumed`
+   is false → that is the unit; skip scanning. Once that unit completes (STEP 7
+   sets `argument_unit_consumed: true`), every later DISCOVER pass falls through
+   to rule 2 — so a single-issue run terminates PASSED via the nothing-actionable
+   exit instead of re-executing the same unit until budgets exhaust.
 2. Else triage: read CI failures, open issues (`/status`), and the DoD gap. Write
    findings to `state.triage_inbox`.
 
 - **Nothing actionable** → terminate CLEAN (DoD already met or no work surfaced).
-  Write `result: "PASSED"` verdict, REPORT, STOP. This is a valid, common exit.
+  `emit_signal("clean_exit", ["loop-engineering","clean_exit","no-actionable-work"],
+  "DoD met / nothing actionable")` so an always-clean project is still visible to
+  the hub aggregator, write `result: "PASSED"` verdict, REPORT, STOP. This is a
+  valid, common exit.
 - `--discover-only` → REPORT the triage and STOP.
 - Otherwise select the highest-value item by `goal-anchored-decisions.md` (primary
   persona + documented priority order; correctness/safety errors rank high
@@ -191,6 +221,7 @@ patch (plan-before-coding.md). Commit after each task for recovery checkpointing
 Return contract: {
   "gate": "PASSED|FAILED|BLOCKED",
   "tasks_completed": <int>, "tasks_total": <int>,
+  "worktree_branch": "<the git branch your worktree commits live on>",
   "changed_files": [<paths>], "blockers": [...], "summary": "<line>"
 }
 """)
@@ -198,6 +229,23 @@ Return contract: {
 
 Capture the return; increment `dispatches_used`. If `gate` is `BLOCKED`/`FAILED`
 → go to STEP 6 FEEDBACK (do not VERIFY a non-result).
+
+**4b. INTEGRATE the maker's worktree (mandatory before VERIFY).** The maker's
+commits live on its worktree branch — NOT in this tree. Nothing downstream may
+run against an unmerged tree (it would verify unchanged code: false green or
+false red, and SHIP would commit nothing):
+
+1. Record `pre_merge_sha = git rev-parse HEAD`, then merge the returned branch
+   into the run's working tree: `git merge --no-ff <worktree_branch>`.
+2. On merge CONFLICT: abort the merge (`git merge --abort`) and treat it as a
+   FAILED gate → STEP 6 FEEDBACK with the conflict context.
+3. Recompute the authoritative changed-file set from the merged tree:
+   `git diff --name-only <pre_merge_sha>..HEAD` → overwrite `changed_files` in
+   state (the maker's self-reported list is a claim; the merged diff is proof).
+4. **Operative-tree rule:** from here on, STEP 5 VERIFY (mechanical gate,
+   reviewer inputs, supervisor reproduction) and STEP 6 SHIP
+   (`/post-fix-pipeline` commit) ALL operate on THIS tree — the T0 working
+   tree post-merge — never on the maker's worktree.
 
 ---
 
@@ -221,6 +269,13 @@ Two independent gates, neither run by the maker:
    Return {gate: PASSED|FAILED, blocking_findings:[...], summary}.
    """)
    ```
+   Increment `dispatches_used` for the checker dispatch too — the STEP 8
+   dashboard counts every `Agent()` call, not just the maker's.
+   This reviewer — a fresh agent given only the RAW merged diff (never the
+   maker's self-assessment) — plus the T0 supervisor reproduction below
+   TOGETHER realize the spec §3 "blind test verify" layer
+   (`independent-test-verification.md`): a deliberate KISS composition, not a
+   fourth dispatched verifier.
 3. **Supervisor reproduction.** T0 (this body) MUST reproduce the claimed gate —
    re-run the test/lint command itself, and apply an output-plausibility check to
    any user-facing value (`supervisor-verification.md`,
@@ -239,11 +294,25 @@ dissent → STEP 6 FEEDBACK.
 ```
 Skill("/post-fix-pipeline", args="<run_id>, test-results/auto-verify.json")
 ```
-Captures docs update + commit. Record `state.artifacts.commit_sha`. → STEP 7 LEARN.
+Captures docs update + commit (on the T0 tree the maker's branch was merged
+into at STEP 4b). Record `state.artifacts.commit_sha`. → STEP 7 LEARN.
 
-**FAIL — self-heal (bounded):** pick the healer by root-cause clarity, then
-return to STEP 5 VERIFY and increment `retries_used`. When a heal subsequently
-PASSES VERIFY, `emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what healed>")`:
+**PASS with `--no-ship` (TERMINAL branch):** skip `/post-fix-pipeline` entirely;
+record `state.artifacts.commit_sha = "SKIPPED"`; still run STEP 7 LEARN for its
+learning capture but emit `clean_exit` (tags
+`["loop-engineering","clean_exit","no-ship-terminal"]`) INSTEAD of `shipped` —
+nothing was committed, and the `shipped` metric must stay honest. Then go
+directly to STEP 8 REPORT with `result: "PASSED"` and `Commits: SKIPPED`. The
+run STOPS after its first verified unit — it does NOT loop back to DISCOVER
+(verified-but-uncommitted work must not pile up under later merges).
+
+**FAIL — self-heal (bounded):** pick the healer by root-cause clarity. The heal
+runs inline at T0 and edits the SAME post-merge tree; before returning to
+STEP 5 VERIFY, recompute `changed_files` so the reviewer sees the healed diff —
+`git diff --name-only <pre_merge_sha>..HEAD` plus any uncommitted heal edits
+from `git status --porcelain` — then re-enter STEP 5 and increment
+`retries_used`. When a heal subsequently PASSES VERIFY,
+`emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what healed>")`:
 
 ```
 # clear root cause:
@@ -272,9 +341,14 @@ Skill("/learn-n-improve", args="session")
 Captures the discover→plan→make→check→ship pattern (and any heal) into
 `.claude/learnings.json`, typed GENERIC vs PRODUCT-SPECIFIC (`learnings-routing.md`).
 Then directly `emit_signal("shipped", ["loop-engineering","shipped",<unit-class>],
-"<unit>")` for hub monitoring (do NOT rely on `/learn-n-improve` to set the link —
-see Monitoring). Then loop back to STEP 2 DISCOVER for the next unit, until
-DISCOVER finds nothing actionable or a budget caps the run.
+"<unit>")` for hub monitoring — this is the SINGLE emit site for `shipped`
+(exactly one entry per shipped unit; STEP 6 SHIP emits nothing, and do NOT rely
+on `/learn-n-improve` to set the link — see Monitoring). Under `--no-ship` the
+`clean_exit` emit from STEP 6 replaces it. Mark the unit consumed: if it was the
+`$ARGUMENTS`-named unit, set `state.argument_unit_consumed: true` so DISCOVER
+never re-selects it. Then loop back to STEP 2 DISCOVER for the next unit, until
+DISCOVER finds nothing actionable or a budget caps the run (`--no-ship` runs
+already terminated at STEP 6).
 
 ---
 
@@ -285,7 +359,7 @@ DISCOVER finds nothing actionable or a budget caps the run.
    {
      "schema_version": "1.0.0",
      "run_id": "<run_id>",
-     "result": "PASSED | ESCALATED | BLOCKED | FAILED",
+     "result": "PASSED | ESCALATED | BLOCKED",
      "dod": "<one-sentence DoD>",
      "cycles_run": <int>,
      "units_shipped": <int>,
@@ -298,7 +372,7 @@ DISCOVER finds nothing actionable or a budget caps the run.
 2. **Dashboard:**
    ```
    ============================================================
-   Loop Engineering: <PASSED | ESCALATED | BLOCKED | FAILED>
+   Loop Engineering: <PASSED | ESCALATED | BLOCKED>
      Run ID: <run_id>   Cycles: <n>/<max>
      Units shipped: <n>   Heals: <n>   Dispatches: <n>
      Commits: <shas or SKIPPED>
@@ -329,7 +403,7 @@ missing file as `{"learnings": []}`), APPEND (never overwrite) one entry, write 
 ```json
 {
   "hub_pattern_link": "loop-engineering",
-  "signal": "shipped | healed | escalated | preflight_blocked",
+  "signal": "shipped | healed | escalated | preflight_blocked | clean_exit",
   "tags": ["loop-engineering", "<signal>", "<stable defect/unit class>"],
   "error": { "message": "<one-line what happened>" },
   "run_id": "<run_id>",
@@ -341,13 +415,14 @@ Use a STABLE `tags` signature per defect class (e.g. the failing test id or the
 missing-closure name) — the aggregator counts a class that recurs across runs as
 "recurring despite the pattern" (lower effectiveness), and a one-off as addressed.
 
-Emit points (each writes exactly one entry):
+Emit points (each signal has exactly ONE emit site; each writes exactly one entry):
 - **STEP 1.5 BLOCK** → `emit_signal("preflight_blocked", ["loop-engineering","preflight_blocked",<missing-name>], "<closure gap or maker==checker>")`.
-- **STEP 6 SHIP** → `emit_signal("shipped", ["loop-engineering","shipped",<unit-class>], "<unit>")` (in addition to STEP 7 LEARN).
+- **STEP 2 clean exit / STEP 6 `--no-ship` terminal** → `emit_signal("clean_exit", ["loop-engineering","clean_exit",<"no-actionable-work"|"no-ship-terminal">], "<why>")`.
+- **STEP 7 LEARN** → `emit_signal("shipped", ["loop-engineering","shipped",<unit-class>], "<unit>")` — the SINGLE `shipped` emit site; STEP 6 SHIP emits nothing (a second emit would double-count the spec §5.1 effectiveness metric).
 - **STEP 6 FEEDBACK after a successful heal** → `emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what was healed>")`.
 - **STEP 6 budget exhaustion / ESCALATE** → `emit_signal("escalated", ["loop-engineering","escalated",<unit-class>], "<unresolved unit + what was tried>")`.
 
-The DIRECT `emit_signal` path above is **authoritative for all four signals**. Do
+The DIRECT `emit_signal` path above is **authoritative for all five signals**. Do
 NOT rely on `/learn-n-improve` to set `hub_pattern_link` — in unattended mode it
 defaults that field to `null`, so a delegated entry is never matched by the
 aggregator. `/learn-n-improve` still runs for its own learning capture; it does
@@ -363,10 +438,16 @@ hub-ward signal (same constraint as all error-prevention telemetry).
 
 - MUST emit a hub-linked `.claude/learnings.json` entry (`hub_pattern_link:
   "loop-engineering"`) on every terminal outcome — `preflight_blocked`,
-  `escalated`, `healed`, `shipped` — so the hub's weekly aggregator can monitor
-  this pattern's downstream defects/effectiveness. The defect signals
+  `escalated`, `healed`, `shipped`, `clean_exit` — from each signal's SINGLE
+  emit site, so the hub's weekly aggregator can monitor this pattern's
+  downstream defects/effectiveness without double counting. The defect signals
   (`preflight_blocked`, `escalated`) MUST NOT be skipped — they are the whole
   point of downstream monitoring.
+- MUST integrate the maker's worktree branch into the run's working tree
+  (STEP 4b merge, conflicts → FEEDBACK) BEFORE VERIFY — verifying or shipping
+  an unmerged tree is a false gate (false green/red, empty commit); and MUST
+  recompute `changed_files` from the merged tree (and again after every heal)
+  so the reviewer never grades a stale diff.
 - MUST run STEP 1.5 PREFLIGHT before any dispatch and BLOCK with
   `WORKER_REGISTRY_NOT_LOADED` if a worker/sub-skill is missing OR maker==checker.
   Provisioning does not resolve closures — a downstream project can have this skill

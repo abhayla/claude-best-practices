@@ -1,0 +1,35 @@
+{
+  "skill": "loop-engineering",
+  "eval_date": "2026-07-02",
+  "method": "3 independent context-blind subagent runs (2x sonnet, 1x haiku). Each run received the full confusable-neighbor roster (loop-engineering, development-loop, debugging-loop, fix-loop, systematic-debugging, loop [interval runner], ralph-loop) as name+description pairs plus the 20 queries, and routed each query to one skill or NONE. No file access, no other context.",
+  "should_trigger": [
+    {"id": "S1", "query": "Run autonomously until the whole backlog is done — find work, do it, verify it, ship it, repeat.", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S2", "query": "Set up a self-healing loop that keeps fixing and verifying until the definition of done is met", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S3", "query": "I want a maker-checker loop where a separate agent reviews the work before anything is committed", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S4", "query": "loop engineering", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S5", "query": "Work through the open issues unattended overnight and escalate anything you can't fix", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S6", "query": "Run the discover plan execute verify loop on this repo", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S7", "query": "Can you triage CI failures and open issues, pick the highest value one, fix it, verify independently, and keep going until nothing is left?", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S8", "query": "autonomous feedback cycle with budgets — max 5 cycles then escalate", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S9", "query": "i want u to keep shipping fixes on ur own, with an independent checker, till everything's green", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0},
+    {"id": "S10", "query": "Given this DoD: 'all lint errors resolved repo-wide', run the unattended loop to completion", "expected": "loop-engineering", "runs": ["loop-engineering", "loop-engineering", "loop-engineering"], "rate": 1.0}
+  ],
+  "should_not_trigger": [
+    {"id": "N1", "query": "Build the user-profile feature end to end: plan, implement, verify, commit", "expected": "development-loop", "runs": ["development-loop", "development-loop", "development-loop"], "misfire_rate": 0.0},
+    {"id": "N2", "query": "Debug and fix this NullPointerException end to end and verify the fix", "expected": "debugging-loop", "runs": ["debugging-loop", "debugging-loop", "debugging-loop"], "misfire_rate": 0.0},
+    {"id": "N3", "query": "Tests are failing, iterate fix and retest until green: npm test", "expected": "fix-loop", "runs": ["fix-loop", "fix-loop", "fix-loop"], "misfire_rate": 0.0},
+    {"id": "N4", "query": "Run /babysit-prs every 10 minutes", "expected": "loop", "runs": ["loop", "loop", "loop"], "misfire_rate": 0.0},
+    {"id": "N5", "query": "Check the deploy status every 5 minutes until it's live", "expected": "loop", "runs": ["loop", "loop", "loop"], "misfire_rate": 0.0},
+    {"id": "N6", "query": "Start a ralph loop on this prompt until the feature is complete", "expected": "ralph-loop", "runs": ["ralph-loop", "ralph-loop", "ralph-loop"], "misfire_rate": 0.0},
+    {"id": "N7", "query": "Refactor this nested loop to be more efficient", "expected": "NONE", "runs": ["NONE", "NONE", "NONE"], "misfire_rate": 0.0},
+    {"id": "N8", "query": "Set up a for-loop to iterate over these files in the script", "expected": "NONE", "runs": ["NONE", "NONE", "NONE"], "misfire_rate": 0.0},
+    {"id": "N9", "query": "Diagnose this flaky test — root cause unclear, don't fix yet", "expected": "systematic-debugging", "runs": ["systematic-debugging", "systematic-debugging", "systematic-debugging"], "misfire_rate": 0.0},
+    {"id": "N10", "query": "Add a while loop with a retry budget to the API client", "expected": "NONE", "runs": ["NONE", "NONE", "NONE"], "misfire_rate": 0.0}
+  ],
+  "summary": {
+    "should_trigger_rate": "10/10 at 100% (30/30 routings)",
+    "should_not_misfire_rate": "0/10 (0/30 routings pulled to loop-engineering)",
+    "cross_skill_conflicts": 0,
+    "note": "Perfect separation across all 3 runs, including the confusable neighbors sharing the word 'loop'. The description's closing disambiguation sentence ('For a single feature use /development-loop; for one bug use /debugging-loop; this is the autonomous meta-loop that ROUTES into them') is doing exactly its job."
+  }
+}
