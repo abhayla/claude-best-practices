@@ -1,6 +1,6 @@
 # Loop Engineering — Canonical Spec
 
-version: 1.2.2
+version: 1.2.3
 status: active
 owner: hub (Systems Architect)
 created: 2026-06-16

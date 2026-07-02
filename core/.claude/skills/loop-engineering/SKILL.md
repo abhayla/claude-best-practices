@@ -24,7 +24,7 @@ triggers:
   - discover plan execute verify loop
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.2.2"
+version: "1.2.3"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -380,7 +380,8 @@ the current unit) — VERIFY is unreachable otherwise. Each heal/redo increments
 
 1. **VERIFY dissent** (merge succeeded). The heal runs inline at T0 and edits
    the SAME post-merge tree. Before re-entering STEP 5, COMMIT the heal's
-   edits (a heal checkpoint commit, e.g. `git commit -am "heal: <what>"`) —
+   edits (a heal checkpoint commit: `git add -A && git commit -m "heal: <what>"`
+   — `add -A` so files the heal CREATED are captured too, not just tracked edits) —
    an uncommitted heal edit is invisible to the commit-to-commit diff the
    checker receives — then recompute `changed_files` from
    `git diff --name-only <pre_merge_sha>..HEAD`, which is now complete.
