@@ -82,7 +82,7 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 - [ ] 2.3 — contract: ___
 - [ ] 2.4 — pilot run signal: ___
 - [ ] 2.5 — telemetry confirmed: ___
-- [ ] 3.1 / 3.2 — PR #___
+- [ ] 3.1 — spec §3.5 "three rings" landed (PR pending merge); 3.2 SKILL.md pointer sync still open
 - [ ] 4.1 — PR #___
 - [ ] 5.1 — PR #___
 - [ ] 5.2 — BLOCKED on owner approval (G6 gate)

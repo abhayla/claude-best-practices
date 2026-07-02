@@ -79,6 +79,25 @@ workers (distinct `subagent_type`s), so no new agents, rules, or hooks are creat
 | FEEDBACK | `/fix-loop` (or `/debugging-loop` if root cause unclear), retry under budget | back to VERIFY |
 | LEARN | `/learn-n-improve` | `learnings.json` |
 
+## 3.5 The three rings (nested feedback loops at three timescales)
+
+The §3 DAG is only the INNERMOST of three nested loops (Andrew Ng's 3-loops model —
+captured 2026-06-30, `docs/process-improvement/sources/2026-06-30-andrew-ng-3-product-development-loops.md`).
+Each outer ring steers the ring inside it; a loop run is never "the whole system":
+
+| Ring | Owner | Timescale | What cycles | Existing hub implementation |
+|---|---|---|---|---|
+| **1 — Machine** | the agents | minutes | the §3 DAG (DISCOVER→…→LEARN) | this spec |
+| **2 — Developer** | the project owner | hours | goal/contract revision, escalation review, gate approvals | `/goal-creator` contracts, `/escalation-report` + triage inbox, `human-approval-gates.md` G1/G2/G3 |
+| **3 — External** | real users | days–weeks | shipped work → usage/feedback → next goals | dogfood flywheel (`/synthesize-hub`), `aggregate_telemetry.py`, downstream `learnings.json` |
+
+Placement rule for human gates (Ng's context-advantage criterion): a Ring-2 pause belongs
+ONLY where the human knows something the machine does not (taste, strategy, spend,
+irreversibility) — never as routine babysitting of Ring 1. Escalations exit Ring 1 to
+Ring 2 with the human fixing the CONTRACT, not the build; Ring-3 signals enter as new
+DISCOVER inputs, never mid-cycle. This section names the model; the gate mechanics stay
+owned by their SSOTs (`decision-authority.md`, `human-approval-gates.md`) — no duplication.
+
 ## 4. Autonomy guarantees (the parts loops leak at)
 
 - **Bounded** — inherits `global_retry_budget: 15` + `max_retries_per_step: 3`
