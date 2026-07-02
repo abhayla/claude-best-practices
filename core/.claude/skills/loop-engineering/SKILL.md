@@ -24,7 +24,7 @@ triggers:
   - discover plan execute verify loop
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.2.3"
+version: "1.2.4"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -301,9 +301,18 @@ Two independent gates, neither run by the maker:
 
 1. **Mechanical gate.**
    ```
-   Skill("/auto-verify", args="--strict-gates")
+   Skill("/auto-verify", args="--strict-gates --range <pre_merge_sha>..HEAD")
    ```
-   Read `test-results/auto-verify.json`.
+   Read `test-results/auto-verify.json`. The `--range` is load-bearing: the
+   merge (4b) and every heal checkpoint are COMMITTED, so the working tree is
+   clean and a bare invocation would detect ZERO changed files and vacuously
+   green the exact merged diff this gate exists to verify. With `--range`,
+   auto-verify maps tests from `git diff <pre_merge_sha>..HEAD`, skips the
+   git-stash pre-existing check (runs failing tests at `<pre_merge_sha>`
+   instead), treats a MISSING `test-results/fix-loop.json` as the expected
+   first-verify shape (WARN, not a strict-gate BLOCK — this loop runs VERIFY
+   before any fix-loop), and still BLOCKs with `NO_TESTS_FOR_CHANGE` under
+   `--strict-gates` if the range is empty or uncovered.
 2. **Independent review gate** — dispatch a DIFFERENT agent than the maker, given
    the maker's RAW merged diff (not its self-assessment), prompted adversarially.
    Build the dispatch context from the merged tree: capture

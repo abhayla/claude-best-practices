@@ -1,6 +1,6 @@
 # Loop Engineering — Canonical Spec
 
-version: 1.2.3
+version: 1.2.4
 status: active
 owner: hub (Systems Architect)
 created: 2026-06-16
@@ -89,7 +89,7 @@ workers (distinct `subagent_type`s), so no new agents, rules, or hooks are creat
 | DISCOVER | `/status` or triage read (CI failures, open issues, the task) | `triage-inbox.md`; nothing actionable → exit clean (`clean_exit` signal) |
 | PLAN | `/brainstorm` (if novel) → `/writing-plans` | `plan.md` |
 | EXECUTE (maker) | `pre_merge_sha` recorded at dispatch; `Agent(<config-resolved maker — SKILL STEP 1.5.3; default plan-executor-agent>, isolation:"worktree")`; the orchestrator then MERGES the maker's returned `worktree_branch` into the run's working tree (SKILL STEP 4b) — VERIFY/SHIP operate on the post-merge T0 tree, never the worktree, and are unreachable until that merge succeeds | `worktree_branch` + `changed_files[]` (recomputed from the merged diff) |
-| VERIFY (checker) | `/auto-verify` + `Agent(<config-resolved checker — SKILL STEP 1.5.3; default code-reviewer-agent>)` (maker≠checker) + T0 supervisor reproduction — the "blind test verify" layer is realized by the context-blind reviewer given the RAW merged diff itself (`git diff pre_merge_sha..HEAD`, passed in the dispatch context — not a path list; complete on every entry because each heal is COMMITTED — a heal checkpoint commit — before VERIFY re-entry) plus the T0 reproduction (`independent-test-verification.md`), not a fourth dispatch | `result == PASSED` |
+| VERIFY (checker) | `/auto-verify --strict-gates --range pre_merge_sha..HEAD` (the range makes the mechanical gate verify the COMMITTED merged diff — a bare invocation would see a clean working tree and vacuously green) + `Agent(<config-resolved checker — SKILL STEP 1.5.3; default code-reviewer-agent>)` (maker≠checker) + T0 supervisor reproduction — the "blind test verify" layer is realized by the context-blind reviewer given the RAW merged diff itself (`git diff pre_merge_sha..HEAD`, passed in the dispatch context — not a path list; complete on every entry because each heal is COMMITTED — a heal checkpoint commit — before VERIFY re-entry) plus the T0 reproduction (`independent-test-verification.md`), not a fourth dispatch | `result == PASSED` |
 | GATE | pass → SHIP; fail → FEEDBACK | branch |
 | SHIP | `/post-fix-pipeline` (commit) | `commit_sha` |
 | FEEDBACK | three entry modes (SKILL STEP 6): VERIFY dissent → `/fix-loop` (or `/debugging-loop` if root cause unclear) on the post-merge tree, the heal COMMITTED (heal checkpoint commit) before re-entering VERIFY; merge CONFLICT → resolve-and-complete the 4b merge (or re-dispatch the maker); maker `FAILED\|BLOCKED` → re-dispatch the maker. Retry under budget | back to VERIFY only after a successful 4b merge |

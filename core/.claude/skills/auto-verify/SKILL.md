@@ -13,17 +13,15 @@ triggers:
   - verify before commit
   - verify correctness
 allowed-tools: "Bash Read Grep Glob Write Skill Agent"
-argument-hint: "[--files <paths>] [--full-suite] [--strict-gates] [--capture-proof | --no-capture-proof] [--allow-degraded-ui]"
-version: "4.3.0"
+argument-hint: "[--files <paths>] [--range <base>..<head>] [--full-suite] [--strict-gates] [--strict-quality] [--capture-proof | --no-capture-proof] [--allow-degraded-ui]"
+version: "4.4.0"
 type: workflow
 ---
 
 # Auto-Verify — Post-Change Verification
 
-Verify code changes by running targeted tests, reviewing visual proof, and
-enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
-
-**Arguments:** $ARGUMENTS
+Verify code changes by running targeted tests, reviewing visual proof, and enforcing
+quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`. **Arguments:** $ARGUMENTS
 
 ---
 
@@ -32,8 +30,10 @@ enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `--files` | git diff | Specific files to verify (overridden by `--full-suite`) |
+| `--range` | — | Verify a COMMITTED range: changed files come from `git diff --name-only <base>..<head>`; the git-stash pre-existing check is replaced by a run-at-base check (see STEP 3). For committed-merge callers like loop-engineering STEP 5 (`--range <pre_merge_sha>..HEAD`). Overrides `--files`/bare-diff detection |
 | `--full-suite` | false | Run full test suite regardless of risk (overrides `--files`) |
 | `--strict-gates` | false | Missing upstream JSON = BLOCK (set by orchestrator) |
+| `--strict-quality` | false | Treat STEP 4 quality-gate failures as BLOCKING (default: non-blocking QUALITY_GATE warning) |
 | `--capture-proof` | true (from config) | Capture screenshots on every test, pass or fail |
 | `--no-capture-proof` | — | Disable screenshot capture even if config says true |
 | `--allow-degraded-ui` | false | Allow PASSED verdict when UI tests are mapped but not screenshot-verified (silent-degradation opt-out) |
@@ -45,37 +45,47 @@ enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 Check if the upstream `fix-loop` stage passed:
 
 1. If `test-results/fix-loop.json` exists, read it:
-   - If `result` is `FAILED` or `FLAKY` → BLOCK. Exit immediately.
-   - If `result` is `PASSED` or `FIXED` → proceed to STEP 1.
+   - If `result` is `FAILED`, or `flaky_detected` is `true` → BLOCK. Exit immediately.
+     (No `FLAKY` result exists — per `testing.md` flaky arrives as `FAILED` + `flaky_detected: true`.)
+   - If `result` is `PASSED` or `FIXED` (and not flaky) → proceed to STEP 1.
+   - Unreadable/corrupt (`UNKNOWN`): with `--strict-gates` → BLOCK ("fix-loop.json
+     unreadable — cannot trust the upstream gate"); without → WARN and proceed.
 
 2. If `test-results/fix-loop.json` does NOT exist:
-   - **With `--strict-gates`:** BLOCK. Report: "BLOCKED: fix-loop output missing — run fix-loop first or use orchestrator."
-   - **Without `--strict-gates`:** WARN: "No fix-loop results found — proceeding without gate check. Run via /test-pipeline for enforced gates."
-   - Proceed to STEP 1.
+   - **With `--strict-gates` and no `--range`:** BLOCK. Report: "BLOCKED: fix-loop output missing — run fix-loop first or use orchestrator."
+   - **With `--range`:** a missing upstream is EXPECTED — committed-change callers
+     (loop-engineering STEP 5) run VERIFY before any fix-loop — WARN and proceed;
+     strictness stays on the downstream gates (NO_TESTS_FOR_CHANGE, silent-degradation).
+   - **Without `--strict-gates`:** WARN: "No fix-loop results found — proceeding without gate check." Proceed to STEP 1.
 
 ```bash
+case " $ARGUMENTS " in *" --strict-gates "*) STRICT_GATES=true ;; *) STRICT_GATES=false ;; esac
+RANGE=$(printf '%s' "$ARGUMENTS" | sed -n 's/.*--range \([^ ]*\).*/\1/p')
 if [ -f test-results/fix-loop.json ]; then
   UPSTREAM_RESULT=$(python3 -c "
 import json, sys
 try:
     data = json.load(open('test-results/fix-loop.json'))
-    print(data.get('result', 'UNKNOWN'))
+    print('FLAKY_DETECTED' if data.get('flaky_detected') is True else data.get('result', 'UNKNOWN'))
 except (json.JSONDecodeError, IOError) as e:
     print(f'WARN: Could not parse fix-loop.json: {e}', file=sys.stderr)
     print('UNKNOWN')
 ")
-  if [ "$UPSTREAM_RESULT" = "FAILED" ] || [ "$UPSTREAM_RESULT" = "FLAKY" ]; then
+  if [ "$UPSTREAM_RESULT" = "FAILED" ] || [ "$UPSTREAM_RESULT" = "FLAKY_DETECTED" ]; then
     echo "BLOCKED: fix-loop reported $UPSTREAM_RESULT"
     exit 1
   fi
   if [ "$UPSTREAM_RESULT" = "UNKNOWN" ]; then
-    echo "WARN: fix-loop.json unreadable — treating as missing"
-    # Fall through to the missing-file logic below
+    if [ "$STRICT_GATES" = "true" ]; then
+      echo "BLOCKED: fix-loop.json unreadable — cannot trust the upstream gate (--strict-gates enforced)"
+      exit 1
+    fi
+    echo "WARN: fix-loop.json unreadable — proceeding without gate check"
   else
     echo "fix-loop result: $UPSTREAM_RESULT — proceeding"
   fi
 else
-  if [ "$STRICT_GATES" = "true" ]; then
+  if [ "$STRICT_GATES" = "true" ] && [ -z "$RANGE" ]; then
     echo "BLOCKED: fix-loop output missing (--strict-gates enforced)"
     exit 1
   else
@@ -97,12 +107,18 @@ which tests to run and classifies risk, but does NOT execute the tests itself.
 Test execution happens in STEP 2 via `tester-agent`. This avoids double
 execution where tests run once for mapping and again for verification.
 
+**Change detection:** with `--range <base>..<head>`, changed files come from
+`git diff --name-only <base>..<head>` — committed changes (e.g. loop-engineering STEP 5's
+merged diff, `--range <pre_merge_sha>..HEAD`) where the tree is clean and a bare `git diff`
+would be EMPTY. Bare invocation keeps today's uncommitted-diff behavior. Thread the range into the mapper:
+
 ```
-Skill("/regression-test", args="$FILES_ARG --framework auto")
+Skill("/regression-test", args="$RANGE_OR_FILES_ARG --framework auto")  # "<base>..<head>" with --range, else $FILES_ARG
 ```
 
-**Fallback if `/regression-test` is not installed:** Use `git diff --name-only` to
-identify changed files, then map to tests by naming convention (`*_test.py`,
+**Fallback if `/regression-test` is not installed:** Use `git diff --name-only
+<base>..<head>` (with `--range`) or `git diff --name-only` (bare) to identify
+changed files, then map to tests by naming convention (`*_test.py`,
 `test_*.py`, `*.test.ts`, `*.spec.ts`) and directory adjacency. Set risk to
 MEDIUM (no import graph tracing available). Log: "WARN: /regression-test not
 available — using fallback file-based test mapping."
@@ -132,7 +148,11 @@ After `/regression-test` completes, read `test-results/regression-test.json`:
        (back-compat for non-gated callers — but the warning MUST be surfaced).
    - **No code changed** (docs/config/fixtures-only, or no changed files): write
      `result: "PASSED"`, `summary.total: 0`, `warnings: ["No tests mapped to
-     changed files"]` — legitimately nothing to verify.
+     changed files"]` — legitimately nothing to verify. **EXCEPTION — `--range`
+     with ZERO changed files:** the caller asserted a committed change exists, so
+     an empty range is a wrong range / vacuous verification: under `--strict-gates`
+     write `result: "FAILED"`, category `NO_TESTS_FOR_CHANGE` ("--range <range>
+     produced 0 changed files"); without it, WARN prominently.
    Then skip Steps 2-3 and proceed to Step 4 (quality gates still run).
 
 Coverage gaps flagged by `/regression-test` (source files with no mapped tests)
@@ -199,15 +219,11 @@ commands, pyproject.toml, package.json, or build.gradle exist, write
 `failures: [{"test": "N/A", "category": "INFRA_MISSING", "message": "No test
 framework detected — cannot execute tests"}]` and exit.
 
-Delegate test execution to `tester-agent`, which provides:
-- **UI test detection** — auto-classifies tests by scanning imports for UI frameworks
-- **Per-test screenshot verification (UI tests)** — runs each UI test individually,
-  captures screenshot, verifies via AI/baseline, records screenshot-based verdict
-- **Batch execution (non-UI tests)** — standard batch run with exit-code verdicts
-- Smart test ordering (CRITICAL risk first, then HIGH, MEDIUM, LOW)
-- Verdict rules: UI tests use screenshot verdict; non-UI use exit codes
-- Isolated re-run of failures to detect test pollution
-- Structured output with pass/fail/skip/flaky breakdown and verdict_source per test
+Delegate test execution to `tester-agent`, which provides: UI test detection
+(import scanning); per-test screenshot verification for UI tests (run → capture
+→ AI/baseline verify → screenshot verdict); batch exit-code execution for non-UI
+tests; risk-ordered execution (CRITICAL → LOW); isolated re-run of failures to
+detect pollution; structured output with per-test verdict_source.
 
 ```
 Agent("tester-agent", prompt="Run these tests and provide a verdict.
@@ -220,7 +236,7 @@ $OVERALL_RISK
 
 Options:
 - Full suite: $FULL_SUITE
-- Run ID: $RUN_ID
+- Run ID: $RUN_ID (minted at STEP 2 entry per testing.md's run_id format {ISO-8601}_{7-char-sha}, ':' replaced with '-' for paths)
 
 IMPORTANT — UI Test Screenshot Verification:
 1. Classify each test file as UI or non-UI by scanning imports
@@ -245,16 +261,21 @@ Return: verdict (PASSED/FAILED), test counts, failure details,
 ui_test_count, screenshot manifest, per-test verdict_source.")
 ```
 
-After `tester-agent` returns, the agent provides TWO verdict dimensions:
+After `tester-agent` returns, COMPUTE two verdict dimensions from its per-test
+results (the agent returns a single overall verdict + per-test `verdict_source`
+entries; `ui_verdict`/`code_verdict` are DERIVED here, not returned fields):
 
-| Verdict | Source | Authoritative For |
+| Derived Verdict | Computed From | Authoritative For |
 |---------|--------|-------------------|
-| `ui_verdict` | Screenshot verification | UI tests |
-| `code_verdict` | Exit codes | Non-UI tests |
+| `ui_verdict` | Worst per-test result with `verdict_source: "screenshot"` | UI tests |
+| `code_verdict` | Worst per-test result with `verdict_source: "exit_code"` | Non-UI tests |
 
-1. If EITHER verdict is **FAILED** → proceed to STEP 3 (evaluate results, report)
-2. If BOTH verdicts are **PASSED** → proceed to STEP 2.5 (confirmation review) then STEP 4
-3. Record the agent's screenshot manifest in `test-evidence/{run_id}/manifest.json`
+Then route LINEARLY — one unambiguous flow on BOTH pass and fail results:
+
+1. Record the agent's screenshot manifest in `test-evidence/{run_id}/manifest.json`
+2. ALWAYS proceed to STEP 2.5, then STEP 3 — the single verdict-assembly point
+   (silent-degradation gate + override/flag union; routes to STEP 4 on PASS,
+   reports on FAIL). Never jump from STEP 2 directly to STEP 4.
 
 ---
 
@@ -278,18 +299,17 @@ supplementary visual evidence (not authoritative).
 
 **Gate signal:** STEP 3 reads `visual-review.json` to incorporate overrides into its failure union. Visual review is the authoritative screenshot-signal; exit code is secondary.
 
-See `references/visual-proof-review.md` for:
-- Full bash snippets for manifest read + skip logic
-- 8-point evaluation criteria for each screenshot
-- Verdict classification tables (UI `screenshot` source; non-UI `exit_code` source)
-- Full `visual-review.json` schema with override/flag examples
-- STEP 3 gate-impact rules
+See `references/visual-proof-review.md` for the full bash snippets, the 8-point
+evaluation criteria, the UI/non-UI verdict classification tables, the complete
+`visual-review.json` schema with override/flag examples, and STEP 3 gate-impact rules.
 
 ---
 
 ## STEP 3: Evaluate Results
 
-After test execution and visual review:
+Runs on EVERY path (pass and fail) after STEP 2.5 — the single verdict-assembly
+point: silent-degradation gate + visual-review override/flag union. Routes to
+STEP 4 on PASS; reports on FAIL.
 
 ### Verdict Logic by Test Type
 
@@ -332,11 +352,18 @@ After test execution and visual review:
 
 ### Pre-Existing Failure Detection
 
-For each failing test, verify whether it's caused by our changes:
+For each failing test, verify whether it's caused by our changes. **Bare
+invocation (uncommitted changes)** — stash check. **`--range` (committed
+changes)** — the stash check is SKIPPED: `git stash` stashes nothing on a clean
+tree, so "clean state" would equal our state and a genuine regression would be
+misread as pre-existing; re-run the failing test at `<base>` instead:
 
 ```bash
-git stash && <test_runner> <failing_test> && git stash pop
+# bare:    git stash && <test_runner> <failing_test> && git stash pop
+# --range: git worktree add /tmp/av-base <base> && (cd /tmp/av-base && <test_runner> <failing_test>); git worktree remove --force /tmp/av-base
 ```
+
+"Clean state" below = the `<base>` run (range mode) or the stashed run (bare mode):
 
 | Clean state | Our changes | Verdict | Action |
 |-------------|-------------|---------|--------|
@@ -447,12 +474,8 @@ Write machine-readable results to `test-results/auto-verify.json`:
 **For UI tests:** `visual_review` is ALWAYS populated (mandatory). The `failures`
 array includes `verdict_source: "screenshot"` for each UI test failure.
 
-**For non-UI tests:** If `--capture-proof` was not enabled:
-```json
-"visual_review": {
-  "enabled": false
-}
-```
+**For non-UI tests:** if `--capture-proof` was not enabled, emit
+`"visual_review": {"enabled": false}`.
 
 Create `test-results/` directory if it doesn't exist. This JSON is consumed by stage gates — see `testing.md` for the full schema.
 
@@ -468,7 +491,8 @@ stage gate aggregator from reading results from a previous run.
 - MUST produce `test-results/auto-verify.json` on every run, even when BLOCKED or zero tests found. — Why: downstream stage gates read this file; missing file = pipeline hang.
 - MUST use `result` as the canonical gate field name — never `status`, `verdict`, or `outcome`. — Why: all pipeline skills parse `result` by convention; renaming breaks the aggregator.
 - MUST distinguish UI test verdicts (screenshot-authoritative) from non-UI (exit-code-authoritative). — Why: UI tests can pass exit code but fail visually (empty table, broken layout).
-- MUST NOT proceed past Step 0 if upstream fix-loop reported FAILED or FLAKY. — Why: verifying known-broken code wastes compute and produces misleading results.
+- MUST NOT proceed past Step 0 if upstream fix-loop reported FAILED or `flaky_detected: true`. — Why: verifying known-broken code wastes compute and produces misleading results.
+- MUST route STEP 2 → 2.5 → 3 on BOTH pass and fail results — STEP 3 is the single verdict-assembly point and MUST NOT be bypassed on the pass path. — Why: skipping STEP 3 on "all passed" skips exactly the silent-degradation gate that guards a PASSED declaration.
 - MUST report pre-existing failures separately from regression failures in the output. — Why: blocking on pre-existing failures prevents any new work from passing verification.
 - MUST degrade gracefully if `/regression-test` or `tester-agent` are missing — use fallbacks, not hard failures. — Why: not all projects have these installed; hard failure makes the skill unusable in simpler setups.
 - MUST fail the silent-degradation gate when UI tests are mapped but screenshot verification was skipped, unless `--allow-degraded-ui` was explicitly passed. — Why: a silent fallback to exit-code-only verification for UI tests reintroduces exactly the "green tests, broken UI" failure mode the dual-signal architecture exists to prevent.
