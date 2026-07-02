@@ -1,6 +1,6 @@
 # Loop Engineering — Canonical Spec
 
-version: 1.1.0
+version: 1.2.1
 status: active
 owner: hub (Systems Architect)
 created: 2026-06-16
@@ -72,11 +72,11 @@ workers (distinct `subagent_type`s), so no new agents, rules, or hooks are creat
 |---|---|---|
 | DISCOVER | `/status` or triage read (CI failures, open issues, the task) | `triage-inbox.md`; nothing actionable → exit clean (`clean_exit` signal) |
 | PLAN | `/brainstorm` (if novel) → `/writing-plans` | `plan.md` |
-| EXECUTE (maker) | `Agent(plan-executor-agent, isolation:"worktree")`; the orchestrator then MERGES the maker's returned `worktree_branch` into the run's working tree (SKILL STEP 4b) — VERIFY/SHIP operate on the post-merge T0 tree, never the worktree | `worktree_branch` + `changed_files[]` (recomputed from the merged diff) |
-| VERIFY (checker) | `/auto-verify` + `Agent(code-reviewer-agent)` (maker≠checker) + T0 supervisor reproduction — the "blind test verify" layer is realized by the context-blind reviewer on the RAW merged diff plus the T0 reproduction (`independent-test-verification.md`), not a fourth dispatch | `result == PASSED` |
+| EXECUTE (maker) | `pre_merge_sha` recorded at dispatch; `Agent(plan-executor-agent, isolation:"worktree")`; the orchestrator then MERGES the maker's returned `worktree_branch` into the run's working tree (SKILL STEP 4b) — VERIFY/SHIP operate on the post-merge T0 tree, never the worktree, and are unreachable until that merge succeeds | `worktree_branch` + `changed_files[]` (recomputed from the merged diff) |
+| VERIFY (checker) | `/auto-verify` + `Agent(code-reviewer-agent)` (maker≠checker) + T0 supervisor reproduction — the "blind test verify" layer is realized by the context-blind reviewer given the RAW merged diff itself (`git diff pre_merge_sha..HEAD`, passed in the dispatch context — not a path list) plus the T0 reproduction (`independent-test-verification.md`), not a fourth dispatch | `result == PASSED` |
 | GATE | pass → SHIP; fail → FEEDBACK | branch |
 | SHIP | `/post-fix-pipeline` (commit) | `commit_sha` |
-| FEEDBACK | `/fix-loop` (or `/debugging-loop` if root cause unclear), retry under budget | back to VERIFY |
+| FEEDBACK | three entry modes (SKILL STEP 6): VERIFY dissent → `/fix-loop` (or `/debugging-loop` if root cause unclear) on the post-merge tree; merge CONFLICT → resolve-and-complete the 4b merge (or re-dispatch the maker); maker `FAILED\|BLOCKED` → re-dispatch the maker. Retry under budget | back to VERIFY only after a successful 4b merge |
 | LEARN | `/learn-n-improve` | `learnings.json` |
 
 ## 3.5 The three rings (nested feedback loops at three timescales)
@@ -143,9 +143,9 @@ hub-linked entry to `.claude/learnings.json` — the file the hub's weekly
 |---|---|---|
 | `preflight_blocked` | STEP 1.5 | provisioning shipped the skill without its worker closure (the #1 downstream defect) |
 | `escalated` | STEP 6 budget exhaustion | a unit the loop could not resolve under budget |
-| `healed` | STEP 6 (heal then pass) | self-healing worked — positive effectiveness |
+| `healed` | STEP 6 PASS arm (when the passing VERIFY resolved a heal) | self-healing worked — positive effectiveness |
 | `shipped` | STEP 7 (the single emit site — never STEP 6) | a unit completed cleanly |
-| `clean_exit` | STEP 2 nothing-actionable exit / STEP 6 `--no-ship` terminal | the loop ran and found nothing to do (or verified without shipping) — an always-clean project stays visible |
+| `clean_exit` | STEP 2 nothing-actionable exit / STEP 2 `--discover-only` / STEP 6 `--no-ship` terminal | the loop ran and found nothing to do (or triaged/verified without shipping) — an always-clean project stays visible |
 
 Each entry sets `hub_pattern_link: "loop-engineering"` and a STABLE `tags`
 signature per defect class. The aggregator's `compute_error_prevention_rate` keys
