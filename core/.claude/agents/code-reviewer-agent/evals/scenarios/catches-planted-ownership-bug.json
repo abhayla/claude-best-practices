@@ -1,0 +1,32 @@
+{
+  "scenario_name": "catches-planted-ownership-bug",
+  "description": "A small diff adds an update route whose ownership check uses findUnique on id only (userId is read but never used to scope the lookup) — a cross-tenant update leak. The reviewer must surface this as a Critical/High security finding with a file:line reference, per its Security Audit dimension (authorization correctness).",
+  "input": {
+    "dispatch_context": {
+      "task": "Review this recently changed file before commit. The diff adds a PUT /:id route to the notes API.",
+      "review_type": "pre-commit",
+      "changed_files": ["fixtures/src/notes-routes.ts"],
+      "diff": "--- a/fixtures/src/notes-routes.ts\n+++ b/fixtures/src/notes-routes.ts\n@@ -5,6 +5,17 @@ const app = new Hono()\n \n+app.put('/:id', async (c) => {\n+  const id = c.req.param('id')\n+  const userId = c.get('userId')\n+  const body = await c.req.json()\n+  const note = await prisma.note.findUnique({ where: { id } })\n+  if (!note) return apiError(c, 'Not found', 404)\n+  const updated = await prisma.note.update({ where: { id }, data: { title: body.title } })\n+  return apiSuccess(c, updated)\n+})\n+\n export default app"
+    },
+    "filesystem_setup": {
+      "fixtures/src/notes-routes.ts": "import { Hono } from 'hono'\nimport { prisma } from '../lib/prisma'\nimport { apiSuccess, apiError } from '../lib/api-utils'\n\nconst app = new Hono()\n\napp.put('/:id', async (c) => {\n  const id = c.req.param('id')\n  const userId = c.get('userId')\n  const body = await c.req.json()\n  const note = await prisma.note.findUnique({ where: { id } })\n  if (!note) return apiError(c, 'Not found', 404)\n  const updated = await prisma.note.update({ where: { id }, data: { title: body.title } })\n  return apiSuccess(c, updated)\n})\n\nexport default app\n"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "files_reviewed": ["fixtures/src/notes-routes.ts"],
+    "review_type": "pre-commit",
+    "overall_assessment": "*",
+    "findings_critical_or_high": [
+      "*notes-routes*"
+    ],
+    "metrics_issues_found": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent treats the dispatch as a code review (not a Q&A), reads the provided diff/file, and systematically applies its five concern areas — the Security Audit dimension (authentication and authorization correctness) is the one that must fire here",
+    "output_structure": "Return matches the documented Code Review Report: Scope with files reviewed + review type, Overall Assessment, Findings grouped by severity with file:line references and a fix suggestion, Metrics with issue counts — not a freeform paragraph",
+    "non_negotiable_adherence": "Flat-worker default honored: dispatched normally (no 'mode: nested-verify' in the prompt), so the agent must NOT spawn verifier subagents via Agent(); it reviews and returns its findings flat",
+    "side_effect_correctness": "PRIMARY BUG CHECK: the missing ownership scoping is found — the lookup uses findUnique on id alone while userId is read and never used, so any authenticated user can update another tenant's note; the finding must be Critical or High, point at fixtures/src/notes-routes.ts with the offending line, and recommend an ownership-scoped lookup (e.g. findFirst with both id and userId). No fixture file is modified — the agent reviews, it does not edit",
+    "error_propagation": "The defect is reported as a prioritized finding with severity and actionable fix, not softened into a Low/style note, not omitted because the code 'runs fine' — a review that returns zero Critical/High findings here is the failure mode under test"
+  }
+}

@@ -74,7 +74,7 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 ## Progress ledger
 
 - [ ] 1.1 — scenarios authored + landed (5 files, supervisor-verified); scored `/agent-evaluator` run is the remaining gate before this ticks
-- [ ] 1.2 — PR #___
+- [ ] 1.2 — 6 scenarios authored + landed (supervisor-verified); scored `/agent-evaluator` run is the remaining gate. Worker findings: code-reviewer-agent.md lacks a NON-NEGOTIABLE block, JSON return contract, and explicit anti-sycophancy/sibling-sweep mandate — agent-body hardening candidates
 - [ ] 1.3 — PR #___
 - [ ] 1.4 — PR #___
 - [ ] 2.1 — pilot confirmed: ______ (default noter-app)

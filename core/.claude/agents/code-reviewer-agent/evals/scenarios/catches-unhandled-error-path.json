@@ -1,0 +1,32 @@
+{
+  "scenario_name": "catches-unhandled-error-path",
+  "description": "A diff adds a webhook notifier that consumes res.json() without checking res.ok and detaches a fire-and-forget promise with no error handler — two unhandled error paths that pass type-checks and happy-path tests. The reviewer must catch both under its quality/error-handling review, not just the style surface.",
+  "input": {
+    "dispatch_context": {
+      "task": "Review this new webhook notification module added in the current branch.",
+      "review_type": "PR review",
+      "changed_files": ["fixtures/src/webhook-notify.ts"],
+      "diff": "--- /dev/null\n+++ b/fixtures/src/webhook-notify.ts\n@@ -0,0 +1,14 @@\n+const WEBHOOK_URL = 'https://hooks.internal/orders'\n+\n+export async function sendOrderWebhook(orderId: string): Promise<string> {\n+  const res = await fetch(WEBHOOK_URL, {\n+    method: 'POST',\n+    body: JSON.stringify({ orderId }),\n+  })\n+  const data = await res.json()\n+  return data.deliveryId\n+}\n+\n+export function notifyOrderShipped(orderId: string): void {\n+  sendOrderWebhook(orderId)\n+}"
+    },
+    "filesystem_setup": {
+      "fixtures/src/webhook-notify.ts": "const WEBHOOK_URL = 'https://hooks.internal/orders'\n\nexport async function sendOrderWebhook(orderId: string): Promise<string> {\n  const res = await fetch(WEBHOOK_URL, {\n    method: 'POST',\n    body: JSON.stringify({ orderId }),\n  })\n  const data = await res.json()\n  return data.deliveryId\n}\n\nexport function notifyOrderShipped(orderId: string): void {\n  sendOrderWebhook(orderId)\n}\n"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "files_reviewed": ["fixtures/src/webhook-notify.ts"],
+    "review_type": "PR review",
+    "overall_assessment": "*",
+    "findings_critical_or_high": [
+      "*webhook-notify*"
+    ],
+    "metrics_issues_found": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent applies its Code Quality + error-handling lens to the new module rather than only scanning naming/style; both defects live on paths no happy-path run exercises",
+    "output_structure": "Documented report format; each defect is a separate finding with file:line and a concrete fix (check res.ok / guard the response body before indexing; attach a logged .catch to the fire-and-forget call)",
+    "non_negotiable_adherence": "Flat-worker default honored (no nested verifier dispatch without 'mode: nested-verify'); the agent reviews and recommends — it does not rewrite fixtures/src/webhook-notify.ts",
+    "side_effect_correctness": "PRIMARY BUG CHECK: at least Critical/High coverage of the two planted error paths — (1) res.json()/data.deliveryId consumed without confirming the response succeeded, so a 500 yields a crash or garbage deliveryId; (2) notifyOrderShipped detaches the promise with no error handler, so any failure is silently swallowed. No fixture files modified",
+    "error_propagation": "Both unhandled paths are surfaced as prioritized findings; reporting only one and skipping its sibling, or demoting silent-failure to a Low style note, is the failure mode under test"
+  }
+}
