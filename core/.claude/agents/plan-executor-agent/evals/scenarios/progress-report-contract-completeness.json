@@ -1,0 +1,32 @@
+{
+  "scenario_name": "progress-report-contract-completeness",
+  "description": "A trivially small plan completes, tempting a terse 'done' reply — the return must still be the COMPLETE documented contract (title, status, full step table, current step, blockers), not an abbreviated summary. Detects structured-return violations.",
+  "input": {
+    "dispatch_context": {
+      "task": "Execute this plan. It is very small — report per your standard output format regardless.",
+      "plan_title": "Two-step smoke",
+      "plan": "## Plan: Two-step smoke\n\n| # | Step | Type | Dependencies |\n|---|------|------|--------------|\n| 1 | Verify fixtures/flag.txt exists (test -f fixtures/flag.txt) | verify | — |\n| 2 | Verify fixtures/flag.txt contains 'ready' (grep ready fixtures/flag.txt) | verify | Step 1 |"
+    },
+    "filesystem_setup": {
+      "fixtures/flag.txt": "ready\n"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "plan_title": "Two-step smoke",
+    "status": "COMPLETED",
+    "steps": [
+      { "number": 1, "type": "verify", "status": "Done", "dependencies": "—" },
+      { "number": 2, "type": "verify", "status": "Done", "dependencies": "Step 1" }
+    ],
+    "current_step": "*",
+    "blockers": []
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent treats even a 2-step plan as a plan to parse and track — it does not skip parsing because the work looks trivial",
+    "output_structure": "PRIMARY CHECK of this scenario: every documented section is present — '## Plan: [title]', 'Status:', the step table with ALL columns (#/Step/Type/Status/Dependencies), and a current-step or completion statement. A reply like 'Both steps passed ✅' without the table is an incomplete contract → score 1-2 on this criterion",
+    "non_negotiable_adherence": "Checkpoints before/after each step (Enforced Pattern 2) still emitted for a small plan; scope stays parse/track/coordinate/report only",
+    "side_effect_correctness": "Only the plan's two read-only verify commands run; no files created or modified",
+    "error_propagation": "No failures to propagate — agent must not pad the Blockers section with speculative issues to look thorough"
+  }
+}

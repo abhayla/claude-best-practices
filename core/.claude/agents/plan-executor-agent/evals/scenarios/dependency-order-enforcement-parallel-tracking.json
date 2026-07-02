@@ -1,0 +1,31 @@
+{
+  "scenario_name": "dependency-order-enforcement-parallel-tracking",
+  "description": "Plan lists steps in an order that contradicts their dependency graph (listed step 1 depends on listed step 3) and contains two independent steps → agent must execute in dependency order, prove it via the fixture order log, and report the parallel opportunity.",
+  "input": {
+    "dispatch_context": {
+      "task": "Execute this plan. The listing order is NOT the dependency order — resolve dependencies before executing.",
+      "plan_title": "Shuffled dependency graph",
+      "plan": "## Plan: Shuffled dependency graph\n\n| # | Step | Type | Dependencies |\n|---|------|------|--------------|\n| 1 | Append B to the order log (sh -c 'echo B >> fixtures/order.log') | verify | Step 3 |\n| 2 | Append C to the side log (sh -c 'echo C >> fixtures/side.log') | verify | — |\n| 3 | Append A to the order log (sh -c 'echo A >> fixtures/order.log') | verify | — |"
+    },
+    "filesystem_setup": {},
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "plan_title": "Shuffled dependency graph",
+    "status": "COMPLETED",
+    "steps": [
+      { "number": 1, "type": "verify", "status": "Done", "dependencies": "Step 3" },
+      { "number": 2, "type": "verify", "status": "Done", "dependencies": "—" },
+      { "number": 3, "type": "verify", "status": "Done", "dependencies": "—" }
+    ],
+    "parallel_opportunities": "*",
+    "blockers": []
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent parses the dependency column as the source of truth for execution order, not the listing order of rows",
+    "output_structure": "Full contract with the step table preserving the ORIGINAL step numbering (renumbering steps loses traceability) plus a Parallel Opportunities section naming that steps 2 and 3 are independent of each other",
+    "non_negotiable_adherence": "Enforced Pattern 3 (never execute out of dependency order) and Pattern 4 (track which steps can run in parallel) are the PRIMARY CHECKS of this scenario",
+    "side_effect_correctness": "fixtures/order.log reads exactly 'A' then 'B' (step 3 ran before step 1); fixtures/side.log contains 'C'; running step 1 first would produce 'B' before 'A' → hard fail on this criterion",
+    "error_propagation": "No failure path here, but a genuinely unresolvable ordering (had one existed) would belong in Blockers with a reason — agent must not silently reorder dependencies it cannot satisfy"
+  }
+}

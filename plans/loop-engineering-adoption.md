@@ -73,7 +73,7 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 
 ## Progress ledger
 
-- [ ] 1.1 — PR #___
+- [ ] 1.1 — scenarios authored + landed (5 files, supervisor-verified); scored `/agent-evaluator` run is the remaining gate before this ticks
 - [ ] 1.2 — PR #___
 - [ ] 1.3 — PR #___
 - [ ] 1.4 — PR #___
