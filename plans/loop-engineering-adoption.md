@@ -22,6 +22,16 @@ Every source converged on "the verifier is the bottleneck." Scope honestly (KISS
 
 **Documentation:** each eval run's report saved under the pattern's `evals/`; registry hashes resynced; full local CI (`pre-git-merge-checker-agent`) before each PR.
 
+### Phase 1b — coverage ratchet for the remaining ~160 skills (doctrine, 2026-07-02)
+
+Full coverage is an EMERGENT outcome of three triggers, never a batch project (mirrors `rule-curation.md`: reactive, not speculative — a big-bang 164-eval push would mostly test rarely-invoked skills and create a standing maintenance tax on every future pattern edit):
+
+1. **Touch trigger (the ratchet):** any PR that creates OR modifies a skill must add/refresh that skill's eval — authoring already requires this via `/writing-skills`+`/skill-evaluator`; extend the same gate to modifications. Coverage only ever goes up.
+2. **Usage trigger:** telemetry + prompt logs rank actually-invoked skills; the top-used uneval'd skills get evals next (top ~20 covers most real dispatches).
+3. **Failure trigger:** any skill implicated in a lesson/failure gets an eval as part of the fix (skill-level analogue of "write a failing test first").
+
+Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — "each night: write + verify ONE eval for the most-used uneval'd skill" — i.e., eval coverage is itself dogfooded as a loop. DoD for this doctrine: the modify-gate exists (hook or CI check) and the nightly-loop contract is authored; coverage % is observed via the registry, never hand-claimed.
+
 ## Phase 2 — Downstream pilot (the test drive)
 
 | # | Work item | Owner | Test strategy | DoD (machine-checkable) |
