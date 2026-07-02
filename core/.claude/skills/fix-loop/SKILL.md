@@ -3,10 +3,12 @@ name: fix-loop
 description: >
   Analyze failures and iteratively apply minimal fixes, optionally retesting until resolved.
   Full Loop mode (with retest command) iterates until green. Single Fix mode
-  (no retest) does one pass. Use when tests fail, builds break, or runtime errors
-  occur. For unclear root causes or repeated failures, escalate to
+  (no retest) does one pass — the right fit for applying a minimal fix to a
+  runtime error with no retest command. Use when tests fail, builds break, or
+  runtime errors occur. For unclear root causes or repeated failures, escalate to
   /systematic-debugging. For end-to-end bug resolution with verified proof,
-  use /debugging-loop instead.
+  use /debugging-loop instead. For autonomous fixing of an open PR's CI in the
+  cloud, prefer native /autofix-pr.
 triggers:
   - fix-loop
   - fix tests
@@ -16,7 +18,7 @@ triggers:
   - retest until green
 allowed-tools: "Bash Read Grep Glob Write Edit Skill Agent"
 argument-hint: "[failure_output] [retest_command: <cmd>] [max_iterations: N] [--strict-gates] [--capture-proof | --no-capture-proof]"
-version: "1.5.0"
+version: "1.6.0"
 type: workflow
 ---
 
@@ -56,11 +58,13 @@ Analyze failures, apply minimal fixes, and optionally retest until resolved.
 | `files_of_interest` | — | Specific files to focus on |
 | `--strict-gates` | false | Passed by orchestrator for consistency; no upstream gate for fix-loop |
 | `--capture-proof` | true (from config) | Forward to retest command — capture screenshots on every test |
-| `--no-capture-proof` | — | Disable screenshot capture even if config says true |
+| `--no-capture-proof` | — | Disable screenshot capture even if config says true; wins over `--capture-proof` when both are passed |
 
 ---
 
 ## STEP 1: Analyze Failure (via test-failure-analyzer-agent)
+
+If `failure_output` is empty but a `retest_command` was provided, run the retest command first to capture the failure output.
 
 Delegate failure classification to `test-failure-analyzer-agent` for structured
 diagnosis. The agent is read-only — it classifies failures and suggests fixes
@@ -102,6 +106,10 @@ Before applying a fix, check if the failure is flaky:
    - Log a tracking issue
    - Report as FAILED with `flaky_detected: true` in the structured output — flaky is a failure category, not an acceptable outcome
 4. Continue to STEP 2 only for non-flaky failures
+
+STEP 1A applies only when a test invocation is available (Full Loop mode, or a runnable
+test derivable from `failure_output`). In Single Fix mode (no retest command), do NOT
+re-run — note the flaky suspicion in the STEP 4 report instead.
 
 ## STEP 2: Apply Fix
 
@@ -158,7 +166,7 @@ Write machine-readable results to `test-results/fix-loop.json`:
 {
   "skill": "fix-loop",
   "timestamp": "<ISO-8601>",
-  "result": "PASSED|FAILED",
+  "result": "PASSED|FAILED|FIXED",
   "flaky_detected": true,
   "summary": {
     "iterations": "<N>",
@@ -174,6 +182,8 @@ Write machine-readable results to `test-results/fix-loop.json`:
 ```
 
 Create `test-results/` directory if it doesn't exist. This JSON is consumed by stage gates.
+`result` uses testing.md's canonical enum: report `FIXED` when the loop resolved failures,
+`PASSED` when the retest was green without a fix (the aggregator treats both as pass).
 
 ---
 
@@ -188,7 +198,11 @@ If the same error persists after 2 iterations:
    - `CONTRACT_MISMATCH` → delegate to /contract-test for contract analysis
    - `MIGRATION_FAILURE` → delegate to /db-migrate-verify for schema validation
    - `VISUAL_REGRESSION` → delegate to /verify-screenshots for baseline comparison
-4. If confidence remains Low after specialist consultation, report UNRESOLVED and ask for user input
+4. If the category-specialist route does not apply, the same error still persists, or
+   confidence remains Low after specialist consultation, invoke `/systematic-debugging`
+   (via `Skill()`) with the accumulated failure context — attempts made, approaches
+   tried, and evidence paths — BEFORE reporting anything unresolved
+5. Only if /systematic-debugging also fails to isolate the root cause, report UNRESOLVED and ask for user input
 
 ## AUTO-RECORD LEARNING (MANDATORY)
 

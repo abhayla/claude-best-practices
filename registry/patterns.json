@@ -2597,25 +2597,32 @@
     }
   },
   "fix-loop": {
-    "hash": "b7c76ea4cc466bebe6f358e87b1a730bad55b4cb6929e5fa0ac82fa601ba50af",
+    "hash": "86246e1ee41b024216ea86aad9f8ff62eb2619693f93a00efbe302bb873a58bc",
     "type": "skill",
     "category": "core",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-07-02",
     "dependencies": [
-      "test-failure-analyzer-agent"
+      "contract-test",
+      "db-migrate-verify",
+      "debugger-agent",
+      "debugging-loop",
+      "systematic-debugging",
+      "test-failure-analyzer-agent",
+      "test-knowledge",
+      "verify-screenshots"
     ],
     "visibility": "public",
-    "description": "Analyze failures and iteratively apply minimal fixes, optionally retesting until resolved. Full Loop mode (with retest command) iterates until green. Single Fix mode (no retest) does one pass. Use when tests fail, builds break, or runtime errors occur.",
+    "description": "Analyze failures and iteratively apply minimal fixes, optionally retesting until resolved. Full Loop mode (with retest command) iterates until green. Single Fix mode (no retest) does one pass — the right fit for applying a minimal fix to a runtime error with no retest command. Use when tests fail, builds break, or runtime errors occur. For unclear root causes or repeated failures, escalate to /systematic-debugging. For end-to-end bug resolution with verified proof, use /debugging-loop instead. For autonomous fixing of an open PR's CI in the cloud, prefer native /autofix-pr.",
     "tags": [
       "testing",
       "fix",
       "iteration",
       "debugging"
     ],
-    "changelog": "v1.3.0: Add triggers list, add Agent to allowed-tools (required for test-failure-analyzer-agent delegation), add test-failure-analyzer-agent dependency",
+    "changelog": "v1.6.0 (2026-07-02): MINOR — operationalize the /systematic-debugging escalation handoff (ESCALATION step 4 invokes Skill(\"/systematic-debugging\") with accumulated failure context before any UNRESOLVED report), result enum aligned to testing.md canonical PASSED|FAILED|FIXED, Single Fix flaky handling defined (no re-run without a retest command — note suspicion in report), description names the /autofix-pr boundary + Single Fix runtime-error fit, flag-precedence and empty-failure_output notes; registry deps expanded to the real delegation closure (debugger-agent + delegated skills) | v1.3.0: Add triggers list, add Agent to allowed-tools (required for test-failure-analyzer-agent delegation), add test-failure-analyzer-agent dependency",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
