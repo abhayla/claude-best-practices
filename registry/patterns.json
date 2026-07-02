@@ -1133,18 +1133,18 @@
     }
   },
   "code-reviewer-agent": {
-    "hash": "1dfe3909d4e616ad1bc00c14879a53489407201a0c710a2b38d920fce872ebb3",
+    "hash": "1edb0f1bceb08c8df4caea204d502a472f189a6b5821da6a383929d8249ae5bb",
     "type": "agent",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-03",
     "dependencies": [],
     "visibility": "public",
     "description": "Use proactively to review recently changed files for code quality, type safety, build issues, performance, and security. Spawn after any non-trivial code change, before committing or",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.0.0: Genericized and restructured; v2.1.1: added a NON-NEGOTIABLE section (review-only, no destructive re-runs, file:line verdicts, stay flat) closing an eval nit",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2781,20 +2781,20 @@
     }
   },
   "git-worktrees": {
-    "hash": "c657668a752064fb217d7af3d72f9309e101e6f1809a1e9d8eec02d022e038c8",
+    "hash": "8a3d16dd9831e9bda08cf264ea0fd0725e0061365a32eac972325fe4be6113ac",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-03",
     "dependencies": [],
     "visibility": "public",
     "description": "Git worktree isolation patterns for parallel development",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research; v1.1.1: noted the gitignored-env-files gotcha (secrets/deps don't travel with a fresh worktree; build-time-baked config like NEXT_PUBLIC_* silently breaks) in the post-creation setup step",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3689,18 +3689,18 @@
     }
   },
   "plan-executor-agent": {
-    "hash": "8a2ef741e19db8bc95b5976bd813d91f94f9addd5a74d106cb67229e48699970",
+    "hash": "dd26d62e6b483d2dc2c5201444bc41727a9845cc0b28c264468985b15b5ab6eb",
     "type": "agent",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-03",
     "dependencies": [],
     "visibility": "public",
     "description": "Use this agent to parse structured plans into tracked steps, coordinate execution order, and report progress. Handles step dependencies and failure recovery. Use when executing multi-step implementation plans.",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.0.0: Genericized and restructured; v2.0.1: added a NON-NEGOTIABLE section (scope, no unrequested commits, structured contract return, no dispatch) closing an eval nit",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6387,13 +6387,13 @@
     }
   },
   "goal-creator": {
-    "hash": "65d4a346355ed32c7bcc96ff4bbbb954fc24faf7df8ab3e6be36dfda2889994a",
+    "hash": "4d1a693e0740827f8161b0f51e67b18c911103ef1ec1a72daf7df48b10fc8e57",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-06-21",
+    "last_updated": "2026-07-03",
     "dependencies": [],
     "visibility": "public",
     "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
@@ -6406,7 +6406,7 @@
       "unattended",
       "self-improvement"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation); v2.0.0: renamed back to goal-creator (restoring the original firekaro-planner skill name per owner request)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation); v2.0.0: renamed back to goal-creator (restoring the original firekaro-planner skill name per owner request); v2.1.0: folded pilot learnings L001 (verify contract-asserted repo facts at authoring time or scope making them true) and L002 (budget explicit worktree env-setup before first build/test) into the STEP 1 fork inventory",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
