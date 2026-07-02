@@ -16,7 +16,7 @@ triggers:
   - worktree isolation
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<task requiring isolated parallel development or worktree management>"
-version: "1.1.0"
+version: "1.1.1"
 type: workflow
 ---
 
@@ -91,6 +91,15 @@ git log --oneline -3
 
 Each worktree has its own working directory, so dependencies installed locally
 (e.g., `node_modules/`, `.venv/`) are per-worktree.
+
+**Gotcha — gitignored env files don't travel with the worktree.** A fresh worktree
+shares tracked source with the main checkout but NOT gitignored files (env
+secrets like `.env.local`, `node_modules/`, other local config) — `git worktree
+add` never copies them. Copy the required env files from the primary checkout
+and reinstall deps BEFORE any build/test in the new worktree, not after a
+failure surfaces. This bites hardest with build-time-injected env vars (e.g.
+Next.js `NEXT_PUBLIC_*`) — they get baked into the bundle at build time, so a
+missing env file produces a **silently broken build**, not a loud error.
 
 ---
 

@@ -14,7 +14,7 @@ description: >
 type: workflow
 allowed-tools: "Read Write Edit Grep Glob Bash"
 argument-hint: "[one-line description of the goal, optional]"
-version: "2.0.0"
+version: "2.1.0"
 triggers:
   - goal creator
   - create a goal
@@ -99,6 +99,8 @@ minimum:
 - **Pre-made design decisions** — every fork the run must NOT pause on (the bulk of a build interview). Each is a decision, not a menu.
 - **Stage breakdown** — how the work splits into stages, and per-stage acceptance.
 - **Verification gates** — static gates (type-check/test/build) + the baked-in verification rules adapted to the tree (see `references/baked-in-rules.md`), gated by blast radius.
+- **Contract-fact verification (pilot learning L001)** — a contract that ASSERTS a repo fact as a premise (e.g. "`docs/contracts/.run/` is gitignored") MUST VERIFY it at authoring time (`git check-ignore <path>`, or read the actual config) or include making-it-true as an explicit in-scope task. A falsified premise resurfaces as a checker finding downstream — verify or scope it now, never assume it.
+- **Worktree env-setup budget (pilot learning L002)** — when §0.1 mandates a dedicated git worktree, budget an explicit env-setup task BEFORE the first build/test stage: gitignored secrets (`.env.local`) and installed deps (`node_modules`) do not travel with a fresh worktree, and build-time-baked config (e.g. `NEXT_PUBLIC_*`) silently produces a broken build if missing at build time, not a loud error.
 - **Failure-recovery budgets** — per-task fix budget, tool-hang recovery, hard-halt list.
 - **Commit + push policy** — commit granularity, message format, branch, push target, what NOT to stage.
 - **Definition of Done** — the checkbox list that gates completion. **DoD verbs are load-bearing** (`core/.claude/rules/dod-verbs.md`): an autonomous run satisfies the LITERAL checkbox and stops. State the ACTION + the COMPLETENESS BAR explicitly — "**report** X" yields a report, not closed gaps; "every layer **represented**" yields one example, not the exhaustive matrix. Never write "each X" when you mean "a representative X".
