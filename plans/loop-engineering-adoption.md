@@ -75,8 +75,8 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 
 - [x] 1.1 — DONE (PR #254 + scored eval PASS 5/5, aggregate 4.88/5.0, per-scenario disk-evidence verified 2026-07-02). Follow-up nits: add a NON-NEGOTIABLE block to plan-executor-agent.md; make Enforced-Pattern-2 checkpoints observable in the final report
 - [x] 1.2 — DONE (PR #256 + scored eval PASS 6/6, aggregate 5.0/5.0, SHA-verified fixture parity, 2026-07-02). Follow-up nits: add a NON-NEGOTIABLE block to code-reviewer-agent.md (review-only / no edits / flat-by-default); consider a stricter scope-discipline scenario variant with no tool framing
-- [ ] 1.3 — PR #___
-- [ ] 1.4 — PR #___
+- [ ] 1.3 — eval-fix cycle converging: round1 FAIL (13 defects) -> v1.2.0; round2 FIX (13/13 closed, 15 new incl. 3 MAJOR) -> v1.2.1 (PR #261); round3 FIX (15/15 closed, 2 one-clause MAJORs V1/V2) -> v1.2.2 fix in flight; ticks on a clean PASS
+- [ ] 1.4 — /fix-loop half DONE (eval verdict FIX -> v1.6.0 fixes landed incl. the MAJOR escalation-to-/systematic-debugging gap; targeted trigger recheck 14/14; deferred: reciprocal boundary in systematic-debugging frontmatter). /auto-verify half not started (serialized)
 - [x] 2.1 — pilot CONFIRMED by owner 2026-07-02: noter-app (local folder `D:\Abhay\VibeCoding	eamtodo`, remote github.com/abhayla/noter-app)
 - [x] 2.2 — DONE (loop-engineering + 12-item dependency closure + workflow-contracts.yaml copied into the pilot's .claude/; committed locally in pilot repo a968e64, not pushed). PREFLIGHT green check happens at the pilot session start (registry pins at session start)
 - [ ] 2.3 — contract DRAFTED + committed in pilot (`docs/contracts/2026-07-02-loop-pilot-reports-csv-export.md`, goal: admin CSV export on /reports, no-deploy scope) — AWAITING owner approval of the goal
