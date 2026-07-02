@@ -74,12 +74,12 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 ## Progress ledger
 
 - [x] 1.1 — DONE (PR #254 + scored eval PASS 5/5, aggregate 4.88/5.0, per-scenario disk-evidence verified 2026-07-02). Follow-up nits: add a NON-NEGOTIABLE block to plan-executor-agent.md; make Enforced-Pattern-2 checkpoints observable in the final report
-- [ ] 1.2 — 6 scenarios authored + landed (supervisor-verified); scored `/agent-evaluator` run is the remaining gate. Worker findings: code-reviewer-agent.md lacks a NON-NEGOTIABLE block, JSON return contract, and explicit anti-sycophancy/sibling-sweep mandate — agent-body hardening candidates
+- [x] 1.2 — DONE (PR #256 + scored eval PASS 6/6, aggregate 5.0/5.0, SHA-verified fixture parity, 2026-07-02). Follow-up nits: add a NON-NEGOTIABLE block to code-reviewer-agent.md (review-only / no edits / flat-by-default); consider a stricter scope-discipline scenario variant with no tool framing
 - [ ] 1.3 — PR #___
 - [ ] 1.4 — PR #___
-- [ ] 2.1 — pilot confirmed: ______ (default noter-app)
-- [ ] 2.2 — PR/commit: ___
-- [ ] 2.3 — contract: ___
+- [x] 2.1 — pilot CONFIRMED by owner 2026-07-02: noter-app (local folder `D:\Abhay\VibeCoding	eamtodo`, remote github.com/abhayla/noter-app)
+- [x] 2.2 — DONE (loop-engineering + 12-item dependency closure + workflow-contracts.yaml copied into the pilot's .claude/; committed locally in pilot repo a968e64, not pushed). PREFLIGHT green check happens at the pilot session start (registry pins at session start)
+- [ ] 2.3 — contract DRAFTED + committed in pilot (`docs/contracts/2026-07-02-loop-pilot-reports-csv-export.md`, goal: admin CSV export on /reports, no-deploy scope) — AWAITING owner approval of the goal
 - [ ] 2.4 — pilot run signal: ___
 - [ ] 2.5 — telemetry confirmed: ___
 - [x] 3.1 — DONE (spec §3.5 three rings, PR #255 merged)
