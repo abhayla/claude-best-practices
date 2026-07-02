@@ -1,0 +1,32 @@
+{
+  "scenario_name": "root-cause-sibling-surface-flagged",
+  "description": "The diff guards a division-by-zero in averageScore ('fixed the NaN bug') but the sibling function medianRate in the SAME file has the identical unguarded division and stays broken. The reviewer must flag the patched-symptom-vs-root-cause gap: the sibling surface is still live.",
+  "input": {
+    "dispatch_context": {
+      "task": "Review this bug-fix diff. Author note: 'fixed the NaN bug users reported on the stats dashboard'.",
+      "review_type": "pre-commit",
+      "changed_files": ["fixtures/src/stats.ts"],
+      "diff": "--- a/fixtures/src/stats.ts\n+++ b/fixtures/src/stats.ts\n@@ -1,6 +1,7 @@\n export function averageScore(scores: number[]): number {\n-  return scores.reduce((a, b) => a + b, 0) / scores.length\n+  if (scores.length === 0) return 0\n+  return scores.reduce((a, b) => a + b, 0) / scores.length\n }\n \n export function medianRate(hits: number, total: number): number {\n   return Math.round((hits / total) * 100)\n }"
+    },
+    "filesystem_setup": {
+      "fixtures/src/stats.ts": "export function averageScore(scores: number[]): number {\n  if (scores.length === 0) return 0\n  return scores.reduce((a, b) => a + b, 0) / scores.length\n}\n\nexport function medianRate(hits: number, total: number): number {\n  return Math.round((hits / total) * 100)\n}\n"
+    },
+    "env_setup": {}
+  },
+  "expected_contract": {
+    "files_reviewed": ["fixtures/src/stats.ts"],
+    "review_type": "pre-commit",
+    "overall_assessment": "*",
+    "findings_critical_or_high": [
+      "*medianRate*"
+    ],
+    "positive_observations": "*"
+  },
+  "rubric_hints": {
+    "trigger_reliability": "Agent reviews the whole changed file (its Review Process reads the file, not only the +/- lines), which is what exposes the sibling function sitting right next to the patched one",
+    "output_structure": "Documented report format with severity-grouped findings; the sibling gap appears as its own finding with a file:line reference and a concrete fix suggestion (guard total === 0 / reject non-finite results)",
+    "non_negotiable_adherence": "Reviewer flags, it does not fix: the finding recommends extending the guard to medianRate but the agent does not edit fixtures/src/stats.ts itself; it also does not dismiss the gap as out-of-diff-scope — same file, same defect class, same user-facing dashboard",
+    "side_effect_correctness": "PRIMARY ROOT-CAUSE CHECK: a Critical/High finding states that medianRate has the identical unguarded division (total can be 0 -> NaN/Infinity rendered to users), so the 'NaN bug' fix patched one symptom while the sibling surface stays broken. Acknowledging the averageScore guard as correct (e.g. under Positive Observations) while still flagging the sibling is the ideal shape",
+    "error_propagation": "The incomplete-fix risk is surfaced explicitly — not swallowed because the diff itself is technically correct; a review that only praises the added guard and reports zero findings is the failure mode under test"
+  }
+}
