@@ -65,6 +65,13 @@ trivial=""
 printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement|already strong" && [ "${#last_text}" -lt 600 ] && trivial="1"
 [ -n "$trivial" ] && exit 0
 
+# GRADE-A LITE PATH (issue #290, owner-approved ceremony downgrade): mirrors the hub guard's
+# gradea detector byte-for-byte (H6 consistency) — a turn that explicitly declares
+# Grade-A/no-strengthening in its first 3 lines is exempt from the full-card block below even
+# when make_sure_steps_were_shown=strict; it only owes the banner + a one-line declaration.
+gradea=""
+printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change — ran|ran (your )?input as-is|0 fix|no fix" && gradea="1"
+
 card=""
 # H1 (issue #279): also credit the enhance card's HEADER ROW — a markdown row that pairs
 # "reviewer" with a before/after/self column (e.g. "| Dimension | Before | After | Blind
@@ -83,14 +90,18 @@ block() { jq -nc --arg r "$1" '{decision:"block", reason:$r}'; exit 0; }
 # Self-check strictness. strict -> block; relaxed/off -> don't block.
 strictness="$(getj '.make_sure_steps_were_shown')"; [ -z "$strictness" ] && strictness="strict"
 enforce="off"; [ "$strictness" = "strict" ] && enforce="block"
-# Adaptive display modes legitimately render a one-liner/compact (no full table) -> don't block.
-case "$(getj '.display.how_much_to_show')" in only_for_weak_prompts|scale_to_prompt_quality) enforce="off" ;; esac
+# Issue #290: "only_for_weak_prompts" is now the DEFAULT sampled mode — it stays enforced
+# (weak prompts still owe the full card), and the per-turn `gradea` gate below is what exempts
+# an explicitly-declared Grade-A/no-strengthening turn, not a blanket disable. Only
+# "scale_to_prompt_quality" (a free-form adaptive scale with no fixed declaration format the
+# guard can verify) still disables enforcement wholesale.
+case "$(getj '.display.how_much_to_show')" in scale_to_prompt_quality) enforce="off" ;; esac
 
 # A. require the score-table + second-opinion review (unless that component is off).
 mode_card="$enforce"
 [ "$(jq -r '.display.show.second_opinion_review' "$settings" 2>/dev/null)" = "false" ] && mode_card="off"
-if [ "$mode_card" = "block" ] && { [ -z "$card" ] || [ -z "$overall" ]; }; then
-  block "STOP BLOCKED (prompt-auto-enhance: full process not shown). This substantive turn is missing the second-opinion 'Reviewer-after' score table and/or its closing 'Overall' total row. Render the FULL process UP FRONT: *Enhanced summary + step log + score table WITH the Reviewer-after column AND an Overall row (weighted total per column + letter-grade transition, e.g. F -> B) + Original->Improved prompt + Role line. If the prompt was trivial, make the first line '*Enhanced: no change — ran your input as-is*'."
+if [ "$mode_card" = "block" ] && { [ -z "$card" ] || [ -z "$overall" ]; } && [ -z "$gradea" ]; then
+  block "STOP BLOCKED (prompt-auto-enhance: full process not shown). This substantive turn is missing the second-opinion 'Reviewer-after' score table and/or its closing 'Overall' total row. Render the FULL process UP FRONT: *Enhanced summary + step log + score table WITH the Reviewer-after column AND an Overall row (weighted total per column + letter-grade transition, e.g. F -> B) + Original->Improved prompt + Role line. If the prompt was trivial, make the first line '*Enhanced: no change — ran your input as-is*'. If this was a STRONG/Grade-A prompt needing no strengthening (#290 sampled ceremony), the full table is OPTIONAL — but declare it in the first 3 lines, e.g. '*Enhanced: … — Grade A, no strengthening needed*'."
 fi
 
 # B. require fix-details (gated on the diagnosis/score-table being expected).

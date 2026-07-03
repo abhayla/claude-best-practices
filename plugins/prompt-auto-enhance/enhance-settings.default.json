@@ -47,7 +47,7 @@
 
   "display": {
     "show_the_process": true,
-    "how_much_to_show": "every_time",
+    "how_much_to_show": "only_for_weak_prompts",
     "weak_prompt_score_below": 7,
     "show_step_log_only_for_multipart": false,
     "show": {

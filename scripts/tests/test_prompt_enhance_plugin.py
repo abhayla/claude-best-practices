@@ -59,7 +59,9 @@ def test_defaults_all_on():
     assert s["after_improving"] == "run_immediately"
     assert s["enhance_slash_commands"] is False  # skip slash/custom prompts by default
     assert s["display"]["show_the_process"] is True
-    assert s["display"]["how_much_to_show"] == "every_time"
+    # #290 (owner-approved ceremony downgrade): the full grade-card + independent-reviewer
+    # ceremony is now SAMPLED by default — only_for_weak_prompts, not every_time.
+    assert s["display"]["how_much_to_show"] == "only_for_weak_prompts"
     for k, v in s["display"]["show"].items():
         assert v is True, f"display.show.{k} should default ON"
     for k in ("skip_if_just_a_question", "skip_tip_for_simple_tasks",
@@ -280,7 +282,26 @@ def test_stop_no_block_when_review_off(tmp_path):
 
 
 @pytestmark_fn
-@pytest.mark.parametrize("mode", ["only_for_weak_prompts", "scale_to_prompt_quality"])
-def test_stop_no_block_in_adaptive_modes(tmp_path, mode):
-    sf = _write_settings(tmp_path, **{"display.how_much_to_show": mode})
+def test_stop_no_block_in_scale_to_prompt_quality_mode(tmp_path):
+    # scale_to_prompt_quality has no fixed declaration format the guard can verify, so it
+    # still disables enforcement wholesale.
+    sf = _write_settings(tmp_path, **{"display.how_much_to_show": "scale_to_prompt_quality"})
     assert _run_stop(_LONG + " one-liner, no table.", tmp_path, settings_file=sf).strip() == ""
+
+
+@pytestmark_fn
+def test_stop_still_blocks_in_only_for_weak_prompts_mode_without_gradea(tmp_path):
+    # #290: only_for_weak_prompts is now the DEFAULT sampled mode — it stays enforced (a weak
+    # prompt still owes the full card); only an explicitly-declared Grade-A turn is exempt
+    # (covered by test_stop_no_block_when_gradea_declared below).
+    sf = _write_settings(tmp_path, **{"display.how_much_to_show": "only_for_weak_prompts"})
+    assert '"block"' in _run_stop(_LONG + " one-liner, no table.", tmp_path, settings_file=sf)
+
+
+@pytestmark_fn
+def test_stop_no_block_when_gradea_declared(tmp_path):
+    # #290: a turn whose first 3 lines declare Grade-A/no-strengthening is exempt from the
+    # full-card block even in only_for_weak_prompts (strict) mode.
+    sf = _write_settings(tmp_path, **{"display.how_much_to_show": "only_for_weak_prompts"})
+    text = "Grade A, no strengthening needed.\n" + _LONG
+    assert _run_stop(text, tmp_path, settings_file=sf).strip() == ""
