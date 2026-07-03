@@ -4,6 +4,11 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-06-29 — Grant analytics_storage by default so GA4 actually collects
+
+- **updated** skill `analytics-setup` (`core/.claude/skills/analytics-setup/SKILL.md`, 1.1.0 → 1.1.1 PATCH; mirrored in `plugins/auto-google-analytics/skills/analytics-setup/SKILL.md`) — Consent Mode v2 default flipped from `analytics_storage:'denied'` (no banner/auto-grant to ever flip it) to `'granted'`; `ad_storage` stays denied. The prior denied-by-default silently recorded ~0 users/pageviews across all PIFS sites (2026-06-29 incident) because cookieless "modeling" doesn't populate standard reports at low/normal traffic. Documented the EU/UK consent-banner alternative and the STEP 6 behaviour-based verify (collect hit must show `gcs=G1x1`). Hash resynced.
+- **bumped** plugin `auto-google-analytics` (`plugins/auto-google-analytics/.claude-plugin/plugin.json`, 0.1.1 → 0.1.2 PATCH) — `scripts/inject_analytics.py` snippet updated to match (analytics_storage granted by default); required so the version-keyed plugin cache actually serves the fix.
+
 ### 2026-07-03 — Close deferred loop-engineering pilot items: contract-authoring lessons + worker NON-NEGOTIABLE blocks
 
 - **updated** skill `goal-creator` (`core/.claude/skills/goal-creator/SKILL.md`, 2.0.0 → 2.1.0 MINOR) — folded two GENERIC contract-authoring lessons from the noter-app loop pilot into the STEP 1 fork inventory: L001 (a contract that ASSERTS a repo fact as a premise MUST verify it at authoring time, e.g. `git check-ignore`, or scope making it true — a falsified premise resurfaces as a checker finding downstream) and L002 (a contract mandating a dedicated git worktree MUST budget an explicit env-setup task — gitignored secrets/deps don't travel with a fresh worktree, and build-time-baked config like `NEXT_PUBLIC_*` silently produces a broken build). Hash resynced.
