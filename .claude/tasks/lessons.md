@@ -655,3 +655,9 @@ occurred AND the prior turns already landed the work — i.e. a pure confirmatio
 - Mistake: pushed a new `.claude/rules/` file (model-routing.md) without running the full local pytest first; CI failed on `test_rule_organization.py` (approved hub-rule set + 320-line total budget).
 - Root cause: assumed validators + registry checks covered rule files; the lean-rules gate only surfaces via the pytest suite.
 - Rule: ANY change under `.claude/rules/` requires (1) adding the filename to ALLOWED_HUB_RULES in scripts/tests/test_rule_organization.py, (2) fitting the 320-line total budget (trim, don't raise), (3) full local pytest BEFORE push — same discipline as registered-pattern edits.
+
+## 2026-07-03: Never operate on a worktree while its background maker may still be running
+**Mistake:** During the #290 fix, a background Sonnet maker's guard file showed a ~20-min-stale mtime and 0 commits, so I diagnosed it as "hung" and ran `git checkout -- <file>` + full-suite reproduction on its live worktree. The maker was NOT hung — it was doing slow rule-budget trimming (28 min total) and committed atomically right after. My mutating git op raced its commit.
+**Root cause:** An idle file mtime ≠ agent done. A maker doing slow, non-file-touching work (test iterations, budget compression, thinking) can leave files untouched for many minutes while still running.
+**Why it resolved safely (luck, not design):** the maker's commit was atomic (`git add -A` + commit), so the final HEAD had its complete work; my working-tree `checkout` became a no-op against the committed state.
+**Rule:** Do NOT run mutating git ops (checkout/add/commit/reset) on a worktree while its background maker may still be running. Wait for the completion notification (or `TaskStop` the agent first). READ-ONLY inspection (git log/status/diff, running tests) is fine; mutation is not. If you must take over a genuinely-hung maker, TaskStop it first to eliminate the race.
