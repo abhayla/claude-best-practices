@@ -46,8 +46,13 @@ if [ "$(getj '.enhance_slash_commands')" != "true" ]; then
     if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
     then {t:(if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)}
     else empty end' "$tp" 2>/dev/null | tail -1)
+  # H4 (issue #279): tolerate a leading whitespace/newline before the literal "/command" text
+  # (JSON-escaped as \n or \r\n). Scope boundary — DELIBERATELY NOT covered: a marker-less,
+  # fully-expanded slash-command BODY with no literal "/" prefix and no <command-name> tag. No
+  # in-repo reproduction of that shape exists, and a broad heuristic exemption would weaken
+  # card enforcement (YAGNI + don't-weaken-genuine-miss).
   case "$last_user" in
-    *'<command-name>'*|*'"t":"/'*|*'"t":" /'*) exit 0 ;;
+    *'<command-name>'*|*'"t":"/'*|*'"t":" /'*|*'"t":"\n/'*|*'"t":"\r\n/'*) exit 0 ;;
   esac
 fi
 
@@ -61,7 +66,11 @@ printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — 
 [ -n "$trivial" ] && exit 0
 
 card=""
-printf '%s' "$full" | grep -qE "reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
+# H1 (issue #279): also credit the enhance card's HEADER ROW — a markdown row that pairs
+# "reviewer" with a before/after/self column (e.g. "| Dimension | Before | After | Blind
+# reviewer |") — even when it uses none of the fixed prose tokens below. The before/after/self
+# co-requirement keeps an UNRELATED table row that merely contains "reviewer" from counting.
+printf '%s' "$full" | grep -qE "^[[:space:]]*\|.*(before|after|self).*reviewer.*\||reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
 # The card MUST close with an Overall/total row (weighted sum + letter-grade transition); a
 # per-dimension table with no total is an incomplete card (regression guard for the dropped total row).
 overall=""

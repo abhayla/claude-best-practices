@@ -62,9 +62,14 @@ last_user=$(jq -rc '
   if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
   then {t:(if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)}
   else empty end' "$tp" 2>/dev/null | tail -1)
+# H4 (issue #279): tolerate a leading whitespace/newline before the literal "/command" text
+# (JSON-escaped as \n or \r\n). Scope boundary — DELIBERATELY NOT covered: a marker-less,
+# fully-expanded slash-command BODY with no literal "/" prefix and no <command-name> tag. No
+# in-repo reproduction of that shape exists, and a broad heuristic exemption would weaken
+# card enforcement (YAGNI + don't-weaken-genuine-miss).
 case "$last_user" in
   *'<command-name>'*) is_slash="1" ;;
-  *'"t":"/'*|*'"t":" /'*) is_slash="1" ;;
+  *'"t":"/'*|*'"t":" /'*|*'"t":"\n/'*|*'"t":"\r\n/'*) is_slash="1" ;;
 esac
 
 # Drop leading blank lines: the turn-aggregate starts with the newline that
@@ -94,17 +99,26 @@ case "$emode" in auto|ask|off) : ;; *) emode="auto" ;; esac
 trivial=""
 printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement" && [ "${#last_text}" -lt 600 ] && trivial="1"
 # G11: detect the full process by the reviewer-card token SET (not one literal), so a
-# legitimately-worded card is not false-blocked.
+# legitimately-worded card is not false-blocked. H1 (issue #279): also credit the enhance
+# card's HEADER ROW — a markdown row that pairs "reviewer" with a before/after/self column
+# (e.g. "| Dimension | Before | After | Blind reviewer |") — even when it uses none of the
+# fixed prose tokens below. The before/after/self co-requirement keeps an UNRELATED table row
+# that merely contains "reviewer" (e.g. "| File | Reviewer |") from counting as a card.
 card=""
-printf '%s' "$full" | grep -qE "reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
-# G7: block on substantive + not-trivial + NO card, regardless of banner shape.
-if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]; then
+printf '%s' "$full" | grep -qE "^[[:space:]]*\|.*(before|after|self).*reviewer.*\||reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" && card="1"
+# H2 (issue #279): also require the closing Overall/total row (mirrors the plugin guard's
+# overall check) — a per-dimension table with no total row is an incomplete card, not a
+# rendered one.
+overall=""
+printf '%s' "$full" | grep -qE "overall|[a-f] *(→|->) *[a-f]|weighted total" && overall="1"
+# G7: block on substantive + not-trivial + (NO card OR NO overall row), regardless of banner shape.
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && { [ -z "$card" ] || [ -z "$overall" ]; }; then
   rc="$root/.claude/.reviewcard-count"
   rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   if [ "$rn" -lt 4 ]; then
     printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead." '{decision:"block", reason:$r}'
+    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column and/or its closing 'Overall' total row (weighted total + letter-grade transition) (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + an Overall row + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead." '{decision:"block", reason:$r}'
     exit 0
   else
     # G9: cap exhausted — the turn escaped without the card; log a distinct escalation line.
