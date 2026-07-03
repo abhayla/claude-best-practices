@@ -27,31 +27,28 @@ multi-step answer, tool edits/commits), self-apply the banner + full process (tr
 logs substantive turns missing the banner to `.claude/.enhance-misses.log` (telemetry,
 non-blocking). Genuinely trivial turns (`yes`/`go ahead`) and slash-command turns are exempt.
 
-## MANDATORY OUTPUT — always SHOW the full enhancement process (default ON)
+## MANDATORY OUTPUT — sampled: full process on WEAK prompts, one-liner on strong ones (#290)
 
-The one-liner is NOT enough — by default the user wants to SEE the whole pipeline on
-every substantive turn. Render FULL mode (not the compact block):
+SAMPLED, not blanket-mandatory: the full pipeline (transcript + grade card + independent
+reviewer) is REQUIRED only on a **WEAK prompt** (a dimension scored < 7, or a fix was applied).
+A **STRONG / Grade-A / zero-fix** prompt just needs the banner + a one-line Grade-A declaration
+— no full table forced. Kills prior over-fire (blocking a plain status answer to strengthen).
 
-- **Non-trivial prompt:** after the banner, render in this order:
-  1. **Pipeline transcript** — per-step counts/deltas (skill STEP 4.5)
-  2. **Before→after card + independent reviewer (EVERY turn, no threshold, no bypass)** — per-dim
-     before/after scores + Changes Applied. A context-blind `Agent()` reviewer (fresh instance; sees
-     only the two prompts + rubric, never the pipeline's scores) re-grades both prompts; the card shows
-     its PER-DIMENSION scores (visible Reviewer-after column) AND a closing **`Overall` row that sums
-     each column to a single weighted total** (Before / Self-after / Reviewer-after) plus the
-     letter-grade transition (e.g. `F → B`). The Overall row is MANDATORY — per-dimension rows without
-     the total are an incomplete card. The blind Reviewer-after Overall WINS the rendered lift.
-     Directly under the table, print the **`Independent reviewer (ran this turn …)` provenance line**
-     stating who re-graded (context-blind subagent) and the self-vs-blind divergence (flag if > 1.0).
-  3. **Original → Final Strengthened Prompt**, fenced blocks (skill STEP 4.6); the Final
-     block MUST open with the R1 `Act as …` persona whenever Role & Framing scored < 7
-  4. **`Role: <name> — <why>`** line (R2, stage 4.7) — never a substitute for the R1 persona
-- **Trivial / continuation prompt:** render the one-liner
-  `*Enhanced: no change — ran your input as-is*` so the user is never left guessing.
+- **Weak prompt:** after the banner render, in order: (1) **pipeline transcript** (skill STEP
+  4.5); (2) **before→after card + independent reviewer** — a context-blind `Agent()` reviewer
+  (fresh instance, sees only the two prompts + rubric) re-grades both; card shows PER-DIMENSION
+  scores (Reviewer-after column) + a **mandatory `Overall` row** (weighted total, e.g. `F → B`;
+  a card without it is incomplete); the blind Overall WINS the lift; print the `Independent
+  reviewer (ran this turn …)` provenance line + self-vs-blind divergence (flag if > 1.0);
+  (3) **Original → Final Strengthened Prompt** fenced blocks (STEP 4.6; Final opens with the R1
+  `Act as …` persona when Role & Framing < 7); (4) **`Role: <name> — <why>`** line (R2, 4.7).
+- **Strong / Grade-A / zero-fix prompt:** banner + one-line declaration in the FIRST 3 lines —
+  `*Enhanced: <what was checked> — Grade A, no strengthening needed*`. Full table optional.
+- **Trivial / continuation prompt:** the one-liner `*Enhanced: no change — ran your input as-is*`.
 
-Skipping the process on a non-trivial turn is a defect (class-C telemetry backstop). This
-section is the SSOT for the FORMAT; skill stages 4–4.7 produce the content. Compact
-format-A is a fallback ONLY when the user explicitly asks to reduce verbosity.
+Skipping BOTH the full process AND the Grade-A declaration on a substantive turn is a defect
+(`no-overask-guard.sh`'s `gradea` detector still blocks it). SSOT for FORMAT when the card
+renders; skill stages 4–4.7 produce content. Compact format-A only on explicit user request.
 
 ## The unified per-prompt pipeline (0 → 6)
 

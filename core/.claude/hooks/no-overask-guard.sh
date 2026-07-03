@@ -98,6 +98,14 @@ case "$emode" in auto|ask|off) : ;; *) emode="auto" ;; esac
 # a long working turn cannot dodge by mentioning the phrase somewhere in prose.
 trivial=""
 printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement" && [ "${#last_text}" -lt 600 ] && trivial="1"
+# GRADE-A LITE PATH (issue #290, owner-approved ceremony downgrade): the full grade-card +
+# independent-reviewer is now SAMPLED — required only on WEAK prompts (that needed
+# strengthening). A turn that explicitly declares Grade-A/no-strengthening in its FIRST 3
+# LINES is exempt from the full-card enforcement below; it only owes the banner + a one-line
+# declaration. The 3-line window (vs. the 1-line/short-only `trivial` check above) lets a
+# longer substantive Grade-A turn still qualify — length alone no longer forces the full table.
+gradea=""
+printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change — ran|ran (your )?input as-is|0 fix|no fix" && gradea="1"
 # G11: detect the full process by the reviewer-card token SET (not one literal), so a
 # legitimately-worded card is not false-blocked. H1 (issue #279): also credit the enhance
 # card's HEADER ROW — a markdown row that pairs "reviewer" with a before/after/self column
@@ -111,14 +119,17 @@ printf '%s' "$full" | grep -qE "^[[:space:]]*\|.*(before|after|self).*reviewer.*
 # rendered one.
 overall=""
 printf '%s' "$full" | grep -qE "overall|[a-f] *(→|->) *[a-f]|weighted total" && overall="1"
-# G7: block on substantive + not-trivial + (NO card OR NO overall row), regardless of banner shape.
-if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && { [ -z "$card" ] || [ -z "$overall" ]; }; then
+# G7: block on substantive + not-trivial + (NO card OR NO overall row), regardless of banner
+# shape — AND not-grade-a-declared (#290: an explicitly-declared Grade-A/no-strengthening
+# turn is sampled OUT of this gate; the base substantive/not-trivial/no-card condition below
+# is preserved byte-for-byte so it stays a pure ADDITIVE exemption, never a rewrite).
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && { [ -z "$card" ] || [ -z "$overall" ]; } && [ -z "$gradea" ]; then
   rc="$root/.claude/.reviewcard-count"
   rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   if [ "$rn" -lt 4 ]; then
     printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column and/or its closing 'Overall' total row (weighted total + letter-grade transition) (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + an Overall row + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead." '{decision:"block", reason:$r}'
+    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column and/or its closing 'Overall' total row (weighted total + letter-grade transition) (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + an Overall row + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead. If this was a STRONG/Grade-A prompt needing no strengthening (#290 sampled ceremony), the full card is OPTIONAL — but you must then declare it in the FIRST 3 LINES, e.g. '*Enhanced: … — Grade A, no strengthening needed*'." '{decision:"block", reason:$r}'
     exit 0
   else
     # G9: cap exhausted — the turn escaped without the card; log a distinct escalation line.

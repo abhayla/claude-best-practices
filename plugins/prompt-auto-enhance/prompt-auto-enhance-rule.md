@@ -18,30 +18,30 @@ hook stayed silent.** The hook gates on PROMPT shape; a short / continuation fre
 still spawn substantive work, and the discipline fires on the output's blast radius, not the
 prompt's shape. Whenever a (non-slash-command) turn produces substantive output (real analysis,
 multi-step answer, tool edits/commits), self-apply the banner + full process (transcript + grade
-card + final prompt) + `Role:` line + governance tail even with no reminder injected. The Stop hook
-(`enhance-process-guard.sh`) keeps a quiet log of substantive turns missing the process (telemetry,
-non-blocking). Genuinely trivial turns (`yes`/`go ahead`) and slash-command turns are exempt.
+card + final prompt) + `Role:` line + governance tail even with no reminder injected. The Stop
+hook (`enhance-process-guard.sh`) keeps a quiet log of substantive turns missing the process
+(telemetry, non-blocking). Genuinely trivial turns (`yes`/`go ahead`) and slash-commands are exempt.
 
-## MANDATORY OUTPUT — always SHOW the full enhancement process (default ON)
+## MANDATORY OUTPUT — sampled: full process on WEAK prompts, one-liner on strong ones (#290)
 
-The one-liner is NOT enough — by default the user wants to SEE the whole pipeline on
-every substantive turn. Render FULL mode (not the compact block):
+SAMPLED, not blanket-mandatory (default `display.how_much_to_show: "only_for_weak_prompts"`):
+full pipeline required only on a **WEAK prompt** (a dimension scored below
+`display.weak_prompt_score_below`, default 7, or a fix was applied); kills prior over-fire
+(blocking a plain status answer to strengthen).
 
-- **Non-trivial prompt:** after the banner, render in this order:
-  1. **Pipeline transcript** — per-step counts/deltas (skill STEP 4.5)
-  2. **Before→after card + independent reviewer (EVERY turn, no bypass)** — per-dim before/after scores + Changes
-     Applied. A context-blind `Agent()` reviewer (sees only the two prompts + rubric, never the pipeline's scores) re-grades both.
-     The card shows its per-dim Reviewer-after column AND a closing **mandatory `Overall` row** (weighted total per column + `F → B` grade) — per-dim rows without the total are an incomplete card; the blind Overall WINS the lift.
-     Under the table, print the `Independent reviewer (ran this turn …)` provenance line + the self-vs-blind divergence (flag if > 1.0).
-  3. **Original → Final Strengthened Prompt**, fenced blocks (skill STEP 4.6); the Final
-     block MUST open with the R1 `Act as …` persona whenever Role & Framing scored < 7
-  4. **`Role: <name> — <why>`** line (R2, stage 4.7) — never a substitute for the R1 persona
-- **Trivial / continuation prompt:** render the one-liner
-  `*Enhanced: no change — ran your input as-is*` so the user is never left guessing.
+- **Weak prompt:** banner, then (1) **pipeline transcript** (STEP 4.5); (2) **before→after
+  card + independent reviewer** — a context-blind `Agent()` reviewer (sees only the two prompts
+  + rubric) re-grades both; card shows per-dim Reviewer-after column + a **mandatory `Overall`
+  row** (weighted total, `F → B`; incomplete without it); blind Overall WINS the lift; print
+  the `Independent reviewer (ran this turn …)` provenance line + self-vs-blind divergence (flag
+  if > 1.0); (3) **Original → Final Strengthened Prompt** fenced blocks (STEP 4.6; Final opens
+  with R1 `Act as …` when Role & Framing < 7); (4) **`Role: <name> — <why>`** line (R2, 4.7).
+- **Strong / Grade-A / zero-fix prompt:** banner + one-line declaration in the FIRST 3 lines —
+  `*Enhanced: <what was checked> — Grade A, no strengthening needed*`. Full table optional.
+- **Trivial / continuation prompt:** the one-liner `*Enhanced: no change — ran your input as-is*`.
 
-Skipping the process on a non-trivial turn is a defect (class-C telemetry backstop). This
-section is the SSOT for the FORMAT; skill stages 4–4.7 produce the content. Compact
-format-A is a fallback ONLY when the user explicitly asks to reduce verbosity.
+Skipping BOTH is a defect (`enhance-process-guard.sh` blocks it in `strict` mode via `gradea`) —
+SSOT for FORMAT when the card renders; skill stages 4–4.7 produce content; format-A on request only.
 
 ## The unified per-prompt pipeline (0 → 6)
 
@@ -93,8 +93,8 @@ flow in `/prompt-auto-enhance` — no resource changes without explicit user app
 ## Load-bearing contracts
 
 - Banner on every response; Tier 1 gathered before responding; strengthening runs on
-  every non-filtered prompt via the `/prompt-auto-enhance` pipeline (skip only Grade A
-  / pure knowledge questions — the full process still renders)
+  every non-filtered prompt via the `/prompt-auto-enhance` pipeline (a Grade A / zero-fix
+  prompt renders the banner + one-line declaration — the full table is sampled, not forced)
 - Optional one-line skill hint at STEP 4.6 (max 2 skills, informational only — the
   skill's job is prompt enhancement, not execution routing); skip on direct,
   mechanical, bug-fix, lookup, and documentation prompts

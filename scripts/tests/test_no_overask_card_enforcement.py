@@ -221,6 +221,69 @@ _NO_CARD_ANYWHERE_TRANSCRIPT = [
 ]
 
 
+# Issue #290 (owner-approved ceremony downgrade): a turn whose FIRST line explicitly declares
+# Grade-A/no-strengthening is exempt from the full-card enforcement — it only owes the banner +
+# a one-line declaration. Deliberately >600 chars (and NOT matching the `trivial` detector's
+# "ran as-is"/"no enhancement" first-line phrasing) so this exercises the NEW `gradea` path, not
+# the pre-existing `trivial` escape (which is length-capped at <600 and phrased differently).
+_GRADE_A_DECLARED_TEXT = (
+    "*Enhanced: checked git state and recent commits — Grade A, no strengthening needed*\n\n"
+    + ("This turn's prompt was already clear, well-scoped, and needed no rewriting. " * 8)
+)
+assert len(_GRADE_A_DECLARED_TEXT) >= 600
+
+_GRADE_A_DECLARED_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "what's the current git branch and status"}},
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "text", "text": _GRADE_A_DECLARED_TEXT}]},
+    },
+]
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_gradea_declared_turn_is_not_blocked(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _GRADE_A_DECLARED_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"hub {GUARD} wrongly blocked a turn that explicitly declared Grade-A/no-strengthening "
+        f"in its first 3 lines with no full card (issue #290 sampled ceremony): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_gradea_declared_turn_is_not_blocked(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _GRADE_A_DECLARED_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} wrongly blocked a turn that explicitly declared "
+        f"Grade-A/no-strengthening in its first 3 lines with no full card (issue #290): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_still_blocks_when_neither_card_nor_gradea_declared(tmp_path_factory):
+    """Companion negative for #290: a substantive turn with NEITHER a card NOR a Grade-A
+    declaration must stay blocked — the downgrade is an ADDITIVE exemption, not a general
+    loosening. Reuses the existing #253/#279 negative-control transcript."""
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"hub {GUARD} failed to block a substantive turn with no card and no Grade-A "
+        f"declaration (weak-prompt path must stay enforced, issue #290): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_still_blocks_when_neither_card_nor_gradea_declared(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} failed to block a substantive turn with no card and no "
+        f"Grade-A declaration (weak-prompt path must stay enforced, issue #290): {out}"
+    )
+
+
 # Regression lock for issue #279: a fully-rendered card whose reviewer COLUMN is worded
 # differently (a markdown table row "| Dim | Before | After | Blind reviewer |") and that
 # uses NONE of the fixed prose tokens ("reviewer-after", "independent reviewer", …) — this
