@@ -25,8 +25,12 @@ SNIP = (
     '<!-- Google Analytics 4 (gtag) + Consent Mode v2 + blanket click tracking '
     '(auto-google-analytics plugin) -->\n'
     "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
+    # analytics_storage GRANTED by default so GA4 actually collects (Abhay's
+    # sites are India-focused — no GDPR; pair with a privacy-policy line). Leaving
+    # it 'denied' with no consent-grant silently records ~0 (the 2026-06-29 bug).
+    # Ad-storage stays denied. For an EU audience, switch to 'denied' + a consent banner.
     "gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',"
-    "ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});"
+    "ad_personalization:'denied',analytics_storage:'granted',wait_for_update:500});"
     "gtag('js',new Date());gtag('config','__GA__');</script>\n"
     '<script async src="https://www.googletagmanager.com/gtag/js?id=__GA__"></script>\n'
     "<script>document.addEventListener('click',function(e){"
