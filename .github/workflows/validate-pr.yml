@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -20,3 +22,5 @@ jobs:
         run: PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
       - name: Run tests
         run: PYTHONPATH=. python -m pytest scripts/tests/ -v
+      - name: Eval coverage (advisory)
+        run: PYTHONPATH=. python scripts/check_eval_coverage.py --base "origin/${{ github.base_ref }}"

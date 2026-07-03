@@ -180,6 +180,7 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 - **`sync_to_local.py`** — Hub→local sync: pulls patterns into a local project directory
 - **`third_party_skills.py`** — Detects and includes third-party agent skills during provisioning (called by `recommend.py`)
 - **`pipeline_aggregator.py`** — Standalone aggregator for testing-pipeline results: reads `test-results/*.json` and applies the union-of-failures rule
+- **`check_eval_coverage.py`** — Advisory (non-blocking) eval-coverage touch-trigger gate: warns via `::warning::` when a changed `SKILL.md` lacks an `evals/*.md` report; wired into `validate-pr.yml`, always exits 0
 - **`bootstrap.sh`** (repo root, not in `scripts/`) — Curl-pipe-bash installer for downstream users: `curl -sL .../bootstrap.sh | bash -s -- --stacks <list> [--target <dir>]`. Calls `bootstrap.py` after fetching the repo
 - **`trust_score.py`** / **`collect_signals.py`** / **`simulate_walk_phase.py`** / **`generate_trust_dashboard.py`** — the trust-score / walk-phase MVP toolchain (engine, real-signal adapter, sandbox simulator, dashboard generator). See "Trust Score & Walk-Phase (autonomous-factory MVP)" under Architecture before touching scoring, gates, or ledgers
 
