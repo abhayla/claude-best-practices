@@ -60,7 +60,7 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 | # | Work item | Owner | Test strategy | DoD |
 |---|---|---|---|---|
 | 5.1 | `docs/loop-vocabulary.md`: map Ng's 3 rings, Karpathy's 9 rules, Ralph, Willison's brakes, and the 20 patterns → the hub asset implementing each (or an honest "not covered — YAGNI") | Claude | `dedup_check.py --validate-all` (link integrity) | file exists; referenced from the spec; CI green |
-| 5.2 | Package loop-engineering as a G6 plugin via `/plugin-lifecycle` | **Abhay — strategic G6 build, requires explicit approval BEFORE building** | plugin-lifecycle's own create+validate flow | DO NOT START until approved; blocked marker here flips on approval |
+| 5.2 | Package loop-engineering as a G6 plugin via `/plugin-lifecycle` | **Abhay — strategic G6 build, requires explicit approval BEFORE building** | plugin-lifecycle's own create+validate flow | APPROVED 2026-07-03 — plugin scaffolded, `claude plugin validate` + hub CI green |
 
 ---
 
@@ -86,4 +86,4 @@ Once Phase 2 proves the loop, tail coverage becomes a narrow overnight loop — 
 - [x] 3.2 — DONE (SKILL.md §3.5 pointer, v1.1.1, registry hash resynced; full local CI green — validators PASS + 1631 pytest passed 2026-07-02). Note: loop-engineering skill is core-only (no dual-home entry), so `test_dual_home_sync.py` has nothing to compare — the pytest run covers it
 - [x] 4.1 — DONE 2026-07-03: /learn-n-improve v2.5.0 adds success-pattern capture (success_patterns array in the same learnings.json, schema attempted/worked/mechanism/reuse_trigger/evidence, GENERIC vs PRODUCT-SPECIFIC typed per learnings-routing.md, reuses the reuse_count>=2 constraint-injection pipeline + approval gate); mini-eval 6/6 PASS (evals/2026-07-03-eval-report.md)
 - [x] 5.1 — DONE (docs/loop-vocabulary.md + spec pointer; supervisor-verified 33/33 cited paths; landed via the docs/loop-vocabulary PR 2026-07-02)
-- [ ] 5.2 — BLOCKED on owner approval (G6 gate)
+- [x] 5.2 — APPROVED by owner 2026-07-03; plugin scaffolded via /plugin-lifecycle as plugins/loop-engineering v0.1.0 (13 skills + 2 agents + marketplace entry); pending: /plugin install validation in a second project (the open G6-graduation proof)
