@@ -15,12 +15,18 @@ Hub and core copies stay byte-identical; registry hashes stay in sync.
 import hashlib
 import json
 import re
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).parent.parent.parent
 CORE = ROOT / "core" / ".claude" / "hooks"
 HUB = ROOT / ".claude" / "hooks"
 REGISTRY = ROOT / "registry" / "patterns.json"
+PLUGIN_GUARD = ROOT / "plugins" / "prompt-auto-enhance" / "hooks" / "enhance-process-guard.sh"
 
 GUARD = "no-overask-guard.sh"
 REMINDER = "prompt-enhance-reminder.sh"
@@ -114,6 +120,149 @@ def test_reminder_demands_full_process_up_front_not_format_A():
     assert "format A" not in rem, "reminder must NOT demand the weaker compact 'format A' (G6)"
     assert "FULL ENHANCE PROCESS UP FRONT" in rem, "reminder must demand the full process up front (G6)"
     assert "Reviewer-after" in rem, "reminder must name the reviewer card column (G6)"
+
+
+def _scratch_repo(tmp_path_factory) -> Path:
+    """A throwaway git repo so the guard's state files (.claude/.reviewcard-count,
+    .overask-violations.log, etc.) never touch the real hub checkout, and so the
+    test's outcome cannot depend on ambient hub state (e.g. a real .enhance-mode)."""
+    scratch = tmp_path_factory.mktemp("guard-scratch")
+    subprocess.run(["git", "init", "-q"], cwd=str(scratch), check=True)
+    return scratch
+
+
+def _run_guard(hook_path: Path, transcript_lines: list, cwd: Path) -> str:
+    """Invoke a guard hook against a synthetic transcript; return its raw stdout."""
+    fd, tp = tempfile.mkstemp(suffix=".jsonl", dir=str(cwd))
+    try:
+        with open(fd, "w", encoding="utf-8") as f:
+            for line in transcript_lines:
+                f.write(json.dumps(line) + "\n")
+        result = subprocess.run(
+            [shutil.which("bash") or "bash", str(hook_path)],
+            input=json.dumps({"transcript_path": tp}),
+            capture_output=True,
+            text=True,
+            cwd=str(cwd),
+        )
+        return result.stdout.strip()
+    finally:
+        Path(tp).unlink(missing_ok=True)
+
+
+def _is_block(out: str) -> bool:
+    if not out:
+        return False
+    try:
+        return json.loads(out).get("decision") == "block"
+    except (json.JSONDecodeError, AttributeError):
+        return False
+
+
+_CARD_TEXT = (
+    "*Enhanced: checked stuff*\n\n"
+    "Before-after grade card:\n"
+    "| Dim | Before | Self-after | Reviewer-after |\n"
+    "|---|---|---|---|\n"
+    "| Role | 2 | 8 | 8 |\n"
+    "Overall: F -> B\n"
+    "Independent reviewer (ran this turn): blind re-grade, divergence 0.2\n\n"
+    "Diagnosis: MISSING_ROLE\n"
+    "Changes Applied: [1] ROLE (high) -> added persona\n"
+    "Role: engineer — because X\n"
+)
+
+# The final block must, on its own, already clear each guard's ">=300 chars" substantive
+# gate and contain NONE of the card tokens. Otherwise a last-block-only implementation
+# (the exact bug #253 alleges) would exit on the length gate before ever checking for a
+# card, at which point it "passes" the test for the wrong reason (2026-07-03 review
+# finding: a short final block does not discriminate a fixed guard from a broken one).
+_LONG_CARDLESS_FINAL_BLOCK = "Done, committed the change. " * 15  # 420 chars, no card tokens
+assert len(_LONG_CARDLESS_FINAL_BLOCK) >= 300
+
+# Reproduces issue #253: the card renders in an EARLY assistant text block, then the
+# turn makes tool calls, then ends with a long final summary block that itself contains
+# no card — all within ONE real user turn (no intervening real user message). A
+# last-block-only guard would see only the final block: long enough to trigger its
+# substantiveness check, and card-less, so it would incorrectly block.
+_MID_TURN_CARD_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "do the thing"}},
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _CARD_TEXT}]}},
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "echo hi"}}]},
+    },
+    {
+        "type": "user",
+        "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "hi"}]},
+    },
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _LONG_CARDLESS_FINAL_BLOCK}]}},
+]
+
+# Negative control: no card anywhere in the turn — the guard MUST still block a long,
+# non-trivial turn with no reviewer card, or the guard is doing nothing at all.
+_NO_CARD_ANYWHERE_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "do the thing"}},
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Some early text with no card. " * 10}]}},
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "echo hi"}}]},
+    },
+    {
+        "type": "user",
+        "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "hi"}]},
+    },
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _LONG_CARDLESS_FINAL_BLOCK}]}},
+]
+
+
+def test_discriminating_transcript_would_trip_a_last_block_only_bug():
+    """Meta-check: prove the transcript above actually discriminates. If a guard only
+    looked at the LAST assistant text block (the literal bug #253 describes), that
+    block alone already clears the length gate and contains no card token — so a
+    last-block-only implementation would find "substantive, no card" and block. This
+    is what makes test_*_credits_a_card_rendered_before_tool_calls below meaningful:
+    the real hooks passing it proves they look past the last block, not that the
+    scenario was too small to trigger the guard at all (2026-07-03 review finding)."""
+    assert len(_LONG_CARDLESS_FINAL_BLOCK) >= 300
+    lowered = _LONG_CARDLESS_FINAL_BLOCK.lower()
+    assert not re.search(r"reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer", lowered)
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_credits_a_card_rendered_before_tool_calls(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _MID_TURN_CARD_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"hub {GUARD} wrongly blocked a turn whose card rendered before tool calls (issue #253): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_credits_a_card_rendered_before_tool_calls(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _MID_TURN_CARD_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} wrongly blocked a turn whose card rendered before tool calls (issue #253): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_still_blocks_when_no_card_anywhere(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"hub {GUARD} failed to block a substantive turn with no reviewer card anywhere: {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_still_blocks_when_no_card_anywhere(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} failed to block a substantive turn with no reviewer card anywhere: {out}"
+    )
 
 
 def test_registry_hashes_in_sync():
