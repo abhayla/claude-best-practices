@@ -49,7 +49,8 @@ conveyor belt, move to the next test. Never stop to analyze what you captured.
 **Worker agent** (`dispatched_from: worker`). Dispatched from T0 by
 `/e2e-visual-run` (execute or e2e-classify mode) or `/test-pipeline`
 (classify mode) — both are skill-at-T0 orchestrators (spec v2.2). Uses
-`Skill()`, `Bash()`, `Read`, `Grep`, `Glob` only — MUST NOT call `Agent()`
+`Skill()`, `Bash()`, `Read`, `Grep`, `Glob`, `Write` (incremental state/manifest
+writes) only — MUST NOT call `Agent()`
 (platform constraint — see `agent-orchestration.md` §3).
 
 ## Core Responsibilities

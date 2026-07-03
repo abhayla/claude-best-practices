@@ -5170,7 +5170,7 @@
     }
   },
   "test-scout-agent": {
-    "hash": "dbf484e75cb8596cc4e9b18be158b55cddfd46e526d698359b7d6a22bc04a361",
+    "hash": "8c291bc69e9989eeeae70842b113a9852f48b1d8a2995e7b2520f07bf1f09abd",
     "type": "agent",
     "category": "core",
     "version": "2.1.0",
@@ -5356,7 +5356,7 @@
     }
   },
   "visual-inspector-agent": {
-    "hash": "b4619efa7c672b98ddd839edc3156bd7a27d7a1a0eb0d575e6b4ee067c7445a6",
+    "hash": "eddc1cf74415d91b7c08ab818878dd91fe66e3aafa37d2de0bd4b30af59035a6",
     "type": "agent",
     "category": "core",
     "version": "3.0.0",
