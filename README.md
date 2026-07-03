@@ -39,7 +39,7 @@ pip install -r scripts/requirements.txt
 
 **Step 3: Choose how to provision your project**
 
-You have three options. Pick the one that fits your needs:
+You have three options. Pick the one that fits your needs. (Cross-reference: [`docs/GETTING-STARTED.md`](docs/GETTING-STARTED.md) walks through the same options step by step, plus an "Advanced / low-level" note on the deprecated `bootstrap.py` stack-filter path.)
 
 ---
 

@@ -252,13 +252,24 @@ def generate_getting_started(hub_repo: str, available_stacks: list[str], counts:
         "cp -r core/.claude/ /path/to/your/project/.claude/",
         "```",
         "",
-        "### Option B: Bootstrap with Stack Filtering",
+        "### Option B: Smart Provisioning (recommended)",
+        "Auto-detects your project's tech stacks and copies only matching patterns:",
         "```bash",
-        f"python scripts/bootstrap.py --stacks {stacks_str} --target /path/to/project",
+        "PYTHONPATH=. python scripts/recommend.py --local /path/to/your/project --provision",
         "```",
+        "See the full walkthrough (including Option C, full synthesis) in the main "
+        "[README](../README.md#getting-started).",
         "",
-        "### Option C: Remote Bootstrap",
+        "### Advanced / low-level (bootstrap.py — legacy stack-filter installer)",
+        "`bootstrap.py` and its remote wrapper `bootstrap.sh` copy patterns for explicitly-named "
+        "stacks with no auto-detection. `bootstrap.py` prints its own DEPRECATED notice pointing at "
+        "`recommend.py --provision` / `/synthesize-project` — prefer Option B above unless you need "
+        "this low-level control (e.g. scripted CI provisioning of a fixed stack list):",
         "```bash",
+        "# Local",
+        f"python scripts/bootstrap.py --stacks {stacks_str} --target /path/to/project",
+        "",
+        "# Remote",
         f"curl -sL https://raw.githubusercontent.com/{hub_repo}/main/bootstrap.sh | bash -s -- --stacks {stacks_str}",
         "```",
         "",
