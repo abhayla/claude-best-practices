@@ -6472,7 +6472,7 @@
     }
   },
   "no-overask-guard": {
-    "hash": "c65fb3d1957ac5b5b3b192323fcd87f8e4bd6f635e78d8213a54cd8fe3c21f5c",
+    "hash": "3134424c3a23dd6ad18fc25f329a2a3d52ba10387ca8c2d51b6cf68d4fe236b8",
     "type": "hook",
     "category": "core",
     "version": "1.1.0",

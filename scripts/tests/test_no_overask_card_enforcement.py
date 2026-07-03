@@ -59,9 +59,14 @@ def test_card_block_is_decoupled_from_banner_shape():
     body = _guard()
     # the old block-present gate must be gone...
     assert "enh_block" not in body, "the enh_block gate must be gone (G7)"
-    # ...and the card block fires on substantive + not-trivial + NO card, not on banner shape.
-    assert '[ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -z "$card" ]' in body, (
-        "card block must gate on (substantive AND not-trivial AND no-card), banner-independent (G7)"
+    # ...and the card block fires on substantive + not-trivial + (no-card OR no-overall-row),
+    # not on banner shape (H2/issue #279 ported the hub's overall-row check).
+    assert (
+        '[ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && { [ -z "$card" ] || [ -z "$overall" ]; }'
+        in body
+    ), (
+        "card block must gate on (substantive AND not-trivial AND (no-card OR no-overall)), "
+        "banner-independent (G7/H2)"
     )
 
 
@@ -216,6 +221,74 @@ _NO_CARD_ANYWHERE_TRANSCRIPT = [
 ]
 
 
+# Regression lock for issue #279: a fully-rendered card whose reviewer COLUMN is worded
+# differently (a markdown table row "| Dim | Before | After | Blind reviewer |") and that
+# uses NONE of the fixed prose tokens ("reviewer-after", "independent reviewer", …) — this
+# used to false-block because the old regex matched only that fixed prose. Includes an
+# Overall row + Diagnosis/Changes-Applied substance so ONLY the card-wording gap is exercised.
+_DIFF_WORDED_CARD_TEXT = (
+    "*Enhanced: checked stuff*\n\n"
+    "Score table:\n"
+    "| Dim | Before | After | Blind reviewer |\n"
+    "|---|---|---|---|\n"
+    "| Role | 2 | 8 | 8 |\n"
+    "Overall: F -> B\n\n"
+    "Diagnosis: MISSING_ROLE\n"
+    "Changes Applied: [1] ROLE (high) -> added persona\n"
+    "Role: engineer — because X\n"
+)
+
+_DIFF_WORDED_CARD_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "do the thing"}},
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "text", "text": _DIFF_WORDED_CARD_TEXT}]},
+    },
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "echo hi"}}]},
+    },
+    {
+        "type": "user",
+        "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "hi"}]},
+    },
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _LONG_CARDLESS_FINAL_BLOCK}]}},
+]
+
+
+# Negative control for the H1 tightening (issue #279 review): an UNRELATED markdown table
+# that merely contains the word "reviewer" (e.g. "| File | Reviewer |") plus the common word
+# "overall" somewhere — but NO before/after/self card header row and NONE of the enhance
+# prose tokens — must NOT be credited as a card. The guard MUST still block, or the widened
+# regex would have opened a genuine-miss escape hatch.
+_REVIEWER_TABLE_NO_CARD_TEXT = (
+    "Here is the assignment table for the sprint:\n"
+    "| File | Reviewer |\n"
+    "|---|---|\n"
+    "| a.py | bob |\n"
+    "| b.py | carol |\n"
+    "Overall this covers the backlog. " * 8
+)
+assert len(_REVIEWER_TABLE_NO_CARD_TEXT) >= 300
+
+_REVIEWER_TABLE_NO_CARD_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "do the thing"}},
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "text", "text": _REVIEWER_TABLE_NO_CARD_TEXT}]},
+    },
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "echo hi"}}]},
+    },
+    {
+        "type": "user",
+        "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "hi"}]},
+    },
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _LONG_CARDLESS_FINAL_BLOCK}]}},
+]
+
+
 def test_discriminating_transcript_would_trip_a_last_block_only_bug():
     """Meta-check: prove the transcript above actually discriminates. If a guard only
     looked at the LAST assistant text block (the literal bug #253 describes), that
@@ -263,6 +336,59 @@ def test_plugin_guard_still_blocks_when_no_card_anywhere(tmp_path_factory):
     assert _is_block(out), (
         f"plugin {PLUGIN_GUARD.name} failed to block a substantive turn with no reviewer card anywhere: {out}"
     )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_credits_differently_worded_reviewer_column(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _DIFF_WORDED_CARD_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"hub {GUARD} wrongly blocked a card whose reviewer column is worded differently "
+        f"(issue #279): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_credits_differently_worded_reviewer_column(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _DIFF_WORDED_CARD_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} wrongly blocked a card whose reviewer column is worded "
+        f"differently (issue #279): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_still_blocks_reviewer_table_without_a_real_card(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _REVIEWER_TABLE_NO_CARD_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"hub {GUARD} failed to block a turn whose only 'reviewer' content is an unrelated "
+        f"table (no before/after/self card header) (issue #279 review): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_still_blocks_reviewer_table_without_a_real_card(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _REVIEWER_TABLE_NO_CARD_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} failed to block a turn whose only 'reviewer' content is an "
+        f"unrelated table (no before/after/self card header) (issue #279 review): {out}"
+    )
+
+
+def test_card_regex_consistent_across_guards():
+    """H6: the card-detection regex AND the overall-row regex must be byte-identical across
+    the hub, core, and plugin guards so they cannot drift out of sync again (issue #279)."""
+    hub_body = (HUB / GUARD).read_text(encoding="utf-8")
+    core_body = (CORE / GUARD).read_text(encoding="utf-8")
+    plugin_body = PLUGIN_GUARD.read_text(encoding="utf-8")
+    card_snippet = r"^[[:space:]]*\|.*(before|after|self).*reviewer.*\|"
+    overall_snippet = r"overall|[a-f] *(→|->) *[a-f]|weighted total"
+    for name, body in [("hub", hub_body), ("core", core_body), ("plugin", plugin_body)]:
+        assert card_snippet in body, f"{name} guard's card-detection regex drifted (H6)"
+        assert overall_snippet in body, f"{name} guard's overall-row regex drifted (H6)"
 
 
 def test_registry_hashes_in_sync():
