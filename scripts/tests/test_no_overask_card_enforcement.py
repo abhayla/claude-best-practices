@@ -15,12 +15,18 @@ Hub and core copies stay byte-identical; registry hashes stay in sync.
 import hashlib
 import json
 import re
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).parent.parent.parent
 CORE = ROOT / "core" / ".claude" / "hooks"
 HUB = ROOT / ".claude" / "hooks"
 REGISTRY = ROOT / "registry" / "patterns.json"
+PLUGIN_GUARD = ROOT / "plugins" / "prompt-auto-enhance" / "hooks" / "enhance-process-guard.sh"
 
 GUARD = "no-overask-guard.sh"
 REMINDER = "prompt-enhance-reminder.sh"
@@ -114,6 +120,72 @@ def test_reminder_demands_full_process_up_front_not_format_A():
     assert "format A" not in rem, "reminder must NOT demand the weaker compact 'format A' (G6)"
     assert "FULL ENHANCE PROCESS UP FRONT" in rem, "reminder must demand the full process up front (G6)"
     assert "Reviewer-after" in rem, "reminder must name the reviewer card column (G6)"
+
+
+def _run_guard(hook_path: Path, transcript_lines: list) -> str:
+    """Invoke a guard hook against a synthetic transcript; return its raw stdout."""
+    fd, tp = tempfile.mkstemp(suffix=".jsonl")
+    try:
+        with open(fd, "w", encoding="utf-8") as f:
+            for line in transcript_lines:
+                f.write(json.dumps(line) + "\n")
+        result = subprocess.run(
+            [shutil.which("bash") or "bash", str(hook_path)],
+            input=json.dumps({"transcript_path": tp}),
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+        )
+        return result.stdout.strip()
+    finally:
+        Path(tp).unlink(missing_ok=True)
+
+
+_CARD_TEXT = (
+    "*Enhanced: checked stuff*\n\n"
+    "Before-after grade card:\n"
+    "| Dim | Before | Self-after | Reviewer-after |\n"
+    "|---|---|---|---|\n"
+    "| Role | 2 | 8 | 8 |\n"
+    "Overall: F -> B\n"
+    "Independent reviewer (ran this turn): blind re-grade, divergence 0.2\n\n"
+    "Diagnosis: MISSING_ROLE\n"
+    "Changes Applied: [1] ROLE (high) -> added persona\n"
+    "Role: engineer — because X\n"
+)
+
+# Reproduces issue #253: the card renders in an EARLY assistant text block, then the
+# turn makes tool calls, then ends with a short final summary block — all within ONE
+# real user turn (no intervening real user message).
+_MID_TURN_CARD_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "do the thing"}},
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _CARD_TEXT}]}},
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "echo hi"}}]},
+    },
+    {
+        "type": "user",
+        "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "hi"}]},
+    },
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Done, committed the change."}]}},
+]
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_credits_a_card_rendered_before_tool_calls():
+    out = _run_guard(HUB / GUARD, _MID_TURN_CARD_TRANSCRIPT)
+    assert '"decision":"block"' not in out, (
+        f"hub {GUARD} wrongly blocked a turn whose card rendered before tool calls (issue #253): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_credits_a_card_rendered_before_tool_calls():
+    out = _run_guard(PLUGIN_GUARD, _MID_TURN_CARD_TRANSCRIPT)
+    assert '"decision":"block"' not in out, (
+        f"plugin {PLUGIN_GUARD.name} wrongly blocked a turn whose card rendered before tool calls (issue #253): {out}"
+    )
 
 
 def test_registry_hashes_in_sync():
