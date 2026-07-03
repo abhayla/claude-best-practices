@@ -650,3 +650,8 @@ occurred AND the prior turns already landed the work — i.e. a pure confirmatio
 - **Mistake**: Replied to enhance-guard STOP blocks with the trivial banner + a full restated summary (>600 chars) — blocked 3×.
 - **Root cause**: `no-overask-guard.sh:95` + plugin `enhance-process-guard.sh:60` only honor the "no change — ran your input as-is" first line when total reply <600 chars. Also built-in commands like /init reach hooks as expanded prompt text, so the slash-command exemption never matches.
 - **Rule**: When an enhance guard blocks a slash-command/trivial turn, reply with the banner + a reply UNDER 600 chars (don't restate the summary). Hook fix candidate: detect built-in command turns via <command-name> tag / raise the trivial cap.
+
+## 2026-07-03 — hub-rule edits have a CI-only lean-rules gate
+- Mistake: pushed a new `.claude/rules/` file (model-routing.md) without running the full local pytest first; CI failed on `test_rule_organization.py` (approved hub-rule set + 320-line total budget).
+- Root cause: assumed validators + registry checks covered rule files; the lean-rules gate only surfaces via the pytest suite.
+- Rule: ANY change under `.claude/rules/` requires (1) adding the filename to ALLOWED_HUB_RULES in scripts/tests/test_rule_organization.py, (2) fitting the 320-line total budget (trim, don't raise), (3) full local pytest BEFORE push — same discipline as registered-pattern edits.
