@@ -82,7 +82,7 @@ def render_readme_counts_block(counts: dict) -> str:
         README_COUNTS_START,
         "| Component | Count | Description |",
         "|-----------|-------|-------------|",
-        f"| **Agents** | {counts['agents']} | Sub-agents for code review, debugging, testing, git, planning, security, docs (includes deprecated workflow-master orchestrators kept as historical stubs) |",
+        f"| **Agents** | {counts['agents']} | Sub-agents for code review, debugging, testing, git, planning, security, docs |",
         f"| **Skills** | {counts['skills']} | Slash-command workflows: `/implement`, `/fix-loop`, `/tdd`, `/synthesize-project`, `/development-loop`, and more |",
         f"| **Rules** | {counts['rules']} | Scoped coding rules for workflow, testing, FastAPI, Android, Compose, Firebase, etc. |",
         f"| **Hooks** | {counts['hooks']} | Auto-format, secret scanning, dangerous command blocking, context monitoring, governance |",
@@ -252,13 +252,24 @@ def generate_getting_started(hub_repo: str, available_stacks: list[str], counts:
         "cp -r core/.claude/ /path/to/your/project/.claude/",
         "```",
         "",
-        "### Option B: Bootstrap with Stack Filtering",
+        "### Option B: Smart Provisioning (recommended)",
+        "Auto-detects your project's tech stacks and copies only matching patterns:",
         "```bash",
-        f"python scripts/bootstrap.py --stacks {stacks_str} --target /path/to/project",
+        "PYTHONPATH=. python scripts/recommend.py --local /path/to/your/project --provision",
         "```",
+        "See the full walkthrough (including Option C, full synthesis) in the main "
+        "[README](../README.md#getting-started).",
         "",
-        "### Option C: Remote Bootstrap",
+        "### Advanced / low-level (bootstrap.py — legacy stack-filter installer)",
+        "`bootstrap.py` and its remote wrapper `bootstrap.sh` copy patterns for explicitly-named "
+        "stacks with no auto-detection. `bootstrap.py` prints its own DEPRECATED notice pointing at "
+        "`recommend.py --provision` / `/synthesize-project` — prefer Option B above unless you need "
+        "this low-level control (e.g. scripted CI provisioning of a fixed stack list):",
         "```bash",
+        "# Local",
+        f"python scripts/bootstrap.py --stacks {stacks_str} --target /path/to/project",
+        "",
+        "# Remote",
         f"curl -sL https://raw.githubusercontent.com/{hub_repo}/main/bootstrap.sh | bash -s -- --stacks {stacks_str}",
         "```",
         "",
@@ -476,18 +487,18 @@ if __name__ == "__main__":
     counts = component_counts(claude_dir)
 
     dashboard = generate_dashboard_md(registry, [], {}, docs_dir=docs_dir)
-    (docs_dir / "DASHBOARD.md").write_text(dashboard)
+    (docs_dir / "DASHBOARD.md").write_text(dashboard, encoding="utf-8")
     print("Generated docs/DASHBOARD.md")
 
     catalog = generate_stack_catalog(claude_dir)
-    (docs_dir / "STACK-CATALOG.md").write_text(catalog)
+    (docs_dir / "STACK-CATALOG.md").write_text(catalog, encoding="utf-8")
     print("Generated docs/STACK-CATALOG.md")
 
     from scripts.bootstrap import get_available_stacks
     available_stacks = get_available_stacks()
 
     getting_started = generate_getting_started("abhayla/claude-best-practices", available_stacks, counts)
-    (docs_dir / "GETTING-STARTED.md").write_text(getting_started)
+    (docs_dir / "GETTING-STARTED.md").write_text(getting_started, encoding="utf-8")
     print("Generated docs/GETTING-STARTED.md")
 
     if update_readme_counts(root / "README.md", counts):

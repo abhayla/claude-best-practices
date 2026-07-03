@@ -26,9 +26,9 @@ When implementing features or fixing bugs, follow this structured approach:
 - Fix failures before proceeding
 
 ### Step 5: Fix Loop
-- If tests fail, iterate: analyze → fix → retest
-- Maximum 5 iterations before escalating
-- Each iteration must try a different approach
+When tests fail, do NOT hand-iterate — follow `claude-behavior.md` rule 15: invoke `/fix-loop`
+(known retest command) or `/systematic-debugging` (unclear root cause or 2+ failed attempts).
+Never manually retry the same approach 3+ times without switching to a structured skill.
 
 ### Step 6: Verify
 - Run broader test suite for regression check

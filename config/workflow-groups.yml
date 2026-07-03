@@ -46,7 +46,6 @@ workflows:
       agents:
         - android-build-fixer-agent
         - anthropic-multi-agent-reviewer-agent
-        - development-loop-master-agent
         - karpathy-advisor-agent
         - plan-executor-agent
         - planner-researcher-agent
@@ -189,7 +188,6 @@ workflows:
         - systematic-debugging
       agents:
         - debugger-agent
-        - debugging-loop-master-agent
         - test-failure-analyzer-agent
       rules:
         - claude-behavior
@@ -210,7 +208,6 @@ workflows:
         - vps-deploy
       agents:
         - context-reducer-agent
-        - learning-self-improvement-master-agent
         - session-summarizer-agent
       rules:
         - context-management
@@ -231,7 +228,6 @@ workflows:
         - start-session
         - status
       agents:
-        - session-continuity-master-agent
         - session-summarizer-agent
       rules:
         - context-management
@@ -257,7 +253,6 @@ workflows:
         - fastapi-database-admin-agent
         - karpathy-advisor-agent
         - skill-author-agent
-        - skill-authoring-master-agent
         - workflow-master-template
       rules:
         - agent-team-selection
@@ -284,7 +279,6 @@ workflows:
         - security-audit
       agents:
         - android-kotlin-reviewer-agent
-        - code-review-master-agent
         - code-reviewer-agent
         - security-auditor-agent
         - workflow-master-template
@@ -307,7 +301,6 @@ workflows:
         - improve-codebase-architecture
       agents:
         - docs-manager-agent
-        - documentation-master-agent
         - workflow-master-template
       rules: []
 

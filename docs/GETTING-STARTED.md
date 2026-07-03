@@ -7,13 +7,20 @@
 cp -r core/.claude/ /path/to/your/project/.claude/
 ```
 
-### Option B: Bootstrap with Stack Filtering
+### Option B: Smart Provisioning (recommended)
+Auto-detects your project's tech stacks and copies only matching patterns:
 ```bash
-python scripts/bootstrap.py --stacks ai-gemini,android-compose --target /path/to/project
+PYTHONPATH=. python scripts/recommend.py --local /path/to/your/project --provision
 ```
+See the full walkthrough (including Option C, full synthesis) in the main [README](../README.md#getting-started).
 
-### Option C: Remote Bootstrap
+### Advanced / low-level (bootstrap.py — legacy stack-filter installer)
+`bootstrap.py` and its remote wrapper `bootstrap.sh` copy patterns for explicitly-named stacks with no auto-detection. `bootstrap.py` prints its own DEPRECATED notice pointing at `recommend.py --provision` / `/synthesize-project` — prefer Option B above unless you need this low-level control (e.g. scripted CI provisioning of a fixed stack list):
 ```bash
+# Local
+python scripts/bootstrap.py --stacks ai-gemini,android-compose --target /path/to/project
+
+# Remote
 curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bootstrap.sh | bash -s -- --stacks ai-gemini,android-compose
 ```
 
@@ -31,7 +38,7 @@ curl -sL https://raw.githubusercontent.com/abhayla/claude-best-practices/main/bo
 
 | Component | Count | Description |
 |-----------|-------|-------------|
-| Agents | 36 | Specialized sub-agents for code review, debugging, testing, etc. |
+| Agents | 29 | Specialized sub-agents for code review, debugging, testing, etc. |
 | Skills | 170 | Slash-command workflows like `/implement`, `/fix-loop`, `/status` |
 | Rules | 55 | Scoped coding rules that activate based on file paths |
 | Hooks | 21 | Example hooks you can adapt (see `hooks/README.md`) |
