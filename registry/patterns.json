@@ -1072,34 +1072,6 @@
       "last_updated": "2026-06-20"
     }
   },
-  "code-review-master-agent": {
-    "hash": "8212abddbd6717c0428f7eface030657b99cc77e4d4392595211262f7a8af48c",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate pre-merge quality gates, security audit, risk scoring, PR creation, and review feedback handling with deferred item TTL.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "review",
-      "quality"
-    ],
-    "changelog": "v1.0.0: Initial release — code review orchestration with defense-in-depth model | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.4)",
-    "tier": "nice-to-have",
-    "deprecated": true,
-    "deprecated_by": "code-review-workflow",
-    "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0,
-      "sample_size": 1,
-      "last_updated": "2026-06-20"
-    }
-  },
   "code-review-workflow": {
     "hash": "76f6aac83c28298d34716c9ef1f9687e354cf8280d12a6740d3934896550ec62",
     "type": "skill",
@@ -1615,34 +1587,6 @@
       "last_updated": "2026-06-20"
     }
   },
-  "debugging-loop-master-agent": {
-    "hash": "f3004536c55d2ed29305d8ab0a3c05501f93f2cd852c6ece1f7995a1fa367938",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate structured bug diagnosis and resolution with mandatory learning capture. Root cause classification guides fix strategy.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "debugging",
-      "diagnosis"
-    ],
-    "changelog": "v1.0.0: Initial release — debugging loop with scientific method approach | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.3) — superseded by /debugging-loop skill-at-T0",
-    "tier": "nice-to-have",
-    "deprecated": true,
-    "deprecated_by": "debugging-loop",
-    "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0,
-      "sample_size": 1,
-      "last_updated": "2026-06-20"
-    }
-  },
   "deploy-strategy": {
     "hash": "21023ec63f543eef2938e490e3863455ad52dd0571367f12df61b78262f3ccae",
     "type": "skill",
@@ -1757,34 +1701,6 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-06-20"
-    }
-  },
-  "development-loop-master-agent": {
-    "hash": "1b073bc06a74ae7be913b5b0c52be83fb7b9a1e730e9f2c2416064a0541842f3",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-24",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate the full development cycle: ideate, plan, implement, verify, commit. Complexity-adaptive routing skips unnecessary steps for simple tasks.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "development",
-      "planning"
-    ],
-    "changelog": "v1.0.0: Initial release — development loop orchestration with complexity detection | v1.0.1 (2026-04-24): DEPRECATED (Phase 3.2) — superseded by /development-loop skill-at-T0; kept for 2-version-cycle window",
-    "tier": "nice-to-have",
-    "deprecated": true,
-    "deprecated_by": "development-loop",
-    "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0,
-      "sample_size": 1,
       "last_updated": "2026-06-20"
     }
   },
@@ -1940,33 +1856,6 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-06-20"
-    }
-  },
-  "documentation-master-agent": {
-    "hash": "5d632c3ac6a18418bbbcf16a879b32cf6c60b3436bb1527450df3a5432d0a017",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate documentation generation: ADRs, API docs, structure enforcement, staleness audits. Parallel step execution for independent doc types.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "documentation"
-    ],
-    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.5)",
-    "tier": "nice-to-have",
-    "deprecated": true,
-    "deprecated_by": "documentation-workflow",
-    "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0,
-      "sample_size": 1,
       "last_updated": "2026-06-20"
     }
   },
@@ -3157,33 +3046,6 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-06-20"
-    }
-  },
-  "learning-self-improvement-master-agent": {
-    "hash": "d9024fe6b606d15b816d31d89359a9727ae5dffb1ebce2628af0d73fddbdef55",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate learning capture, pattern detection, and skill generation. Enforces 3+ occurrence threshold for proposals.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "learning"
-    ],
-    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.7)",
-    "tier": "nice-to-have",
-    "deprecated": true,
-    "deprecated_by": "learning-self-improvement",
-    "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0,
-      "sample_size": 1,
       "last_updated": "2026-06-20"
     }
   },
@@ -4669,33 +4531,6 @@
       "last_updated": "2026-06-20"
     }
   },
-  "session-continuity-master-agent": {
-    "hash": "52f3aa877a1f51b32f9674468cf8a7d28abd3ac2943aa04dd9d6f6e7038ded99",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate session save, restore, and handover. Mode-aware (save vs restore) with freshness validation.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "session"
-    ],
-    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.6)",
-    "tier": "nice-to-have",
-    "deprecated": true,
-    "deprecated_by": "session-continuity",
-    "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0,
-      "sample_size": 1,
-      "last_updated": "2026-06-20"
-    }
-  },
   "session-reminder": {
     "hash": "97dc8ffa553ff1b0f08234549c4d8bad107a31bdc643beec637dc82738ff3cde",
     "type": "hook",
@@ -4762,33 +4597,6 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 3,
-      "last_updated": "2026-06-20"
-    }
-  },
-  "skill-authoring-master-agent": {
-    "hash": "7cb975dc8da3502c6aab92ee721b543e652612b252fc446111f7fbee02fd1a9a",
-    "type": "agent",
-    "category": "core",
-    "version": "1.0.1",
-    "source": "hub:abhayla/claude-best-practices",
-    "discovered": "2026-03-30",
-    "last_updated": "2026-04-25",
-    "dependencies": [],
-    "visibility": "public",
-    "description": "Orchestrate skill creation, validation, and registration. Enforces overlap detection and mandatory quality gates.",
-    "tags": [
-      "orchestration",
-      "workflow",
-      "skill-authoring"
-    ],
-    "changelog": "v1.0.0: Initial release | v1.0.1 (2026-04-25): DEPRECATED (Phase 3.8 — final workflow-master retirement)",
-    "tier": "nice-to-have",
-    "deprecated": true,
-    "deprecated_by": "skill-authoring-workflow",
-    "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0,
-      "sample_size": 1,
       "last_updated": "2026-06-20"
     }
   },

@@ -82,7 +82,7 @@ def render_readme_counts_block(counts: dict) -> str:
         README_COUNTS_START,
         "| Component | Count | Description |",
         "|-----------|-------|-------------|",
-        f"| **Agents** | {counts['agents']} | Sub-agents for code review, debugging, testing, git, planning, security, docs (includes deprecated workflow-master orchestrators kept as historical stubs) |",
+        f"| **Agents** | {counts['agents']} | Sub-agents for code review, debugging, testing, git, planning, security, docs |",
         f"| **Skills** | {counts['skills']} | Slash-command workflows: `/implement`, `/fix-loop`, `/tdd`, `/synthesize-project`, `/development-loop`, and more |",
         f"| **Rules** | {counts['rules']} | Scoped coding rules for workflow, testing, FastAPI, Android, Compose, Firebase, etc. |",
         f"| **Hooks** | {counts['hooks']} | Auto-format, secret scanning, dangerous command blocking, context monitoring, governance |",
@@ -476,18 +476,18 @@ if __name__ == "__main__":
     counts = component_counts(claude_dir)
 
     dashboard = generate_dashboard_md(registry, [], {}, docs_dir=docs_dir)
-    (docs_dir / "DASHBOARD.md").write_text(dashboard)
+    (docs_dir / "DASHBOARD.md").write_text(dashboard, encoding="utf-8")
     print("Generated docs/DASHBOARD.md")
 
     catalog = generate_stack_catalog(claude_dir)
-    (docs_dir / "STACK-CATALOG.md").write_text(catalog)
+    (docs_dir / "STACK-CATALOG.md").write_text(catalog, encoding="utf-8")
     print("Generated docs/STACK-CATALOG.md")
 
     from scripts.bootstrap import get_available_stacks
     available_stacks = get_available_stacks()
 
     getting_started = generate_getting_started("abhayla/claude-best-practices", available_stacks, counts)
-    (docs_dir / "GETTING-STARTED.md").write_text(getting_started)
+    (docs_dir / "GETTING-STARTED.md").write_text(getting_started, encoding="utf-8")
     print("Generated docs/GETTING-STARTED.md")
 
     if update_readme_counts(root / "README.md", counts):
