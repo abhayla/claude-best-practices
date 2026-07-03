@@ -121,11 +121,14 @@ def test_tools_is_yaml_list_not_scalar(agent_file):
     fm = _parse_frontmatter(agent_file)
     if _is_template_doc(fm, agent_file.stem):
         pytest.skip("reference-doc file without tools declaration")
-    if "tools" not in fm:
-        pytest.skip(
-            "agent does not declare tools (default tool set applies); "
-            "out of scope for this invariant"
-        )
+    assert "tools" in fm, (
+        f"{agent_file.stem} has no `tools:` in frontmatter — it inherits the "
+        f"full default tool set instead of a least-privilege grant. Add an "
+        f"explicit `tools:` list scoped to what the agent's body actually "
+        f"drives (pattern-structure.md Tool Grants table). Reference-doc "
+        f"files without a runtime contract (e.g. *-template.md) are exempt "
+        f"via `_is_template_doc`."
+    )
     # _tools_set raises TypeError on scalar form; call to trigger.
     _tools_set(fm)
 

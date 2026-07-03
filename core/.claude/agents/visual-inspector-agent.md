@@ -7,6 +7,8 @@ description: >
   (STEP 4 verify_queue) after scout + test run populate the queue. Applies the
   verdict matrix, records verdicts with confidence scores, and routes failures
   to fix_queue, expected_changes to its own lane, and passes to completed.
+tools: ["Skill", "Read", "Write"]
+dispatched_from: worker
 model: sonnet
 color: blue
 version: "3.0.0"
@@ -39,7 +41,8 @@ Both must agree for a confident pass.
 **Worker agent** (`dispatched_from: worker`). Dispatched from T0 by
 `/test-pipeline` (skill-at-T0, STEP 4 WAVE 2 — UI Visual Verification)
 or `/e2e-visual-run` (skill-at-T0, STEP 4 verify_queue drain). Uses
-`Skill()` and `Read` (multimodal) only — MUST NOT call `Agent()`
+`Skill()`, `Read` (multimodal), and `Write` (incremental verdict writes)
+only — MUST NOT call `Agent()`
 (platform constraint — see `agent-orchestration.md` §3).
 
 **v3.0.0 architecture (M2 — independent UI runner).** This agent now

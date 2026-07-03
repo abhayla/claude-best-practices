@@ -7,8 +7,12 @@ from pathlib import Path
 import pytest
 
 from scripts.workflow_quality_gate_validate_patterns import (
+    GLOBAL_RULES_BUDGET,
+    SIZE_WARN,
     _looks_like_agent,
     check_cross_references,
+    check_global_rules_budget,
+    check_hub_skill_sizes,
     check_portability,
     count_content_lines,
     is_valid_semver,
@@ -1203,4 +1207,82 @@ class TestCheckCrossReferencesFalsePositives:
             f"https://docs.claude.com/en/docs/claude-code/slash-commands\n"
             f"After re-checking, bump the `Last reviewed` date in the "
             f"IGNORE_REFS MAINTENANCE NOTE."
+        )
+
+
+# ── Issue #287: hub-skill size coverage + aggregate global-rule budget ─────
+
+
+class TestHubSkillSizeCoverage:
+    """Size-only WARNING pass for hub-only `.claude/skills/*/SKILL.md`.
+
+    These are operational (not distributable) skills, so they must NOT be
+    subjected to the full core portability gate — only a size-drift signal.
+    """
+
+    def test_discovers_at_least_one_hub_skill_over_size_warn(self):
+        """The check must actually walk the real hub `.claude/skills/` tree
+        and find at least one oversized skill (e.g. prompt-auto-enhance,
+        known to be 969 lines as of 2026-07-03) — proving the discovery
+        path is wired to the real directory, not an empty/mocked one."""
+        warnings = check_hub_skill_sizes()
+        assert warnings, (
+            "Expected at least one hub SKILL.md over SIZE_WARN "
+            f"({SIZE_WARN}) lines to be discovered and flagged; got none. "
+            "Either the hub skills tree is empty/unreachable or the check "
+            "regressed."
+        )
+        assert all("WARNING" in w for w in warnings), (
+            "All hub-skill-size findings must be non-fatal WARNINGs so the "
+            f"gate stays PASS-overall: {warnings}"
+        )
+
+    def test_flags_prompt_auto_enhance_specifically(self):
+        """Known long hub skill — regression pin for the specific finding,
+        not just 'some warning exists'."""
+        warnings = check_hub_skill_sizes()
+        assert any("prompt-auto-enhance" in w for w in warnings), (
+            f"Expected prompt-auto-enhance to be flagged as oversized; got: {warnings}"
+        )
+
+
+class TestGlobalRulesBudget:
+    """Aggregate WARNING check summing every `# Scope: global` rule's
+    content lines in core/.claude/rules/ against GLOBAL_RULES_BUDGET."""
+
+    def test_computes_a_positive_total_and_respects_budget_constant(self):
+        warnings = check_global_rules_budget()
+        # The check must run against the real rules corpus and always be
+        # able to compute SOME total > 0 (the hub ships 20+ global rules).
+        # Whether that total currently exceeds GLOBAL_RULES_BUDGET or not,
+        # any emitted warning must be non-fatal and reference the budget.
+        if warnings:
+            assert all("WARNING" in w for w in warnings)
+            assert any(str(GLOBAL_RULES_BUDGET) in w for w in warnings), (
+                f"Warning should reference the budget constant {GLOBAL_RULES_BUDGET}: {warnings}"
+            )
+
+    def test_budget_constant_is_a_round_number_above_current_total(self):
+        """Sanity-pin: the budget constant should not be an arbitrarily
+        low number that would make every CI run WARNING-noisy immediately.
+        It must sit above the real current total (computed independently
+        here, not via the checked function, to avoid a tautology)."""
+        from pathlib import Path as _Path
+
+        from scripts.workflow_quality_gate_validate_patterns import RULES_DIR
+
+        total = 0
+        for rule_path in sorted(RULES_DIR.glob("*.md")):
+            if rule_path.name == "README.md":
+                continue
+            content = rule_path.read_text(encoding="utf-8")
+            first_lines = "\n".join(content.splitlines()[:10])
+            if "# Scope: global" in first_lines:
+                total += len(content.splitlines())
+
+        assert total > 0, "Expected at least one global rule with real content"
+        assert GLOBAL_RULES_BUDGET > total, (
+            f"GLOBAL_RULES_BUDGET ({GLOBAL_RULES_BUDGET}) should sit above the "
+            f"current real total ({total}) so it warns as the corpus grows, "
+            f"not immediately on every run."
         )

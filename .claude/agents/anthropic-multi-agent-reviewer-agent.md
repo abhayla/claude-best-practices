@@ -6,6 +6,8 @@ description: >
   patterns. Use proactively when agents or orchestration patterns are added or
   modified. Identifies principle violations, evaluation gaps, and production
   readiness issues before they compound into system-level failures.
+tools: ["Read", "Grep", "Glob"]
+dispatched_from: worker
 model: sonnet
 color: yellow
 ---

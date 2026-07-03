@@ -27,6 +27,7 @@ CORE_CLAUDE = ROOT / "core" / ".claude"
 SKILLS_DIR = CORE_CLAUDE / "skills"
 AGENTS_DIR = CORE_CLAUDE / "agents"
 RULES_DIR = CORE_CLAUDE / "rules"
+HUB_SKILLS_DIR = ROOT / ".claude" / "skills"
 REGISTRY_PATH = ROOT / "registry" / "patterns.json"
 WORKFLOW_CONTRACTS_PATH = ROOT / "config" / "workflow-contracts.yaml"
 RESPONSIBILITY_ALLOWLIST_PATH = CORE_CLAUDE / "config" / "orchestrator-responsibility-allowlist.yml"
@@ -38,6 +39,11 @@ RESPONSIBILITY_CAP = 4
 SIZE_WARN = 500
 SIZE_FAIL = 1000
 STUB_MIN_LINES = 30
+
+# Aggregate budget for the sum of content lines across every `# Scope: global`
+# rule in core/.claude/rules/ — set just above the ~2105-line total observed
+# 2026-07-03 so it warns as the corpus grows rather than failing immediately.
+GLOBAL_RULES_BUDGET = 2200
 
 # Known stack prefixes
 STACK_PREFIXES = ["fastapi-", "android-", "ai-gemini-", "firebase-", "react-", "flutter-", "vue-", "nuxt-", "expo-"]
@@ -1075,6 +1081,92 @@ def validate_third_party_registry() -> list[str]:
     return mod.validate_registry(ROOT)
 
 
+def check_hub_skill_sizes() -> list[str]:
+    """Size-only WARNING pass for hub-only `.claude/skills/*/SKILL.md` files.
+
+    Hub skills are operational (not distributable), so they do NOT get the
+    full core portability gate (`check_portability` / `validate_skill`) —
+    that would wrongly hold an internal skill to the downstream-portability
+    standard. This check only surfaces size drift: WARN over SIZE_WARN,
+    flag (still non-fatal — "WARNING" keeps it out of hard_errors) over
+    SIZE_FAIL, so long hub skills stay visible without breaking CI.
+    """
+    warnings: list[str] = []
+    if not HUB_SKILLS_DIR.exists():
+        return warnings
+
+    offenders = []
+    for skill_dir in sorted(HUB_SKILLS_DIR.iterdir()):
+        if not skill_dir.is_dir():
+            continue
+        skill_md = skill_dir / "SKILL.md"
+        if not skill_md.exists():
+            continue
+        total_lines = len(skill_md.read_text(encoding="utf-8").splitlines())
+        if total_lines > SIZE_FAIL:
+            offenders.append((skill_dir.name, total_lines))
+            warnings.append(
+                f"{skill_dir.name}: WARNING — hub SKILL.md is {total_lines} lines "
+                f"(over SIZE_FAIL {SIZE_FAIL}) — size-only check for hub-only "
+                f"skills, non-fatal; consider splitting into references/"
+            )
+        elif total_lines > SIZE_WARN:
+            offenders.append((skill_dir.name, total_lines))
+            warnings.append(
+                f"{skill_dir.name}: WARNING — hub SKILL.md is {total_lines} lines "
+                f"(recommended max {SIZE_WARN})"
+            )
+
+    if offenders:
+        print(f"\n[hub-skill-size] {len(offenders)} hub skill(s) over {SIZE_WARN} lines:")
+        for name, lines in sorted(offenders, key=lambda x: -x[1]):
+            print(f"  {name}: {lines} lines")
+
+    return warnings
+
+
+def check_global_rules_budget() -> list[str]:
+    """Aggregate WARNING check: sum content lines across every `# Scope:
+    global` rule in core/.claude/rules/ and warn if the total exceeds
+    GLOBAL_RULES_BUDGET. Complements the per-file SIZE_WARN/SIZE_FAIL
+    checks in validate_rule(), which only look at one file at a time and
+    can't see the corpus growing globally-loaded rule by globally-loaded
+    rule (every one of them loads on every session).
+    """
+    warnings: list[str] = []
+    if not RULES_DIR.exists():
+        return warnings
+
+    per_rule = []
+    for rule_path in sorted(RULES_DIR.glob("*.md")):
+        if rule_path.name == "README.md":
+            continue
+        content = rule_path.read_text(encoding="utf-8")
+        first_lines = "\n".join(content.splitlines()[:10])
+        if "# Scope: global" not in first_lines:
+            continue
+        per_rule.append((rule_path.stem, len(content.splitlines())))
+
+    total = sum(lines for _, lines in per_rule)
+
+    print(
+        f"\n[global-rules-budget] {len(per_rule)} global rule(s), {total} total "
+        f"content lines (budget {GLOBAL_RULES_BUDGET})"
+    )
+    if per_rule:
+        print("  Top offenders:")
+        for name, lines in sorted(per_rule, key=lambda x: -x[1])[:5]:
+            print(f"    {name}: {lines} lines")
+
+    if total > GLOBAL_RULES_BUDGET:
+        warnings.append(
+            f"global-rules-budget: WARNING — total global-rule lines {total} "
+            f"exceed budget {GLOBAL_RULES_BUDGET} (see printed breakdown above)"
+        )
+
+    return warnings
+
+
 def validate_all() -> list[str]:
     """Run all validators. Returns list of all errors."""
     all_errors = []
@@ -1138,6 +1230,12 @@ def validate_all() -> list[str]:
 
     # Workflow contracts validation
     all_errors.extend(validate_workflow_contracts())
+
+    # Hub-skill size-only coverage (WARNING, non-fatal — issue #287)
+    all_errors.extend(check_hub_skill_sizes())
+
+    # Aggregate global-rule budget (WARNING, non-fatal — issue #287)
+    all_errors.extend(check_global_rules_budget())
 
     return all_errors
 
