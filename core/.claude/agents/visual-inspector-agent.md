@@ -7,6 +7,8 @@ description: >
   (STEP 4 verify_queue) after scout + test run populate the queue. Applies the
   verdict matrix, records verdicts with confidence scores, and routes failures
   to fix_queue, expected_changes to its own lane, and passes to completed.
+tools: ["Skill", "Read", "Write"]
+dispatched_from: worker
 model: sonnet
 color: blue
 version: "3.0.0"

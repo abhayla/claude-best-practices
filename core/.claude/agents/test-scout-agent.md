@@ -8,6 +8,8 @@ description: >
   (functional/api/ui) using accumulate semantics, populate queues; dispatched
   from T0 by `/test-pipeline` (STEP 2 SCOUT) or `/e2e-visual-run` (STEP 2 SCOUT).
   Mode auto-detected from dispatch context.
+tools: ["Skill", "Bash", "Read", "Grep", "Glob", "Write"]
+dispatched_from: worker
 model: sonnet
 color: blue
 version: "2.1.0"
