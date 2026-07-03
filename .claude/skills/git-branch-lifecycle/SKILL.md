@@ -97,6 +97,15 @@ a reviewer; this skill can).
    Do NOT arm merge over a dissent.
 3. **Ensure committed + pushed.** If the tree is dirty, let auto-git commit, or commit here.
    `git push -u origin "HEAD:$BR"`.
+<!-- DUAL-SYNC:HUB-ONLY -->
+   **Accrue one honest calibration run (#196).** After the review passes, run
+   `PYTHONPATH=. python scripts/record_task_run.py --stage reversible --reviewed` — this is
+   the explicit per-task completion point for the trust-score walk-phase MVP: it auto-derives
+   real signals (tests, secret-scan, the reviewer signal from this very step) plus an honest
+   git-history `human_had_to_fix` proxy, and appends ONE shadow-mode run to the ATLAS ledger
+   (idempotent per branch, never lands anything). Broadening this hook to `auto-pr.sh` (the
+   unattended path) is a future option, not done here.
+<!-- DUAL-SYNC:END -->
 4. **Open PR + arm auto-merge** (idempotent — reuse existing PR):
    ```bash
    gh pr view "$BR" >/dev/null 2>&1 || gh pr create --base main --head "$BR" --fill
