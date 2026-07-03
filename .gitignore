@@ -68,6 +68,9 @@ trust-score/calibration-ledger.jsonl
 trust-score/sim-ledger.jsonl
 trust-score/ledgers/
 
+# Idempotency marker for scripts/record_task_run.py (#196 honest auto-accrual)
+trust-score/.recorded-branches
+
 # Local scratch notes (untracked working notes, e.g. ad-hoc gap-analysis prompts)
 /Notes
 

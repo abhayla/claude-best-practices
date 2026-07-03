@@ -183,6 +183,7 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 - **`check_eval_coverage.py`** — Advisory (non-blocking) eval-coverage touch-trigger gate: warns via `::warning::` when a changed `SKILL.md` lacks an `evals/*.md` report; wired into `validate-pr.yml`, always exits 0
 - **`bootstrap.sh`** (repo root, not in `scripts/`) — Curl-pipe-bash installer for downstream users: `curl -sL .../bootstrap.sh | bash -s -- --stacks <list> [--target <dir>]`. Calls `bootstrap.py` after fetching the repo
 - **`trust_score.py`** / **`collect_signals.py`** / **`simulate_walk_phase.py`** / **`generate_trust_dashboard.py`** — the trust-score / walk-phase MVP toolchain (engine, real-signal adapter, sandbox simulator, dashboard generator). See "Trust Score & Walk-Phase (autonomous-factory MVP)" under Architecture before touching scoring, gates, or ledgers
+- **`record_task_run.py`** (#196) — honest per-task trust-score accrual: auto-derives real signals + an honest git-history `human_had_to_fix` proxy (never silently `False`) and appends ONE shadow-mode run per branch to the ATLAS ledger; idempotent via `trust-score/.recorded-branches`. Wired into `/git-branch-lifecycle finish` STEP 3
 
 > One-off migration scripts (e.g. `pr2_premerge_migration.py`, a single-use PR1→PR2 hash-format transition from PR #15) are intentionally omitted from this list — even though the file still sits in `scripts/`, it is a spent one-shot migration, not part of the standing toolchain. Don't "fix" its omission by documenting it.
 
