@@ -1,6 +1,6 @@
 # Claude-Resource Audit Remediation Program
 
-**Status:** PLANNED — owner reviewing issues; execution not started
+**Status:** IN PROGRESS — P0 (#279) DONE + LANDED (PR #292 merged, #279 closed 2026-07-03); PAUSED for owner `/plugin update prompt-auto-enhance` + restart (stale 0.2.0 plugin guard) before P1
 **Created:** 2026-07-03  ·  **Owner:** Abhay (gates) + Claude (execution)
 **Source:** 7-way parallel read-only audit of every Claude resource (170 skills, 36 agents, 55 rules, 21 hooks, 285 registry keys). Findings filed as issues **#281–#290** + evidence added to open **#279** (enhance-guard) and **#196** (trust-score).
 
