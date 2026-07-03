@@ -5774,7 +5774,7 @@
     }
   },
   "workflow": {
-    "hash": "ff80a950e0d9d23cb723ffde736e104871091d5c33eab386ba702e08448852f4",
+    "hash": "4da9f4343c57675b27b5b7d3e02aeff803a5671f95d99e3d86c74867279054d7",
     "type": "rule",
     "category": "core",
     "version": "2.0.0",
