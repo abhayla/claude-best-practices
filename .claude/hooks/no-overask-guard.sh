@@ -70,6 +70,12 @@ last_user=$(jq -rc '
 case "$last_user" in
   *'<command-name>'*) is_slash="1" ;;
   *'"t":"/'*|*'"t":" /'*|*'"t":"\n/'*|*'"t":"\r\n/'*) is_slash="1" ;;
+  # A skill EXECUTION turn (reached via /command OR natural language): the harness injects the skill
+  # body as a plain (non-tool_result) user message that SPLITS the turn, so it becomes $last_user
+  # and carries the stable marker below. Skills are enhance-exempt (enhance_slash_commands=false),
+  # so exempt the turn even when the enhance banner fell into the pre-split segment (the false-block
+  # this arm fixes). Anchored to the harness's literal marker — a plain prompt can't accidentally hit it.
+  *'Base directory for this skill:'*) is_slash="1" ;;
 esac
 
 # Drop leading blank lines: the turn-aggregate starts with the newline that
