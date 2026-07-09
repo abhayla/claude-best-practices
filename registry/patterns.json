@@ -6280,7 +6280,7 @@
     }
   },
   "no-overask-guard": {
-    "hash": "ee718d95636b033e758ac600b229c7cfb7dd7220f7f7c3b5c672cc243215b7f4",
+    "hash": "60f0a17266ecfbddf335d252d4ed30691f7663bde0b33de5ea24163281352eba",
     "type": "hook",
     "category": "core",
     "version": "1.1.0",
