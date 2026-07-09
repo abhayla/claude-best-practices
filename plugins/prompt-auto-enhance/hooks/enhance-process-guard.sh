@@ -84,7 +84,7 @@ printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — 
 # Grade-A/no-strengthening in its first 3 lines is exempt from the full-card block below even
 # when make_sure_steps_were_shown=strict; it only owes the banner + a one-line declaration.
 gradea=""
-printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change — ran|ran (your )?input as-is|0 fix|no fix" && gradea="1"
+printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change — ran|ran (your )?input as-is|0 fix|no fix|prompt already strong \(grade [0-9]" && gradea="1"
 
 card=""
 # H1 (issue #279): also credit the enhance card's HEADER ROW — a markdown row that pairs
@@ -119,9 +119,12 @@ if [ "$mode_card" = "block" ] && { [ -z "$card" ] || [ -z "$overall" ]; } && [ -
 fi
 
 # B. require fix-details (gated on the diagnosis/score-table being expected).
+# A declared Grade-A / strong-banner turn ($gradea) owes NO diagnosis (nothing was strengthened),
+# so it is exempt from this fix-details block too — mirrors section A above (which already skips on
+# $gradea) and the hub guard, whose substance block only fires when a card is actually present.
 want_sub=""
 { [ "$(getj '.display.show.score_table')" = "true" ] || [ "$(getj '.display.show.whats_wrong')" = "true" ]; } && want_sub="1"
-if [ -n "$want_sub" ] && [ -z "$substance" ] && [ "$enforce" = "block" ]; then
+if [ -n "$want_sub" ] && [ -z "$substance" ] && [ -z "$gradea" ] && [ "$enforce" = "block" ]; then
   block "STOP BLOCKED (prompt-auto-enhance: fix-details missing). The score table shows numbers but not the diagnose->fix detail — add a 'Diagnosis:' block, a per-dimension Fix column, and a 'Changes Applied' list (taxonomy: VAGUE_INTENT, MISSING_CONTEXT, UNDER_CONSTRAINED, MISSING_OUTPUT_SPEC, MISSING_ROLE...)."
 fi
 
