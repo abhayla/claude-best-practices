@@ -16,6 +16,20 @@ command -v jq >/dev/null || exit 0
 
 plugin_root="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+# ── Coexistence guard: stand down where a SUPERSET enforcer already runs (hub dedup) ──
+# Some hosts (the hub itself) wire an operational Stop hook, .claude/hooks/no-overask-guard.sh,
+# that enforces THIS exact card/Overall block PLUS over-ask + narrate-and-stop governance. Where
+# that hook is present AND wired into the repo's Stop hooks, this plugin's card block is fully
+# redundant and would double-fire — two `decision:block` stops and two log lines per single miss
+# (the enhance-block-miss double-count). Stand down there. Downstream projects that provisioned
+# the plugin but have NO no-overask-guard.sh do not match, so their enforcement is unchanged (no
+# regression). Detection: the hook file exists AND settings.json references it in a Stop entry.
+if [ -f "$root/.claude/hooks/no-overask-guard.sh" ] && \
+   grep -q "no-overask-guard.sh" "$root/.claude/settings.json" 2>/dev/null; then
+  exit 0
+fi
+
 settings="$plugin_root/enhance-settings.default.json"
 [ -f "$HOME/.claude/enhance-settings.json" ] && settings="$HOME/.claude/enhance-settings.json"
 [ -f "$root/.claude/enhance-settings.json" ] && settings="$root/.claude/enhance-settings.json"
