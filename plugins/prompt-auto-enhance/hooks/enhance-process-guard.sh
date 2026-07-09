@@ -67,6 +67,10 @@ if [ "$(getj '.enhance_slash_commands')" != "true" ]; then
   # card enforcement (YAGNI + don't-weaken-genuine-miss).
   case "$last_user" in
     *'<command-name>'*|*'"t":"/'*|*'"t":" /'*|*'"t":"\n/'*|*'"t":"\r\n/'*) exit 0 ;;
+    # Skill-execution turn: the harness-injected skill body (which splits the turn and becomes
+    # $last_user) carries this stable marker. Skills are enhance-exempt, so exit even when the
+    # banner fell into the pre-split segment (the skill-turn false-block).
+    *'Base directory for this skill:'*) exit 0 ;;
   esac
 fi
 

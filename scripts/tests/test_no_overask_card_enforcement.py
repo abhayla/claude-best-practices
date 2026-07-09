@@ -531,6 +531,57 @@ def test_card_regex_consistent_across_guards():
         assert overall_snippet in body, f"{name} guard's overall-row regex drifted (H6)"
 
 
+# ── Skill-execution turn exemption (fix/enhance-guard-skill-turn-exempt) ──
+# When a skill runs (reached via /command OR natural language), the harness injects the skill BODY
+# as a plain (non-tool_result) user message that SPLITS the turn — it becomes the guard's
+# $last_user and carries the stable marker "Base directory for this skill:". The enhance banner
+# lands in the pre-split segment, so the post-split final text ($last_text) has no card → the guard
+# would false-block. Skills are enhance-exempt, so a $last_user carrying that marker exempts the turn.
+_SKILL_BODY = (
+    "Base directory for this skill: /repo/.claude/skills/end-session\n\n"
+    "# End Session — Round Up & Close\n\nClose out a work session cleanly..."
+)
+
+_SKILL_TURN_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "can we end this session?"}},
+    {"type": "assistant", "message": {"role": "assistant", "content": [
+        {"type": "text", "text": "*Enhanced: mapping to /end-session — Grade A, no strengthening needed*"},
+        {"type": "tool_use", "id": "s1", "name": "Skill", "input": {"skill": "end-session"}},
+    ]}},
+    # the harness-injected skill body (splits the turn; becomes $last_user)
+    {"type": "user", "message": {"role": "user", "content": _SKILL_BODY}},
+    # the card-less final segment the guard actually evaluates
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _LONG_CARDLESS_FINAL_BLOCK}]}},
+]
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_exempts_skill_execution_turn(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _SKILL_TURN_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"hub {GUARD} wrongly blocked a skill-execution turn whose card-less final segment follows "
+        f"a harness-injected skill body — skills are enhance-exempt (turn-split false-block): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_exempts_skill_execution_turn(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _SKILL_TURN_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} wrongly blocked a skill-execution turn (turn-split false-block): {out}"
+    )
+
+
+def test_guards_carry_skill_body_marker_exemption():
+    """Static lock: all three guards exempt a turn whose $last_user carries the skill-body marker."""
+    for name, fp in [("hub", HUB / GUARD), ("core", CORE / GUARD), ("plugin", PLUGIN_GUARD)]:
+        assert "Base directory for this skill:" in fp.read_text(encoding="utf-8"), (
+            f"{name} guard must exempt skill-execution turns via the skill-body marker"
+        )
+
+
 # ── Coexistence dedup (fix/dedup-enhance-stop-hooks): the plugin guard must STAND DOWN where
 # the hub-operational superset Stop hook (no-overask-guard.sh) is present AND wired, so a single
 # card-miss cannot double-fire (two blocks + two log lines — the enhance-block-miss double-count).
