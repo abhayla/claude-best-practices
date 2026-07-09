@@ -454,6 +454,67 @@ def test_card_regex_consistent_across_guards():
         assert overall_snippet in body, f"{name} guard's overall-row regex drifted (H6)"
 
 
+# ── Coexistence dedup (fix/dedup-enhance-stop-hooks): the plugin guard must STAND DOWN where
+# the hub-operational superset Stop hook (no-overask-guard.sh) is present AND wired, so a single
+# card-miss cannot double-fire (two blocks + two log lines — the enhance-block-miss double-count).
+# Downstream projects without that hook keep full plugin enforcement (no regression — already
+# pinned by test_plugin_guard_still_blocks_when_no_card_anywhere, which uses a bare scratch repo).
+
+
+def _scratch_repo_with_superset(tmp_path_factory) -> Path:
+    """A throwaway git repo that ALSO carries a wired no-overask-guard.sh — i.e. it looks like
+    the hub (or any host running the superset enforcer). The plugin card-guard must recognise
+    this and stand down."""
+    scratch = tmp_path_factory.mktemp("guard-superset")
+    subprocess.run(["git", "init", "-q"], cwd=str(scratch), check=True)
+    hooks_dir = scratch / ".claude" / "hooks"
+    hooks_dir.mkdir(parents=True)
+    (hooks_dir / GUARD).write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+    (scratch / ".claude" / "settings.json").write_text(
+        json.dumps({"hooks": {"Stop": [{"matcher": "", "hooks": [
+            {"type": "command", "command": 'bash "$(git rev-parse --show-toplevel)/.claude/hooks/no-overask-guard.sh"'}
+        ]}]}}),
+        encoding="utf-8",
+    )
+    return scratch
+
+
+def test_plugin_guard_source_has_coexistence_standdown():
+    body = PLUGIN_GUARD.read_text(encoding="utf-8")
+    assert 'no-overask-guard.sh"' in body and "$root/.claude/settings.json" in body, (
+        "plugin guard must stand down when the hub superset hook is present AND wired"
+    )
+    # the hub guard is the superset ENFORCER — it must NOT carry a stand-down (it can't defer to
+    # itself), or the hub would lose all card enforcement.
+    hub_body = (HUB / GUARD).read_text(encoding="utf-8")
+    assert "Coexistence guard" not in hub_body, "the hub superset guard must NOT stand itself down"
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_stands_down_when_superset_hook_present(tmp_path_factory):
+    """The dedup: a substantive card-less turn that the plugin guard WOULD block is left alone
+    once the hub-operational no-overask-guard.sh is present + wired (it enforces the same card)."""
+    scratch = _scratch_repo_with_superset(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} double-fired: it must stand down where the superset "
+        f"no-overask-guard.sh is present + wired (dedup), leaving one enforcer, not two: {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_still_blocks_even_with_its_own_hook_present(tmp_path_factory):
+    """No-regression companion: the SUPERSET (hub) guard is the sole remaining enforcer where it
+    is wired, so it must still block the same card-less turn — the dedup removes the DUPLICATE,
+    never the enforcement."""
+    scratch = _scratch_repo_with_superset(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"hub {GUARD} must remain the active enforcer where it is wired (dedup keeps exactly "
+        f"one enforcer, not zero): {out}"
+    )
+
+
 def test_registry_hashes_in_sync():
     reg = json.loads(REGISTRY.read_text(encoding="utf-8"))
 
