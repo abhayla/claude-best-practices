@@ -105,7 +105,7 @@ printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — 
 # declaration. The 3-line window (vs. the 1-line/short-only `trivial` check above) lets a
 # longer substantive Grade-A turn still qualify — length alone no longer forces the full table.
 gradea=""
-printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change — ran|ran (your )?input as-is|0 fix|no fix" && gradea="1"
+printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change — ran|ran (your )?input as-is|0 fix|no fix|prompt already strong \(grade [0-9]" && gradea="1"
 # G11: detect the full process by the reviewer-card token SET (not one literal), so a
 # legitimately-worded card is not false-blocked. H1 (issue #279): also credit the enhance
 # card's HEADER ROW — a markdown row that pairs "reviewer" with a before/after/self column

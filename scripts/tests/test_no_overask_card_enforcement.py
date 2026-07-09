@@ -261,6 +261,83 @@ def test_plugin_guard_gradea_declared_turn_is_not_blocked(tmp_path_factory):
     )
 
 
+# ── Anchored strong-banner exemption (fix/enhance-gradea-strong-banner) ──
+# The UserPromptSubmit reminder tells a STRONG prompt to emit exactly
+# "*Enhanced: prompt already strong (grade N) — ran as-is*", but the gradea regex did not
+# recognise that wording ("already strong"/"grade 8" are not "grade a"; "ran as-is" != "ran
+# input as-is"), so a turn that FOLLOWED the sanctioned strong format was blocked anyway. Fix:
+# exempt ONLY the anchored literal `prompt already strong (grade <digit>` — tight enough that
+# loose "strong" prose cannot dodge the full-card enforcement (the no-hole control below).
+_STRONG_BANNER_TEXT = (
+    "*Enhanced: prompt already strong (grade 8) — ran as-is*\n\n"
+    + ("The prompt was clear and well scoped, so I proceeded directly with the work. " * 9)
+)
+assert len(_STRONG_BANNER_TEXT) >= 600  # clears the substantive gate + past the trivial<600 escape
+
+_STRONG_BANNER_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "merge #309 and update the plugin"}},
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _STRONG_BANNER_TEXT}]}},
+]
+
+# No-hole control: a turn that only CLAIMS strength in loose prose ("was already strong") but does
+# NOT emit the anchored "prompt already strong (grade <digit>" banner — and has no card, no
+# grade-a, no "no strengthening needed" — must STILL block. The exemption is the exact banner,
+# not any mention of strength.
+_LOOSE_STRONG_PROSE_TEXT = (
+    "I judged the request and the prompt was already strong enough to run, so I did. "
+    + ("Proceeding with the change and reporting the outcome below. " * 9)
+)
+assert len(_LOOSE_STRONG_PROSE_TEXT) >= 600
+assert not re.search(
+    r"prompt already strong \(grade [0-9]|grade a[^a-z]|no strengthening needed|ran (your )?input as-is",
+    _LOOSE_STRONG_PROSE_TEXT.lower(),
+), "the no-hole control must contain NONE of the exemption tokens, or it doesn't test the anchor"
+
+_LOOSE_STRONG_PROSE_TRANSCRIPT = [
+    {"type": "user", "message": {"role": "user", "content": "do the thing"}},
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _LOOSE_STRONG_PROSE_TEXT}]}},
+]
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_exempts_sanctioned_strong_banner(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _STRONG_BANNER_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"hub {GUARD} wrongly blocked a turn opening with the sanctioned strong banner "
+        f"'prompt already strong (grade N)' (reminder/guard wording mismatch): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_exempts_sanctioned_strong_banner(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _STRONG_BANNER_TRANSCRIPT, scratch)
+    assert not _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} wrongly blocked the sanctioned strong banner: {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_still_blocks_loose_strong_prose(tmp_path_factory):
+    """No-hole: mentioning 'strong' in prose must NOT exempt — only the anchored banner does."""
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _LOOSE_STRONG_PROSE_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"hub {GUARD} failed to block a turn that only claims strength in loose prose — the "
+        f"anchored exemption must not open a hole: {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_still_blocks_loose_strong_prose(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _LOOSE_STRONG_PROSE_TRANSCRIPT, scratch)
+    assert _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} failed to block loose 'strong' prose (no-hole control): {out}"
+    )
+
+
 @pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
 def test_hub_guard_still_blocks_when_neither_card_nor_gradea_declared(tmp_path_factory):
     """Companion negative for #290: a substantive turn with NEITHER a card NOR a Grade-A
