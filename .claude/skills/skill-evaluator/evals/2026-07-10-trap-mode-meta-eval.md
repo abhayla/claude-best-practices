@@ -87,3 +87,33 @@ verdict with full per-case evidence rather than a bare "looks fine."
 - Did not run a 3rd round (task caps repair/re-run at 2 iterations); reported honestly instead
   of loosening the bar or reframing the pass condition to force a CERTIFIED-avoids-failure
   narrative.
+
+## Round 3 (conductor re-run, 2026-07-10) — proof bar MET
+
+Round 2's planted defect (additive-vs-multiplicative discount stacking) was re-derivable: sonnet
+independently recomputes the correct arithmetic from first principles and flags the flaw even when
+told not to second-guess, so the trap could never trigger a MISS — it was a case-design failure,
+not a certification-procedure failure (per the limitation note added to
+`references/trap-test-protocol.md` §1).
+
+Round 3 fixed the case design rather than the procedure: a throwaway `github-pr-automation-helper`
+guidance skill (also outside the repo) planted two NON-re-derivable false domain facts a worker
+cannot recompute from first principles — `gh pr merge --auto requires --admin on protected
+branches`, and `auto-merge only supports merge-commit, not squash`. Sonnet workers adopted both
+falsehoods verbatim: trap case T01 scored 0/10 (trap MISSED) and trap case T02 scored 0/10 (trap
+MISSED) — the worker took the guidance's false claims as given rather than verifying them. Control
+case replay scored 8/10 (passed) and the probe case scored 10/10 (passed), showing the miss was
+specific to the two planted falsehoods, not general worker incompetence. Judge calibration was
+exact: the deliberately-wrong known-bad answer scored 0/0/0/0 as expected, zero deviation. The
+fingerprint gate (CASE-TAG echo, no placeholders, no rotation) passed cleanly across the whole
+run.
+
+With two of the four cases MISSED, the trap-mode verdict was **NOT-CERTIFIED** — the correct,
+required refusal for a weak asset carrying non-re-derivable false guidance.
+
+**Conclusion:** the trap mode's own proof bar — "refuses to certify a weak asset" — is now
+satisfied. Round 2 is not a wasted run: it is the evidence behind protocol §1's limitation note
+that traps must plant non-re-derivable falsehoods (a wrong domain/API fact, a false "this step is
+optional") rather than a re-derivable formula a competent cheap model can independently recompute.
+Round 3's evidence artifacts (cases, worker answers, judge output, fingerprint mapping) are
+scratchpad-only by design, per this file's existing convention — not committed to the repo.

@@ -1,4 +1,4 @@
-# Fable-Window Program — master state & handoff (updated 2026-07-10)
+# Fable-Window Program — master state & handoff (updated 2026-07-10, item 2+4 DONE)
 
 **What this is:** the owner-approved program to use the free Fable 5 window to fix the factory's
 ROOT PROCESSES so improvement continues after Fable leaves. This file is the single resume point —
@@ -23,24 +23,34 @@ memory: `project_fable_operating_manual_plugin.md`). Proven: Sonnet+manual 33/33
 fixed silent hookEventName drop). Still owed someday for full G6 bar: real `/plugin install` in a
 second project.
 
-**⏳ 2–10: LISTED, EXPLAINED TO OWNER, NOT YET APPROVED.** Owner approval is the ONLY blocker.
-Recommended order (justified to owner 2026-07-10): **#2 first, then #3**; both benefit from
-Fable-window authoring.
+**✅ 2. Real-run trust-score graduation engine — DONE** (PR #317 merged 2026-07-10): zero-manual
+merged-PR trust recorder wired into `auto-pr-reconcile.sh` SessionStart; per-skill ledger fields +
+`stats_by`; Verified-by evidence gating (85 verified / 60 unverified / hard-gate veto proven by a
+planted false-done trap at score 35). First live sweep recorded 15 real PRs, ATLAS ledger 28/30.
+PR #317 itself was logged as a false-confidence run (AUTO but needed a checker fix round) — the
+program's first honest calibration point.
 
-2. **Real-run trust-score graduation engine** (P0) — auto-record an honest trust-ledger entry on
-   every merged piece of work, zero manual steps; exercise per-stage graduation on real work;
-   per-skill granularity. G5's literal DoD (30 honest runs). Existing parts:
-   `scripts/record_task_run.py`, `scripts/trust_score.py`, `config/trust-score.yml`,
-   `trust-score/ledgers/`. Trap-test: planted false "done" must be vetoed by a hard gate.
-3. **Standing-goal invariant ledger** (P0) — `goals/<name>.md` per finished deliverable with a
-   cheap read-only predicate + daily sentinel; finishing = enrollment ("a goal verified once is an
-   assumption with a timestamp"; the GA4-silently-dead incident is the motivating example).
-4. **Trap-test mode in /skill-evaluator** (P1) — productize the proof bar; certify future assets.
-   (Partially seeded: the parity exam + rubric now exist as reusable patterns.)
-5. **Governance dormancy overhaul** (P1) — "fire where it pays" predicate for the enhance/guard
-   ceremony; 80%-comply line-lint on rules; delete-the-harness pass. NEEDS OWNER decisions (his
-   own rule 5 + he previously preferred the FULL visible enhance process — conflict to resolve
-   with him). This session's stop-hook noise is live evidence.
+**✅ 4. Trap-test mode in /skill-evaluator — DONE** (PR #318 merged + round-3 meta-eval, both
+2026-07-10): trap mode in `/skill-evaluator` (v2.4.0, dual-home synced) +
+`references/trap-test-protocol.md`; proof bar MET on round 3 (NOT-CERTIFIED verdict for a weak
+asset carrying non-re-derivable planted falsehoods; round 2's re-derivable-formula miss is
+honestly documented as a weak-trap-type lesson now encoded in the protocol). Detail:
+`.claude/skills/skill-evaluator/evals/2026-07-10-trap-mode-meta-eval.md` §"Round 3".
+
+**⏳ 3, 5–10: LISTED, EXPLAINED TO OWNER, NOT YET FULLY APPROVED/LANDED.**
+
+3. **Standing-goal invariant ledger** (P0) — status: BUILT + checker round done (1 blocker fixed:
+   sentinel issue-labels self-provisioning; byte-exact timestamps; hermetic seed tests); landing in
+   flight on `feat/item3-standing-goals`. Labels `standing-goals`/`maintenance` created in the live
+   repo. `goals/<name>.md` per finished deliverable with a cheap read-only predicate + daily
+   sentinel; finishing = enrollment ("a goal verified once is an assumption with a timestamp"; the
+   GA4-silently-dead incident is the motivating example).
+5. **Governance dormancy overhaul** (P1) — status: OWNER DECISION LOCKED 2026-07-10: the full
+   visible enhance process fires on HUMAN-TYPED prompts only; machine turns (task-notifications,
+   wakeups, skill-execution, autonomous continuations) get a one-liner at most. Build in flight
+   (fire-where-it-pays classifier + compliance lint + dormancy audit; rule-file diff goes to owner
+   before applying — his own rule 5). This session's stop-hook noise was the live evidence that
+   triggered the decision.
 6. **Self-enforcing cost ledger** (P1) — daily loop-cost ledger + cadence-is-a-cost-decision
    check + Notifier alerts. Critical the day billing starts.
 7. **Refusal→fallback + model-swap playbook in model-routing.md** (P2) — VERIFIED facts ready to
