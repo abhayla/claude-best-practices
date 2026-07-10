@@ -1,0 +1,6 @@
+{
+  "name": "good-plugin",
+  "version": "0.1.0",
+  "description": "well-formed fixture plugin for test_validate_plugin_cleanroom.py",
+  "author": { "name": "test" }
+}

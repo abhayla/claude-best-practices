@@ -1,0 +1,13 @@
+{
+  "name": "cleanroom-test-marketplace",
+  "owner": { "name": "test" },
+  "metadata": { "description": "fixture marketplace for test_validate_plugin_cleanroom.py", "version": "0.0.1" },
+  "plugins": [
+    { "name": "good-plugin", "source": "./good-plugin", "description": "well-formed fixture" },
+    { "name": "hooks-declared-plugin", "source": "./hooks-declared-plugin", "description": "plants the manifest hooks-double-declare defect" },
+    { "name": "missing-skill-plugin", "source": "./missing-skill-plugin", "description": "plants a missing SKILL.md defect" },
+    { "name": "missing-commands-plugin", "source": "./missing-commands-plugin", "description": "plants a missing commands dir defect" },
+    { "name": "missing-hook-file-plugin", "source": "./missing-hook-file-plugin", "description": "plants a hooks.json referencing a missing script" },
+    { "name": "no-version-plugin", "source": "./no-version-plugin", "description": "plants a missing version defect" }
+  ]
+}

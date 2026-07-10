@@ -1,0 +1,7 @@
+{
+  "name": "missing-commands-plugin",
+  "version": "0.1.0",
+  "description": "plants a manifest 'commands' field pointing to a missing directory",
+  "author": { "name": "test" },
+  "commands": "./commands"
+}
