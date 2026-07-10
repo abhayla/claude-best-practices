@@ -4286,22 +4286,22 @@
     }
   },
   "end-session": {
-    "hash": "5c5dac61c3583d8f35f280ceb84b7e504c4f1740660f3eb8f3f29bd615640adc",
+    "hash": "afde3f9486044d3cb5cc9be9de57edccf4f6b33c922010ed053f9cc2839c2cf9",
     "type": "skill",
     "category": "core",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-06-26",
+    "last_updated": "2026-07-10",
     "dependencies": [],
     "visibility": "public",
-    "description": "End and close a session: round up + save a resumable checkpoint + land work (CI-gated) + confirm closeable. Renamed from save-session; pairs with start-session.",
+    "description": "End and close a session: round up + save a resumable checkpoint + land work (CI-gated) + enroll standing goals + confirm closeable. Renamed from save-session; pairs with start-session.",
     "tags": [
       "session",
       "context",
       "continuity"
     ],
-    "changelog": "v1.2.0: Add triggers for natural language discoverability | v1.1.0: Add triggers, registry version sync | v1.0.0: Initial release",
+    "changelog": "v2.3.0 (2026-07-10): MINOR — add STEP 5b Enroll Standing Goals (goals/<slug>.md invariant enrollment, run scripts/check_standing_goals.py) | v1.2.0: Add triggers for natural language discoverability | v1.1.0: Add triggers, registry version sync | v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,

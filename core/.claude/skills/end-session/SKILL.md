@@ -16,7 +16,7 @@ triggers:
   - checkpoint
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "[session-name]"
-version: "2.2.0"
+version: "2.3.0"
 ---
 
 # End Session — Round Up & Close
@@ -179,6 +179,18 @@ bash "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/hooks/session-git-lan
 MUST NOT force-merge past failing CI, and MUST NOT report the session as closed while the branch is
 still open — STEP 5 either merges+closes the branch (after CI passes) or surfaces the CI failure.
 Report which happened in STEP 6.
+
+---
+
+## STEP 5b: Enroll Standing Goals
+
+For each deliverable this session FINISHED whose continued working matters beyond the session (a
+wired hook, a scheduled workflow, a deployed artifact, an installable plugin), write or update
+`goals/<slug>.md` (see `goals/README.md` for the format) with 1-2 cheap read-only predicates that
+would catch its silent death, then run `PYTHONPATH=. python scripts/check_standing_goals.py` and
+confirm the new goal passes. A goal verified once is an assumption with a timestamp — enrollment is
+what keeps it verified. Skip only when the session shipped nothing with a standing runtime/wiring
+surface (pure docs/analysis).
 
 ---
 
