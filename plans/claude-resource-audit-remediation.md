@@ -1,6 +1,9 @@
 # Claude-Resource Audit Remediation Program
 
-**Status:** IN PROGRESS (2026-07-03) — P0 #279 ✅ (PR #292), P1 #281/#286/#289/#284 ✅ (PR #294), P2 #285/#287 ✅ (PR #295), #282 ✅ (PR #296), #288 ✅ closed (not-a-bug). PAUSED at P3 + the #196 auto-accrual honesty fork (4 owner decisions presented).
+**Status:** ✅ COMPLETE (2026-07-03) — all 12 issues CLOSED + merged; #187 intentionally OPEN (spike done, pilot owner-gated).
+- **P0** #279 ✅ PR #292 · **P1** #281/#286/#289/#284 ✅ PR #294 · **P2** #285/#287 ✅ PR #295, #282 ✅ PR #296, #288 ✅ closed (not-a-bug), #196 ✅ PR #297+#300 (firewall test + honest auto-accrual, shadow-mode)
+- **P3** (owner-approved "do your recommended option on all four"): #290 ✅ PR #301 (ceremony downgrade mandatory→sampled), #283 ✅ closed (reactive-defer), #187 ✅ spike PR #299 (GO-WITH-CAVEATS → pilot cbp-workflows; build is the owner-gated next step)
+- **Restart needed:** #290's plugin change (0.3.0) needs `/plugin update prompt-auto-enhance` + one restart to take effect (like #279).
 **Created:** 2026-07-03  ·  **Owner:** Abhay (gates) + Claude (execution)
 **Source:** 7-way parallel read-only audit of every Claude resource (170 skills, 36 agents, 55 rules, 21 hooks, 285 registry keys). Findings filed as issues **#281–#290** + evidence added to open **#279** (enhance-guard) and **#196** (trust-score).
 
