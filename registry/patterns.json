@@ -112,9 +112,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "adr": {
@@ -139,8 +139,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "adversarial-review": {
@@ -162,8 +162,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "agent-evaluator": {
@@ -213,8 +213,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "ai-gemini-api": {
@@ -234,10 +234,10 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "android": {
@@ -256,9 +256,9 @@
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "android-adb-test": {
@@ -310,10 +310,10 @@
     "changelog": "v2.0.0: Merged with claude-android-ninja references and templates",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "android-build-fixer-agent": {
@@ -405,10 +405,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "android-kotlin": {
@@ -433,9 +433,9 @@
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "android-kotlin-reviewer-agent": {
@@ -488,10 +488,10 @@
     "changelog": "v1.0.0: Initial â€” consolidated from ChrisWW + TaeseongYun repos",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "android-run-e2e": {
@@ -598,8 +598,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "anthropic-multi-agent-research-system-skill": {
@@ -683,8 +683,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "architecture-fitness": {
@@ -709,8 +709,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "auto-format": {
@@ -751,8 +751,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "batch": {
@@ -774,8 +774,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "brainstorm": {
@@ -797,8 +797,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "branching": {
@@ -820,8 +820,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "bun-elysia": {
@@ -896,8 +896,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "changelog-contributing": {
@@ -922,8 +922,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "chaos-resilience": {
@@ -947,9 +947,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "ci-cd-setup": {
@@ -972,8 +972,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "claude-behavior": {
@@ -993,8 +993,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "claude-guardian": {
@@ -1016,8 +1016,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "code-quality-gate": {
@@ -1043,8 +1043,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "code-readability": {
@@ -1121,8 +1121,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "compose-ui": {
@@ -1143,10 +1143,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "configuration-ssot": {
@@ -1172,8 +1172,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "context-management": {
@@ -1193,8 +1193,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "context-reducer-agent": {
@@ -1284,8 +1284,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "contract-test": {
@@ -1310,9 +1310,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "contribute-practice": {
@@ -1359,8 +1359,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "create-github-issue": {
@@ -1406,10 +1406,10 @@
     "changelog": "v1.0.0: Initial registration",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "d3-viz": {
@@ -1475,9 +1475,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "db-migrate": {
@@ -1506,8 +1506,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "db-migrate-verify": {
@@ -1529,8 +1529,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "debugger-agent": {
@@ -1550,8 +1550,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "debugging-loop": {
@@ -1614,8 +1614,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "design-principles": {
@@ -1726,8 +1726,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "disaster-recovery": {
@@ -1756,9 +1756,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "doc-staleness": {
@@ -1783,8 +1783,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "doc-structure-enforcer": {
@@ -1810,8 +1810,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "docker-optimize": {
@@ -1832,10 +1832,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "docs-manager-agent": {
@@ -2093,8 +2093,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "expo-dev": {
@@ -2137,8 +2137,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "fastapi-backend": {
@@ -2199,9 +2199,9 @@
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "fastapi-db-migrate": {
@@ -2226,8 +2226,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "fastapi-deploy": {
@@ -2253,9 +2253,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "fastapi-run-backend-tests": {
@@ -2280,9 +2280,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "feature-flag": {
@@ -2306,8 +2306,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "five-advisors": {
@@ -2357,9 +2357,9 @@
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "firebase-ai": {
@@ -2380,10 +2380,10 @@
     "changelog": "v1.0.2: Add TOC, version caveat, remove internal nickname, fix Node.js version | v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "firebase-data-connect": {
@@ -2404,10 +2404,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "firebase-dev": {
@@ -2428,10 +2428,10 @@
     "changelog": "v1.0.2: Add TOC, add deleteDoc to Write Operations (complete CRUD) | v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "firebase-test": {
@@ -2454,10 +2454,10 @@
     "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "fix-github-issue": {
@@ -2519,8 +2519,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "flutter": {
@@ -2567,10 +2567,10 @@
     "changelog": "v1.0.0: Initial release â€” grounded in cric repo patterns",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 0.67,
+      "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "flutter-dev": {
@@ -2688,8 +2688,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "github": {
@@ -2788,8 +2788,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "hono-backend": {
@@ -2839,9 +2839,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "iac-deploy": {
@@ -2862,10 +2862,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "implement": {
@@ -2889,8 +2889,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "incident-response": {
@@ -2911,9 +2911,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "integration-test": {
@@ -2937,8 +2937,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "jest-dev": {
@@ -2985,10 +2985,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.67,
+      "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "learn-n-improve": {
@@ -3013,8 +3013,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "learning-self-improvement": {
@@ -3096,8 +3096,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "middleware-test": {
@@ -3119,9 +3119,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "mobile-a11y-test": {
@@ -3145,10 +3145,10 @@
     "changelog": "v1.0.0: Initial release",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "mock-server": {
@@ -3172,9 +3172,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "monitoring-setup": {
@@ -3195,9 +3195,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "monorepo": {
@@ -3363,9 +3363,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "pattern-portability": {
@@ -3468,8 +3468,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "pg-query": {
@@ -3491,8 +3491,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "pipeline-fix-pr": {
@@ -3546,8 +3546,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "plan-executor-agent": {
@@ -3590,8 +3590,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "planner-researcher-agent": {
@@ -3611,8 +3611,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "playwright": {
@@ -3634,8 +3634,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "pm2-deploy": {
@@ -3687,8 +3687,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "pr-standards": {
@@ -3710,8 +3710,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "prd-parser": {
@@ -3738,8 +3738,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "prisma-orm": {
@@ -3792,8 +3792,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "project-scaffold": {
@@ -3820,8 +3820,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "prompt-auto-enhance": {
@@ -3855,8 +3855,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "prompt-logger": {
@@ -3900,9 +3900,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "quality-gate-evaluator-agent": {
@@ -3925,9 +3925,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "react-native-dev": {
@@ -4049,8 +4049,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "reddit": {
@@ -4095,9 +4095,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "regression-test": {
@@ -4121,8 +4121,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "remotion-video": {
@@ -4167,8 +4167,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "research-mode": {
@@ -4227,8 +4227,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "rule-curation": {
@@ -4281,8 +4281,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "end-session": {
@@ -4331,8 +4331,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     },
     "deprecated": true,
     "deprecated_by": "end-session"
@@ -4362,8 +4362,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "secret-scanner": {
@@ -4401,8 +4401,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "security-auditor-agent": {
@@ -4422,8 +4422,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "security-baseline": {
@@ -4470,8 +4470,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "serialize-fixes": {
@@ -4567,8 +4567,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "skill-author-agent": {
@@ -4596,8 +4596,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "skill-authoring-workflow": {
@@ -4677,8 +4677,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "skill-master": {
@@ -4700,8 +4700,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "solidity-audit": {
@@ -4753,8 +4753,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "start-session": {
@@ -4780,8 +4780,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "status": {
@@ -4803,8 +4803,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "strategic-architect": {
@@ -4826,8 +4826,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "subagent-driven-dev": {
@@ -4851,8 +4851,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "supply-chain-audit": {
@@ -4875,8 +4875,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "systematic-debugging": {
@@ -4898,8 +4898,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "tailwind-dev": {
@@ -4948,8 +4948,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "tdd-failing-test-generator": {
@@ -5002,8 +5002,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "test-data-management": {
@@ -5028,8 +5028,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "test-failure-analyzer-agent": {
@@ -5102,8 +5102,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "test-maintenance": {
@@ -5128,8 +5128,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "test-pipeline": {
@@ -5166,8 +5166,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "test-scout-agent": {
@@ -5213,8 +5213,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "testing": {
@@ -5234,8 +5234,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "trace-test": {
@@ -5257,9 +5257,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "twitter-x": {
@@ -5306,8 +5306,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "update-practices": {
@@ -5352,8 +5352,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "visual-inspector-agent": {
@@ -5504,8 +5504,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "web-research-specialist-agent": {
@@ -5529,8 +5529,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "web-scraper": {
@@ -5577,9 +5577,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "workflow": {
@@ -5599,8 +5599,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "workflow-master-template": {
@@ -5648,8 +5648,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "writing-skills": {
@@ -5698,10 +5698,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-10"
     }
   },
   "improve-codebase-architecture": {

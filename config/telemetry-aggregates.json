@@ -1,9 +1,919 @@
 {
-  "loop-engineering": {
-    "adoption_rate": null,
-    "retention_days_p50": null,
-    "error_prevention_rate": 1.0,
-    "sample_size": 0,
-    "last_updated": "2026-07-02"
+  "a11y-audit": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "adr": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "adversarial-review": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "agent-orchestration": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "ai-gemini-api": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "android": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "android-arch": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "android-gradle": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "android-kotlin": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "android-mvi-scaffold": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "anthropic-agent-orchestration-guide": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "api-docs-generator": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "apply-selections": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "architecture-fitness": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "auto-verify": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "batch": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "brainstorm": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "branching": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "change-risk-scoring": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "changelog-contributing": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "chaos-resilience": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "ci-cd-setup": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "claude-behavior": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "claude-guardian": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "code-quality-gate": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "code-reviewer-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "compose-ui": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "configuration-ssot": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "context-management": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "continue": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "contract-test": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "coverage-analysis": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "cross-platform-visual": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "dast-scan": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "db-migrate": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "db-migrate-verify": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "debugger-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "deploy-strategy": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "diataxis-docs": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "disaster-recovery": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "doc-staleness": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "doc-structure-enforcer": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "docker-optimize": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "executing-plans": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "fastapi-api-tester-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "fastapi-database-admin-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "fastapi-db-migrate": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "fastapi-deploy": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "fastapi-run-backend-tests": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "feature-flag": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "firebase": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "firebase-ai": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "firebase-data-connect": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "firebase-dev": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "firebase-test": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "fix-issue": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "fix-loop": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "flutter-dart-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "git-worktrees": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "handover": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "html-prototype": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "iac-deploy": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "implement": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "incident-response": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "integration-test": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "k8s-deploy": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "learn-n-improve": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "merge-strategy": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "middleware-test": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "mobile-a11y-test": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "mock-server": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "monitoring-setup": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "parallel-worktree-orchestrator-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "perf-test": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "pg-query": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "pipeline-orchestrator": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "plan-to-issues": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "planner-researcher-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "playwright": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "post-fix-pipeline": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "pr-standards": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "prd-parser": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "project-manager-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "project-scaffold": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "prompt-auto-enhance": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "prompt-auto-enhance-rule": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "pytest-dev": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "quality-gate-evaluator-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "receive-code-review": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "redis-patterns": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "regression-test": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "request-code-review": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "review-gate": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "rule-writing-meta": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "save-session": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "scan-discovery-report": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "schema-designer": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "security-audit": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "security-auditor-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "semgrep-rules": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "session-summarizer-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "skill-author-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "skill-factory": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "skill-master": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "ssot-audit": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "start-session": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "status": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "strategic-architect": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "subagent-driven-dev": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "supply-chain-audit": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "synthesize-project": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "systematic-debugging": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "tdd": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "tdd-rule": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "test-data-management": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "test-generator": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "test-knowledge": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "test-maintenance": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "test-pipeline": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "test-pipeline-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "tester-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "testing": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "trace-test": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "ui-ux-pro-max": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "verify-screenshots": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "web-quality": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "web-research-specialist-agent": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "websocket-patterns": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "workflow": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "writing-plans": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
+  },
+  "xml-to-compose": {
+    "adoption_rate": 1.0,
+    "retention_days_p50": 0,
+    "error_prevention_rate": null,
+    "sample_size": 1,
+    "last_updated": "2026-07-10"
   }
 }
