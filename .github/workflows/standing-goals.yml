@@ -23,8 +23,12 @@ jobs:
       - name: File or update issue if failing
         if: steps.sentinel.outcome == 'failure'
         run: |
+          # Self-provisioning: ensure the labels exist (idempotent via --force) so a
+          # fork/re-clone without them cannot fail issue creation silently.
+          gh label create standing-goals --force --color 8250df --description "Standing-goal sentinel: an enrolled invariant is failing" || true
+          gh label create maintenance --force --color fbca04 --description "Repository maintenance" || true
           BODY_FILE=sentinel-report.txt
-          EXISTING=$(gh issue list --state open --label standing-goals --json number --jq '.[0].number')
+          EXISTING=$(gh issue list --state open --label standing-goals --json number --jq '.[0].number // empty')
           if [ -n "$EXISTING" ]; then
             gh issue comment "$EXISTING" --body-file "$BODY_FILE"
           else

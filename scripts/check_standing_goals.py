@@ -170,8 +170,9 @@ def format_report(report: dict) -> str:
 def update_timestamps(report: dict, today: str | None = None) -> list[Path]:
     """Rewrite last_verified to today for every PASSING goal, byte-for-byte otherwise.
 
-    Only the `last_verified: "..."` frontmatter line is touched; everything else
-    (including comments, key order, and the body) is preserved untouched.
+    Only the `last_verified: "..."` frontmatter line is touched; every other byte —
+    including line endings, comments, key order, and the body — is preserved exactly.
+    Reads/writes bytes (not text mode) so no platform newline translation ever occurs.
     """
     today = today or date.today().isoformat()
     updated = []
@@ -179,7 +180,7 @@ def update_timestamps(report: dict, today: str | None = None) -> list[Path]:
         if not g["passed"]:
             continue
         path = Path(g["path"])
-        text = path.read_text(encoding="utf-8")
+        text = path.read_bytes().decode("utf-8")
         lines = text.splitlines(keepends=True)
         if not lines or lines[0].strip() != "---":
             continue
@@ -195,14 +196,17 @@ def update_timestamps(report: dict, today: str | None = None) -> list[Path]:
             stripped = lines[i].lstrip()
             if stripped.startswith("last_verified:"):
                 indent = lines[i][: len(lines[i]) - len(stripped)]
-                newline = lines[i][-2:] if lines[i].endswith("\r\n") else lines[i][-1:]
-                if not newline.strip() == "" or newline not in ("\n", "\r\n"):
-                    newline = "\n"
-                lines[i] = f'{indent}last_verified: "{today}"{newline}'
+                if lines[i].endswith("\r\n"):
+                    eol = "\r\n"
+                elif lines[i].endswith("\n"):
+                    eol = "\n"
+                else:
+                    eol = ""
+                lines[i] = f'{indent}last_verified: "{today}"{eol}'
                 changed = True
                 break
         if changed:
-            path.write_text("".join(lines), encoding="utf-8")
+            path.write_bytes("".join(lines).encode("utf-8"))
             updated.append(path)
     return updated
 

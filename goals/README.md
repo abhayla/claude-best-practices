@@ -48,6 +48,15 @@ Predicate kinds:
 - `kind: command` — `cmd` is run via `subprocess.run(shell=True, cwd=<repo root>)`; exit 0
   means the invariant holds. Keep predicates read-only and cheap (seconds, not minutes).
 
+Predicate discipline:
+- **Stay hermetic**: no network, no `gh`, no environment dependence — OR accept that the
+  predicate is a **cron-only signal**. Pass/fail verification belongs to the daily
+  sentinel, never PR CI: the PR-time test suite checks only that goal files are
+  structurally valid (parse + well-formed frontmatter), it never executes predicates.
+- **Prefer `python` one-liners** for command predicates — portable across the sentinel's
+  ubuntu runner and local Windows/Git Bash runs.
+- **Flat by design**: only `goals/*.md` is scanned — subdirectories are not recursed.
+
 A goal passes iff **all** of its predicates pass. A malformed goal file (unparseable
 frontmatter, missing `name`/`predicates`, an unknown predicate `kind`, or an empty
 `predicates` list) is reported as a **failure**, never silently skipped — a broken

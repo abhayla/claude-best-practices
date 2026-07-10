@@ -6,12 +6,13 @@ from pathlib import Path
 import pytest
 
 from scripts.check_standing_goals import (
+    _split_frontmatter,
     check_all_goals,
-    evaluate_goal,
     format_report,
     load_goal_files,
     main,
     update_timestamps,
+    validate_frontmatter,
 )
 
 REPO_ROOT = Path(__file__).parent.parent.parent
@@ -203,17 +204,50 @@ class TestUpdateTimestamps:
             '    cmd: "exit 1"\n',
         )
 
+        passing_before = passing_path.read_bytes()
+        failing_before = failing_path.read_bytes()
+
         report = check_all_goals(goals_dir=goals_dir, repo_root=tmp_path)
         update_timestamps(report, today="2026-07-10")
 
-        passing_text = passing_path.read_text(encoding="utf-8")
-        assert 'last_verified: "2026-07-10"' in passing_text
-        assert 'enrolled: "2026-01-01"' in passing_text  # untouched
-        assert "Body text describing the goal." in passing_text  # body untouched
-        assert 'on_failure: "hint"' in passing_text  # untouched
+        # BYTE-exact assertion: the passing file may differ from its original bytes
+        # ONLY in the single last_verified line — any EOL rewrite fails this.
+        passing_after = passing_path.read_bytes()
+        expected = passing_before.replace(
+            b'last_verified: "2020-01-01"', b'last_verified: "2026-07-10"', 1
+        )
+        assert passing_after == expected
 
-        failing_text = failing_path.read_text(encoding="utf-8")
-        assert 'last_verified: "2020-01-01"' in failing_text  # untouched — goal failed
+        # Failing goal: NOT a single byte changed.
+        assert failing_path.read_bytes() == failing_before
+
+    def test_crlf_file_stays_crlf_and_only_one_line_changes(self, tmp_path):
+        goals_dir = tmp_path / "goals"
+        goals_dir.mkdir()
+        path = goals_dir / "crlf-goal.md"
+        content = (
+            '---\r\n'
+            'name: crlf-goal\r\n'
+            'description: "a goal saved with CRLF line endings"\r\n'
+            'last_verified: "2020-01-01"\r\n'
+            'predicates:\r\n'
+            '  - kind: command\r\n'
+            '    cmd: "exit 0"\r\n'
+            '---\r\n'
+            'Body line.\r\n'
+        )
+        path.write_bytes(content.encode("utf-8"))
+        before = path.read_bytes()
+
+        report = check_all_goals(goals_dir=goals_dir, repo_root=tmp_path)
+        update_timestamps(report, today="2026-07-10")
+
+        after = path.read_bytes()
+        expected = before.replace(
+            b'last_verified: "2020-01-01"', b'last_verified: "2026-07-10"', 1
+        )
+        assert after == expected  # CRLF preserved everywhere; only the one line changed
+        assert b'last_verified: "2026-07-10"\r\n' in after
 
 
 class TestPlantedDeadInvariant:
@@ -251,17 +285,26 @@ class TestPlantedDeadInvariant:
 
 
 class TestRealSeedGoals:
-    """The 3 real seed goals in goals/ must parse and pass against the live repo
-    (except any predicate explicitly flagged as dependent on an in-flight PR)."""
+    """The 3 real seed goals in goals/ must be STRUCTURALLY valid (parse, well-formed
+    frontmatter, non-empty predicates).
+
+    Deliberately does NOT execute the live predicates: pass/fail verification belongs to
+    the daily standing-goals.yml sentinel, never PR CI (cron-only by design — an
+    anticipatory or environment-dependent goal must not block PRs). Enrolled predicates
+    should stay hermetic (no network, no gh, no environment dependence) or be understood
+    as cron-only signals — see goals/README.md.
+    """
 
     @pytest.mark.parametrize("slug", [
         "trust-recorder-sweep",
         "fable-operating-manual-plugin",
         "plugins-marketplace-integrity",
     ])
-    def test_seed_goal_parses_and_passes(self, slug):
+    def test_seed_goal_is_structurally_valid(self, slug):
         path = REPO_ROOT / "goals" / f"{slug}.md"
         assert path.exists(), f"seed goal file missing: {path}"
-        result = evaluate_goal(path, repo_root=REPO_ROOT)
-        assert result["malformed"] is False, result.get("error")
-        assert result["passed"] is True, result
+        fm, _raw = _split_frontmatter(path.read_text(encoding="utf-8"))
+        error = validate_frontmatter(fm)
+        assert error is None, f"{slug}: {error}"
+        assert fm["name"] == slug
+        assert len(fm["predicates"]) >= 1

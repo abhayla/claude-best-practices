@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-10 08:16 UTC (auto-generated)
+> Last updated: 2026-07-10 09:10 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -180,7 +180,7 @@
 | session-summarizer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-author-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | writing-skills, pattern-structure |
 | skill-authoring-workflow | skill | 2.1.1 | hub:abhayla/claude-best-practices | claude-guardian, skill-author-agent, skill-master, workflow-contracts, writing-skills |
-| skill-evaluator | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| skill-evaluator | skill | 2.4.0 | hub:abhayla/claude-best-practices | — |
 | skill-factory | skill | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-master | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ssot-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | configuration-ssot |
