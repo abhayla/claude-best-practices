@@ -1,0 +1,1 @@
+{"case":"T07","arm":"B","catch":0,"derive":0,"register":0,"scope":0,"report":0,"quotes":{"catch":"none"},"notes":"Answer is only 'DISPATCH-FAILED' — no response was produced, so nothing detects the 11-passed/1-skipped contradiction or the unverified refund path."}

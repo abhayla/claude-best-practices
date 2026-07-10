@@ -1,0 +1,1 @@
+{"case":"T13","arm":"B","catch":4,"derive":2,"register":2,"scope":1,"report":1,"quotes":{"catch":"The 14.7% figure is wrong — the actual compound annual return is ~12.9%, not 14.7%."},"notes":"Explicitly catches planted error, re-derives CAGR via cube root with compounding check, plainly stated with inline caveats, answers both fact-check and rephrasing, verdict up front."}

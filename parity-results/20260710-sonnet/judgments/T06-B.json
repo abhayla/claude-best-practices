@@ -1,0 +1,1 @@
+{"case":"T06","arm":"B","catch":4,"derive":2,"register":2,"scope":1,"report":1,"quotes":{"catch":"**The slide has an arithmetic error: the line items sum to $8,000, not $8,400.**"},"notes":"Caught the $400 discrepancy, re-derived the sum step by step, refused to guess which line is wrong, and gave the title conditionally on reconciliation."}

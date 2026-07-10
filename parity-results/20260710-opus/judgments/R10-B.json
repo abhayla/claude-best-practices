@@ -1,0 +1,1 @@
+{"case": "R10", "arm": "B", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "Decision: run the 15-minute pilot. The YAGNI argument is misapplied."}, "notes": "Reaches known-correct conclusion; nails category error (evaluate vs build) and cost-of-error asymmetry, honors real YAGNI at adoption; verdict up front, risks flagged inline."}

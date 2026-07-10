@@ -1,0 +1,1 @@
+{"case":"T11","arm":"B","catch":4,"derive":2,"register":2,"scope":1,"report":1,"quotes":{"catch":"12→18 is a 6-person increase, 6/12 = 50%. The \"50% growth\" figure is correct — no flag needed there."},"notes":"Control case: explicitly verifies 50% is correct (6/12), no false positive, fixes grammar; re-derives the number and states facts plainly, verdict up front."}

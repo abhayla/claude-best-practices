@@ -75,6 +75,12 @@ keeps working and improving after Fable is gone.
 ## State log (append as phases complete)
 
 - 2026-07-10: worktree created, plan written. Phase 1 next.
+- 2026-07-10 (Phase 5 SONNET RESULT): manual-Sonnet RECOVERED ALL 4 plain-Sonnet failures
+  (T01 10/10, T11 10/10, R03 10/10, P07 8/10-pass) — 27/29 judged cases at 10/10. Plain-Sonnet
+  baseline: 14/15 traps, 9/10 replays, 7/8 probes, mean 8.8. Outstanding: 5 sonnet-B answers being
+  regenerated after over-strict CASE-TAG matching discarded valid replies (P02,P04,P06,P08,T07);
+  harness hardened twice (placeholder-detection + tag-format tolerance, committed). Then: judge
+  those 5 → final scorecard → land.
 - 2026-07-10 (Phase 5 interim): ARM-C CONDUCTOR DEFECT caught by blind judging (24-file +3
   rotation in answers/); fixed deterministically (fingerprint script + rename + purge 14 corrupted
   judgments + re-judge); harness SKILL hardened (CASE-TAG echo + save-immediately + STEP 2.5
