@@ -61,7 +61,9 @@ cannot terminate — `dod-verbs.md`).
 **Before starting a hand-rolled loop, check the platform-native routing table
 first** (spec §3.7): a recurring check on external state fits native `/loop`
 fixed interval; a self-paced autonomous continuation fits `/loop` dynamic
-(self-paced, `ScheduleWakeup`); a calendar cadence that must survive the
+(self-paced via the `ScheduleWakeup` tool — first-party confirmed, live tool
+schema 2026-07-10, `docs/claude-references/schedule-wakeup-tool.md`); a
+calendar cadence that must survive the
 session closing fits cloud Routines (`/schedule`); a single well-specified
 task with a transcript-verifiable end state and no need for maker≠checker /
 bounded healing / strategy mutation / hub telemetry fits native `/goal
