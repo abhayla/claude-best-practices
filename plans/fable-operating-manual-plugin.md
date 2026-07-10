@@ -75,6 +75,14 @@ keeps working and improving after Fable is gone.
 ## State log (append as phases complete)
 
 - 2026-07-10: worktree created, plan written. Phase 1 next.
+- 2026-07-10 (Phase 5 interim): ARM-C CONDUCTOR DEFECT caught by blind judging (24-file +3
+  rotation in answers/); fixed deterministically (fingerprint script + rename + purge 14 corrupted
+  judgments + re-judge); harness SKILL hardened (CASE-TAG echo + save-immediately + STEP 2.5
+  fingerprint gate, committed). INTERIM A-vs-C RESULT: opus plain 33/33 mean 10.0, fable 33/33
+  mean 9.6 → NO separable discipline gap at this difficulty inside the governed hub env (ceiling +
+  home-field confounds disclosed). EXTENSION: sonnet candidate run launched (arms A/B, results in
+  parity-results/20260710-sonnet/) to locate where the discipline gap starts — that's the model
+  post-Fable routing actually uses. Opus arm B still completing (for no-harm confirmation).
 - 2026-07-10: Phases 1–4 DONE (commits 8146537, +manual, 70931c7): scaffold+marketplace, exam
   frozen (33 cases + rubric + calibration), manual v1.0 + distilled core, hooks (validated live)
   + harness skill. Phase 5 RUNNING: 3 arm conductors dispatched (A=opus, B=opus+manual, C=fable),
