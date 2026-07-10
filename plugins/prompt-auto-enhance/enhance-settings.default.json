@@ -5,6 +5,7 @@
     "enabled": "Master switch for the whole prompt-improver. false = turn everything off.",
     "when_to_run": "automatic = improve every real prompt; ask_first = only improve when you reply 'enhance'; off = never improve (plugin stays installed).",
     "after_improving": "run_immediately = improve the prompt and answer in one go; let_me_review_first = improve the prompt, show it, then STOP and wait for you to approve/edit/run it.",
+    "full_process_scope": "WHICH turns get the full visible process (score table + reviewer + fixes). human-prompts (default) = only prompts YOU typed; skip the ceremony on machine turns (background task-notifications, scheduled wakeups, skill-execution turns, system-reminder-only turns) — they still run, just without the card. everywhere = full process on every substantive turn regardless of origin. weak-only = like human-prompts, and among those only the weak ones (defer to display.how_much_to_show).",
     "enhance_slash_commands": "false (default) = NEVER improve a /command or saved custom prompt (whether you made it or Anthropic provided it) — run it exactly as-is, any size. true = treat them like normal prompts.",
     "when_to_enhance.skip_short_prompts": "Don't improve tiny prompts. count_by words or characters; minimum = the cutoff below which a prompt is skipped.",
     "when_to_enhance.skip_these_phrases": "Exact replies that are just continuations (yes/ok/thanks...) and shouldn't be improved.",
@@ -32,6 +33,8 @@
   "when_to_run": "automatic",
 
   "after_improving": "run_immediately",
+
+  "full_process_scope": "human-prompts",
 
   "enhance_slash_commands": false,
 

@@ -28,6 +28,13 @@ emit_full() {
 }
 if ! command -v jq >/dev/null; then emit_full; exit 0; fi
 
+# ── Shared turn-origin classifier (fire-where-it-pays predicate) ──
+# SSOT ships WITH the plugin at hooks/turn-origin.sh so the plugin is self-contained. Fail-open:
+# a missing lib => classify_turn stub returns "human" => the full_process_scope check below is a
+# no-op => unchanged pre-predicate behavior.
+[ -f "$plugin_root/hooks/turn-origin.sh" ] && . "$plugin_root/hooks/turn-origin.sh"
+command -v classify_turn >/dev/null 2>&1 || classify_turn() { echo human; }
+
 getj() { jq -r "$1 // empty" "$settings" 2>/dev/null; }
 
 # ── Master switch ── (raw read: jq's `// empty` would collapse boolean false to empty)
@@ -76,6 +83,15 @@ fi
 # /clear /exit are intercepted upstream and never reach this hook — correct, they aren't prompts.
 if [ "$(jq -r '.enhance_slash_commands' "$settings" 2>/dev/null)" = "false" ]; then
   case "$trimmed" in /*) exit 0 ;; esac
+fi
+
+# ── full_process_scope: fire-where-it-pays (owner 2026-07-10) ──
+# human-prompts (default) / weak-only => skip the full process on a MACHINE-origin turn
+# (task-notification / scheduled-wakeup / skill-execution / system-reminder-only). "everywhere"
+# disables the exemption (prior behavior: full process on every substantive turn).
+fps="$(getj '.full_process_scope')"; [ -z "$fps" ] && fps="human-prompts"
+if [ "$fps" != "everywhere" ] && [ "$(classify_turn "$prompt")" = "machine" ]; then
+  exit 0
 fi
 
 # ── Skip rules (each honored only if its .enabled is true) ──
