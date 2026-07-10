@@ -1,6 +1,6 @@
 # Loop Engineering — Canonical Spec
 
-version: 1.2.4
+version: 1.3.0
 status: active
 owner: hub (Systems Architect)
 created: 2026-06-16
@@ -92,7 +92,7 @@ workers (distinct `subagent_type`s), so no new agents, rules, or hooks are creat
 | VERIFY (checker) | `/auto-verify --strict-gates --range pre_merge_sha..HEAD` (the range makes the mechanical gate verify the COMMITTED merged diff — a bare invocation would see a clean working tree and vacuously green) + `Agent(<config-resolved checker — SKILL STEP 1.5.3; default code-reviewer-agent>)` (maker≠checker) + T0 supervisor reproduction — the "blind test verify" layer is realized by the context-blind reviewer given the RAW merged diff itself (`git diff pre_merge_sha..HEAD`, passed in the dispatch context — not a path list; complete on every entry because each heal is COMMITTED — a heal checkpoint commit — before VERIFY re-entry) plus the T0 reproduction (`independent-test-verification.md`), not a fourth dispatch | `result == PASSED` |
 | GATE | pass → SHIP; fail → FEEDBACK | branch |
 | SHIP | `/post-fix-pipeline` (commit) | `commit_sha` |
-| FEEDBACK | three entry modes (SKILL STEP 6): VERIFY dissent → `/fix-loop` (or `/debugging-loop` if root cause unclear) on the post-merge tree, the heal COMMITTED (heal checkpoint commit) before re-entering VERIFY; merge CONFLICT → resolve-and-complete the 4b merge (or re-dispatch the maker); maker `FAILED\|BLOCKED` → re-dispatch the maker. Retry under budget | back to VERIFY only after a successful 4b merge |
+| FEEDBACK | three entry modes (SKILL STEP 6): VERIFY dissent → `/fix-loop` (or `/debugging-loop` if root cause unclear) on the post-merge tree, the heal COMMITTED (heal checkpoint commit) before re-entering VERIFY; merge CONFLICT → resolve-and-complete the 4b merge (or re-dispatch the maker); maker `FAILED\|BLOCKED` → re-dispatch the maker. On a REPEAT heal for the same failing gate (§3.6) the STRATEGY is mutated + novelty-gated, not re-run. Retry under budget | back to VERIFY only after a successful 4b merge |
 | LEARN | `/learn-n-improve` | `learnings.json` |
 
 ## 3.5 The three rings (nested feedback loops at three timescales)
@@ -116,6 +116,50 @@ owned by their SSOTs (`decision-authority.md`, `human-approval-gates.md`) — no
 
 Shared loop-pattern vocabulary (the 20 loop design patterns, Karpathy's 9 harness rules, the
 Ralph loop, Willison's brakes → the hub asset owning each): `docs/loop-vocabulary.md`.
+
+## 3.6 Bilevel self-improvement (strategy mutation + novelty gate in the FEEDBACK arm)
+
+The FEEDBACK arm's default reflex is a lower-level loop: heal → re-verify → heal again. If it
+keeps failing on the SAME gate, retrying accumulates only more LESSONS while re-running the SAME
+search strategy — the loop is stuck by construction. The **outer** (bilevel) loop fixes that: on a
+repeat heal it mutates the stuck loop's SEARCH STRATEGY itself, with a novelty ledger so a
+proven-failed strategy is never re-run and exhaustion is detectable. It composes with the STEP 7
+learning capture (which remembers WHAT unstuck it) — it does not replace it. Full mechanics live in
+SKILL STEP 6 §6a; this section is the design record.
+
+- **Strategy ledger** — when the loop enters heal N≥2 for the same failing gate, the orchestrator
+  writes a strategy-attempt record to the working state file (`state.strategy_ledger`, keyed by a
+  stable failing-gate signature: `<step>:<failure-class>`). Record shape:
+  `{attempt, failing_gate, strategy:{decomposition, diagnostic, model}, worker, failure_signature, ts}`.
+- **Three mutation axes (enumerable → exhaustion detectable):** `decomposition`
+  (whole → bisected → single-surface), `diagnostic` (`/fix-loop` → `/debugging-loop`), `model`
+  (sonnet → opus, escalated LAST — cheapest-sufficient first). A strategy is the tuple
+  `{decomposition, diagnostic, model}`.
+- **Mutation rule** — the next heal MUST select a strategy that differs on ≥1 axis from EVERY
+  recorded failed attempt (equivalently: a tuple not already in the ledger), advancing along the
+  cheapest-axis-first preference order. The first flip is conditional on the baseline diagnostic:
+  fix-loop baseline → flip diagnostic first; debugging-loop baseline → flip decomposition first,
+  never de-escalating the diagnostic while the same failure-class persists. Then decomposition,
+  then model LAST.
+- **Novelty gate** — before dispatching a heal, compare the proposed strategy against the ledger:
+  identical → REJECT and mutate again; all enumerable tuples recorded → **axes exhausted** →
+  `/escalation-report` (the existing terminal) with the strategy ledger attached, so a human/Ring-2
+  fixes the CONTRACT rather than re-trying an exhausted search. Honesty note: under the shipped
+  default `max_retries_per_step: 3` the per-step budget veto normally terminates the search long
+  before the 12 enumerable tuples are explored — the budget dominates; the axes-exhaustion terminal
+  is the BACKSTOP for configurations that raise `max_retries_per_step` (and the ledger is keyed by
+  `<step>:<failure-class>` while `step_retries` is keyed by `<step>` alone, so multiple failure
+  classes on one step share the same budget counter).
+- **Success capture** — when a mutated strategy SUCCEEDS, the STEP 7 `/learn-n-improve` call records
+  the strategy delta (which axis change unstuck it) as a `success_patterns` entry. The existing
+  success-pattern schema (attempted/worked/mechanism/reuse_trigger) carries the delta with **no
+  extension** — so the next stall mutates the winning axis first instead of rediscovering it.
+
+Net new mechanism: **0 new patterns** — this is FEEDBACK-arm state + selection logic inside the
+existing `loop-engineering` skill, reusing `/fix-loop`/`/debugging-loop` (healers), the strategy
+ledger in the existing state file, `/escalation-report` (exhaustion terminal), and
+`/learn-n-improve`'s existing success-pattern capture. Consistent with §2's "composes existing
+assets, creates no new engine".
 
 ## 4. Autonomy guarantees (the parts loops leak at)
 

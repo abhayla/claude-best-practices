@@ -24,7 +24,7 @@ triggers:
   - discover plan execute verify loop
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.2.4"
+version: "1.3.0"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -42,9 +42,13 @@ re-implement them. Canonical design: `docs/specs/loop-engineering-spec.md` — i
 §3.5 "The three rings": this loop is Ring 1 (machine, minutes); the owner's contract
 revisions + gate approvals are Ring 2 (hours); user feedback entering DISCOVER is Ring 3
 (days). Escalations exit to Ring 2 for a CONTRACT fix, never for babysitting the build.
+§3.6 "Bilevel self-improvement" specifies the strategy-mutation + novelty gate that STEP 6
+uses to change a stuck loop's search instead of re-running a proven-failed one.
 
 **Self-\* spine (composed, not built):** healing = `/fix-loop` · `/debugging-loop`
-· `/systematic-debugging`; verification = maker≠checker
+· `/systematic-debugging` (with **bilevel strategy mutation** on repeated stalls —
+STEP 6's strategy ledger + novelty gate mutate the STUCK loop's SEARCH strategy,
+not just its lessons; spec §3.6); verification = maker≠checker
 (`supervisor-verification.md` + `independent-test-verification.md`); learning =
 `/learn-n-improve`; feedback = `/escalation-report` + triage inbox.
 
@@ -98,6 +102,7 @@ cannot terminate — `dod-verbs.md`).
      "pre_merge_sha": null,
      "units_shipped": 0,
      "heals": 0,
+     "strategy_ledger": {},
      "workers": { "maker": "plan-executor-agent", "checker": "code-reviewer-agent" },
      "budget": { "global_retry_budget": 15, "max_retries_per_step": 3, "retries_used": 0, "step_retries": {}, "dispatches_used": 0 },
      "artifacts": { "plans": [], "commits": [] },
@@ -114,7 +119,10 @@ cannot terminate — `dod-verbs.md`).
    check elapsed time against `started_at` at every STEP 2 entry and every
    FEEDBACK re-entry — exceeded → ESCALATE. `workers` holds the DEFAULT
    maker/checker names; STEP 1.5.3 overwrites them with the config-resolved
-   values, and STEPs 4/5.2 dispatch from `state.workers`.
+   values, and STEPs 4/5.2 dispatch from `state.workers`. `strategy_ledger`
+   starts empty; STEP 6's bilevel self-improvement mechanism keys it by
+   failing-gate signature to record each failed heal strategy so the next heal
+   is mutated to a novel one (never a re-run of a proven-failed search).
 5. **Append INIT event** to `events.jsonl`.
 
 ---
@@ -361,7 +369,14 @@ concurs. Any dissent → STEP 6 FEEDBACK.
 **PASS** (and not `--no-ship`): if this passing VERIFY resolved a FEEDBACK
 heal, FIRST increment `heals` and
 `emit_signal("healed", ["loop-engineering","healed",<failure-class>], "<what healed>")`
-— the FAIL arm's pending emit fires here, where the outcome is known. Then:
+— the FAIL arm's pending emit fires here, where the outcome is known. **If a §6a
+MUTATED strategy is what unstuck it** (the ledger for this signature holds ≥1
+recorded failed attempt), flag the STRATEGY DELTA (the winning tuple minus the
+failed ones — which axis change broke the stall) so STEP 7's `/learn-n-improve`
+records it as a success pattern (see STEP 7). The flag itself MUST CARRY the
+winning tuple + the failed tuples inline — the ledger entry is cleared next, so
+STEP 7 cannot re-read it. Then clear
+`state.strategy_ledger[<signature>]` (the stall is resolved). Then:
 ```
 Skill("/post-fix-pipeline", args="<run_id>, test-results/auto-verify.json")
 ```
@@ -385,7 +400,62 @@ after its first verified unit — it does NOT loop back to DISCOVER
 **FAIL — self-heal (bounded).** FEEDBACK has three entry modes. Every re-entry
 to STEP 5 VERIFY requires `merged_this_cycle: true` (a successful 4b merge for
 the current unit) — VERIFY is unreachable otherwise. Each heal/redo increments
-`retries_used` AND `budget.step_retries[<failing step>]`:
+`retries_used` AND `budget.step_retries[<failing step>]`.
+
+### 6a. Bilevel self-improvement — mutate the STUCK loop's SEARCH strategy (not just its lessons)
+
+A loop that heals-and-retries the SAME search strategy with more accumulated
+notes is stuck by construction. So on a REPEAT heal for the same failing gate
+(heal N≥2), the orchestrator MUST change the STRATEGY itself, tracked so an
+already-failed strategy is never re-run. This governs which healer/worker/model
+each mode below dispatches on a repeat; it composes with the STEP 7 learning
+capture — it does not replace it.
+
+- **Failing-gate signature** — the stable key that means "this same gate failed
+  again": `<failing step>:<failure class>` (e.g. `verify_review:<failing_test_id>`,
+  `mechanical:<gate>`, `execute:<blocker-class>`). It reuses the
+  `budget.step_retries[<step>]` keying idea. Key `state.strategy_ledger[<signature>]`
+  by it.
+- **Three mutation axes — each enumerable, so exhaustion is DETECTABLE:**
+
+  | Axis | Values (cheapest → most expensive) |
+  |---|---|
+  | **decomposition** | `whole` → `bisected` (split the failing range/tasks in half) → `single-surface` (isolate one file/test at a time) |
+  | **diagnostic** | `fix-loop` (fast analyze→fix→retest) → `debugging-loop` (structured reproduce→isolate→root-cause) |
+  | **model** | `sonnet` → `opus` — the worker/model tier the healer (or re-dispatched maker) runs on; escalate the tier only AFTER ≥2 supervised failures, so **model is the LAST axis to change** (cheapest-sufficient first) |
+
+  A strategy is the tuple `{decomposition, diagnostic, model}`; the worker/agent
+  identity rides the diagnostic (which healer skill/worker runs) + the model tier.
+- **Strategy-attempt record** — APPEND to `state.strategy_ledger[<signature>]` the
+  moment a heal attempt FAILS (write it on re-entry, before selecting the next
+  strategy):
+  ```json
+  {
+    "attempt": <n>,
+    "failing_gate": "<signature>",
+    "strategy": {"decomposition": "whole", "diagnostic": "fix-loop", "model": "sonnet"},
+    "worker": "<healer / re-dispatched worker identity>",
+    "failure_signature": "<one line: what STILL failed after this strategy>",
+    "ts": "<iso>"
+  }
+  ```
+- **Mutation rule** — the next strategy MUST differ on ≥1 axis from EVERY recorded
+  attempt for this signature. (Two distinct tuples differ on ≥1 axis, so this is
+  exactly: the proposed tuple is NOT already in the ledger.) Advance along the
+  preference order to the first not-yet-recorded tuple. The first axis to flip is
+  CONDITIONAL on the baseline diagnostic: baseline used `fix-loop` → flip
+  `diagnostic` first (fix-loop→debugging-loop); baseline already used
+  `debugging-loop` (the unclear-root-cause path) → flip `decomposition` first
+  (whole→bisected→single-surface) and NEVER de-escalate the diagnostic back to
+  fix-loop while the same failure-class persists. Then continue: change
+  `decomposition`, then escalate `model` (sonnet→opus) LAST.
+- **Novelty gate (before dispatching ANY heal on a repeat)** — compare the proposed
+  strategy against the ledger: identical to a recorded attempt → REJECT and mutate
+  again; if EVERY enumerable tuple is already recorded → **axes exhausted** → go to
+  the Budget-exhausted arm below (`/escalation-report` with the strategy ledger
+  attached). Never re-run a strategy the ledger already proved failed.
+
+The three entry modes:
 
 1. **VERIFY dissent** (merge succeeded). The heal runs inline at T0 and edits
    the SAME post-merge tree. Before re-entering STEP 5, COMMIT the heal's
@@ -394,14 +464,22 @@ the current unit) — VERIFY is unreachable otherwise. Each heal/redo increments
    an uncommitted heal edit is invisible to the commit-to-commit diff the
    checker receives — then recompute `changed_files` from
    `git diff --name-only <pre_merge_sha>..HEAD`, which is now complete.
-   Pick the healer by root-cause clarity:
+   **Select the strategy via §6a.** First heal for this gate → the baseline
+   `{whole, fix-loop-if-root-cause-clear-else-debugging-loop, sonnet}` (record it
+   if it then fails). Repeat heal (N≥2) → the novelty-gated MUTATED strategy off
+   `state.strategy_ledger[<signature>]`. Dispatch the chosen diagnostic, at the
+   chosen model tier, over the chosen decomposition:
    ```
-   # clear root cause:
+   # diagnostic == fix-loop  (add --range for a bisected decomposition, one file at a time for single-surface):
    Skill("/fix-loop", args="<failure context>")
-   # unclear root cause OR 2+ failed heal attempts on the same unit — read off
-   # budget.step_retries (does diagnose→fix→verify→learn):
+   # diagnostic == debugging-loop  (structured reproduce→isolate→root-cause→fix→verify):
    Skill("/debugging-loop", args="<failure context>")
    ```
+   When the mutated strategy escalates `model` to opus, run the healer's dispatched
+   workers at opus (cheapest-sufficient — escalate the tier only after ≥2 failures).
+   The old fixed "fix-loop→debugging-loop after 2 fails" heuristic is now just the
+   FIRST mutation step of §6a for a fix-loop baseline (backward compatible); a
+   debugging-loop baseline mutates decomposition first, never back to fix-loop.
 2. **Merge-conflict entry** (4b aborted; HEAD == `pre_merge_sha`; the maker's
    commits sit only on the unmerged `worktree_branch`). The heal IS the
    integration: re-run `git merge --no-ff <worktree_branch>`, resolve the
@@ -416,18 +494,35 @@ the current unit) — VERIFY is unreachable otherwise. Each heal/redo increments
    heal in the T0 tree — do NOT run a healer against it. Re-dispatch the maker
    (STEP 4) with the failure/blocker context appended to the plan context; the
    failed attempt's worktree branch is abandoned (record it in `events.jsonl`).
-   VERIFY is reached only after the redo's 4b merge succeeds.
+   On a REPEAT maker-failure for the same blocker signature (heal N≥2), apply the
+   §6a mutation to the RE-DISPATCH itself — record the failed attempt in
+   `state.strategy_ledger`, then pick a novel strategy (e.g. escalate the maker's
+   `model` sonnet→opus, or `bisect` the plan into a smaller sub-unit), never a
+   verbatim re-dispatch of the same `{decomposition, model}`. VERIFY is reached
+   only after the redo's 4b merge succeeds.
 
 The `healed` emit for any of these fires at the PASS arm, when the heal's
 re-VERIFY passes.
 
 **Budget exhausted** (`retries_used >= global_retry_budget` OR
 `cycle > max_cycles` OR any `step_retries[<step>] > max_retries_per_step` OR
-the configured wall-clock cap exceeded):
+the configured wall-clock cap exceeded OR **§6a strategy axes exhausted** —
+every enumerable `{decomposition, diagnostic, model}` tuple for the failing
+gate is already recorded in `state.strategy_ledger[<signature>]`, so no novel
+strategy remains). Honesty note: under the shipped default
+`max_retries_per_step: 3` the per-step budget veto normally fires long before
+the 12 enumerable tuples are explored — the budget dominates and terminates
+the search first; the axes-exhaustion terminal is the BACKSTOP for
+configurations that raise `max_retries_per_step` (and the ledger is keyed by
+`<step>:<failure-class>` while `step_retries` is keyed by `<step>` alone, so
+multiple failure classes on one step share the same budget counter):
 ```
-Skill("/escalation-report", args="<run_id>")
+Skill("/escalation-report", args="<run_id>")   # attach state.strategy_ledger[<signature>] — the strategies already tried + their failure signatures
 ```
-Append the unresolved unit to `state.triage_inbox` with what was tried,
+Append the unresolved unit to `state.triage_inbox` with what was tried
+(including the full strategy ledger for the failing gate — every mutation
+attempted and why each failed, so a human/Ring-2 fixes the CONTRACT rather than
+re-trying an exhausted search),
 `emit_signal("escalated", ["loop-engineering","escalated",<unit-class>], "<unit + what was tried>")`.
 When the capped unit was never attempted (a clean run that hit `max_cycles`
 with one more unit discovered), say so explicitly — message
@@ -446,6 +541,16 @@ Skill("/learn-n-improve", args="session")
 ```
 Captures the discover→plan→make→check→ship pattern (and any heal) into
 `.claude/learnings.json`, typed GENERIC vs PRODUCT-SPECIFIC (`learnings-routing.md`).
+**If a §6a strategy mutation unstuck a stalled gate this cycle** (flagged at the
+STEP 6 PASS arm), this `/learn-n-improve` call MUST also record the STRATEGY DELTA
+as a `success_patterns` entry — its existing schema carries this with no change:
+`attempted` = the stuck gate + the strategies that failed; `worked` = the winning
+`{decomposition, diagnostic, model}` tuple; `mechanism` = which axis change broke
+the stall (e.g. "fix-loop→debugging-loop surfaced the real root cause the fast
+retry kept missing"); `reuse_trigger` = "when a heal stalls on <gate class>, mutate
+<that axis> first"; `type` GENERIC (the bilevel-search craft) unless the delta is
+this codebase's own quirk. This is the memory of what unstuck the loop, so the next
+stall mutates the winning axis first instead of rediscovering it.
 Then directly increment `units_shipped` and
 `emit_signal("shipped", ["loop-engineering","shipped",<unit-class>], "<unit>")`
 for hub monitoring — this is the SINGLE emit site for `shipped` (exactly one
@@ -584,6 +689,14 @@ hub-ward signal (same constraint as all error-prevention telemetry).
 - MUST be BOUNDED + TERMINATING — honor `global_retry_budget` and `--max-cycles`;
   on exhaustion run `/escalation-report` and write the unit to the triage inbox.
   NEVER loop unbounded.
+- MUST mutate the SEARCH STRATEGY on a repeat heal (heal N≥2 for the same failing
+  gate), not just accumulate lessons and retry (§6a). Record each failed heal
+  attempt's strategy (`{decomposition, diagnostic, model}` + the failure signature)
+  in `state.strategy_ledger[<signature>]`, and select a next strategy that differs
+  on ≥1 axis from EVERY recorded attempt (novelty gate). Identical strategy →
+  REJECT and mutate again; all enumerable tuples exhausted → `/escalation-report`
+  with the strategy ledger attached. MUST capture the winning strategy delta as a
+  `/learn-n-improve` success pattern when a mutation unstuck the loop (STEP 7).
 - MUST run at T0 — if dispatched as a worker, `Agent` is stripped and the
   maker/checker dispatch silently inlines (the 2026-04-24 platform failure mode).
 - MUST NOT SHIP if VERIFY failed or `--no-ship` is set — unverified code reaching
