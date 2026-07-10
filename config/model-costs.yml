@@ -1,0 +1,52 @@
+# Cost-ledger rulebook — USD-per-MTok rates for scripts/cost_ledger.py (fable-window item 6).
+#
+# This hub has no billing account wired to Claude Code sessions today — these rates are
+# ESTIMATES sourced from Anthropic's published API pricing as of `as_of` below, so the ledger
+# can express token spend in dollars for cadence/threshold decisions BEFORE real billing data
+# exists. UPDATE THIS FILE when Anthropic pricing changes or real billing starts — it is the
+# single source of truth `cost_ledger.py` reads at runtime, never hard-code a rate in the script.
+as_of: "2026-07-10"
+
+# USD per MILLION tokens (MTok), by model family. A transcript's `model` string (e.g.
+# "claude-opus-4-8") is matched by case-insensitive substring against these family keys.
+families:
+  opus:
+    input: 15.00
+    output: 75.00
+    cache_write: 18.75
+    cache_read: 1.50
+  sonnet:
+    input: 3.00
+    output: 15.00
+    cache_write: 3.75
+    cache_read: 0.30
+  haiku:
+    input: 0.80
+    output: 4.00
+    cache_write: 1.00
+    cache_read: 0.08
+  fable:
+    # "Fable" is this environment's session branding for the frontier model, not a distinct
+    # billed API SKU — transcripts record the real underlying model id (e.g. "claude-sonnet-5"
+    # matches the `sonnet` family above), so this entry only fires if a raw "fable" string is
+    # ever recorded. Priced at opus rates (the conservative/expensive assumption) until real
+    # data disambiguates it.
+    input: 15.00
+    output: 75.00
+    cache_write: 18.75
+    cache_read: 1.50
+  default:
+    # Any model string matching none of the families above (a future/unrecognized model) falls
+    # back here — priced conservatively at opus rates so an unmatched model never silently
+    # underestimates spend.
+    input: 15.00
+    output: 75.00
+    cache_write: 18.75
+    cache_read: 1.50
+
+# Owner-alert threshold: a day whose estimated USD exceeds this triggers `cost_ledger.py --alert`.
+daily_alert_usd: 50
+
+# How many days of daily rollups the local ledger (costs/ledger.jsonl) retains before
+# `cost_ledger.py --daily` prunes older entries.
+ledger_retention_days: 365
