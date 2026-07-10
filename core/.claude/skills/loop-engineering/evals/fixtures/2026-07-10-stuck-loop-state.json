@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "2026-07-10T09-00-00Z_abc1234",
+  "started_at": "2026-07-10T09:00:00Z",
+  "dod": "Fix the failing checkout-total calculation so test_checkout_total passes on the default path.",
+  "cycle": 1,
+  "max_cycles": 5,
+  "argument_unit_consumed": false,
+  "merged_this_cycle": true,
+  "pre_merge_sha": "abc1234",
+  "units_shipped": 0,
+  "heals": 0,
+  "strategy_ledger": {
+    "verify_review:test_checkout_total": [
+      {
+        "attempt": 1,
+        "failing_gate": "verify_review:test_checkout_total",
+        "strategy": { "decomposition": "whole", "diagnostic": "fix-loop", "model": "sonnet" },
+        "worker": "fix-loop @ sonnet",
+        "failure_signature": "test_checkout_total still off by tax rounding; fix-loop patched the visible symptom, checker still dissents",
+        "ts": "2026-07-10T09:05:00Z"
+      },
+      {
+        "attempt": 2,
+        "failing_gate": "verify_review:test_checkout_total",
+        "strategy": { "decomposition": "whole", "diagnostic": "fix-loop", "model": "sonnet" },
+        "worker": "fix-loop @ sonnet",
+        "failure_signature": "same gate fails again; fix-loop re-applied a near-identical patch, root cause never isolated",
+        "ts": "2026-07-10T09:12:00Z"
+      }
+    ]
+  },
+  "workers": { "maker": "plan-executor-agent", "checker": "code-reviewer-agent" },
+  "budget": {
+    "global_retry_budget": 15,
+    "max_retries_per_step": 3,
+    "retries_used": 2,
+    "step_retries": { "verify_review": 2 },
+    "dispatches_used": 6
+  },
+  "artifacts": { "plans": ["docs/plans/checkout-total-plan.md"], "commits": [] },
+  "triage_inbox": ".workflows/loop-engineering/triage-inbox.md"
+}
