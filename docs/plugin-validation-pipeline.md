@@ -28,7 +28,9 @@ Useful flags:
 | `--json` | Print only the machine-readable verdict JSON |
 | `--plugins-root` / `--marketplace-path` | Override the plugins root / marketplace.json path (used by the pytest fixtures; not needed for normal use) |
 
-Exit code is `0` iff every gate that ran passed.
+Exit code is `0` iff every gate that ran passed. Note: on a machine without the `claude`
+CLI on PATH, gates 2 and 3 SKIP (recorded as `ran: false` in the verdict JSON) — an exit
+code of `0` there reflects the structural gate only, not a serving proof.
 
 ## The three gates
 
@@ -65,10 +67,13 @@ Exit code is `0` iff every gate that ran passed.
    **PASS signal is deterministic, not text-compliance-based.** Claude Code reports its
    resolved session state — including every loaded plugin's `name`/`path`/`source` — in a
    `{"type":"system","subtype":"init"}` line at the very start of `stream-json` output,
-   before the model generates any text. The gate parses that line and checks the plugin
-   appears with `source: "<name>@inline"` at the expected `--plugin-dir` path. It also
-   surfaces (as evidence, not as the pass criterion) any `skills`/`slash_commands` in that
-   same event whose names are prefixed `<plugin-name>:`.
+   before the model generates any text. The gate parses that line and keys the verdict on
+   `name` + `path`: the plugin must appear in `init.plugins` with its resolved `path` equal
+   to the exact `--plugin-dir` directory we passed (a stronger check than matching the
+   `source` label — the `<name>@inline` source string is recorded in the evidence but is
+   not what decides the verdict). It also surfaces (as evidence, not as the pass
+   criterion) any `skills`/`slash_commands` in that same event whose names are prefixed
+   `<plugin-name>:`.
 
    **Why not just read the model's reply?** An earlier version of this probe asked the
    model to list its available skills in free text and grepped the reply for

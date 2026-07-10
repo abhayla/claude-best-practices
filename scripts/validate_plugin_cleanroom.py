@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -135,14 +136,20 @@ def check_structural_gate(plugin_dir: Path, plugin_name: str | None = None,
             if not skill_md.is_file():
                 issues.append(f"skill directory missing SKILL.md: {skill_dir.relative_to(plugin_dir)}")
 
-    # agents/*.md must exist (non-empty files) for every declared agent.
+    # agents/: if the directory exists it must contain at least one *.md agent file,
+    # and none of them may be empty.
     agents_dir = plugin_dir / "agents"
     if agents_dir.is_dir():
         agent_files = list(agents_dir.glob("*.md"))
         if not agent_files:
             issues.append("agents/ directory exists but contains no *.md agent files")
+        for agent_file in agent_files:
+            if agent_file.stat().st_size == 0:
+                issues.append(f"agent file is empty: {agent_file.relative_to(plugin_dir)}")
 
-    # hooks/hooks.json: every referenced command file must exist relative to the plugin root.
+    # hooks/hooks.json: every plugin file referenced in a hook command must exist. A command
+    # may carry an interpreter prefix and flags (e.g. `bash ${CLAUDE_PLUGIN_ROOT}/x.sh --flag`),
+    # so tokenize and resolve ONLY the tokens anchored at ${CLAUDE_PLUGIN_ROOT}.
     hooks_json = plugin_dir / "hooks" / "hooks.json"
     if hooks_json.is_file():
         try:
@@ -155,9 +162,17 @@ def check_structural_gate(plugin_dir: Path, plugin_name: str | None = None,
                 for matcher in matchers:
                     for hook in matcher.get("hooks", []):
                         command = hook.get("command", "")
-                        rel = command.replace("${CLAUDE_PLUGIN_ROOT}", "").lstrip("/\\")
-                        if rel and not (plugin_dir / rel).is_file():
-                            issues.append(f"hooks.json ({event}) references missing file: {rel}")
+                        try:
+                            tokens = shlex.split(command, posix=True)
+                        except ValueError:
+                            issues.append(f"hooks.json ({event}) command does not tokenize: {command}")
+                            continue
+                        for token in tokens:
+                            if "${CLAUDE_PLUGIN_ROOT}" not in token:
+                                continue
+                            rel = token.replace("${CLAUDE_PLUGIN_ROOT}", "").lstrip("/\\")
+                            if rel and not (plugin_dir / rel).is_file():
+                                issues.append(f"hooks.json ({event}) references missing file: {rel}")
 
     return issues
 

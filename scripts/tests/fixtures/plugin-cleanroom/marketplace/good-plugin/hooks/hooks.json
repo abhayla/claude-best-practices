@@ -4,7 +4,7 @@
       {
         "matcher": "",
         "hooks": [
-          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/noop.sh", "timeout": 5 }
+          { "type": "command", "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/noop.sh --quiet", "timeout": 5 }
         ]
       }
     ]

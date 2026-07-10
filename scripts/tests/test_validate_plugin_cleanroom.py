@@ -85,6 +85,55 @@ class TestStructuralGate:
         assert any("not registered" in issue for issue in issues)
 
 
+class TestHookCommandTokenization:
+    """Regression guard: a hook command with an interpreter prefix + flags
+    (`bash ${CLAUDE_PLUGIN_ROOT}/hooks/x.sh --flag`) must resolve only the
+    ${CLAUDE_PLUGIN_ROOT}-anchored token — never the whole command string."""
+
+    @staticmethod
+    def _make_plugin(tmp_path, hook_command, with_script=True):
+        # Named "good-plugin" so the fixture marketplace registration check passes.
+        plugin_dir = tmp_path / "good-plugin"
+        (plugin_dir / ".claude-plugin").mkdir(parents=True)
+        (plugin_dir / ".claude-plugin" / "plugin.json").write_text(
+            '{"name": "good-plugin", "version": "0.1.0", "description": "tokenization fixture"}',
+            encoding="utf-8",
+        )
+        hooks_dir = plugin_dir / "hooks"
+        hooks_dir.mkdir()
+        (hooks_dir / "hooks.json").write_text(
+            '{"hooks": {"SessionStart": [{"matcher": "", "hooks": ['
+            f'{{"type": "command", "command": "{hook_command}", "timeout": 5}}'
+            "]}]}}",
+            encoding="utf-8",
+        )
+        if with_script:
+            (hooks_dir / "guard.sh").write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+        return plugin_dir
+
+    def test_interpreter_prefix_and_args_with_script_present_passes(self, tmp_path):
+        plugin_dir = self._make_plugin(
+            tmp_path, "bash ${CLAUDE_PLUGIN_ROOT}/hooks/guard.sh --flag value", with_script=True
+        )
+        issues = check_structural_gate(plugin_dir, "good-plugin", MARKETPLACE_PATH)
+        assert issues == []
+
+    def test_interpreter_prefix_and_args_with_script_absent_fails_naming_script(self, tmp_path):
+        plugin_dir = self._make_plugin(
+            tmp_path, "bash ${CLAUDE_PLUGIN_ROOT}/hooks/guard.sh --flag value", with_script=False
+        )
+        issues = check_structural_gate(plugin_dir, "good-plugin", MARKETPLACE_PATH)
+        missing = [issue for issue in issues if "references missing file" in issue]
+        assert len(missing) == 1
+        assert "hooks/guard.sh" in missing[0]
+        assert "--flag" not in missing[0] and "bash" not in missing[0]
+
+    def test_bare_plugin_root_command_still_checked(self, tmp_path):
+        plugin_dir = self._make_plugin(tmp_path, "${CLAUDE_PLUGIN_ROOT}/hooks/guard.sh", with_script=False)
+        issues = check_structural_gate(plugin_dir, "good-plugin", MARKETPLACE_PATH)
+        assert any("references missing file" in issue and "hooks/guard.sh" in issue for issue in issues)
+
+
 class TestRealPlugins:
     """The 5 shipped plugins under plugins/ must all clear the structural gate —
     a regression guard so a future plugin edit can't silently reintroduce the
