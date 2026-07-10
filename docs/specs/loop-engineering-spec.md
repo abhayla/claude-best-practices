@@ -137,11 +137,19 @@ SKILL STEP 6 §6a; this section is the design record.
   `{decomposition, diagnostic, model}`.
 - **Mutation rule** — the next heal MUST select a strategy that differs on ≥1 axis from EVERY
   recorded failed attempt (equivalently: a tuple not already in the ledger), advancing along the
-  cheapest-axis-first preference order (flip diagnostic → change decomposition → escalate model).
+  cheapest-axis-first preference order. The first flip is conditional on the baseline diagnostic:
+  fix-loop baseline → flip diagnostic first; debugging-loop baseline → flip decomposition first,
+  never de-escalating the diagnostic while the same failure-class persists. Then decomposition,
+  then model LAST.
 - **Novelty gate** — before dispatching a heal, compare the proposed strategy against the ledger:
   identical → REJECT and mutate again; all enumerable tuples recorded → **axes exhausted** →
   `/escalation-report` (the existing terminal) with the strategy ledger attached, so a human/Ring-2
-  fixes the CONTRACT rather than re-trying an exhausted search.
+  fixes the CONTRACT rather than re-trying an exhausted search. Honesty note: under the shipped
+  default `max_retries_per_step: 3` the per-step budget veto normally terminates the search long
+  before the 12 enumerable tuples are explored — the budget dominates; the axes-exhaustion terminal
+  is the BACKSTOP for configurations that raise `max_retries_per_step` (and the ledger is keyed by
+  `<step>:<failure-class>` while `step_retries` is keyed by `<step>` alone, so multiple failure
+  classes on one step share the same budget counter).
 - **Success capture** — when a mutated strategy SUCCEEDS, the STEP 7 `/learn-n-improve` call records
   the strategy delta (which axis change unstuck it) as a `success_patterns` entry. The existing
   success-pattern schema (attempted/worked/mechanism/reuse_trigger) carries the delta with **no

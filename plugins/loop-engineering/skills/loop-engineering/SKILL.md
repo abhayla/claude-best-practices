@@ -373,7 +373,9 @@ heal, FIRST increment `heals` and
 MUTATED strategy is what unstuck it** (the ledger for this signature holds ≥1
 recorded failed attempt), flag the STRATEGY DELTA (the winning tuple minus the
 failed ones — which axis change broke the stall) so STEP 7's `/learn-n-improve`
-records it as a success pattern (see STEP 7); then clear
+records it as a success pattern (see STEP 7). The flag itself MUST CARRY the
+winning tuple + the failed tuples inline — the ledger entry is cleared next, so
+STEP 7 cannot re-read it. Then clear
 `state.strategy_ledger[<signature>]` (the stall is resolved). Then:
 ```
 Skill("/post-fix-pipeline", args="<run_id>, test-results/auto-verify.json")
@@ -440,9 +442,13 @@ capture — it does not replace it.
 - **Mutation rule** — the next strategy MUST differ on ≥1 axis from EVERY recorded
   attempt for this signature. (Two distinct tuples differ on ≥1 axis, so this is
   exactly: the proposed tuple is NOT already in the ledger.) Advance along the
-  preference order to the first not-yet-recorded tuple: flip `diagnostic` first
-  (fix-loop→debugging-loop), then change `decomposition` (whole→bisected→single-surface),
-  then escalate `model` (sonnet→opus) LAST.
+  preference order to the first not-yet-recorded tuple. The first axis to flip is
+  CONDITIONAL on the baseline diagnostic: baseline used `fix-loop` → flip
+  `diagnostic` first (fix-loop→debugging-loop); baseline already used
+  `debugging-loop` (the unclear-root-cause path) → flip `decomposition` first
+  (whole→bisected→single-surface) and NEVER de-escalate the diagnostic back to
+  fix-loop while the same failure-class persists. Then continue: change
+  `decomposition`, then escalate `model` (sonnet→opus) LAST.
 - **Novelty gate (before dispatching ANY heal on a repeat)** — compare the proposed
   strategy against the ledger: identical to a recorded attempt → REJECT and mutate
   again; if EVERY enumerable tuple is already recorded → **axes exhausted** → go to
@@ -472,7 +478,8 @@ The three entry modes:
    When the mutated strategy escalates `model` to opus, run the healer's dispatched
    workers at opus (cheapest-sufficient — escalate the tier only after ≥2 failures).
    The old fixed "fix-loop→debugging-loop after 2 fails" heuristic is now just the
-   FIRST mutation step of §6a (backward compatible).
+   FIRST mutation step of §6a for a fix-loop baseline (backward compatible); a
+   debugging-loop baseline mutates decomposition first, never back to fix-loop.
 2. **Merge-conflict entry** (4b aborted; HEAD == `pre_merge_sha`; the maker's
    commits sit only on the unmerged `worktree_branch`). The heal IS the
    integration: re-run `git merge --no-ff <worktree_branch>`, resolve the
@@ -502,7 +509,13 @@ re-VERIFY passes.
 the configured wall-clock cap exceeded OR **§6a strategy axes exhausted** —
 every enumerable `{decomposition, diagnostic, model}` tuple for the failing
 gate is already recorded in `state.strategy_ledger[<signature>]`, so no novel
-strategy remains):
+strategy remains). Honesty note: under the shipped default
+`max_retries_per_step: 3` the per-step budget veto normally fires long before
+the 12 enumerable tuples are explored — the budget dominates and terminates
+the search first; the axes-exhaustion terminal is the BACKSTOP for
+configurations that raise `max_retries_per_step` (and the ledger is keyed by
+`<step>:<failure-class>` while `step_retries` is keyed by `<step>` alone, so
+multiple failure classes on one step share the same budget counter):
 ```
 Skill("/escalation-report", args="<run_id>")   # attach state.strategy_ledger[<signature>] — the strategies already tried + their failure signatures
 ```
