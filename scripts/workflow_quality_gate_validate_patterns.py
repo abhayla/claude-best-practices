@@ -722,7 +722,7 @@ def check_cross_references(skills_dir: Path) -> list[str]:
         # Claude Code built-in slash commands — see MAINTENANCE NOTE above:
         "update-config", "continue", "compact", "help", "status",
         "model", "cost", "memory", "review", "agents", "exit",
-        "goal", "loop",  # autonomous-run built-ins (code.claude.com/docs/en/goal.md)
+        "goal", "loop", "schedule",  # autonomous-run built-ins (code.claude.com/docs/en/goal.md, /routines.md)
         "autofix-pr", "code-review",  # cloud PR auto-fix + multi-agent review built-ins
                                       # (code.claude.com/docs/en/claude-code-on-the-web, /code-review)
     }

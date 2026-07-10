@@ -1,6 +1,6 @@
 # Loop Engineering — Canonical Spec
 
-version: 1.3.0
+version: 1.4.0
 status: active
 owner: hub (Systems Architect)
 created: 2026-06-16
@@ -161,6 +161,106 @@ ledger in the existing state file, `/escalation-report` (exhaustion terminal), a
 `/learn-n-improve`'s existing success-pattern capture. Consistent with §2's "composes existing
 assets, creates no new engine".
 
+## 3.7 Platform-native loop taxonomy (compose with, never reinvent, the native primitives)
+
+The hub already names its own loop stages (§3) but did not, until this section, classify them
+against the platform's OWN native loop primitives — so a new automation can accidentally
+hand-roll what the harness already ships. Every fact below is cited to the hub's own cached docs
+(`docs/claude-references/`, `Fetched:` dates as shown) or explicitly flagged **Unverified** where
+no first-party citation exists in this repo's captures.
+
+### The four native loop types
+
+| # | Type | Trigger mechanism | Pacing owner | Persistence across sessions | Cost profile |
+|---|---|---|---|---|---|
+| 1 | **`/loop <interval> <prompt>`** (fixed interval) | user-given interval, converted to a `CronCreate` cron expression (`docs/claude-references/scheduled-tasks.md`, fetched 2026-06-23) | **harness** — deterministic cadence, no model judgment per tick | session-scoped; restored on `--resume`/`--continue` if the recurring task is <7 days old; **7-day hard expiry**, then self-deletes | fixed cadence regardless of need — halving the interval doubles the tick cost (§3.8 below) |
+| 2 | **`/loop <prompt>`** (dynamic, self-paced) | Claude picks the next delay (1 min–1 h) each iteration based on what it observed, via the internal `ScheduleWakeup` tool — **verified available to the T0 session only**: `docs/claude-references/sub-agents.md` lists `ScheduleWakeup` among tools "not available to subagents, even when listed in the `tools` field" | **model, at T0** — adaptive backoff replaces hand-rolled polling logic; MAY use the `Monitor` tool to stream a background script instead of polling at all | same session-scoped rules as #1 (7-day expiry, `--resume` restores if unexpired) | adapts to observed state (short waits on active work, long waits when quiet) — cheaper than fixed-interval polling on the same task |
+| 3 | **`CronCreate`/`CronList`/`CronDelete`** (the raw scheduled-task tools `/loop` and one-shot reminders sit on top of) — for DURABLE, session-independent cadence use **cloud Routines** (`/schedule`, `docs/claude-references/routines.md`, fetched 2026-06-27) instead, a *separate* first-party primitive (Anthropic-managed infra, ≥1-hour minimum interval, triggers: schedule/API/GitHub-event) — **NOT** built on `CronCreate` | calendar/cron expression (session-scoped tool) or a managed schedule (cloud Routines) | harness (cron scheduler checks every second; low-priority enqueue; jitter up to 30 min on recurring tasks) | session-scoped `CronCreate` tasks: die with the session / 7-day expiry, up to 50 per session. Cloud Routines: persist independent of any open session, draw a **daily run-count cap** on top of normal subscription usage | session-scoped tasks are near-free (one prompt re-run); cloud Routines bill as full cloud sessions per firing |
+| 4 | **`/goal <condition>`** (one-shot autonomous contract) | a session-scoped, prompt-based Stop hook: after every turn the condition + transcript are sent to the configured small-fast model (default Haiku) for a yes/no (`docs/claude-references/goal.md`, fetched 2026-06-23) | **harness-orchestrated, model-evaluated** — the evaluator is a SEPARATE (cheaper) model from the one doing the work, but reads only the conversation transcript; it "does not call tools, so it can only judge what Claude has already surfaced" | one goal active per session; restored on `--resume`/`--continue` (turn count, timer, token baseline all reset); cleared by `/goal clear` or a fresh `/clear` | evaluator tokens run on the small-fast model and are "typically negligible compared to main-turn spend" (per the cached doc) — the real cost is the underlying work turns, identical to any other autonomous run |
+
+**Routing table** — which loop-engineering entry point maps to which native type:
+
+| Task shape | Native primitive | Why |
+|---|---|---|
+| Recurring check on EXTERNAL state at a known cadence (poll a deploy, babysit a PR, check a build) | **`/loop` fixed interval** | deterministic cadence matches a known-frequency external event; no adaptive judgment needed |
+| Self-paced autonomous continuation (work until quiet, back off adaptively) | **`/loop` dynamic (self-paced)** | the harness's `ScheduleWakeup`-driven backoff replaces hand-rolled polling/backoff logic — cheaper and simpler than reimplementing it |
+| Calendar cadence that must survive the session closing / the machine being off | **cloud Routines (`/schedule`)** — session-scoped `CronCreate` tasks 7-day-expire and die with the session, so they are NOT durable enough for this shape | Routines run on Anthropic-managed infra independent of any open session (per `routines.md`) |
+| Run-to-Definition-of-Done, a SINGLE well-specified task with a transcript-verifiable end state, no fleet doctrine needed | **`/goal <condition>`** | the built-in evaluator-after-every-turn loop is a lighter-weight, near-free wrapper for exactly this shape (see `goal.md`'s own examples: migrate a module until all call sites compile, implement a design doc until acceptance criteria hold) |
+| Unattended MULTI-UNIT work needing independent maker≠checker verification, bounded self-healing, and hub-ward telemetry | **`/loop-engineering`** | see the honest comparison below — this is the shape native `/goal` does not cover |
+
+### Where hand-rolled loop-engineering DoD gating still beats native `/goal`
+
+`/goal`'s evaluator is a genuine platform primitive, not a toy — but it solves a narrower problem
+than §3's DAG. loop-engineering keeps its own gating for four reasons, each because `/goal` has no
+equivalent:
+
+1. **Maker≠checker enforcement.** `/goal`'s evaluator reads the SAME conversation transcript the
+   implementer wrote — it never spawns an independent agent given the raw diff, so it cannot catch
+   what `independent-test-verification.md` exists to catch (a plausible-sounding "done" that never
+   happened). loop-engineering's STEP 5 dispatches a SEPARATE `Agent()` checker on the raw merged
+   diff specifically because the doer is the worst judge of its own work.
+2. **Healing budgets.** `/goal` has no `max_retries_per_step` / `global_retry_budget` / wall-clock
+   cap — the docs describe only an optional turn/time CLAUSE inside the condition text itself
+   (e.g. "or stop after 20 turns"), evaluated by the same non-tool-calling evaluator. loop-engineering
+   enforces per-step AND global numeric budgets in `state.json`, independent of any prose clause.
+3. **Strategy mutation (§3.6).** A stuck `/goal` loop just keeps re-attempting with the evaluator's
+   "no, keep going, here's why" as its only steering signal — there is no equivalent to the §3.6
+   strategy ledger + novelty gate that forces a DIFFERENT `{decomposition, diagnostic, model}` tuple
+   on a repeat stall. `/goal` has no mechanism to detect "this is the same failed approach again."
+4. **Telemetry round-trip.** loop-engineering emits hub-linked `.claude/learnings.json` entries on
+   every terminal signal (§5.1) that the hub's weekly aggregator ingests. `/goal` has no equivalent
+   hub-ward signal — a `/goal` run's outcome is visible only in that session's own transcript.
+
+Where native `/goal` is SIMPLER and should be preferred: a single, well-specified task whose done
+state is directly transcript-checkable (no multi-unit DISCOVER ranking needed, no independent
+reviewer needed because the "check" IS the condition text itself), and where the overhead of
+`state.json` + a worktree-merge dance + a strategy ledger is disproportionate to the task. Use
+`/goal` directly for that shape; reserve `/loop-engineering` for the shape its extra machinery earns
+its keep on (multi-unit, needs independent verification, needs bounded self-healing across repeats).
+
+**Sentinel comments (`<<autonomous-loop>>` / `<<autonomous-loop-dynamic>>`):** **Unverified** — no
+occurrence of either literal string was found in this repo's `docs/claude-references/` cache or the
+`docs/process-improvement/sources/` captures at authoring time; this section does not assert their
+existence, format, or semantics. If a future capture confirms them, record the citation here rather
+than inferring their shape.
+
+## 3.8 Budget introspection (loop-domain budgets compose with, never replace, token/turn budgets)
+
+The hub's own doc cache does **not** document an official `budget.total()` / `budget.spent()` /
+`budget.remaining()` API on the Dynamic Workflows tool (`docs/claude-references/workflows.md`,
+fetched 2026-06-23, has no `budget` reference) — that claim traces only to a third-party capture
+(`docs/process-improvement/sources/2026-07-06-claudedevs-getting-started-with-loops.md`, line 71:
+"`/usage`, `/goal` (no args), `/workflows` token-introspection commands... they're the native
+equivalent of the Workflow tool's `budget.spent()`"), which itself does not cite a first-party
+source. **Unverified**: treat any specific `budget.*()` method signature as directional, not
+confirmed platform fact, until a first-party doc is captured and cited here.
+
+What IS first-party-verified as native token/turn introspection: `/goal` with no arguments prints
+"how many turns have been evaluated" and "the current token spend" for the active/most-recent goal
+(`docs/claude-references/goal.md`) — a real, citable per-goal budget readout.
+
+**Guidance — wire a token/turn target into a loop contract, alongside the loop-domain budget, not
+instead of it.** loop-engineering's own budgets (`max_heals` via `budget.step_retries[<step>]`,
+`global_retry_budget`, `max_cycles`, an optional wall-clock cap — spec §4) are **loop-domain**
+budgets: they bound how much WORK a stuck gate may retry. A token/turn budget is an orthogonal,
+**spend-domain** concern that composes with, never substitutes for, the loop-domain one:
+
+- When authoring a `/goal-creator` contract or a `/goal <condition>` invocation, append the
+  documented turn/time clause (`goal.md`: "include a turn or time clause in the condition, such as
+  `or stop after 20 turns`") so the SPEND has an explicit ceiling the evaluator judges each turn,
+  independent of whether the WORK is bounded.
+- For `/loop-engineering` runs, the existing `--max-cycles` / `global_retry_budget` /
+  `max_retries_per_step` bound the WORK; they say nothing about token spend. Where a project also
+  needs a spend ceiling, track it via the project's own cost ledger (the hub's own
+  `scripts/collect_signals.py` / `trust-score/` ledgers are the hub's analog) rather than inventing
+  a second in-skill budget field — spend tracking is a SEPARATE concern from `state.json`'s
+  work-retry budgets, and conflating them would violate `configuration-ssot.md`'s one-canonical-layer
+  rule.
+- Neither budget substitutes for the other: a loop can be work-bounded (bounded cycles) yet still
+  overspend tokens on an expensive model tier per cycle, and a token-bounded loop can still spin
+  forever on cheap retries if `global_retry_budget` is unset. Author BOTH explicitly for any
+  autonomous run with real cost exposure.
+
 ## 4. Autonomy guarantees (the parts loops leak at)
 
 - **Bounded** — inherits `global_retry_budget: 15` + `max_retries_per_step: 3`
@@ -240,3 +340,10 @@ signal to travel (same constraint as all error-prevention telemetry — not new)
 - `agent-orchestration.md`, `supervisor-verification.md`,
   `independent-test-verification.md`, `goal-anchored-decisions.md`,
   `decision-authority.md`, `rule-curation.md`
+- `docs/loop-vocabulary.md` — shared loop-pattern vocabulary (§3.7 supersedes its
+  "Table C §I" note that `/loop` + `/goal` map to the hub encoding only in passing —
+  §3.7 is now the detailed taxonomy + routing table)
+- Platform-native primitive docs (§3.7/§3.8 citations): `docs/claude-references/goal.md`
+  (fetched 2026-06-23), `docs/claude-references/scheduled-tasks.md` (fetched 2026-06-23),
+  `docs/claude-references/routines.md` (fetched 2026-06-27), `docs/claude-references/sub-agents.md`,
+  `docs/claude-references/workflows.md` (fetched 2026-06-23)

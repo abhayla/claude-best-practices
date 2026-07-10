@@ -24,7 +24,7 @@ triggers:
   - discover plan execute verify loop
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.3.0"
+version: "1.4.0"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -43,7 +43,9 @@ re-implement them. Canonical design: `docs/specs/loop-engineering-spec.md` — i
 revisions + gate approvals are Ring 2 (hours); user feedback entering DISCOVER is Ring 3
 (days). Escalations exit to Ring 2 for a CONTRACT fix, never for babysitting the build.
 §3.6 "Bilevel self-improvement" specifies the strategy-mutation + novelty gate that STEP 6
-uses to change a stuck loop's search instead of re-running a proven-failed one.
+uses to change a stuck loop's search instead of re-running a proven-failed one. §3.7
+"Platform-native loop taxonomy" classifies this skill against the platform's own `/loop`,
+`/goal`, and cloud-Routines primitives, with a routing table for which one fits which task.
 
 **Self-\* spine (composed, not built):** healing = `/fix-loop` · `/debugging-loop`
 · `/systematic-debugging` (with **bilevel strategy mutation** on repeated stalls —
@@ -55,6 +57,19 @@ not just its lessons; spec §3.6); verification = maker≠checker
 **Input:** `$ARGUMENTS` — a Definition of Done, issue URL, or triage source. If
 empty, ask the user for the DoD before proceeding (an autonomous loop with no DoD
 cannot terminate — `dod-verbs.md`).
+
+**Before starting a hand-rolled loop, check the platform-native routing table
+first** (spec §3.7): a recurring check on external state fits native `/loop`
+fixed interval; a self-paced autonomous continuation fits `/loop` dynamic
+(self-paced, `ScheduleWakeup`); a calendar cadence that must survive the
+session closing fits cloud Routines (`/schedule`); a single well-specified
+task with a transcript-verifiable end state and no need for maker≠checker /
+bounded healing / strategy mutation / hub telemetry fits native `/goal
+<condition>` directly — SIMPLER than this skill for that shape. Reach for
+`/loop-engineering` only when the task genuinely needs what native `/goal`
+lacks: independent maker≠checker verification, bounded self-healing with
+strategy mutation (§3.6), or hub-ward telemetry across a multi-unit DISCOVER
+loop. Composing with the native primitive beats reinventing it.
 
 ---
 

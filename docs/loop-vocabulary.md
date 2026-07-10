@@ -53,7 +53,7 @@ Source: `docs/process-improvement/sources/2026-karpathy-loops-md-field-notes.md`
 
 | § | Rule | Hub encoding | Coverage |
 |---|---|---|---|
-| I | Write the loop, not the prompt | `/loop` + `/goal` (platform); `core/.claude/skills/loop-engineering/SKILL.md` | full |
+| I | Write the loop, not the prompt | `/loop` + `/goal` (platform); `core/.claude/skills/loop-engineering/SKILL.md`; the platform-native taxonomy + routing table (which primitive for which task shape) is `docs/specs/loop-engineering-spec.md` §3.7 | full |
 | II | Separate the roles (planner/generator/evaluator) | maker `plan-executor-agent` ≠ checker `code-reviewer-agent`; `core/.claude/rules/independent-test-verification.md`, `supervisor-verification.md` | full |
 | III | Negotiate the contract first | `core/.claude/rules/plan-before-coding.md`; `/goal-creator` contracts; step contracts in `config/workflow-contracts.yaml` | **partial** — contracts are authored + gated, but there is no generator↔evaluator argue-on-disk negotiation step |
 | IV | Write to disk, not to context | `.claude/tasks/` (todo + lessons); `.remember/`; `.workflows/loop-engineering/state.json`; `.claude/hooks/compaction-handoff.sh`; git history | full |
