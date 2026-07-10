@@ -676,3 +676,34 @@ JSON; don't hardcode when one script serves multiple events). (b) "The hook's ou
 when I run it" is NOT verification for hooks — the contract test is an end-to-end probe inside a
 real session that asks whether the effect landed (plugin-lifecycle STEP 8 exists for exactly this).
 (c) Silent-drop failure modes (no error, no log) are why acceptance runs are non-optional.
+
+## 2026-07-10 — Concurrent worktree landings: rebase onto fresh origin/main immediately before every push
+
+**Surfaced during:** the fable-window program (9 parallel worktree builds landing PRs #317–#326).
+PR #319 went CONFLICTING/no-CI because two later PRs (#318/#320) touched registry/patterns.json and
+the regenerated docs after it branched — GitHub can't build a merge commit, so the required check
+never runs and auto-merge silently stalls. **Rule:** every maker rebases onto fresh origin/main
+immediately before its final commit/push; the conductor re-checks `mergeable` after arming
+auto-merge instead of assuming armed == landing. Registry/docs conflicts resolve by keeping BOTH
+sides' entries then regenerating docs from the merged registry.
+
+## 2026-07-10 — The hub-rules 320-line budget is a hard CI gate: rule edits ship as pointer + docs playbook
+
+**Surfaced during:** item 7. An owner-approved 24-line rule addition failed CI on
+test_rule_organization.py (total 339 > 320). **Rule:** before editing any .claude/rules/*.md,
+check the whole-tree line budget; land substance as a docs/ playbook with a ≤5-line rule pointer
+(progressive disclosure — exactly what the gate prescribes), or trim superseded prose in the same
+file with the trims enumerated for the owner. Owner-approved CONTENT is preserved verbatim;
+placement may adapt to the gate with disclosure.
+
+## 2026-07-10 — A subagent security flag on "unauthorized" approvals usually means transcript isolation, and the conductor must re-verify, not dismiss
+
+**Surfaced during:** item 5's rule application. The worker was flagged for "fabricated
+authorization" because the owner's AskUserQuestion approval lived only in the conductor's
+transcript — invisible to the worker's isolated scanner. The flag was a false positive AND useful:
+it forced a line-by-line re-verification of the applied text against the approved diff before
+landing. **Rules:** (a) when delegating an owner-approved change, expect the flag and treat it as
+a verification trigger, never dismiss it unexamined; (b) the conductor re-verifies the applied
+artifact against the approval byte-for-byte and documents provenance (who approved, where, when)
+in the PR body; (c) never mark a worker's commit "owner-approved" unless the approval is real in
+the conductor's transcript — the scanner is right to treat unverifiable approval claims as poison.
