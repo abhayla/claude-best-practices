@@ -5,7 +5,7 @@ synthetic transcript fixture under `tmp_path` and injects a fake `notify` for al
 """
 
 import json
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from scripts import cost_ledger as cl
@@ -60,7 +60,9 @@ class TestScanTranscripts:
         _write_jsonl(
             project / "session-a.jsonl",
             [
-                "{not valid json",
+                # must contain '"usage"' to survive the prefilter and reach json.loads —
+                # a malformed line WITHOUT it is skipped silently (documented in scan_transcripts)
+                '{"message": {"usage": {"input_tokens": broken',
                 _entry("claude-sonnet-4", "2026-07-01T00:00:00Z", {"input_tokens": 10, "output_tokens": 5}),
             ],
         )
@@ -208,13 +210,96 @@ class TestAppendDaily:
         _write_jsonl(
             project / "session-a.jsonl",
             [
-                "garbage not json",
+                '{"garbage with "usage" but not json',
                 _entry("claude-sonnet-4", f"{yesterday.isoformat()}T00:00:00Z", {"input_tokens": 10, "output_tokens": 0}),
             ],
         )
         ledger_path = tmp_path / "ledger.jsonl"
         outcome = cl.append_daily(ledger_path=ledger_path, projects_dir=tmp_path, config=CONFIG, today=today)
         assert outcome["skipped_lines"] == 1
+
+
+class TestCompletenessContract:
+    """The checker blockers: a partial (deadline-aborted) scan must never freeze a day, and
+    the today-boundary must be UTC on both sides."""
+
+    def test_aborted_scan_must_not_freeze_a_partial_day(self, tmp_path, monkeypatch):
+        """REGRESSION (blocker 1): plant $30 of true usage for one day; simulate a
+        deadline-aborted scan that saw only $3 of it -> append_daily must persist NOTHING
+        (not a frozen $3 row); the next COMPLETE scan must then record the true $30."""
+        today = date(2026, 7, 10)
+        day = "2026-07-09"
+        ledger_path = tmp_path / "ledger.jsonl"
+        # true data on disk: 10M sonnet input tokens = $30.00
+        project = tmp_path / "myproj"
+        _write_jsonl(
+            project / "session-a.jsonl",
+            [_entry("claude-sonnet-4", f"{day}T00:00:00Z", {"input_tokens": 10_000_000, "output_tokens": 0})],
+        )
+
+        real_scan = cl.scan_transcripts
+
+        def partial_aborted_scan(projects_dir, since_date=None, stats=None, deadline=None, min_mtime=None):
+            # a deadline-cut scan: saw only 1M of the 10M tokens ($3 of $30), then aborted
+            if stats is not None:
+                stats["aborted"] = "deadline"
+                stats.setdefault("skipped_lines", 0)
+            yield day, "myproj", "claude-sonnet-4", "main", {"input_tokens": 1_000_000, "output_tokens": 0}, "s1"
+
+        monkeypatch.setattr(cl, "scan_transcripts", partial_aborted_scan)
+        first = cl.append_daily(ledger_path=ledger_path, projects_dir=tmp_path, config=CONFIG, today=today)
+        assert first["aborted"] == "deadline"
+        assert first["appended"] == []
+        assert cl.load_ledger(ledger_path) == []  # nothing frozen
+
+        monkeypatch.setattr(cl, "scan_transcripts", real_scan)
+        second = cl.append_daily(ledger_path=ledger_path, projects_dir=tmp_path, config=CONFIG, today=today)
+        assert second["appended"] == [day]
+        records = cl.load_ledger(ledger_path)
+        assert len(records) == 1
+        assert round(records[0]["usd"], 2) == 30.00  # the TRUE total, not the partial $3
+
+    def test_current_utc_day_never_appended_even_when_local_date_is_ahead(self, tmp_path, monkeypatch):
+        """REGRESSION (blocker 2): freeze 'now' at 23:30 UTC on 2026-07-10 (already 05:00 on
+        the 11th in IST) — an entry stamped earlier that same UTC day is still accruing and
+        must NOT be appended when `today` is left to its default."""
+        frozen_now = datetime(2026, 7, 10, 23, 30, tzinfo=timezone.utc)
+
+        class _FrozenDateTime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return frozen_now if tz else frozen_now.replace(tzinfo=None)
+
+        monkeypatch.setattr(cl, "datetime", _FrozenDateTime)
+        assert cl._utc_today() == date(2026, 7, 10)
+
+        project = tmp_path / "myproj"
+        _write_jsonl(
+            project / "session-a.jsonl",
+            [
+                _entry("claude-sonnet-4", "2026-07-10T22:00:00Z", {"input_tokens": 100, "output_tokens": 0}),
+                _entry("claude-sonnet-4", "2026-07-09T22:00:00Z", {"input_tokens": 100, "output_tokens": 0}),
+            ],
+        )
+        ledger_path = tmp_path / "ledger.jsonl"
+        outcome = cl.append_daily(ledger_path=ledger_path, projects_dir=tmp_path, config=CONFIG)
+        assert outcome["appended"] == ["2026-07-09"]  # completed UTC day only
+        assert {r["date"] for r in cl.load_ledger(ledger_path)} == {"2026-07-09"}
+
+    def test_incremental_scan_skips_files_older_than_min_mtime(self, tmp_path):
+        project = tmp_path / "myproj"
+        old_file = project / "old-session.jsonl"
+        _write_jsonl(
+            old_file,
+            [_entry("claude-sonnet-4", "2026-07-01T00:00:00Z", {"input_tokens": 100, "output_tokens": 0})],
+        )
+        import os as _os
+
+        old_epoch = datetime(2026, 6, 1, tzinfo=timezone.utc).timestamp()
+        _os.utime(old_file, (old_epoch, old_epoch))
+        cutoff = datetime(2026, 7, 1, tzinfo=timezone.utc).timestamp()
+        assert list(cl.scan_transcripts(tmp_path, min_mtime=cutoff)) == []
+        assert len(list(cl.scan_transcripts(tmp_path))) == 1
 
 
 class TestCheckAlert:

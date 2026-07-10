@@ -14,8 +14,21 @@ Transcript layout (per-project, under `--projects-dir`, default `~/.claude/proje
 Each assistant message line carries `message.usage` (token counts) and `message.model`;
 lines without `message.usage` (system/tool/user entries) are skipped, not errors.
 
+COMPLETENESS CONTRACT (the ledger must never freeze a partial day): a day is appended to
+the ledger ONLY from a scan that ran to completion. A deadline-aborted scan appends NOTHING
+— its per-day totals are partial, and the idempotency-by-date guard would otherwise freeze
+the partial number forever. Bootstrap on a fresh machine: the first full-history scan takes
+longer than the hook's soft deadline (measured ~106s over ~2,000 files), so run
+`--daily --deadline-seconds 0` once manually; after that first complete pass the daily tick
+scans only files modified since the newest recorded day (transcripts are append-only, so a
+file whose mtime predates day D cannot contain day-D entries) and finishes in seconds.
+
+All dates are UTC: entry timestamps are UTC, so "today" (the still-accruing, never-appended
+day) is the UTC date too — using the machine-local date would mis-classify the in-progress
+UTC day as completed between local midnight and UTC midnight (e.g. 00:00-05:30 IST).
+
 CLI:
-    python scripts/cost_ledger.py --daily [--projects-dir PATH]
+    python scripts/cost_ledger.py --daily [--projects-dir PATH] [--deadline-seconds N]
     python scripts/cost_ledger.py --report [--days 7]
     python scripts/cost_ledger.py --cadence-report
     python scripts/cost_ledger.py --alert
@@ -23,10 +36,11 @@ CLI:
 
 import argparse
 import json
+import os
 import subprocess
 import time
 from collections import Counter
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import yaml
@@ -53,6 +67,14 @@ def default_projects_dir() -> Path:
     return Path.home() / ".claude" / "projects"
 
 
+def _utc_today() -> date:
+    """The current UTC date. Entry dates come from UTC timestamps, so the "today is still
+    accruing" boundary MUST be UTC as well — `date.today()` (machine-local) would treat the
+    in-progress UTC day as a completed past day between local and UTC midnight (IST is
+    UTC+5:30, so 00:00-05:30 local), freezing a partial day into the ledger."""
+    return datetime.now(timezone.utc).date()
+
+
 def load_config(config_path: Path | str | None = None) -> dict:
     path = Path(config_path) if config_path else CONFIG_PATH
     with open(path, encoding="utf-8") as f:
@@ -64,7 +86,13 @@ def _parse_iso_date(timestamp: str):
     return datetime.fromisoformat(ts).date()
 
 
-def scan_transcripts(projects_dir, since_date=None, stats: dict | None = None, deadline: float | None = None):
+def scan_transcripts(
+    projects_dir,
+    since_date=None,
+    stats: dict | None = None,
+    deadline: float | None = None,
+    min_mtime: float | None = None,
+):
     """Stream usage-bearing entries from every `*.jsonl` transcript under `projects_dir`.
 
     Yields `(date_str, project, model, attribution, usage, session_id)` for every assistant
@@ -73,7 +101,25 @@ def scan_transcripts(projects_dir, since_date=None, stats: dict | None = None, d
     (`skipped_lines` / `skipped_files`) rather than raising — one bad file must never abort
     the whole scan. `deadline` (a `time.monotonic()` value) stops the scan gracefully and sets
     `stats["aborted"] = "deadline"` when exceeded, so a caller with a hard time budget (the
-    SessionStart hook) still gets a partial, honest result.
+    SessionStart hook) still gets a partial, honest result — which callers with a
+    completeness requirement (append_daily) must treat as NOT persistable.
+
+    `min_mtime` (epoch seconds) skips whole files whose st_mtime is older — the incremental-
+    scan lever: transcripts are append-only and entries are written in near-real-time, so a
+    file last touched before day D cannot contain day-D entries.
+
+    Double-counting: subagent transcripts under `<session>/subagents/` do NOT duplicate the
+    parent session file's entries. Verified empirically 2026-07-10 against the real
+    ~/.claude/projects/ tree: across 40 sessions with subagent dirs, 0 of 6,927 subagent
+    usage entries shared a `message.id`/`uuid` with the parent session file — each usage
+    entry appears in exactly one file, so summing across all files is correct without
+    message-id dedup.
+
+    Lines lacking the literal substring '"usage"' are skipped WITHOUT json parsing (a full
+    parse of every line measured ~106s over the real tree; the prefilter is what makes the
+    incremental daily tick fit its deadline). Consequence: a malformed line only counts
+    toward `skipped_lines` if it contains '"usage"' — an unparseable line without it is
+    indistinguishable from an uninteresting one at prefilter speed, and is skipped silently.
     """
     if stats is None:
         stats = {}
@@ -116,12 +162,26 @@ def scan_transcripts(projects_dir, since_date=None, stats: dict | None = None, d
                 stats["aborted"] = "deadline"
                 return
             try:
+                if min_mtime is not None and jsonl_path.stat().st_mtime < min_mtime:
+                    continue
                 fh = open(jsonl_path, encoding="utf-8")
             except OSError:
                 stats["skipped_files"] += 1
                 continue
             with fh:
-                for line in fh:
+                for line_no, line in enumerate(fh):
+                    # Deadline check INSIDE the per-line loop too (every ~5000 lines): a
+                    # single multi-hundred-MB transcript could otherwise overshoot the soft
+                    # deadline by the whole time it takes to read that one file.
+                    if (
+                        deadline is not None
+                        and line_no % 5000 == 4999
+                        and time.monotonic() >= deadline
+                    ):
+                        stats["aborted"] = "deadline"
+                        return
+                    if '"usage"' not in line:
+                        continue  # prefilter — see docstring; skips json.loads on ~70% of lines
                     line = line.strip()
                     if not line:
                         continue
@@ -258,8 +318,13 @@ def _prune_old(ledger_path: Path, retention_days: int, today: date) -> None:
                 continue
             kept.append(line if line.endswith("\n") else line + "\n")
     if changed:
-        with open(ledger_path, "w", encoding="utf-8") as f:
+        # Crash-safe rewrite: write a sibling temp file, then atomically swap it in — a crash
+        # mid-write must never leave the ledger truncated (os.replace is atomic on the same
+        # filesystem on both Windows and POSIX).
+        tmp_path = ledger_path.with_suffix(ledger_path.suffix + ".tmp")
+        with open(tmp_path, "w", encoding="utf-8") as f:
             f.writelines(kept)
+        os.replace(tmp_path, ledger_path)
 
 
 def append_daily(
@@ -269,31 +334,56 @@ def append_daily(
     today: date | None = None,
     deadline: float | None = None,
 ) -> dict:
-    """Append one JSON line per completed day (strictly before `today`) not already present in
-    the ledger. Idempotent by date — re-running never duplicates a day already recorded, and
-    today (still accruing) is always excluded regardless of what the scan finds for it."""
+    """Append one JSON line per COMPLETED day (strictly before `today`, in UTC) not already
+    present in the ledger. Idempotent by date — re-running never duplicates a recorded day.
+
+    COMPLETENESS CONTRACT: a day is persisted only from a scan that ran to completion. When
+    the scan hit its deadline (`stats["aborted"]`), NOTHING is appended — the per-day totals
+    are partial, and appending one would freeze the partial number forever behind the
+    idempotency guard (a later complete scan could never correct it). The chosen fix is
+    no-append (simplest honest behavior) rather than provisional-and-overwrite rows: unfrozen
+    days are simply captured by the next COMPLETE scan, which the incremental min_mtime
+    filter below makes cheap after the one-time full-history bootstrap (see module docstring).
+
+    `--report` may still show live partial data — it renders from the ledger plus nothing
+    it persists, so only THIS function carries the completeness requirement.
+    """
     ledger_path = ledger_path or LEDGER_PATH
     config = config or load_config()
     projects_dir = Path(projects_dir) if projects_dir else default_projects_dir()
-    today = today or date.today()
+    today = today or _utc_today()
 
     existing = _ledger_dates(ledger_path)
+
+    # Incremental scan: once the ledger has a complete history through its newest date, only
+    # files modified on/after that day can contain entries for the days still missing
+    # (append-only transcripts; entries are written in near-real-time). The 1-day margin
+    # absorbs filesystem-mtime vs entry-timestamp clock skew. Fresh ledger -> full scan.
+    min_mtime = None
+    if existing:
+        newest = max(existing)
+        newest_start_utc = datetime.combine(
+            date.fromisoformat(newest), datetime.min.time(), tzinfo=timezone.utc
+        )
+        min_mtime = newest_start_utc.timestamp() - 86400
+
     stats: dict = {}
-    entries = list(scan_transcripts(projects_dir, stats=stats, deadline=deadline))
-    days = aggregate(entries, config)
+    entries = list(scan_transcripts(projects_dir, stats=stats, deadline=deadline, min_mtime=min_mtime))
 
-    ledger_path.parent.mkdir(parents=True, exist_ok=True)
-    appended = []
-    with open(ledger_path, "a", encoding="utf-8") as f:
-        for date_str in sorted(days):
-            if date.fromisoformat(date_str) >= today:
-                continue
-            if date_str in existing:
-                continue
-            f.write(json.dumps(days[date_str], sort_keys=True) + "\n")
-            appended.append(date_str)
+    appended: list[str] = []
+    if not stats.get("aborted"):
+        days = aggregate(entries, config)
+        ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(ledger_path, "a", encoding="utf-8") as f:
+            for date_str in sorted(days):
+                if date.fromisoformat(date_str) >= today:
+                    continue
+                if date_str in existing:
+                    continue
+                f.write(json.dumps(days[date_str], sort_keys=True) + "\n")
+                appended.append(date_str)
 
-    _prune_old(ledger_path, config.get("ledger_retention_days", 365), today)
+        _prune_old(ledger_path, config.get("ledger_retention_days", 365), today)
 
     return {"appended": appended, "skipped_lines": stats.get("skipped_lines", 0), "aborted": stats.get("aborted")}
 
@@ -355,7 +445,7 @@ def check_alert(ledger_path: Path | None = None, config: dict | None = None, tod
     """
     ledger_path = ledger_path or LEDGER_PATH
     config = config or load_config()
-    today = today or date.today()
+    today = today or _utc_today()  # ledger dates are UTC — see _utc_today()
     yesterday = (today - timedelta(days=1)).isoformat()
     threshold = config.get("daily_alert_usd", 50)
 
@@ -537,6 +627,12 @@ def _main() -> int:
     p.add_argument("--days", type=int, default=7, help="report window in days (default 7)")
     p.add_argument("--cadence-report", action="store_true", help="print the cadence-is-a-cost-decision report")
     p.add_argument("--alert", action="store_true", help="check yesterday's spend and alert if over threshold")
+    p.add_argument(
+        "--deadline-seconds",
+        type=int,
+        default=DAILY_DEADLINE_SECONDS,
+        help="soft scan deadline for --daily (0 = unbounded; use once to bootstrap a fresh ledger)",
+    )
     args = p.parse_args()
 
     config = load_config()
@@ -556,7 +652,7 @@ def _main() -> int:
         return 0
 
     if args.daily:
-        deadline = time.monotonic() + DAILY_DEADLINE_SECONDS
+        deadline = time.monotonic() + args.deadline_seconds if args.deadline_seconds > 0 else None
         outcome = append_daily(projects_dir=projects_dir, config=config, deadline=deadline)
         alert = check_alert(config=config)
         print(
