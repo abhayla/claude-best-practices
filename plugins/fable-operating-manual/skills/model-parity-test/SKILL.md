@@ -86,6 +86,14 @@ misfiling is usually a deterministic shift/rotation — verify ambiguous slots b
 filenames, re-verify to a clean bijection, and only then judge. Grading a misfiled answer against
 the wrong key produces meaningless scores that silently destroy the whole comparison.
 
+Two additional checks the token-match alone misses (both bit a real run): (a) a file whose match
+score is ~zero for EVERY case (placeholder like `DISPATCH-FAILED`, empty, or truncated content)
+counts as **MISSING** — never let a claimed-ID tie-break "pass" it; enforce a minimum match score
+and a minimum byte size. (b) Tag-echo verification must accept reasonable format variants (a bare
+`P02` echo is a correct pairing signal even without the literal `CASE-TAG:` prefix) — discard a
+GOOD answer only on an actual ID mismatch, not on prefix formatting; over-strict tag matching threw
+away 4 valid answers in a live run.
+
 ## STEP 3: Anonymize
 
 Build the judging set: for every saved answer create `judgments/queue/<case>-<rand6>.md` where
