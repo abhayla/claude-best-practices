@@ -22,6 +22,11 @@
       "description": "Autonomous Google Analytics 4 for any project: /auto-google-analytics detects the stack, provisions the GA4 property + web stream via a service-account key (no browser login), injects the gtag + Consent Mode v2 + blanket ui_click snippet into source, verifies a real hit browser-free, and records the Measurement ID in a project-local inventory. Bundles the analytics-setup engine so it works standalone. One-time service-account key is the only human step; falls back to guided manual without it."
     },
     {
+      "name": "fable-operating-manual",
+      "source": "./fable-operating-manual",
+      "description": "Make any model operate with Claude Fable 5's working discipline: ships the Fable 5 Operating Manual (reasoning procedures extracted from Fable at peak capability), auto-delivers its distilled core into every session and every dispatched sub-agent via hooks, and includes /model-parity-test — a blind 3-arm trap-test exam (plain model vs model+manual vs Fable baseline) that measures exactly how much discipline transferred."
+    },
+    {
       "name": "loop-engineering",
       "source": "./loop-engineering",
       "description": "Autonomous DISCOVER → PLAN → EXECUTE → VERIFY → SHIP meta-loop with independent maker≠checker verification, self-healing (fix-loop/debugging-loop), and self-learning (learn-n-improve) — ships the full worker/skill dependency closure so a downstream project gets a working loop from one /plugin install."
