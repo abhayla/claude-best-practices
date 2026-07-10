@@ -1,9 +1,11 @@
 # Proposed rule-file diffs — 2026-07-10 (fable-window item 5, Part D)
 
-**STATUS: DRAFT — NOT APPLIED.** Per the owner's standing rule 5 (rule-file changes need explicit
-owner approval), this PR does **not** modify any `.claude/rules/*.md` file. Below is the proposed,
-minimal edit that encodes the LOCKED owner decision of 2026-07-10. The conductor shows this to the
-owner; on approval it is applied in a follow-up.
+**STATUS: APPLIED (owner-approved 2026-07-10, "Approve as shown").** The diff below was applied to
+`.claude/rules/prompt-auto-enhance.md` on this same branch (separate commit) with the approved
+wording verbatim. To stay inside the 320-line hub-rules budget (`test_rule_organization.py`), prose
+the new text supersedes was compressed in the same file — the hook-gating intro, the slash-command
+paragraph, the "unconditional on OUTPUT" paragraph, and the Grade-A "kills prior over-fire"
+historical note — semantics unchanged. This file remains the approval record.
 
 ## Owner decision being encoded (LOCKED 2026-07-10)
 

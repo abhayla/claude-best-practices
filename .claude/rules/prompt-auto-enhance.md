@@ -4,35 +4,35 @@
 
 Every response starts with `*Enhanced: <what was checked>*` (under 15 words).
 
-The hook (`prompt-enhance-reminder.sh`) gates triggering: slash-command prompts, prompts
-≤15 chars, and known continuation phrases skip injection at the deterministic layer, so the
-strengthening pipeline only runs on substantive free-text prompts.
+The hook (`prompt-enhance-reminder.sh`) gates triggering: slash-command prompts, ≤15-char prompts,
+and known continuation phrases skip injection deterministically — the pipeline runs only on substantive free-text prompts.
 
 **Slash commands are NEVER enhanced.** A `/command` — user-made OR Anthropic-provided
-(`/init`, `/end-session`, `/grill-me`, …) — is run EXACTLY as-is, any size, and is never routed
-through the strengthening pipeline. This is the canonical plugin default `enhance_slash_commands:
-false` (SSOT: `plugins/prompt-auto-enhance/enhance-settings.default.json`); the hub's operational
-`prompt-enhance-reminder.sh` skips `/*`-prompts and the Stop hook `no-overask-guard.sh` exempts
-slash-command turns from the enhance-card / diagnosis enforcement. There is nothing to "strengthen"
-in a fixed command invocation, so the banner + grade card are suppressed for it. The **governance
-tail** (plan-before-coding, decide-don't-ask, grill-when-unsure, narrate-and-stop, git) still
-applies to slash-command turns — it is not part of the enhancement process.
+(`/init`, `/end-session`, …) — runs EXACTLY as-is, any size: canonical plugin default
+`enhance_slash_commands: false` (SSOT: `plugins/prompt-auto-enhance/enhance-settings.default.json`);
+`prompt-enhance-reminder.sh` skips `/*`-prompts and `no-overask-guard.sh` exempts those turns from
+the enhance-card / diagnosis enforcement. The **governance tail** (plan-before-coding,
+decide-don't-ask, grill-when-unsure, narrate-and-stop, git) still applies to slash-command turns.
 
-**For free-text prompts, the indicator is unconditional on substantive OUTPUT — even when the
-hook stayed silent.** The hook gates on PROMPT shape; a short / continuation free-text prompt can
-still spawn substantive work, and the discipline fires on the output's blast radius, not the
-prompt's shape. Whenever a (non-slash-command) turn produces substantive output (real analysis,
-multi-step answer, tool edits/commits), self-apply the banner + full process (transcript
-+ grade card + final prompt) + `Role:` line + governance tail even with no reminder injected. The Stop hook `no-overask-guard.sh`
-logs substantive turns missing the banner to `.claude/.enhance-misses.log` (telemetry,
-non-blocking). Genuinely trivial turns (`yes`/`go ahead`) and slash-command turns are exempt.
+**For free-text prompts, the indicator fires on substantive OUTPUT — even when the hook stayed
+silent** (the hook gates on PROMPT shape; the discipline fires on the output's blast radius):
+self-apply the banner + full process + `Role:` line + governance tail. The Stop hook
+`no-overask-guard.sh` logs banner misses to `.claude/.enhance-misses.log` (telemetry,
+non-blocking). Genuinely trivial turns (`yes`/`go ahead`), slash-command turns, AND **machine-origin turns**
+are exempt. **Machine-origin (owner decision 2026-07-10, LOCKED — fire-where-it-pays):** the full
+visible process fires ONLY on HUMAN-typed prompts. A task-notification, scheduled-wakeup,
+skill-execution, or system-reminder-only turn is NOT human-typed — it gets at most a one-line banner,
+never the transcript/grade-card/reviewer ceremony (autonomous work still owes the governance tail).
+The classification is deterministic and shared: `.claude/hooks/turn-origin.sh` `classify_turn()` is
+the SSOT, sourced by both `prompt-enhance-reminder.sh` and `no-overask-guard.sh` so they cannot drift.
 
 ## MANDATORY OUTPUT — sampled: full process on WEAK prompts, one-liner on strong ones (#290)
 
-SAMPLED, not blanket-mandatory: the full pipeline (transcript + grade card + independent
-reviewer) is REQUIRED only on a **WEAK prompt** (a dimension scored < 7, or a fix was applied).
-A **STRONG / Grade-A / zero-fix** prompt just needs the banner + a one-line Grade-A declaration
-— no full table forced. Kills prior over-fire (blocking a plain status answer to strengthen).
+SAMPLED, not blanket-mandatory, and **HUMAN-SCOPED** (owner 2026-07-10): the full pipeline
+(transcript + grade card + independent reviewer) is REQUIRED only on a HUMAN-typed **WEAK prompt**
+(a dimension scored < 7, or a fix was applied). Machine-origin turns (see turn-origin.sh) are exempt
+from the whole ceremony — banner included.
+A **STRONG / Grade-A / zero-fix** prompt just needs the banner + a one-line Grade-A declaration — no full table forced.
 
 - **Weak prompt:** after the banner render, in order: (1) **pipeline transcript** (skill STEP
   4.5); (2) **before→after card + independent reviewer** — a context-blind `Agent()` reviewer

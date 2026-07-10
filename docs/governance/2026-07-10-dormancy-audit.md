@@ -66,7 +66,7 @@ output: `python scripts/lint_rule_compliance.py --json`.
 ## Recommended follow-ups (owner-gated, NOT in this PR)
 
 1. **`config-change-crud-guard.sh`**: fix the `kind` derivation or retire it (317 unactionable rows).
-2. **Rule text**: apply the Part-D diff to `prompt-auto-enhance.md` (human-typed scope).
+2. **Rule text**: ~~apply the Part-D diff to `prompt-auto-enhance.md`~~ — DONE (owner approved 2026-07-10, applied on this branch).
 3. **`ba-usecase-discovery-reminder.sh`**: extend the machine-turn exemption to it if its telemetry
    shows the same autonomous-turn noise.
 4. **DEMOTE pass**: review the 15 zero-signal directives one at a time; move genuinely-unenforceable
