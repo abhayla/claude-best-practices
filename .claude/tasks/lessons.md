@@ -661,3 +661,18 @@ occurred AND the prior turns already landed the work — i.e. a pure confirmatio
 **Root cause:** An idle file mtime ≠ agent done. A maker doing slow, non-file-touching work (test iterations, budget compression, thinking) can leave files untouched for many minutes while still running.
 **Why it resolved safely (luck, not design):** the maker's commit was atomic (`git add -A` + commit), so the final HEAD had its complete work; my working-tree `checkout` became a no-op against the committed state.
 **Rule:** Do NOT run mutating git ops (checkout/add/commit/reset) on a worktree while its background maker may still be running. Wait for the completion notification (or `TaskStop` the agent first). READ-ONLY inspection (git log/status/diff, running tests) is fine; mutation is not. If you must take over a genuinely-hung maker, TaskStop it first to eliminate the race.
+
+## 2026-07-10 — Hook `additionalContext` without `hookEventName` is silently dropped; only an installed-context test catches it
+
+**Surfaced during:** fable-operating-manual v0.1.0. The injection hook emitted
+`{"hookSpecificOutput": {"additionalContext": ...}}`, passed bash -n, passed a direct-execution
+probe (output looked perfect), passed `claude plugin validate`, passed full CI — and did NOTHING
+when the plugin actually loaded: Claude Code ignores hookSpecificOutput lacking `hookEventName`.
+Caught ONLY by the clean-room acceptance run (`claude -p "is the manual in your context?"
+--plugin-dir ...` → NO). Fix (v0.1.1, PR #315): echo `hook_event_name` from the hook's stdin JSON.
+
+**Rules:** (a) A hook emitting hookSpecificOutput MUST include `hookEventName` (read it from stdin
+JSON; don't hardcode when one script serves multiple events). (b) "The hook's output looks right
+when I run it" is NOT verification for hooks — the contract test is an end-to-end probe inside a
+real session that asks whether the effect landed (plugin-lifecycle STEP 8 exists for exactly this).
+(c) Silent-drop failure modes (no error, no log) are why acceptance runs are non-optional.
