@@ -14,6 +14,9 @@
 #      the hub's common landing path is autonomous auto-merge, which never runs record_task_run.py
 #      (that only fires on the manual `/git-branch-lifecycle finish` path), so this is what makes
 #      N/30 grow from real work instead of stalling at the floor.
+#   1c. Daily tick of the cost ledger (scripts/cost_ledger.py --daily, fable-window item 6) —
+#      appends yesterday's token/USD rollup and alerts the owner if it exceeded daily_alert_usd.
+#      Internally bounded (60s soft deadline); a transcript-scan hiccup must never block session start.
 #   2. Arm native auto-merge (squash) on every OPEN, non-draft PR that doesn't already have it —
 #      EXCEPT the current HEAD branch (active work must not be merged out from under the session).
 #      GitHub still gates the actual merge on the required `validate` check, so a red/pending PR
@@ -54,6 +57,11 @@ git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads/ 2>/de
 #     scripts/record_merged_prs.py). Fail-safe: recording trouble must never block session start.
 if command -v python >/dev/null 2>&1; then
   log "record-merged-prs: $(PYTHONPATH=. python scripts/record_merged_prs.py --quiet 2>&1 | tail -1)" || true
+fi
+
+# 1c. Daily cost-ledger tick (fable-window item 6): append yesterday's rollup + alert-if-over.
+if command -v python >/dev/null 2>&1; then
+  log "cost-ledger: $(PYTHONPATH=. python scripts/cost_ledger.py --daily 2>&1 | tail -1)" || true
 fi
 
 [ "${AUTO_MERGE:-1}" = "0" ] && { log "AUTO_MERGE=0 — prune only, no arming"; exit 0; }
