@@ -51,6 +51,7 @@ synced:
     - session-git-landing.sh
     - session-governance-status.sh
     - stale-branch-reaper.sh
+    - turn-origin.sh
     - verifier-edge-guard.sh
 
 # shared: mostly-shared resources. The non-fenced SKELETON must be identical across both copies

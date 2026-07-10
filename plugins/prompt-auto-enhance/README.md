@@ -43,6 +43,7 @@ explains each one in one line. Quick reference:
 | `enabled` | Master on/off for the whole prompt-improver |
 | `when_to_run` = `automatic` \| `ask_first` \| `off` | Improve every prompt / only when you reply `enhance` / never |
 | `after_improving` = `run_immediately` \| `let_me_review_first` | Run the improved prompt right away, or show it and **wait for you** to approve/edit/trigger |
+| `full_process_scope` = `human-prompts` \| `everywhere` \| `weak-only` | **Which turns get the full visible process.** `human-prompts` (default) = only prompts *you* typed; a machine turn (background task-notification, scheduled wakeup, skill-execution turn, system-reminder-only turn) still runs but skips the score-table/reviewer ceremony. `everywhere` = full process on every substantive turn. `weak-only` = human prompts, and among those only the weak ones. |
 | `enhance_slash_commands` | `false` (default) = never improve a `/command` or saved custom prompt (yours or Anthropic's) — run as-is |
 | `when_to_enhance.skip_short_prompts` (count_by, minimum) | Don't bother improving tiny prompts |
 | `when_to_enhance.skip_these_phrases` / `skip_phrases_starting_with` | Don't improve continuations like "yes" / "now do …" |

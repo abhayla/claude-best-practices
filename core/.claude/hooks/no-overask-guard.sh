@@ -85,6 +85,23 @@ full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
+# ── MACHINE-origin turn: exempt the ENHANCE enforcement exactly like a slash command (owner
+# 2026-07-10, fire-where-it-pays). A task-notification / scheduled-wakeup / skill-execution /
+# system-reminder-only turn is not a human-typed prompt, so its full-process card + banner + role
+# telemetry below MUST NOT fire (that was the .enhance-misses.log noise). We reuse the $is_slash
+# plumbing: setting it here makes the 5 enhance gates below skip. The OVER-ASK + NARRATE-AND-STOP
+# governance guards further down deliberately do NOT consult $is_slash, so they STAY active on
+# machine turns (autonomous work still owes decide-don't-ask). SSOT for the predicate: the shared
+# turn-origin.sh classifier; fail-open (missing lib => classify_turn stub => human => unchanged).
+if [ -f "$root/.claude/hooks/turn-origin.sh" ]; then
+  . "$root/.claude/hooks/turn-origin.sh"
+fi
+command -v classify_turn >/dev/null 2>&1 || classify_turn() { echo human; }
+if [ -z "$is_slash" ]; then
+  lu_text=$(printf '%s' "$last_user" | jq -r '.t // ""' 2>/dev/null)
+  [ "$(classify_turn "$lu_text")" = "machine" ] && is_slash="1"
+fi
+
 # ── ENHANCE_MODE gate (auto | ask | off; absent = auto) ──
 # Gates ONLY the prompt-enhancement enforcement (reviewer-card + diagnosis-substance
 # blocks and the enhance telemetry). The over-ask + narrate-and-stop guards below are

@@ -36,6 +36,10 @@ settings="$plugin_root/enhance-settings.default.json"
 [ -n "$ENHANCE_SETTINGS_FILE" ] && [ -f "$ENHANCE_SETTINGS_FILE" ] && settings="$ENHANCE_SETTINGS_FILE"
 getj() { jq -r "$1 // empty" "$settings" 2>/dev/null; }
 
+# ── Shared turn-origin classifier (fire-where-it-pays) — ships with the plugin; fail-open. ──
+[ -f "$plugin_root/hooks/turn-origin.sh" ] && . "$plugin_root/hooks/turn-origin.sh"
+command -v classify_turn >/dev/null 2>&1 || classify_turn() { echo human; }
+
 # No enforcement when the improver isn't running / isn't displaying.
 [ "$(jq -r '.enabled' "$settings" 2>/dev/null)" = "false" ] && exit 0
 mode="$(getj '.when_to_run')"; case "$mode" in ask_first|off) exit 0 ;; esac
@@ -72,6 +76,17 @@ if [ "$(getj '.enhance_slash_commands')" != "true" ]; then
     # banner fell into the pre-split segment (the skill-turn false-block).
     *'Base directory for this skill:'*) exit 0 ;;
   esac
+fi
+
+# ── full_process_scope: fire-where-it-pays — exempt MACHINE-origin turns from the process-guard
+# block (mirrors the reminder hook). "everywhere" keeps enforcement on every substantive turn. ──
+fps="$(getj '.full_process_scope')"; [ -z "$fps" ] && fps="human-prompts"
+if [ "$fps" != "everywhere" ]; then
+  lu_text=$(jq -rc '
+    if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
+    then (if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)
+    else empty end' "$tp" 2>/dev/null | tail -1)
+  [ "$(classify_turn "$lu_text")" = "machine" ] && exit 0
 fi
 
 full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')

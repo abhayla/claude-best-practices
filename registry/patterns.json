@@ -6227,7 +6227,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-06-27",
-    "total_patterns": 278
+    "total_patterns": 279
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6281,13 +6281,13 @@
     }
   },
   "no-overask-guard": {
-    "hash": "7940e06a0ad314c83ca813918af9b69aca4dd581c2088771c42148c74fc7e156",
+    "hash": "3f71b8afc7c76ac5d2c41a9ada2afb9b9f5e41d1875a2d0b9b0f8b0274a93ab1",
     "type": "hook",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-06-21",
+    "last_updated": "2026-07-10",
     "dependencies": [],
     "visibility": "public",
     "description": "Stop hook enforcing stop-discipline deterministically: BLOCKS over-ask (trailing offer / multiple-choice / recommendation+question) and narrate-and-stop endings on reversible work and re-injects the decision-authority rule; exempts genuine blockers and *Sync-check:* intent grills; logs enhance-banner/block/role misses as non-blocking telemetry; per-turn auto-continue cap of 12 via .claude/.keepgoing-count.",
@@ -6297,8 +6297,29 @@
       "stop-discipline",
       "telemetry"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses | v1.2.0 (2026-07-10): fire-where-it-pays — machine-origin turns (task-notification/scheduled-wakeup/skill-exec/system-reminder-only, via shared turn-origin.sh) are exempt from enhance-card/banner/role enforcement like slash commands; over-ask + narrate-and-stop guards stay active.",
     "tier": "must-have"
+  },
+  "turn-origin": {
+    "hash": "f6634a2c1a3e01de3ff3cfbad52367c5f7a911db73dbd5bf6ecf9981b365f430",
+    "type": "hook",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-07-10",
+    "last_updated": "2026-07-10",
+    "dependencies": [],
+    "visibility": "public",
+    "tier": "must-have",
+    "description": "Shared turn-origin classifier (sourced lib, not event-wired): classify_turn(prompt) -> human|machine. SSOT for the fire-where-it-pays predicate — the full prompt-auto-enhance ceremony fires only on human-typed prompts; task-notification / scheduled-wakeup / skill-execution / system-reminder-only turns classify as machine. Sourced by prompt-enhance-reminder.sh and no-overask-guard.sh so the two hooks cannot drift.",
+    "tags": [
+      "governance",
+      "hook",
+      "prompt-enhance",
+      "classifier",
+      "dry"
+    ],
+    "changelog": "v1.0.0 (2026-07-10): extracted the machine-vs-human turn predicate into one SSOT (fable-window item 5)."
   },
   "session-governance-status": {
     "hash": "3cf87f5cf60ed7f7e58dcc21d523c11ca81675687c187c860cb16869ebf9aaf3",

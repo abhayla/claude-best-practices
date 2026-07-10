@@ -48,6 +48,15 @@ printf '0' > "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/.diagnosis-co
 
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
+# ── Shared turn-origin classifier (fire-where-it-pays predicate, owner 2026-07-10) ──
+# SSOT: .claude/hooks/turn-origin.sh. Fail-open: if the lib is missing, define a stub that
+# treats every turn as human (== unchanged pre-predicate behavior), so a missing lib never
+# silences the enhance pipeline.
+if [ -f "$root/.claude/hooks/turn-origin.sh" ]; then
+  . "$root/.claude/hooks/turn-origin.sh"
+fi
+command -v classify_turn >/dev/null 2>&1 || classify_turn() { echo human; }
+
 # ── ENHANCE_MODE session flag (auto | ask | off; absent = auto = unchanged behavior) ──
 # Gates ONLY the prompt-enhancement pipeline (L2 strengthening + L3 enforcement). The
 # governance tail (plan-before-coding, decide-don't-ask, grill, narrate-and-stop) is
@@ -138,6 +147,17 @@ case "$trimmed" in
     exit 0
     ;;
 esac
+
+# Skip 0b: MACHINE-origin turn — fire-where-it-pays (owner 2026-07-10). A task-notification,
+# scheduled-wakeup, skill-execution, or system-reminder-only turn is NOT a human-typed prompt, so
+# the enhance STRENGTHENING pipeline must NOT run on it (grading autonomous turns like human prompts
+# is exactly the .enhance-misses.log noise this predicate removes). Emit ONLY the governance tail —
+# autonomous work still owes decide-don't-ask / narrate-and-stop — never the enhance block. Mirrors
+# the slash-command skip above. The SSOT for the predicate is turn-origin.sh (sourced above).
+if [ "$(classify_turn "$prompt")" = "machine" ]; then
+  emit_governance_tail
+  exit 0
+fi
 
 # Skip 1: empty or short prompts (≤15 chars trimmed)
 if [ "${#trimmed}" -le 15 ]; then
