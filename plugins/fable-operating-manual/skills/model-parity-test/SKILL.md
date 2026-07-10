@@ -70,6 +70,22 @@ scoring; one case per worker (no shared context between cases). Save each raw an
 (`/usage` or dispatch metadata) for the cost metric; if unavailable, estimate from character counts
 and label the estimate as such.
 
+**Pairing-integrity protocol (mandatory — a real run was corrupted without it):** prepend
+`CASE-TAG: <id>` as the first line of every worker prompt and instruct the worker to echo that
+exact line as the FIRST line of its reply (workers learn nothing from it). The conductor MUST
+verify the echoed tag matches the intended case before saving, and MUST save each answer
+immediately on return — never buffer a batch of results and write filenames afterwards (concurrent
+batching once produced a silent 24-file rotation, every answer filed under a case 3 slots away).
+
+## STEP 2.5: Fingerprint gate (mandatory before ANY judging)
+
+Content-verify the answer↔case pairing for every arm: for each answer file, check it echoes its
+case's distinctive tokens (its CASE-TAG line and/or case-specific figures). Any mismatch, duplicate,
+or missing case → STOP judging that arm, rebuild the true mapping by content-matching (the
+misfiling is usually a deterministic shift/rotation — verify ambiguous slots by reading them), fix
+filenames, re-verify to a clean bijection, and only then judge. Grading a misfiled answer against
+the wrong key produces meaningless scores that silently destroy the whole comparison.
+
 ## STEP 3: Anonymize
 
 Build the judging set: for every saved answer create `judgments/queue/<case>-<rand6>.md` where
