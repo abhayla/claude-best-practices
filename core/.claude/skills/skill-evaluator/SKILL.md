@@ -13,10 +13,13 @@ triggers:
   - test skill quality
   - skill evaluation
   - audit skill
+  - trap test
+  - certify on cheap model
+  - trap-test mode
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
-argument-hint: "<trigger|output|full|conflicts> <skill-path> [--baseline]"
+argument-hint: "<trigger|output|full|conflicts|trap> <skill-path> [--baseline] [--model sonnet] [--cases <path>] [--bar all|0.9]"
 type: workflow
-version: "2.3.0"
+version: "2.4.0"
 ---
 
 # Skill Evaluator — Evaluate Skill Quality
@@ -106,6 +109,7 @@ these checks — they caught issues in 5/5 evaluated skills.
 | `output` | Output quality: scenarios, stress test, assertions, benchmarks |
 | `full` | Both trigger + output, aggregated report |
 | `conflicts` | Cross-skill conflict scan across ALL installed skills |
+| `trap` | Fable-independence certification: does the asset still produce disciplined, correct behavior when a CHEAP model drives it? Planted-defect exam + blind judging |
 
 1. Load target skill's SKILL.md, extract: name, description, triggers, allowed-tools
 2. If `--baseline`: snapshot current version (`cp -r <skill-path> <workspace>/skill-snapshot/`)
@@ -310,6 +314,43 @@ Add results to the evaluation report under the `REFERENCE SELF-UPDATE` section.
 
 ---
 
+## STEP T: Trap Mode (mode: trap)
+
+**Read:** `references/trap-test-protocol.md` for the full procedure — case authoring, conductor
+discipline, blind judging, the rubric, and the repair loop. This section is only the orchestration
+summary; the reference is the source of truth.
+
+CLI: `/skill-evaluator trap <asset-path> [--model sonnet] [--cases <path>] [--bar all|0.9]`.
+`<asset-path>` is any hub asset (skill, plugin manual, rule) whose value claim includes working
+under a cheaper/other model. `--model` defaults to `sonnet` (the cheap target being certified).
+`--cases` overrides the default `<asset>/evals/trap-cases/` location. `--bar` defaults to `all`
+(every case must be caught); `0.9` accepts a documented ≥90% catch-rate for large case sets.
+
+Non-negotiables (detailed procedure in the reference file):
+
+1. **Cases FROZEN before any arm runs.** Author + freeze traps/replays/probes to
+   `<asset>/evals/trap-cases/` (one file per case) BEFORE the certification run starts. No case may
+   be added, removed, or edited after dispatch begins.
+2. **Conductor arms pinned to the target cheap model.** Every worker `Agent()` dispatch uses
+   `model: <--model, default sonnet>` — never the T0 frontier model. The asset under test (skill,
+   manual, rule) is given to the arm exactly as a downstream cheap-model user would receive it.
+3. **Judge = opus, fresh context, anonymized + shuffled answers, fixed rubric.** A separate judge
+   dispatch per answer, blind to which case/arm produced it, scored against the frozen rubric (see
+   reference §4). Mix in ≥1 calibration case with a known score; a miscalibrated judge batch is void
+   and must be re-run.
+4. **Verdict is CERTIFIED only when every trap case is caught, or the documented `--bar` is met.**
+   Anything short is NOT-CERTIFIED — name the specific missed case IDs, never a bare percentage.
+5. **Misses drive a bounded repair loop.** For each miss, procedurally rewrite the FAILING SECTION
+   of the asset (never the case, never the rubric), re-run ONLY the missed cases, max 2 rounds, then
+   re-freeze. If still not certified after 2 rounds, report NOT-CERTIFIED honestly — do not loosen
+   the bar to force a pass.
+
+Output: a `TRAP CERTIFICATION` report (per-case table, catch-rate, misses, judge calibration
+result, verdict) appended to the caller's evaluation report (STEP 6) or written standalone when
+`trap` is the only mode requested.
+
+---
+
 ## STEP 5: Human Review (standalone only)
 
 **When invoked standalone** (not delegated from writing-skills):
@@ -329,7 +370,7 @@ Locked output format:
 ```
 SKILL EVALUATION REPORT: <skill-name>
 =====================================
-Mode: <trigger|output|full|conflicts>
+Mode: <trigger|output|full|conflicts|trap>
 Iteration: <N>
 
 SKILL NECESSITY
@@ -366,6 +407,15 @@ MODEL COVERAGE
   Tested on:         <model list or "single model: X">
   Divergent results: <list or "N/A">
 
+TRAP CERTIFICATION (mode: trap only)
+  Target model:      <--model, e.g. sonnet>
+  Cases:              N traps / N replays / N probes (frozen <path>)
+  Catch-rate:         N/N (N%)
+  Missed cases:       <case IDs, or "none">
+  Judge calibration:  <PASS | discarded+re-run — N deviations>
+  Repair rounds:      <0-2>
+  Trap verdict:       CERTIFIED | NOT-CERTIFIED
+
 OVERALL VERDICT: PASS | FIX | FAIL
 Blocking issues: <list or "none">
 Recommended fixes: <prioritized, mapped to failure types>
@@ -380,6 +430,9 @@ Recommended fixes: <prioritized, mapped to failure types>
 | PASS | Trigger ≥80%, stress ≥90%, no conflicts, no regressions, skill adds value | Proceed |
 | FIX | Minor issues below threshold | Fix specific issues, re-run eval |
 | FAIL | Critical failures, design gaps, skill adds no value | Major rework |
+
+Trap mode returns its own verdict (see STEP T): `CERTIFIED` or `NOT-CERTIFIED` — never a
+percentage in place of naming missed case IDs.
 
 ---
 
@@ -400,6 +453,10 @@ Recommended fixes: <prioritized, mapped to failure types>
 - Always run all 10 pre-flight checks (0.4) for skills with `references/` — Why: the protocol file, CHANGELOG, entry format, mode detection, admission gate, scoring, two-tier structure, and approval gate must all be present for the self-update mechanism to work
 - Always run Tests A-E (3.4b) for skills with `references/` during output evaluation — Why: structural presence is not enough; mode detection, gap detection, scoring, approval gating, and post-update integrity must all work at runtime
 - Always test both FULL and STANDALONE modes when learn-n-improve is available in the project — Why: downstream projects may or may not have learn-n-improve; skills must work correctly in both environments
+- Always freeze trap-mode cases before dispatching any arm — Why: cases edited after seeing results are no longer a certification, they're a curve-fit
+- Always pin trap-mode arms to the target `--model` (never the T0 frontier model) — Why: the whole point is proving the asset works under the CHEAP model a downstream user will actually run
+- Always run the trap-mode fingerprint gate before judging — Why: a misfiled answer graded against the wrong case produces a meaningless certification
+- Always name specific missed case IDs in a NOT-CERTIFIED trap verdict — Why: "62% catch-rate" gives the repair loop nothing to fix
 
 ## MUST NOT DO
 
@@ -409,3 +466,5 @@ Recommended fixes: <prioritized, mapped to failure types>
 - MUST NOT suggest fixes contradicting writing-skills best practices — fixes must align with authoring guidance
 - MUST NOT add specific keywords from failed queries to description — that's overfitting; generalize from the category
 - MUST NOT block on human review when delegated from writing-skills — return verdict immediately
+- MUST NOT weaken a trap case, the rubric, or the pass bar to force a CERTIFIED verdict — repair the ASSET only, never the exam
+- MUST NOT exceed 2 repair rounds in trap mode — report NOT-CERTIFIED honestly rather than iterating indefinitely

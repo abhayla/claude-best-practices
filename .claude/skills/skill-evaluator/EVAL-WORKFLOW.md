@@ -97,6 +97,20 @@ catches authoring issues that cause behavioral failures downstream.
 Log all pass/fail results. Even "all pass" is a finding — record it
 explicitly. If structural issues are found, they feed into Step 3 (Fix).
 
+### Step 1.5: Trap Mode — when required
+
+Run `/skill-evaluator trap <asset-path>` (in addition to Step 2's `full` mode, not instead of
+it) whenever the asset's value claim includes **"works under a cheaper/other model"** — this
+covers portable manuals, distilled/generalized rules, and harness skills built to be driven by
+a model other than the authoring one. It also applies to **every fable-window program item**
+per `plans/fable-window-program.md` (the program's proof bar is explicit: "EVERY item ships
+with machine-checkable DoD + CI green + Fable-independence trap-test on a cheap model"). Full
+procedure: `references/trap-test-protocol.md`.
+
+One asset per run — the existing "no batch shortcuts" rule (this file's CRITICAL RULE 6 /
+general rule below) applies to trap-mode runs exactly as it does to `full`-mode runs; do not
+fold trap certification for two assets into a single dispatch.
+
 ### Step 2: Behavioral Evaluation
 
 Run `/skill-evaluator full` **inside the test project** in a clean subagent.
