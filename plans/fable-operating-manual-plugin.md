@@ -75,3 +75,10 @@ keeps working and improving after Fable is gone.
 ## State log (append as phases complete)
 
 - 2026-07-10: worktree created, plan written. Phase 1 next.
+- 2026-07-10: Phases 1–4 DONE (commits 8146537, +manual, 70931c7): scaffold+marketplace, exam
+  frozen (33 cases + rubric + calibration), manual v1.0 + distilled core, hooks (validated live)
+  + harness skill. Phase 5 RUNNING: 3 arm conductors dispatched (A=opus, B=opus+manual, C=fable),
+  answers land in parity-results/20260710-opus/answers/ (target 99); keys extracted to keys/;
+  aggregation script ready in session scratchpad (aggregate_parity.py). Next on arm completion:
+  anonymize → 2 judge conductors (opus judges, 1 answer each, calibration mixed in) → aggregate →
+  repair loop → land.
