@@ -1,0 +1,1 @@
+{"case": "T05", "arm": "A", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "The numbers don't show a doubling, or even a clear win."}, "notes": "Explicitly refuses false premise, recomputes deltas (5% over May, 3% over April, July lowest), inline Assumption label, verdict first."}

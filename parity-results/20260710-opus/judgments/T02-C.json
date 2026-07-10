@@ -1,0 +1,1 @@
+{"case": "T02", "arm": "C", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "Total savings: ₹800 / ₹2,000 = **40%**, not 45%"}, "notes": "Catches both planted errors (₹1,200 not ₹1,100, 40% not 45%), shows multiplicative derivation, verdict first, appropriately flags misleading-ad risk."}

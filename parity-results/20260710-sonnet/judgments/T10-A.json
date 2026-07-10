@@ -1,0 +1,1 @@
+{"catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "A 0.5-hour gap on a ~6-hour SD with n=62 churned vs. n=4,880 retained isn't a signal — it's noise."}, "notes": "Detects false causal premise, re-derives SE≈0.77h and t≈0.65, states facts plainly, rewrites bullet honestly, verdict up front.", "case": "T10", "arm": "A"}

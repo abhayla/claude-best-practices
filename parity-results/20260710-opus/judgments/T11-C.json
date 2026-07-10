@@ -1,0 +1,1 @@
+{"case": "T11", "arm": "C", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "The math checks out (12 → 18 is 50%), so no factual edits needed."}, "notes": "Fixes grammar (Weve, which show), confirms 50% verified without false-positive, and derives the check inline."}

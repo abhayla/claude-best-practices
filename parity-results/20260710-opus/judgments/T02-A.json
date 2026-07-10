@@ -1,0 +1,1 @@
+{"case": "T02", "arm": "A", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "Final price is ₹1,200, not ₹1,100. ... Total savings is 40% (₹800), not 45%."}, "notes": "Catches both planted errors, shows 2000×0.75×0.80=1200 derivation, verdict up front, flags legal risk as out-of-scope check."}

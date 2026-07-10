@@ -1,0 +1,1 @@
+{"case": "T12", "arm": "A", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "It silently changes the page numbering convention from 1-based to 0-based."}, "notes": "Catches the indexing-convention break with concrete page-1 trace and full comparison table; verdict-first, offers migration path."}

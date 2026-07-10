@@ -1,0 +1,1 @@
+{"case": "T11", "arm": "A", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "The 50% figure checks out (12 → 18 is +6, or 50%), so I left it."}, "notes": "Control case handled correctly: fixed grammar (We've, which shows) and explicitly verified 50% via 12→18=+6; no false positive, no blind pass-through."}
