@@ -4632,23 +4632,24 @@
     }
   },
   "skill-evaluator": {
-    "hash": "b0e1de7dd514666a6a8698ad7d4ba1f68b9d634263bce702502f618644934d38",
+    "hash": "8aae266cc2ffd2ff6fb45c780657ad98aec71b17b854fc243fc51602c22dde9d",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "2.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-02",
-    "last_updated": "2026-04-03",
+    "last_updated": "2026-07-10",
     "dependencies": [],
     "visibility": "public",
-    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Includes pre-flight checks for registry sync, frontmatter completeness, structural integrity, and v8 platform compliance.",
+    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Includes pre-flight checks for registry sync, frontmatter completeness, structural integrity, and v8 platform compliance. Trap mode (v2.4.0) certifies an asset (skill, manual, rule) still produces disciplined, correct behavior when driven by a cheap model, via a planted-defect exam + blind judging.",
     "tags": [
       "evaluation",
       "skills",
       "testing",
-      "quality"
+      "quality",
+      "trap-test"
     ],
-    "changelog": "v2.1.0: Add v8 platform compliance (name constraints, third-person descriptions, reference depth, model matrix testing) | v2.0.0: Add Step 0 pre-flight checks (registry sync, frontmatter completeness, structural integrity), cross-skill intelligence (bidirectional signposting, near-duplicate resolution, skill-vs-rule overlap), delegation edge cases in stress test | v1.0.0: Initial release",
+    "changelog": "v2.4.0: Add trap mode — cheap-model certification via planted-defect cases + blind opus judging, generalized from the fable-operating-manual model-parity-test harness (references/trap-test-protocol.md) | v2.3.0: (pre-existing, undocumented in prior changelog) | v2.1.0: Add v8 platform compliance (name constraints, third-person descriptions, reference depth, model matrix testing) | v2.0.0: Add Step 0 pre-flight checks (registry sync, frontmatter completeness, structural integrity), cross-skill intelligence (bidirectional signposting, near-duplicate resolution, skill-vs-rule overlap), delegation edge cases in stress test | v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
