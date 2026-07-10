@@ -13,7 +13,19 @@ re-execute anything locally. It derives the remaining signals from the PR's own 
 shadow-mode contract as record_task_run.py (never lands or merges anything).
 
 Swept automatically by `.claude/hooks/auto-pr-reconcile.sh` at SessionStart (fail-safe: a
-`gh`/network hiccup here must never block session start).
+`gh`/network hiccup here must never block session start — every gh call carries a
+subprocess timeout, each per-PR failure is skipped rather than fatal, and the whole sweep
+runs under a hard deadline).
+
+Known limitations:
+  - The `Verified-by:` body marker is SELF-ASSERTED evidence — the same automation that did
+    the work can plant it. What catches an inflated verification signal over time is shadow
+    mode + the hard gates + the human_had_to_fix calibration loop (a liar's AUTO runs show up
+    as false confidence); an APPROVED GitHub review is the stronger of the two evidence
+    branches.
+  - `production_health=1.0` is the established hub convention (a hub task has no production
+    surface to break), inherited from record_task_run.py — and it is load-bearing: without
+    that 0.10 a green verified PR could not reach the 85 AUTO threshold.
 
 CLI:
     python scripts/record_merged_prs.py [--limit 15] [--dry-run] [--report] [--quiet]
@@ -23,6 +35,7 @@ import argparse
 import json
 import re
 import subprocess
+import time
 from datetime import date
 from pathlib import Path
 
@@ -39,10 +52,17 @@ _SKILL_RE = re.compile(r"(?im)^skill:\s*(\S+)")
 
 PR_FIELDS = "number,headRefName,title,body,mergedAt,commits,reviews,statusCheckRollup"
 
+# Hang guards for the SessionStart hook's "never block session start" contract: per-gh-call
+# timeout + a whole-sweep deadline (bounded in Python, NOT via the `timeout` shell command —
+# on Windows Git Bash that can resolve to Windows' timeout.exe, which cannot run commands).
+GH_TIMEOUT_SECONDS = 20
+SWEEP_DEADLINE_SECONDS = 90
 
-def _gh(args: list[str]) -> str:
-    """Run `gh` with the given args; raise on nonzero exit."""
-    result = subprocess.run(["gh", *args], cwd=ROOT, capture_output=True, text=True)
+
+def _gh(args: list[str], timeout: float = GH_TIMEOUT_SECONDS) -> str:
+    """Run `gh` with the given args; raise on nonzero exit. Bounded by `timeout` —
+    subprocess.TimeoutExpired propagates and is handled as a normal per-PR failure."""
+    result = subprocess.run(["gh", *args], cwd=ROOT, capture_output=True, text=True, timeout=timeout)
     if result.returncode != 0:
         raise RuntimeError(f"gh {' '.join(args)} failed: {result.stderr.strip()}")
     return result.stdout
@@ -114,8 +134,10 @@ def derive_human_had_to_fix(pr: dict) -> bool | None:
 
 
 def already_recorded(number: int, marker_path: Path, ledger_path: Path) -> bool:
-    """Belt-and-suspenders dedup: the marker (gitignored, machine-local) OR a matching
-    `pr` field already present in the committed ledger."""
+    """Belt-and-suspenders dedup: the marker file OR a matching `pr` field already present
+    in the ledger. Both are gitignored, machine-local state (trust-score/ledgers/ is in
+    .gitignore too) — the second layer guards against a lost/wiped marker on the SAME
+    machine, not against another clone recording independently."""
     if marker_path.exists():
         recorded = {
             int(line.strip()) for line in marker_path.read_text(encoding="utf-8").splitlines() if line.strip()
@@ -155,48 +177,68 @@ def record_merged_prs(
     recorded: list[int] = []
     skipped = 0
     results: dict[int, dict] = {}
+    summary: dict = {"recorded": recorded, "skipped": 0, "results": results}
+
+    # Hard sweep deadline (SessionStart contract). On expiry we stop gracefully — any PR
+    # left unrecorded is simply picked up by the next session's sweep.
+    deadline = time.monotonic() + SWEEP_DEADLINE_SECONDS
 
     for number in numbers:
+        if time.monotonic() >= deadline:
+            summary["aborted"] = "deadline"
+            break
+
+        # NOTE (accepted race): this check-then-act (already_recorded -> record ->
+        # mark_recorded) is not atomic — two SessionStart sweeps running concurrently on
+        # the SAME clone could in principle both record a PR. Accepted: sessions rarely
+        # start simultaneously, and session-concurrency-guard.sh already warns when
+        # multiple sessions share a working tree.
         if already_recorded(number, marker_path, ledger_path):
             skipped += 1
             continue
 
-        pr = fetch_pr(number, gh=gh)
-        ci_green = validate_check_passed(pr)
+        # One bad PR (gh timeout/error, garbage JSON) skips that PR — never crashes the sweep.
+        try:
+            pr = fetch_pr(number, gh=gh)
+            ci_green = validate_check_passed(pr)
 
-        signals = assemble_signals(
-            tests_passed=1 if ci_green else 0,
-            tests_total=1,
-            coverage=0.0,
-            independent_verification=independent_verification(pr),
-            regression_clean=1.0 if ci_green else 0.0,
-            production_health=1.0,
-            secret_scan_clean=1.0 if ci_green else 0.0,
-        )
+            signals = assemble_signals(
+                tests_passed=1 if ci_green else 0,
+                tests_total=1,
+                coverage=0.0,
+                independent_verification=independent_verification(pr),
+                regression_clean=1.0 if ci_green else 0.0,
+                production_health=1.0,
+                secret_scan_clean=1.0 if ci_green else 0.0,
+            )
 
-        extra = {
-            "pr": number,
-            "branch": pr.get("headRefName"),
-            "skill": derive_skill(pr),
-            "recorded_at": date.today().isoformat(),
-        }
+            extra = {
+                "pr": number,
+                "branch": pr.get("headRefName"),
+                "skill": derive_skill(pr),
+                "recorded_at": date.today().isoformat(),
+            }
 
-        result = collect_and_record(
-            signals,
-            stage="reversible",
-            record=not dry_run,
-            human_had_to_fix=derive_human_had_to_fix(pr),
-            ledger_path=ledger_path,
-            config_path=CONFIG_PATH,
-            extra=extra,
-        )
+            result = collect_and_record(
+                signals,
+                stage="reversible",
+                record=not dry_run,
+                human_had_to_fix=derive_human_had_to_fix(pr),
+                ledger_path=ledger_path,
+                config_path=CONFIG_PATH,
+                extra=extra,
+            )
+        except Exception:
+            skipped += 1
+            continue
 
         results[number] = {"score": result["score"], "recommended": result["recommended"]}
         recorded.append(number)
         if not dry_run:
             mark_recorded(number, marker_path)
 
-    return {"recorded": recorded, "skipped": skipped, "results": results}
+    summary["skipped"] = skipped
+    return summary
 
 
 def _main() -> int:

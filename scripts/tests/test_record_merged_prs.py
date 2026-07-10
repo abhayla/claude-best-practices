@@ -5,6 +5,7 @@ matching the module's design (every gh access goes through an injectable `gh(arg
 """
 
 import json
+import subprocess
 
 from scripts.trust_score import load_ledger, stats_by
 from scripts import record_merged_prs as rmp
@@ -225,3 +226,54 @@ class TestDeriveSkill:
     def test_no_slash_in_branch_is_none(self):
         pr = _pr(1, body="", branch="main-fixup")
         assert rmp.derive_skill(pr) is None
+
+
+class TestHangGuards:
+    def test_gh_timeout_on_one_pr_skips_it_and_sweep_continues(self, tmp_path):
+        """A gh timeout (or any per-PR error) must skip THAT PR, never crash the sweep."""
+        marker = tmp_path / ".recorded-prs"
+        ledger = tmp_path / "atlas.jsonl"
+        good_pr = _pr(402, body="Verified-by: code-reviewer-agent", branch="auto/work-402")
+
+        def gh(args):
+            if args[:2] == ["pr", "list"]:
+                return json.dumps([{"number": 401}, {"number": 402}])
+            if args[:2] == ["pr", "view"]:
+                if int(args[2]) == 401:
+                    raise subprocess.TimeoutExpired(cmd="gh pr view 401", timeout=20)
+                return json.dumps(good_pr)
+            raise AssertionError(f"unexpected gh args: {args}")
+
+        outcome = rmp.record_merged_prs(limit=15, marker_path=marker, ledger_path=ledger, gh=gh)
+
+        assert outcome["recorded"] == [402]
+        assert outcome["skipped"] == 1
+        assert "aborted" not in outcome
+        assert len(load_ledger(ledger)) == 1
+
+    def test_sweep_deadline_aborts_gracefully(self, tmp_path, monkeypatch):
+        """Once the sweep deadline passes, remaining PRs are left for the next session's
+        sweep and the summary carries `aborted: deadline`."""
+        marker = tmp_path / ".recorded-prs"
+        ledger = tmp_path / "atlas.jsonl"
+        pr_a = _pr(501, body="Verified-by: code-reviewer-agent", branch="auto/work-501")
+        pr_b = _pr(502, body="Verified-by: code-reviewer-agent", branch="auto/work-502")
+        gh = _fake_gh([501, 502], {501: pr_a, 502: pr_b})
+
+        # Fake clock: the deadline is computed on the first call; the second iteration's
+        # check sees a time already past it, so only PR 501 gets processed.
+        ticks = iter([0.0, 0.0, 1000.0, 1000.0, 1000.0])
+        monkeypatch.setattr(rmp.time, "monotonic", lambda: next(ticks))
+
+        outcome = rmp.record_merged_prs(limit=15, marker_path=marker, ledger_path=ledger, gh=gh)
+
+        assert outcome["aborted"] == "deadline"
+        assert outcome["recorded"] == [501]
+        assert len(load_ledger(ledger)) == 1
+
+    def test_default_gh_runner_has_a_timeout(self):
+        """The real _gh must pass a timeout to subprocess.run (hang guard for the hook)."""
+        import inspect
+
+        sig = inspect.signature(rmp._gh)
+        assert sig.parameters["timeout"].default == rmp.GH_TIMEOUT_SECONDS
