@@ -1,15 +1,15 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-10 09:10 UTC (auto-generated)
+> Last updated: 2026-07-10 09:47 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 278 |
-| Core (universal) | 205 |
+| Total Patterns | 279 |
+| Core (universal) | 206 |
 | Stack-specific | 73 |
 | Agents | 29 |
 | Configs | 3 |
-| Hooks | 21 |
+| Hooks | 22 |
 | Rules | 55 |
 | Skills | 170 |
 
@@ -131,7 +131,7 @@
 | loop-engineering | skill | 1.2.4 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| no-overask-guard | hook | 1.1.0 | project:firekaro-planner | — |
+| no-overask-guard | hook | 1.2.0 | project:firekaro-planner | — |
 | notifier-integration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | output-plausibility-verification | rule | 1.0.1 | project:firekaro-planner | — |
@@ -208,6 +208,7 @@
 | tester-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | to-prd | skill | 1.0.0 | upstream:mattpocock/skills@engineering/to-prd | improve-codebase-architecture, plan-to-issues |
+| turn-origin | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | update-practices | skill | 1.2.1 | hub:abhayla/claude-best-practices | — |
 | verifier-edge-guard | hook | 1.0.1 | hub:abhayla/claude-best-practices | — |
