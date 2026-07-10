@@ -154,6 +154,11 @@ newly-discovered convention into this skill's cheat-sheet below.
   installed copy — prove the fix locally, then land.
 - **`claude plugin validate`** runs the same check as the submission pipeline — run it every time.
 - **`/reload-plugins`** hot-reloads skills/agents/hooks/MCP without a restart.
+- **Hook `hookSpecificOutput` MUST carry `hookEventName`** (read `hook_event_name` from the hook's
+  stdin JSON — don't hardcode when one script serves several events). Without it Claude Code
+  SILENTLY drops the payload — no error, hook "runs fine" standalone. The only test that catches it
+  is the STEP 8 installed-context probe (`claude -p "<is the effect present?>" --plugin-dir ...`),
+  which is why that step is non-optional (hub lesson, PR #315).
 - **Never declare a plugin's hooks in `plugin.json`.** Hooks in `hooks/hooks.json` are auto-loaded;
   declaring them again causes a duplicate-load error (hub lesson, PR #244).
 - **Only `plugin.json` lives in `.claude-plugin/`.** Every component dir (`skills/`, `hooks/`, …) sits
