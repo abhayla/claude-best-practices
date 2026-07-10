@@ -71,3 +71,8 @@ output: `python scripts/lint_rule_compliance.py --json`.
    shows the same autonomous-turn noise.
 4. **DEMOTE pass**: review the 15 zero-signal directives one at a time; move genuinely-unenforceable
    ones to skill docs (keep load-bearing doctrine).
+
+
+## Decision on the 15 DEMOTE candidates (2026-07-10, Decision Advisor — owner-delegated)
+
+**KEEP all 15; DEMOTE none.** Zero telemetry signal on craft/behavioral doctrine is a measurement gap, not proof of dormancy: (a) YAGNI / measure-before-optimize / no-redundant-comments are cross-referenced SSOTs cited by `design-principles.md`/`code-readability.md` (demoting breaks pointer integrity); (b) assumption-flagging, Unverified-flagging, direct-honesty, self-improving are exercised every substantive session; (c) `model-routing.md` and `product-incubation.md` recently earned their keep (fable-window program; noter-app graduation). The real 320-line-budget lever is a DEFERRED dedup pass (collapse CRITICAL-RULES restatements to one-line pointers, e.g. `claude-docs-cache.md`, `product-incubation.md`) — zero doctrine loss, case-by-case, owner-diff-approved per rule 5.
