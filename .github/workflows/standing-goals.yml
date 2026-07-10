@@ -1,0 +1,36 @@
+name: Check Standing Goals
+on:
+  schedule:
+    - cron: '0 5 * * *'  # daily 5am UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r scripts/requirements.txt
+      - name: Check standing goals
+        id: sentinel
+        run: PYTHONPATH=. python scripts/check_standing_goals.py | tee sentinel-report.txt
+        continue-on-error: true
+      - name: File or update issue if failing
+        if: steps.sentinel.outcome == 'failure'
+        run: |
+          BODY_FILE=sentinel-report.txt
+          EXISTING=$(gh issue list --state open --label standing-goals --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body-file "$BODY_FILE"
+          else
+            gh issue create --title "Standing-goal sentinel: invariant(s) failing" \
+              --label "standing-goals,maintenance" \
+              --body-file "$BODY_FILE"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
