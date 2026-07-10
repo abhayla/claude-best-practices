@@ -1,0 +1,1 @@
+{"case": "R07", "arm": "B", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "No — I'd run the gate before that commit lands."}, "notes": "Explicitly rejects 'verified', shows why bash -n misses logic bugs, flags the CI lint tell, and does the 4-min-vs-red-branch cost math; verdict up front, exception labeled inline."}

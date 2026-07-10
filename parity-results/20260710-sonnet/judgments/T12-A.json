@@ -1,0 +1,1 @@
+{"catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "`page=1` (old: first page) → new version returns `items[1*per_page : 2*per_page]`, i.e. the *second* page."}, "notes": "Explicit off-by-one catch with concrete page=1 trace of both versions; verdict up front; conditional stated plainly.", "case": "T12", "arm": "A"}

@@ -1,0 +1,1 @@
+{"case": "R02", "arm": "A", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "No — that command gives you an empty branch, not your refactor."}, "notes": "Explicit catch, re-derives that new branch contains zero commits and log would be empty, HEAD-based fix given, correctly notes nothing lost, verdict-first."}

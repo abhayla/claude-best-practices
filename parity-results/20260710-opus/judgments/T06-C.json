@@ -1,0 +1,1 @@
+{"case": "T06", "arm": "C", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "Discrepancy: $400 (line items are short of the total by ~4.8%)"}, "notes": "Computes sum $8,000, flags $400 gap, offers both fixes without guessing which is wrong; titles deferred to reconciliation."}

@@ -1,0 +1,1 @@
+{"case": "T01", "arm": "B", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "$0.35M ÷ $3.5M = **10.0% exactly**, not 15%. That puts you **below** the 12% target, not ahead of it."}, "notes": "Explicitly catches the 10% error, refuses the false framing, shows the 0.35/3.5 derivation, verdict up front, flags out-of-scope shared-model risk."}

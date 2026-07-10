@@ -1,0 +1,1 @@
+{"case": "R05", "arm": "B", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "**The missing step is bumping the manifest `version`** (e.g. `0.3.1 → 0.3.2`) in the same change, then merging that."}, "notes": "Names unbumped version as root cause and bump as fix; traces cache-key resolver logic; risks labeled inline; verdict up front."}

@@ -1,0 +1,1 @@
+{"catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "Don't approve this — the test doesn't test anything."}, "notes": "Rejects merge, explains monkeypatch replaces function-under-test making assertion vacuous; derives both import-binding cases and gives corrected test.", "case": "T04", "arm": "A"}

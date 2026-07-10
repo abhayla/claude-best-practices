@@ -1,0 +1,1 @@
+{"case": "R07", "arm": "C", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "Short answer: no — run the 4 minutes."}, "notes": "Explicitly rejects 'verified', distinguishes bash -n/spot-probe from the real gate, says run the suite; re-derives the syntax-vs-logic and guard-both-sides argument itself; verdict leads."}

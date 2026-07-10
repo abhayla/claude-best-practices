@@ -1,0 +1,1 @@
+{"case": "R05", "arm": "C", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "you never bumped the version, and the cache is keyed by version"}, "notes": "Names unbumped version as root cause and bump as fix; traces cache-key freshness logic; verdict up front; extra process/CI suggestions clearly flagged as recurrence prevention. Perfect 10."}

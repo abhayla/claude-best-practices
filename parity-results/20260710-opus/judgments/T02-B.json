@@ -1,0 +1,1 @@
+{"case": "T02", "arm": "B", "catch": 4, "derive": 2, "register": 2, "scope": 1, "report": 1, "quotes": {"catch": "Do not publish this — both numbers are wrong."}, "notes": "Corrects both planted errors (₹1,200 not ₹1,100; 40% not 45%), shows the 1−(0.75×0.80)=0.60 derivation, verdict leads, risk + source-of-truth flagged inline."}
