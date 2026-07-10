@@ -37,31 +37,37 @@ asset carrying non-re-derivable planted falsehoods; round 2's re-derivable-formu
 honestly documented as a weak-trap-type lesson now encoded in the protocol). Detail:
 `.claude/skills/skill-evaluator/evals/2026-07-10-trap-mode-meta-eval.md` §"Round 3".
 
-**⏳ 3, 5–10: LISTED, EXPLAINED TO OWNER, NOT YET FULLY APPROVED/LANDED.**
+**✅ 3, 5–10: ALL DONE (2026-07-10)** — built fully autonomously per the item-1 playbook
+(worktree maker ≠ opus checker + cheap-model trap-test before every landing, CI-gated auto-merge):
 
-3. **Standing-goal invariant ledger** (P0) — status: BUILT + checker round done (1 blocker fixed:
-   sentinel issue-labels self-provisioning; byte-exact timestamps; hermetic seed tests); landing in
-   flight on `feat/item3-standing-goals`. Labels `standing-goals`/`maintenance` created in the live
-   repo. `goals/<name>.md` per finished deliverable with a cheap read-only predicate + daily
-   sentinel; finishing = enrollment ("a goal verified once is an assumption with a timestamp"; the
-   GA4-silently-dead incident is the motivating example).
-5. **Governance dormancy overhaul** (P1) — status: OWNER DECISION LOCKED 2026-07-10: the full
-   visible enhance process fires on HUMAN-TYPED prompts only; machine turns (task-notifications,
-   wakeups, skill-execution, autonomous continuations) get a one-liner at most. Build in flight
-   (fire-where-it-pays classifier + compliance lint + dormancy audit; rule-file diff goes to owner
-   before applying — his own rule 5). This session's stop-hook noise was the live evidence that
-   triggered the decision.
-6. **Self-enforcing cost ledger** (P1) — daily loop-cost ledger + cadence-is-a-cost-decision
-   check + Notifier alerts. Critical the day billing starts.
-7. **Refusal→fallback + model-swap playbook in model-routing.md** (P2) — VERIFIED facts ready to
-   encode (see `docs/process-improvement/INBOX.md` pending queue + claude-api skill: HTTP 200
-   `stop_reason:"refusal"`, server-side `fallbacks` beta to opus-4.8). Rule edit → owner approval.
-8. **Bilevel self-improvement upgrade** (P2) — outer loop mutates a stuck loop's SEARCH STRATEGY
-   (not just lessons) + novelty tracking + success-pattern capture in lessons flow.
-9. **Platform-native loop adoption** (P2) — official 4-type taxonomy into loop-engineering spec;
-   measure native /goal vs hand-rolled DoD gating; budget introspection.
-10. **Repeatable plugin-validation pipeline** (P2) — one-command clean-room install validation;
-    run on the 3 unvalidated plugins (+ fable-operating-manual's owed install test).
+3. **Standing-goal ledger** ✅ PR #319 — goals/ predicates + daily standing-goals.yml sentinel +
+   /end-session STEP 5b enrollment; malformed goals are failures, never skipped; checker caught
+   the missing-labels reporting blocker pre-merge.
+5. **Governance dormancy** ✅ PR #322 — turn-origin.sh classifier (human|machine, dual-home synced),
+   enhance ceremony human-prompts-only (owner decision + owner-approved rule diff applied),
+   plugin 0.4.0 full_process_scope, rule-compliance lint, dormancy audit (15 DEMOTE candidates
+   await owner case-by-case).
+6. **Cost ledger** ✅ PR #323 — cost_ledger.py + config/model-costs.yml + SessionStart tick +
+   >$50/day Notifier alert; checker caught the partial-day-freeze blocker on live data; first
+   honest measurement: main frontier loop ≈90% of $300–1,000/day API-equivalent.
+7. **Refusal→fallback rule** ✅ PR #321 — owner-approved model-routing addition (compact, fits the
+   320-line budget) + docs/governance/refusal-fallback-playbook.md; verified vs claude-api ref.
+8. **Bilevel self-improvement** ✅ PR #324 — loop-engineering v1.3.0 strategy ledger + mutation
+   axes + novelty gate in the FEEDBACK arm; plugin 0.2.0; 3/3 sonnet orchestrators mutated the
+   stuck strategy instead of retrying.
+9. **Platform loop taxonomy** ✅ PR #326 — spec §3.7/§3.8 (4 native loop types, routing table,
+   budget introspection), loop-engineering v1.4.0, plugin 0.3.0; 5/5 routing trap-test; live
+   ScheduleWakeup tool-schema citations captured to docs/claude-references/.
+10. **Plugin validation pipeline** ✅ PR #325 — validate_plugin_cleanroom.(py|sh) 3-gate pipeline;
+    first sweep 4/4 owing plugins PASS at the serve-validation bar (the heavier second-project
+    /plugin install G6 bar remains a separate, owner-framed standard); found `claude plugin
+    validate` silently accepts hooks-in-manifest.
+
+**PROGRAM COMPLETE.** Open owner decisions: (a) G6 framing — does automated serve-validation
+upgrade the 4 swept plugins, or does the second-project install bar stand? (b) the 15
+DEMOTE-candidate rule directives in docs/governance/2026-07-10-dormancy-audit.md. Lessons:
+.claude/tasks/lessons.md 2026-07-10 entries (rebase-before-push, rules line budget, security-flag
+transcript isolation).
 
 ## Context sources for a cold session (in order)
 
