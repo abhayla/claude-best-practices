@@ -14,6 +14,7 @@ from scripts.trust_score import (
     load_config,
     load_ledger,
     record_run,
+    stats_by,
 )
 
 
@@ -165,3 +166,45 @@ class TestLedger:
         assert stats["auto_runs"] == 1
         assert stats["false_confidence"] == 1
         assert stats["false_confidence_rate"] == 1.0
+
+    def test_extra_fields_are_merged_into_entry(self, tmp_path):
+        ledger = tmp_path / "ledger.jsonl"
+        result = compute_trust_score(_perfect_signals(), DEFAULT_CONFIG)
+        record_run(result, ledger, human_had_to_fix=False, extra={"pr": 42, "branch": "auto/work-1"})
+        entry = load_ledger(ledger)[0]
+        assert entry["pr"] == 42
+        assert entry["branch"] == "auto/work-1"
+        assert entry["score"] == result["score"]
+
+    def test_extra_fields_cannot_override_core_keys(self, tmp_path):
+        ledger = tmp_path / "ledger.jsonl"
+        result = compute_trust_score(_perfect_signals(), DEFAULT_CONFIG)
+        record_run(
+            result,
+            ledger,
+            human_had_to_fix=False,
+            stage="reversible",
+            extra={"score": -1, "recommended": "BOGUS", "stage": "irreversible"},
+        )
+        entry = load_ledger(ledger)[0]
+        assert entry["score"] == result["score"]
+        assert entry["recommended"] == result["recommended"]
+        assert entry["stage"] == "reversible"
+
+
+class TestStatsBy:
+    def test_groups_calibration_stats_by_key(self):
+        runs = [
+            {"recommended": "AUTO", "human_had_to_fix": False, "skill": "alpha"},
+            {"recommended": "AUTO", "human_had_to_fix": True, "skill": "alpha"},
+            {"recommended": "AUTO", "human_had_to_fix": False, "skill": "beta"},
+        ]
+        by_skill = stats_by(runs, "skill")
+        assert set(by_skill.keys()) == {"alpha", "beta"}
+        assert by_skill["alpha"]["total_runs"] == 2
+        assert by_skill["alpha"]["false_confidence"] == 1
+        assert by_skill["beta"]["total_runs"] == 1
+        assert by_skill["beta"]["false_confidence"] == 0
+
+    def test_empty_runs_is_safe(self):
+        assert stats_by([], "skill") == {}
