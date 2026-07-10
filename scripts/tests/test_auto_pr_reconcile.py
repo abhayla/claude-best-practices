@@ -66,3 +66,22 @@ def test_skips_draft_and_already_armed_prs():
     lib = _lib()  # the draft/already-armed filtering lives in the shared landing lib
     assert "isDraft==false" in lib, "must skip draft PRs"
     assert "autoMergeRequest==null" in lib, "must skip PRs that already have auto-merge armed"
+
+
+def test_records_merged_prs_for_zero_manual_trust_accrual():
+    """Step 1b: sweep freshly-merged PRs into the trust-score ledger (scripts/record_merged_prs.py),
+    since the common autonomous auto-merge landing path never calls record_task_run.py."""
+    body = _hook()
+    assert "record_merged_prs.py" in body, "must invoke the zero-manual merged-PR trust recorder"
+    assert "--quiet" in body, "must call it with --quiet to keep the hook log to one line"
+
+
+def test_record_merged_prs_call_is_fail_safe():
+    """The recording step must never be able to abort the hook — it stays guarded and the
+    hook still ends with exit 0 regardless of what record_merged_prs.py does."""
+    body = _hook()
+    lines = body.splitlines()
+    call_idx = next(i for i, line in enumerate(lines) if "python scripts/record_merged_prs.py" in line)
+    preceding = "\n".join(lines[max(0, call_idx - 3):call_idx])
+    assert "command -v python" in preceding, "the recorder call must be guarded (python may be absent)"
+    assert body.rstrip().splitlines()[-1] == "exit 0", "hook must still end fail-safe with exit 0"

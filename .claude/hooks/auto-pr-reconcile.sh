@@ -10,6 +10,10 @@
 #
 # What it does (idempotent, fail-safe, CI-gated):
 #   1. fetch --prune; hard-delete LOCAL branches whose PR gh confirms is MERGED (never loses work).
+#   1b. Sweep recently MERGED PRs for zero-manual trust-score accrual (scripts/record_merged_prs.py) —
+#      the hub's common landing path is autonomous auto-merge, which never runs record_task_run.py
+#      (that only fires on the manual `/git-branch-lifecycle finish` path), so this is what makes
+#      N/30 grow from real work instead of stalling at the floor.
 #   2. Arm native auto-merge (squash) on every OPEN, non-draft PR that doesn't already have it —
 #      EXCEPT the current HEAD branch (active work must not be merged out from under the session).
 #      GitHub still gates the actual merge on the required `validate` check, so a red/pending PR
@@ -45,6 +49,12 @@ git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads/ 2>/de
         git branch -D "$b" >/dev/null 2>&1 && log "pruned merged branch '$b'"
       fi
     done
+
+# 1b. Record trust-score calibration runs for freshly-merged PRs (zero-manual accrual; see
+#     scripts/record_merged_prs.py). Fail-safe: recording trouble must never block session start.
+if command -v python >/dev/null 2>&1; then
+  log "record-merged-prs: $(PYTHONPATH=. python scripts/record_merged_prs.py --quiet 2>&1 | tail -1)" || true
+fi
 
 [ "${AUTO_MERGE:-1}" = "0" ] && { log "AUTO_MERGE=0 — prune only, no arming"; exit 0; }
 

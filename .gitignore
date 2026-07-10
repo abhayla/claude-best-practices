@@ -71,6 +71,9 @@ trust-score/ledgers/
 # Idempotency marker for scripts/record_task_run.py (#196 honest auto-accrual)
 trust-score/.recorded-branches
 
+# Idempotency marker for scripts/record_merged_prs.py (zero-manual merged-PR accrual)
+trust-score/.recorded-prs
+
 # Local scratch notes (untracked working notes, e.g. ad-hoc gap-analysis prompts)
 /Notes
 

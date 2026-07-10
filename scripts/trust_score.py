@@ -124,6 +124,7 @@ def record_run(
     ledger_path: Path,
     human_had_to_fix: bool | None = None,
     stage: str | None = None,
+    extra: dict | None = None,
 ) -> dict:
     """Append one scored run to the calibration ledger (JSONL) and return the entry.
 
@@ -131,7 +132,9 @@ def record_run(
     It is what lets calibration_stats() later measure the engine's false-confidence
     rate — the number that must drop low before shadow mode can end. `stage` is stored
     so graduation can be judged PER STAGE (a reversible stage can earn autonomy while an
-    irreversible one never does).
+    irreversible one never does). `extra` is an optional dict of caller-supplied fields
+    (e.g. `pr`, `branch`, `skill` from record_merged_prs.py) merged into the entry — the
+    core keys above always win on collision, so a caller can never silently overwrite them.
     """
     entry = {
         "score": result["score"],
@@ -139,10 +142,25 @@ def record_run(
         "human_had_to_fix": human_had_to_fix,
         "stage": stage,
     }
+    if extra:
+        entry = {**extra, **entry}
     ledger_path.parent.mkdir(parents=True, exist_ok=True)
     with open(ledger_path, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry) + "\n")
     return entry
+
+
+def stats_by(runs: list[dict], key: str) -> dict:
+    """Per-`key` calibration breakdown (e.g. per-skill), grouping runs by `r.get(key)`.
+
+    Same shape as calibration_stats() but one entry per distinct group value — lets a
+    dashboard see which skill/branch/etc is dragging down the false-confidence rate.
+    Graduation itself stays PER STAGE (see graduation_status()); this is diagnostic.
+    """
+    groups: dict = {}
+    for r in runs:
+        groups.setdefault(r.get(key), []).append(r)
+    return {group: calibration_stats(group_runs) for group, group_runs in groups.items()}
 
 
 def graduation_status(runs: list[dict], config: dict) -> dict:

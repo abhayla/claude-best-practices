@@ -78,16 +78,20 @@ def collect_and_record(
     human_had_to_fix=None,
     ledger_path: Path | None = None,
     config_path: Path | None = None,
+    extra: dict | None = None,
 ) -> dict:
     """Score assembled signals and (optionally) record the run to a chosen ledger.
 
     Paths resolve at call time (not import time) so the module-level LEDGER_PATH /
-    CONFIG_PATH stay overridable — passing None uses the current module defaults.
+    CONFIG_PATH stay overridable — passing None uses the current module defaults. `extra`
+    passes through to record_run() (e.g. record_merged_prs.py's pr/branch/skill fields).
     """
     config = load_config(config_path or CONFIG_PATH)
     result = compute_trust_score(signals, config, stage=stage)
     if record:
-        record_run(result, ledger_path or LEDGER_PATH, human_had_to_fix=human_had_to_fix, stage=stage)
+        record_run(
+            result, ledger_path or LEDGER_PATH, human_had_to_fix=human_had_to_fix, stage=stage, extra=extra
+        )
     return result
 
 
