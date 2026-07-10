@@ -1,0 +1,7 @@
+{
+  "name": "hooks-declared-plugin",
+  "version": "0.1.0",
+  "description": "plants the manifest hooks-double-declare defect (see docs/installing-plugins-in-downstream-projects.md authoring gotcha)",
+  "author": { "name": "test" },
+  "hooks": "./hooks/hooks.json"
+}

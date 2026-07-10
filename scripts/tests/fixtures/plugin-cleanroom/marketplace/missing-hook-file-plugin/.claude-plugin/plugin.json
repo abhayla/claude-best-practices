@@ -1,0 +1,6 @@
+{
+  "name": "missing-hook-file-plugin",
+  "version": "0.1.0",
+  "description": "plants a hooks/hooks.json referencing a script that does not exist on disk",
+  "author": { "name": "test" }
+}

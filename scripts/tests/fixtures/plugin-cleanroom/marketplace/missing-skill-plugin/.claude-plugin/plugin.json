@@ -1,0 +1,6 @@
+{
+  "name": "missing-skill-plugin",
+  "version": "0.1.0",
+  "description": "plants a missing SKILL.md defect (skills/demo/ dir exists but has no SKILL.md)",
+  "author": { "name": "test" }
+}

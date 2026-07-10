@@ -1,0 +1,5 @@
+{
+  "name": "no-version-plugin",
+  "description": "plants a missing 'version' field defect",
+  "author": { "name": "test" }
+}
