@@ -52,6 +52,11 @@
       "name": "cbp-react-stack",
       "source": "./cbp-react-stack",
       "description": "React-family stack toolbox (vitest/jest runners, Next.js + React/RN test patterns) — first Tier-2 stack pack; pairs with cbp-build-test-workflows"
+    },
+    {
+      "name": "cbp-python-stack",
+      "source": "./cbp-python-stack",
+      "description": "Python/FastAPI stack toolbox (pytest-dev, FastAPI test/migrate/deploy helpers + 2 agents) — second Tier-2 stack pack; pairs with cbp-build-test-workflows"
     }
   ]
 }

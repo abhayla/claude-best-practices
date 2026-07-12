@@ -1,0 +1,7 @@
+{
+  "name": "cbp-python-stack",
+  "version": "0.1.0",
+  "description": "The Python/FastAPI stack toolbox (#187 distribution pilot, second Tier-2 stack pack): framework-aware helpers the workflow plugins pick up automatically in Python backends — pytest-dev test-runner know-how, fastapi-run-backend-tests, fastapi-db-migrate (Alembic), fastapi-deploy, plus the FastAPI API-tester and database-admin agents. Install alongside cbp-build-test-workflows so test-pipeline uses the stack-aware path.",
+  "author": { "name": "Abhay Kumar" },
+  "keywords": ["python", "fastapi", "pytest", "alembic", "stack-pack", "distribution-pilot", "claude-code", "goal-6"]
+}
