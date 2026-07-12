@@ -4,6 +4,17 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — G6 graduation sweep: plugins 6-9 GRADUATED — all 9 G6-validated, DoD bar met
+
+- **validated** plugins `cbp-workflows`, `cbp-build-test-workflows`, `cbp-learning-workflow`,
+  `cbp-react-stack` through the formal graduation sweep (`docs/g6-graduation-2026-07-12.md`):
+  per-plugin context-isolated skeptic refutation passes, all four GRADUATED at high confidence.
+  The sweep earned its keep: the learning plugin's first audit was justifiably REFUTED (install
+  config deleted during cleanup = no install trace); re-run with preserved deterministic evidence
+  (transcript init plugins array + installed_plugins.json gitCommitSha, live-verified against
+  GitHub). New rule: graduation exercises preserve transcript + install config until the skeptic
+  pass completes. **All 9 marketplace plugins are now G6-graduated — the G6 DoD ≥9 bar is met.**
+
 ### 2026-07-12 — cbp-react-stack: 9th plugin — G6 count bar reached (first Tier-2 stack pack)
 
 - **added** plugin `cbp-react-stack` (`plugins/cbp-react-stack/`, v0.1.0) — the React-family toolbox
