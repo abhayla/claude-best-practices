@@ -1,6 +1,6 @@
 # Plan — Platform Migration & Futuristic Goal (2026 H2)
 
-**Status:** active · **Created:** 2026-06-19 · **Owner:** Abhay · **Driver:** Claude (Delivery Lead)
+**Status:** COMPLETE (2026-06-19/20; epic #119 truth-audited + closed 2026-07-12) · **Created:** 2026-06-19 · **Owner:** Abhay · **Driver:** Claude (Delivery Lead)
 **Anchors:** `plans/idea-to-deploy-readiness.md` (goal #3) · research 2026-06-19 (Claude Code
 whats-new W13–24, verified) · `engineering-roles.md` · `decision-authority.md`
 **Tracker mirror:** GitHub epic issue [#119](https://github.com/abhayla/claude-best-practices/issues/119) · `.remember/remember.md`
@@ -153,6 +153,7 @@ whats-new, myclaw comparison.) Fable 5 is escalation-only for hardest tasks and 
   needs Abhay sign-off before deletion (escalate per `decision-authority.md`).
 
 ## Log
+- 2026-07-12 — **TRUTH-AUDIT (improvement-loop cycle 2, owner-approved):** epic #119's checklist was stale (0/11 ticked on a finished initiative). Independently re-verified PRs #120–#124/#145/#146/#150 MERGED + artifacts on disk; issue body rewritten to 11/11 with per-phase outcomes; epic CLOSED. This header's `active` status corrected to COMPLETE. Adjacent open decision: #153 only.
 - 2026-06-19 — Plan created; Fable dependency resolved (none); tracking triple set up; Phase 0 audit delegated.
 - 2026-06-19 — Phase 0 ledger complete (276 reconciled: 242 KEEP / 28 MIGRATE / 6 RETIRE).
 - 2026-06-19 — Goal RATIFIED by Abhay → codified as README goal #4. Phase 1.3 investigated on
