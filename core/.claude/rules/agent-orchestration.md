@@ -80,6 +80,8 @@ Parallelism is preserved at the T0 dispatch point: multiple `Agent()` calls in a
 
 **Visibility rule:** Every worker MUST return a structured contract (JSON with `gate`, `artifacts`, `summary` fields) to the T0 orchestrator. The orchestrator MUST NOT proceed to the next wave until it has read the return. No fire-and-forget dispatches.
 
+**Background-by-default subagents (CC v2.1.198, verified 2026-07-12 — closes issue #337):** since v2.1.198 subagents run in the **background by default**; the runtime keeps a dispatch foreground "when it needs the result before continuing," and a background completion re-invokes the orchestrator ([sub-agents doc](https://code.claude.com/docs/en/sub-agents)). Verified in-environment: explicit synchronous dispatches (`run_in_background: false`) return inline before the orchestrator continues, and a live flat fan-out (`code-review-workflow` E2E on ≥v2.1.198) synthesized only after all worker contracts arrived. **Doctrine consequence: none for the flat model — but do not leave same-turn gating to runtime inference.** A dispatch whose contract gates the SAME wave's synthesis (maker/checker, blind re-grade, verification pass) SHOULD pass `run_in_background: false` explicitly; default-background dispatch is appropriate only for workers whose results feed a LATER wave or turn. This restates the visibility rule above under the new default — never fire-and-forget.
+
 ## 3. Worker Agent Constraints
 
 Workers (agents dispatched from a T0 orchestrator) MUST conform to:
