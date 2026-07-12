@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-10 10:35 UTC (auto-generated)
+> Last updated: 2026-07-12 09:23 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -22,7 +22,7 @@
 | adr | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | agent-evaluator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| agent-orchestration | rule | 1.5.0 | hub:abhayla/claude-best-practices | — |
+| agent-orchestration | rule | 1.6.0 | hub:abhayla/claude-best-practices | — |
 | agent-team-selection | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-compose-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -131,7 +131,7 @@
 | loop-engineering | skill | 1.4.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| no-overask-guard | hook | 1.2.0 | project:firekaro-planner | — |
+| no-overask-guard | hook | 1.2.1 | project:firekaro-planner | — |
 | notifier-integration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | output-plausibility-verification | rule | 1.0.1 | project:firekaro-planner | — |
