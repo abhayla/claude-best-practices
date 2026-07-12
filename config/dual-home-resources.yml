@@ -39,7 +39,6 @@ synced:
     - youtube-transcript
   rules:
     - claude-behavior.md
-    - claude-docs-cache.md
     - context-management.md
     - workflow.md
   hooks:

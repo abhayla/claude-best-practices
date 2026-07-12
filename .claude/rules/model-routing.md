@@ -11,9 +11,9 @@ Set `model` explicitly on EVERY Agent()/workflow dispatch — inheriting the fro
 | `opus` | deep debugging, architecture analysis, multi-file work with design freedom |
 | omit `model` (inherit frontier) | ONLY frontier judgment: novel unrubriced design, subtle spec reasoning, the final ship-gate adversarial verification |
 
-When torn pick the cheaper tier; escalate ONE tier after 2 supervised failures (record the
-routing lesson). Checker MAY differ from maker (model diversity). Verification rigor NEVER
-drops with the tier — cheap execution, full supervision.
+When torn pick the cheaper tier; escalate ONE tier after 2 supervised failures (record the routing lesson).
+Checker MAY differ from maker (model diversity).
+Verification rigor NEVER drops with the tier — cheap execution, full supervision.
 
 ## Refusal→fallback + Fable-exit swap (owner-approved 2026-07-10 — playbook: docs/governance/refusal-fallback-playbook.md)
 Fable/Mythos can DECLINE as a SUCCESS (HTTP 200, stop_reason:"refusal"): branch on stop_reason, never exit code; new claude-fable-5 code defaults to server-side fallbacks (betas:["server-side-fallback-2026-06-01"] + fallbacks:[{"model":"claude-opus-4-8"}]); a HEADLESS flagged run ENDS THE TURN — reroute to opus and continue, don't fail; never ask a Fable dispatch to echo raw chain-of-thought (reasoning_extraction). Fable-window close: only the "omit model" row re-points to opus.

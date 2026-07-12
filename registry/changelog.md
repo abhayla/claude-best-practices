@@ -4,6 +4,17 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — Rule DEMOTE Group A enacted (owner-approved): 2 hub rules -> on-demand docs
+
+- **demoted** hub always-loaded rules per the lint_rule_compliance.py evidence (zero telemetry/hook
+  enforcement) and owner approval: `.claude/rules/claude-docs-cache.md` -> procedure merged into
+  `docs/claude-references/README.md` (prior hand-authored notes preserved; core/ distributable copy
+  unchanged, dual-home entry removed since the hub copy is gone); `.claude/rules/product-incubation.md`
+  -> `docs/governance/product-incubation.md`. Group B (the 8 judgment rules in claude-behavior.md)
+  KEPT by the same owner decision; the prompt-auto-enhance REWRITE candidate deferred pending a week
+  of post-#332 telemetry. `model-routing.md` rewrapped so directives parse whole (lint artifact).
+  Saves ~150 always-loaded lines per session.
+
 ### 2026-07-12 — recommend.py becomes a plugin RECOMMENDER — the #187 end-state ships
 
 - **added** `config/plugin-recommendations.yml` (SSOT: universal workflow plugins + stack->pack +
