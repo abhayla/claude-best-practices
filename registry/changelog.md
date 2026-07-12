@@ -4,6 +4,16 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — cbp-python-stack: 10th plugin, second Tier-2 stack pack
+
+- **added** plugin `cbp-python-stack` (`plugins/cbp-python-stack/`, v0.1.0) — pytest-dev + FastAPI
+  test/migrate/deploy helpers + api-tester/database-admin agents; covers the fleet's 2 FastAPI repos.
+  Rules stay provisioned. Validation: plugin validate PASS, clean-room 4/4, full gate 1787/0, and a
+  composition E2E with graduation-grade preserved evidence (transcript init lists both plugins): the
+  installed pipeline root-caused a genuine REST-convention bug and fixed the APP (POST 200→201), not
+  the test — independently re-verified 2/2 green. Evidence:
+  `docs/cbp-python-stack-pilot-validation-2026-07-12.md`.
+
 ### 2026-07-12 — G6 graduation sweep: plugins 6-9 GRADUATED — all 9 G6-validated, DoD bar met
 
 - **validated** plugins `cbp-workflows`, `cbp-build-test-workflows`, `cbp-learning-workflow`,
