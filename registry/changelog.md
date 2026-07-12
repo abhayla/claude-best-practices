@@ -4,6 +4,18 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — cbp-build-test-workflows: 7th plugin, #187 cluster 2 (build-and-test workflows)
+
+- **added** plugin `cbp-build-test-workflows` (`plugins/cbp-build-test-workflows/`, v0.1.0) — `development-loop`
+  + `test-pipeline` with their universal dispatch closure (15 sub-skills, 7 agents). Enacts the stack-pack
+  boundary (pytest-dev/jest-dev/vitest-dev/fastapi-* stay provisioned; E2E proved graceful degradation
+  without them) and the companion-not-duplicate rule (code-review-workflow → cbp-workflows; debugging-loop →
+  loop-engineering). First plugin-copy divergence: ships `test-pipeline.default.yml` inside the skill dir
+  with a patched fallback so the installed pipeline never BLOCKs on missing project config. Validation:
+  plugin validate PASS, clean-room serve PASS (17/17), full gate 1787/0, real isolated-config second-project
+  install + test-pipeline E2E (3/3 green, ci_gate PASSED; stale-lock guard + --force remediation also
+  exercised live). Evidence: `docs/cbp-build-test-workflows-pilot-validation-2026-07-12.md`.
+
 ### 2026-07-12 — cbp-workflows: 6th plugin, the #187 install-not-copy distribution pilot
 
 - **added** plugin `cbp-workflows` (`plugins/cbp-workflows/`, v0.1.0, PR #334) — the owner-approved

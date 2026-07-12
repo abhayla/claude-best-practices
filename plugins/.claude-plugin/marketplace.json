@@ -37,6 +37,11 @@
       "name": "cbp-workflows",
       "source": "./cbp-workflows",
       "description": "Quality-trio workflows (code-review, documentation, skill-authoring) + their dispatch closure — the #187 install-not-copy distribution pilot"
+    },
+    {
+      "name": "cbp-build-test-workflows",
+      "source": "./cbp-build-test-workflows",
+      "description": "Build-and-test workflows (development-loop + three-lane test-pipeline) with their universal dispatch closure — #187 install-not-copy pilot, cluster 2"
     }
   ]
 }
