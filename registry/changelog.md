@@ -4,6 +4,17 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — cbp-learning-workflow: 8th plugin, #187 cluster 3 (learning/self-improvement)
+
+- **added** plugin `cbp-learning-workflow` (`plugins/cbp-learning-workflow/`, v0.1.0) —
+  `learning-self-improvement` + its dispatch closure (learn-n-improve, skill-factory, test-knowledge,
+  update-practices; context-reducer + session-summarizer agents). Companion-not-duplicate held
+  (skill-authoring-workflow → cbp-workflows); no config patch needed (core template already
+  self-contained). Validation: plugin validate PASS, clean-room serve PASS (5/5), full gate 1787/0,
+  real isolated-config second-project install + learn-n-improve E2E (structured L001 entry captured
+  into a fresh .claude/learnings.json, correct step gating, CAPTURED). Evidence:
+  `docs/cbp-learning-workflow-pilot-validation-2026-07-12.md`.
+
 ### 2026-07-12 — cbp-build-test-workflows: 7th plugin, #187 cluster 2 (build-and-test workflows)
 
 - **added** plugin `cbp-build-test-workflows` (`plugins/cbp-build-test-workflows/`, v0.1.0) — `development-loop`

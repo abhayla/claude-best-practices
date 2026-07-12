@@ -42,6 +42,11 @@
       "name": "cbp-build-test-workflows",
       "source": "./cbp-build-test-workflows",
       "description": "Build-and-test workflows (development-loop + three-lane test-pipeline) with their universal dispatch closure — #187 install-not-copy pilot, cluster 2"
+    },
+    {
+      "name": "cbp-learning-workflow",
+      "source": "./cbp-learning-workflow",
+      "description": "Learning/self-improvement workflow (capture error→fix→lesson, distill into skill proposals, prune) with its dispatch closure — #187 install-not-copy pilot, cluster 3"
     }
   ]
 }
