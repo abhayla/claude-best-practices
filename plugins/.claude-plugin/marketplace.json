@@ -1,6 +1,8 @@
 {
   "name": "claude-best-practices",
-  "owner": { "name": "Abhay Kumar" },
+  "owner": {
+    "name": "Abhay Kumar"
+  },
   "metadata": {
     "description": "Claude Best Practices Hub — capabilities packaged as installable Claude Code plugins (Goal 6). Install a plugin into any project and update it centrally from this marketplace.",
     "version": "0.1.0"
@@ -30,6 +32,11 @@
       "name": "loop-engineering",
       "source": "./loop-engineering",
       "description": "Autonomous DISCOVER → PLAN → EXECUTE → VERIFY → SHIP meta-loop with independent maker≠checker verification, self-healing (fix-loop/debugging-loop), and self-learning (learn-n-improve) — ships the full worker/skill dependency closure so a downstream project gets a working loop from one /plugin install."
+    },
+    {
+      "name": "cbp-workflows",
+      "source": "./cbp-workflows",
+      "description": "Quality-trio workflows (code-review, documentation, skill-authoring) + their dispatch closure — the #187 install-not-copy distribution pilot"
     }
   ]
 }
