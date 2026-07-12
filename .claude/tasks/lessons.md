@@ -707,3 +707,8 @@ a verification trigger, never dismiss it unexamined; (b) the conductor re-verifi
 artifact against the approval byte-for-byte and documents provenance (who approved, where, when)
 in the PR body; (c) never mark a worker's commit "owner-approved" unless the approval is real in
 the conductor's transcript — the scanner is right to treat unverifiable approval claims as poison.
+
+## 2026-07-12 — Stop-hook false blocks: transcript shape ≠ hook assumptions (issue #331, PR #332)
+- **Mistake:** enhance-guard inspected only the LAST user entry (`tail -1`); the harness writes a slash command as TWO consecutive user entries (marker + marker-less expanded body), so /init turns were false-blocked, and stop-feedback entries stripped the origin on retries (double-block).
+- **Root cause:** detection built on an assumed transcript shape with no fixture tests; the "unreproduced" scope boundary (H4) was never re-checked against live transcripts.
+- **Rule:** any hook that parses the transcript MUST have behavioral tests against real-shape fixtures (see scripts/tests/test_no_overask_guard_slash_exemption.py), and "no repro exists" claims expire — re-verify them when telemetry (.enhance-misses.log) keeps accruing. Also: mid-turn assistant text emitted alongside tool_use may never persist to the transcript — user-critical content belongs in the turn's final text message.
