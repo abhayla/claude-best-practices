@@ -55,28 +55,44 @@ last_text=$(jq -r '
 # =false, the canonical plugin default; SSOT plugins/prompt-auto-enhance/enhance-settings.default.json).
 # So the enhance-card / diagnosis-substance blocks + enhance telemetry below MUST NOT fire on a
 # slash-command turn. The over-ask + narrate-and-stop GOVERNANCE guards further down still apply.
-# Detect by inspecting the LAST real user entry: a harness slash invocation carries a
-# <command-name> tag; a raw client prompt is the literal "/command args" text.
+# Detect by inspecting the FINAL USER SUBMISSION — not just the last user entry (issue #331).
+# The harness writes a slash invocation as TWO consecutive user entries: the <command-name>
+# marker entry AND the fully-expanded command BODY as a separate marker-less plain-text entry
+# (live repro: session 889094c3 2026-07-12 lines 17-18 — the exact shape H4/issue #279 left
+# uncovered as unreproduced). `tail -1` saw only the body and missed the exemption, so /init
+# turns were false-blocked. A SUBMISSION = the maximal run of consecutive real-user entries
+# (attachment/system entries interleave freely and are ignored). For ORIGIN we walk BACK past
+# "Stop hook feedback:" submissions: a stop-block feedback entry is never a real prompt, and it
+# must not strip the original turn's slash/machine origin (that stripping caused the /init
+# DOUBLE-block — the retry turn was judged as human because its last entry was the feedback).
 is_slash=""
-last_user=$(jq -rc '
-  if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
-  then {t:(if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)}
-  else empty end' "$tp" 2>/dev/null | tail -1)
-# H4 (issue #279): tolerate a leading whitespace/newline before the literal "/command" text
-# (JSON-escaped as \n or \r\n). Scope boundary — DELIBERATELY NOT covered: a marker-less,
-# fully-expanded slash-command BODY with no literal "/" prefix and no <command-name> tag. No
-# in-repo reproduction of that shape exists, and a broad heuristic exemption would weaken
-# card enforcement (YAGNI + don't-weaken-genuine-miss).
-case "$last_user" in
+last_sub=$(jq -s -r '
+  [ .[]
+    | if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
+      then {k:"U", t:(if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)}
+      elif .type=="assistant" then {k:"A", t:""}
+      else empty end ]
+  | reduce .[] as $e ({runs:[], prev:""};
+      if $e.k=="A" then {runs:.runs, prev:"A"}
+      elif .prev=="U" then {runs:(.runs[0:-1] + [(.runs[-1] + "\n" + $e.t)]), prev:"U"}
+      else {runs:(.runs + [$e.t]), prev:"U"} end)
+  | .runs
+  | ((map(select(startswith("Stop hook feedback:") | not)) | last) // (last // ""))
+' "$tp" 2>/dev/null)
+case "$last_sub" in
   *'<command-name>'*) is_slash="1" ;;
-  *'"t":"/'*|*'"t":" /'*|*'"t":"\n/'*|*'"t":"\r\n/'*) is_slash="1" ;;
-  # A skill EXECUTION turn (reached via /command OR natural language): the harness injects the skill
-  # body as a plain (non-tool_result) user message that SPLITS the turn, so it becomes $last_user
-  # and carries the stable marker below. Skills are enhance-exempt (enhance_slash_commands=false),
-  # so exempt the turn even when the enhance banner fell into the pre-split segment (the false-block
-  # this arm fixes). Anchored to the harness's literal marker — a plain prompt can't accidentally hit it.
+  # A skill EXECUTION turn (reached via /command OR natural language): the harness injects the
+  # skill body as a plain user message carrying this stable marker. Skills are enhance-exempt
+  # (enhance_slash_commands=false). Anchored to the harness's literal marker.
   *'Base directory for this skill:'*) is_slash="1" ;;
 esac
+# Raw-client shape: the submission text IS the literal "/command args" prompt; tolerate leading
+# whitespace/newlines (H4, issue #279) — now matched on decoded text, not JSON escapes.
+if [ -z "$is_slash" ]; then
+  case "$(printf '%s' "$last_sub" | sed -E 's/^[[:space:]]+//' | head -c 1)" in
+    /) is_slash="1" ;;
+  esac
+fi
 
 # Drop leading blank lines: the turn-aggregate starts with the newline that
 # followed the @@TURN@@ sentinel; head -1 on a blank line would re-create the
@@ -98,8 +114,7 @@ if [ -f "$root/.claude/hooks/turn-origin.sh" ]; then
 fi
 command -v classify_turn >/dev/null 2>&1 || classify_turn() { echo human; }
 if [ -z "$is_slash" ]; then
-  lu_text=$(printf '%s' "$last_user" | jq -r '.t // ""' 2>/dev/null)
-  [ "$(classify_turn "$lu_text")" = "machine" ] && is_slash="1"
+  [ "$(classify_turn "$last_sub")" = "machine" ] && is_slash="1"
 fi
 
 # ── ENHANCE_MODE gate (auto | ask | off; absent = auto) ──
@@ -120,7 +135,7 @@ case "$emode" in auto|ask|off) : ;; *) emode="auto" ;; esac
 # G4: a turn is exempt only if its FIRST line declares "ran as-is" AND the turn is short —
 # a long working turn cannot dodge by mentioning the phrase somewhere in prose.
 trivial=""
-printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement" && [ "${#last_text}" -lt 600 ] && trivial="1"
+printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|ran as-is|no change —|no enhancement" && [ "${#last_text}" -lt 600 ] && trivial="1"
 # GRADE-A LITE PATH (issue #290, owner-approved ceremony downgrade): the full grade-card +
 # independent-reviewer is now SAMPLED — required only on WEAK prompts (that needed
 # strengthening). A turn that explicitly declares Grade-A/no-strengthening in its FIRST 3
@@ -128,7 +143,7 @@ printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — 
 # declaration. The 3-line window (vs. the 1-line/short-only `trivial` check above) lets a
 # longer substantive Grade-A turn still qualify — length alone no longer forces the full table.
 gradea=""
-printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change — ran|ran (your )?input as-is|0 fix|no fix|prompt already strong \(grade [0-9]" && gradea="1"
+printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change —|ran (your )?input as-is|ran as-is|0 fix|no fix|prompt already strong \(grade [0-9]" && gradea="1"
 # G11: detect the full process by the reviewer-card token SET (not one literal), so a
 # legitimately-worded card is not false-blocked. H1 (issue #279): also credit the enhance
 # card's HEADER ROW — a markdown row that pairs "reviewer" with a before/after/self column

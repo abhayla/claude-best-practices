@@ -6281,10 +6281,10 @@
     }
   },
   "no-overask-guard": {
-    "hash": "3f71b8afc7c76ac5d2c41a9ada2afb9b9f5e41d1875a2d0b9b0f8b0274a93ab1",
+    "hash": "20ed26bcfa3e4c98435776c1bee000501e0192ed8cb68e54171a9d37f892ea65",
     "type": "hook",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
     "last_updated": "2026-07-10",

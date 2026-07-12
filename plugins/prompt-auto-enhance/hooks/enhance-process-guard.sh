@@ -56,25 +56,41 @@ last_text=$(jq -r '
   else empty end' "$tp" 2>/dev/null | awk 'BEGIN{RS="@@TURN@@"} END{printf "%s", $0}')
 [ -z "$last_text" ] && exit 0
 
+# Final-user-SUBMISSION extraction (issue #331) — shared by the slash exemption and the
+# machine-origin scope below. The harness writes a slash invocation as TWO consecutive user
+# entries (the <command-name> marker entry + the fully-expanded marker-less BODY entry), so
+# inspecting only the last entry (`tail -1`) missed the exemption and false-blocked /command
+# turns (live repro: session 889094c3 2026-07-12). A SUBMISSION = the maximal run of
+# consecutive real-user entries; origin classification walks BACK past "Stop hook feedback:"
+# submissions so a blocked slash/machine turn keeps its exemption through the block chain.
+last_sub=$(jq -s -r '
+  [ .[]
+    | if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
+      then {k:"U", t:(if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)}
+      elif .type=="assistant" then {k:"A", t:""}
+      else empty end ]
+  | reduce .[] as $e ({runs:[], prev:""};
+      if $e.k=="A" then {runs:.runs, prev:"A"}
+      elif .prev=="U" then {runs:(.runs[0:-1] + [(.runs[-1] + "\n" + $e.t)]), prev:"U"}
+      else {runs:(.runs + [$e.t]), prev:"U"} end)
+  | .runs
+  | ((map(select(startswith("Stop hook feedback:") | not)) | last) // (last // ""))
+' "$tp" 2>/dev/null)
+
 # Slash-command exemption — mirror the UserPromptSubmit hook: when enhance_slash_commands is not
 # true (default false), a /command (user-made OR Anthropic-provided) is run as-is and is NEVER
 # enhanced. This guard only enforces the enhance process, so a slash-command turn exits entirely.
 if [ "$(getj '.enhance_slash_commands')" != "true" ]; then
-  last_user=$(jq -rc '
-    if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
-    then {t:(if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)}
-    else empty end' "$tp" 2>/dev/null | tail -1)
-  # H4 (issue #279): tolerate a leading whitespace/newline before the literal "/command" text
-  # (JSON-escaped as \n or \r\n). Scope boundary — DELIBERATELY NOT covered: a marker-less,
-  # fully-expanded slash-command BODY with no literal "/" prefix and no <command-name> tag. No
-  # in-repo reproduction of that shape exists, and a broad heuristic exemption would weaken
-  # card enforcement (YAGNI + don't-weaken-genuine-miss).
-  case "$last_user" in
-    *'<command-name>'*|*'"t":"/'*|*'"t":" /'*|*'"t":"\n/'*|*'"t":"\r\n/'*) exit 0 ;;
-    # Skill-execution turn: the harness-injected skill body (which splits the turn and becomes
-    # $last_user) carries this stable marker. Skills are enhance-exempt, so exit even when the
-    # banner fell into the pre-split segment (the skill-turn false-block).
+  case "$last_sub" in
+    *'<command-name>'*) exit 0 ;;
+    # Skill-execution turn: the harness-injected skill body carries this stable marker.
+    # Skills are enhance-exempt, so exit even when the banner fell into the pre-split segment.
     *'Base directory for this skill:'*) exit 0 ;;
+  esac
+  # Raw-client shape: the submission text IS the literal "/command args" prompt; tolerate
+  # leading whitespace/newlines (H4, issue #279) — matched on decoded text, not JSON escapes.
+  case "$(printf '%s' "$last_sub" | sed -E 's/^[[:space:]]+//' | head -c 1)" in
+    /) exit 0 ;;
   esac
 fi
 
@@ -82,11 +98,7 @@ fi
 # block (mirrors the reminder hook). "everywhere" keeps enforcement on every substantive turn. ──
 fps="$(getj '.full_process_scope')"; [ -z "$fps" ] && fps="human-prompts"
 if [ "$fps" != "everywhere" ]; then
-  lu_text=$(jq -rc '
-    if .type=="user" and ((.message.content|type)=="string" or ([.message.content[]?|.type]|index("tool_result")|not))
-    then (if (.message.content|type)=="string" then .message.content else ([.message.content[]?|select(.type=="text")|.text]|join(" ")) end)
-    else empty end' "$tp" 2>/dev/null | tail -1)
-  [ "$(classify_turn "$lu_text")" = "machine" ] && exit 0
+  [ "$(classify_turn "$last_sub")" = "machine" ] && exit 0
 fi
 
 full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
@@ -95,7 +107,7 @@ subchars="$(getj '.when_to_enhance.min_response_size_to_check_characters')"; cas
 [ "${#last_text}" -lt "$subchars" ] && exit 0
 
 trivial=""
-printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — ran|no enhancement|already strong" && [ "${#last_text}" -lt 600 ] && trivial="1"
+printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|ran as-is|no change —|no enhancement|already strong" && [ "${#last_text}" -lt 600 ] && trivial="1"
 [ -n "$trivial" ] && exit 0
 
 # GRADE-A LITE PATH (issue #290, owner-approved ceremony downgrade): mirrors the hub guard's
@@ -103,7 +115,7 @@ printf '%s' "$full" | head -1 | grep -qE "ran (your )?input as-is|no change — 
 # Grade-A/no-strengthening in its first 3 lines is exempt from the full-card block below even
 # when make_sure_steps_were_shown=strict; it only owes the banner + a one-line declaration.
 gradea=""
-printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change — ran|ran (your )?input as-is|0 fix|no fix|prompt already strong \(grade [0-9]" && gradea="1"
+printf '%s' "$full" | head -3 | grep -qE "grade a[^a-z]|grade: a|no strengthening needed|no change —|ran (your )?input as-is|ran as-is|0 fix|no fix|prompt already strong \(grade [0-9]" && gradea="1"
 
 card=""
 # H1 (issue #279): also credit the enhance card's HEADER ROW — a markdown row that pairs
