@@ -1,0 +1,7 @@
+{
+  "name": "cbp-react-stack",
+  "version": "0.1.0",
+  "description": "The React-family stack toolbox (#187 distribution pilot, first Tier-2 stack pack): framework-aware helpers the workflow plugins pick up automatically in React / Next.js / React Native projects — vitest-dev and jest-dev test runners, nextjs-dev, react-test-patterns, and the React Native dev/E2E skills. Install alongside cbp-build-test-workflows so test-pipeline uses the stack-aware path instead of the generic one.",
+  "author": { "name": "Abhay Kumar" },
+  "keywords": ["react", "nextjs", "react-native", "vitest", "jest", "stack-pack", "distribution-pilot", "claude-code", "goal-6"]
+}
