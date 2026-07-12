@@ -1,4 +1,8 @@
-# Scope: global
+# Product incubation & graduation (demoted from always-loaded rules, owner-approved 2026-07-12)
+
+> Was `.claude/rules/product-incubation.md` (# Scope: global). Demoted per the rule-compliance
+> lint — fires rarely; read this BEFORE placing product code in or near the hub.
+
 
 # Product Incubation & Graduation (hub-as-factory operating model)
 
