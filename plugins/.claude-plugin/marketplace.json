@@ -47,6 +47,11 @@
       "name": "cbp-learning-workflow",
       "source": "./cbp-learning-workflow",
       "description": "Learning/self-improvement workflow (capture error→fix→lesson, distill into skill proposals, prune) with its dispatch closure — #187 install-not-copy pilot, cluster 3"
+    },
+    {
+      "name": "cbp-react-stack",
+      "source": "./cbp-react-stack",
+      "description": "React-family stack toolbox (vitest/jest runners, Next.js + React/RN test patterns) — first Tier-2 stack pack; pairs with cbp-build-test-workflows"
     }
   ]
 }

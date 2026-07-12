@@ -4,6 +4,20 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — cbp-react-stack: 9th plugin — G6 count bar reached (first Tier-2 stack pack)
+
+- **added** plugin `cbp-react-stack` (`plugins/cbp-react-stack/`, v0.1.0) — the React-family toolbox
+  (vitest-dev, jest-dev, nextjs-dev, react-test-patterns, react-native-dev, react-native-e2e); pairs
+  with cbp-build-test-workflows. Fleet-evidence pick (3/5 enrolled repos are React-family). The
+  `react-nextjs` rule stays provisioned (plugins can't ship auto-loaded rules — #187 spike).
+  Validation: plugin validate PASS, clean-room serve PASS (6/6), full gate 1787/0, and the pilot's
+  most complete downstream test yet — a two-plugin COMPOSITION E2E in a fresh Vite+React+Vitest
+  project with a genuinely failing test (RTL cleanup vs vitest globals): cross-plugin skill
+  resolution proven (pipeline invoked cbp-react-stack:vitest-dev by name), root-cause fix applied
+  (setupFiles + afterEach(cleanup)), independently re-verified 2/2 green. Evidence:
+  `docs/cbp-react-stack-pilot-validation-2026-07-12.md`. **Marketplace now holds 9 plugins — the
+  G6 DoD count bar (>=9).**
+
 ### 2026-07-12 — cbp-learning-workflow: 8th plugin, #187 cluster 3 (learning/self-improvement)
 
 - **added** plugin `cbp-learning-workflow` (`plugins/cbp-learning-workflow/`, v0.1.0) —
