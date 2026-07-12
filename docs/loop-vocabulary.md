@@ -60,7 +60,7 @@ Source: `docs/process-improvement/sources/2026-karpathy-loops-md-field-notes.md`
 | V | Let the loop restart | Ralph-style `/loop` re-entry; bounded FEEDBACK arm (spec §3/§4); escalation fixes the CONTRACT, not the build (spec §3.5) | **partial** — retry/heal is encoded; a deliberate "throw it away and rebuild" restart is not an explicit step |
 | VI | Score the subjective | weighted signals in `config/trust-score.yml`; prompt-auto-enhance grade rubric | **partial** — no calibrated taste rubric (design/originality/craft) with reference anchors |
 | VII | Read the traces | `.claude/hooks/prompt-logger.sh`; telemetry miss-logs (`.claude/.enhance-misses.log` etc.); `/escalation-report` artifacts | **partial** — traces are captured, but grep-the-divergence transcript review is practiced ad hoc, not encoded |
-| VIII | Delete the harness | `core/.claude/rules/rule-curation.md` (reactive, prune what the model does free); `.claude/skills/cc-adoption-scout/` (adopt-platform, delete hand-rolled) | full |
+| VIII | Delete the harness | `core/.claude/rules/rule-curation.md` (reactive, prune what the model does free); `.claude/skills/review-new-claude-features/` (adopt-platform, delete hand-rolled) | full |
 | IX | The bottleneck always moves | goal-pulse cadence (`goals.yml`); `/self-improve` + `/learn-n-improve` continuous-improvement loop | full |
 
 ## Other named loops (quick map)

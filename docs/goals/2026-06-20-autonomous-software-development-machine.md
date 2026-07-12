@@ -38,7 +38,7 @@ A closed loop with three **intake streams** feeding one **autonomous build pipel
 ```
   ┌─ Intake (what to absorb) ───────────────┐
   │ A. Latest Claude Code / Anthropic        │      ┌─ Autonomous pipeline (per Goal 3) ─┐
-  │    platform features  → /cc-adoption-scout│      │ BA → UX(approve) → build → test →   │
+  │    platform features  → /review-new-claude-features│      │ BA → UX(approve) → build → test →   │
   │ B. Best repos/patterns on GitHub          │ ───▶ │ independent-verify → QA → deploy    │
   │    → /self-improve, /github               │      └────────────┬───────────────────────┘
   │ C. Relevant new technology / libraries    │                   │ each stage emits signals
@@ -63,7 +63,7 @@ The machine is the **synthesis** of the existing goals — not a new silo:
 
 - **Continuous adoption intake** — periodically scout new Claude Code releases, high-signal
   GitHub repos/patterns, and notable new tech; classify each as ADOPT / KEEP-hand-rolled /
-  REJECT / MEASURE-FIRST (the existing `/cc-adoption-scout` doctrine) and file migration work.
+  REJECT / MEASURE-FIRST (the existing `/review-new-claude-features` doctrine) and file migration work.
 - **Autonomous pipeline execution** — run the Goal-3 lifecycle with the right engineering role
   owning each stage, capturing learnings every stage (`/learning-self-improvement`).
 - **Trust-gated decisioning** — every run produces a trust score; reversible/internal stages may
@@ -139,4 +139,4 @@ Feature-completeness or "the matrix has a hole" are not reasons to build.
 - `core/.claude/rules/goal-anchored-decisions.md` — how this goal becomes the decision anchor.
 - `plans/idea-to-deploy-readiness.md` — the Goal-3 lifecycle the pipeline drives.
 - `plans/platform-migration-2026H2.md` — Goal-4 intake stream A.
-- `.claude/skills/cc-adoption-scout` · `.claude/skills/self-improve` — intake streams A/B.
+- `.claude/skills/review-new-claude-features` · `.claude/skills/self-improve` — intake streams A/B.
