@@ -1,0 +1,7 @@
+{
+  "name": "cbp-learning-workflow",
+  "version": "0.1.0",
+  "description": "The hub's learning-and-self-improvement workflow installed as a plugin (#187 distribution pilot, cluster 3): capture error→fix→lesson patterns from real sessions into .claude/learnings.json, distill them into skill proposals, and keep the knowledge base pruned — with the dispatch closure (learn-n-improve, skill-factory, test-knowledge, update-practices + context-reducer and session-summarizer agents) so one /plugin install gives a working learning loop.",
+  "author": { "name": "Abhay Kumar" },
+  "keywords": ["learning", "self-improvement", "lessons", "knowledge-base", "distribution-pilot", "claude-code", "goal-6"]
+}
