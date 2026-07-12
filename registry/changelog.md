@@ -4,6 +4,18 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — cbp-workflows: 6th plugin, the #187 install-not-copy distribution pilot
+
+- **added** plugin `cbp-workflows` (`plugins/cbp-workflows/`, v0.1.0, PR #334) — the owner-approved
+  #187 pilot: the quality-trio workflows (`code-review-workflow`, `documentation-workflow`,
+  `skill-authoring-workflow`) + their level-1 dispatch closure (13 sub-skills, 4 worker agents)
+  packaged as ONE installable plugin instead of per-repo copies. Marketplace entry added; CLAUDE.md
+  plugin count 5→6. Validation: `claude plugin validate` PASS, clean-room serve PASS (16/16 skills
+  from the plugin alone), full gate 1787 tests green, and a REAL isolated-config second-project
+  `/plugin install` + `code-review-workflow` E2E run that caught a planted `ZeroDivisionError`.
+  Spike answers + scope decisions (level-1 closure cut, 93-skill transitive-closure measurement,
+  no-duplicate-SSOT rule vs branch-lifecycle): `docs/cbp-workflows-pilot-validation-2026-07-12.md`.
+
 ### 2026-06-29 — Grant analytics_storage by default so GA4 actually collects
 
 - **updated** skill `analytics-setup` (`core/.claude/skills/analytics-setup/SKILL.md`, 1.1.0 → 1.1.1 PATCH; mirrored in `plugins/auto-google-analytics/skills/analytics-setup/SKILL.md`) — Consent Mode v2 default flipped from `analytics_storage:'denied'` (no banner/auto-grant to ever flip it) to `'granted'`; `ad_storage` stays denied. The prior denied-by-default silently recorded ~0 users/pageviews across all PIFS sites (2026-06-29 incident) because cookieless "modeling" doesn't populate standard reports at low/normal traffic. Documented the EU/UK consent-banner alternative and the STEP 6 behaviour-based verify (collect hit must show `gcs=G1x1`). Hash resynced.
