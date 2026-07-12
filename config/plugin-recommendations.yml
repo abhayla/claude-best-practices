@@ -1,0 +1,49 @@
+# Plugin recommendations — the install-not-copy layer of the #187 distribution model.
+#
+# recommend.py reads this file to tell a project WHICH marketplace plugins to install
+# (workflows + its stack's toolbox) alongside (and increasingly instead of) copy-provision.
+# One canonical home: edit recommendations here, never hardcode plugin sets in scripts.
+#
+# marketplace: the marketplace name projects add once:
+#   /plugin marketplace add <hub-repo-or-path>   (marketplace name below is what installs
+#   resolve against, e.g. `cbp-workflows@claude-best-practices`)
+marketplace: claude-best-practices
+
+# Universal: recommended for EVERY project regardless of stack.
+universal:
+  - name: cbp-workflows
+    why: code-review, documentation, and skill-authoring workflows + their closure
+  - name: cbp-build-test-workflows
+    why: development-loop + the three-lane test-pipeline (bundled default config)
+  - name: cbp-learning-workflow
+    why: capture error->fix->lesson patterns into .claude/learnings.json each session
+  - name: loop-engineering
+    why: the autonomous maker/checker meta-loop + debugging cluster
+  - name: branch-lifecycle
+    why: git/session lifecycle (branch choice, auto-PR, session save/restore)
+  - name: prompt-auto-enhance
+    why: prompt grading + strengthening pipeline
+
+# Stack packs: recommended when the project's detected stack matches.
+# Keys are hub stack names (STACK_DETECTORS / config/repos.yml vocabulary).
+by_stack:
+  react-nextjs: [cbp-react-stack]
+  react: [cbp-react-stack]
+  fastapi-python: [cbp-python-stack]
+
+# Dependency triggers: recommended when a detected dependency matches (covers projects
+# the stack detectors miss, e.g. Vite+React apps with no `next` dependency).
+by_dependency:
+  react: [cbp-react-stack]
+  next: [cbp-react-stack]
+  vitest: [cbp-react-stack]
+  jest: [cbp-react-stack]
+  react-native: [cbp-react-stack]
+  fastapi: [cbp-python-stack]
+  pytest: [cbp-python-stack]
+
+# Reminder printed with recommendations: what plugins can NOT carry (stays provisioned).
+provision_note: >-
+  Path-scoped rules (e.g. react-nextjs, fastapi-backend) and project-owned files
+  (CLAUDE.md, goals.yml, custom configs) cannot ship in plugins — they remain
+  copy-provisioned by this script.

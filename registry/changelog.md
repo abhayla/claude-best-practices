@@ -4,6 +4,17 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — recommend.py becomes a plugin RECOMMENDER — the #187 end-state ships
+
+- **added** `config/plugin-recommendations.yml` (SSOT: universal workflow plugins + stack->pack +
+  dependency->pack maps + the provision-note for what plugins can't carry) and a
+  `PLUGIN RECOMMENDATIONS (install-not-copy)` section in every `recommend.py` run (Step 1d:
+  `recommend_plugins()` / `print_plugin_recommendations()`, graceful no-op without the config).
+  Dependency triggers cover projects the stack detectors miss (live-proven: a Vite+React app with
+  no `next` dep got cbp-react-stack via its vitest/react deps). 7 unit tests incl. a
+  marketplace-registration cross-check; full gate 1794/0. Copy-provision remains for rules +
+  project-owned files — retiring the copy machinery is a separate owner decision.
+
 ### 2026-07-12 — cbp-python-stack: 10th plugin, second Tier-2 stack pack
 
 - **added** plugin `cbp-python-stack` (`plugins/cbp-python-stack/`, v0.1.0) — pytest-dev + FastAPI
