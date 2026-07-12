@@ -135,11 +135,18 @@ def test_plugin_reminder_honors_full_process_scope(tmp_path):
     cfg = json.loads(default_settings.read_text(encoding="utf-8"))
     assert cfg.get("full_process_scope") == "human-prompts", "owner default must be human-prompts"
 
+    # Run from a NEUTRAL cwd (downstream-like project with no local reminder copy), not the
+    # hub root: since the coexistence stand-down (2026-07-12) the plugin copy correctly goes
+    # SILENT wherever the host wires its own prompt-enhance-reminder.sh — which the hub does.
+    # This test's purpose is scope-honoring, not hub-cwd behavior.
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+
     def run_plugin(prompt: str, settings_path: Path) -> str:
         return subprocess.run(
             [BASH, str(PLUGIN_REMINDER)],
             input=json.dumps({"prompt": prompt}),
-            capture_output=True, text=True, cwd=str(ROOT),
+            capture_output=True, text=True, cwd=str(neutral),
             env={**_os_environ(), "ENHANCE_SETTINGS_FILE": str(settings_path)},
         ).stdout
 

@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+
+# -- Coexistence stand-down (hub lesson, calculatekaro migration 2026-07-12; mirrors the
+# enhance-process-guard precedent, PR #309): when the HOST project wires its OWN copy of this
+# hook in .claude/settings.json, the project's copy wins and this plugin copy stands down --
+# otherwise both fire (double gates/PRs/reminders). Downstream projects with no local copy
+# are unaffected.
+_std_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+_std_self="$(basename "$0")"
+if [ -f "$_std_root/.claude/hooks/$_std_self" ] && grep -q "$_std_self" "$_std_root/.claude/settings.json" 2>/dev/null; then
+  exit 0
+fi
 # Autonomous PR + auto-merge handler — so closing a session lands the work without touching git.
 # (branch-lifecycle PLUGIN version — self-contained.)
 #

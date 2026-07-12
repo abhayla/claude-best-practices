@@ -4,6 +4,17 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-12 — plugin-hook coexistence stand-down (migration friction fix, improvement-backlog item 1)
+
+- **bumped** plugin `branch-lifecycle` (0.1.1 -> 0.1.2) and `prompt-auto-enhance` (0.4.1 -> 0.4.2) —
+  all 7 branch-lifecycle hooks + the enhance reminder now STAND DOWN when the host project wires its
+  OWN copy of the same hook in .claude/settings.json (project copy wins; mirrors the
+  enhance-process-guard precedent PR #309). Kills the double-fire (double gates/PRs/reminders) found
+  during the calculatekaro plugins-first migration. 17 behavioral tests
+  (`test_plugin_hook_coexistence.py`) + live stand-down verified in calculatekaro (4/4 silent);
+  `test_turn_origin_classifier.py` reminder test moved to a neutral cwd (its hub-cwd run now
+  correctly stands down — intended new behavior, purpose of the test preserved). Full gate 1811/0.
+
 ### 2026-07-12 — Rule DEMOTE Group A enacted (owner-approved): 2 hub rules -> on-demand docs
 
 - **demoted** hub always-loaded rules per the lint_rule_compliance.py evidence (zero telemetry/hook
