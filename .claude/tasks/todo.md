@@ -22,6 +22,10 @@ the exact way to start it. Feeder systems below the table add items automaticall
 | 8 | Eval grandfather list shrink (165 skills) | **Sonnet**, opportunistic | Either — CI nags on every touched skill | Editing any listed skill forces `/skill-evaluator`; the list only shrinks |
 | 9 | G5 milestone **M1a** — label-fidelity audit of `human_had_to_fix` (89% fc on reversible AUTO is likely proxy noise; hand-classify a sample vs real PR history) | **Opus** | **You**, whenever | Point any Opus session at plan §4 M1a |
 | 10 | G5 milestone **M1b** — kill the constant-60 default signals in merged-PR scoring (47/56 runs carry no information) | **Sonnet** (mechanical, plan-scoped) | **You**, after M1a | `/debugging-loop` on `record_merged_prs.py`/`collect_signals.py` per plan §4 M1b |
+| 11 | **Fable-harvest Session B** — failure-archaeology → 10–16 skills (plan: `plans/fable-harvest-window.md`) | **Fable 5** (window-sensitive) | **You**, ASAP while window open | `/continue` in a Fable session — the plan file is the brief |
+| 12 | **Fable-harvest Session C** — rubric-mining from ledgers + weakened-test hunter skill (same plan) | **Fable 5** (window-sensitive) | **You**, after B | `/continue` in a Fable session |
+| 13 | Rule-stack audit follow-ups — 2 hook bugs (machine-origin exemption, BA-gate precision) + claude-behavior cleanup + enhance-ceremony rewrite, per `docs/governance/fable-rule-stack-audit-2026-07-13.md` §4 | **Opus** (bugs/cleanup); **you** approve each rule change | **You** — approve the audit's proposals | Point any session at the audit doc §4 |
+| 14 | Scan items #7–#10 (audit-subagent surface, pre-install skill security scan, novelty tracking, doc citations) — not window-sensitive | **Sonnet/Opus** | **You**, whenever | Scan report `sources/2026-07-13-fable-window-external-scan-report.md` has the briefs |
 | — | *Fable-only reserve:* unplanned novel design, adversarial strategic verification, Operating-Manual updates, twice-escalated incidents | **Fable 5** | **You**, when one appears | Open a Fable session and describe it |
 
 ## Future / to-be-discussed (owner decisions, nothing started)
