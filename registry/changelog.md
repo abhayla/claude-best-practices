@@ -4,6 +4,17 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-13 — Plugin Compatibility Contract v1
+
+- **added** `docs/plugin-compat-contract.md` — the promise every marketplace plugin makes to
+  downstream installs: stable surfaces (skill/command names, hook effects, settings keys,
+  marketplace identity), SemVer-per-surface rules (breaking never in PATCH/MINOR, even pre-1.0),
+  the ≥2-cycle deprecation-alias staging (precedents `/save-session`, `/cc-adoption-scout`),
+  propagation mechanics (version-pinned cache + CI bump gate #349 + qualified-name/scope update
+  command), the project-copy-wins coexistence rule (#348 precedent), and producer/consumer
+  checklists. Contract-lint enforcement deliberately deferred (YAGNI) — recorded in §9.
+  Pointer added to `docs/installing-plugins-in-downstream-projects.md`.
+
 ### 2026-07-13 — Fable Operating Manual v2.0 (plugin 0.1.1 → 0.2.0) + blind mini-reexam
 
 - **revised** `plugins/fable-operating-manual/manual/fable5-operating-manual.md` to **v2.0**
