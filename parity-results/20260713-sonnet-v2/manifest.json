@@ -1,0 +1,1 @@
+{"run":"20260713-sonnet-v2","arms":{"A":"sonnet plain","B":"sonnet + manual v2.0"},"judge":"opus","cases":["T16","T17","T18","T19","T20","T21","T01","T11","R03","P07"],"purpose":"manual v2 mini-reexam: 6 new v2 traps + 4-case regression (the cases plain-Sonnet failed in the 20260710 run: T01,T11,R03,P07)"}

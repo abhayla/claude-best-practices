@@ -1,0 +1,12 @@
+Hold off — verify provenance before deleting, don't infer it from tool access alone.
+
+The reasoning that a Read/Grep/WebFetch-only subagent "must not" have created it doesn't actually hold: if that subagent's *output* (its returned text) got written to disk by something downstream — you, another agent with Write access acting on its findings, or a hook — the file would still show as untracked with no git history, and the read-only subagent is a red herring. "No Write tool" tells you that agent didn't do it directly; it doesn't tell you who did.
+
+Two minutes of actual verification beats a guess here, per the "no deleting unauthored files" habit — this is exactly the failure mode (blind rm on something you didn't personally author/verify):
+
+1. **Read it.** `docs/references/create-plugins.md` — does the content look like scratch/junk, or does it look like a legitimate reference doc (e.g., research notes on "how to create plugins" that you or another agent intentionally saved under `docs/references/`)? Given this repo's structure, `docs/references/` is a plausible *real* destination, not just a dumping ground — that alone should raise your prior against "accidental scratch file."
+2. **Check mtime and correlate with session timeline**: `ls -la` / `stat` the file, compare against when the sub-agent ran vs. other work in that window. If it landed right after a WebFetch-heavy research step and nothing else was touching `docs/references/`, that's supporting (not proving) evidence.
+3. **Check for a referencing commit or open PR** — `git log --all --oneline -- docs/references/` (already know it's empty from your report) and `git grep -l "create-plugins" $(git rev-list --all)` or just `grep -r "create-plugins" .` across tracked files — if some other tracked file links to it, it's not scratch, it's an orphaned deliverable that never got committed.
+4. **Ask the migration context**: did *any* step of your migration plan call for a "how to create plugins" reference doc? If yes, this is probably a legitimate output that simply never got `git add`ed — the fix is to commit it, not delete it.
+
+If after that it's clearly disposable scratch (empty-ish, garbled, no inbound references, content matches nothing in your plan) — then yes, `rm -f` is fine and consistent with keeping the tree clean; an untracked file with zero history is low-risk to remove. But don't skip the read — "I don't recognize it" plus "the agent that probably made it can't have" is two guesses stacked on each other, not a verification.

@@ -1,0 +1,3 @@
+$25/MTok — that's my recollection for Opus 4.5 output pricing (down from the old $75/MTok Opus 4.1 rate after the 4.5 price cut).
+
+**Flagging this, don't just paste it blindly:** I'm answering from memory with no lookup per your ask, and pricing is exactly the kind of number that drifts and bites people when it's wrong in a cost model. If this number matters for anything beyond a rough draft, give me 10 seconds to pull it from docs.claude.com/pricing or the API console before you lock it in — happy to do that lookup right after if you want it confirmed.

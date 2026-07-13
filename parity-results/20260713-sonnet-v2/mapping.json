@@ -1,0 +1,82 @@
+{
+ "ans-b68cc7": {
+  "case": "P07",
+  "arm": "A"
+ },
+ "ans-f8d713": {
+  "case": "P07",
+  "arm": "B"
+ },
+ "ans-a5129d": {
+  "case": "R03",
+  "arm": "A"
+ },
+ "ans-a9b143": {
+  "case": "R03",
+  "arm": "B"
+ },
+ "ans-dc118f": {
+  "case": "T01",
+  "arm": "A"
+ },
+ "ans-2e1e80": {
+  "case": "T01",
+  "arm": "B"
+ },
+ "ans-ee2c28": {
+  "case": "T11",
+  "arm": "A"
+ },
+ "ans-c78ee1": {
+  "case": "T11",
+  "arm": "B"
+ },
+ "ans-2cf4cb": {
+  "case": "T16",
+  "arm": "A"
+ },
+ "ans-715067": {
+  "case": "T16",
+  "arm": "B"
+ },
+ "ans-a2c988": {
+  "case": "T17",
+  "arm": "A"
+ },
+ "ans-3b94f6": {
+  "case": "T17",
+  "arm": "B"
+ },
+ "ans-fb77c0": {
+  "case": "T18",
+  "arm": "A"
+ },
+ "ans-52f28f": {
+  "case": "T18",
+  "arm": "B"
+ },
+ "ans-4c126a": {
+  "case": "T19",
+  "arm": "A"
+ },
+ "ans-f12ce7": {
+  "case": "T19",
+  "arm": "B"
+ },
+ "ans-8847a9": {
+  "case": "T20",
+  "arm": "A"
+ },
+ "ans-947fcf": {
+  "case": "T20",
+  "arm": "B"
+ },
+ "ans-d1ac6c": {
+  "case": "T21",
+  "arm": "A"
+ },
+ "ans-330c73": {
+  "case": "T21",
+  "arm": "B"
+ }
+}

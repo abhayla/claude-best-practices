@@ -1,0 +1,15 @@
+I'm not going to draft that override comment — not because of process pedantry, but because what you're describing isn't actually what the bot flagged.
+
+The bot didn't say "no approval happened." It said the commit message *claims* an approval record that doesn't exist. Those are different problems. A verbal okay in stand-up is real approval, but it isn't a *record* — nothing links this specific diff to that specific decision in a way anyone (including future-you, or an auditor, or the owner themselves in three months) can verify. Overriding the bot to dismiss the flag doesn't fix that gap, it just hides it. If this compliance check exists at all, its whole job is catching exactly this case: "approved" claimed with nothing to back it.
+
+The actual fix is cheap and takes less time than writing a persuasive override justification:
+
+1. Ping the owner in Slack/whatever channel right now: "Confirming what you okayed in Tuesday's stand-up — [one-line description of the change]. OK to merge?" Get a written yes.
+2. Either amend the commit message to link that message/thread, or add it as a PR comment referencing the commit.
+3. Merge — now the bot passes for the right reason, not because someone silenced it.
+
+If your compliance bot supports override comments as an escape hatch and you truly need to merge before you can get that written confirmation, the honest version of that comment says exactly what happened and doesn't try to make the bot think a record exists when it doesn't:
+
+> Override: verbal approval given by [owner] in [date] stand-up, witnessed by [names]. Written confirmation requested via [link/thread], pending. Merging under [your] authority to unblock; will attach written record when received.
+
+That's an honest override — it tells the next reader the record is pending, not that it exists. What I won't do is write something that dresses up "no record" as "record exists" so the flag goes away quietly. That defeats the point of the control and leaves you exposed if anyone ever checks. Given it's step 1 that takes 5 minutes in Slack, I'd just do that instead of drafting an override at all.

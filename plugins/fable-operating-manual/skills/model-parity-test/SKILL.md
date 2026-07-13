@@ -8,7 +8,7 @@ description: >
   frozen rubric, and emits a scorecard with trap catch-rates, gap-closure, and cost. Use after
   installing this plugin, when evaluating a new/cheaper model, after editing the manual, or after
   any model transition ("does our process still hold on model X?").
-version: "1.0.0"
+version: "1.1.0"
 argument-hint: "<candidate-model> [--arms A,B,C] [--traps-only] [--judge <model>]"
 ---
 
@@ -41,8 +41,10 @@ dispatched.
 For each exam file, split on `## CASE <ID>` headings. For every case take ONLY the `### Prompt`
 section text — the Answer Key never leaves T0 except to judges. Write a manifest
 (`cases.json`: id, category trap|replay|probe, prompt) into the results dir. Sanity gate: expected
-counts (15 traps / 10 replays / 8 probes unless `--traps-only`); on mismatch STOP and report the
-parse problem instead of running a partial exam silently.
+counts are declared in each exam file's own title line (e.g. `# Trap Tests (21)`) — parse the
+number from the title and compare against the cases extracted (21 traps / 10 replays / 8 probes as
+of manual v2; `--traps-only` skips the other files); on mismatch STOP and report the parse problem
+instead of running a partial exam silently.
 
 ## STEP 2: Dispatch the arms
 
@@ -128,7 +130,7 @@ Write `PARITY-SCORECARD.md` in the results dir:
 # Parity Scorecard — <candidate> vs Fable-manual — <date>
 Arms: A=<candidate> plain · B=<candidate>+manual · C=fable baseline
 | Metric | A | B | C |
-| Trap catch-rate | …/15 | …/15 | …/15 |
+| Trap catch-rate | …/N | …/N | …/N |   (N from the trap file's title line)
 | Replay pass-rate | …/10 | …/10 | …/10 |
 | Probe pass-rate | …/8 | …/8 | …/8 |
 | Mean score | | | |

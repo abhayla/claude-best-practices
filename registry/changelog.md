@@ -4,7 +4,26 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
-## [Unreleased]
+### 2026-07-13 — Fable Operating Manual v2.0 (plugin 0.1.1 → 0.2.0) + blind mini-reexam
+
+- **revised** `plugins/fable-operating-manual/manual/fable5-operating-manual.md` to **v2.0**
+  against the post-v1 documented incident record (silent hook-payload drop PR #315, armed
+  auto-merge stall PR #319, live-worktree mutation race, transcript-isolation checker flag,
+  stop-hook transcript-shape false blocks #331/#332): new **§13 the-artifact-is-not-the-effect**
+  (verify at the point of consumption; accepted ≠ delivered ≠ done; versioned-cache propagation;
+  real-sample parsing) and **§14 shared state and other actors** (idle ≠ dead; never mutate a
+  possibly-live actor's state; sync-before-publish; a checker's flag is a re-verification
+  trigger), plus **§8.6 negatives expire**, catalogue rows 13–17, self-test item 6. Distilled
+  core updated (89/100 lines).
+- **extended** the exam battery with traps **T16–T21** (one per new failure class, authored
+  before the manual sections per the exam-before-manual discipline); harness SKILL v1.1.0 now
+  reads expected counts from exam-file title lines instead of hardcoding 15.
+- **re-examined** blind (sonnet arms A/B, opus judges, calibration-validated):
+  plain Sonnet **failed T01+T11 again; manual v2 recovered both to 10/10** (10/10 passes,
+  mean 10.0 vs 8.4); the six new traps didn't separate arms at Q&A difficulty (disclosed);
+  zero regressions. Scorecard: `parity-results/20260713-sonnet-v2/`; addendum in
+  `docs/fable-operating-manual/PARITY-REPORT.md`.
+
 ### 2026-07-13 — Fable Operating Manual: plain-English explainer + gap register; added to universal recommendations
 
 - **added** `docs/fable-operating-manual/how-it-works.md` (owner-requested) — how the manual makes
