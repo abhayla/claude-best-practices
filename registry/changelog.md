@@ -4,6 +4,16 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-13 — sync machinery stage-1 retirement (owner-approved): auto copy-sync OFF
+
+- **retired** the push-triggered hub→projects copy-sync: `sync-to-projects.yml` is now
+  workflow_dispatch-only (plugin-covered content propagates via /plugin update, CI-enforced by the
+  version-bump gate; all 5 enrolled repos are plugins-first as of #346 stage 2). Manual dispatch
+  kept for the residual copy-provisioned surface (rules, non-pack stack helpers, shipped configs).
+- **updated** skill `update-practices` (1.2.1 -> 1.3.0 MINOR, hash resynced) — scope narrowed to
+  the residual surface; plugin-covered content explicitly routed to `/plugin update`.
+  `docs/SYNC-ARCHITECTURE.md` section 4 rewritten to match. Back-flow (collate/telemetry) untouched.
+
 ### 2026-07-13 — plugin version-bump gate: the propagation rule moves from prose to CI (model-proof)
 
 - **added** `scripts/check_plugin_version_bump.py` + a BLOCKING validate-pr.yml step — a plugin
