@@ -39,7 +39,7 @@ triggers:
   - check if tests pass
   - make the tests pass
   - test fix commit cycle
-version: "3.0.0"
+version: "3.1.0"
 ---
 
 # /test-pipeline — Skill-at-T0 Orchestrator
@@ -178,6 +178,16 @@ Mutually exclusive: `--skip-fix` and `--update-baselines` MUST NOT both be set.
 4. **Clean prior artifacts.** Remove `test-results/`, `test-evidence/`, and
    `.workflows/testing-pipeline/` from any prior run. Keep the 3 most recent
    `test-evidence/{run_id}/` directories; delete older ones.
+4a. **Test-debt baseline check.** Read `.workflows/test-debt-baseline.json`
+    (deliberately OUTSIDE `.workflows/testing-pipeline/` so sub-step 4's cleanup
+    never removes it). Absent → this is the pipeline's FIRST run in this repo:
+    set `first_run: true` in state. Pre-existing failures surfaced by a first
+    full-suite run are TEST DEBT, not regressions caused by the current work —
+    STEP 6's Baseline gate files them as one consolidated debt issue and records
+    them in the baseline file instead of fanning out per-failure fixers. Present →
+    load its `known_debt` list into state; those test_ids are excluded from
+    new-failure triage (reported as `known_debt`) until they pass, at which point
+    they are removed from the baseline file in the same run.
 5. **Initialize state.** `Write .workflows/testing-pipeline/state.json`:
    ```json
    {
@@ -584,6 +594,23 @@ Triage fans out three worker waves. All dispatches originate at T0; workers
 never chain-dispatch. Each fan-out chunk is **one T0 assistant message with
 up-to-N parallel `Agent()` calls** (N = `concurrency.max_concurrent_*` for
 that wave).
+
+### Baseline gate (first run / known debt) — runs BEFORE the budget guard
+
+- `state.first_run == true` → split the failure list: failures in tests NOT touched by
+  the current change are PRE-EXISTING TEST DEBT, not new regressions (the recorded class:
+  first installed-pipeline runs surfacing 42 and ~60 pre-existing failures in two repos,
+  mixed into unrelated migration work). File ONE consolidated issue via
+  `github-issue-manager-agent` (title `test-debt: <N> pre-existing failing tests found by
+  first pipeline run`, body listing every debt test_id + category), write the debt list to
+  `.workflows/test-debt-baseline.json`
+  (`{"created": "<iso>", "run_id": "<run_id>", "baseline_issue": <n>,
+  "known_debt": [{"test_id": "...", "category": "..."}]}`), and continue the fan-outs
+  below ONLY for failures attributable to the current change.
+- Later runs → drop failures whose `test_id` is in `known_debt` from the triage list;
+  they are reported in STEP 9 as `known_debt` (count + baseline-issue pointer), never
+  dispatched to fixers as regressions. A baselined test that now PASSES is removed from
+  the baseline file in the same run (comment the baseline issue with the shrink).
 
 ### Budget guard (REQ-M015, v2 §3.3 end)
 

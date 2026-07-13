@@ -4,6 +4,35 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-13 — Fable-harvest Session B: 3 failure-archaeology skills + 3 workflow upgrades
+
+Evidence base: `docs/governance/fable-failure-archaeology-2026-07-13.md` (9 failure classes
+mined from git history, lessons/telemetry, and downstream issue history; owner interview
+resolved audience/overlap/volume forks). Every skill passed `/skill-evaluator full` (2–3
+rounds, reports in each skill's `evals/`). Three hub-only siblings
+(`verify-effect-at-destination`, `platform-event-live-probe`, `hook-transcript-fixture-test`)
+ship in `.claude/skills/` (not registered — hub-operational).
+
+- **added** skill `full-defect-surface-sweep` (core, nice-to-have) — after root-causing a bug,
+  enumerate every sibling of the class repo-wide; fix or file linked residuals; sweep table in
+  the fix PR (class C: partial-fix under-coverage — IPODhan #81/#72/#73, KKB #90→#93).
+- **added** skill `dependency-migration-triage` (core, nice-to-have) — snapshot → cluster by
+  error signature → classify (masked quirk / latent real bug / incompatibility) → fix in waves
+  with full-suite re-runs (class C: KKB mockk 4-PR chain).
+- **added** skill `mock-data-hunter` (core, nice-to-have) — pre-ship sweep for
+  fabricated/demo/seeded data on prod paths + substance joins to source-of-truth rows
+  (class B: IPODhan #94/#96/#97/#98 "shape-vs-substance").
+- **updated** skill `test-pipeline` 3.0.0 → 3.1.0 — first-run test-debt baseline: pre-existing
+  failures filed as ONE consolidated debt issue + `known_debt` exclusion from later triage
+  (class E: IPODhan #109 / AlgoChanakya #89 silent test debt).
+- **updated** skill `create-github-issue` 1.0.0 → 1.1.0 — commit-independent SIG2 root-cause
+  recurrence check (open+closed, 90d) + `## Recurrence` body section; links a re-filed root
+  cause instead of silently duplicating (class F: KKB #51→#60).
+- **updated** skill `auto-verify` 4.4.0 → 4.5.0 — STEP 2.5.2b substance check: demo/seeded/
+  fabricated data rendering cleanly is an OVERRIDE, not a pass (class B).
+- **updated** plugin `cbp-build-test-workflows` 0.1.0 → 0.2.0 — bundles the upgraded
+  `test-pipeline` + `auto-verify` copies (version bump = install-cache propagation).
+
 ### 2026-07-13 — Plugin Compatibility Contract v1
 
 - **added** `docs/plugin-compat-contract.md` — the promise every marketplace plugin makes to
