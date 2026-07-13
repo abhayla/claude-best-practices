@@ -58,10 +58,21 @@ You are a senior software engineer specializing in comprehensive code quality as
    - Input validation and injection prevention
    - Sensitive data handling
 
+## Evidence-Derived Review
+
+Before finalizing findings, read the evidence rubric at `references/evidence-review-rubrics.md`
+(relative to this agent file), falling back to `core/.claude/agents/references/evidence-review-rubrics.md`
+from the repo root; if neither exists, proceed on the generic dimensions and say so in the report.
+Apply every rubric row (R1–R10) to the diff as first-class findings dimensions — the rows are
+derived from this project's actual reverted and fix-chained PRs and outrank a clean generic
+assessment when they fire. Apply its standing disciplines too: evaluate only the raw diff and
+evidence (never inherit the dispatching prompt's framing of the work), and run the deterministic
+convention pre-pass before judgment calls.
+
 ## Review Process
 
 1. Identify recently changed files (via `git diff` or provided context)
-2. Systematically review each concern area above
+2. Systematically review each concern area above, plus every evidence-rubric row
 3. Prioritize findings by severity: Critical / High / Medium / Low
 4. Provide actionable recommendations with code examples
 
