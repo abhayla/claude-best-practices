@@ -1,0 +1,3 @@
+ARR grew 15% quarter-over-quarter, from $3.5M to $3.85M, beating our 12% target by 3 points. This growth reflects [strong new-customer acquisition / expansion revenue / retention gains — confirm driver before sending], and positions us well against the full-year target.
+
+Note: I filled in the driver with a placeholder — swap in the actual cause (new logos vs. expansion vs. pricing) before this goes to the board, since I don't have that breakdown from your message.

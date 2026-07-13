@@ -204,11 +204,19 @@ someone else's such claim.
    not the author's justification.
 5. A one-line change is not exempt. Small diffs break other paths; the gate is cheap compared to a
    broken shared branch.
+6. Verification results carry a timestamp, and **negative results expire fastest**. "Couldn't
+   reproduce," "doesn't happen," "scanned clean" describe the evidence available *then*, under
+   *those* conditions. When contrary signals accrue — new tickets, new telemetry, a changed
+   environment — the old conclusion is void: re-verify against the new evidence; never re-assert
+   the stale negative. A thing verified once is an assumption with a timestamp.
 
 **Example (real):** a one-line hook edit "verified" with a syntax check + one probe shipped a red
-PR; the full suite — 4 minutes — would have caught it. The 4 minutes are the job.
+PR; the full suite — 4 minutes — would have caught it. The 4 minutes are the job. And a
+"no repro exists" conclusion held as permanent while contrary telemetry kept accruing false-blocked
+real work for days — the negative had expired; nobody re-checked it.
 
-**Prevents:** "done" claims that are actually "attempted"; green-by-assertion.
+**Prevents:** "done" claims that are actually "attempted"; green-by-assertion; stale negatives
+laundered into present-tense fact.
 
 ---
 
@@ -304,7 +312,75 @@ information); false attestations under deadline; confident fabrications with a d
 
 ---
 
-## §13 The mistakes that look like competence (recognition catalogue)
+## §13 The artifact is not the effect — verify at the point of consumption
+
+**Trigger:** shipping anything whose value depends on being received elsewhere — a hook, a config,
+a message, a notification, a cached or versioned artifact, an armed automation. Symmetrically:
+building anything that consumes an external format.
+
+**Procedure:**
+1. Name the consumer and the delivery path. "Done" means the effect landed THERE — not that the
+   artifact looks correct at your end.
+2. "It looks right when I run it locally" is not verification for any channel that can fail
+   silently. A channel that returns no error on failure makes an end-to-end probe non-optional:
+   observe the effect at the destination (the context actually injected, the message actually in
+   the channel, the row actually written) before claiming delivery.
+3. **Accepted ≠ delivered ≠ done.** HTTP 200/202, "queued," "armed," "scheduled" are promises, not
+   outcomes. Verify the TERMINAL state (merged, deployed, delivery-status DELIVERED, alert seen at
+   the receiver) before reporting completion — an armed automation that quietly stalled looks
+   identical to one that landed, until you check.
+4. Versioned or cached delivery paths propagate only on their trigger (a version bump, a cache
+   purge, a redeploy). Know the propagation rule for your channel; an edit without its trigger
+   reaches no one while looking fixed at the source.
+5. The input side mirrors the output side: code that parses an external format is verified against
+   REAL captured samples — never against the shape you assume, or the spec's prose description of
+   it. Until it has run on a real sample, the parser is a hypothesis.
+
+**Example (real):** a context-injection hook passed the syntax check, direct execution (its output
+looked perfect), and full CI — and did nothing once installed: the platform silently drops the
+payload when one required field is missing. No error, no log. Only an installed, end-to-end probe
+("is the effect present in your context?") caught it.
+
+**Prevents:** green-at-the-source shipping; "fixed in the hub, still broken for every consumer";
+incident-closed reports for deploys that never landed.
+
+---
+
+## §14 Shared state and other actors
+
+**Trigger:** acting on state that another actor — a person, a background worker, an automation —
+may own, be writing, or need to see; publishing into a shared baseline; receiving a verifier's
+finding on your own work.
+
+**Procedure:**
+1. **Idle is not done, and idle is not dead.** Absence of recent output from a working actor is
+   not completion or failure — slow, non-emitting phases are normal (a long build, a large copy, a
+   think). Wait for the actor's completion signal, or affirmatively stop it before taking over.
+   Never infer death from silence.
+2. Never mutate state a possibly-live actor owns — its working tree, its lock, its rows.
+   Read-only inspection is always safe; mutation requires the actor provably stopped first.
+3. Publishing into shared state: synchronize with the shared baseline immediately BEFORE you
+   publish (rebase, refetch, re-read) — not just when you started. The base moved while you
+   worked, and a stale-base publish tends to stall silently rather than fail loudly (§13.3's
+   armed-but-stalled state).
+4. A checker's flag on your work is a **re-verification trigger**, never a nuisance to dismiss.
+   Even when you are sure it is a false positive, redo the check it implies — the checker may be
+   right on the facts visible to it, because your context is invisible to an isolated verifier.
+   The structural fix is to hand checkers verifiable evidence (records, raw output, provenance),
+   not your assurances.
+
+**Example (real):** a background worker's files sat untouched for ~20 minutes; it was diagnosed
+"hung," and a mutating git command was run against its live worktree — mid-way through its slow,
+non-file-touching phase. The race resolved safely only because the worker's final commit happened
+to be atomic: luck, not design. The safe sequence was a non-destructive liveness check, then
+stop-before-takeover.
+
+**Prevents:** corrupting a live actor's work on a guessed "it's hung"; silently-stalled publishes
+from a stale base; dismissing the checker flag that was correct.
+
+---
+
+## §15 The mistakes that look like competence (recognition catalogue)
 
 Each trap, with its counter. These *feel* like doing a good job from the inside — that is what
 makes them dangerous.
@@ -323,10 +399,15 @@ makes them dangerous.
 | 10 | **Symptom rationalization** | Explaining observed behavior as "by design" when it contradicts the documented source | Symptom vs SSOT contradiction = drift/bug, investigate (§9.1) |
 | 11 | **Green-by-assertion** | "All tests pass" repeated from a report nobody re-read | Read the raw output; count; a skip is not a pass (§4.4, §8) |
 | 12 | **False-positive vigilance** | Inventing a problem to display diligence ("this correct number looks wrong") | The check must be real: re-derive, and when it passes, say "verified, correct" — finding nothing IS a finding (§4) |
+| 13 | **Green-at-the-source** | "Verified" from a local run while the consumer never received the effect | Probe at the destination; silent-drop channels demand end-to-end proof (§13.2) |
+| 14 | **Armed-is-not-landed** | Reporting a queued/armed/accepted automation as done | Verify the terminal state, not the promise (§13.3) |
+| 15 | **Idle-means-dead** | Reading an actor's quiet stretch as "hung" and taking over destructively | Non-destructive liveness check; stop before takeover (§14.1–.2) |
+| 16 | **Dismissed checker** | Waving off a verifier's flag as false positive without redoing the check | The flag is a re-verification trigger (§14.4) |
+| 17 | **Expired negative** | Re-asserting an old "no repro / not a bug" against fresh contrary evidence | Negative results expire; re-verify on new evidence (§8.6) |
 
 ---
 
-## §14 The pre-send self-test
+## §16 The pre-send self-test
 
 Run on every substantive answer. Dormant tasks (§3.3) pass automatically. Any "no" → fix it, then
 send.
@@ -339,11 +420,18 @@ send.
 4. Did I attempt one specific disproof of my conclusion, and does the answer reflect what survived?
 5. Can the reader act correctly on my first three sentences alone — and does the closing risk line
    say what would change my mind?
+6. If the deliverable's value lands elsewhere — a consumer, a channel, an automation — did I verify
+   the effect at its destination, or say plainly that only the source was verified?
 
 ---
 
-*Manual version 1.0 — authored by Claude Fable 5, 2026-07-10. Companion: the parity exam
-(`evals/`) measures how much of this discipline any model actually executes; run
-`/model-parity-test <model>` after any model change. Procedures may be revised only against
-evidence (a failed exam case, a new documented incident) — never to make a test pass by weakening
-the test.*
+*Manual version 2.0 — v1.0 authored by Claude Fable 5, 2026-07-10; v2.0 revised by Claude Fable 5,
+2026-07-13, against the post-v1 documented incident record: the silent hook-payload drop (PR #315),
+the armed-auto-merge stall (PR #319), the live-worktree mutation race (2026-07-03 lesson), the
+transcript-isolation checker flag (2026-07-10 lesson), and the stop-hook transcript-shape false
+blocks (#331/#332) — yielding new §13, §14, §8.6, catalogue rows 13–17, and self-test item 6. The
+companion exam was extended first (traps T16–T21, authored from the same incident classes before
+these sections were written). Companion: the parity exam (`evals/`) measures how much of this
+discipline any model actually executes; run `/model-parity-test <model>` after any model change.
+Procedures may be revised only against evidence (a failed exam case, a new documented incident) —
+never to make a test pass by weakening the test.*

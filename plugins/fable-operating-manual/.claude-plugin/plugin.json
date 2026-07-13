@@ -1,6 +1,6 @@
 {
   "name": "fable-operating-manual",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Make any model operate with Claude Fable 5's working discipline. Ships the Fable 5 Operating Manual (reasoning procedures extracted from Fable at peak capability: read intent beneath words, decompose into independently checkable pieces, re-derive every number, label known vs guessed, attack your own conclusion, answer-first reporting), auto-delivered into every session and every dispatched sub-agent via hooks, plus /model-parity-test \u2014 a blind 3-arm exam (plain model vs model+manual vs Fable baseline) with trap tests that PROVES how much of the discipline transferred instead of assuming it.",
   "author": {
     "name": "Abhay Kumar"

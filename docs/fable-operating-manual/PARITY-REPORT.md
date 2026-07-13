@@ -105,3 +105,23 @@ is now Fable."
 
 (Plugin `fable-operating-manual`; run from a session without the plugin's injection hooks active —
 see the skill's contamination preflight.)
+
+---
+
+## Addendum — Manual v2.0 mini-reexam (2026-07-13)
+
+The manual was revised to v2.0 against the post-v1 documented incident record (new §13
+effect-at-consumption, §14 shared-state/other-actors, §8.6 negatives-expire; six new traps
+T16–T21 authored from the incident classes BEFORE the sections were written). A blind
+mini-reexam ran the new traps plus a regression sample (T01, T11, R03, P07 — the v1 run's
+plain-Sonnet failure set) on sonnet, arms A/B, opus judges, calibration-validated.
+
+**Results** (full scorecard: `parity-results/20260713-sonnet-v2/PARITY-SCORECARD.md`):
+plain Sonnet failed T01 (1/10) and T11 (3/10) again — the v1 discipline gap reproduces — and
+Sonnet + manual v2 recovered both to 10/10, passing 10/10 overall (mean 10.0 vs 8.4). The six
+new v2 traps did not separate the arms at this difficulty (plain Sonnet caught all six in Q&A
+form); the v2 sections showed as explicit procedure in arm B's answers and caused zero
+regressions. Honest read: v2's new sections are incident-grounded reinforcement whose real
+target population is agentic sessions under load, which a Q&A exam only proxies; the manual's
+proven gap-closing power remains the numeric/verification discipline, unchanged and re-confirmed
+on v2.
