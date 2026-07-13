@@ -1,6 +1,6 @@
 ---
 name: hook-transcript-fixture-test
-description: Ship any hook that parses transcripts, turn origin, or session state with fixture tests against CAPTURED REAL transcript samples — never the assumed shape. Use when creating or editing hooks that read transcript JSONL, classify turn types, or detect model output patterns (enhance guards, stop guards, turn-origin classifiers).
+description: Ship any hook that parses transcripts, turn origin, or session state with fixture tests against CAPTURED REAL transcript samples — never the assumed shape. Use when creating or editing hooks that read transcript JSONL, classify turn types, or detect model output patterns (enhance guards, stop guards, turn-origin classifiers) — and when a guard hook misfires/false-positives, use THIS (capture the misfiring shape as a fixture first), not generic debugging; /systematic-debugging and /fix-loop come after the fixture reproduces the misfire.
 version: "1.0.0"
 type: workflow
 triggers:
@@ -15,7 +15,7 @@ argument-hint: "<hook-path> [turn-shapes-to-cover]"
 # Hook Transcript Fixture Test
 
 Transcript-parsing hooks are this hub's single most-churned mechanism: ~13 fix commits over one
-month on the enhance/over-ask guard family, nearly all the same defect — the hook was built on an
+month on the enhance/over-ask guard family (as of 2026-07), nearly all the same defect — the hook was built on an
 ASSUMED transcript shape and a real shape broke it (slash commands write TWO user entries, a
 marker and a marker-less body; mid-turn text beside tool_use may never persist; machine-origin
 turns look like user turns). Every one of those false-positive cycles was preventable by testing
@@ -40,13 +40,17 @@ Add any shape your specific hook introduces. Each matrix row becomes at least on
 ## STEP 2: Capture Real Samples
 
 Pull REAL transcript excerpts for each row — from live session JSONL under
-`~/.claude/projects/<project-dir>/` (main sessions and subagent transcripts), or by generating
-the shape live (run a slash command, trigger a notification) and then excerpting.
+`~/.claude/projects/<project-dir>/` (main sessions and subagent transcripts; `<project-dir>` is
+the project path with separators flattened to dashes, e.g. `D--Abhay-VibeCoding-myrepo`), or by
+generating the shape live (run a slash command, trigger a notification) and then excerpting.
 
 - Trim to the minimal entries that exercise the branch (a handful of JSONL lines).
 - Anonymize: strip real prompts/PII, keep the STRUCTURE (roles, markers, field names) byte-exact.
-- Store under `scripts/tests/fixtures/transcripts/<shape-name>.jsonl` (or the project's fixture
-  convention).
+- Store under `scripts/tests/fixtures/transcripts/<shape-name>.jsonl` (create the directory on
+  first use; or follow the project's existing fixture convention).
+- A shape you cannot generate locally (e.g. a scheduled-wakeup turn before any routine exists) is
+  recorded as a DOCUMENTED GAP: add a skipped test naming the missing shape and the capture
+  condition — never hand-fabricate the fixture to fill the row.
 
 Hand-writing a fixture from memory of the format defeats the entire point — the format in your
 memory IS the assumed shape that keeps being wrong.
@@ -56,12 +60,15 @@ memory IS the assumed shape that keeps being wrong.
 For each fixture, a test that runs the hook's parse/classify path against the file and asserts
 the decision:
 
+- FIRST identify the target hook's ACTUAL I/O contract — hooks in one repo differ (some read
+  JSON on stdin per the platform hook contract; some are sourced libraries taking function
+  arguments; some read env vars). Read the hook's own input handling before writing the harness.
 - **Positive cases** — shapes where the hook SHOULD act (the real violation it exists to catch).
 - **Negative cases** — every shape where it must stay silent (slash, machine-origin,
   skill-execution, sanctioned-banner-present). False positives are this hook family's dominant
   defect, so negative cases carry most of the value.
-- Invoke the hook as the platform does (feed JSON on stdin / env vars per the hook contract),
-  not by sourcing internal functions only — the I/O boundary is part of what breaks.
+- Invoke the hook through that contract as the platform does (stdin JSON / args / env), not by
+  sourcing internal functions only — the I/O boundary is part of what breaks.
 
 ## STEP 4: Run the Matrix and Wire Into the Suite
 
@@ -73,8 +80,12 @@ held the line.
 ## STEP 5: On Any Live False-Positive, Capture Before Fixing
 
 When the shipped hook misfires in a live session: FIRST excerpt that session's real transcript
-into a new fixture reproducing the misfire, THEN fix against it. The failing fixture is the
-regression guard; a fix without it re-enters the fix-the-fix loop.
+into a new fixture reproducing the misfire, THEN fix against it. Locate the session file by its
+session id under `~/.claude/projects/<project-dir>/` (the misfire report or hook log usually
+carries the id; otherwise take the newest JSONL there) and excerpt the FULL turn — all entries
+belonging to that turn, not just the single line that looks wrong, since misclassification
+usually spans adjacent entries. The failing fixture is the regression guard; a fix without it
+re-enters the fix-the-fix loop.
 
 ## MUST DO
 

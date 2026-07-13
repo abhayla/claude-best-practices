@@ -1,6 +1,6 @@
 ---
 name: full-defect-surface-sweep
-description: Enumerate every sibling instance of a just-diagnosed root cause repo-wide BEFORE closing the bug — fix them or file explicitly-linked residual issues. Use after any root-cause diagnosis and before declaring a bug fixed; a fix without a surface sweep is a partial fix.
+description: Enumerate every sibling instance of a just-diagnosed root cause repo-wide BEFORE closing the bug — fix them or file explicitly-linked residual issues. Use after any root-cause diagnosis and before declaring a bug fixed; a fix without a surface sweep is a partial fix. This is the executable sweep procedure behind the bug-triage-discipline rule's sibling-audit requirement — invoke it even when no formal issue is being filed (pre-issue sweeps, data defects, config classes).
 version: "1.0.0"
 type: workflow
 triggers:
@@ -20,6 +20,14 @@ a dependency fix that took four sequential PR waves because sibling failure clas
 discovered one at a time. The pattern is constant — the fix treats the INSTANCE that was
 reported, while the CLASS lives on elsewhere. This skill runs between "root cause found" and
 "bug closed".
+
+## STEP 0: Confirm the Root Cause Is Actually Isolated
+
+This skill consumes a DIAGNOSED root cause; it cannot rescue an undiagnosed one. If the root
+cause is still a hypothesis (symptoms observed, mechanism unconfirmed), run `/systematic-debugging`
+first — sweeping on a misdiagnosis produces a confident "CLASS CLOSED" verdict about the wrong
+class, which is worse than no sweep. Proceed only when you can state the mechanism in one
+sentence and point at the `file:line` (or data predicate) that embodies it.
 
 ## STEP 1: Abstract the Instance Into a Class
 
@@ -61,6 +69,10 @@ Record every hit — zero-hit sweeps are a legitimate result and get reported as
 - Siblings needing separate work: file one issue per coherent residual, each titled
   `residual: <class> — <specific surface>` and cross-linked to the fix PR — the residual list
   is part of the fix, not optional housekeeping.
+- Before filing, search existing issues (open AND closed) for the same residual title/class — a
+  re-run of the sweep must comment on or reference the existing residual, never file a duplicate.
+- At scale (10+ hits in one class), file ONE class-level issue carrying the full hit checklist
+  instead of N near-identical issues — per-surface issues are for genuinely distinct work items.
 - Never silently skip a hit: unfixed + unfiled is how the class resurfaces as a "new" bug.
 
 ## STEP 5: Attach the Sweep Table to the Fix

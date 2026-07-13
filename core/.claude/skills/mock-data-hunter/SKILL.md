@@ -28,9 +28,21 @@ Run the marker sweep over application source (exclude `test/`, `__tests__/`, `*.
 `fixtures/`, `stories/`, `e2e/` — those are LEGITIMATE homes for fake data):
 
 ```bash
+# Repeated --include flags — a quoted brace list ("*.{ts,tsx,...}") is NOT expanded by grep
+# and silently matches nothing (false CLEAN). Verify the sweep finds a planted marker first.
 grep -rniE "mock|demo|dummy|placeholder|fake|sample.?data|for (the )?mvp|hardcode|lorem" \
-  --include="*.{ts,tsx,js,jsx,py,vue,svelte,dart,kt,swift,rb,php,html}" <src-dirs>
+  --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --include="*.py" \
+  --include="*.vue" --include="*.svelte" --include="*.dart" --include="*.kt" \
+  --include="*.swift" --include="*.rb" --include="*.php" --include="*.html" <src-dirs>
 ```
+
+Sanity-check the harness before trusting a clean result: plant `MOCKHUNT-CANARY` in a scratch
+file inside the sweep scope and confirm the command finds it, then remove it. A sweep that can't
+find the canary is broken, and its "clean" means nothing.
+
+On large repos/monorepos, sweep per package/app directory (highest-traffic user-facing app
+first) rather than the whole tree at once; record which packages were swept vs skipped in the
+STEP 5 scope line — an unswept package is not a clean package.
 
 Plus the structural suspects the word-grep misses:
 - Literal metric constants in render paths (percent splits, counts, currency amounts assigned
@@ -52,8 +64,12 @@ For every hit, answer: does this value reach a PRODUCTION-rendered surface?
 
 ## STEP 3: Verify Substance on Data-Backed Pages (the positive check)
 
-The grep finds what's fake; this step proves what's real. For each key user-facing
-metric/list/table, verify the rendered value JOINS to a source-of-truth row:
+The grep finds what's fake; this step proves what's real — run it EVEN WHEN STEP 1 came back
+clean (fabricated constants need no suspicious vocabulary; the recorded P0s rendered perfectly
+plausible numbers). With `--include-db`, extend the check into the live store itself: query for
+seeded-name patterns and future-dated rows among production records (the seeded-rows class),
+read-only. For each key user-facing metric/list/table, verify the rendered value JOINS to a
+source-of-truth row:
 
 1. Pick the value on the page (a metric, a top-N list entry, a directory row).
 2. Locate its origin: trace the render → API/query → table/collection.
@@ -78,12 +94,15 @@ Locked output:
 
 ```
 MOCK DATA SWEEP
-Scope:    <dirs/URL swept, db included? y/n>
+Scope:    <dirs/URL swept, db included? y/n, packages skipped: [...]>
 | # | Location | What it fabricates | Serving path | Class | Severity | Issue |
 |---|---|---|---|---|---|---|
 Substance checks: <N values traced to source-of-truth rows, M dead-ended>
 Verdict: CLEAN | FINDINGS (P0: n, P1: n, P2: n)
 ```
+
+Order findings by file path so repeat runs diff stably; a re-run references issues already filed
+for unchanged findings instead of re-filing them.
 
 ## MUST DO
 

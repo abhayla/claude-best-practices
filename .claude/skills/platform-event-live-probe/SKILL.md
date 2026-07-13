@@ -1,6 +1,6 @@
 ---
 name: platform-event-live-probe
-description: Live-probe a platform event or API surface BEFORE building on it — prove the event fires and its payload reaches the exact consumer you plan to use, with a minimal tracer. Use before wiring a new Claude Code hook event, SDK callback, webhook, or any documented-but-unverified platform behavior. A documented event name is not delivery.
+description: Live-probe a platform event or API surface BEFORE building on it — prove the event fires and its payload reaches the exact consumer you plan to use, with a minimal tracer. Use before wiring a new Claude Code hook event, SDK callback, webhook, or any documented-but-unverified platform behavior. A documented event name is not delivery. (The after-build half of this discipline — verifying a change you already made landed at its consumer — is /verify-effect-at-destination.)
 version: "1.0.0"
 type: workflow
 triggers:
@@ -8,7 +8,7 @@ triggers:
   - "does this hook event actually work"
   - "verify the event fires before building"
   - "probe the platform behavior first"
-allowed-tools: Read, Write, Bash, Grep, Glob
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "<event-or-surface> <intended-consumer>"
 ---
 
@@ -70,7 +70,14 @@ These are independent facts; the hub's failure was exactly a yes-fired/no-delive
 Append the result where the next builder will look (the project's platform-reference doc or
 lessons file), including: event, platform/CLI version probed, fired/delivered verdicts, nonce
 evidence, and date. Platform behavior changes across versions — a probe result carries its
-vintage, and a `no` from three versions ago is worth re-probing.
+vintage, and a `no` from three versions ago is worth re-probing. Check this record BEFORE
+probing: a same-version prior probe of the same event answers the question without a re-run;
+a different-version or stale one is the re-probe trigger.
+
+Under time pressure with no probe possible right now: build nothing load-bearing on the
+unverified event — either design against the surface a prior probe already verified, or ship the
+artifact unwired with the probe as the named activation condition. "No time to probe" is never
+license to assume delivery.
 
 ## MUST DO
 

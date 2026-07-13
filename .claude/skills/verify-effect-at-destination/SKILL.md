@@ -32,8 +32,16 @@ State, in one line each, BEFORE any probing:
    in a live session; the served cache copy contains the new line; the message exists in the chat;
    the row reads back; the gate rejects a violating test branch).
 
-If you cannot name an observable terminal state, the change is not verifiable — redesign it
-before building further.
+Multiple consumers → one verdict block per consumer (a change delivered to one consumer and not
+another is a partial delivery, the worst kind to miss). If the request gives too little context
+to name the consumer, ask the one clarifying question first; if no observable terminal state can
+exist even with full context, the change is not verifiable — redesign it before building further.
+
+Boundary notes: for a change consumed BEFORE it exists (deciding whether a platform event can
+carry your payload at all), use `/platform-event-live-probe` — that skill is the before-build
+half of this discipline; this one verifies after the change is made. For plugin fixes
+specifically, `/plugin-lifecycle` owns the full fix sequence and already embeds this skill's
+version-bump + served-cache probe.
 
 ## STEP 2: Classify the Delivery Channel
 
@@ -47,6 +55,7 @@ Route to the matching probe. Channels fail silently in channel-specific ways:
 | DB / config / ledger write | Write goes to the wrong path/env, or a reader uses a different default | Read the row/key back through the CONSUMER's read path, not the writer's handle |
 | CI gate / guard hook | Gate wired but pattern never matches, or event never fires at that boundary | Push a deliberately-violating change on a scratch branch; confirm the gate REJECTS it |
 | Generated/derived docs | Generator not re-run; stale artifact ships | Regenerate, then diff the derived file — confirm it moved |
+| Internal consumer (same process/repo — a function's callers, an imported module) | Callers exercise a path the edit didn't actually change | Here the project's tests ARE the destination probe — run the CONSUMERS' tests, not just the edited unit's. STEP 3's "tests are source checks" applies only to cross-boundary channels above |
 
 ## STEP 3: Run the Destination Probe
 
@@ -58,6 +67,9 @@ Execute the probe from STEP 2 before any completion claim.
 - The probe MUST observe the consumer surface itself. If the consumer is a future session or
   another machine, probe the nearest real proxy (the served cache copy, the armed config read
   back through the platform's own API) and say so in the report.
+- No environment to run the probe right now (no test channel, no scratch target)? That is a
+  legitimate `SOURCE-ONLY-VERIFIED` — report it honestly with a named follow-up; never upgrade
+  the verdict because probing was inconvenient.
 </constraints>
 
 ## STEP 4: Check the Propagation Trigger
@@ -93,8 +105,10 @@ probe is not.
   channels — Why: without a marker you cannot distinguish your delivery from pre-existing content
 - Always probe with the CONSUMER's read path, not the writer's handle — Why: writer-side reads
   hid a wrong-path config write until a reader failed in production
-- Always re-probe after any subsequent edit to the same surface — Why: a later edit can silently
-  un-deliver a previously verified effect (regression on the channel, not the code)
+- Always re-probe after any subsequent edit to the same surface, AND after environment drift with
+  no edit (cache purge, token rotation, platform upgrade) — Why: a later edit or a changed channel
+  can silently un-deliver a previously verified effect; the code being untouched proves nothing
+  about the channel
 - Always record NOT-DELIVERED findings as a platform gap or bug before working around them —
   Why: the SessionStart/SessionEnd reliability gap was only fixed because the failure was recorded
 
