@@ -4,6 +4,14 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-13 — eval-coverage RATCHET (owner-approved): advisory warning becomes a blocking gate
+
+- **upgraded** `check_eval_coverage.py` with `--enforce`: a changed skill lacking an `evals/`
+  report now FAILS validate-pr unless grandfathered in the new shrink-only
+  `config/eval-coverage-grandfather.yml` (165 pre-gate skills; entries may only be REMOVED as
+  evals are added — a test blocks stale entries, so coverage can only improve). New skills must
+  ship with evals from day one. 6 tests; full gate 1822/0.
+
 ### 2026-07-13 — plugin version-bump gate: the propagation rule moves from prose to CI (model-proof)
 
 - **added** `scripts/check_plugin_version_bump.py` + a BLOCKING validate-pr.yml step — a plugin
