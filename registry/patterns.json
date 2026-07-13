@@ -1105,18 +1105,18 @@
     }
   },
   "code-reviewer-agent": {
-    "hash": "1edb0f1bceb08c8df4caea204d502a472f189a6b5821da6a383929d8249ae5bb",
+    "hash": "78cb33d2d4d866d0d85834c51c923f8447409c243699bac0a3a9ea36437a24fb",
     "type": "agent",
     "category": "core",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-07-03",
+    "last_updated": "2026-07-13",
     "dependencies": [],
     "visibility": "public",
     "description": "Use proactively to review recently changed files for code quality, type safety, build issues, performance, and security. Spawn after any non-trivial code change, before committing or",
     "tags": [],
-    "changelog": "v2.0.0: Genericized and restructured; v2.1.1: added a NON-NEGOTIABLE section (review-only, no destructive re-runs, file:line verdicts, stay flat) closing an eval nit",
+    "changelog": "v2.0.0: Genericized and restructured; v2.1.1: added a NON-NEGOTIABLE section (review-only, no destructive re-runs, file:line verdicts, stay flat) closing an eval nit | v2.2.0: Evidence-Derived Review section citing references/evidence-review-rubrics.md (Fable-harvest Session C rubric-mining)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3906,13 +3906,13 @@
     }
   },
   "quality-gate-evaluator-agent": {
-    "hash": "edb2e4c8a470da866663b8eeec7560ac884b0272bd06ada53dee6cba4c532f3f",
+    "hash": "5c04012b644f736f58cb3c3aac12549943a470cf94a01e5474e930a3a5d236a8",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-13",
     "dependencies": [],
     "visibility": "public",
     "description": "Evaluate code or content against quality criteria with pass/fail verdicts",
@@ -3921,7 +3921,7 @@
       "evaluation",
       "gate"
     ],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.0.0: Initial registration | v1.1.0: evidence-derived rubric rows added to scoring (references/evidence-review-rubrics.md, Fable-harvest Session C)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6227,7 +6227,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-07-13",
-    "total_patterns": 282
+    "total_patterns": 283
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6983,6 +6983,25 @@
       "production"
     ],
     "changelog": "v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
+    "tier": "nice-to-have"
+  },
+  "weakened-test-hunter": {
+    "hash": "14e39b3304ca09b068ab2c438f520ee284adf8a3fe525d50d7dd12d951e9aae9",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-07-13",
+    "last_updated": "2026-07-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Verify a claimed fix did not go green by weakening its tests - re-run the claimed checks, diff every test change against the pre-change baseline, and classify each loosened or deleted assertion as legitimate (spec-backed) or weakening; returns VERIFIED / CAVEATS / REFUTED (or INCONCLUSIVE when the baseline cannot be made to run). Use before accepting any \"tests pass now\" claim on a change that touches test files. Complements /auto-verify (zero-test vacuous greens); this catches non-zero-but-defanged greens.",
+    "tags": [
+      "quality",
+      "testing",
+      "verification"
+    ],
+    "changelog": "v1.0.0: initial - Fable-harvest Session C weakened-test hunter (plans/fable-harvest-window.md Session C)",
     "tier": "nice-to-have"
   }
 }

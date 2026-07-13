@@ -4,6 +4,33 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-13 — Fable-harvest Session C: evidence-derived checker rubrics + weakened-test hunter
+
+Part 1 (rubric-mining, `plans/fable-harvest-window.md` §Session C): derived per-checker scoring
+rubrics from the DIFFERENCE between known-good merged PRs (clean history, zero follow-up fixes:
+#154/#199/#202) and known-bad ones (reverted or fix-chained: #106+9 fixes, #142→#150, #189→#193,
+#217→#223/#231, #237→#239/#244, #313→#315, #75→#260–#268, #351/#354→#360/#361) — 10 evidence-cited
+rubric rows + 3 standing disciplines + good-PR PASS signals. Part 2: the verification skill that
+catches fixes going green by gutting their tests (nothing previously covered the
+non-zero-but-defanged green; `/auto-verify` covers only the zero-test vacuous green).
+
+- **added** reference `core/.claude/agents/references/evidence-review-rubrics.md` — the rubric
+  SSOT both checkers cite (rows R1–R10: test-claim reconciliation, consumer-effect evidence,
+  fixture-grounded parsers, state-lifecycle dead ends, per-X isolation, weakened-test hunt,
+  sibling-surface enumeration, full-path tracing, full-gate/live-state evidence, substance over
+  shape). Rides with the agents; not a standalone registry pattern.
+- **updated** agent `code-reviewer-agent` 2.1.1 → 2.2.0 — Evidence-Derived Review section citing
+  the rubric (hub + core copies; pair stays `divergent`). Plugin copies (`cbp-workflows`,
+  `loop-engineering`) deferred to a `/plugin-lifecycle` follow-up.
+- **updated** agent `quality-gate-evaluator-agent` 1.0.0 → 1.1.0 — rubric rows become extra
+  scorecard criteria; a firing row caps the affected criterion at FAIL (synced pair, both copies).
+- **added** skill `weakened-test-hunter` (core, nice-to-have) — re-run claimed checks, baseline
+  count-delta comparison in a temporary worktree, 10-pattern assertion-weakening taxonomy,
+  spec-citation classification, VERIFIED/CAVEATS/REFUTED/INCONCLUSIVE verdict. Passed
+  `/skill-evaluator full` (4 rounds, reports in `evals/`). Deferred: reciprocal signpost line in `/auto-verify`'s
+  description (would cascade a `cbp-build-test-workflows` plugin bump; no activation conflict
+  observed in eval).
+
 ### 2026-07-13 — Fable-harvest Session B: 3 failure-archaeology skills + 3 workflow upgrades
 
 Evidence base: `docs/governance/fable-failure-archaeology-2026-07-13.md` (9 failure classes

@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-13 16:40 UTC (auto-generated)
+> Last updated: 2026-07-13 17:41 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 282 |
-| Core (universal) | 209 |
+| Total Patterns | 283 |
+| Core (universal) | 210 |
 | Stack-specific | 73 |
 | Agents | 29 |
 | Configs | 3 |
 | Hooks | 22 |
 | Rules | 55 |
-| Skills | 173 |
+| Skills | 174 |
 
 ## Pattern Inventory
 
@@ -54,7 +54,7 @@
 | code-quality-gate | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-readability | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | code-review-workflow | skill | 2.3.0 | hub:abhayla/claude-best-practices | code-reviewer-agent, receive-code-review, request-code-review, review-gate, security-auditor-agent, workflow-contracts |
-| code-reviewer-agent | agent | 2.1.1 | hub:abhayla/claude-best-practices | — |
+| code-reviewer-agent | agent | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | configuration-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | context-management | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | context-reducer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -159,7 +159,7 @@
 | prompt-auto-enhance | skill | 4.0.0 | hub:abhayla/claude-best-practices | writing-skills, claude-guardian, skill-author |
 | prompt-logger | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | provenance-report | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
-| quality-gate-evaluator-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| quality-gate-evaluator-agent | agent | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | react-nextjs | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | receive-code-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | regression-test | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -220,6 +220,7 @@
 | vps-deploy | skill | 1.0.0 | hub:abhayla/claude-best-practices | deploy-strategy, pm2-deploy, incident-response, disaster-recovery |
 | vue | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | vue-e2e | rule | 1.0.0 | project:firekaro-planner | — |
+| weakened-test-hunter | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | web-research-specialist-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | workflow | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | workflow-contracts | config | 1.0.0 | hub:abhayla/claude-best-practices | — |

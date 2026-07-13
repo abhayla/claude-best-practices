@@ -38,6 +38,16 @@ If criteria are provided, use them directly. If not, apply standard quality crit
 | **Security** | OWASP basics: injection, auth, data exposure |
 | **Performance** | Obvious bottlenecks, N+1 queries, unnecessary allocations |
 
+In BOTH cases, additionally apply the evidence-derived rubric: read
+`references/evidence-review-rubrics.md` (relative to this agent file), falling back to
+`core/.claude/agents/references/evidence-review-rubrics.md` from the repo root; if neither
+exists, proceed on the criteria above and say so in the report. Every rubric row that applies
+to the deliverable becomes an extra scorecard criterion — the rows are derived from this
+project's actual reverted and fix-chained PRs, and a firing row caps the affected criterion at
+FAIL regardless of the generic assessment. Follow its standing disciplines: evaluate only the
+raw deliverable and evidence (never inherit the dispatching prompt's framing), and run the
+deterministic convention pre-pass before judgment calls.
+
 ### Step 2: Score Each Criterion
 
 Rate each criterion:
