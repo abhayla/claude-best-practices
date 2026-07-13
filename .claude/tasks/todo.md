@@ -29,6 +29,13 @@ the exact way to start it. Feeder systems below the table add items automaticall
 - More stack packs (Android for KKB, Vue for AlgoChanakya) — parked until a workflow needs one (YAGNI).
 - Re-run `/model-parity-test` after any major Operating-Manual revision (judgment-triggered) —
   DONE for v2.0 (2026-07-13 mini-reexam, PR #363); next trigger = next major revision.
+- Operating-Manual v2.1 candidate (evidence-gated, owner-approved 2026-07-13): add a
+  **contradictory-instructions check** to §1 — "if two instructions cannot both hold (e.g.
+  'be exhaustive' + 'under 100 words'), serve the operating intent and state the tradeoff in
+  one line, never silently sacrifice one" — plus a matching distilled-core line. Sourced from
+  an external manual variant compared 2026-07-13 (only real gap found; v2.0 is otherwise a
+  superset). Per the manual's revision policy, fold in ONLY at the next evidence-driven bump
+  (a failed exam case or documented incident of this class) — never as a standalone edit.
 - REWRITE candidate in prompt-auto-enhance rule — re-measure telemetry ~2026-07-19 (post-#332 week).
 
 ## Where items come from (the feeders — automatic)
