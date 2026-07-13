@@ -724,3 +724,16 @@ was absent from this session and from its dispatched subagents. Useful consequen
 Arm A dispatched from such a session is an uncontaminated control (verified by probe, not
 assumed). Rule: before relying on an installed plugin's hook effect in-session, probe for the
 effect at the consumer (§13 of the manual — the incident that section was written from).
+
+## 2026-07-13 — A push racing an armed auto-merge silently re-creates the deleted branch (class H, live instance)
+- **Mistake:** armed auto-merge on PR #371, then pushed one more commit to the same branch. CI
+  was already green → the squash-merge + branch-auto-delete completed BETWEEN my arm and my push,
+  so the push RE-CREATED the remote branch (`* [new branch]` in push output was the tell) and the
+  commit never entered the PR. I then read "merged" and force-deleted the local branch — orphaning
+  the commit on a zombie remote branch.
+- **Root cause:** treated "auto-merge armed" as "still open for more commits". Armed ≠ open:
+  merge can complete the moment checks pass, and delete-branch-on-merge makes any later push a
+  silent branch re-creation, not an append.
+- **Rule:** after arming auto-merge, treat the branch as CLOSED. A follow-up commit goes on a NEW
+  branch from main (or verify `gh pr view --json state` is still OPEN immediately before pushing).
+  The tell to never ignore: `git push` printing `* [new branch]` for a branch that already existed.
