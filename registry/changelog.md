@@ -4,6 +4,15 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-13 — plugin version-bump gate: the propagation rule moves from prose to CI (model-proof)
+
+- **added** `scripts/check_plugin_version_bump.py` + a BLOCKING validate-pr.yml step — a plugin
+  source change now FAILS CI unless that plugin's version was bumped (README/evals exempt; new
+  plugins exempt). Closes the last prose-only step of the /plugin-lifecycle propagation contract
+  (version-pinned cache means an un-bumped fix silently never ships) so the process holds for ANY
+  model driving a session (owner question 2026-07-13). 5 tests against throwaway git repos incl. a
+  wiring pin; full gate 1816/0.
+
 ### 2026-07-12 — plugin-hook coexistence stand-down (migration friction fix, improvement-backlog item 1)
 
 - **bumped** plugin `branch-lifecycle` (0.1.1 -> 0.1.2) and `prompt-auto-enhance` (0.4.1 -> 0.4.2) —
