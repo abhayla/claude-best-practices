@@ -737,3 +737,18 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Rule:** after arming auto-merge, treat the branch as CLOSED. A follow-up commit goes on a NEW
   branch from main (or verify `gh pr view --json state` is still OPEN immediately before pushing).
   The tell to never ignore: `git push` printing `* [new branch]` for a branch that already existed.
+
+## 2026-07-13 (recurrence, same day) — armed-merge race hit AGAIN despite the lesson above
+- **Mistake:** Session C pushed a board commit to `feat/fable-harvest-session-c` minutes after
+  arming auto-merge on PR #375; the squash had already landed and the push silently re-created
+  the deleted branch (the exact `* [new branch]` tell the lesson names). Recovery recipe worked
+  (cherry-pick onto fresh main branch → PR #376, delete orphan), but the prose lesson did NOT
+  prevent the second occurrence within one day.
+- **Root cause:** the armed state was verified once, then treated as durable across a
+  multi-minute gap while unrelated work (board edit) was prepared. Prose can't interrupt that.
+- **Rule (escalation, owner-gated per rule 5):** prose has now failed twice in one day → this
+  needs a deterministic gate, not memory. Proposal for the item-13 hook batch: a pre-push guard
+  (in `auto-git.sh` or a wrapper) that, before any `git push` to a non-main branch, checks
+  `gh pr view <branch> --json state,mergedAt` and BLOCKS the push with a fresh-branch instruction
+  when the PR is MERGED. Until approved: never push to an armed branch outside the same command
+  chain as a state re-check.
