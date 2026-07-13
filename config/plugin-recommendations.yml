@@ -23,6 +23,8 @@ universal:
     why: git/session lifecycle (branch choice, auto-PR, session save/restore)
   - name: prompt-auto-enhance
     why: prompt grading + strengthening pipeline
+  - name: fable-operating-manual
+    why: injects the Fable-discipline operating core into every session and sub-agent, any model; /model-parity-test proves the transfer
 
 # Stack packs: recommended when the project's detected stack matches.
 # Keys are hub stack names (STACK_DETECTORS / config/repos.yml vocabulary).
