@@ -3,8 +3,11 @@
 Flags a changed SKILL.md whose skill has no eval report under its sibling
 evals/ dir. Warn-first by design (see plans/loop-engineering-adoption.md
 Phase 1b): coverage is 4/170 core skills today, so blocking would fail
-almost every skill-edit PR. This script only ever emits GitHub ::warning::
-annotations and always exits 0 — it never fails CI.
+almost every skill-edit PR. Default mode emits GitHub ::warning:: annotations and
+exits 0. With --enforce (the RATCHET, owner-approved 2026-07-13): a changed skill
+lacking an evals/ report FAILS CI (exit 1) unless it is grandfathered in
+config/eval-coverage-grandfather.yml — a shrink-only allowlist of the skills that
+predate the gate. New skills must ship with evals from day one.
 """
 
 import subprocess
@@ -83,12 +86,28 @@ def _resolve_base(cli_base: Optional[str]) -> str:
     return "origin/main"
 
 
+def _grandfathered(root: Path) -> set:
+    cfg = root / "config" / "eval-coverage-grandfather.yml"
+    if not cfg.exists():
+        return set()
+    names = set()
+    in_list = False
+    for line in cfg.read_text(encoding="utf-8").splitlines():
+        s = line.strip()
+        if s.startswith("grandfathered:"):
+            in_list = True
+        elif in_list and s.startswith("- "):
+            names.add(s[2:].strip())
+    return names
+
+
 def main(argv: list) -> int:
     base = None
     if "--base" in argv:
         idx = argv.index("--base")
         if idx + 1 < len(argv):
             base = argv[idx + 1]
+    enforce = "--enforce" in argv
 
     root = Path(__file__).resolve().parent.parent
     resolved_base = _resolve_base(base)
@@ -99,15 +118,29 @@ def main(argv: list) -> int:
         return 0
 
     uncovered = uncovered_changed_skills(changed_files, root)
+    grandfathered = _grandfathered(root) if enforce else set()
 
+    blocking = []
     for item in uncovered:
-        print(
-            f"::warning::Skill '{item['skill']}' ({item['skill_md']}) has no eval "
-            f"report ({item['reason']}) — consider running /skill-evaluator"
-        )
+        if enforce and item["skill"] not in grandfathered:
+            blocking.append(item)
+            print(
+                f"::error::Skill '{item['skill']}' ({item['skill_md']}) has no eval "
+                f"report ({item['reason']}) — the eval-coverage ratchet blocks changed "
+                f"skills without evals/ (grandfather list: config/eval-coverage-grandfather.yml, "
+                f"shrink-only). Run /skill-evaluator and commit the report."
+            )
+        else:
+            print(
+                f"::warning::Skill '{item['skill']}' ({item['skill_md']}) has no eval "
+                f"report ({item['reason']}) — consider running /skill-evaluator"
+            )
 
+    if blocking:
+        print(f"check_eval_coverage: RATCHET FAILED — {len(blocking)} non-grandfathered changed skill(s) lack evals")
+        return 1
     if uncovered:
-        print(f"check_eval_coverage: {len(uncovered)} changed skill(s) lack eval coverage")
+        print(f"check_eval_coverage: {len(uncovered)} changed skill(s) lack eval coverage (grandfathered)")
     else:
         print("check_eval_coverage: all changed skills covered")
 

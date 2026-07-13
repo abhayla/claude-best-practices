@@ -22,7 +22,7 @@ jobs:
         run: PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
       - name: Run tests
         run: PYTHONPATH=. python -m pytest scripts/tests/ -v
-      - name: Eval coverage (advisory)
-        run: PYTHONPATH=. python scripts/check_eval_coverage.py --base "origin/${{ github.base_ref }}"
+      - name: Eval coverage (ratchet — blocking for non-grandfathered skills)
+        run: PYTHONPATH=. python scripts/check_eval_coverage.py --enforce --base "origin/${{ github.base_ref }}"
       - name: Plugin version-bump gate (blocking)
         run: PYTHONPATH=. python scripts/check_plugin_version_bump.py --base "origin/${{ github.base_ref }}"
