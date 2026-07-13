@@ -4,6 +4,7 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+## [Unreleased]
 ### 2026-07-13 — Fable Operating Manual: plain-English explainer + gap register; added to universal recommendations
 
 - **added** `docs/fable-operating-manual/how-it-works.md` (owner-requested) — how the manual makes
@@ -11,6 +12,33 @@ All notable pattern additions, updates, and removals.
   walk-through, and an honest 9-entry gap/edge-case register (G1-G9) with mitigations + residual
   risks. Also **added `fable-operating-manual` to the recommender's universal list** — a real gap
   found while writing (the model-proofing plugin wasn't being recommended to projects).
+
+### 2026-07-13 — eval-coverage RATCHET (owner-approved): advisory warning becomes a blocking gate
+
+- **upgraded** `check_eval_coverage.py` with `--enforce`: a changed skill lacking an `evals/`
+  report now FAILS validate-pr unless grandfathered in the new shrink-only
+  `config/eval-coverage-grandfather.yml` (165 pre-gate skills; entries may only be REMOVED as
+  evals are added — a test blocks stale entries, so coverage can only improve). New skills must
+  ship with evals from day one. 6 tests; full gate 1822/0.
+
+### 2026-07-13 — sync machinery stage-1 retirement (owner-approved): auto copy-sync OFF
+
+- **retired** the push-triggered hub→projects copy-sync: `sync-to-projects.yml` is now
+  workflow_dispatch-only (plugin-covered content propagates via /plugin update, CI-enforced by the
+  version-bump gate; all 5 enrolled repos are plugins-first as of #346 stage 2). Manual dispatch
+  kept for the residual copy-provisioned surface (rules, non-pack stack helpers, shipped configs).
+- **updated** skill `update-practices` (1.2.1 -> 1.3.0 MINOR, hash resynced) — scope narrowed to
+  the residual surface; plugin-covered content explicitly routed to `/plugin update`.
+  `docs/SYNC-ARCHITECTURE.md` section 4 rewritten to match. Back-flow (collate/telemetry) untouched.
+
+### 2026-07-13 — plugin version-bump gate: the propagation rule moves from prose to CI (model-proof)
+
+- **added** `scripts/check_plugin_version_bump.py` + a BLOCKING validate-pr.yml step — a plugin
+  source change now FAILS CI unless that plugin's version was bumped (README/evals exempt; new
+  plugins exempt). Closes the last prose-only step of the /plugin-lifecycle propagation contract
+  (version-pinned cache means an un-bumped fix silently never ships) so the process holds for ANY
+  model driving a session (owner question 2026-07-13). 5 tests against throwaway git repos incl. a
+  wiring pin; full gate 1816/0.
 
 ### 2026-07-12 — plugin-hook coexistence stand-down (migration friction fix, improvement-backlog item 1)
 

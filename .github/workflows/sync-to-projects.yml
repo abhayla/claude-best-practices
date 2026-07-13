@@ -1,10 +1,10 @@
 name: Sync to Projects
+# STAGE-1 RETIREMENT (owner-approved 2026-07-13, claude-best-practices#346): the automatic
+# push-triggered copy-sync is OFF — plugin-covered content now reaches projects via
+# /plugin update (version-pinned, CI-gated by the version-bump gate). Manual dispatch is
+# kept for the residual copy-provisioned surface (path-scoped rules, stack helpers without
+# packs, project-owned templates) until stage 2 decides its final form.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'core/.claude/**'
-      - 'registry/patterns.json'
   workflow_dispatch:
 
 permissions:

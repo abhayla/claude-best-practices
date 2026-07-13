@@ -26,13 +26,18 @@ Hub registry → compare hashes → show diff → copy files → update sync-con
 - Script: `scripts/sync_to_local.py`
 - Output: Updated `.claude/` files in local project
 
-### 4. Hub → Registered Projects (sync-to-projects)
+### 4. Hub → Registered Projects (sync-to-projects) — STAGE-1 RETIRED (2026-07-13)
 ```
-Hub push → sync_to_projects.py → create PR per project
+[retired auto-trigger]  Hub push -x-> sync_to_projects.py
+[current]               Hub edit → version bump → /plugin update in each project
+[residual, manual-only] workflow_dispatch → sync_to_projects.py (rules + non-pack stack helpers)
 ```
-- Triggered: Push to main (core/, stacks/, registry/)
-- Script: `scripts/sync_to_projects.py --all`
-- Output: PRs to registered project repos
+- Plugin-covered content (workflows, sub-skills, agents, stack packs) is INSTALLED, not copied —
+  all 5 enrolled repos migrated 2026-07-13 (#346 stage 2); propagation is CI-enforced by
+  `check_plugin_version_bump.py`.
+- The push-triggered auto-sync is OFF; `workflow_dispatch` remains for the residual
+  copy-provisioned surface until stage 2 (owner-gated) decides its final form.
+- Script: `scripts/sync_to_projects.py --all` (unchanged, manual)
 
 ### 5. Local → Hub (contribute-practice skill)
 ```
