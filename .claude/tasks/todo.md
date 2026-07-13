@@ -25,7 +25,8 @@ the exact way to start it. Feeder systems below the table add items automaticall
 ## Future / to-be-discussed (owner decisions, nothing started)
 
 - More stack packs (Android for KKB, Vue for AlgoChanakya) — parked until a workflow needs one (YAGNI).
-- Re-run `/model-parity-test` after any major Operating-Manual revision (judgment-triggered).
+- Re-run `/model-parity-test` after any major Operating-Manual revision (judgment-triggered) —
+  DONE for v2.0 (2026-07-13 mini-reexam, PR #363); next trigger = next major revision.
 - REWRITE candidate in prompt-auto-enhance rule — re-measure telemetry ~2026-07-19 (post-#332 week).
 
 ## Where items come from (the feeders — automatic)
