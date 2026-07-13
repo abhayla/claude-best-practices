@@ -712,3 +712,15 @@ the conductor's transcript — the scanner is right to treat unverifiable approv
 - **Mistake:** enhance-guard inspected only the LAST user entry (`tail -1`); the harness writes a slash command as TWO consecutive user entries (marker + marker-less expanded body), so /init turns were false-blocked, and stop-feedback entries stripped the origin on retries (double-block).
 - **Root cause:** detection built on an assumed transcript shape with no fixture tests; the "unreproduced" scope boundary (H4) was never re-checked against live transcripts.
 - **Rule:** any hook that parses the transcript MUST have behavioral tests against real-shape fixtures (see scripts/tests/test_no_overask_guard_slash_exemption.py), and "no repro exists" claims expire — re-verify them when telemetry (.enhance-misses.log) keeps accruing. Also: mid-turn assistant text emitted alongside tool_use may never persist to the transcript — user-critical content belongs in the turn's final text message.
+
+## 2026-07-13 — `claude plugin update` needs the marketplace-qualified name + scope; this session type gets no plugin hook injection
+
+**Surfaced during:** fable-operating-manual v2.0 landing. (a) `claude plugin update <name>` fails
+"not found" for a project-scope install unless BOTH the qualified name AND scope are given:
+`claude plugin update "<name>@<marketplace>" --scope project`. (b) Observed and probe-verified:
+a claude.ai/code-bridged session does NOT receive installed-plugin hook output (SessionStart or
+SubagentStart) even though fresh CLI sessions in the same repo do — the injected operating core
+was absent from this session and from its dispatched subagents. Useful consequence: parity-exam
+Arm A dispatched from such a session is an uncontaminated control (verified by probe, not
+assumed). Rule: before relying on an installed plugin's hook effect in-session, probe for the
+effect at the consumer (§13 of the manual — the incident that section was written from).
