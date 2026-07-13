@@ -729,13 +729,13 @@
     "tier": "must-have"
   },
   "auto-verify": {
-    "hash": "2ad00f9f551f3a8b5da9206a28635224b733cf50c4710357612a841ea67b3b46",
+    "hash": "7246cbde9fb0afe64fe7b4142916f811416335025d233e0d7ff1ca83d698241d",
     "type": "skill",
     "category": "core",
-    "version": "4.4.0",
+    "version": "4.5.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-07-03",
+    "last_updated": "2026-07-13",
     "dependencies": [
       "regression-test",
       "tester-agent",
@@ -746,7 +746,7 @@
     "visibility": "public",
     "description": "Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces structured results for pipeline consumption. Does NOT fix — use /fix-loop for fixes, /test-pipeline for the full fix-verify-commit chain.",
     "tags": [],
-    "changelog": "v4.4.0 (2026-07-03): MINOR — eval-driven fixes F1–F11 (evals/2026-07-02-eval-report.md): F1 STEP 2 rerouted to the linear 2→2.5→3→4 flow — STEP 3 is the single verdict-assembly point on BOTH pass and fail paths, so the silent-degradation gate always runs before a PASSED and STEP 2.5 always runs on failures; F2 new --range <base>..<head> parameter for committed-change callers (loop-engineering STEP 5): changed files from git diff <base>..<head>, stash pre-existing check replaced by a run-at-base check, empty range BLOCKs with NO_TESTS_FOR_CHANGE under --strict-gates, and a MISSING fix-loop.json with --range is the expected first-verify shape (WARN, not a strict-gate BLOCK; corrupt file still BLOCKs); F4 STEP 0 checks flaky_detected: true (dead FLAKY enum removed per testing.md); F5 corrupt/unreadable fix-loop.json now BLOCKs under --strict-gates (STRICT_GATES bound from args); F6 ui_verdict/code_verdict declared as DERIVED from tester-agent's per-test verdict_source entries; F7 verdict_source added to the reference schema examples; F8 --strict-quality declared in Parameters + argument-hint; F3/F9 registry description boundary + dependency closure (code-quality-gate, contract-test, perf-test); F10 TOC added to references/visual-proof-review.md; F11 run_id format pointer to testing.md. | v4.3.0 (2026-06-15): MINOR — monorepo runner scoping: scope test runner to the changed sub-package, not repo root, in multi-stack monorepos (fixes #53). | v4.2.0 (2026-06-15): MINOR — NO_TESTS_FOR_CHANGE: under --strict-gates a code change that executed 0 tests is FAILED, not a vacuous PASS (fixes #50). | v3.1.0: Added triggers, CRITICAL RULES, dependency fallbacks, zero-test handling; v3.0.0: UI screenshot verdicts, dual-verdict model; v2.0.0: Genericized and restructured | v2.1.0: split STEP 2.5 sub-content to references/visual-proof-review.md (412 lines, under 500 cap); added --team note (parallel disjoint test-area teammates; read-only, doer!=checker)",
+    "changelog": "v4.5.0: STEP 2.5.2b substance check - demo/seeded/fabricated data rendering cleanly is an override, not a pass (fable-harvest B, class B)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1364,13 +1364,13 @@
     }
   },
   "create-github-issue": {
-    "hash": "154bf1c04c2a4f7ecba231f771c3e414d3cdef6cb5032e682e8b81065f53d24e",
+    "hash": "4c7f00aac5f58785a6c62a02695bde2a45ad22a1252276b9594031a913c1289f",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-07-13",
     "dependencies": [],
     "visibility": "public",
     "description": "Universal skill to create GitHub Issues from a structured failure profile. Use when an agent needs to surface a failure as a tracked work item. Hard-fails on missing GitHub (no silent skip). 4 preflight checks + 3-field sha256 dedup.",
@@ -1380,7 +1380,7 @@
       "testing-pipeline",
       "failure-tracking"
     ],
-    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M008)",
+    "changelog": "v1.1.0: SIG2 root-cause recurrence check (open+closed, 90d) + Recurrence body section (fable-harvest B, class F)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5133,13 +5133,13 @@
     }
   },
   "test-pipeline": {
-    "hash": "303a287f590eb8561cc4011a194dc0913ebde90c5cd1442f3fce43d5b60868eb",
+    "hash": "a6a71591e32e0f961ba33e329d899a1f92968635967ad3e2bcd3d6d45e730c22",
     "type": "skill",
     "category": "core",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-07-13",
     "dependencies": [
       "auto-verify",
       "escalation-report",
@@ -5161,7 +5161,7 @@
       "pipeline",
       "verification"
     ],
-    "changelog": "deps corrected to real runtime closure (drop deprecated test-pipeline-agent; add the 6 dispatched worker agents + escalation-report/pipeline-fix-pr/serialize-fixes) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” preamble added, registry sync, dependencies declared | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 inline 9-step orchestrator per spec v2.2; replaces thin wrapper-dispatching-test-pipeline-agent model | v2.1.0 (2026-04-24): STEP 1 INIT sub-step 2a — CONFIG_SCHEMA_INCOMPATIBLE fail-fast gate; closes Phase 3.1 downstream silent-mismatch gap | v2.1.1 (2026-04-24): PATCH — budget key names aligned with actual config (budgets.* → budget.*; added retry.global_budget). PR #26 schema gate correctly detected the mismatch at run-time on the testbed. | v2.2.0 (2026-04-25): MINOR — auto-injection fixes (user-goal description + 20 triggers); STEP 1 CONFIG_MISSING + PIPELINE_IN_PROGRESS + arg-validation gates; STEP 2 empty-suite early exit + stack runner fallback; STEP 3 partial-execution check + granular dispatch events; STEP 4 checkpoint flag ownership contract + single-signal cap doc link; STEP 6 budget pre-check (dispatches_used+chunk_size) + recommended-action dispatch matrix (all 6 action types); STEP 7 deterministic affected-subset algorithm + max_verify_affected_tests cap; STEP 8 regression re-entry with counter continuation; STEP 9 error handling + always-write finalized_at + lock release; dispatch counter accounting docs (explains the 4-vs-5 observation); artifact path conventions; --only-issues flag expansion; 8 new CRITICAL RULES | v2.3.0 (2026-04-25): MINOR — STEP 1 sub-step 2b WORKER_REGISTRY_PROBE gate; fail-fast BLOCKED with WORKER_REGISTRY_NOT_LOADED + restart remediation when newly-synced workers are not in Claude Code runtime registry; closes the 2026-04-25 FIREKaro-Vue downstream validation finding",
+    "changelog": "v3.1.0: first-run test-debt baseline - pre-existing failures filed as one consolidated debt issue + known_debt exclusion from triage (fable-harvest B, class E)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6226,8 +6226,8 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-06-27",
-    "total_patterns": 279
+    "last_updated": "2026-07-13",
+    "total_patterns": 282
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -6921,6 +6921,68 @@
       "concurrency"
     ],
     "changelog": "v1.0.0 (2026-06-27): Initial — promoted to core alongside the branch-choice skill.",
+    "tier": "nice-to-have"
+  },
+  "full-defect-surface-sweep": {
+    "hash": "8206d9dbccb28562ce10805dfe993328744191d7d427327a8e9a3f8f00eb3f20",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-07-13",
+    "last_updated": "2026-07-13",
+    "dependencies": [
+      "systematic-debugging"
+    ],
+    "visibility": "public",
+    "description": "Enumerate every sibling instance of a just-diagnosed root cause repo-wide BEFORE closing the bug — fix them or file explicitly-linked residual issues. Use after any root-cause diagnosis and before declaring a bug fixed; a fix without a surface sweep is a partial fix. This is the executable sweep procedure behind the bug-triage-discipline rule's sibling-audit requirement — invoke it even when no formal issue is being filed (pre-issue sweeps, data defects, config classes).",
+    "tags": [
+      "debugging",
+      "quality",
+      "sweep"
+    ],
+    "changelog": "v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
+    "tier": "nice-to-have"
+  },
+  "dependency-migration-triage": {
+    "hash": "58bbb1bdd57b21e34c62db1e8dd17c44056761035271b014b5c62964a07ec6eb",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-07-13",
+    "last_updated": "2026-07-13",
+    "dependencies": [
+      "fix-loop",
+      "systematic-debugging"
+    ],
+    "visibility": "public",
+    "description": "Triage the TEST-SUITE failures a dependency upgrade, removal, or framework migration surfaces — snapshot the failure set, cluster by error signature, classify each cluster (masked quirk vs latent real bug vs genuine incompatibility), and fix in waves with full-suite re-runs. Use when a dep bump/removal/migration turns tests red at scale (5+ failures), before fixing anything test-by-test. NOT for production incidents or runtime outages (use /incident-response or /systematic-debugging); a single known failure with a retest command goes to /fix-loop.",
+    "tags": [
+      "testing",
+      "migration",
+      "triage"
+    ],
+    "changelog": "v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
+    "tier": "nice-to-have"
+  },
+  "mock-data-hunter": {
+    "hash": "7c4f2403542f65700984ae1fa2141cdf37f2679964bec9cf741d8d79b4276149",
+    "type": "skill",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-07-13",
+    "last_updated": "2026-07-13",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Sweep a codebase for hardcoded, demo, or seed data serving on PRODUCTION paths before ship — fabricated metrics, placeholder entities, future-dated records, \"for MVP\" fallbacks that shape-only checks never catch. Use before a deploy, when auditing a live site's data credibility, or after any incident where fake data reached users.",
+    "tags": [
+      "quality",
+      "data",
+      "production"
+    ],
+    "changelog": "v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
     "tier": "nice-to-have"
   }
 }

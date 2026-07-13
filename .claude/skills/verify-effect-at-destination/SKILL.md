@@ -1,6 +1,6 @@
 ---
 name: verify-effect-at-destination
-description: Verify a change's effect at its CONSUMER's end before claiming done — probe the injected context, served plugin version, delivered message, or written row. Use after wiring or editing any hook, plugin, config, notification, or integration whose value lands somewhere other than the edited file. Accepted/armed/queued/CI-green are promises, not effects.
+description: Verify a change's effect at its CONSUMER's end before claiming done — probe the injected context, served plugin version, delivered message, or written row. Use after wiring or editing any hook, plugin, config, notification, or integration whose value lands somewhere other than the edited file. Accepted/armed/queued/CI-green are promises, not effects. (Full plugin fix/release sequence: /plugin-lifecycle owns it; pre-build event-delivery questions: /platform-event-live-probe.)
 version: "1.0.0"
 type: workflow
 triggers:

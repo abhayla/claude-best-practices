@@ -62,6 +62,10 @@ For every hit, answer: does this value reach a PRODUCTION-rendered surface?
 | Prod surface but visibly labeled as demo/sample | FINDING (lower severity) — labels erode, and labeled fake data still pollutes scrapers/SEO/trust |
 | Dev/test/storybook only | Clean — record and move on |
 
+A fallback branch that is REACHABLE on a production path counts as reaching production even if
+it has never fired — classify it as a silent demo-fallback (STEP 4), not as clean; "hasn't
+happened yet" is exactly when it will.
+
 ## STEP 3: Verify Substance on Data-Backed Pages (the positive check)
 
 The grep finds what's fake; this step proves what's real — run it EVEN WHEN STEP 1 came back

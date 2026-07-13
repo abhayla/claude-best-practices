@@ -1,7 +1,18 @@
 {
   "name": "cbp-build-test-workflows",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The hub's build-and-test workflows — development-loop (idea → planned → implemented → verified feature) and test-pipeline (the three-lane orchestrated test run with fix-loop healing) — installed as one plugin (#187 distribution pilot, cluster 2). Ships the universal dispatch closure (15 sub-skills + 7 worker agents + a bundled default pipeline config); stack-specific helpers stay provisioned per stack, and the code-review/debugging workflows come from the companion cbp-workflows and loop-engineering plugins.",
-  "author": { "name": "Abhay Kumar" },
-  "keywords": ["workflows", "development-loop", "test-pipeline", "tdd", "fix-loop", "distribution-pilot", "claude-code", "goal-6"]
+  "author": {
+    "name": "Abhay Kumar"
+  },
+  "keywords": [
+    "workflows",
+    "development-loop",
+    "test-pipeline",
+    "tdd",
+    "fix-loop",
+    "distribution-pilot",
+    "claude-code",
+    "goal-6"
+  ]
 }

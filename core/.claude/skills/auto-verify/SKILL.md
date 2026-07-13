@@ -14,7 +14,7 @@ triggers:
   - verify correctness
 allowed-tools: "Bash Read Grep Glob Write Skill Agent"
 argument-hint: "[--files <paths>] [--range <base>..<head>] [--full-suite] [--strict-gates] [--strict-quality] [--capture-proof | --no-capture-proof] [--allow-degraded-ui]"
-version: "4.4.0"
+version: "4.5.0"
 type: workflow
 ---
 
@@ -294,6 +294,7 @@ supplementary visual evidence (not authoritative).
 
 1. **2.5.1 Read Manifest** — parse `test-evidence/{run_id}/manifest.json`; skip gracefully if absent or zero screenshots (non-UI project)
 2. **2.5.2 Review All Screenshots** — 100% review rate; multimodal Read each screenshot, evaluate against 8-point criteria, classify per UI/non-UI verdict-source tables
+2b. **2.5.2b Substance check (shape-vs-substance)** — judge the DATA, not just the layout: placeholder/demo/seeded content rendering cleanly (fake entity names like Alpha/Beta/Test/Acme, future dates, suspiciously round hardcoded metric splits, "for MVP" fallback values) is an OVERRIDE (FAILED), never a pass — a page can render perfectly while serving fabricated data, and shape-only review is exactly what let four such incidents ship on one recorded production site. Where a rendered value is claimed to come from live data, spot-check that it plausibly joins to a source-of-truth row (see the output-plausibility-verification rule); for a dedicated pre-ship sweep run /mock-data-hunter
 3. **2.5.3 Write Visual Review Results** — emit `test-evidence/{run_id}/visual-review.json` with overrides + flags; `result: FAILED` if ANY overrides exist
 4. **2.5.4 Gate Impact** — FAILED overrides add to STEP 3's main failure list; PASSED proceeds normally
 

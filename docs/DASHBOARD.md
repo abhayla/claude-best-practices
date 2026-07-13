@@ -1,17 +1,17 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-10 10:35 UTC (auto-generated)
+> Last updated: 2026-07-13 16:40 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 279 |
-| Core (universal) | 206 |
+| Total Patterns | 282 |
+| Core (universal) | 209 |
 | Stack-specific | 73 |
 | Agents | 29 |
 | Configs | 3 |
 | Hooks | 22 |
 | Rules | 55 |
-| Skills | 170 |
+| Skills | 173 |
 
 ## Pattern Inventory
 
@@ -22,7 +22,7 @@
 | adr | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | agent-evaluator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| agent-orchestration | rule | 1.5.0 | hub:abhayla/claude-best-practices | — |
+| agent-orchestration | rule | 1.6.0 | hub:abhayla/claude-best-practices | — |
 | agent-team-selection | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-compose-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -35,7 +35,7 @@
 | auto-format | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-git | hook | 1.1.1 | hub:abhayla/claude-best-practices | — |
 | auto-pr | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| auto-verify | skill | 4.4.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent, code-quality-gate, contract-test, perf-test |
+| auto-verify | skill | 4.5.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent, code-quality-gate, contract-test, perf-test |
 | ba-discovery-checklist | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ba-usecase-discovery-reminder | hook | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
@@ -65,7 +65,7 @@
 | continuous-improvement | rule | 1.0.0 | user-directive:abhay-2026-06-25 | — |
 | contribute-practice | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | coverage-analysis | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| create-github-issue | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| create-github-issue | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | cross-project-context-capture | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | dangerous-command-blocker | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | db-migrate | skill | 1.0.0 | hub:abhayla/claude-best-practices | schema-designer |
@@ -73,6 +73,7 @@
 | debugger-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | debugging-loop | skill | 2.2.0 | hub:abhayla/claude-best-practices | auto-verify, debugger-agent, fix-loop, learn-n-improve, systematic-debugging, test-failure-analyzer-agent, workflow-contracts |
 | decision-authority | rule | 1.2.0 | project:firekaro-planner | — |
+| dependency-migration-triage | skill | 1.0.0 | hub:abhayla/claude-best-practices | fix-loop, systematic-debugging |
 | deploy-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup, k8s-deploy |
 | design-principles | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | design-ssot | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -106,6 +107,7 @@
 | fix-loop | skill | 1.6.0 | hub:abhayla/claude-best-practices | contract-test, db-migrate-verify, debugger-agent, debugging-loop, systematic-debugging, test-failure-analyzer-agent, test-knowledge, verify-screenshots |
 | flutter | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | flutter-dart-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| full-defect-surface-sweep | skill | 1.0.0 | hub:abhayla/claude-best-practices | systematic-debugging |
 | full-space-first | rule | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | git-branch-lifecycle | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | git-collaboration | rule | 1.0.1 | hub:abhayla/claude-best-practices | — |
@@ -130,8 +132,9 @@
 | learnings-routing | rule | 1.0.0 | project:firekaro-planner | — |
 | loop-engineering | skill | 1.4.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
+| mock-data-hunter | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| no-overask-guard | hook | 1.2.0 | project:firekaro-planner | — |
+| no-overask-guard | hook | 1.2.1 | project:firekaro-planner | — |
 | notifier-integration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | output-plausibility-verification | rule | 1.0.1 | project:firekaro-planner | — |
@@ -203,14 +206,14 @@
 | test-healer-agent | agent | 2.3.0 | hub:abhayla/claude-best-practices | fix-loop, test-failure-analyzer-agent |
 | test-knowledge | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | test-maintenance | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| test-pipeline | skill | 3.0.0 | hub:abhayla/claude-best-practices | auto-verify, escalation-report, fastapi-api-tester-agent, fix-loop, github-issue-manager-agent, pipeline-fix-pr, post-fix-pipeline, serialize-fixes, test-failure-analyzer-agent, test-scout-agent, tester-agent, visual-inspector-agent |
+| test-pipeline | skill | 3.1.0 | hub:abhayla/claude-best-practices | auto-verify, escalation-report, fastapi-api-tester-agent, fix-loop, github-issue-manager-agent, pipeline-fix-pr, post-fix-pipeline, serialize-fixes, test-failure-analyzer-agent, test-scout-agent, tester-agent, visual-inspector-agent |
 | test-scout-agent | agent | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | tester-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | to-prd | skill | 1.0.0 | upstream:mattpocock/skills@engineering/to-prd | improve-codebase-architecture, plan-to-issues |
 | turn-origin | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
-| update-practices | skill | 1.2.1 | hub:abhayla/claude-best-practices | — |
+| update-practices | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | verifier-edge-guard | hook | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | visual-inspector-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |

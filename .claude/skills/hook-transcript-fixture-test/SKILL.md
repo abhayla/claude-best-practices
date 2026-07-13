@@ -72,8 +72,8 @@ the decision:
 
 ## STEP 4: Run the Matrix and Wire Into the Suite
 
-Run the tests; every matrix row must have at least one passing fixture test before the hook
-ships. Wire into the standing test suite (`scripts/tests/`) so the NEXT edit to the hook re-runs
+Run the tests; every matrix row must have at least one passing fixture test — or a documented-gap
+skipped test per STEP 2 for shapes that cannot be generated locally — before the hook ships. Wire into the standing test suite (`scripts/tests/`) so the NEXT edit to the hook re-runs
 the whole matrix — the churn record shows each fix for one shape regressed another until fixtures
 held the line.
 
@@ -90,7 +90,7 @@ re-enters the fix-the-fix loop.
 ## MUST DO
 
 - Always cover every negative shape in STEP 1's matrix — Why: 430+ logged guard misses and ~13
-  fix commits came from firing on shapes that should have been exempt
+  fix commits (as of 2026-07) came from firing on shapes that should have been exempt
 - Always capture fixtures from real transcripts, not from the format documentation or memory —
   Why: the documented/remembered shape is precisely the assumption that has repeatedly been wrong
 - Always exercise the hook through its platform I/O contract (stdin JSON, exit codes) — Why:
