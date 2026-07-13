@@ -1,5 +1,9 @@
 # Installing the hub's plugins in a downstream project
 
+> **Compatibility promise:** what plugin updates may and may not break — stable surfaces, SemVer
+> rules, deprecation staging — is defined in `docs/plugin-compat-contract.md`. Read it before
+> relying on a plugin surface or shipping a plugin change.
+
 The hub ships an in-tree plugin marketplace at `plugins/.claude-plugin/marketplace.json`
 (marketplace name: **`claude-best-practices`**). It currently distributes three plugins:
 
