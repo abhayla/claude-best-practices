@@ -18,8 +18,10 @@ the exact way to start it. Feeder systems below the table add items automaticall
 | 4 | AlgoChanakya test debt — fixture-chain errors (algochanakya #89) | **Sonnet** | **You**, whenever | In the algochanakya folder: `/debugging-loop` pointing at issue #89 |
 | 5 | Sync retirement stage 2 — final form of the residual copy surface | **Opus** frames options; **you decide** | **You**, after clusters finish | Ask "frame sync stage 2" in any session |
 | 6 | Monthly release-scout findings | **Sonnet** (routine runs itself) | **Nobody** — self-starts Aug 1, 13:30 IST | Automatic; filed issues appear titled `new-claude-features:` — approve/decline in any session |
-| 7 | G5 trust-score graduation | No one — accrues from every merged PR | **Nobody** | Automatic; watch `trust-score/dashboard.html` |
+| 7 | G5 trust-score graduation — **design landed** (`plans/g5-autonomy-graduation-design.md`, PR #365): L0–L4 ladder, evidence bars; runs keep accruing per merged PR | No one — accrues from every merged PR | **Nobody** | Automatic; watch `trust-score/dashboard.html`; ladder milestones are items 9–10 |
 | 8 | Eval grandfather list shrink (165 skills) | **Sonnet**, opportunistic | Either — CI nags on every touched skill | Editing any listed skill forces `/skill-evaluator`; the list only shrinks |
+| 9 | G5 milestone **M1a** — label-fidelity audit of `human_had_to_fix` (89% fc on reversible AUTO is likely proxy noise; hand-classify a sample vs real PR history) | **Opus** | **You**, whenever | Point any Opus session at plan §4 M1a |
+| 10 | G5 milestone **M1b** — kill the constant-60 default signals in merged-PR scoring (47/56 runs carry no information) | **Sonnet** (mechanical, plan-scoped) | **You**, after M1a | `/debugging-loop` on `record_merged_prs.py`/`collect_signals.py` per plan §4 M1b |
 | — | *Fable-only reserve:* unplanned novel design, adversarial strategic verification, Operating-Manual updates, twice-escalated incidents | **Fable 5** | **You**, when one appears | Open a Fable session and describe it |
 
 ## Future / to-be-discussed (owner decisions, nothing started)
