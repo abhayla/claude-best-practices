@@ -1,14 +1,16 @@
 ---
 name: update-practices
 description: >
-  Pull latest best practices from the hub into your project's .claude/ directory.
-  Compares local files (agents, skills, rules, hooks, and shipped configs under
-  .claude/config/) against hub registry + hub config directory, shows diffs,
-  and copies updates.
-  Use when your local patterns are outdated or after hub registry changes.
+  Pull latest COPY-PROVISIONED practices from the hub into your project's .claude/
+  directory — the residual surface only: path-scoped rules, stack helpers without a
+  plugin pack, and shipped configs. PLUGIN-COVERED content (the workflow plugins,
+  their sub-skills/agents, stack packs) is NOT synced here — update those with
+  `/plugin update <name>` (the install-not-copy model, hub #346). Compares local
+  files against hub registry + hub config directory, shows diffs, and copies updates.
+  Use when your copy-provisioned patterns are outdated or after hub registry changes.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--check-only] [--force]"
-version: "1.2.1"
+version: "1.3.0"
 type: workflow
 ---
 
