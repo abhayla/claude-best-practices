@@ -4,6 +4,14 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-13 — Fable Operating Manual: plain-English explainer + gap register; added to universal recommendations
+
+- **added** `docs/fable-operating-manual/how-it-works.md` (owner-requested) — how the manual makes
+  any model run with Fable-discipline: the 3 pieces, why enforcement is mechanical, an 8-scenario
+  walk-through, and an honest 9-entry gap/edge-case register (G1-G9) with mitigations + residual
+  risks. Also **added `fable-operating-manual` to the recommender's universal list** — a real gap
+  found while writing (the model-proofing plugin wasn't being recommended to projects).
+
 ### 2026-07-12 — plugin-hook coexistence stand-down (migration friction fix, improvement-backlog item 1)
 
 - **bumped** plugin `branch-lifecycle` (0.1.1 -> 0.1.2) and `prompt-auto-enhance` (0.4.1 -> 0.4.2) —
