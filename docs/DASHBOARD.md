@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-13 17:41 UTC (auto-generated)
+> Last updated: 2026-07-14 03:01 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -48,7 +48,7 @@
 | change-risk-scoring | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | changelog-contributing | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ci-cd-setup | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| claude-behavior | rule | 1.3.0 | hub:abhayla/claude-best-practices | — |
+| claude-behavior | rule | 1.3.1 | hub:abhayla/claude-best-practices | — |
 | claude-docs-cache | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | code-quality-gate | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -91,7 +91,7 @@
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
 | e2e-visual-run | skill | 5.1.0 | hub:abhayla/claude-best-practices | fix-loop, serialize-fixes, test-healer-agent, test-scout-agent, tester-agent, verify-screenshots, visual-inspector-agent |
 | end-session | skill | 2.3.0 | hub:abhayla/claude-best-practices | — |
-| engineering-roles | rule | 1.7.0 | project:firekaro-planner | — |
+| engineering-roles | rule | 1.7.1 | project:firekaro-planner | — |
 | environment-validation | rule | 1.0.0 | project:firekaro-planner | — |
 | error-handling | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | escalation-report | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
@@ -130,7 +130,7 @@
 | learn-n-improve | skill | 2.5.0 | hub:abhayla/claude-best-practices | — |
 | learning-self-improvement | skill | 2.1.1 | hub:abhayla/claude-best-practices | context-reducer-agent, learn-n-improve, session-summarizer-agent, skill-factory, test-knowledge, workflow-contracts |
 | learnings-routing | rule | 1.0.0 | project:firekaro-planner | — |
-| loop-engineering | skill | 1.4.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
+| loop-engineering | skill | 1.5.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | mock-data-hunter | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
