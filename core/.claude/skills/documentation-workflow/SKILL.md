@@ -1,212 +1,66 @@
 ---
 name: documentation-workflow
 description: >
-  Orchestrate project documentation maintenance end-to-end as a skill-at-T0
-  orchestrator (Phase 3.5 of subagent-dispatch-platform-limit remediation).
-  The skill body IS the orchestrator — runs in the user's T0 session and
-  drives: ADR creation → API docs generation → structure enforcement →
-  staleness audit. Invokes sub-skills (/adr, /api-docs-generator,
-  /doc-structure-enforcer, /doc-staleness) via Skill(); optionally
-  dispatches the docs-drafting worker via Agent() at T0 for bulk content
-  generation when the structure audit reveals substantial missing content.
-  Use after architecture decisions, PR merges, or on a scheduled cadence.
-type: workflow
-triggers:
-  - update documentation
-  - documentation workflow
-  - generate docs
-  - doc maintenance
-  - docs pipeline
-allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
-argument-hint: "[scope: 'all' | 'adr' | 'api' | 'structure' | 'staleness']"
-version: "2.1.1"
+  POINTER to the installable cbp-workflows plugin — this capability graduated from a
+  copied core/ template to plugin-as-SSOT (#346 stage 2, plugins-first-only). Use
+  this pointer when provisioning: install the plugin instead of copying. Original
+  purpose: Orchestrate project documentation maintenance end-to-end as a skill-at-T0 orchestrator (Phase 3.5 of subagent-dispatch-platform-limit remediation). The skill body IS the orchestrator — runs in the use
+type: reference
+allowed-tools: "Read"
+argument-hint: "(no arguments — informational pointer)"
+version: "3.0.0"
 ---
 
-# /documentation-workflow — Skill-at-T0 Orchestrator
+# documentation-workflow — now ships as a plugin
 
-This skill's body is injected into the user's T0 session and executed there.
-The retired `documentation-master-agent` is NOT dispatched (deprecated
-Phase 3.5, 2026-04-25); its orchestration lives here.
+This capability is **no longer distributed as a copied template**. It ships in the
+cbp-workflows plugin (G6-validated 2026-07-12) so there is **one source of truth** instead
+of a template copy that drifts. This file is a pointer left in `core/` so provisioning
+surfaces the redirect rather than silently dropping the capability (#346 stage 2,
+plugins-first-only — owner decision 2026-07-14; recipe:
+`plans/core-skills-thin-pointer-retirement.md`).
 
-**Why skill-at-T0:** Platform constraint documented in Phases 3.1–3.4 —
-dispatched subagents don't receive the `Agent` tool
-([Anthropic docs](https://code.claude.com/docs/en/sub-agents)).
-
-**Input:** `$ARGUMENTS` — optional scope. Default is `all`.
-
----
-
-## CLI Signature
+## How to get it
 
 ```
-/documentation-workflow [scope] [--dry-run] [--skip-staleness]
+/plugin marketplace add abhayla/claude-best-practices
+/plugin install cbp-workflows@claude-best-practices
+/reload-plugins
 ```
 
-| Argument / Flag | Default | Meaning |
-|-----------------|---------|---------|
-| `scope` | `all` | `all` \| `adr` \| `api` \| `structure` \| `staleness` |
-| `--dry-run` | off | Produce proposed changes without writing them |
-| `--skip-staleness` | off | Skip the staleness audit (STEP 5) |
+## What it does (so provisioning can decide without installing)
 
----
+Orchestrate project documentation maintenance end-to-end as a skill-at-T0 orchestrator (Phase 3.5 of subagent-dispatch-platform-limit remediation). The skill body IS the orchestrator — runs in the user's T0 session and drives: ADR creation → API docs generation → structure enforcement → staleness audit. Invokes sub-skills (/adr, /api-docs-generator, /doc-structure-enforcer, /doc-staleness) via Skill(); optionally dispatches the docs-drafting worker via Agent() at T0 for bulk content generation when the structure audit reveals substantial missing content.
 
-## STEP 1: INIT
+After install the skill resolves as `cbp-workflows:documentation-workflow` (invokable as `/documentation-workflow` when no
+shadowing copy exists). Historical `references/` and `evals/` directories are retained
+here for evidence; the LIVE copies ship inside the plugin.
 
-1. **Parse args.** Normalize `scope` to one of the 5 values.
-2. **Read config** `.claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.documentation`.
-   `master_agent` should be null; `sub_orchestrators` empty.
-3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
-4. **Initialize state** at `.workflows/documentation/state.json` (schema
-   2.0.0) with step_status for all steps, `dispatches_used: 0`,
-   `scope: "<arg>"`, `dry_run: <bool>`.
-5. **Detect context.** Git log for architecture-relevant commits since last
-   doc update; presence of `openapi.yaml`/`openapi.json` signals API lane.
-6. Append INIT event.
+## Structure of the plugin copy (from the retired template, for orientation)
 
----
+- INIT
+- 5: PREFLIGHT (dependency-closure gate — BLOCK on missing workers)
+- ADR (skip if scope ∉ {all, adr} OR no architecture decisions detected)
+- API_DOCS (skip if scope ∉ {all, api} OR no OpenAPI spec)
+- STRUCTURE (skip if scope ∉ {all, structure})
+- Optional: docs-manager-agent dispatch (bulk content drafting)
+- Workflow: documentation
+- Run ID: <run_id>
+- Audit report: <structure audit path>
+- Scope: <list of missing doc targets>
+- Dry-run: <bool>
+- STALENESS (skip if scope ∉ {all, staleness} OR --skip-staleness)
 
-## STEP 1.5: PREFLIGHT (dependency-closure gate — BLOCK on missing workers)
+Original invocation shape: `[scope: 'all' | 'adr' | 'api' | 'structure' | 'staleness']`.
+The plugin copy is the LIVE version — its steps, gates, and worker dispatches may
+have evolved past this snapshot; always trust the installed skill over this list.
 
-Before any dispatch, verify the runtime closure this workflow needs is present
-AND dispatchable. Pattern provisioning copies by tier and may not resolve a
-skill's full closure, so a project can have this skill without its workers — a
-silent inline run or a mid-dispatch crash is the failure this gate prevents.
+## Why it moved
 
-- **Required sub-skills** (invoked via `Skill()`): `adr`, `api-docs-generator`, `doc-structure-enforcer`, `doc-staleness`. Check each exists at
-  `.claude/skills/<name>/SKILL.md` (only those on the path you will actually run).
-- **Required worker agents** (dispatched via `Agent()`): `docs-manager-agent` (when bulk drafting runs). File presence
-  (`.claude/agents/<name>.md`) is necessary but NOT sufficient — the agent registry
-  is pinned at session start (`pattern-structure.md` → "registry session-pinning"),
-  so probe runtime dispatchability for any agent on the path about to run.
-- **On any missing/undispatchable dependency → BLOCK** with verdict
-  `WORKER_REGISTRY_NOT_LOADED`, list what is missing, and emit: "run
-  `/update-practices` to provision the closure, then RESTART the session (agent
-  registry is pinned at session start), then re-run." Write the BLOCKED verdict to
-  this workflow's report artifact and STOP.
-
-Only when the required closure is present and dispatchable, continue.
-
----
-
-## STEP 2: ADR (skip if scope ∉ {all, adr} OR no architecture decisions detected)
-
-```
-Skill("/adr", args="create-from-recent-commits")
-```
-
-Scans recent commits for ADR-worthy changes (new dependencies, schema
-migrations, API contract changes, architectural patterns). Writes to
-`docs/adr/`. Honors `--dry-run`. If no candidates: mark SKIPPED.
-
-Capture paths into `state.artifacts.adrs`.
-
----
-
-## STEP 3: API_DOCS (skip if scope ∉ {all, api} OR no OpenAPI spec)
-
-```
-Skill("/api-docs-generator", args="<project root>")
-```
-
-Extracts API annotations, regenerates OpenAPI spec + Redoc/Swagger UI
-under `docs/api/`. Validates against API tests.
-
----
-
-## STEP 4: STRUCTURE (skip if scope ∉ {all, structure})
-
-```
-Skill("/doc-structure-enforcer", args="audit")
-```
-
-Verifies docs follow Diataxis or project layout (`docs/.structure.yml`).
-`audit` reports without moves; `enforce` mode does `git mv`. If
-`--dry-run`, always `audit`. Otherwise, prompt user before transitioning
-to `enforce`. Never auto-mv without confirmation.
-
-### Optional: docs-manager-agent dispatch (bulk content drafting)
-
-If audit reveals substantial missing content:
-
-```
-Agent(subagent_type="docs-manager-agent", prompt="""
-## Workflow: documentation
-## Run ID: <run_id>
-## Audit report: <structure audit path>
-## Scope: <list of missing doc targets>
-## Dry-run: <bool>
-
-Generate draft content for each missing target following the project's
-doc structure. Return a contract listing produced drafts for user review.
-""")
-```
-
-Increment `dispatches_used` by 1. Drafts go to `docs-drafts/`; nothing
-is promoted to `docs/` without user review.
-
----
-
-## STEP 5: STALENESS (skip if scope ∉ {all, staleness} OR --skip-staleness)
-
-```
-Skill("/doc-staleness", args="audit --since-last-sync")
-```
-
-Diffs code vs docs, flags references to removed/renamed symbols, broken
-links, stale examples. Severity-ranked report to
-`test-results/doc-staleness.json`.
-
-Gate: if `critical_stale_count > 0`, transition to `step_status.STALENESS
-= warned` (NOT blocked — docs lag is common; surface but don't halt).
-
----
-
-## STEP 6: REPORT
-
-1. **Finalize state.** Write `test-results/documentation-verdict.json`:
-   ```json
-   {
-     "schema_version": "2.0.0",
-     "run_id": "<run_id>",
-     "result": "COMPLETED | WARNED",
-     "scope": "<...>",
-     "steps_executed": [...],
-     "steps_skipped": [...],
-     "artifacts": { "adrs": [...], "api_docs": [...],
-                    "structure_moves": [...], "staleness_report": "<path>" },
-     "staleness": { "critical": <n>, "moderate": <n>, "minor": <n> },
-     "budget_used": { "dispatches_used": <n> },
-     "finalized_at": "<iso>"
-   }
-   ```
-2. **Dashboard:**
-   ```
-   ============================================================
-   Documentation Workflow: <COMPLETED | WARNED>
-     Run ID: <run_id>
-     Scope: <scope>
-     ADRs created: <N>
-     API docs regenerated: <YES | SKIPPED>
-     Structure moves: <N>
-     Staleness: <critical>/<moderate>/<minor>
-   ============================================================
-   ```
-3. **Handoff:** critical staleness → suggest `/fix-github-issue` for each;
-   structure moves → suggest `/code-review-workflow` to surface the
-   rename diff in a PR.
-
----
-
-## CRITICAL RULES
-
-- MUST run STEP 1.5 PREFLIGHT before any dispatch and BLOCK with `WORKER_REGISTRY_NOT_LOADED` if a required sub-skill or worker agent (on the path being run) is missing/undispatchable. Provisioning does not always resolve dependency closures, so this skill can be present without its workers.
-- MUST run at T0 — dispatching this as a worker strips `Agent` at runtime
-  and the optional STEP 4 docs-manager-agent dispatch silently inlines.
-- MUST NOT dispatch `documentation-master-agent` (deprecated 2026-04-25,
-  2-cycle window).
-- MUST NOT auto-execute `doc-structure-enforcer` in enforce mode without
-  user confirmation — file moves are disruptive.
-- MUST NOT treat staleness as hard block — it's warning-only.
-- MUST respect `--dry-run` across all steps — no file writes.
-- MUST write `.workflows/documentation/state.json` + `events.jsonl`
-  after every step transition.
+- **Single source of truth** — plugin updates reach every project via
+  `/plugin update cbp-workflows`; copied templates drift silently.
+- **Closure completeness** — the plugin bundles its full sub-skill + agent closure, so
+  an install never hits a missing-worker preflight block.
+- **Shadowing trap** — a provisioned copy of a same-named skill SHADOWS the installed
+  plugin's version, so plugin-covered skills are excluded from copy-provision
+  (`config/plugin-recommendations.yml` is the SSOT `recommend.py` consults).

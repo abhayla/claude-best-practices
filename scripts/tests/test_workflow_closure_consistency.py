@@ -6,6 +6,7 @@ MUST declare that agent in its registry `dependencies`, or provisioning ships
 the skill without its worker. Also guards that no pattern declares a deprecated
 dependency. These run repo-wide so the defect class cannot regress.
 """
+from scripts.tests.skill_paths import resolve_skill_md
 import json
 import re
 import pathlib
@@ -29,7 +30,7 @@ def _frontmatter_type(body: str) -> str | None:
 def _agent_dispatching_workflow_skills():
     """Names of non-deprecated, non-reference skills that actually dispatch agents."""
     out = []
-    for sp in sorted((HUB / "core" / ".claude" / "skills").glob("*/SKILL.md")):
+    for sp in sorted(resolve_skill_md(d.name) for d in (HUB / "core" / ".claude" / "skills").iterdir() if (d / "SKILL.md").exists()):
         name = sp.parent.name
         entry = REGISTRY.get(name, {})
         if not isinstance(entry, dict) or entry.get("deprecated"):
@@ -109,7 +110,7 @@ def test_loop_engineering_emits_hub_linked_telemetry():
     (aggregate_telemetry.compute_error_prevention_rate keys on `hub_pattern_link`)
     can monitor downstream defects/effectiveness. Guards that the monitoring wiring
     — and all five terminal signals — can't be silently dropped from the skill."""
-    body = (HUB / "core" / ".claude" / "skills" / "loop-engineering" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("loop-engineering").read_text(encoding="utf-8")
     assert 'hub_pattern_link' in body and 'loop-engineering' in body, (
         "loop-engineering SKILL.md must wire hub_pattern_link telemetry for hub monitoring"
     )
@@ -123,7 +124,7 @@ def test_loop_engineering_emits_hub_linked_telemetry():
 def test_loop_engineering_telemetry_link_matches_aggregator_key():
     """The hub_pattern_link value emitted by the skill MUST equal the registry key
     the aggregator looks up, or the signal is silently dropped at aggregation."""
-    body = (HUB / "core" / ".claude" / "skills" / "loop-engineering" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("loop-engineering").read_text(encoding="utf-8")
     assert "loop-engineering" in REGISTRY, "loop-engineering must be a registry key"
     # the skill must link to EXACTLY its own registry name, or the aggregator drops the signal
     assert re.search(r'hub_pattern_link["\']?\s*:\s*["\']loop-engineering["\']', body), (
@@ -134,7 +135,7 @@ def test_loop_engineering_telemetry_link_matches_aggregator_key():
 def test_loop_engineering_skill_dispatches_two_distinct_agents():
     """The SKILL.md body must dispatch a maker AND a separate checker (not the same
     agent twice) — the runtime guarantee behind the contract-level maker≠checker."""
-    body = (HUB / "core" / ".claude" / "skills" / "loop-engineering" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("loop-engineering").read_text(encoding="utf-8")
     dispatched = {a for a in re.findall(r'subagent_type=["\']([a-z0-9-]+)["\']', body)
                   if a not in BUILTIN_AGENTS}
     assert len(dispatched) >= 2, (
@@ -157,7 +158,7 @@ def test_workflows_declare_their_contract_config_in_closure():
     """Every workflow whose SKILL reads workflow-contracts.yaml must declare it as
     a dependency, so the closure provisions it downstream."""
     missing = []
-    for sp in sorted((HUB / "core" / ".claude" / "skills").glob("*/SKILL.md")):
+    for sp in sorted(resolve_skill_md(d.name) for d in (HUB / "core" / ".claude" / "skills").iterdir() if (d / "SKILL.md").exists()):
         name = sp.parent.name
         entry = REGISTRY.get(name, {})
         if not isinstance(entry, dict) or entry.get("deprecated"):

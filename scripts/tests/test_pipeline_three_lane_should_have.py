@@ -6,6 +6,7 @@ correctly. Runtime behavior testing happens via /agent-evaluator scenarios
 (not yet authored for these flags) and end-to-end smoke runs.
 """
 
+from scripts.tests.skill_paths import resolve_skill_md
 from pathlib import Path
 import yaml
 
@@ -69,7 +70,7 @@ def test_test_track_overrides_example_is_valid_yaml():
 
 
 def test_serialize_fixes_documents_autosquash():
-    body = (SKILLS_DIR / "serialize-fixes" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("serialize-fixes").read_text(encoding="utf-8")
     assert "--autosquash" in body, "/serialize-fixes MUST document --autosquash flag (REQ-S005)"
     assert "git rebase" in body and "--autosquash" in body
     assert "GIT_SEQUENCE_EDITOR" in body, (
@@ -78,7 +79,7 @@ def test_serialize_fixes_documents_autosquash():
 
 
 def test_serialize_fixes_safety_aborts_on_rebase_failure():
-    body = (SKILLS_DIR / "serialize-fixes" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("serialize-fixes").read_text(encoding="utf-8")
     assert "git rebase --abort" in body, "Autosquash must abort on rebase failure to preserve original commits"
 
 
@@ -96,13 +97,13 @@ def test_ui_lane_use_checkpoint_in_config():
 
 
 def test_escalation_report_documents_slack_notification():
-    body = (SKILLS_DIR / "escalation-report" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("escalation-report").read_text(encoding="utf-8")
     assert "SLACK_WEBHOOK_URL" in body, "/escalation-report MUST document Slack integration (REQ-C002)"
     assert "REQ-C002" in body
 
 
 def test_escalation_report_slack_failure_is_non_fatal():
-    body = (SKILLS_DIR / "escalation-report" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("escalation-report").read_text(encoding="utf-8")
     # Slack failure must not abort the escalation report
     assert "best-effort" in body.lower() or "non-fatal" in body.lower() or "fail-soft" in body.lower()
 
@@ -111,13 +112,13 @@ def test_escalation_report_slack_failure_is_non_fatal():
 
 
 def test_escalation_report_documents_codeowners_assign():
-    body = (SKILLS_DIR / "escalation-report" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("escalation-report").read_text(encoding="utf-8")
     assert "CODEOWNERS" in body, "/escalation-report MUST document CODEOWNERS auto-assign (REQ-C004)"
     assert "REQ-C004" in body
     assert "gh issue edit" in body and "add-assignee" in body
 
 
 def test_escalation_report_codeowners_failure_is_non_fatal():
-    body = (SKILLS_DIR / "escalation-report" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("escalation-report").read_text(encoding="utf-8")
     # Auto-assign failure must not abort
     assert "best-effort" in body.lower() or "MUST NOT abort" in body

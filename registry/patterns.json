@@ -118,23 +118,23 @@
     }
   },
   "adr": {
-    "hash": "0e30f106c824787afae6a8f9945e4773963f42f572bfae10e8e28c9fe0f2cb1a",
+    "hash": "d6bd351bce6e296515d2f9f34f6fd81847895b3d5e843a67729ba6159ed0547f",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Create and manage Architecture Decision Records (ADRs) using the Michael Nygard template. Initialize, create, list, supersede, deprecate, and index ADRs.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Create and manage Architecture Decision Records (ADRs) using the Michael Nygard template. Initialize, create, list, supersede, deprecate, and index ADRs.",
     "tags": [
       "documentation",
       "architecture",
       "ADR",
       "decisions"
     ],
-    "changelog": "v1.0.0: Initial release â€” Michael Nygard template, lifecycle management, index generation",
+    "changelog": "v1.0.0: Initial release â€” Michael Nygard template, lifecycle management, index generation | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -662,23 +662,23 @@
     }
   },
   "api-docs-generator": {
-    "hash": "c3f22589268242c93c86d6c42033884a30d52e68fe0e850833b260df6698ddc8",
+    "hash": "5693217a9f01a54105a4c702e2311d782b54e329b04661260dd15b4cf073f1cb",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Auto-generate OpenAPI docs from code annotations (FastAPI, Express, NestJS, Go), validate against API tests, generate Redoc/Swagger UI, API versioning and deprecation docs",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Auto-generate OpenAPI docs from code annotations (FastAPI, Express, NestJS, Go), validate against API tests, generate Redoc/Swagger UI, API versioning and deprecation docs",
     "tags": [
       "API",
       "OpenAPI",
       "Swagger",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release â€” multi-framework OpenAPI generation, validation, CI integration",
+    "changelog": "v1.0.0: Initial release â€” multi-framework OpenAPI generation, validation, CI integration | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -729,13 +729,13 @@
     "tier": "must-have"
   },
   "auto-verify": {
-    "hash": "7246cbde9fb0afe64fe7b4142916f811416335025d233e0d7ff1ca83d698241d",
+    "hash": "e708d6abf8a469cc92fbb1f86a4cead0960ef92625fed1e2665b1d43e17069c1",
     "type": "skill",
     "category": "core",
-    "version": "4.5.0",
+    "version": "5.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "regression-test",
       "tester-agent",
@@ -744,9 +744,9 @@
       "perf-test"
     ],
     "visibility": "public",
-    "description": "Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces structured results for pipeline consumption. Does NOT fix — use /fix-loop for fixes, /test-pipeline for the full fix-verify-commit chain.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Run a post-change verification pipeline that maps changed files to targeted tests, executes via tester-agent with UI screenshot verdicts, enforces quality gates, and produces struc",
     "tags": [],
-    "changelog": "v4.5.0: STEP 2.5.2b substance check - demo/seeded/fabricated data rendering cleanly is an override, not a pass (fable-harvest B, class B)",
+    "changelog": "v4.5.0: STEP 2.5.2b substance check - demo/seeded/fabricated data rendering cleanly is an override, not a pass (fable-harvest B, class B) | v5.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1073,13 +1073,13 @@
     }
   },
   "code-review-workflow": {
-    "hash": "76f6aac83c28298d34716c9ef1f9687e354cf8280d12a6740d3934896550ec62",
+    "hash": "2ce461323fccc2f7b3eb3dd1473004196329b490fcab246665f28bcace31edf1",
     "type": "skill",
     "category": "core",
-    "version": "2.3.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-23",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "code-reviewer-agent",
       "receive-code-review",
@@ -1089,13 +1089,13 @@
       "workflow-contracts"
     ],
     "visibility": "public",
-    "description": "Slash-command wrapper for code-review-master-agent. Pre-merge quality gates, PR creation, and review feedback handling.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Slash-command wrapper for code-review-master-agent. Pre-merge quality gates, PR creation, and review feedback handling.",
     "tags": [
       "orchestration",
       "workflow",
       "review"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4); added --team parallel-review-team mode (Stage B: bakes in multi-agent best-practice items 1,4,5,6; self-gated on EXPERIMENTAL_AGENT_TEAMS)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from review-gate/request-code-review, add dependencies, registry sync | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.4); added --team parallel-review-team mode (Stage B: bakes in multi-agent best-practice items 1,4,5,6; self-gated on EXPERIMENTAL_AGENT_TEAMS) | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1289,16 +1289,16 @@
     }
   },
   "contract-test": {
-    "hash": "c7e2a7df3828e08d001b27f4911fa8fc5f31482c81203bab64566c54af8c3a76",
+    "hash": "01eef052e01a23b082185ee5b812d0239774083a60b76d9436d9ae3e151dcf02",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Consumer-driven contract testing with Pact, provider verification, contract broker integration, and CI can-i-deploy workflow",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Consumer-driven contract testing with Pact, provider verification, contract broker integration, and CI can-i-deploy workflow",
     "tags": [
       "testing",
       "contract",
@@ -1306,7 +1306,7 @@
       "API",
       "consumer-driven"
     ],
-    "changelog": "v1.0.0: Initial release â€” Pact consumer/provider, broker, CI integration",
+    "changelog": "v1.0.0: Initial release â€” Pact consumer/provider, broker, CI integration | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1555,13 +1555,13 @@
     }
   },
   "debugging-loop": {
-    "hash": "f7660a560073aa163837292220705b175e94d1b7503677bdd519154a9463362c",
+    "hash": "4496e0fbd12757b09b6ad7bbcad8a5ca09563f9b98f12fed0b5a09dee1f54686",
     "type": "skill",
     "category": "core",
-    "version": "2.2.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "auto-verify",
       "debugger-agent",
@@ -1572,13 +1572,13 @@
       "workflow-contracts"
     ],
     "visibility": "public",
-    "description": "Full-cycle bug resolution orchestrator: chains systematic-debugging, fix-loop, auto-verify, and learn-n-improve via debugging-loop-master-agent.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in loop-engineering; core/ file redirects provisioning to /plugin install. Was: Full-cycle bug resolution orchestrator: chains systematic-debugging, fix-loop, auto-verify, and learn-n-improve via debugging-loop-master-agent.",
     "tags": [
       "orchestration",
       "workflow",
       "debugging"
     ],
-    "changelog": "v2.1.1 (2026-06-15): PATCH — fix stale step numbers in --skip-verify/--skip-learn flag descriptions (VERIFY=STEP4, LEARN=STEP5). | v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent",
+    "changelog": "v2.1.1 (2026-06-15): PATCH — fix stale step numbers in --skip-verify/--skip-learn flag descriptions (VERIFY=STEP4, LEARN=STEP5). | v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.1.0: Add triggers, differentiate from systematic-debugging, add dependencies, preamble constraints | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR — skill-at-T0 rewrite (Phase 3.3); replaces thin wrapper-dispatches-master-agent | v3.0.0: MAJOR — retired as a copied template; thin pointer to loop-engineering (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1672,13 +1672,13 @@
     }
   },
   "development-loop": {
-    "hash": "81077d78637bbde36ce3a5a8acd2dca40f3b8a7b4bb6b63af5efb4985de1f238",
+    "hash": "094c81f773cdea93353c34614e972395dd9cc7c617b8680721fd210ff127bcca",
     "type": "skill",
     "category": "core",
-    "version": "2.1.1",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-23",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "auto-verify",
       "brainstorm",
@@ -1689,13 +1689,13 @@
       "writing-plans"
     ],
     "visibility": "public",
-    "description": "Full development cycle skill-at-T0 orchestrator: invokes brainstorm, writing-plans, auto-verify, post-fix-pipeline via Skill() and dispatches plan-executor-agent (+ optional planner-researcher-agent) via Agent() at T0.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Full development cycle skill-at-T0 orchestrator: invokes brainstorm, writing-plans, auto-verify, post-fix-pipeline via Skill() and dispatches plan-executor-agent (+ optional planne",
     "tags": [
       "orchestration",
       "workflow",
       "development"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK on missing workers/sub-skills); correct dependencies to real runtime closure (drop deprecated development-loop-master-agent + unused executing-plans; add plan-executor-agent + planner-researcher-agent) | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model | v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release; added --team parallel-build mode (STEP 4-TEAM: disjoint file partition + worktree isolation + lead-waits + verifier teammate + zero-collision gate; bakes in best-practice items A,B,C,D)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK on missing workers/sub-skills); correct dependencies to real runtime closure (drop deprecated development-loop-master-agent + unused executing-plans; add plan-executor-agent + planner-researcher-agent) | v2.0.0 (2026-04-24): MAJOR — full body rewrite as skill-at-T0 orchestrator (Phase 3.2); replaces thin wrapper-dispatches-master-agent model | v1.1.0: Add triggers, differentiate from fix-issue/implement, add dependencies, registry sync | v1.0.0: Initial release; added --team parallel-build mode (STEP 4-TEAM: disjoint file partition + worktree isolation + lead-waits + verifier teammate + zero-collision gate; bakes in best-practice items A,B,C,D) | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1762,23 +1762,23 @@
     }
   },
   "doc-staleness": {
-    "hash": "0b278635a9fb5f0d695c96e47793343f3018f6aecb92ff21b59e9b6ef2475666",
+    "hash": "c2e614e82c17a81f48dee5b227ff0932e6eee66d243a0db923ae6f2fe21b97d6",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Detect documentation that has drifted from the codebase â€” stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Detect documentation that has drifted from the codebase â€” stale references, outdated examples, missing modules, broken links. Produces a prioritized staleness report.",
     "tags": [
       "documentation",
       "staleness",
       "drift-detection",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release â€” file/symbol/command/link staleness detection, severity-prioritized report",
+    "changelog": "v1.0.0: Initial release â€” file/symbol/command/link staleness detection, severity-prioritized report | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1788,16 +1788,16 @@
     }
   },
   "doc-structure-enforcer": {
-    "hash": "3beb753346639ef6ff892592c53c6aec2238c57708587a71fec48934e05d2f91",
+    "hash": "0f23684d12c4ba3df07c80efaaf140e50a6541eb96108356d142a13ad3676098",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Enforce stage-based documentation folder structure via config-driven rules. Two modes: audit (report misplaced files) or enforce (git mv + update references). Aligns with project-manager-agent.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Enforce stage-based documentation folder structure via config-driven rules. Two modes: audit (report misplaced files) or enforce (git mv + update references). Aligns with project-m",
     "tags": [
       "documentation",
       "structure",
@@ -1805,7 +1805,7 @@
       "pipeline-stages",
       "folder-management"
     ],
-    "changelog": "v1.0.0: Initial release â€” stage-based folder structure, pattern + content classification, git mv + ref updates",
+    "changelog": "v1.0.0: Initial release â€” stage-based folder structure, pattern + content classification, git mv + ref updates | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1860,13 +1860,13 @@
     }
   },
   "documentation-workflow": {
-    "hash": "7cbe17dbe37704d10cec4d58e9468bb2ca8a3e4b929f81d9e267d64c90614624",
+    "hash": "22c9c0261625c077c985ed7aadbb14121206697ec8c11f97f453b50c5a9f45d6",
     "type": "skill",
     "category": "core",
-    "version": "2.1.1",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "adr",
       "api-docs-generator",
@@ -1876,13 +1876,13 @@
       "workflow-contracts"
     ],
     "visibility": "public",
-    "description": "Slash-command wrapper for documentation-master-agent. Full doc generation and maintenance orchestration.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Slash-command wrapper for documentation-master-agent. Full doc generation and maintenance orchestration.",
     "tags": [
       "orchestration",
       "workflow",
       "documentation"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.5) | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2050,22 +2050,22 @@
     }
   },
   "escalation-report": {
-    "hash": "78977adb3f0bcf497b0457afabf92e1f17460afa670bc4f7d3d78e64106e3218",
+    "hash": "37a1dfe5b8cd5ca1b6f6158a8c6f3defba106205b121a0ab097b67100d4d7a41",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Generate test-results/escalation-report.md when the test pipeline hits its retry/dispatch/wall-clock budget with failures still unresolved. Use to surface what is resolved vs open for the next session.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Generate test-results/escalation-report.md when the test pipeline hits its retry/dispatch/wall-clock budget with failures still unresolved. Use to surface what is resolved vs open ",
     "tags": [
       "testing-pipeline",
       "escalation",
       "reporting"
     ],
-    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M020, REQ-M023)",
+    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M020, REQ-M023) | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2461,25 +2461,25 @@
     }
   },
   "fix-github-issue": {
-    "hash": "0681fa889f34283d0ee05c62da9e8864d4db131aa076765bfafae92255f62e6d",
+    "hash": "235b8366e13e5a06604ad24510e0706bc8300bbe946c2355431e048fd94f057b",
     "type": "skill",
     "category": "core",
-    "version": "3.0.0",
+    "version": "4.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-05-24",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "fix-loop",
       "post-fix-pipeline"
     ],
     "visibility": "public",
-    "description": "Analyze and implement a fix for a specific GitHub Issue. Fetches issue details via gh, explores codebase for root cause, plans minimal fix, implements, verifies with tests, and runs post-fix-pipeline.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Analyze and implement a fix for a specific GitHub Issue. Fetches issue details via gh, explores codebase for root cause, plans minimal fix, implements, verifies with tests, and run",
     "tags": [
       "github",
       "bug-fix",
       "workflow"
     ],
-    "changelog": "v3.0.0: Renamed from fix-issue → fix-github-issue (MAJOR — invocation surface change). Old name preserved as deprecation stub for 2 version cycles. | v2.6.0: prior history under former name fix-issue",
+    "changelog": "v3.0.0: Renamed from fix-issue → fix-github-issue (MAJOR — invocation surface change). Old name preserved as deprecation stub for 2 version cycles. | v2.6.0: prior history under former name fix-issue | v4.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2489,13 +2489,13 @@
     }
   },
   "fix-loop": {
-    "hash": "86246e1ee41b024216ea86aad9f8ff62eb2619693f93a00efbe302bb873a58bc",
+    "hash": "be890c1fd4284dd54358c5a1b3306212ccd82f2a9efa7597e9a9dce482e028ce",
     "type": "skill",
     "category": "core",
-    "version": "1.6.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-07-02",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "contract-test",
       "db-migrate-verify",
@@ -2507,14 +2507,14 @@
       "verify-screenshots"
     ],
     "visibility": "public",
-    "description": "Analyze failures and iteratively apply minimal fixes, optionally retesting until resolved. Full Loop mode (with retest command) iterates until green. Single Fix mode (no retest) does one pass — the right fit for applying a minimal fix to a runtime error with no retest command. Use when tests fail, builds break, or runtime errors occur. For unclear root causes or repeated failures, escalate to /systematic-debugging. For end-to-end bug resolution with verified proof, use /debugging-loop instead. For autonomous fixing of an open PR's CI in the cloud, prefer native /autofix-pr.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Analyze failures and iteratively apply minimal fixes, optionally retesting until resolved. Full Loop mode (with retest command) iterates until green. Single Fix mode (no retest) do",
     "tags": [
       "testing",
       "fix",
       "iteration",
       "debugging"
     ],
-    "changelog": "v1.6.0 (2026-07-02): MINOR — operationalize the /systematic-debugging escalation handoff (ESCALATION step 4 invokes Skill(\"/systematic-debugging\") with accumulated failure context before any UNRESOLVED report), result enum aligned to testing.md canonical PASSED|FAILED|FIXED, Single Fix flaky handling defined (no re-run without a retest command — note suspicion in report), description names the /autofix-pr boundary + Single Fix runtime-error fit, flag-precedence and empty-failure_output notes; registry deps expanded to the real delegation closure (debugger-agent + delegated skills) | v1.3.0: Add triggers list, add Agent to allowed-tools (required for test-failure-analyzer-agent delegation), add test-failure-analyzer-agent dependency",
+    "changelog": "v1.6.0 (2026-07-02): MINOR — operationalize the /systematic-debugging escalation handoff (ESCALATION step 4 invokes Skill(\"/systematic-debugging\") with accumulated failure context before any UNRESOLVED report), result enum aligned to testing.md canonical PASSED|FAILED|FIXED, Single Fix flaky handling defined (no re-run without a retest command — note suspicion in report), description names the /autofix-pr boundary + Single Fix runtime-error fit, flag-precedence and empty-failure_output notes; registry deps expanded to the real delegation closure (debugger-agent + delegated skills) | v1.3.0: Add triggers list, add Agent to allowed-tools (required for test-failure-analyzer-agent delegation), add test-failure-analyzer-agent dependency | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2670,20 +2670,20 @@
     }
   },
   "git-worktrees": {
-    "hash": "8a3d16dd9831e9bda08cf264ea0fd0725e0061365a32eac972325fe4be6113ac",
+    "hash": "f72dace060a754b021e5bf852351394943544d7ed1c23b1ca03c77218029244f",
     "type": "skill",
     "category": "core",
-    "version": "1.1.1",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-07-03",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Git worktree isolation patterns for parallel development",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in loop-engineering; core/ file redirects provisioning to /plugin install. Was: Git worktree isolation patterns for parallel development",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research; v1.1.1: noted the gitignored-env-files gotcha (secrets/deps don't travel with a fresh worktree; build-time-baked config like NEXT_PUBLIC_* silently breaks) in the post-creation setup step",
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research; v1.1.1: noted the gitignored-env-files gotcha (secrets/deps don't travel with a fresh worktree; build-time-baked config like NEXT_PUBLIC_* silently breaks) in the post-creation setup step | v2.0.0: MAJOR — retired as a copied template; thin pointer to loop-engineering (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2869,22 +2869,22 @@
     }
   },
   "implement": {
-    "hash": "1260e7c145d745b248e235abbacd5d9ed4dc2f733e937703ecaa9aa62d4e5eb6",
+    "hash": "8c784632b1e0dc72918893ca72d73fb12f2c1534d6d1d6e2229c06ef37b97b3c",
     "type": "skill",
     "category": "core",
-    "version": "2.2.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-06-23",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "fix-loop",
       "post-fix-pipeline",
       "learn-n-improve"
     ],
     "visibility": "public",
-    "description": "Implement a feature or fix following a structured workflow: requirements analysis, test creation, implementation, test execution, fix-loop delegation, and verification.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Implement a feature or fix following a structured workflow: requirements analysis, test creation, implementation, test execution, fix-loop delegation, and verification.",
     "tags": [],
-    "changelog": "v2.2.0: Added triggers, empty-args guard, test-framework fallback, fixed orphaned lines, strengthened CRITICAL RULES; v2.1.0: Enhanced with community patterns; v2.0.0: Initial structured workflow; added --team note (disjoint-partition only; points to development-loop STEP 4-TEAM)",
+    "changelog": "v2.2.0: Added triggers, empty-args guard, test-framework fallback, fixed orphaned lines, strengthened CRITICAL RULES; v2.1.0: Enhanced with community patterns; v2.0.0: Initial structured workflow; added --team note (disjoint-partition only; points to development-loop STEP 4-TEAM) | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2917,22 +2917,22 @@
     }
   },
   "integration-test": {
-    "hash": "f4f46b20a8c7c07e06295d31f88a99891cbbb9205a8e65708c73bfb3abed638e",
+    "hash": "7dd4c8cc72a71f69cb8f4824ff8c3fdb29f4d27c463727902ac25ce40f73bb78",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Reference guide for integration testing patterns across service boundaries. Covers database, cache, queue, and external API testing.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Reference guide for integration testing patterns across service boundaries. Covers database, cache, queue, and external API testing.",
     "tags": [
       "testing",
       "integration",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.0.0: Initial release | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2992,23 +2992,23 @@
     }
   },
   "learn-n-improve": {
-    "hash": "7cbe9e449f7812e1e0c90e4473216a4485695abebac2e762928aaf18987d27b0",
+    "hash": "c9e0085c4746d75257f1fded9c679dd1d311c1bfb17ef3d3313e3fb5a482da32",
     "type": "skill",
     "category": "core",
-    "version": "2.5.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-07-03",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Analyze session outcomes, build error-fix-lesson AND success-pattern databases, detect patterns, and inject proven learnings/wins as active constraints into skills. Four modes: session, deep, meta, test-run.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-learning-workflow; core/ file redirects provisioning to /plugin install. Was: Analyze session outcomes, build error-fix-lesson AND success-pattern databases, detect patterns, and inject proven learnings/wins as active constraints into skills. Four modes: ses",
     "tags": [
       "learning",
       "self-improvement",
       "session",
       "patterns"
     ],
-    "changelog": "v2.5.0 (2026-07-03): MINOR — add STEP 3.5 success-pattern capture (what-worked/why/reuse-trigger/evidence, typed GENERIC/PRODUCT-SPECIFIC per learnings-routing.md, filed under success_patterns in the same learnings.json), wire success signals into STEP 2's decision table and capture triggers, extend STEP 4/5.5/6 to cover success patterns alongside failure learnings (loop-engineering-adoption plan item 4.1) | v2.3.0: Add triggers, preamble constraints, strengthen RULES to CRITICAL RULES with MUST/MUST NOT, registry sync | v2.1.0: Enhanced with community patterns",
+    "changelog": "v2.5.0 (2026-07-03): MINOR — add STEP 3.5 success-pattern capture (what-worked/why/reuse-trigger/evidence, typed GENERIC/PRODUCT-SPECIFIC per learnings-routing.md, filed under success_patterns in the same learnings.json), wire success signals into STEP 2's decision table and capture triggers, extend STEP 4/5.5/6 to cover success patterns alongside failure learnings (loop-engineering-adoption plan item 4.1) | v2.3.0: Add triggers, preamble constraints, strengthen RULES to CRITICAL RULES with MUST/MUST NOT, registry sync | v2.1.0: Enhanced with community patterns | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-learning-workflow (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3496,25 +3496,25 @@
     }
   },
   "pipeline-fix-pr": {
-    "hash": "9e04dbafeeddf7a7dcaffeeba3a30ed3fd4144ab72415165f630f7f2c45788c1",
+    "hash": "d478cec674425d15a135732ee1090ad4ba97560bdb0c5c86cf7aca57484d9d4e",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "serialize-fixes"
     ],
     "visibility": "public",
-    "description": "Land pipeline fixer diffs on a new branch pipeline-fixes/{run_id} and open one PR (vs N commits on working branch). Wraps /serialize-fixes for atomic diff apply; adds branch creation + push + gh pr create. Never auto-merges. REQ-C003 of test-pipeline-three-lane spec.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Land pipeline fixer diffs on a new branch pipeline-fixes/{run_id} and open one PR (vs N commits on working branch). Wraps /serialize-fixes for atomic diff apply; adds branch creati",
     "tags": [
       "testing-pipeline",
       "git",
       "pull-requests",
       "automation"
     ],
-    "changelog": "v1.0.0: Initial release per REQ-C003",
+    "changelog": "v1.0.0: Initial release per REQ-C003 | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3664,25 +3664,25 @@
     }
   },
   "post-fix-pipeline": {
-    "hash": "6db86dcc06444323d59f70565c6876989031f7e96b500ad9b9f67e09fe4a94dc",
+    "hash": "dff325e1dcc9c328328616f4b702236a8289b8d56ecf72652768056b42dcdcd6",
     "type": "skill",
     "category": "core",
-    "version": "3.1.0",
+    "version": "4.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "learn-n-improve",
       "auto-verify"
     ],
     "visibility": "public",
-    "description": "Finalize verified changes: read auto-verify gate, update docs, commit, capture learnings. Does NOT re-run tests.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Finalize verified changes: read auto-verify gate, update docs, commit, capture learnings. Does NOT re-run tests.",
     "tags": [
       "pipeline",
       "commit",
       "verification"
     ],
-    "changelog": "v3.0.0: Add triggers, preamble constraints, CRITICAL RULES, dependencies, registry sync | v2.0.0: Genericized and restructured",
+    "changelog": "v3.0.0: Add triggers, preamble constraints, CRITICAL RULES, dependencies, registry sync | v2.0.0: Genericized and restructured | v4.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4031,20 +4031,20 @@
     }
   },
   "receive-code-review": {
-    "hash": "14fef9d674050c8acc588e55dc84963a447cb65f21ab9f992e2a683dc9bc3f25",
+    "hash": "59f522c533d49ec463cf969b7d89f30ff8ebc62162cfdad83393dcb6b7f2e5d7",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Feedback triage, disagreement protocol, learning extraction",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Feedback triage, disagreement protocol, learning extraction",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4149,20 +4149,20 @@
     }
   },
   "request-code-review": {
-    "hash": "3add2d9fc77827de378e3f5e0eb8e34a4f27fc0da506e48718e2b9a4d1ce8d8b",
+    "hash": "6fd51529c71405d84ee2ba4ffebd2f11fba27170390ac59d4f49b5fe6179a4d4",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Risk-aware PR creation with intelligent review questions",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Risk-aware PR creation with intelligent review questions",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4200,13 +4200,13 @@
     }
   },
   "review-gate": {
-    "hash": "61d5df4ee8ade8cfe1d19c1ce5df2dfeff88595e94ccd46d3f71374175511d5d",
+    "hash": "f62e6637d504b5da944976fcd77c6a155b987b1f9c311019eeb27182a5ee6e6c",
     "type": "skill",
     "category": "core",
-    "version": "2.4.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-06-23",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "code-quality-gate",
       "architecture-fitness",
@@ -4216,13 +4216,13 @@
       "pr-standards"
     ],
     "visibility": "public",
-    "description": "Stage 9 review orchestrator with parallelized sub-skill batches, fix loop, and consolidated verdict",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Stage 9 review orchestrator with parallelized sub-skill batches, fix loop, and consolidated verdict",
     "tags": [
       "review",
       "orchestration",
       "quality-gate"
     ],
-    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps; added --team note (parallel gate-checks share+challenge; -> code-review-workflow STEP 2-TEAM discipline)",
+    "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps; added --team note (parallel gate-checks share+challenge; -> code-review-workflow STEP 2-TEAM discipline) | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4475,23 +4475,23 @@
     }
   },
   "serialize-fixes": {
-    "hash": "04528780dd8084aa1d047dc4aaa7bcd115bc23f7a396427c8e6ee6e8015932e6",
+    "hash": "c00acae3439401430ee18f86e70f2a8346080ac7b2d06883508a0b7fb1b6c0b3",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-04-24",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Apply unified-diff files sequentially to the working tree using atomic three-phase protocol (git apply --check then git apply then git commit). Use when multiple parallel fixers produced diffs that need to land on a shared branch without conflicts. Discards stale diffs on conflict; resets working tree on partial failure.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Apply unified-diff files sequentially to the working tree using atomic three-phase protocol (git apply --check then git apply then git commit). Use when multiple parallel fixers pr",
     "tags": [
       "testing-pipeline",
       "git",
       "diff",
       "serialization"
     ],
-    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M015, REQ-M018)",
+    "changelog": "v1.0.0: PR2 of test-pipeline-three-lane (REQ-M015, REQ-M018) | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4601,13 +4601,13 @@
     }
   },
   "skill-authoring-workflow": {
-    "hash": "9ed3bcc68529e12af8647ecdb1ee8fd5e5bbf4ab91bd375044f125773ffc950e",
+    "hash": "a63ac3c0887d4118324f621c458508a36dbb3785a98857786d955f6a147e2f74",
     "type": "skill",
     "category": "core",
-    "version": "2.1.1",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "claude-guardian",
       "skill-author-agent",
@@ -4616,13 +4616,13 @@
       "writing-skills"
     ],
     "visibility": "public",
-    "description": "Slash-command wrapper for skill-authoring-master-agent. Pattern creation with overlap detection and quality gates.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Slash-command wrapper for skill-authoring-master-agent. Pattern creation with overlap detection and quality gates.",
     "tags": [
       "orchestration",
       "workflow",
       "skill-authoring"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 — final workflow-master retirement)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.8 — final workflow-master retirement) | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4659,20 +4659,20 @@
     }
   },
   "skill-factory": {
-    "hash": "fa9ea08e6fd6d01131a97445f3389990f10cd50fb0c03ac5ad6dad6aa2fea1ce",
+    "hash": "757d403343389b2d8bb1a212ed27f5c81b9e705263e61e3e1e5d5d24e62fa8f2",
     "type": "skill",
     "category": "core",
-    "version": "3.0.0",
+    "version": "4.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Detect repeated workflows in session logs and classify them into the right automation type (skill, agent, hook, MCP server, or rule). Use when you notice recurring manual steps that should be automated.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-learning-workflow; core/ file redirects provisioning to /plugin install. Was: Detect repeated workflows in session logs and classify them into the right automation type (skill, agent, hook, MCP server, or rule). Use when you notice recurring manual steps tha",
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.0.0: Genericized and restructured | v4.0.0: MAJOR — retired as a copied template; thin pointer to cbp-learning-workflow (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4785,20 +4785,20 @@
     }
   },
   "status": {
-    "hash": "2ff7318f8e2c2c2e74b24b565ff40f31d26e86278c1faef669a7b8559452eda4",
+    "hash": "ffc1d9171571fb8e698d46583b659fcfc60db0556b85f2951eef7b61c7162f0d",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Generate a project health snapshot showing git status, test status, and project state in a single report. Use when starting a session or checking project health.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in loop-engineering; core/ file redirects provisioning to /plugin install. Was: Generate a project health snapshot showing git status, test status, and project state in a single report. Use when starting a session or checking project health.",
     "tags": [
       "reference"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.0.0: Genericized and restructured | v3.0.0: MAJOR — retired as a copied template; thin pointer to loop-engineering (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4880,20 +4880,20 @@
     }
   },
   "systematic-debugging": {
-    "hash": "01ee7613461b0c3b11195a681b003015036ebd7f6efec40178334e8548f1e7d4",
+    "hash": "e6a0b42a849d9b5e028b3bfbdbcd49736634946ec6f87d78befc09e058b0fd97",
     "type": "skill",
     "category": "core",
-    "version": "1.1.1",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-07-03",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "test-knowledge"
     ],
     "visibility": "public",
-    "description": "Debug failures methodically using a structured diagnosis workflow: reproduce, isolate, hypothesize, gather evidence, find root cause, apply targeted fix, verify, and prevent recurrence. For a KNOWN failure with a retest command that just needs iterate-until-green, use /fix-loop instead.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Debug failures methodically using a structured diagnosis workflow: reproduce, isolate, hypothesize, gather evidence, find root cause, apply targeted fix, verify, and prevent recurr",
     "tags": [],
-    "changelog": "1.1.1: reciprocal routing boundary to /fix-loop in description (companion to fix-loop v1.6.0 escalation fix; deferred item from the fix-loop eval).\nv1.1.0: Fix orphaned code blocks, add inline step summaries, improve triggers, add preamble constraints, fix step reference, sync registry description",
+    "changelog": "1.1.1: reciprocal routing boundary to /fix-loop in description (companion to fix-loop v1.6.0 escalation fix; deferred item from the fix-loop eval).\nv1.1.0: Fix orphaned code blocks, add inline step summaries, improve triggers, add preamble constraints, fix step reference, sync registry description | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5083,21 +5083,21 @@
     }
   },
   "test-knowledge": {
-    "hash": "c1ab55b5ed5674311785a9f9409a7185a82199bafd78c1565542f184e6724d71",
+    "hash": "34d3932713e6631a026ebf30fe31e8df83afa148a28e5cd6da847a86597964b8",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Manage a self-improving knowledge base of testing patterns and lessons learned. Use when debugging test failures, choosing fixtures, handling platform quirks, or recording a resolved test issue.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-learning-workflow; core/ file redirects provisioning to /plugin install. Was: Manage a self-improving knowledge base of testing patterns and lessons learned. Use when debugging test failures, choosing fixtures, handling platform quirks, or recording a resolv",
     "tags": [
       "testing",
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.0.0: Genericized and restructured | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-learning-workflow (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5133,13 +5133,13 @@
     }
   },
   "test-pipeline": {
-    "hash": "a6a71591e32e0f961ba33e329d899a1f92968635967ad3e2bcd3d6d45e730c22",
+    "hash": "481ec6ffd58321203d2d3d0a8b05296523815c3e8405bf7e01646bcefe68b05f",
     "type": "skill",
     "category": "core",
-    "version": "3.1.0",
+    "version": "4.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "auto-verify",
       "escalation-report",
@@ -5155,13 +5155,13 @@
       "visual-inspector-agent"
     ],
     "visibility": "public",
-    "description": "Full test verification pipeline: fix failures, verify changes, review visual proof, commit. Skill-at-T0 orchestrator dispatching the test-pipeline worker agents directly.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-build-test-workflows; core/ file redirects provisioning to /plugin install. Was: Full test verification pipeline: fix failures, verify changes, review visual proof, commit. Skill-at-T0 orchestrator dispatching the test-pipeline worker agents directly.",
     "tags": [
       "testing",
       "pipeline",
       "verification"
     ],
-    "changelog": "v3.1.0: first-run test-debt baseline - pre-existing failures filed as one consolidated debt issue + known_debt exclusion from triage (fable-harvest B, class E)",
+    "changelog": "v3.1.0: first-run test-debt baseline - pre-existing failures filed as one consolidated debt issue + known_debt exclusion from triage (fable-harvest B, class E) | v4.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5311,20 +5311,20 @@
     }
   },
   "update-practices": {
-    "hash": "256b412a6a4629eb4c271ae6d6486383c34cb1e773497b11a492fd9a0afdc820",
+    "hash": "d79fc3bc57d634f52557af9fba18fa9d436c65a93295c586d6e9dee144be5a5f",
     "type": "skill",
     "category": "core",
-    "version": "1.3.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-25",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Pull latest best practices from the hub into your project's .claude/ directory. Compares local files against hub registry, shows diffs, and copies updates.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in cbp-workflows; core/ file redirects provisioning to /plugin install. Was: Pull latest best practices from the hub into your project's .claude/ directory. Compares local files against hub registry, shows diffs, and copies updates.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured | v1.1.0 (2026-04-24): sync shipped configs from core/.claude/config/; promoted tier=must-have to fix Phase 3.1 downstream sync gap | v1.2.0 (2026-04-25): MINOR — STEP 5 tracks newly-added agents; STEP 5.5 prints prominent RESTART REQUIRED banner before STEP 6 when new agents synced; closes the 2026-04-25 platform finding (Claude Code agent registry session-pinning)",
+    "changelog": "v2.0.0: Genericized and restructured | v1.1.0 (2026-04-24): sync shipped configs from core/.claude/config/; promoted tier=must-have to fix Phase 3.1 downstream sync gap | v1.2.0 (2026-04-25): MINOR — STEP 5 tracks newly-added agents; STEP 5.5 prints prominent RESTART REQUIRED banner before STEP 6 when new agents synced; closes the 2026-04-25 platform finding (Claude Code agent registry session-pinning) | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6196,16 +6196,16 @@
     }
   },
   "goal-creator": {
-    "hash": "4d1a693e0740827f8161b0f51e67b18c911103ef1ec1a72daf7df48b10fc8e57",
+    "hash": "7805999f192a4983146d446f51f1f28de5da3660ac93a577c8cb5680acd40c77",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
-    "last_updated": "2026-07-03",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
-    "description": "Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first; idempotency preflight + worktree-lock isolation + cross-session progress log + DoD-verb precision + blast-radius verification gates pointing to hub rules. Authors and stops — never runs the executor, never commits.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in loop-engineering; core/ file redirects provisioning to /plugin install. Was: Author a zero-open-questions contract to hand to an autonomous executor (built-in /goal, /loop, routines, headless) that runs unattended until a Definition of Done. Interview-first",
     "tags": [
       "goal-creator",
       "autonomous",
@@ -6215,7 +6215,7 @@
       "unattended",
       "self-improvement"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation); v2.0.0: renamed back to goal-creator (restoring the original firekaro-planner skill name per owner request); v2.1.0: folded pilot learnings L001 (verify contract-asserted repo facts at authoring time or scope making them true) and L002 (budget explicit worktree env-setup before first build/test) into the STEP 1 fork inventory",
+    "changelog": "v1.0.0: Promoted from firekaro-planner goal-creator (generalized, executor-agnostic, de-project-specific) — Tier 4; v1.1.0: Self-contained principle now requires verifying every cited reference file exists at drafting time (stale citations force mid-run improvisation); v2.0.0: renamed back to goal-creator (restoring the original firekaro-planner skill name per owner request); v2.1.0: folded pilot learnings L001 (verify contract-asserted repo facts at authoring time or scope making them true) and L002 (budget explicit worktree env-setup before first build/test) into the STEP 1 fork inventory | v3.0.0: MAJOR — retired as a copied template; thin pointer to loop-engineering (plugins-first-only, owner decision 2026-07-14)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6389,13 +6389,13 @@
     "tier": "must-have"
   },
   "loop-engineering": {
-    "hash": "85590bc09cb9b0eb15da948250c199b2de3f6e7cd9895cb56efe0bbffc7cfc39",
+    "hash": "49acc34f0fdf7dbfb601e618840c1c65e128b04707ffe85db0cb6f1fad9b7069",
     "type": "skill",
     "category": "core",
-    "version": "1.5.0",
+    "version": "2.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-16",
-    "last_updated": "2026-07-10",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "auto-verify",
       "brainstorm",
@@ -6412,7 +6412,7 @@
       "writing-plans"
     ],
     "visibility": "public",
-    "description": "Autonomous DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker)→SHIP|FEEDBACK loop as a skill-at-T0 orchestrator. Self-verifying (maker plan-executor-agent ≠ checker code-reviewer-agent), self-healing (/fix-loop, /debugging-loop), self-learning (/learn-n-improve each cycle), self-feedback (/escalation-report + triage inbox on budget exhaustion). Emits hub-linked telemetry (hub_pattern_link) on every terminal signal so the weekly aggregate_telemetry cron monitors downstream defects/effectiveness. Composes existing hub workflows under hard budgets; creates no new engine.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): ships in loop-engineering; core/ file redirects provisioning to /plugin install. Was: Autonomous DISCOVER→PLAN→EXECUTE(maker)→VERIFY(checker)→SHIP|FEEDBACK loop as a skill-at-T0 orchestrator. Self-verifying (maker plan-executor-agent ≠ checker code-reviewer-agent), ",
     "tags": [
       "orchestration",
       "workflow",
@@ -6420,7 +6420,7 @@
       "self-healing",
       "loop-engineering"
     ],
-    "changelog": "v1.4.0 (2026-07-10): MINOR - platform-native loop taxonomy (fable-window item 9). Spec gains 3.7 (the four native loop types - /loop fixed interval, /loop dynamic self-paced via ScheduleWakeup, session-scoped CronCreate tasks vs cloud Routines, /goal one-shot contract - with a routing table for which loop-engineering entry point maps to which, and an honest comparison of where hand-rolled DoD gating still beats native /goal: maker!=checker enforcement, healing budgets, strategy mutation (3.6), hub telemetry) and 3.8 (budget introspection - loop-domain budgets compose with, never replace, token/turn budgets; the claimed Workflow-tool budget.spent() API is flagged Unverified, no first-party citation found). SKILL.md gains a ~10-line routing pointer before STEP 1: check the taxonomy table before starting a hand-rolled loop. Spec bumped to 1.4.0. Plugin bumped 0.2.0->0.3.0. | v1.3.0 (2026-07-10): MINOR - bilevel self-improvement in the FEEDBACK arm (fable-window item 8). STEP 6 gains 6a: on a REPEAT heal for the same failing gate (N>=2) the orchestrator mutates the STUCK loop's SEARCH strategy (not just accumulating lessons) along three enumerable axes {decomposition, diagnostic, model}, records each failed attempt to a new state.strategy_ledger keyed by failing-gate signature, and a novelty gate rejects any strategy already in the ledger - all axes exhausted routes to /escalation-report with the ledger attached. A winning mutation is captured as a /learn-n-improve success_patterns delta (no schema change). Spec bumped to 1.3.0 (3.6). Plugin bumped 0.1.0->0.2.0. | v1.2.4 (2026-07-03): PATCH — STEP 5 mechanical gate now invokes Skill(\"/auto-verify\", args=\"--strict-gates --range <pre_merge_sha>..HEAD\") — companion to auto-verify v4.4.0 F2: the committed 4b merge + heal checkpoints leave a clean working tree, so a bare invocation detected zero changed files and vacuously greened the merged diff; the range makes the mechanical gate verify the merged diff, skip the stash check, and keep NO_TESTS_FOR_CHANGE armed. Spec bumped to 1.2.4 (§3 VERIFY row quotes the invocation).\n1.2.3: W1 (round-5 verification) — heal checkpoint commit example now `git add -A && git commit -m` so heal-created (untracked) files reach the checker diff; W2 (cosmetic ordering) accepted as-is. Round-5 verdict: PASS, V1-V10 all closed (evals/2026-07-02-eval-report-v4.md).\nv1.2.2 (2026-07-02): PATCH - v3 re-eval defect fixes (V1-V10): heal checkpoint commit - every mode-1 heal is COMMITTED before re-entering VERIFY so git diff <pre_merge_sha>..HEAD is complete on every entry (uniform at all four diff-capture sites; the git-status-porcelain special case removed); CRITICAL RULE + spec VERIFY/FEEDBACK rows updated (V1); STEPs 4/5.2 dispatch the STEP 1.5.3-RESOLVED maker/checker stored in state.workers (defaults preserved when config absent), 1.5.1 probes the resolved names (V2); --no-ship wording corrected - only the SHIP commit is skipped, the 4b integration merge still lands (V3); state.artifacts.plans[] array (one per cycle) + pre_merge_sha/workers keys declared in the template (V4); dead step_status field dropped (V5); debugging-loop selector reads 2+ failed HEAL ATTEMPTS off budget.step_retries, not unsatisfiable failed cycles (V6); healed/shipped relabeled mid-run emit points, not terminal outcomes (V7); spec 3 diagram redrawn - FEEDBACK returns to VERIFY/EXECUTE, never DISCOVER (V8); spec 5.1 preflight_blocked row notes the retroactive STEP 4/5 emit site + the maker-equals-checker tag defined for the emit literal (V9); both -> all three in the STEP 5 gate sentence (V10). Spec bumped to 1.2.2. | v1.2.1 (2026-07-02): PATCH - v2 re-eval defect fixes (N1-N15): coherent no-merge-path design - pre_merge_sha captured at STEP 4 dispatch (always defined), merged_this_cycle gate makes VERIFY/SHIP unreachable without a successful 4b merge, FEEDBACK gets three explicit entry modes (VERIFY dissent / merge-conflict resolve-and-complete-or-redispatch / maker-FAILED redispatch) (N1,N2); checker is handed the RAW merged diff itself in the dispatch prompt (N3); --discover-only emits clean_exit + PASSED verdict (N5); ESCALATE routes through STEP 8 explicitly + not-attempted cap message defined (N6,N7); emit-site invariant reworded literally true, healed emit fires at the PASS arm (N4,N8); max_retries_per_step + wall-clock ENFORCED via step_retries (N9); state gains merged_this_cycle/units_shipped/heals/commits[], retroactive-block verdict uses real counts, --no-ship units_shipped=0 (N10); /status added to PREFLIGHT (N11); dispatch-count wording reconciled (N12); run log named events.jsonl (N13). Spec bumped to 1.2.1 (N14); guard test pins clean_exit (N15). | v1.2.0 (2026-07-02): MINOR — eval-driven behavior fixes (2026-07-02 FAILED eval, F1–F13): CRITICAL F1 worktree integration — new STEP 4b merges the maker's returned worktree_branch into the T0 run tree before VERIFY (conflict → FEEDBACK), changed_files recomputed from the merged diff, operative-tree rule for STEPs 5–6; single shipped emit site at STEP 7 (F2); $ARGUMENTS unit marked consumed after ship so single-issue runs terminate PASSED (F3); heal path recomputes changed_files before re-VERIFY (F4); PREFLIGHT gets a concrete dispatchability probe (agent-types listing, else file-check + retroactive BLOCK on dispatch-time not-found, residual risk stated) (F5); --no-ship terminal branch defined (PASSED, commits SKIPPED, clean_exit emit, no loop-back) (F6); spec blind-test-verify layer reconciled as blind reviewer on RAW diff + T0 reproduction (F7); unreachable FAILED verdict enum dropped (F8); inline-DAG dangling ref + budget-override note fixed (F9); maker≠checker assert resolves from contract dispatch: fields (F10); new clean_exit signal closes the silent clean-exit blind spot (F11); STEP 1.5 BLOCKED verdict shape specified (F12); checker dispatch counted in dispatches_used, /goal dead ref removed, triggers trimmed to 6, spec triage naming fixed (F13). | v1.1.1 (2026-07-02): PATCH - point the canonical-design reference at spec 3.5 three rings (machine/developer/external) with the context-advantage escalation rule. | v1.1.0 (2026-06-17): MINOR — hub-ward monitoring: emit a hub-linked .claude/learnings.json entry (hub_pattern_link: loop-engineering) on every terminal signal (preflight_blocked / escalated / healed / shipped) so the existing weekly aggregate_telemetry cron surfaces downstream defects + effectiveness in the registry, no new pipeline. Spec §5.1. | v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md.",
+    "changelog": "v1.4.0 (2026-07-10): MINOR - platform-native loop taxonomy (fable-window item 9). Spec gains 3.7 (the four native loop types - /loop fixed interval, /loop dynamic self-paced via ScheduleWakeup, session-scoped CronCreate tasks vs cloud Routines, /goal one-shot contract - with a routing table for which loop-engineering entry point maps to which, and an honest comparison of where hand-rolled DoD gating still beats native /goal: maker!=checker enforcement, healing budgets, strategy mutation (3.6), hub telemetry) and 3.8 (budget introspection - loop-domain budgets compose with, never replace, token/turn budgets; the claimed Workflow-tool budget.spent() API is flagged Unverified, no first-party citation found). SKILL.md gains a ~10-line routing pointer before STEP 1: check the taxonomy table before starting a hand-rolled loop. Spec bumped to 1.4.0. Plugin bumped 0.2.0->0.3.0. | v1.3.0 (2026-07-10): MINOR - bilevel self-improvement in the FEEDBACK arm (fable-window item 8). STEP 6 gains 6a: on a REPEAT heal for the same failing gate (N>=2) the orchestrator mutates the STUCK loop's SEARCH strategy (not just accumulating lessons) along three enumerable axes {decomposition, diagnostic, model}, records each failed attempt to a new state.strategy_ledger keyed by failing-gate signature, and a novelty gate rejects any strategy already in the ledger - all axes exhausted routes to /escalation-report with the ledger attached. A winning mutation is captured as a /learn-n-improve success_patterns delta (no schema change). Spec bumped to 1.3.0 (3.6). Plugin bumped 0.1.0->0.2.0. | v1.2.4 (2026-07-03): PATCH — STEP 5 mechanical gate now invokes Skill(\"/auto-verify\", args=\"--strict-gates --range <pre_merge_sha>..HEAD\") — companion to auto-verify v4.4.0 F2: the committed 4b merge + heal checkpoints leave a clean working tree, so a bare invocation detected zero changed files and vacuously greened the merged diff; the range makes the mechanical gate verify the merged diff, skip the stash check, and keep NO_TESTS_FOR_CHANGE armed. Spec bumped to 1.2.4 (§3 VERIFY row quotes the invocation).\n1.2.3: W1 (round-5 verification) — heal checkpoint commit example now `git add -A && git commit -m` so heal-created (untracked) files reach the checker diff; W2 (cosmetic ordering) accepted as-is. Round-5 verdict: PASS, V1-V10 all closed (evals/2026-07-02-eval-report-v4.md).\nv1.2.2 (2026-07-02): PATCH - v3 re-eval defect fixes (V1-V10): heal checkpoint commit - every mode-1 heal is COMMITTED before re-entering VERIFY so git diff <pre_merge_sha>..HEAD is complete on every entry (uniform at all four diff-capture sites; the git-status-porcelain special case removed); CRITICAL RULE + spec VERIFY/FEEDBACK rows updated (V1); STEPs 4/5.2 dispatch the STEP 1.5.3-RESOLVED maker/checker stored in state.workers (defaults preserved when config absent), 1.5.1 probes the resolved names (V2); --no-ship wording corrected - only the SHIP commit is skipped, the 4b integration merge still lands (V3); state.artifacts.plans[] array (one per cycle) + pre_merge_sha/workers keys declared in the template (V4); dead step_status field dropped (V5); debugging-loop selector reads 2+ failed HEAL ATTEMPTS off budget.step_retries, not unsatisfiable failed cycles (V6); healed/shipped relabeled mid-run emit points, not terminal outcomes (V7); spec 3 diagram redrawn - FEEDBACK returns to VERIFY/EXECUTE, never DISCOVER (V8); spec 5.1 preflight_blocked row notes the retroactive STEP 4/5 emit site + the maker-equals-checker tag defined for the emit literal (V9); both -> all three in the STEP 5 gate sentence (V10). Spec bumped to 1.2.2. | v1.2.1 (2026-07-02): PATCH - v2 re-eval defect fixes (N1-N15): coherent no-merge-path design - pre_merge_sha captured at STEP 4 dispatch (always defined), merged_this_cycle gate makes VERIFY/SHIP unreachable without a successful 4b merge, FEEDBACK gets three explicit entry modes (VERIFY dissent / merge-conflict resolve-and-complete-or-redispatch / maker-FAILED redispatch) (N1,N2); checker is handed the RAW merged diff itself in the dispatch prompt (N3); --discover-only emits clean_exit + PASSED verdict (N5); ESCALATE routes through STEP 8 explicitly + not-attempted cap message defined (N6,N7); emit-site invariant reworded literally true, healed emit fires at the PASS arm (N4,N8); max_retries_per_step + wall-clock ENFORCED via step_retries (N9); state gains merged_this_cycle/units_shipped/heals/commits[], retroactive-block verdict uses real counts, --no-ship units_shipped=0 (N10); /status added to PREFLIGHT (N11); dispatch-count wording reconciled (N12); run log named events.jsonl (N13). Spec bumped to 1.2.1 (N14); guard test pins clean_exit (N15). | v1.2.0 (2026-07-02): MINOR — eval-driven behavior fixes (2026-07-02 FAILED eval, F1–F13): CRITICAL F1 worktree integration — new STEP 4b merges the maker's returned worktree_branch into the T0 run tree before VERIFY (conflict → FEEDBACK), changed_files recomputed from the merged diff, operative-tree rule for STEPs 5–6; single shipped emit site at STEP 7 (F2); $ARGUMENTS unit marked consumed after ship so single-issue runs terminate PASSED (F3); heal path recomputes changed_files before re-VERIFY (F4); PREFLIGHT gets a concrete dispatchability probe (agent-types listing, else file-check + retroactive BLOCK on dispatch-time not-found, residual risk stated) (F5); --no-ship terminal branch defined (PASSED, commits SKIPPED, clean_exit emit, no loop-back) (F6); spec blind-test-verify layer reconciled as blind reviewer on RAW diff + T0 reproduction (F7); unreachable FAILED verdict enum dropped (F8); inline-DAG dangling ref + budget-override note fixed (F9); maker≠checker assert resolves from contract dispatch: fields (F10); new clean_exit signal closes the silent clean-exit blind spot (F11); STEP 1.5 BLOCKED verdict shape specified (F12); checker dispatch counted in dispatches_used, /goal dead ref removed, triggers trimmed to 6, spec triage naming fixed (F13). | v1.1.1 (2026-07-02): PATCH - point the canonical-design reference at spec 3.5 three rings (machine/developer/external) with the context-advantage escalation rule. | v1.1.0 (2026-06-17): MINOR — hub-ward monitoring: emit a hub-linked .claude/learnings.json entry (hub_pattern_link: loop-engineering) on every terminal signal (preflight_blocked / escalated / healed / shipped) so the existing weekly aggregate_telemetry cron surfaces downstream defects + effectiveness in the registry, no new pipeline. Spec §5.1. | v1.0.0 (2026-06-16): Initial release — distributable Loop Engineering meta-loop (Addy Osmani / Anthropic agent-loop). Skill-at-T0, maker≠checker independent verification, bounded retries, learning capture. Composes existing self-* assets per rule-curation + KISS/DRY; spec at docs/specs/loop-engineering-spec.md. | v2.0.0: MAJOR — retired as a copied template; thin pointer to loop-engineering (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
       "error_prevention_rate": 1.0,

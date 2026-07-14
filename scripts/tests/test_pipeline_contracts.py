@@ -8,6 +8,7 @@ Validates the test verification pipeline introduced by the pipeline overhaul:
   - test-evidence-config.json template is valid
 """
 
+from scripts.tests.skill_paths import resolve_skill_md
 import json
 import re
 from pathlib import Path
@@ -29,9 +30,9 @@ TEST_PIPELINE_CONFIG = CONFIG_DIR / "test-pipeline.yml"
 EVIDENCE_CONFIG_TEMPLATE = TEMPLATES_DIR / "test-evidence-config.json"
 
 # Pipeline skills under test
-AUTO_VERIFY = SKILLS_DIR / "auto-verify" / "SKILL.md"
-FIX_LOOP = SKILLS_DIR / "fix-loop" / "SKILL.md"
-POST_FIX = SKILLS_DIR / "post-fix-pipeline" / "SKILL.md"
+AUTO_VERIFY = resolve_skill_md("auto-verify")
+FIX_LOOP = resolve_skill_md("fix-loop")
+POST_FIX = resolve_skill_md("post-fix-pipeline")
 REGRESSION_TEST = SKILLS_DIR / "regression-test" / "SKILL.md"
 CODE_QUALITY_GATE = SKILLS_DIR / "code-quality-gate" / "SKILL.md"
 VERIFY_SCREENSHOTS = SKILLS_DIR / "verify-screenshots" / "SKILL.md"
@@ -441,10 +442,13 @@ class TestVersionConsistency:
             return entry.get("version")
         return None
 
+    # Version consistency compares the REGISTRY (which describes core/ patterns) against
+    # the CORE file — deliberately NOT resolve_skill_md(): a #346 pointer's version is the
+    # core pattern's version; the plugin copy versions independently via plugin.json.
     @pytest.mark.parametrize("skill_name,path", [
-        ("auto-verify", AUTO_VERIFY),
-        ("fix-loop", FIX_LOOP),
-        ("post-fix-pipeline", POST_FIX),
+        ("auto-verify", SKILLS_DIR / "auto-verify" / "SKILL.md"),
+        ("fix-loop", SKILLS_DIR / "fix-loop" / "SKILL.md"),
+        ("post-fix-pipeline", SKILLS_DIR / "post-fix-pipeline" / "SKILL.md"),
         ("verify-screenshots", VERIFY_SCREENSHOTS),
     ])
     def test_skill_version_matches_registry(self, skill_name, path):

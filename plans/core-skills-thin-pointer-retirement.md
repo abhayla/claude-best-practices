@@ -61,7 +61,16 @@ no-non-plugin-consumer rule:
 - `skill-factory` — consumed by `skill-master`, `writing-skills` references.
 - `test-knowledge` — consumed by `fix-loop`, `systematic-debugging`.
 
-**Design finding this forces (stage-4 fork, OWNER decision):** the workflows cross-reference each
+> **FORK RESOLVED (owner, 2026-07-14): "yes, go plugins-first-only."** The batch conversion of all
+> 4 universal workflow-plugin closures executed the same day (32 skills → pointers, same PR as the
+> pilot). Boundary applied: Tier-2 stack packs (cbp-react-stack, cbp-python-stack) stay
+> dual-distributed (conditionally recommended, not universal). EXCLUDED pending hub dogfood
+> (hub `.claude/skills/` operational copies exist): brainstorm, claude-guardian, skill-master,
+> writing-plans, writing-skills. Deviation from the recipe: `references/`+`evals/` dirs are KEPT
+> (historical evidence; they never ship — plugin-covered skills are excluded from copy-provision);
+> cluster-1's strict-rule verdicts below are superseded by this decision.
+
+**Design finding this forced (stage-4 fork — now resolved above; kept for the record):** the workflows cross-reference each
 other and are referenced by global rules pervasively, so under the strict rule the safely
 convertible set beyond entry-skill pointers is ~empty. The refined criterion — convert when every
 consumer resolves at runtime via the universally-recommended plugin — converts everything, but

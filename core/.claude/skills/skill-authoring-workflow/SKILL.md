@@ -1,241 +1,66 @@
 ---
 name: skill-authoring-workflow
 description: >
-  Author, validate, and register new skills, agents, and rules end-to-end
-  as a skill-at-T0 orchestrator (Phase 3.8 of subagent-dispatch-platform-limit
-  remediation — the final workflow-master retirement). The skill body IS
-  the orchestrator — runs in the user's T0 session and drives: overlap-check →
-  author → validate → register. Invokes sub-skills (/writing-skills,
-  /claude-guardian, /skill-master) via Skill(); optionally dispatches
-  skill-author-agent via Agent() at T0 for richer draft generation. Use
-  when creating new patterns from scratch or converting session learnings
-  into skills.
-type: workflow
-allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
-argument-hint: "<skill name, learning reference, or pattern description>"
-version: "2.1.1"
+  POINTER to the installable cbp-workflows plugin — this capability graduated from a
+  copied core/ template to plugin-as-SSOT (#346 stage 2, plugins-first-only). Use
+  this pointer when provisioning: install the plugin instead of copying. Original
+  purpose: Author, validate, and register new skills, agents, and rules end-to-end as a skill-at-T0 orchestrator (Phase 3.8 of subagent-dispatch-platform-limit remediation — the final workflow-master retirement)
+type: reference
+allowed-tools: "Read"
+argument-hint: "(no arguments — informational pointer)"
+version: "3.0.0"
 ---
 
-# /skill-authoring-workflow — Skill-at-T0 Orchestrator
+# skill-authoring-workflow — now ships as a plugin
 
-This skill's body is injected into the user's T0 session and executed there.
-The retired `skill-authoring-master-agent` is NOT dispatched (deprecated
-Phase 3.8, 2026-04-25 — the last workflow-master retirement); its
-orchestration lives here.
+This capability is **no longer distributed as a copied template**. It ships in the
+cbp-workflows plugin (G6-validated 2026-07-12) so there is **one source of truth** instead
+of a template copy that drifts. This file is a pointer left in `core/` so provisioning
+surfaces the redirect rather than silently dropping the capability (#346 stage 2,
+plugins-first-only — owner decision 2026-07-14; recipe:
+`plans/core-skills-thin-pointer-retirement.md`).
 
-**Why skill-at-T0:** Same platform constraint Phases 3.1–3.7 — dispatched
-subagents don't receive the `Agent` tool
-([Anthropic docs](https://code.claude.com/docs/en/sub-agents)). Legacy
-`skill-authoring-master-agent` → `skill-author-agent` (T2) dispatch
-silently inlined.
-
-**Critical:** Validation is BLOCKING — no pattern ships without passing all
-quality checks. Overlap detection MUST run BEFORE authoring begins.
-
-**Input:** `$ARGUMENTS` — skill name, learning reference (e.g., `proposal-4`
-pointing at `.claude/skill-proposals/`), or free-form pattern description.
-
----
-
-## CLI Signature
+## How to get it
 
 ```
-/skill-authoring-workflow <name | proposal-ref | description>
-                          [--type=workflow|reference|rule|agent]
-                          [--dry-run] [--force-overlap]
+/plugin marketplace add abhayla/claude-best-practices
+/plugin install cbp-workflows@claude-best-practices
+/reload-plugins
 ```
 
-| Argument / Flag | Default | Meaning |
-|-----------------|---------|---------|
-| input | (required) | Skill name, `.claude/skill-proposals/<id>` reference, or description |
-| `--type` | workflow | `workflow` \| `reference` (skill types) \| `rule` \| `agent` |
-| `--dry-run` | off | Draft + validate, don't write anywhere |
-| `--force-overlap` | off | Proceed with authoring even if overlap check flags similar existing patterns |
+## What it does (so provisioning can decide without installing)
 
----
+Author, validate, and register new skills, agents, and rules end-to-end as a skill-at-T0 orchestrator (Phase 3.8 of subagent-dispatch-platform-limit remediation — the final workflow-master retirement). The skill body IS the orchestrator — runs in the user's T0 session and drives: overlap-check → author → validate → register. Invokes sub-skills (/writing-skills, /claude-guardian, /skill-master) via Skill(); optionally dispatches skill-author-agent via Agent() at T0 for richer draft generation.
 
-## STEP 1: INIT + OVERLAP_CHECK
+After install the skill resolves as `cbp-workflows:skill-authoring-workflow` (invokable as `/skill-authoring-workflow` when no
+shadowing copy exists). Historical `references/` and `evals/` directories are retained
+here for evidence; the LIVE copies ship inside the plugin.
 
-1. **Parse args.** Resolve `input` to one of: concrete name, proposal path, or description.
-2. **Read config.** `.claude/config/workflow-contracts.yaml (hub repo: config/workflow-contracts.yaml; if absent, use the inline steps below — this skill is self-contained)` → `workflows.skill-authoring`.
-   `master_agent` should be null; `sub_orchestrators` empty (Phase 3.8).
-3. **Generate `run_id`.** `{ISO-8601}_{7-char git sha}` with `:` → `-`.
-4. **Initialize state** at `.workflows/skill-authoring/state.json` (schema 2.0.0):
-   `step_status`, `dispatches_used: 0`, `target_type: "<workflow|...>"`,
-   `overlap_flags: []`.
-5. **Overlap check (MUST run before authoring).** Scan existing
-   `core/.claude/skills/`, `core/.claude/agents/`, `core/.claude/rules/` and
-   `registry/patterns.json` for similar names + descriptions. Use description
-   similarity (substring + keyword matching) + file structure comparison.
-   - If overlaps found AND `--force-overlap` NOT set: report matches,
-     recommend enhancing existing pattern instead of creating new. User
-     must explicitly approve new authoring to proceed.
-   - If `--force-overlap`: record in state but proceed.
-6. Append INIT + OVERLAP_CHECK events.
+## Structure of the plugin copy (from the retired template, for orientation)
 
----
+- INIT + OVERLAP_CHECK
+- 5: PREFLIGHT (dependency-closure gate — BLOCK on missing workers)
+- AUTHOR
+- 2a: Optional skill-author-agent dispatch for richer drafts
+- Workflow: skill-authoring
+- Run ID: <run_id>
+- Target type: <workflow|reference|rule|agent>
+- Input: <resolved input>
+- Overlap findings: <list>
+- Project context: <stack + conventions>
+- 2b: /writing-skills protocol (always runs)
+- VALIDATE (BLOCKING)
 
-## STEP 1.5: PREFLIGHT (dependency-closure gate — BLOCK on missing workers)
+Original invocation shape: `<skill name, learning reference, or pattern description>`.
+The plugin copy is the LIVE version — its steps, gates, and worker dispatches may
+have evolved past this snapshot; always trust the installed skill over this list.
 
-Before any dispatch, verify the runtime closure this workflow needs is present
-AND dispatchable. Pattern provisioning copies by tier and may not resolve a
-skill's full closure, so a project can have this skill without its workers — a
-silent inline run or a mid-dispatch crash is the failure this gate prevents.
+## Why it moved
 
-- **Required sub-skills** (invoked via `Skill()`): `writing-skills`, `claude-guardian`, `skill-master`. Check each exists at
-  `.claude/skills/<name>/SKILL.md` (only those on the path you will actually run).
-- **Required worker agents** (dispatched via `Agent()`): `skill-author-agent`. File presence
-  (`.claude/agents/<name>.md`) is necessary but NOT sufficient — the agent registry
-  is pinned at session start (`pattern-structure.md` → "registry session-pinning"),
-  so probe runtime dispatchability for any agent on the path about to run.
-- **On any missing/undispatchable dependency → BLOCK** with verdict
-  `WORKER_REGISTRY_NOT_LOADED`, list what is missing, and emit: "run
-  `/update-practices` to provision the closure, then RESTART the session (agent
-  registry is pinned at session start), then re-run." Write the BLOCKED verdict to
-  this workflow's report artifact and STOP.
-
-Only when the required closure is present and dispatchable, continue.
-
----
-
-## STEP 2: AUTHOR
-
-### 2a: Optional skill-author-agent dispatch for richer drafts
-
-If input is a proposal reference with substantial evidence OR the description
-is complex enough to warrant deeper investigation:
-
-```
-Agent(subagent_type="skill-author-agent", prompt="""
-## Workflow: skill-authoring
-## Run ID: <run_id>
-## Target type: <workflow|reference|rule|agent>
-## Input: <resolved input>
-## Overlap findings: <list>
-## Project context: <stack + conventions>
-
-Draft the full pattern body per pattern-structure.md. Apply the 6-step
-/writing-skills protocol. Return structured contract:
-{ "gate": "PASSED|FAILED", "draft_path": "<staging path>",
-  "frontmatter": {...}, "body_sections": [...], "self_contained": <bool>,
-  "summary": "<line>" }
-""")
-```
-
-Increment `dispatches_used` by 1. Merge the draft contract into state.
-
-### 2b: /writing-skills protocol (always runs)
-
-```
-Skill("/writing-skills", args="author <resolved-input> --type=<type>")
-```
-
-`/writing-skills` implements the 6-step authoring protocol: frontmatter
-design, step skeletons, trigger design, quality checks, size limits,
-self-containment verification. Writes draft to
-`core/.claude/skills/<name>/SKILL.md` (or agents/ / rules/ based on `--type`).
-
-Capture draft path into `state.artifacts.draft`.
-
----
-
-## STEP 3: VALIDATE (BLOCKING)
-
-```
-Skill("/claude-guardian", args="validate <draft path> --strict")
-```
-
-`/claude-guardian --strict` runs all pattern quality gates:
-- pattern-structure.md (required frontmatter fields)
-- pattern-portability.md (no hardcoded paths, least-privilege tools)
-- pattern-self-containment.md (no placeholders, size limits, cross-refs)
-- Registry fit (overlap + tier assignment)
-
-Produces `test-results/skill-authoring-validation.json`.
-
-Gate: if `verdict != "PASSED"` → `step_status.VALIDATE = blocked`,
-transition to STEP 5 REPORT with BLOCKED verdict. No silent FAIL → ship path.
-User can iterate: fix the draft, re-run STEP 3 only.
-
-If `--dry-run`: always stop after validate, regardless of outcome.
-
----
-
-## STEP 4: REGISTER
-
-Skip if STEP 3 was blocked OR `--dry-run`.
-
-```
-Skill("/skill-master", args="register <draft path>")
-```
-
-`/skill-master register` does:
-- Add entry to `registry/patterns.json` with hash, type, tier, etc.
-- Append an entry to `registry/changelog.md`
-- Register triggers if any
-- Update docs dashboard (regenerate via `generate_docs.py`)
-
-Capture registry entry into `state.artifacts.registered`.
-
----
-
-## STEP 5: REPORT
-
-1. **Finalize state.** Write `test-results/skill-authoring-verdict.json`:
-   ```json
-   {
-     "schema_version": "2.0.0",
-     "run_id": "<run_id>",
-     "result": "PUBLISHED | BLOCKED | DRY_RUN_OK | DRY_RUN_FAILED",
-     "target_type": "<workflow|reference|rule|agent>",
-     "artifacts": {
-       "draft": "<path>",
-       "validation": "<path>",
-       "registered": <bool>
-     },
-     "overlap_check": { "matches": <n>, "forced": <bool> },
-     "validation_verdict": "PASSED | WARNED | FAILED",
-     "quality_score": <0-100>,
-     "budget_used": { "dispatches_used": <n> },
-     "finalized_at": "<iso>"
-   }
-   ```
-2. **Dashboard:**
-   ```
-   ============================================================
-   Skill Authoring Workflow: <PUBLISHED | BLOCKED | DRY_RUN_OK>
-     Run ID: <run_id>
-     Target: <type> <name>
-     Overlap matches: <N>
-     Validation: <PASSED | WARNED | FAILED>
-     Quality score: <N>/100
-     Registry: <added | SKIPPED>
-   ============================================================
-   ```
-3. **Handoff suggestions:**
-   - If PUBLISHED: `Next: commit the new pattern + /code-review-workflow`
-   - If BLOCKED: surface specific validation failures + suggest fixes
-   - If DRY_RUN_OK: `Next: re-run without --dry-run to publish`
-
----
-
-## CRITICAL RULES
-
-- MUST run STEP 1.5 PREFLIGHT before any dispatch and BLOCK with `WORKER_REGISTRY_NOT_LOADED` if a required sub-skill or worker agent (on the path being run) is missing/undispatchable. Provisioning does not always resolve dependency closures, so this skill can be present without its workers.
-- MUST run at T0 — skill body is injected into user's session. Dispatching
-  this as a worker strips `Agent` at runtime and STEP 2a dispatch silently
-  inlines.
-- MUST NOT dispatch `skill-authoring-master-agent` (deprecated 2026-04-25,
-  2-cycle window — the final workflow-master retirement).
-- MUST run OVERLAP_CHECK (STEP 1 sub-step 5) BEFORE authoring. Creating
-  duplicate skills fragments knowledge (rule-curation.md, pattern-self-
-  containment.md).
-- MUST NOT bypass VALIDATE (STEP 3) — quality gates are mandatory and
-  BLOCKING. No silent FAIL → ship path.
-- MUST use `/writing-skills` for the authoring step — never direct file
-  write. The 6-step protocol catches frontmatter + structural errors early.
-- MUST NOT auto-register a pattern that failed validation — unvalidated
-  patterns corrupt the registry and the downstream sync pipeline.
-- MUST respect `--dry-run` — no file writes or registry changes when set.
-- MUST write `.workflows/skill-authoring/state.json` + `events.jsonl`
-  after every step transition.
+- **Single source of truth** — plugin updates reach every project via
+  `/plugin update cbp-workflows`; copied templates drift silently.
+- **Closure completeness** — the plugin bundles its full sub-skill + agent closure, so
+  an install never hits a missing-worker preflight block.
+- **Shadowing trap** — a provisioned copy of a same-named skill SHADOWS the installed
+  plugin's version, so plugin-covered skills are excluded from copy-provision
+  (`config/plugin-recommendations.yml` is the SSOT `recommend.py` consults).

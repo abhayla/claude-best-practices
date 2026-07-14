@@ -4,6 +4,7 @@ Static checks — verify the new skill exists with correct shape, T2A/T2B
 declare the flag, and the documented behavior contract holds.
 """
 
+from scripts.tests.skill_paths import resolve_skill_md
 from pathlib import Path
 import yaml
 import json
@@ -16,40 +17,40 @@ CONFIG_DIR = CORE_CLAUDE / "config"
 
 
 def test_pipeline_fix_pr_skill_exists():
-    skill = SKILLS_DIR / "pipeline-fix-pr" / "SKILL.md"
+    skill = resolve_skill_md("pipeline-fix-pr")
     assert skill.exists(), f"REQ-C003: /pipeline-fix-pr skill must exist at {skill}"
 
 
 def test_pipeline_fix_pr_uses_serialize_fixes_underneath():
     """Wrapper pattern: pipeline-fix-pr delegates atomic diff apply to /serialize-fixes."""
-    body = (SKILLS_DIR / "pipeline-fix-pr" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("pipeline-fix-pr").read_text(encoding="utf-8")
     assert "Skill(\"serialize-fixes\"" in body or "Skill(\"/serialize-fixes\"" in body or 'serialize-fixes"' in body, (
         "/pipeline-fix-pr MUST delegate diff application to /serialize-fixes (no reimplementation)"
     )
 
 
 def test_pipeline_fix_pr_creates_predictable_branch_name():
-    body = (SKILLS_DIR / "pipeline-fix-pr" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("pipeline-fix-pr").read_text(encoding="utf-8")
     assert "pipeline-fixes/" in body, "Branch naming convention pipeline-fixes/{run_id} required (NN#4)"
 
 
 def test_pipeline_fix_pr_never_auto_merges():
     """Per git-collaboration.md § 'Review Before Merge'."""
-    body = (SKILLS_DIR / "pipeline-fix-pr" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("pipeline-fix-pr").read_text(encoding="utf-8")
     assert "Never auto-merge" in body or "never auto-merge" in body.lower()
     assert "git-collaboration.md" in body, "MUST cite git-collaboration.md for the never-auto-merge rationale"
 
 
 def test_pipeline_fix_pr_has_preflight_checks():
     """Same gh CLI preflight as /create-github-issue (gh installed/auth/origin/permission)."""
-    body = (SKILLS_DIR / "pipeline-fix-pr" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("pipeline-fix-pr").read_text(encoding="utf-8")
     assert "STEP 0" in body and "Preflight" in body
     assert "create-github-issue" in body, "Should reference /create-github-issue's preflight as the canonical pattern"
 
 
 def test_pipeline_fix_pr_returns_to_original_branch():
     """NN#2 — caller invoked from a working branch; must return there."""
-    body = (SKILLS_DIR / "pipeline-fix-pr" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("pipeline-fix-pr").read_text(encoding="utf-8")
     assert "ORIGINAL_BRANCH" in body
     assert "git checkout \"$ORIGINAL_BRANCH\"" in body or "return to original branch" in body.lower()
 
@@ -74,5 +75,5 @@ def test_pipeline_fix_pr_in_registry():
 
 def test_pipeline_fix_pr_pr_label_pipeline_auto_fix():
     """Per CRITICAL RULES: must label PR with `pipeline-auto-fix` for filtering."""
-    body = (SKILLS_DIR / "pipeline-fix-pr" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("pipeline-fix-pr").read_text(encoding="utf-8")
     assert "pipeline-auto-fix" in body, "PR must be labeled `pipeline-auto-fix` (per CRITICAL RULES)"

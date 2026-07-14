@@ -1,173 +1,64 @@
 ---
 name: pipeline-fix-pr
 description: >
-  Apply pipeline fixer diffs to a NEW branch and open a single PR with all
-  fixes (instead of N commits on the current branch). Use when the team's
-  git workflow requires PR review for any change. Wraps `/serialize-fixes`
-  for the actual diff application; this skill adds branch creation, push,
-  and `gh pr create`. Propagated from `/test-pipeline --fix-pr-mode` through
-  T2A → T2B context. Does NOT auto-merge — always leaves the PR for human
-  review (per `git-collaboration.md` rule "Review Before Merge").
-type: workflow
-allowed-tools: "Bash Read"
-argument-hint: "<diffs-glob-or-list> [--base <branch>] [--no-push]"
-version: "1.1.0"
+  POINTER to the installable cbp-build-test-workflows plugin — this capability graduated from a
+  copied core/ template to plugin-as-SSOT (#346 stage 2, plugins-first-only). Use
+  this pointer when provisioning: install the plugin instead of copying. Original
+  purpose: Apply pipeline fixer diffs to a NEW branch and open a single PR with all fixes (instead of N commits on the current branch). Use when the team's git workflow requires PR review for any change. Wraps `
+type: reference
+allowed-tools: "Read"
+argument-hint: "(no arguments — informational pointer)"
+version: "2.0.0"
 ---
 
-# Pipeline Fix PR — Single-PR Fixer Batching (REQ-C003)
+# pipeline-fix-pr — now ships as a plugin
 
-When `/test-pipeline` (skill-at-T0, spec v2.2) finishes producing fix diffs
-at STEP 6 TRIAGE Fan-out 3 and the user has opted into `--fix-pr-mode`, this
-skill takes over from `/serialize-fixes` to land the fixes on a separate
-branch + open ONE PR covering all fixes from the run. Cleaner PR diff than
-N commits on the working branch; honors team's PR-required workflow.
+This capability is **no longer distributed as a copied template**. It ships in the
+cbp-build-test-workflows plugin (G6-validated 2026-07-12) so there is **one source of truth** instead
+of a template copy that drifts. This file is a pointer left in `core/` so provisioning
+surfaces the redirect rather than silently dropping the capability (#346 stage 2,
+plugins-first-only — owner decision 2026-07-14; recipe:
+`plans/core-skills-thin-pointer-retirement.md`).
 
-**Request:** $ARGUMENTS — `<diffs-glob-or-list> [--base <branch>] [--no-push]`
-
-> Spec reference: `docs/specs/test-pipeline-three-lane-spec.md` v1.6 §5 REQ-C003
-> Project convention: `core/.claude/rules/git-collaboration.md` § "Review Before Merge"
->
-> **Native cloud alternative:** once the fix PR exists, the user MAY run Claude Code's native
-> **`/autofix-pr`** from the PR branch to have Claude autonomously watch CI + review comments and
-> push fixes until green (cloud, needs the Claude GitHub App). This skill builds the PR from
-> serialized fixer diffs; `/autofix-pr` is the opt-in native option for *keeping* it green
-> hands-off afterward. Never auto-invoked here.
-
----
-
-## STEP 0: Preflight
-
-Same gh-CLI preflight as `/create-github-issue` (gh installed + authenticated +
-github.com remote + push permission). Hard-fail with structured BLOCKED contract
-on any preflight miss.
-
-If `--no-push` is set (dry-run mode), skip push + PR steps; just create local
-branch + apply diffs locally.
-
----
-
-## STEP 1: Parse arguments + capture context
-
-Extract:
-- `$DIFFS` — diff list (same format as /serialize-fixes)
-- `$BASE` — base branch (default: current branch's upstream tracking, or `main`)
-- `$NO_PUSH` — boolean (default false)
-- `$RUN_ID` — pipeline run_id (from env or last `.workflows/testing-pipeline/sub/test-pipeline.json`)
-
-Capture current branch as `$ORIGINAL_BRANCH` so we can return to it on failure.
-
----
-
-## STEP 2: Create fix branch
-
-```bash
-FIX_BRANCH="pipeline-fixes/${RUN_ID}"
-git checkout -b "$FIX_BRANCH" 2>/dev/null || {
-    echo "WARN: branch $FIX_BRANCH exists; resetting"
-    git checkout "$FIX_BRANCH"
-    git reset --hard "$ORIGINAL_BRANCH"
-}
-```
-
----
-
-## STEP 3: Apply diffs (delegate to /serialize-fixes)
+## How to get it
 
 ```
-Skill("serialize-fixes", args="$DIFFS")
+/plugin marketplace add abhayla/claude-best-practices
+/plugin install cbp-build-test-workflows@claude-best-practices
+/reload-plugins
 ```
 
-Read its return contract for `applied`/`conflicted`/`failed` counts and per-issue commit SHAs.
+## What it does (so provisioning can decide without installing)
 
-**Behavior change vs main flow:** the commits land on `$FIX_BRANCH` instead of
-the original branch. `/serialize-fixes`'s atomicity guarantees still apply
-(`git apply --check` first, `git reset --hard HEAD` cleanup on partial failure,
-discard stale diffs on conflict).
+Apply pipeline fixer diffs to a NEW branch and open a single PR with all fixes (instead of N commits on the current branch). Use when the team's git workflow requires PR review for any change. Wraps `/serialize-fixes` for the actual diff application; this skill adds branch creation, push, and `gh pr create`.
 
----
+After install the skill resolves as `cbp-build-test-workflows:pipeline-fix-pr` (invokable as `/pipeline-fix-pr` when no
+shadowing copy exists). Historical `references/` and `evals/` directories are retained
+here for evidence; the LIVE copies ship inside the plugin.
 
-## STEP 4: Push branch + open PR (skipped if --no-push)
+## Structure of the plugin copy (from the retired template, for orientation)
 
-```bash
-if [ "$NO_PUSH" != "true" ]; then
-    git push -u origin "$FIX_BRANCH"
+- Preflight
+- Parse arguments + capture context
+- Create fix branch
+- Apply diffs (delegate to /serialize-fixes)
+- Push branch + open PR (skipped if --no-push)
+- Summary
+- Per-Issue Outcomes
+- Test plan
+- Return to original branch + return contract
+- NON-NEGOTIABLE
 
-    PR_TITLE="fix(test-pipeline): heal $applied_count test failures from run $RUN_ID"
-    PR_BODY=$(cat <<EOT
-## Summary
+Original invocation shape: `<diffs-glob-or-list> [--base <branch>] [--no-push]`.
+The plugin copy is the LIVE version — its steps, gates, and worker dispatches may
+have evolved past this snapshot; always trust the installed skill over this list.
 
-Auto-generated PR from \`/test-pipeline --fix-pr-mode\` run \`${RUN_ID}\`.
+## Why it moved
 
-Healed ${applied_count} test failure(s); ${conflicted_count} conflict(s); ${failed_count} commit failure(s).
-
-## Per-Issue Outcomes
-
-| Issue | Test | Status | Commit |
-|---|---|---|---|
-$(for issue in $applied_issues; do
-    echo "| #${issue} | ${test_id} | applied | ${commit_sha} |"
-done)
-$(for issue in $conflicted_issues; do
-    echo "| #${issue} | ${test_id} | CONFLICTED (stale diff discarded) | — |"
-done)
-
-## Test plan
-
-- [ ] CI passes on this branch
-- [ ] Each commit's fix is minimal and tested
-- [ ] No unrelated changes
-- [ ] Manual review of any \`pipeline-fix-conflict\` Issues — those need fresh fix attempts
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-EOT
-)
-
-    gh pr create \
-        --base "$BASE" \
-        --head "$FIX_BRANCH" \
-        --title "$PR_TITLE" \
-        --body "$PR_BODY" \
-        --label "pipeline-auto-fix"
-fi
-```
-
-**Never auto-merge.** PR stays open for human review per `git-collaboration.md`.
-
----
-
-## STEP 5: Return to original branch + return contract
-
-```bash
-git checkout "$ORIGINAL_BRANCH"
-```
-
-Return:
-```json
-{
-  "result": "PR_OPENED" | "BLOCKED" | "DRY_RUN",
-  "fix_branch": "pipeline-fixes/<run_id>",
-  "pr_url": "https://github.com/.../pull/<N>",
-  "pr_number": <N>,
-  "applied": <count>,
-  "conflicted": <count>,
-  "failed": <count>,
-  "no_push_dry_run": <bool>
-}
-```
-
----
-
-## NON-NEGOTIABLE
-
-1. **Never auto-merge.** PR stays open for human review per `git-collaboration.md` § "Review Before Merge".
-2. **Always return to original branch on completion or failure.** The user invoked from a working branch; do NOT leave them on the fix branch.
-3. **Hard-fail on push permission missing.** If `gh repo view --json viewerPermission` is below WRITE, return BLOCKED contract — do NOT silently skip the PR step.
-4. **Branch naming is `pipeline-fixes/{run_id}` — no exceptions.** Predictable naming lets cleanup and follow-up tooling find these branches.
-5. **Reuse `/serialize-fixes` for actual diff application.** This skill is a wrapper for branch + PR plumbing; it MUST NOT reimplement the atomic diff-apply protocol.
-
-## CRITICAL RULES
-
-- MUST verify caller's working branch is clean before creating fix branch (uncommitted changes would corrupt the new branch's diff)
-- MUST NOT push to a branch named like a protected branch (main, master, develop, release/*)
-- MUST emit `pipeline-auto-fix` label on the PR for filtering / dashboard tooling
-- MUST surface `/serialize-fixes`'s conflict/failure counts in the PR body so reviewers see what was attempted but didn't land
+- **Single source of truth** — plugin updates reach every project via
+  `/plugin update cbp-build-test-workflows`; copied templates drift silently.
+- **Closure completeness** — the plugin bundles its full sub-skill + agent closure, so
+  an install never hits a missing-worker preflight block.
+- **Shadowing trap** — a provisioned copy of a same-named skill SHADOWS the installed
+  plugin's version, so plugin-covered skills are excluded from copy-provision
+  (`config/plugin-recommendations.yml` is the SSOT `recommend.py` consults).
