@@ -6227,7 +6227,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-07-13",
-    "total_patterns": 284
+    "total_patterns": 285
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -7022,6 +7022,27 @@
       "agent-safety"
     ],
     "changelog": "v1.0.0: Initial release — 2026-07-14 security audit finding #3 (no untrusted-data guardrail on ingestion surfaces)",
+    "tier": "must-have"
+  },
+  "verify-before-suggest-do-before-delegate": {
+    "hash": "1cd1100eb65c28370bd12d694c362d73c77edf9dcfa6ac0697806e32b253d3ab",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-07-14",
+    "last_updated": "2026-07-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Two-part governance rule from an owner-reported failure pair: (A) any ACTIONABLE tool/service/process recommendation is live-verified before being presented (evidence = source + fetch date + version checked against the project's pinned versions), degrading to inline 'unverified' labels — never fabricating, never stalling — when no verification tool exists; cheap-tests limited to side-effect-free, non-billed, non-interactive probes. (B) the agent is the DEFAULT executor: a step is assigned to the human only after an attempt or verified block, with a named blocker (credential/spend/irreversible/physical/tool-or-permission), rendered as an explicit 'I will do / You need to do' split batched to minimal interruptions. Global scope.",
+    "tags": [
+      "governance",
+      "verification",
+      "autonomy",
+      "execution-ownership",
+      "recommendations"
+    ],
+    "changelog": "v1.0.0: Initial release — owner-reported failure pair 2026-07-14 (unverified suggestions + human-push execution); 21-finding adversarial gap-scan baked in (offline degrade path, evidence-not-attestation, cheap-test bounds, worker propagation, mid-work wall behavior)",
     "tier": "must-have"
   }
 }

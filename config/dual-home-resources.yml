@@ -40,6 +40,7 @@ synced:
   rules:
     - claude-behavior.md
     - context-management.md
+    - verify-before-suggest-do-before-delegate.md
     - workflow.md
   hooks:
     - ba-usecase-discovery-reminder.sh

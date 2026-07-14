@@ -84,6 +84,7 @@ class TestNoDuplicateRules:
         "claude-behavior.md",
         "claude-docs-cache.md",
         "context-management.md",
+        "verify-before-suggest-do-before-delegate.md",
         "workflow.md",
     }
 
@@ -115,6 +116,7 @@ class TestHubRulesAreLean:
         "product-incubation.md",  # hub-as-factory operating model (always-on global guardrail)
         "claude-docs-cache.md",   # docs/claude-references/ cache convention (distributable; dual-home synced)
         "model-routing.md",       # cheapest-sufficient-model dispatch table (owner directive 2026-07-03)
+        "verify-before-suggest-do-before-delegate.md",  # verified recommendations + agent-as-default-executor (owner directive 2026-07-14; dual-home synced)
     }
 
     def test_hub_rules_are_approved_set(self):
@@ -139,12 +141,13 @@ class TestHubRulesAreLean:
     def test_hub_rules_total_lines_under_budget(self):
         """Total hub rules should stay lean to minimize context load.
         Budget raised 250 -> 320 (2026-06-22) to admit the distributable
-        claude-docs-cache.md always-on rule."""
+        claude-docs-cache.md always-on rule; 320 -> 420 (2026-07-14) to admit
+        verify-before-suggest-do-before-delegate.md (owner directive)."""
         total = 0
         for rule in _hub_rule_files():
             total += len(rule.read_text(encoding="utf-8").splitlines())
-        assert total <= 320, (
-            f"Hub rules total {total} lines (budget: 320). "
+        assert total <= 420, (
+            f"Hub rules total {total} lines (budget: 420). "
             f"Move verbose content to skills for on-demand loading."
         )
 
