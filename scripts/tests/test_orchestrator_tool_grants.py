@@ -39,6 +39,11 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENTS_DIR = REPO_ROOT / "core" / ".claude" / "agents"
+# The invariant must also cover the trees actually SHIPPED/RUN, not just the core template
+# (2026-07-14 tool-grant audit: the validator was blind to plugins/ — the distributed artifact —
+# and to the hub-only .claude/agents/). Widened to all three.
+HUB_AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
+PLUGIN_AGENTS_GLOB = "plugins/*/agents/*.md"
 
 
 def _parse_frontmatter(agent_path: Path) -> dict:
@@ -94,8 +99,14 @@ def _is_template_doc(frontmatter: dict, agent_name: str) -> bool:
 
 
 def _all_agent_files() -> list[Path]:
-    """Return all agent files in core/.claude/agents/."""
-    return sorted(AGENTS_DIR.glob("*.md"))
+    """Return all agent files across the three trees the invariant governs:
+    the core template (core/.claude/agents/), the hub-only operational agents
+    (.claude/agents/), and every shipped plugin's agents (plugins/*/agents/)."""
+    files = list(AGENTS_DIR.glob("*.md"))
+    if HUB_AGENTS_DIR.is_dir():
+        files += list(HUB_AGENTS_DIR.glob("*.md"))
+    files += list(REPO_ROOT.glob(PLUGIN_AGENTS_GLOB))
+    return sorted(set(files))
 
 
 def _is_deprecated(frontmatter: dict) -> bool:
