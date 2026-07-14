@@ -6389,10 +6389,10 @@
     "tier": "must-have"
   },
   "loop-engineering": {
-    "hash": "d8033d9e4d8d8553c019e3e947d23fd197b3228c95e086d0a47b964268104509",
+    "hash": "85590bc09cb9b0eb15da948250c199b2de3f6e7cd9895cb56efe0bbffc7cfc39",
     "type": "skill",
     "category": "core",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-16",
     "last_updated": "2026-07-10",

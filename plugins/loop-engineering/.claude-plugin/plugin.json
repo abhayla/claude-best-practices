@@ -1,7 +1,16 @@
 {
   "name": "loop-engineering",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Autonomous DISCOVER → PLAN → EXECUTE → VERIFY → SHIP meta-loop with independent maker≠checker verification, self-healing (fix-loop/debugging-loop) with bilevel strategy mutation + novelty gate on repeated stalls, and self-learning (learn-n-improve) — ships the full worker/skill dependency closure so a downstream project gets a working loop from one /plugin install.",
-  "author": { "name": "Abhay Kumar" },
-  "keywords": ["autonomous-loop", "maker-checker", "self-healing", "verification", "claude-code", "goal-6"]
+  "author": {
+    "name": "Abhay Kumar"
+  },
+  "keywords": [
+    "autonomous-loop",
+    "maker-checker",
+    "self-healing",
+    "verification",
+    "claude-code",
+    "goal-6"
+  ]
 }
