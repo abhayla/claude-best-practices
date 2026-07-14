@@ -1436,7 +1436,7 @@
     }
   },
   "dangerous-command-blocker": {
-    "hash": "9f4859cc78c2abad1a169a00fda3b33f21988366f832649ce56689d7611fc226",
+    "hash": "ef8398632f555c74bd75142532f8b82b1f0c1b7baeb867952ad11b7b0fb137af",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",
@@ -4367,7 +4367,7 @@
     }
   },
   "secret-scanner": {
-    "hash": "c1fb0666ca8c5942ff391cd0bf1120ac223ce6d18575e43d3fda8566087701af",
+    "hash": "77bacfae6a841d88230104f1eb01400f96a184c41eaa20105d5333f2d6d3dd88",
     "type": "hook",
     "category": "core",
     "version": "1.0.0",
@@ -6639,7 +6639,7 @@
     "tier": "nice-to-have"
   },
   "session-git-landing": {
-    "hash": "5d32ded7643cf4d3a5e32c3a3119dc71db85a157d85f2ccc50d1019564f6b678",
+    "hash": "abf3096aa732b14304ac8b1076d340131808caa10cbb4ee7be14d8c26fb91691",
     "type": "hook",
     "category": "need-basis",
     "version": "1.0.0",

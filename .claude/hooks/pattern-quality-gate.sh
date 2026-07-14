@@ -26,8 +26,12 @@
 #     }
 #   }
 
-# Only intercept git commit commands
-COMMAND=$(echo "$TOOL_INPUT" | jq -r '.command // empty')
+# Only intercept git commit commands.
+# Claude Code delivers PreToolUse input as JSON on STDIN ({"tool_input":{"command":...}}).
+# Read stdin first; fall back to the legacy $TOOL_INPUT env for any harness that still sets it.
+input="$(cat 2>/dev/null)"
+[[ -z "$input" ]] && input="${TOOL_INPUT:-}"
+COMMAND=$(printf '%s' "$input" | jq -r '.tool_input.command // .command // empty' 2>/dev/null)
 if [[ -z "$COMMAND" ]]; then exit 0; fi
 if ! echo "$COMMAND" | grep -qE 'git\s+commit'; then exit 0; fi
 

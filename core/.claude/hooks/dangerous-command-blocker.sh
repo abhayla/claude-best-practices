@@ -20,7 +20,14 @@
 #     }
 #   }
 
-COMMAND=$(echo "$TOOL_INPUT" | jq -r '.command // empty')
+# Claude Code delivers PreToolUse input as JSON on STDIN ({"tool_input":{"command":...}}).
+# Read stdin first; fall back to the legacy $TOOL_INPUT env for any harness that still sets it.
+input="$(cat 2>/dev/null)"
+[[ -z "$input" ]] && input="${TOOL_INPUT:-}"
+COMMAND=$(printf '%s' "$input" | jq -r '.tool_input.command // .command // empty' 2>/dev/null)
+# Nothing to inspect (no command in the payload) is not a dangerous command — allow.
+# (A Bash gate that blocked on unparseable input would brick every command; the danger
+# patterns below only match when COMMAND is a real, non-empty string.)
 if [[ -z "$COMMAND" ]]; then exit 0; fi
 
 # --- Catastrophic commands (always block) ---
