@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- Last audited against live repo: 2026-06-19 (registry 268==268, git/workflow-map/scripts/hooks verified accurate); 2026-06-20 addendum on feat/trust-score-mvp: documented trust-score/walk-phase subsystem (PR #163) — trust-score scope only, not a full re-audit; 2026-06-22: G6 plugin section refreshed for PR #195; 2026-06-29 addendum: documented the branch-choice menu + stale-branch-reaper layer (PRs #217/#218/#227, now core) in Autonomous Branch Lifecycle and synced the registered-pattern list — branch-lifecycle scope only, not a full re-audit; 2026-07-14 `/init` audit: synced the two blocking CI gates (eval-coverage ratchet `--enforce`, plugin version-bump), added `eval-coverage-grandfather.yml` + `plugin-recommendations.yml` to Key Config Files, fixed the auto-loaded rule list (`model-routing.md` added; `notifier-integration.md` repointed to `core/`). NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
+<!-- Audit trail (full-audit dates; scoped addenda in git history): 2026-06-19 full audit; 2026-06-20 trust-score addendum (PR #163); 2026-06-22 G6 refresh (PR #195); 2026-06-29 branch-choice addendum (PRs #217/#218/#227); 2026-07-14 /init audit (CI gates, config list, rule list — PR #396). How to audit this file: see "Maintaining This File" at the bottom. NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
 
 ## Critical: Two `.claude/` Directories
 
@@ -30,11 +30,13 @@ PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py::TestCopyClaudeDir
 # Provision a project
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 
-# Full local CI replication (run before opening a PR)
+# Full local CI replication (run before opening a PR — mirrors validate-pr.yml's 6 checks)
 PYTHONPATH=. python scripts/dedup_check.py --validate-all
 PYTHONPATH=. python scripts/dedup_check.py --secret-scan
 PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
 PYTHONPATH=. python -m pytest scripts/tests/ -v
+PYTHONPATH=. python scripts/check_eval_coverage.py --enforce --base origin/main   # skip if no skills changed
+PYTHONPATH=. python scripts/check_plugin_version_bump.py --base origin/main      # skip if plugins/ untouched
 
 # Regenerate docs after registry changes
 python scripts/generate_docs.py
@@ -81,7 +83,7 @@ The hub's trust-score subsystem is the gate that decides whether an autonomous-f
 
 ### Autonomous Branch Lifecycle
 
-The hub manages its own git branches end-to-end so the user never touches git. The flow: edit → auto-commit → auto-push → auto-PR → merge-on-green → auto-prune, leaving only CI-red or genuinely-strategic PRs open for a human. Two hooks + one skill + GitHub config:
+The hub manages its own git branches end-to-end so the user never touches git. The flow: edit → auto-commit → auto-push → auto-PR → merge-on-green → auto-prune, leaving only CI-red or genuinely-strategic PRs open for a human. The pieces (hooks + skills + GitHub config):
 
 - **`.claude/hooks/auto-git.sh`** (SessionStart + Stop) — commits + pushes each turn's work to a task branch; keeps `main` clean (branches off it); guardrail 1b refuses to stack new work onto an already-merged branch. Secret-scan-gated, fail-open.
 - **`.claude/hooks/auto-pr.sh`** (SessionEnd) — opens the PR, arms native CI-gated auto-merge (squash), prunes local branches `gh` confirms MERGED. Arms on session close (NOT per-turn) so work never merges mid-session. Off-switches `AUTO_PR_DISABLE=1` / `AUTO_MERGE=0`.
@@ -263,3 +265,13 @@ Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load alwa
 
 (`notifier-integration.md` is a distributable rule living only in `core/.claude/rules/` — it is not hub-auto-loaded; the Notifier gateway itself is documented in the user-global CLAUDE.md / `GLOBAL.md` §2.)
 - `.claude/rules/workflow.md` — 7-step development workflow (understand → test → implement → fix-loop → verify → commit)
+
+## Maintaining This File (/init audits)
+
+This file is auto-loaded every session — keep it accurate and token-flat (compress when adding). An audit is a diff against the live repo, not a rewrite; never touch owner-approved narrative (G6 architecture, governance sections) without approval. Checklist:
+
+1. **Enumerable lists vs disk** — `ls plugins/` vs the `plugins/` entry; `ls .claude/rules/` vs "Rules for Claude"; `ls scripts/*.py` vs Key Scripts (spent one-shots intentionally omitted); `ls config/` vs Key Config Files; workflow map vs `ls core/.claude/skills/`.
+2. **CI vs prose** — `.github/workflows/validate-pr.yml` steps vs the "Full local CI replication" block AND the CI Workflows section; gate descriptions (blocking vs advisory, flags like `--enforce`) vs the scripts' actual behavior — read the script docstring, don't trust the old prose.
+3. **No pinned counts** — pattern totals, plugin counts, percentages: point at the SSOT (`registry/patterns.json`, `goals.yml`, changelog) instead of pinning numbers that rot. Prefer count-free phrasing ("The pieces:") over "Two hooks + one skill".
+4. **Paths exist** — every referenced file/dir must exist at the stated path (a rule listed under `.claude/rules/` that actually lives in `core/.claude/rules/` is a defect).
+5. **Close out** — update the header audit-trail comment (one terse line), run the quality gate + secret scan locally, land CI-gated on the autonomous branch lifecycle.
