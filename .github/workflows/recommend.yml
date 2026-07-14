@@ -1,7 +1,10 @@
 name: Recommend Resources
 on:
-  schedule:
-    - cron: '0 9 * * 3'  # Wednesday 9am UTC
+  # Weekly cron RETIRED (#346 stage, owner-approved 2026-07-14): all 5 enrolled repos are
+  # plugins-first (2026-07-13 migration sweep), so weekly copy-provision PRs are superseded by
+  # `/plugin update` + config/plugin-recommendations.yml. Manual dispatch retained for
+  # onboarding a NEW downstream repo; re-enable the cron by restoring the schedule block if
+  # copy-distribution ever returns.
   workflow_dispatch:
     inputs:
       repo:
