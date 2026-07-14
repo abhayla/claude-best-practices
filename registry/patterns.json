@@ -6281,13 +6281,13 @@
     }
   },
   "no-overask-guard": {
-    "hash": "20ed26bcfa3e4c98435776c1bee000501e0192ed8cb68e54171a9d37f892ea65",
+    "hash": "8a29d2469901d26d8cdd1b4eeb4af1041e798b9ce657b51a11ab989bd6058af7",
     "type": "hook",
     "category": "core",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-07-10",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
     "description": "Stop hook enforcing stop-discipline deterministically: BLOCKS over-ask (trailing offer / multiple-choice / recommendation+question) and narrate-and-stop endings on reversible work and re-injects the decision-authority rule; exempts genuine blockers and *Sync-check:* intent grills; logs enhance-banner/block/role misses as non-blocking telemetry; per-turn auto-continue cap of 12 via .claude/.keepgoing-count.",
@@ -6297,7 +6297,7 @@
       "stop-discipline",
       "telemetry"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses | v1.2.0 (2026-07-10): fire-where-it-pays — machine-origin turns (task-notification/scheduled-wakeup/skill-exec/system-reminder-only, via shared turn-origin.sh) are exempt from enhance-card/banner/role enforcement like slash commands; over-ask + narrate-and-stop guards stay active.",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses | v1.2.0 (2026-07-10): fire-where-it-pays — machine-origin turns (task-notification/scheduled-wakeup/skill-exec/system-reminder-only, via shared turn-origin.sh) are exempt from enhance-card/banner/role enforcement like slash commands; over-ask + narrate-and-stop guards stay active. | v1.2.2: propagate the #290 gradea (sampled-ceremony) exemption to the enhance-block-miss telemetry detector — it was wired into both BLOCKING detectors but not the telemetry one, logging every legitimate Grade-A one-liner turn as a miss (36/36 of the 7d misses; closes the #331 follow-up class)",
     "tier": "must-have"
   },
   "turn-origin": {

@@ -243,7 +243,7 @@ fi
 # enhanced-prompt block ("final prompt"/"what changed") NOR the trivial "ran as-is"
 # one-liner → the user can't see what was enhanced. Non-blocking telemetry (the
 # behavioral fix is the MANDATORY OUTPUT section in prompt-auto-enhance-rule.md).
-if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' && ! printf '%s' "$full" | grep -qE "final prompt|what changed|ran (your )?input as-is|ran as-is|no change — ran|no enhancement"; then
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ -z "$gradea" ] && [ "${#last_text}" -ge 300 ] && printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' && ! printf '%s' "$full" | grep -qE "final prompt|what changed|ran (your )?input as-is|ran as-is|no change — ran|no enhancement"; then
   printf '%s\tenhance-block-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.enhance-misses.log" 2>/dev/null
 fi
 # Role-miss (R1 persona): a final-prompt block whose text lacks "act as" — the R1 role
