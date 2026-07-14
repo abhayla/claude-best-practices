@@ -757,3 +757,4 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Always `git fetch origin main` immediately before `git checkout -b X origin/main`** — branched from a stale ref and the working tree silently "reverted" a just-merged PR's files (looked like someone else's edit). Fetch+branch must be one command.
 - **Never re-sort/reformat `registry/patterns.json` when adding an entry** — the file is not alphabetized; a sorted rewrite produced a 2989-line diff. Load with `object_pairs_hook=OrderedDict`, append the key, dump with matching indent/ensure_ascii.
 - **Registry `hash` = `dedup_check.hash_pattern()` (whitespace-normalized), NOT raw sha256** — compute via the validator's own function, never by hand.
+- **Run `check_eval_coverage.py --enforce --base origin/main` AFTER committing, not before** — it diffs committed history (`base...HEAD`), so a pre-commit run sees "no changed files" and green-lights a branch that CI will fail (bit PR #407).

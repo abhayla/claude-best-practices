@@ -51,6 +51,27 @@ several sub-skills like `fix-loop`/`systematic-debugging` are referenced by rule
 (`claude-behavior.md` rule 15) and stack skills, so they may need to stay full copies far
 longer; the "declare unused" bar of the verify-before-suggest rule applies).
 
+## Cluster-1 sweep verdicts (2026-07-14 — recorded so the next session doesn't re-derive)
+
+All three remaining cbp-learning-workflow sub-skills **STAY full copies** under the strict
+no-non-plugin-consumer rule:
+
+- `learn-n-improve` — consumed by RULES (`claude-behavior.md` rule 15, `continuous-improvement.md`,
+  `learnings-routing.md`), `project-manager-agent`, and many stack skills (android-run-*, …).
+- `skill-factory` — consumed by `skill-master`, `writing-skills` references.
+- `test-knowledge` — consumed by `fix-loop`, `systematic-debugging`.
+
+**Design finding this forces (stage-4 fork, OWNER decision):** the workflows cross-reference each
+other and are referenced by global rules pervasively, so under the strict rule the safely
+convertible set beyond entry-skill pointers is ~empty. The refined criterion — convert when every
+consumer resolves at runtime via the universally-recommended plugin — converts everything, but
+degrades any project that copy-provisions WITHOUT installing plugins (e.g. rule 15's `/fix-loop` /
+`/learn-n-improve` would hit pointers). That is exactly #346's endgame question: declare
+plugins-first the ONLY supported distribution for workflow capabilities (copy-provision keeps only
+path-scoped rules + stack helpers), or keep dual distribution and stop converting here. Until the
+owner picks, conversions beyond already-landed pointers are BLOCKED-BY-DESIGN-DECISION, not
+mechanical work.
+
 ## Risks / open questions
 
 - **Closure guard semantics** after a workflow's entry skill becomes a pointer — the pilot
