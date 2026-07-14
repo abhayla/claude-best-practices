@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- Last audited against live repo: 2026-06-19 (registry 268==268, git/workflow-map/scripts/hooks verified accurate); 2026-06-20 addendum on feat/trust-score-mvp: documented trust-score/walk-phase subsystem (PR #163) — trust-score scope only, not a full re-audit; 2026-06-22: G6 plugin section refreshed for PR #195; 2026-06-29 addendum: documented the branch-choice menu + stale-branch-reaper layer (PRs #217/#218/#227, now core) in Autonomous Branch Lifecycle and synced the registered-pattern list — branch-lifecycle scope only, not a full re-audit. NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
+<!-- Last audited against live repo: 2026-06-19 (registry 268==268, git/workflow-map/scripts/hooks verified accurate); 2026-06-20 addendum on feat/trust-score-mvp: documented trust-score/walk-phase subsystem (PR #163) — trust-score scope only, not a full re-audit; 2026-06-22: G6 plugin section refreshed for PR #195; 2026-06-29 addendum: documented the branch-choice menu + stale-branch-reaper layer (PRs #217/#218/#227, now core) in Autonomous Branch Lifecycle and synced the registered-pattern list — branch-lifecycle scope only, not a full re-audit; 2026-07-14 `/init` audit: synced the two blocking CI gates (eval-coverage ratchet `--enforce`, plugin version-bump), added `eval-coverage-grandfather.yml` + `plugin-recommendations.yml` to Key Config Files, fixed the auto-loaded rule list (`model-routing.md` added; `notifier-integration.md` repointed to `core/`). NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
 
 ## Critical: Two `.claude/` Directories
 
@@ -183,7 +183,8 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 - **`sync_to_local.py`** — Hub→local sync: pulls patterns into a local project directory
 - **`third_party_skills.py`** — Detects and includes third-party agent skills during provisioning (called by `recommend.py`)
 - **`pipeline_aggregator.py`** — Standalone aggregator for testing-pipeline results: reads `test-results/*.json` and applies the union-of-failures rule
-- **`check_eval_coverage.py`** — Advisory (non-blocking) eval-coverage touch-trigger gate: warns via `::warning::` when a changed `SKILL.md` lacks an `evals/*.md` report; wired into `validate-pr.yml`, always exits 0
+- **`check_eval_coverage.py`** — Eval-coverage touch-trigger gate. CI (`validate-pr.yml`) runs it with `--enforce` (the RATCHET, owner-approved 2026-07-13): a changed `SKILL.md` lacking an `evals/*.md` report FAILS the PR unless the skill is grandfathered in `config/eval-coverage-grandfather.yml`; without `--enforce` it only warns via `::warning::` and exits 0
+- **`check_plugin_version_bump.py`** — BLOCKING CI gate (`validate-pr.yml`): any `plugins/<name>/` source change must bump that plugin's `plugin.json` version, because Claude Code serves installed plugins from a version-pinned cache — an un-bumped edit merges green but never reaches installed copies. New plugins pass; README/evals-only changes are exempt
 - **`bootstrap.sh`** (repo root, not in `scripts/`) — Curl-pipe-bash installer for downstream users: `curl -sL .../bootstrap.sh | bash -s -- --stacks <list> [--target <dir>]`. Calls `bootstrap.py` after fetching the repo
 - **`trust_score.py`** / **`collect_signals.py`** / **`simulate_walk_phase.py`** / **`generate_trust_dashboard.py`** — the trust-score / walk-phase MVP toolchain (engine, real-signal adapter, sandbox simulator, dashboard generator). See "Trust Score & Walk-Phase (autonomous-factory MVP)" under Architecture before touching scoring, gates, or ledgers
 - **`record_task_run.py`** (#196) — honest per-task trust-score accrual: auto-derives real signals + an honest git-history `human_had_to_fix` proxy (never silently `False`) and appends ONE shadow-mode run per branch to the ATLAS ledger; idempotent via `trust-score/.recorded-branches`. Wired into `/git-branch-lifecycle finish` STEP 3
@@ -211,10 +212,12 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 - **`config/trust-score.yml`** — Trust-score rulebook: signal weights (sum 1.0), RECOMMEND `threshold`, and `hard_gates` safety floors. Edit here — `scripts/trust_score.py` mirrors it as a default; never hard-code thresholds
 - **`config/telemetry-aggregates.json`** — Historical effectiveness data from `aggregate_telemetry.py` runs. Generated output — may not exist until the first telemetry run; do not treat its absence as an error
 - **`config/model-costs.yml`** — Cost-ledger rulebook: USD-per-MTok rates by model family (opus/sonnet/haiku/fable/default), `daily_alert_usd` threshold, `ledger_retention_days`. Edit here — `scripts/cost_ledger.py` reads it at runtime; rates are estimates pending real billing (see `as_of`)
+- **`config/eval-coverage-grandfather.yml`** — Shrink-only allowlist for the eval-coverage ratchet (`check_eval_coverage.py --enforce`): skills predating the blocking gate only WARN when changed without evals. RATCHET RULE: entries may only be REMOVED (as evals are added), never added — new skills ship with evals from day one
+- **`config/plugin-recommendations.yml`** — The install-not-copy layer of the #187 distribution model: `recommend.py` reads it to tell a project WHICH marketplace plugins to install (universal workflows + its stack's toolbox) alongside copy-provision. Edit recommendations here, never hardcode plugin sets in scripts
 
 ### CI Workflows
 
-- **`validate-pr.yml`** — Runs all 4 validation commands on PRs
+- **`validate-pr.yml`** — Runs all 4 validation commands on PRs, plus two blocking gates: eval-coverage ratchet (`check_eval_coverage.py --enforce`) and plugin version-bump (`check_plugin_version_bump.py`)
 - **`update-docs.yml`** — Auto-regenerates docs on main push. Avoid running `generate_docs.py` manually on main
 - **`test.yml`** — Runs pytest on `scripts/**` changes
 - **`recommend.yml`** — Weekly cron: provisions patterns for repos in `config/repos.yml`
@@ -255,6 +258,8 @@ Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load alwa
 
 - `.claude/rules/claude-behavior.md` — task approach, self-improvement, git hygiene, code quality, scope discipline
 - `.claude/rules/context-management.md` — progressive disclosure, scratchpad usage, subagent delegation, compaction survival
-- `.claude/rules/notifier-integration.md` — every deployed project wires owner-alerts + uptime heartbeats through the shared Notifier gateway (two env vars + one helper, fail-open); no per-app senders, no external uptime pingers
+- `.claude/rules/model-routing.md` — cheapest sufficient model per dispatch (haiku/sonnet/opus tiers, inherit Fable only for frontier judgment), preemptive security-category routing to opus, refusal→fallback playbook, per-pass effort dial, session-level routing
 - `.claude/rules/prompt-auto-enhance.md` — Tier 1/2 context gathering, grade pipeline, clarification gate, resource CRUD detection
+
+(`notifier-integration.md` is a distributable rule living only in `core/.claude/rules/` — it is not hub-auto-loaded; the Notifier gateway itself is documented in the user-global CLAUDE.md / `GLOBAL.md` §2.)
 - `.claude/rules/workflow.md` — 7-step development workflow (understand → test → implement → fix-loop → verify → commit)
