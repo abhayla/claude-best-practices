@@ -47,6 +47,14 @@ def test_entry_skill_conformance(wf):
     entry, body = _entry_body(wf)
     if body is None:
         pytest.skip(f"{wf}: entry_skill '{entry}' has no SKILL.md")
+    # Plugin-pointer exemption (#346 stage 2, plans/core-skills-thin-pointer-retirement.md):
+    # a core/ entry skill retired to a thin plugin pointer is `type: reference` and carries
+    # the /plugin install redirect. The REAL orchestrator (with its workflow structure and
+    # dispatches) lives in the plugin, so the workflow-shape assertions below don't apply —
+    # but only this exact retirement shape is exempt; an accidental type change still fails.
+    if re.search(r"^type:\s*reference", body, re.MULTILINE) and "/plugin install" in body:
+        assert re.search(r"plugin", body, re.IGNORECASE), f"{wf}: pointer must name its plugin"
+        return
     dispatched = {d for d in re.findall(r'subagent_type=["\']([a-z0-9-]+)["\']', body)
                   if d not in BUILTIN_AGENTS}
     fm = re.search(r'^allowed-tools:\s*"([^"]*)"', body, re.MULTILINE)

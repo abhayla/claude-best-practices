@@ -3018,13 +3018,13 @@
     }
   },
   "learning-self-improvement": {
-    "hash": "1455968c02e8226a26019ff6e7592f8a47c8bc1107818101717821789149efe6",
+    "hash": "3cbde36f689fe419ff1de3dbd83e0503cea14cd6274947e823bd64e6cb044262",
     "type": "skill",
     "category": "core",
-    "version": "2.1.1",
+    "version": "3.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-07-14",
     "dependencies": [
       "context-reducer-agent",
       "learn-n-improve",
@@ -3034,13 +3034,13 @@
       "workflow-contracts"
     ],
     "visibility": "public",
-    "description": "Slash-command wrapper for learning-self-improvement-master-agent. Knowledge accumulation and skill proposal generation.",
+    "description": "POINTER (plugin-as-SSOT, #346 stage 2): the learning workflow now ships as the cbp-learning-workflow plugin; this core/ file redirects provisioning to /plugin install cbp-learning-workflow@claude-best-practices instead of copying the template.",
     "tags": [
       "orchestration",
       "workflow",
       "learning"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7)",
+    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.7) | v3.0.0: MAJOR — retired as a copied template; converted to a thin plugin pointer (cbp-learning-workflow is the SSOT; pilot conversion of #346 stage 2, plans/core-skills-thin-pointer-retirement.md)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,

@@ -89,7 +89,6 @@ grandfathered:
   - jest-dev
   - k8s-deploy
   - karpathy-advisor
-  - learning-self-improvement
   - mcp-server-builder
   - merge-strategy
   - middleware-test
