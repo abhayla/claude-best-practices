@@ -5,7 +5,7 @@
 # can express token spend in dollars for cadence/threshold decisions BEFORE real billing data
 # exists. UPDATE THIS FILE when Anthropic pricing changes or real billing starts — it is the
 # single source of truth `cost_ledger.py` reads at runtime, never hard-code a rate in the script.
-as_of: "2026-07-10"
+as_of: "2026-07-14"
 
 # USD per MILLION tokens (MTok), by model family. A transcript's `model` string (e.g.
 # "claude-opus-4-8") is matched by case-insensitive substring against these family keys.
@@ -26,15 +26,15 @@ families:
     cache_write: 1.00
     cache_read: 0.08
   fable:
-    # "Fable" is this environment's session branding for the frontier model, not a distinct
-    # billed API SKU — transcripts record the real underlying model id (e.g. "claude-sonnet-5"
-    # matches the `sonnet` family above), so this entry only fires if a raw "fable" string is
-    # ever recorded. Priced at opus rates (the conservative/expensive assumption) until real
-    # data disambiguates it.
-    input: 15.00
-    output: 75.00
-    cache_write: 18.75
-    cache_read: 1.50
+    # VERIFIED 2026-07-14: `claude-fable-5` IS a real billed API SKU — $10/MTok input,
+    # $50/MTok output per Anthropic's official models overview + Fable-5 intro doc
+    # (platform.claude.com). The earlier "session branding, not a SKU" note was wrong.
+    # cache_write/cache_read use Anthropic's standard multipliers (1.25x / 0.1x input) —
+    # derived, not separately published; re-verify if a Fable-specific cache rate appears.
+    input: 10.00
+    output: 50.00
+    cache_write: 12.50
+    cache_read: 1.00
   default:
     # Any model string matching none of the families above (a future/unrecognized model) falls
     # back here — priced conservatively at opus rates so an unmatched model never silently
