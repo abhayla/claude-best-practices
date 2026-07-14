@@ -91,3 +91,30 @@ def test_reconcile_skips_dirty_tree(tmp_path):
     assert r.returncode == 0, r.stderr
     assert "BRANCH=feature" in r.stdout, r.stdout
     assert "DIRTY_EXISTS=1" in r.stdout, r.stdout
+
+
+def test_reconcile_handles_github_token_docs_prs():
+    """Regression pin for the 2026-07-14 docs-PR pileup (#378-#399): update-docs.yml opens
+    its PR with the default GITHUB_TOKEN, which never triggers the required `validate`
+    check, so its self-armed auto-merge never fires and one PR stacks per main push.
+    reconcile() must carry the NARROW carve-out (keyed on the auto/docs-update-* branch
+    prefix, NOT a blanket bot exemption): supersede older docs PRs, kick CI via
+    close+reopen when zero checks ran, and re-arm auto-merge."""
+    for path in (LANDING, CORE_LANDING):
+        text = path.read_text(encoding="utf-8")
+        assert 'startswith("auto/docs-update-")' in text, (
+            f"{path}: docs-update carve-out must be keyed on the head-branch prefix"
+        )
+        assert "statusCheckRollup | length" in text, (
+            f"{path}: CI-kick must be gated on ZERO check runs (the GITHUB_TOKEN gap)"
+        )
+        assert "gh pr reopen" in text, (
+            f"{path}: kick must be close+reopen under the session's user token"
+        )
+        assert "Superseded by" in text, (
+            f"{path}: older docs regenerations must be closed as superseded"
+        )
+        # The security bot-block from the composite-autonomy audit must SURVIVE the carve-out.
+        assert "approved-for-merge" in text, (
+            f"{path}: general bot/scan PRs must still require the approved-for-merge label"
+        )

@@ -6639,13 +6639,13 @@
     "tier": "nice-to-have"
   },
   "session-git-landing": {
-    "hash": "abf3096aa732b14304ac8b1076d340131808caa10cbb4ee7be14d8c26fb91691",
+    "hash": "c32dbbd459d123074c99a5984c9a5af2e346cd8b004c4b680cfcab5b8bf73794",
     "type": "hook",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-26",
-    "last_updated": "2026-06-26",
+    "last_updated": "2026-07-14",
     "dependencies": [],
     "visibility": "public",
     "tier": "must-have",
@@ -6657,7 +6657,7 @@
       "dry",
       "hook"
     ],
-    "changelog": "v1.0.0 (2026-06-26): extracted duplicated landing logic from 2 session skills + 2 hooks into one SSOT."
+    "changelog": "v1.0.0 (2026-06-26): extracted duplicated landing logic from 2 session skills + 2 hooks into one SSOT. | v1.1.0: docs-update carve-out — supersede stale auto/docs-update-* PRs, kick CI (close+reopen) on GITHUB_TOKEN PRs with zero checks, re-arm auto-merge; general bot/scan PRs still label-gated"
   },
   "git-branch-lifecycle": {
     "hash": "0e7ca91f6b32154d8e86229bce9d3881be8333502996b50dfe02b4128385f9f2",
