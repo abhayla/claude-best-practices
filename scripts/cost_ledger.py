@@ -249,10 +249,11 @@ def _add_usage(bucket: dict, usage: dict, usd: float) -> None:
 
 def aggregate(entries, config: dict) -> dict:
     """Roll up `scan_transcripts()` entries into one dict per day: token totals by kind, by
-    model family, by attribution (main vs. subagent-name), a distinct session count, and the
+    model family, by attribution (main vs. subagent-name), by project (the transcript's
+    project-dir name — the WHICH-project-spent-it axis), a distinct session count, and the
     estimated total USD (cache_read priced at the cache_read rate, etc., per `usd_for_usage`)."""
     days: dict[str, dict] = {}
-    for date_str, _project, model, attribution, usage, session_id in entries:
+    for date_str, project, model, attribution, usage, session_id in entries:
         day = days.setdefault(
             date_str,
             {
@@ -260,6 +261,7 @@ def aggregate(entries, config: dict) -> dict:
                 "tokens": _empty_bucket(),
                 "by_model": {},
                 "by_attribution": {},
+                "by_project": {},
                 "sessions": set(),
                 "usd": 0.0,
             },
@@ -271,6 +273,7 @@ def aggregate(entries, config: dict) -> dict:
         _add_usage(day["tokens"], usage, usd)
         _add_usage(day["by_model"].setdefault(model, _empty_bucket()), usage, usd)
         _add_usage(day["by_attribution"].setdefault(attribution, _empty_bucket()), usage, usd)
+        _add_usage(day["by_project"].setdefault(project, _empty_bucket()), usage, usd)
 
     result = {}
     for date_str, day in days.items():
@@ -477,12 +480,16 @@ def format_report(records: list[dict], days: int) -> str:
     total_usd = 0.0
     model_totals: Counter = Counter()
     attribution_totals: Counter = Counter()
+    project_totals: Counter = Counter()
     for r in records:
         total_usd += r.get("usd", 0.0)
         for model, bucket in r.get("by_model", {}).items():
             model_totals[model] += bucket.get("usd", 0.0)
         for attribution, bucket in r.get("by_attribution", {}).items():
             attribution_totals[attribution] += bucket.get("usd", 0.0)
+        # by_project is absent on rows recorded before 2026-07-14 — tolerate, don't backfill
+        for project, bucket in r.get("by_project", {}).items():
+            project_totals[project] += bucket.get("usd", 0.0)
         tokens = r.get("tokens", {})
         lines.append(
             f"  {r['date']}  ${r.get('usd', 0.0):8.2f}  "
@@ -498,6 +505,12 @@ def format_report(records: list[dict], days: int) -> str:
         lines.append("By model:")
         for model, usd in model_totals.most_common():
             lines.append(f"  {model:30s} ${usd:8.2f}")
+
+    if project_totals:
+        lines.append("")
+        lines.append("Top projects:")
+        for project, usd in project_totals.most_common(10):
+            lines.append(f"  {project:50s} ${usd:8.2f}")
 
     if attribution_totals:
         lines.append("")

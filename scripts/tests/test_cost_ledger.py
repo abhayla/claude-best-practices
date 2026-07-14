@@ -406,3 +406,60 @@ class TestModelFamilyRates:
 
     def test_unknown_model_uses_default(self):
         assert cl.model_family_rates("something-else", CONFIG) == CONFIG["families"]["default"]
+
+
+class TestPerProjectBreakdown:
+    """Decision D (2026-07-14): per-project cost attribution — the ledger must answer
+    'WHICH project spent it', not just 'how much was spent today'."""
+
+    def test_aggregate_buckets_by_project(self, tmp_path):
+        _write_jsonl(
+            tmp_path / "proj-a" / "s1.jsonl",
+            [_entry("claude-sonnet-4", "2026-07-01T00:00:00Z", {"input_tokens": 1_000_000}, session_id="a1")],
+        )
+        _write_jsonl(
+            tmp_path / "proj-b" / "s2.jsonl",
+            [_entry("claude-sonnet-4", "2026-07-01T01:00:00Z", {"output_tokens": 1_000_000}, session_id="b1")],
+        )
+        days = cl.aggregate(cl.scan_transcripts(tmp_path), CONFIG)
+        day = days["2026-07-01"]
+        assert set(day["by_project"]) == {"proj-a", "proj-b"}
+        assert abs(day["by_project"]["proj-a"]["usd"] - 3.00) < 1e-9   # sonnet input $3/MTok
+        assert abs(day["by_project"]["proj-b"]["usd"] - 15.00) < 1e-9  # sonnet output $15/MTok
+        assert day["by_project"]["proj-a"]["input"] == 1_000_000
+
+    def test_report_lists_top_projects(self):
+        records = [
+            {
+                "date": "2026-07-01",
+                "usd": 18.0,
+                "tokens": {"input": 1, "output": 1, "cache_write": 0, "cache_read": 0},
+                "session_count": 2,
+                "by_model": {},
+                "by_attribution": {},
+                "by_project": {
+                    "D--Abhay-proj-a": {"usd": 15.0},
+                    "D--Abhay-proj-b": {"usd": 3.0},
+                },
+            }
+        ]
+        report = cl.format_report(records, days=7)
+        assert "Top projects:" in report
+        assert "D--Abhay-proj-a" in report
+        # highest-spend project listed before the lower one
+        assert report.index("D--Abhay-proj-a") < report.index("D--Abhay-proj-b")
+
+    def test_report_tolerates_records_without_by_project(self):
+        # pre-decision-D ledger rows have no by_project field — the report must not crash
+        records = [
+            {
+                "date": "2026-07-01",
+                "usd": 1.0,
+                "tokens": {"input": 1, "output": 1, "cache_write": 0, "cache_read": 0},
+                "session_count": 1,
+                "by_model": {},
+                "by_attribution": {},
+            }
+        ]
+        report = cl.format_report(records, days=7)
+        assert "2026-07-01" in report
