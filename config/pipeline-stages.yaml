@@ -94,6 +94,12 @@ stages:
 
   - id: stage_6_pre_tests
     name: "Pre-Impl Tests (TDD Red)"
+    # A1 HUMAN-APPROVAL PAUSE (human-approval-gates.md + ba-architect-loop-integration plan):
+    # after the technical design is produced (plan stage_2 + schema stage_5) and BEFORE any
+    # pre-impl tests + implementation (stages 6-8), project-manager-agent MUST pause for the
+    # owner's explicit design approval — a quick review of the technical approach (data model,
+    # API, key decisions). Distinct from G1 (stage_4 UI mockup). Present the design artifacts,
+    # stop; never infer approval from silence.
     depends_on: [stage_2_plan, stage_5_schema]
     artifacts_out:
       test_matrix:

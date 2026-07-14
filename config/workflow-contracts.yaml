@@ -449,7 +449,11 @@ stage_to_workflow:
   stage_4_demo: null
   stage_5_schema: null
   stage_6_pre_tests: testing-pipeline
-  stage_7_impl: development-loop
+  # stage_7_impl runs the loop-engineering meta-loop (maker≠checker self-heal + strategy
+  # mutation + escalation) instead of raw development-loop. Dispatched with the plan artifact
+  # as its DoD/unit + --no-ship (the pipeline's own stage_10 owns deploy; the loop must not
+  # ship past G2/G3). See project-manager-agent.md "Loop-engineering build stage".
+  stage_7_impl: loop-engineering
   stage_8_post_tests: testing-pipeline
   stage_9_review: code-review
   stage_10_deploy: null

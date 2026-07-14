@@ -487,6 +487,9 @@ class TestOrchestrationConstraintsApplied:
             "development-loop", "test-pipeline", "debugging-loop",
             "code-review-workflow", "documentation-workflow", "session-continuity",
             "learning-self-improvement", "skill-authoring-workflow",
+            # loop-engineering is the stage_7_impl build engine and dispatches
+            # its maker/checker workers via Agent() at T0 (skill-at-T0 orchestrator).
+            "loop-engineering",
         }
         skills_dir = CORE_CLAUDE / "skills"
         errors = []
@@ -818,4 +821,23 @@ class TestSkipConditions:
         s6 = next(s for s in stages if s["id"] == "stage_6_pre_tests")
         assert "stage_2_plan" in s6["depends_on"], (
             "Stage 6 must depend on Stage 2 so it's reachable even if Stage 5 is skipped"
+        )
+
+
+class TestBuildStageUsesLoopEngineering:
+    """stage_7_impl is wired to loop-engineering (ba-architect-loop-integration plan, 2026-07-14)."""
+
+    @pytest.fixture
+    def stage_to_workflow(self):
+        with open(CONFIG_DIR / "workflow-contracts.yaml", encoding="utf-8") as f:
+            return yaml.safe_load(f)["stage_to_workflow"]
+
+    def test_build_stage_maps_to_loop_engineering(self, stage_to_workflow):
+        assert stage_to_workflow["stage_7_impl"] == "loop-engineering", (
+            "stage_7_impl must use the loop-engineering meta-loop as its build engine"
+        )
+
+    def test_loop_engineering_skill_exists(self):
+        assert (CORE_CLAUDE / "skills" / "loop-engineering" / "SKILL.md").exists(), (
+            "stage_7_impl maps to loop-engineering — the skill must exist to be dispatchable"
         )

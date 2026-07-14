@@ -3769,7 +3769,7 @@
     }
   },
   "project-manager-agent": {
-    "hash": "2459ec6c4cca8a757db87d7b7d40a48258d708ca855f7e327fbc723d7e404c6d",
+    "hash": "94dbb210db1bb10c141a76e1ffbcbabacaa089cd0a7de914511a52be6c625a0d",
     "type": "agent",
     "category": "core",
     "version": "1.2.0",

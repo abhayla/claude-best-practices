@@ -19,7 +19,7 @@ Coordinate a multi-stage pipeline from PRD to Production. Load the pipeline DAG 
 
 1. **DAG Loading & Wave Computation** — Read `config/pipeline-stages.yaml` to load stage definitions with dependencies and skip conditions. Compute parallel execution waves from the DAG, adjusting for skipped stages. Identify the critical path.
 
-2. **Agent Dispatch & Gate Validation (incl. human-approval pauses)** — For each wave, dispatch eligible stages in parallel using `Agent()`. Each stage agent receives: upstream artifact paths, expected output artifacts, gate protocol instructions, and idempotency rules. After each agent returns, validate that all `artifacts_out` exist on disk and the gate result is PASSED. Override to FAILED if artifacts are missing despite a PASSED gate. **MUST also HALT for the human-approval gates (`human-approval-gates.md`): G1 after `stage_4_demo` (mockup "build THIS" approval, before implementation; precondition: BA completeness audit clean), G2 after `stage_9_review` (feature-acceptance sign-off, before deploy), G3 before `stage_10_deploy` (production-deploy approval). Present the concrete artifact and STOP for explicit user sign-off — a green automated gate FEEDS these pauses but never replaces the user's approval; never infer approval from silence.**
+2. **Agent Dispatch & Gate Validation (incl. human-approval pauses)** — For each wave, dispatch eligible stages in parallel using `Agent()`. Each stage agent receives: upstream artifact paths, expected output artifacts, gate protocol instructions, and idempotency rules. After each agent returns, validate that all `artifacts_out` exist on disk and the gate result is PASSED. Override to FAILED if artifacts are missing despite a PASSED gate. **MUST also HALT for the human-approval gates (`human-approval-gates.md` + `plans/ba-architect-loop-integration.md`): T0 (before the run) — the `stage_1_prd` input MUST be an owner-approved PRD produced via interactive BA discovery (grill one question at a time, `ba-discovery-checklist.md` — "Option A"); if launched with only a thin idea, STOP and route to interactive BA grilling + feature-set approval FIRST, never fabricate requirements from a one-line input. G1 after `stage_4_demo` (UI mockup "build THIS" approval; precondition: BA completeness audit clean). A1 after the technical design is complete (plan `stage_2` + schema `stage_5`) and BEFORE `stage_6_pre_tests`/implementation — owner reviews + approves the technical approach (data model, API, key decisions); distinct from G1. G2 after `stage_9_review` (feature-acceptance sign-off, before deploy). G3 before `stage_10_deploy` (production-deploy approval). Present the concrete artifact and STOP for explicit user sign-off — a green automated gate FEEDS these pauses but never replaces the user's approval; never infer approval from silence.**
 
 3. **State Management & Persistence** — Maintain `.pipeline/state.json` as the single source of truth. Update stage status, timestamps, retries, and gate results after every action. Create git tags before each stage for rollback checkpoints. Append every significant event to `.pipeline/event-log.jsonl` (never overwrite).
 
@@ -162,9 +162,21 @@ Before dispatching a stage, check `config/workflow-contracts.yaml` →
 - **If mapping is `null`** → dispatch a direct stage agent (existing behavior
   via the Stage Dispatch Protocol above)
 
-When multiple pipeline stages map to the same workflow (e.g., stage_1 and
-stage_7 both map to development-loop), invoke with different `Execute Steps`
+When multiple pipeline stages map to the same workflow (e.g., stage_1, stage_2,
+stage_3 all map to development-loop), invoke with different `Execute Steps`
 subsets — the workflow skill executes only the requested steps per invocation.
+
+**Loop-engineering build stage (`stage_7_impl`).** This stage maps to
+`loop-engineering`, NOT the generic `Execute Steps` form. Dispatch it with the
+**plan artifact as the loop's DoD/unit** and the **`--no-ship`** flag —
+`Skill("/loop-engineering", args="<stage_2_plan.artifacts_out.plan path> --no-ship")`.
+Rationale: the loop's own DISCOVER consumes the named unit and skips re-triaging
+(loop STEP 2 rule 1); `--no-ship` stops it at *verified* so the pipeline's own
+`stage_10_deploy` (behind G3) still owns shipping. The loop's internal VERIFY
+(maker≠checker) overlaps `stage_8_post_tests` — KEEP `stage_8` initially as the
+independent blind re-check (`independent-test-verification.md`); revisit only
+after measuring. A loop PREFLIGHT BLOCK (`WORKER_REGISTRY_NOT_LOADED`) is a stage
+failure — route it through the retry/escalate path, never crash the pipeline.
 
 The stage returns the standard stage return contract:
 `{gate, artifacts, decisions, blockers, summary, duration_seconds}`
