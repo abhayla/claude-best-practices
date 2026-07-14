@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-14 05:16 UTC (auto-generated)
+> Last updated: 2026-07-14 16:17 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 284 |
-| Core (universal) | 211 |
+| Total Patterns | 285 |
+| Core (universal) | 212 |
 | Stack-specific | 73 |
 | Agents | 29 |
 | Configs | 3 |
 | Hooks | 22 |
-| Rules | 56 |
+| Rules | 57 |
 | Skills | 174 |
 
 ## Pattern Inventory
@@ -216,6 +216,7 @@
 | untrusted-content-handling | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | update-practices | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | verifier-edge-guard | hook | 1.0.1 | hub:abhayla/claude-best-practices | — |
+| verify-before-suggest-do-before-delegate | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | visual-inspector-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | verify-screenshots |
 | vps-deploy | skill | 1.0.0 | hub:abhayla/claude-best-practices | deploy-strategy, pm2-deploy, incident-response, disaster-recovery |

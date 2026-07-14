@@ -43,7 +43,7 @@ STUB_MIN_LINES = 30
 # Aggregate budget for the sum of content lines across every `# Scope: global`
 # rule in core/.claude/rules/ — set just above the ~2105-line total observed
 # 2026-07-03 so it warns as the corpus grows rather than failing immediately.
-GLOBAL_RULES_BUDGET = 2200
+GLOBAL_RULES_BUDGET = 2400  # raised 2200->2400 (2026-07-14) to admit verify-before-suggest-do-before-delegate.md
 
 # Known stack prefixes
 STACK_PREFIXES = ["fastapi-", "android-", "ai-gemini-", "firebase-", "react-", "flutter-", "vue-", "nuxt-", "expo-"]

@@ -147,7 +147,7 @@ Once your project has a `.claude/` directory, you can use all the skills directl
 |-----------|-------|-------------|
 | **Agents** | 29 | Sub-agents for code review, debugging, testing, git, planning, security, docs |
 | **Skills** | 174 | Slash-command workflows: `/implement`, `/fix-loop`, `/tdd`, `/synthesize-project`, `/development-loop`, and more |
-| **Rules** | 56 | Scoped coding rules for workflow, testing, FastAPI, Android, Compose, Firebase, etc. |
+| **Rules** | 57 | Scoped coding rules for workflow, testing, FastAPI, Android, Compose, Firebase, etc. |
 | **Hooks** | 22 | Auto-format, secret scanning, dangerous command blocking, context monitoring, governance |
 <!-- COUNTS:END -->
 

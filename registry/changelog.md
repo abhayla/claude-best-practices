@@ -4,6 +4,18 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-14 — verify-before-suggest-do-before-delegate (new must-have global rule)
+
+Owner-reported failure pair: workflows recommending tools/processes from training memory without
+live verification, and plans defaulting execution to the human (or narrating agent action, then
+handing the work over). New dual-homed (`synced`) global rule: Part A makes live verification
+(evidence = source + fetch date + version vs the project's pinned versions) a precondition for any
+actionable recommendation, with an explicit degrade-to-labels path when no verification tool
+exists; Part B makes the agent the default executor — human steps require a named blocker
+(credential/spend/irreversible/physical/tool-or-permission) after an attempt or verified block,
+rendered as an "I will do / You need to do" split. 21 gap-scan findings (self + adversarial
+sonnet reviewer) baked into the text before first release.
+
 ### 2026-07-13 — Fable-harvest Session C: evidence-derived checker rubrics + weakened-test hunter
 
 Part 1 (rubric-mining, `plans/fable-harvest-window.md` §Session C): derived per-checker scoring
