@@ -109,6 +109,32 @@ reconcile() {
     gh pr merge "$num" --auto --squash --delete-branch >/dev/null 2>&1 && { echo "armed #$num ($br — lands when required CI passes)"; any=1; }
   done < <(gh pr list --state open --json number,headRefName,isDraft,autoMergeRequest,author,labels \
             --jq '.[] | select(.isDraft==false) | select(.autoMergeRequest==null) | "\(.number)|\(.headRefName)|\(.author.is_bot)|\([.labels[].name] | join(","))"' 2>/dev/null)
+  # DOCS-UPDATE CARVE-OUT (2026-07-14, pileup #378-#399): update-docs.yml opens its PR with the
+  # default GITHUB_TOKEN, and GitHub never triggers pull_request workflows for GITHUB_TOKEN-created
+  # events — so the required `validate` check NEVER RUNS, the workflow's self-armed auto-merge
+  # never fires, and one docs PR stacks up per main push. These PRs are OUR OWN deterministic
+  # regeneration of already-merged main (no external content), so they get a NARROW exemption from
+  # the bot-block above, keyed on the auto/docs-update-* head-branch prefix — still 100% CI-gated:
+  # supersede all but the newest, kick CI on it (close+reopen under THIS session's user token —
+  # user-token events DO trigger workflows), then arm auto-merge.
+  local newest=0 n
+  while read -r n; do [ "$n" -gt "$newest" ] 2>/dev/null && newest=$n; done \
+    < <(gh pr list --state open --json number,headRefName \
+         --jq '.[] | select(.headRefName | startswith("auto/docs-update-")) | .number' 2>/dev/null)
+  if [ "$newest" -gt 0 ]; then
+    while read -r n; do
+      [ -z "$n" ] || [ "$n" = "$newest" ] && continue
+      gh pr close "$n" --comment "Superseded by #$newest (newer docs regeneration of the same main state)." --delete-branch >/dev/null 2>&1 \
+        && echo "closed superseded docs PR #$n"
+    done < <(gh pr list --state open --json number,headRefName \
+              --jq '.[] | select(.headRefName | startswith("auto/docs-update-")) | .number' 2>/dev/null)
+    if [ "$(gh pr view "$newest" --json statusCheckRollup --jq '.statusCheckRollup | length' 2>/dev/null)" = "0" ]; then
+      gh pr close "$newest" >/dev/null 2>&1 && gh pr reopen "$newest" >/dev/null 2>&1 \
+        && echo "kicked CI on docs PR #$newest (no checks ran — GITHUB_TOKEN gap; close+reopen re-triggers)"
+    fi
+    gh pr merge "$newest" --auto --squash --delete-branch >/dev/null 2>&1 \
+      && { echo "armed docs PR #$newest (lands when validate passes)"; any=1; }
+  fi
   [ "$any" = 0 ] && echo "reconcile: no leftover PRs to land"
   return 0
 }

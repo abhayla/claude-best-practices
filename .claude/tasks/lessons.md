@@ -752,3 +752,8 @@ effect at the consumer (§13 of the manual — the incident that section was wri
   `gh pr view <branch> --json state,mergedAt` and BLOCKS the push with a fresh-branch instruction
   when the PR is MERGED. Until approved: never push to an armed branch outside the same command
   chain as a state re-check.
+
+## 2026-07-14 — rule-authoring session
+- **Always `git fetch origin main` immediately before `git checkout -b X origin/main`** — branched from a stale ref and the working tree silently "reverted" a just-merged PR's files (looked like someone else's edit). Fetch+branch must be one command.
+- **Never re-sort/reformat `registry/patterns.json` when adding an entry** — the file is not alphabetized; a sorted rewrite produced a 2989-line diff. Load with `object_pairs_hook=OrderedDict`, append the key, dump with matching indent/ensure_ascii.
+- **Registry `hash` = `dedup_check.hash_pattern()` (whitespace-normalized), NOT raw sha256** — compute via the validator's own function, never by hand.
