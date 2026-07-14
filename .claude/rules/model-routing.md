@@ -18,6 +18,16 @@ Verification rigor NEVER drops with the tier — cheap execution, full supervisi
 ## Refusal→fallback + Fable-exit swap (owner-approved 2026-07-10 — playbook: docs/governance/refusal-fallback-playbook.md)
 Fable/Mythos can DECLINE as a SUCCESS (HTTP 200, stop_reason:"refusal"): branch on stop_reason, never exit code; new claude-fable-5 code defaults to server-side fallbacks (betas:["server-side-fallback-2026-06-01"] + fallbacks:[{"model":"claude-opus-4-8"}]); a HEADLESS flagged run ENDS THE TURN — reroute to opus and continue, don't fail; never ask a Fable dispatch to echo raw chain-of-thought (reasoning_extraction). Fable-window close: only the "omit model" row re-points to opus.
 
+## Effort dial — set per PASS, not per session (verified vs official docs 2026-07-14)
+Effort is a first-class COST lever, not just quality (same task measured ~6x cheaper at medium
+vs max — practitioner data, Willison 2026-06-09). Official Fable guidance: start `high` (the API
+default), `xhigh` ONLY for capability-sensitive work, step down to `medium`/`low` for routine —
+low-effort Fable often beats xhigh on prior models. Sequence per pass: first design/build pass
+`high` (or `xhigh` when frontier-hard), fix-up/mechanical passes `low`. Knobs: Workflow `agent()`
+`effort:` opt; Agent() dispatches inherit session effort; raw API `output_config.effort`. At
+high/xhigh set a large max_tokens. "ultracode" = `xhigh` + standing multi-agent permission, not a
+6th API level. Task-budget composition + details: docs/governance/refusal-fallback-playbook.md.
+
 ## Session-level routing (owner directive 2026-07-13 — supersedes habit, not the dispatch table)
 Fable 5 is for FABLE-ONLY work; if Opus or Sonnet can do it with the same effectiveness, THEY do it
 — Fable must not burn tokens on work a cheaper tier handles. This applies to the SESSION DRIVER,

@@ -24,7 +24,7 @@ triggers:
   - discover plan execute verify loop
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<goal / Definition of Done, issue URL, or triage source> [--max-cycles N] [--no-ship]"
-version: "1.4.0"
+version: "1.5.0"
 ---
 
 # /loop-engineering — Skill-at-T0 Autonomous Loop Orchestrator
@@ -611,6 +611,28 @@ STEP 6 and `clean_exit` replaced `shipped`.)
    ```
 3. **Handoff:** if ESCALATED, point at the triage inbox; if PASSED with commits,
    suggest `/code-review-workflow`.
+
+---
+
+## Fable-5 runtime notes (spec §3.9)
+
+When the loop driver or a dispatched worker runs on `claude-fable-5`:
+
+1. **Early-stopping guard** — include the official autonomous-pipeline reminder in the
+   driver/worker prompt (verbatim text: spec §3.9(b)). It prevents the rare text-only
+   "I'll now run X" turn-end deep into long runs. Environments that already inject an
+   equivalent autonomy reminder per turn (hook-based governance) are covered; add it
+   explicitly everywhere else — especially headless/cron/raw-API runs.
+2. **Mid-run owner messaging** — don't go silent until STEP 8: at each cycle boundary and
+   on every ESCALATE arm, send a one-line progress ping through the project's Notifier
+   gateway if configured (fail-open no-op otherwise). Raw-API harnesses use a client-side
+   `send_to_user` tool with system-prompt elicitation instead. Verbatim-worthy content
+   only — never narration or reasoning.
+3. **Raw-API loops only** — pass `output_config.task_budget` (beta `task-budgets-2026-03-13`,
+   min 20k tokens, advisory) as the spend-domain budget alongside `state.json`'s
+   work-retry budgets; the two compose and neither substitutes for the other. Not
+   available inside Claude Code sessions. A too-small budget causes refusal-like early
+   stops — raise it before debugging anything else.
 
 ---
 

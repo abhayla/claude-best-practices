@@ -265,6 +265,47 @@ budgets: they bound how much WORK a stuck gate may retry. A token/turn budget is
   forever on cheap retries if `global_retry_budget` is unset. Author BOTH explicitly for any
   autonomous run with real cost exposure.
 
+## 3.9 Fable-5 runtime hardening (task budgets · early-stopping guard · mid-run owner messaging)
+
+First-party-verified 2026-07-14 against platform.claude.com/docs (task-budgets, prompting-claude-fable-5).
+Three additions for loops whose driver or workers run on `claude-fable-5`:
+
+**(a) Native task budgets — the spend-domain mechanism for RAW-API loops.** §3.8's guidance
+("wire a token/turn target alongside the loop-domain budget") now has a first-party mechanism
+when the loop drives the Messages API directly: beta `task-budgets-2026-03-13`,
+`output_config.task_budget: {"type":"tokens","total":N}` — a server-injected, model-only-visible
+countdown across the whole agentic loop. Advisory (pace), not enforced (`max_tokens` is the hard
+cap); min 20k; Fable 5/Mythos 5/Opus 4.8/4.7 only; NOT available on Claude Code/Cowork surfaces —
+so `/loop-engineering` runs inside Claude Code keep using §3.8's cost-ledger approach. WARNING: a
+budget clearly too small for the task triggers refusal-like early stopping / scope-down — raise
+the budget before debugging other parameters. Full parameter detail:
+`docs/governance/refusal-fallback-playbook.md` §Task budgets.
+
+**(b) Early-stopping guard.** Deep into long runs Fable 5 can rarely end a turn with a text-only
+statement of intent ("I'll now run X") without the tool call, or pause to ask permission it
+doesn't need. For autonomous pipelines, include the official system reminder (verbatim, from the
+Prompting Claude Fable 5 doc) in the driver/worker prompt:
+
+> You are operating autonomously. The user is not watching in real time and cannot answer
+> questions mid-task, so asking "Want me to…?" or "Shall I…?" will block the work. For
+> reversible actions that follow from the original request, proceed without asking. Offering
+> follow-ups after the task is done is fine; asking permission after already discussing with the
+> user before doing the work is not. Before ending your turn, check your last paragraph. If it
+> is a plan, an analysis, a question, a list of next steps, or a promise about work you have not
+> done ("I'll…", "let me know when…"), do that work now with tool calls. End your turn only when
+> the task is complete or you are blocked on input only the user can provide.
+
+(The hub's own sessions already inject an equivalent via the UserPromptSubmit governance tail;
+this clause matters for DOWNSTREAM consumers of the loop-engineering plugin and raw-API harnesses,
+which lack those hooks.)
+
+**(c) Mid-run owner messaging.** Long unattended runs SHOULD surface progress before STEP 8:
+at cycle boundaries and on every ESCALATE arm, send a one-line ping through the project's
+Notifier gateway (`notifier-integration.md` — fail-open, no-op when unconfigured). Raw-API
+harnesses use the officially-recommended client-side `send_to_user` tool instead (schema +
+elicitation-prompt requirement: `docs/governance/refusal-fallback-playbook.md` §send_to_user).
+Narration/reasoning is never routed through either channel — verbatim-worthy content only.
+
 ## 4. Autonomy guarantees (the parts loops leak at)
 
 - **Bounded** — inherits `global_retry_budget: 15` + `max_retries_per_step: 3`
