@@ -19,9 +19,13 @@
 #     }
 #   }
 
+# Claude Code delivers PreToolUse input as JSON on STDIN ({"tool_input":{...}}).
+# Read stdin first; fall back to the legacy $TOOL_INPUT env for any harness that still sets it.
+input="$(cat 2>/dev/null)"
+[[ -z "$input" ]] && input="${TOOL_INPUT:-}"
 # Extract content to scan — Write uses "content", Edit uses "new_string"
-CONTENT=$(echo "$TOOL_INPUT" | jq -r '.content // .new_string // empty')
-FILE_PATH=$(echo "$TOOL_INPUT" | jq -r '.file_path // empty')
+CONTENT=$(printf '%s' "$input" | jq -r '.tool_input.content // .tool_input.new_string // .content // .new_string // empty' 2>/dev/null)
+FILE_PATH=$(printf '%s' "$input" | jq -r '.tool_input.file_path // .file_path // empty' 2>/dev/null)
 if [[ -z "$CONTENT" ]]; then exit 0; fi
 
 # Skip scanning known safe file types
@@ -47,7 +51,7 @@ if echo "$CONTENT" | grep -qiE '(api_key|apikey|api_secret|access_token|auth_tok
 fi
 
 # --- Private keys ---
-if echo "$CONTENT" | grep -qE '-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----'; then
+if echo "$CONTENT" | grep -qE -- '-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----'; then
   FOUND="${FOUND}\n- Private key (PEM format)"
 fi
 

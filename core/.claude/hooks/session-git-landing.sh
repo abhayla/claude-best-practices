@@ -93,12 +93,22 @@ reconcile() {
   [ "${AUTO_MERGE:-1}" = "0" ] && { echo "reconcile: skipped (AUTO_MERGE=0)"; return 0; }
   local cur; cur="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
   local any=0
-  while read -r num br; do
+  # SECURITY (2026-07-14 composite-autonomy audit): do NOT auto-arm merge on BOT/scan-authored
+  # PRs — the scan-internet cron opens PRs from external web content, and arming them here would
+  # let external data reach main with no human review point anywhere on the path. A bot-authored
+  # PR (or one carrying a scan/discovery label) is armed ONLY when a human adds the
+  # 'approved-for-merge' label. Human-authored PRs are unchanged.
+  while IFS='|' read -r num br isbot labels; do
     [ -z "$num" ] && continue
     [ "$br" = "$cur" ] && continue                # never the active branch
+    if ! printf '%s' "$labels" | grep -q 'approved-for-merge'; then
+      if [ "$isbot" = "true" ] || printf '%s' "$labels" | grep -qE '(^|,)(discovery|auto-scan|auto-telemetry)(,|$)'; then
+        echo "skipped #$num ($br — bot/scan-authored; add 'approved-for-merge' label to auto-land)"; continue
+      fi
+    fi
     gh pr merge "$num" --auto --squash --delete-branch >/dev/null 2>&1 && { echo "armed #$num ($br — lands when required CI passes)"; any=1; }
-  done < <(gh pr list --state open --json number,headRefName,isDraft,autoMergeRequest \
-            --jq '.[] | select(.isDraft==false) | select(.autoMergeRequest==null) | "\(.number) \(.headRefName)"' 2>/dev/null)
+  done < <(gh pr list --state open --json number,headRefName,isDraft,autoMergeRequest,author,labels \
+            --jq '.[] | select(.isDraft==false) | select(.autoMergeRequest==null) | "\(.number)|\(.headRefName)|\(.author.is_bot)|\([.labels[].name] | join(","))"' 2>/dev/null)
   [ "$any" = 0 ] && echo "reconcile: no leftover PRs to land"
   return 0
 }
