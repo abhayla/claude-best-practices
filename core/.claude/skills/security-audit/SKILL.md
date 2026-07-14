@@ -6,7 +6,7 @@ description: >
   false-positive gating, GitHub Actions hardening, and regulatory compliance testing
   (GDPR, SOC2, HIPAA). Use when performing security reviews, vulnerability discovery,
   or compliance checks.
-allowed-tools: "Bash Read Write Edit Grep Glob"
+allowed-tools: "Bash Read Write Grep Glob"
 triggers: "security audit, vulnerability, codeql, semgrep, sarif, static analysis, security review, insecure defaults"
 argument-hint: "<'full-audit' or 'diff-review' or 'variant <CVE/pattern>' or 'actions-audit'>"
 version: "1.0.0"

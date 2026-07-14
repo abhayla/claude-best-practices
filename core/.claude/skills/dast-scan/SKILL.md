@@ -15,7 +15,7 @@ triggers:
   - fuzz testing
   - property based testing
   - mutation testing
-allowed-tools: "Bash Read Write Edit Grep Glob Agent"
+allowed-tools: "Bash Read Write Grep Glob Agent"
 argument-hint: "<target URL (http://localhost:8000), or 'all endpoints' with base URL>"
 version: "1.0.0"
 type: workflow

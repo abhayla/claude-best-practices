@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-13 17:41 UTC (auto-generated)
+> Last updated: 2026-07-14 05:16 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 283 |
-| Core (universal) | 210 |
+| Total Patterns | 284 |
+| Core (universal) | 211 |
 | Stack-specific | 73 |
 | Agents | 29 |
 | Configs | 3 |
 | Hooks | 22 |
-| Rules | 55 |
+| Rules | 56 |
 | Skills | 174 |
 
 ## Pattern Inventory
@@ -22,7 +22,7 @@
 | adr | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | adversarial-review | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | agent-evaluator | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| agent-orchestration | rule | 1.6.0 | hub:abhayla/claude-best-practices | — |
+| agent-orchestration | rule | 1.7.0 | hub:abhayla/claude-best-practices | — |
 | agent-team-selection | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | android | rule | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | android-compose-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
@@ -48,7 +48,7 @@
 | change-risk-scoring | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | changelog-contributing | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ci-cd-setup | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| claude-behavior | rule | 1.3.0 | hub:abhayla/claude-best-practices | — |
+| claude-behavior | rule | 1.3.1 | hub:abhayla/claude-best-practices | — |
 | claude-docs-cache | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | code-quality-gate | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -91,7 +91,7 @@
 | e2e-test-writing | rule | 1.0.0 | hub:abhayla/claude-best-practices | e2e-best-practices |
 | e2e-visual-run | skill | 5.1.0 | hub:abhayla/claude-best-practices | fix-loop, serialize-fixes, test-healer-agent, test-scout-agent, tester-agent, verify-screenshots, visual-inspector-agent |
 | end-session | skill | 2.3.0 | hub:abhayla/claude-best-practices | — |
-| engineering-roles | rule | 1.7.0 | project:firekaro-planner | — |
+| engineering-roles | rule | 1.7.1 | project:firekaro-planner | — |
 | environment-validation | rule | 1.0.0 | project:firekaro-planner | — |
 | error-handling | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | escalation-report | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
@@ -130,7 +130,7 @@
 | learn-n-improve | skill | 2.5.0 | hub:abhayla/claude-best-practices | — |
 | learning-self-improvement | skill | 2.1.1 | hub:abhayla/claude-best-practices | context-reducer-agent, learn-n-improve, session-summarizer-agent, skill-factory, test-knowledge, workflow-contracts |
 | learnings-routing | rule | 1.0.0 | project:firekaro-planner | — |
-| loop-engineering | skill | 1.4.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
+| loop-engineering | skill | 1.5.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | mock-data-hunter | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -171,7 +171,7 @@
 | save-session | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | schema-designer | skill | 1.0.0 | hub:abhayla/claude-best-practices | pg-query, fastapi-db-migrate |
 | secret-scanner | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| security-audit | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| security-audit | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | security-auditor-agent | agent | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | security-baseline | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | semgrep-rules | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -213,6 +213,7 @@
 | to-prd | skill | 1.0.0 | upstream:mattpocock/skills@engineering/to-prd | improve-codebase-architecture, plan-to-issues |
 | turn-origin | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
+| untrusted-content-handling | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | update-practices | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | verifier-edge-guard | hook | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | verify-screenshots | skill | 2.2.0 | hub:abhayla/claude-best-practices | — |

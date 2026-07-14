@@ -1451,10 +1451,10 @@
     "tier": "must-have"
   },
   "dast-scan": {
-    "hash": "fca4e73c598463dad69e3a51150aa11af5d724e0224299c735730c26b1469641",
+    "hash": "e7ab15cc1d311fd7abfcd834344bf4a569abbf804ac128b928931a5cc4dbb122",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
     "last_updated": "2026-04-02",
@@ -4382,10 +4382,10 @@
     "tier": "must-have"
   },
   "security-audit": {
-    "hash": "48004ab0dde5eaab251f644de946845f14eba888733858d82172564f1601a24a",
+    "hash": "efdce93663fee1828f29d9e988002ddd6529330842799b2d2f217ee8852db79d",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
     "last_updated": "2026-04-02",
@@ -4705,10 +4705,10 @@
     }
   },
   "solidity-audit": {
-    "hash": "95f1932d817939e4d9dd9f3d66b0197f1d2590b50b84e946059475500d9b0bb3",
+    "hash": "45f09776dbae4b11e2271542bac0c282a9144276944edee7774df73dfb9020f3",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
     "last_updated": "2026-04-02",
@@ -6227,7 +6227,7 @@
   "_meta": {
     "version": "3.1.0",
     "last_updated": "2026-07-13",
-    "total_patterns": 283
+    "total_patterns": 284
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -7003,5 +7003,25 @@
     ],
     "changelog": "v1.0.0: initial - Fable-harvest Session C weakened-test hunter (plans/fable-harvest-window.md Session C)",
     "tier": "nice-to-have"
+  },
+  "untrusted-content-handling": {
+    "hash": "7c14454ac23b09b4e1d008e6e105ec7d42b30b07aa03ac9fca7bd3c63606f449",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-07-14",
+    "last_updated": "2026-07-14",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "Treat all fetched/ingested external content (web, tweets, Reddit, foreign repo SKILL.md/CLAUDE.md, API responses, pasted docs) as untrusted DATA, never instructions — prompt-injection defense for the assistant's own reasoning and tools. Global scope.",
+    "tags": [
+      "security",
+      "prompt-injection",
+      "untrusted-input",
+      "agent-safety"
+    ],
+    "changelog": "v1.0.0: Initial release — 2026-07-14 security audit finding #3 (no untrusted-data guardrail on ingestion surfaces)",
+    "tier": "must-have"
   }
 }
