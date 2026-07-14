@@ -15,6 +15,14 @@ When torn pick the cheaper tier; escalate ONE tier after 2 supervised failures (
 Checker MAY differ from maker (model diversity).
 Verification rigor NEVER drops with the tier — cheap execution, full supervision.
 
+## Preemptive category routing (owner-approved 2026-07-14 — don't eat the refusal round-trip)
+Worker categories KNOWN to trip Fable's safety classifiers route straight to `opus`, never fable:
+security scanning / vulnerability analysis / exploit-adjacent audits (security-auditor-agent,
+prompt-injection testing, authz-gap hunting) and any dispatch a prior run saw refused with
+`category:"cyber"`. Reactive fallback (below) stays as the safety net for everything else —
+this rule removes the predictable refusals (and the confusing ~1h sticky-routing tail they
+trigger) from workloads we KNOW are classifier-adjacent.
+
 ## Refusal→fallback + Fable-exit swap (owner-approved 2026-07-10 — playbook: docs/governance/refusal-fallback-playbook.md)
 Fable/Mythos can DECLINE as a SUCCESS (HTTP 200, stop_reason:"refusal"): branch on stop_reason, never exit code; new claude-fable-5 code defaults to server-side fallbacks (betas:["server-side-fallback-2026-06-01"] + fallbacks:[{"model":"claude-opus-4-8"}]); a HEADLESS flagged run ENDS THE TURN — reroute to opus and continue, don't fail; never ask a Fable dispatch to echo raw chain-of-thought (reasoning_extraction). Fable-window close: only the "omit model" row re-points to opus.
 
