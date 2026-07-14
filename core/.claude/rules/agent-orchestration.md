@@ -169,3 +169,15 @@ When a workflow-master dispatches a step, it MUST pass upstream context — not 
 This ensures no skill starts from scratch. The context is the connective tissue that makes skills work as a team instead of isolated tools.
 
 Context MUST be structured (JSON or structured prompt sections), not freeform prose. Freeform context degrades across multiple handoffs.
+
+**Interface contracts for parallel-edit fan-outs (measured, adopted 2026-07-14).** When dispatched
+workers build parts of ONE interlocking artifact in parallel (modules that import/call each other),
+the dispatch context MUST additionally include an **interface contract** — exact file names, public
+function signatures (names, params, return shapes), shared data shapes, import direction, and error
+conventions (raise vs return) — produced by a foundation/architect step (or by wave-1 workers'
+return contracts) and injected VERBATIM into every downstream worker's prompt. Artifact paths +
+summaries are NOT sufficient for interlocking outputs. Evidence (A/B, pilot + 2×2 trial,
+`plans/contract-injection-experiment.md`): without contracts 3/3 parallel builds shipped
+integration defects (7 distinct guessed-interface failures, up to 100% of commands broken); with
+contracts 3/3 integrated defect-free, at the cost of one cheap architect call. Read-only /
+report-back fan-outs (research, review, audit) are exempt — their outputs do not interlock.
