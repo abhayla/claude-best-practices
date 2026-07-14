@@ -53,7 +53,29 @@ the brief constrained least (report's interface), exactly where theory predicts.
   contract binds everyone to the same mistake (mitigation: contracts are cheap to review at T0
   before fan-out).
 
-## Recommendation (owner-gated next step)
+## Wider trial (2026-07-14, owner-approved follow-up) — CONFIRMED, adopted
+
+5-module inventory-manager CLI (storage/validate/filters/report/cli, ~6 interface seams),
+2 independent trials per arm, identical sonnet workers, identical 8-command smoke gauntlet
+run by the orchestrator (3 valid adds, 1 invalid add, 3 list variants, report):
+
+| Build | Integration defects | Detail |
+|---|---|---|
+| A1 — no contract | **4** | cli assumed `validate.validate_item(item)` (TypeError — actual takes name/qty/price), `validate.normalize_item` (absent), `filters.filter_items` (absent), `report.summarize` (absent). EVERY command failed, including valid `add` (exit 1). |
+| A2 — no contract | **2** | cli assumed validate returns an error string — actual raises (invalid add dies with a raw traceback instead of a clean error); `filters.filter_items` absent (all `list` variants dead). `add`/`report` aligned by luck. |
+| B1 — contract | **0** | 8/8 correct, invalid add cleanly rejected (exit 1, proper message) |
+| B2 — contract | **0** | 8/8 correct, invalid add cleanly rejected |
+
+**Combined with the pilot: no-contract 3/3 builds defective (7 distinct guessed-interface
+defects); contract-injected 3/3 defect-free.** The strongest arm-A failure (A1: 100% of
+commands broken) shows defect count GROWS with seam count, as predicted. Architect cost per
+trial: one sonnet call, ~18s. The recurring defect shape is exactly the one contracts remove:
+a consumer guessing a producer's function name/signature/error convention.
+
+**Adopted:** `agent-orchestration.md` §11 now REQUIRES interface contracts for parallel-edit
+fan-outs (owner-approved 2026-07-14, applied same day; registry 1.7.0).
+
+## Original recommendation (pre-trial, retained for the record)
 
 Adopt contract-injection as the DEFAULT dispatch pattern for parallel builds where workers'
 outputs must interlock: a foundation/architect step (or wave-1 workers' return contracts)

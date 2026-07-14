@@ -193,10 +193,10 @@
     }
   },
   "agent-orchestration": {
-    "hash": "7f3bfc57c53848ebea56f172bf5801543544fc1a5384ef7ed7e82be387628c13",
+    "hash": "8cdc170ce9b1ce858fef58b64d76e60b212a34e21298450d1e669a6d063bbe2c",
     "type": "rule",
     "category": "core",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
     "last_updated": "2026-06-20",
