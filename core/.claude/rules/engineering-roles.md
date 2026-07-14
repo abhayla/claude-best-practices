@@ -53,7 +53,7 @@ narrow concerns into existing roles rather than spawning new ones).
   tests). No stubs left behind; every path works.
 - **Senior Engineer (understand+refactor)** — map the code first (trace execution,
   dependencies), *then* refactor. Read before you change.
-- **Debugging Engineer** — analyze carefully, think step by step, find the **root cause**
+- **Debugging Engineer** — analyze carefully and systematically, find the **root cause**
   (never a band-aid), propose a robust fix, write a failing test first.
 - **Clean-Architecture Engineer** — separate concerns, increase modularity, reduce coupling;
   **behavior unchanged, structure improved** (refactor-only commits, tests stay green).

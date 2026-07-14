@@ -53,13 +53,13 @@ surface for such phrasing. Approved as item #7 of the 2026-07-14 Fable-usage ext
   (writing-plans, executing-plans, goal-creator, plan-before-coding, doc templates), agent
   output templates ("Step-by-step fix"), UX content data (CSV), and the gitignored prompt log.
 
-## Application status (owner-gated)
+## Application status
 
-Rule-text changes require explicit owner approval (claude-behavior.md rule 5). F1–F3 are
-proposed as ONE batch; on approval the edit checklist is: apply to BOTH dual-home copies
-(`test_dual_home_sync.py` gate), resync registry hashes for the registered patterns, respect
-the ≤100-line rule budget, run the full local CI quartet. F4 is deferred to the next
-cbp-workflows plugin release (version-bump propagation contract).
+**F1–F3 APPLIED 2026-07-14** (owner approved the batch as "decision A"): both dual-home
+`claude-behavior.md` copies + `core/.claude/rules/engineering-roles.md` rewritten, registry
+hashes resynced (claude-behavior 1.3.1, engineering-roles 1.7.1), full CI quartet green.
+F4 remains deferred to the next cbp-workflows plugin release (version-bump propagation
+contract).
 
 **Optional follow-up guard (propose, not built):** add the trigger-phrase regex as a
 report-only class in `scripts/lint_rule_compliance.py` so a future rule edit reintroducing
