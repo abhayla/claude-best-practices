@@ -1,6 +1,6 @@
 ---
 name: docs-manager-agent
-description: Use this agent for documentation updates — continuation prompts, requirement traceability, testing docs, and generated documentation. Referenced by post-fix-pipeline skill.
+description: Use this agent for documentation updates — continuation prompts, requirement traceability, testing docs, and generated documentation. Referenced by the post-fix-pipeline skill (ships in the companion cbp-build-test-workflows plugin).
 tools: ["Read", "Grep", "Glob", "Edit", "Write"]
 model: sonnet
 ---

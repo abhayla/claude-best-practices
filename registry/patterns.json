@@ -4005,13 +4005,13 @@
     }
   },
   "react-test-patterns": {
-    "hash": "d942935ff6176b052994760baddeddb771da80b04820dba3741c0cac0dd484c8",
+    "hash": "16c9641750b2c5405417d31aa527630d58540286e804739b51024c283b88334c",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-15",
     "dependencies": [],
     "visibility": "public",
     "description": "Advanced React testing patterns with RTL, Server Components, hooks, forms, and state management",
@@ -4021,7 +4021,7 @@
       "rtl",
       "nextjs"
     ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit",
+    "changelog": "v1.0.0: Initial creation from testing gap audit | v1.1.0: add triggers frontmatter (plugin QA review — the only cbp-react-stack skill lacking it)",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,

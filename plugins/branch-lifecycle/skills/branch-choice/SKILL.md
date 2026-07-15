@@ -59,7 +59,7 @@ ahead/behind `main` — then offer:
 4. **Merge the existing branch to `main`, then new branch** — land it via the bundled landing
    script's `merge-one <branch>` subcommand (CI-gated; refuses red/stale), then option 1:
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT:-$(git rev-parse --show-toplevel)/.claude/plugins/branch-lifecycle}/hooks/session-git-landing.sh" merge-one <branch>
+   bash "${CLAUDE_PLUGIN_ROOT:?plugin root not set — run via the installed plugin}/hooks/session-git-landing.sh" merge-one <branch>
    ```
 5. **Stash current changes and decide first** — `git stash` the edits, present state, wait.
 
@@ -82,7 +82,7 @@ to the owner as ONE batched prompt:
 - **Green + clean** (CI passed, no conflicts vs current `main`) → offer to land on the owner's
   approval via the bundled landing script:
   ```bash
-  bash "${CLAUDE_PLUGIN_ROOT:-$(git rev-parse --show-toplevel)/.claude/plugins/branch-lifecycle}/hooks/session-git-landing.sh" merge-one <br>
+  bash "${CLAUDE_PLUGIN_ROOT:?plugin root not set — run via the installed plugin}/hooks/session-git-landing.sh" merge-one <br>
   ```
 - **Red / unfinished / conflicted** → FLAG only with the reason; NEVER merge broken work to `main`,
   even if asked — surface the failing check and let the owner resume or drop it.

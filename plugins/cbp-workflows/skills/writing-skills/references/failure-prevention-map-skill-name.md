@@ -20,7 +20,7 @@ domain-specific reference patterns — not just structural quality gates.
 2. **Read the matched reference pattern(s)** — these are the audit baseline
 3. **Spawn `anthropic-multi-agent-reviewer-agent`** with the authored pattern and matched references:
    ```
-   Agent(subagent_type="anthropic-multi-agent-reviewer-agent",
+   Agent(subagent_type="anthropic-multi-agent-reviewer-agent"  # OPTIONAL — hub-only agent; if not dispatchable in this project, perform the orchestration-pattern review inline instead,
          prompt="Review this pattern against the 8 principles: <pattern content>")
    ```
 4. **Evaluate the gap report:**

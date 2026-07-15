@@ -60,7 +60,7 @@ git log --oneline -20
 ls test-results/*.json 2>/dev/null
 ```
 
-Read `.claude/learnings.json` if it exists. Read any scratchpad or session files from `.claude/sessions/`.
+Read `.claude/learnings.json` if it exists; if absent (fresh install / first run), CREATE it as `{"learnings": [], "success_patterns": []}` before proceeding. Read any scratchpad or session files from `.claude/sessions/`.
 
 | Source | What to extract |
 |--------|----------------|

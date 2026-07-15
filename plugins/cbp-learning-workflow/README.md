@@ -34,7 +34,11 @@ recurring patterns into skill proposals, and keep the knowledge base pruned.
 The workflow is self-contained: where the hub keeps optional config
 (`config/workflow-contracts.yaml`), the skill falls back to its inline steps when absent.
 
-## Boundaries (deliberate, per the #187 tier design)
+## Boundaries
+
+- `skill-factory create` delegates Skill-category creation to `/writing-skills` and Rule-category
+  creation to `/claude-guardian` — both ship in the companion `cbp-workflows` plugin, not here.
+  `scan`/`propose`/`list` modes are fully standalone. (deliberate, per the #187 tier design)
 
 - **`skill-authoring-workflow`** (the workflow that turns an approved proposal into a real,
   validated skill) ships in the companion **`cbp-workflows`** plugin — install both for the

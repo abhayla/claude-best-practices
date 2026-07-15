@@ -8,6 +8,12 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<test-scope> [--component|--hook|--rsc|--form|--state]"
+triggers:
+  - RTL
+  - testing library
+  - react test
+  - hook test
+  - component test
 version: "1.0.0"
 ---
 

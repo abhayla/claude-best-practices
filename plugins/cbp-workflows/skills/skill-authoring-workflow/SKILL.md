@@ -65,7 +65,9 @@ pointing at `.claude/skill-proposals/`), or free-form pattern description.
    `overlap_flags: []`.
 5. **Overlap check (MUST run before authoring).** Scan existing
    `core/.claude/skills/`, `core/.claude/agents/`, `core/.claude/rules/` and
-   `registry/patterns.json` for similar names + descriptions. Use description
+   `registry/patterns.json` for similar names + descriptions (hub repo). In a downstream
+   project those trees don't exist — scan `.claude/skills/`, `.claude/agents/`,
+   `.claude/rules/` plus installed-plugin skills instead. Use description
    similarity (substring + keyword matching) + file structure comparison.
    - If overlaps found AND `--force-overlap` NOT set: report matches,
      recommend enhancing existing pattern instead of creating new. User
@@ -133,7 +135,7 @@ Skill("/writing-skills", args="author <resolved-input> --type=<type>")
 `/writing-skills` implements the 6-step authoring protocol: frontmatter
 design, step skeletons, trigger design, quality checks, size limits,
 self-containment verification. Writes draft to
-`core/.claude/skills/<name>/SKILL.md` (or agents/ / rules/ based on `--type`).
+`core/.claude/skills/<name>/SKILL.md (hub repo) or .claude/skills/<name>/SKILL.md (downstream project)` (or agents/ / rules/ based on `--type`).
 
 Capture draft path into `state.artifacts.draft`.
 
@@ -165,17 +167,17 @@ If `--dry-run`: always stop after validate, regardless of outcome.
 
 Skip if STEP 3 was blocked OR `--dry-run`.
 
-```
-Skill("/skill-master", args="register <draft path>")
-```
-
-`/skill-master register` does:
+**Hub repo only** (detect: `registry/patterns.json` exists at the repo root). Perform the
+registration steps INLINE — there is no separate register skill:
 - Add entry to `registry/patterns.json` with hash, type, tier, etc.
 - Append an entry to `registry/changelog.md`
-- Register triggers if any
 - Update docs dashboard (regenerate via `generate_docs.py`)
 
-Capture registry entry into `state.artifacts.registered`.
+**Downstream project** (no `registry/` at the repo root): there is nothing to register —
+the skill draft in `.claude/skills/<name>/` IS the deliverable. Record
+`state.artifacts.registered = "n/a (downstream — no hub registry)"` and continue to REPORT.
+
+Capture the registry entry (or the n/a marker) into `state.artifacts.registered`.
 
 ---
 

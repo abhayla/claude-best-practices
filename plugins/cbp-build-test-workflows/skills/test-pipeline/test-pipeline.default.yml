@@ -8,7 +8,9 @@
 #     github-issue-manager-agent — per-worker config lookups (auto_heal,
 #     track_detection, capture_proof, concurrency caps)
 #
-# Ships as a default with hub provisioning so downstream projects can
+# BUNDLED FALLBACK for the cbp-build-test-workflows plugin: used when the host
+# project has no provisioned .claude/config/test-pipeline.yml (project config wins).
+# Historical note: derived from the hub's provisioning template so downstream projects can
 # run /test-pipeline out of the box. Provisioned to
 # .claude/config/test-pipeline.yml in target projects. Override any
 # value locally without modifying the hub template.
@@ -73,7 +75,7 @@ track_detection:
     - supertest
     - pact
     - "@pact-foundation/pact"
-  override_file: "core/.claude/config/test-track-overrides.yml"
+  override_file: ".claude/config/test-track-overrides.yml"  # project-local; optional — absent in most projects
   detection_mode: accumulate           # ALL rules run; results accumulate (NOT first-match-wins)
 
 # Retry budget — shared pool across all stages
