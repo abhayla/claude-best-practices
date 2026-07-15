@@ -74,7 +74,8 @@ Every precondition verifiable early is verified DURING INTAKE while the owner is
 
 ## Phases
 
-**Phase 1 — MVP front door (~1 session)**
+**Phase 1 — MVP front door (~1 session)** — BUILD STARTED 2026-07-15 (owner GO "document and go").
+Build log: scaffold ✅ (`GetWorkDone\` + settings.json with VERIFIED repo registry — caught a new trap: folder `OFO` shares algochanakya's remote; registry pins canonical paths). Skill v0.1 ✅ (commit cd098a8). Guard-rail audit ✅ — findings: KKB + AlgoChanakya had NO protection (minimal shells now set via API); NO downstream repo has a universally-requirable PR check (KKB/AC path-filtered, IPODhan/RFP push-only, calculatekaro NO CI AT ALL) → required-check config deferred until each repo lands an always-runs "gate" workflow; 4 gate tasks filed as the inbox's first real items; calculatekaro's gate = exit-test T-002. Dispatch lesson #1: prompt via STDIN, never argument (frontmatter `---` parses as CLI flag).
 - [ ] `/get-work-done` SKILL.md v1: sequential single-worker flow end-to-end (intake→gate→clarify→contract→dispatch→check→report), atomic claim, repo-identity assert, refusal branch.
 - [ ] `D:\Abhay\VibeCoding\GetWorkDone\` + contract template + inbox convention; `GetWorkDone\evidence\` + LEDGER.
 - [ ] Downstream prerequisite audit: branch protection (up-to-date-branch requirement) + secret-scan gate per repo.

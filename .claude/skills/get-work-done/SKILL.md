@@ -79,11 +79,17 @@ status_log: []
    session owns it; skip.
 2. **Last-line re-checks** (cheap; intake already passed them): registry path exists, remote
    matches. Mismatch → abort + park with a question (should be near-impossible after STEP 4).
-3. Launch via background Bash, IN the target repo's directory so its own CLAUDE.md/plugins load:
+3. Launch via background Bash, IN the target repo's directory so its own CLAUDE.md/plugins load.
+   The prompt goes via STDIN — never as an argument (a contract starting with `---` frontmatter
+   is parsed as a CLI flag; live failure 2026-07-15):
    ```bash
-   cd <registry path> && claude -p "<contract body + DoD + 'land via PR, arm CI auto-merge, do NOT merge manually'>" \
-     --model <tier> --max-turns <cap> --output-format json > GWD\heartbeats\T-<id>.result.json
+   # prompt file = contract body + worker mandate + required JSON output shape
+   cd <registry path> && claude -p --model <tier> --max-turns <cap> \
+     --permission-mode bypassPermissions --output-format json \
+     < GWD\heartbeats\T-<id>.prompt.txt > GWD\heartbeats\T-<id>.result.json
    ```
+   Same-repo-as-dispatcher tasks: the contract MUST order the worker into its own git worktree
+   (two sessions must never share one checkout).
 4. On exit, parse the JSON **`stop_reason` — a refusal is NOT success** (exit code lies):
    refusal → re-route once to opus (append `status_log`), continue. Error → one retry, then
    park with the error text.
