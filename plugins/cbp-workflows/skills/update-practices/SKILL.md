@@ -1,14 +1,16 @@
 ---
 name: update-practices
 description: >
-  Pull latest best practices from the hub into your project's .claude/ directory.
-  Compares local files (agents, skills, rules, hooks, and shipped configs under
-  .claude/config/) against hub registry + hub config directory, shows diffs,
-  and copies updates.
-  Use when your local patterns are outdated or after hub registry changes.
+  Pull latest COPY-PROVISIONED practices from the hub into your project's .claude/
+  directory — the residual surface only: path-scoped rules, stack helpers without a
+  plugin pack, and shipped configs. PLUGIN-COVERED content (the workflow plugins,
+  their sub-skills/agents, stack packs) is NOT synced here — update those with
+  `/plugin update <name>` (the install-not-copy model, hub #346). Compares local
+  files against hub registry + hub config directory, shows diffs, and copies updates.
+  Use when your copy-provisioned patterns are outdated or after hub registry changes.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--check-only] [--force]"
-version: "1.2.1"
+version: "1.4.0"
 type: workflow
 ---
 
@@ -74,6 +76,21 @@ For each config file in the hub's `core/.claude/config/` listing (excluding
 This is the critical fix for the 2026-04-24 downstream gap: skills updated to
 new schema versions but config files on disk stayed at old schema, producing
 silent key-shape mismatches at runtime.
+
+## STEP 4.5: Plugin-Covered Exclusion Gate (install-not-copy, hub #346)
+
+Before applying ANY update, drop from the update set every pattern that is
+plugin-covered — copying those recreates the drift and shadowing this model retired:
+
+1. **Pointer skills**: if the fetched hub copy of a skill is `type: reference` AND its
+   body contains a `/plugin install` redirect, it is a #346 retirement pointer — NEVER
+   copy it into `.claude/skills/` (a local copy SHADOWS the installed plugin's same-named
+   skill). Report it as: "plugin-covered — update via `/plugin update <plugin>` instead."
+2. **Installed-plugin shadow guard**: if a same-named skill is already served by an
+   installed plugin (it appears namespaced, e.g. `cbp-workflows:<name>`), skip the copy
+   for the same reason — even when the hub copy is a full body.
+3. What REMAINS in scope is the residual copy-provision surface: path-scoped rules,
+   stack helpers without a plugin pack, hooks, and shipped configs.
 
 ## STEP 4: Show Diffs
 
