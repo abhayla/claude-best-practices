@@ -26,14 +26,14 @@ Break-detection feeds (wired progressively): Gatus health checks (VPS portfolio)
 
 ## On-disk state — ALL outside every git repo (G19)
 
-Root: `D:\Abhay\VibeCoding\tasks\` (sibling of the repos, like GLOBAL.md — durable, un-committable, single-writer-friendly):
+Root: `D:\Abhay\VibeCoding\GetWorkDone\` (sibling of the repos, like GLOBAL.md — durable, un-committable, single-writer-friendly):
 - `inbox/` — incoming items (`source`, `repo`, `type`, `evidence` frontmatter)
 - `queue/` — one contract file per task; **atomic claim by rename** `<id>.queued.md → <id>.claimed.<session>.md` before any dispatch (G2)
 - `OWNER-QUESTIONS.md` — parked blockers: `[task-id] question · recommended answer · what unblocks`
 - `PATTERNS-SEEN.md` — repetition tally (3× → skill-factory proposal)
 - `heartbeats/` — per-worker PID + last-tick file (G3)
 
-Evidence store: `D:\Abhay\VibeCoding\task-evidence\<YYYY-MM-DD>-<task-id>\` + append-only `LEDGER.md`. Retention: prune >90 days; an evidence-write failure is a HARD task failure, never a skip (G20).
+Evidence store: `D:\Abhay\VibeCoding\GetWorkDone\evidence\<YYYY-MM-DD>-<task-id>\` + append-only `LEDGER.md`. Retention: prune >90 days; an evidence-write failure is a HARD task failure, never a skip (G20).
 
 ## Architecture
 
@@ -72,7 +72,7 @@ Evidence store: `D:\Abhay\VibeCoding\task-evidence\<YYYY-MM-DD>-<task-id>\` + ap
 
 **Phase 1 — MVP front door (~1 session)**
 - [ ] `/get-work-done` SKILL.md v1: sequential single-worker flow end-to-end (intake→gate→clarify→contract→dispatch→check→report), atomic claim, repo-identity assert, refusal branch.
-- [ ] `D:\Abhay\VibeCoding\tasks\` + contract template + inbox convention; `task-evidence\` + LEDGER.
+- [ ] `D:\Abhay\VibeCoding\GetWorkDone\` + contract template + inbox convention; `GetWorkDone\evidence\` + LEDGER.
 - [ ] Downstream prerequisite audit: branch protection (up-to-date-branch requirement) + secret-scan gate per repo.
 - [ ] Eval per check_eval_coverage ratchet (new skill ⇒ evals day one).
 - Verify: dry-run a synthetic 2-task brief (one hub, one calculatekaro); worker lands a real PR; checker (not worker) writes the LEDGER entry. **Biggest unknown retired first: headless permission walls in downstream repos.**
@@ -108,6 +108,6 @@ Mitigations are baked into the architecture above, keyed G1–G20: G1 answer ret
 
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
-2. **Dispatcher context rot** — all state on disk; any session resumes the fleet from `tasks\queue\`.
+2. **Dispatcher context rot** — all state on disk; any session resumes the fleet from `GetWorkDone\queue\`.
 3. **Machine-awake dependency** — largely retired by Phase 5b VPS pools; residual: the fleet-keeper's own host. Mitigation: run a second fleet-keeper on a VPS pool once 5b lands (dispatcher redundancy via atomic claims — G2 already makes double-keepers safe).
 4. **Fable burning tokens on routine work** — hard-coded dispatch tiers + weekly `cost_ledger.py --report` audit.
