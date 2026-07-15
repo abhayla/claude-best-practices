@@ -54,6 +54,8 @@ workflows:
       rules:
         - decision-authority
         - plan-before-coding
+        - untrusted-content-handling
+        - verify-before-suggest-do-before-delegate
         - workflow
 
   loop-engineering:
@@ -63,14 +65,17 @@ workflows:
         - auto-verify
         - brainstorm
         - debugging-loop
+        - dependency-migration-triage
         - escalation-report
         - fix-loop
         - git-branch-lifecycle
         - learn-n-improve
         - loop-engineering
+        - mock-data-hunter
         - post-fix-pipeline
         - status
         - systematic-debugging
+        - weakened-test-hunter
         - writing-plans
       agents:
         - code-reviewer-agent
@@ -111,9 +116,11 @@ workflows:
         - fastapi-run-backend-tests
         - fix-loop
         - flutter-e2e-test
+        - full-defect-surface-sweep
         - git-branch-lifecycle
         - integration-test
         - merge-strategy
+        - mock-data-hunter
         - mock-server
         - perf-test
         - pipeline-fix-pr
@@ -179,11 +186,13 @@ workflows:
         - bun-elysia-test
         - db-migrate-verify
         - debugging-loop
+        - dependency-migration-triage
         - fastapi-run-backend-tests
         - firebase-test
         - fix-github-issue
         - fix-loop
         - flutter-e2e-test
+        - full-defect-surface-sweep
         - mobile-a11y-test
         - systematic-debugging
       agents:

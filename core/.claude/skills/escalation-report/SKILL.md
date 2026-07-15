@@ -1,191 +1,68 @@
 ---
 name: escalation-report
 description: >
-  Generate `test-results/escalation-report.md` when `/test-pipeline` (skill-at-T0,
-  spec v2.2) hits the global retry budget (default 15), dispatch budget (default
-  100), or wall-clock budget (default 90 min) with failures still unresolved.
-  Use when budget exhaustion has stopped further fix attempts and you need to
-  surface what's resolved vs what's open for the next session.
-type: workflow
-allowed-tools: "Bash Read Write"
-argument-hint: "<run-id> <state-json-path>"
-version: "1.1.0"
+  POINTER to the installable cbp-build-test-workflows plugin — this capability graduated from a
+  copied core/ template to plugin-as-SSOT (#346 stage 2, plugins-first-only). Use
+  this pointer when provisioning: install the plugin instead of copying. Original
+  purpose: Generate `test-results/escalation-report.md` when `/test-pipeline` (skill-at-T0, spec v2.2) hits the global retry budget (default 15), dispatch budget (default 100), or wall-clock budget (default 90 m
+type: reference
+allowed-tools: "Read"
+argument-hint: "(no arguments — informational pointer)"
+version: "2.0.0"
 ---
 
-# Escalation Report — Generate Pipeline Escalation Markdown
+# escalation-report — now ships as a plugin
 
-Writes a human-readable escalation report covering resolved Issues, unresolved
-Issues with `pipeline-fix-failed` label, and recommended next actions.
-Invoked by `/test-pipeline` (skill-at-T0) on budget exhaustion at STEP 6
-TRIAGE (before Fan-out dispatch if budget guard trips) or STEP 7
-VERIFY-AFFECTED (if retry budget exhausts).
+This capability is **no longer distributed as a copied template**. It ships in the
+cbp-build-test-workflows plugin (G6-validated 2026-07-12) so there is **one source of truth** instead
+of a template copy that drifts. This file is a pointer left in `core/` so provisioning
+surfaces the redirect rather than silently dropping the capability (#346 stage 2,
+plugins-first-only — owner decision 2026-07-14; recipe:
+`plans/core-skills-thin-pointer-retirement.md`).
 
-**Request:** $ARGUMENTS — `<run-id> <state-json-path>`
-- `<run-id>`: pipeline run ID (e.g., `2026-04-23T14-30-00Z_abc1234`)
-- `<state-json-path>`: path to the single consolidated state file at
-  `.workflows/testing-pipeline/state.json` containing per-Issue outcomes
-  (single state file per spec v2.2 §3.4)
+## How to get it
 
-> Spec reference: `docs/specs/test-pipeline-three-lane-spec-v2.md` v2.2 §3.3
-> (budget ownership at T0, BLOCKED verdict emission)
-
----
-
-## STEP 0: Read inputs
-
-Parse `<run-id>` and `<state-json-path>` from $ARGUMENTS. Read the triage state file:
-
-```json
-{
-  "schema_version": "2.0.0",
-  "run_id": "<run-id>",
-  "issues_processed": [
-    {"issue_number": 1234, "test_id": "...", "outcome": "resolved", "commit_sha": "abc1234"},
-    {"issue_number": 1235, "test_id": "...", "outcome": "fix_failed", "attempts": 3, "last_error": "..."},
-    {"issue_number": 1236, "test_id": "...", "outcome": "issue_only_no_fix_attempted", "category": "LOGIC_BUG"}
-  ],
-  "budget_used": 15,
-  "budget_total": 15,
-  "abort_reason": "RETRY_BUDGET_EXHAUSTED" | "DISPATCH_BUDGET_EXCEEDED" | "WALL_CLOCK_EXHAUSTED"
-}
+```
+/plugin marketplace add abhayla/claude-best-practices
+/plugin install cbp-build-test-workflows@claude-best-practices
+/reload-plugins
 ```
 
----
+Also bundled (same skill, alternate closure) in: `loop-engineering` — installing any one serves it.
 
-## STEP 1: Categorize Issues
+## What it does (so provisioning can decide without installing)
 
-Split `issues_processed` into:
-- **resolved**: `outcome == "resolved"` — closed Issues with commit SHA
-- **fix_failed**: `outcome == "fix_failed"` — open Issues that exhausted per-test retry cap
-- **issue_only**: `outcome == "issue_only_no_fix_attempted"` — open Issues with categories like LOGIC_BUG / VISUAL_REGRESSION (per auto-fix matrix)
+Generate `test-results/escalation-report.md` when `/test-pipeline` (skill-at-T0, spec v2.2) hits the global retry budget (default 15), dispatch budget (default 100), or wall-clock budget (default 90 min) with failures still unresolved. Use when budget exhaustion has stopped further fix attempts and you need to surface what's resolved vs what's open for the next session.
 
-For each `fix_failed` Issue, attempt to add the `pipeline-fix-failed` label via `gh issue edit` (best-effort; non-fatal on failure).
+After install the skill resolves as `cbp-build-test-workflows:escalation-report` (invokable as `/escalation-report` when no
+shadowing copy exists). Historical `references/` and `evals/` directories are retained
+here for evidence; the LIVE copies ship inside the plugin.
 
----
+## Structure of the plugin copy (from the retired template, for orientation)
 
-## STEP 2: Generate Markdown report
+- Read inputs
+- Categorize Issues
+- Generate Markdown report
+- Resolved Failures (closed)
+- Unresolved Failures (still open)
+- Auto-Fix Failed (`pipeline-fix-failed` label applied)
+- Issue-Only Categories (no fix attempted)
+- Summary
+- Next Session
+- Optional notifications + reviewer auto-assign (REQ-C002, REQ-C004)
+- REQ-C002: Slack notification
+- REQ-C004: CODEOWNERS auto-assign
 
-Write to `test-results/escalation-report.md`:
+Original invocation shape: `<run-id> <state-json-path>`.
+The plugin copy is the LIVE version — its steps, gates, and worker dispatches may
+have evolved past this snapshot; always trust the installed skill over this list.
 
-```markdown
-# Test Pipeline Escalation — run_id: {run_id}
+## Why it moved
 
-**Status:** {abort_reason} (budget {budget_used}/{budget_total})
-**Generated:** {timestamp}
-
-## Resolved Failures (closed)
-{for each resolved Issue:}
-- #{issue_number}: {test_id} — fixed in `{commit_sha}`
-{end for}
-
-{if no resolved: "(none)"}
-
-## Unresolved Failures (still open)
-
-### Auto-Fix Failed (`pipeline-fix-failed` label applied)
-{for each fix_failed Issue:}
-- #{issue_number}: {test_id} ({category})
-  - Attempted fixes: {attempts}
-  - Last error: {last_error}
-  - Recommendation: {auto-suggested per category — e.g., for VISUAL_REGRESSION: "human review of test-evidence/{run_id}/screenshots/{test}.fail.png"}
-{end for}
-
-### Issue-Only Categories (no fix attempted)
-{for each issue_only Issue:}
-- #{issue_number}: {test_id} ({category})
-  - Reason: {category} is `ISSUE_ONLY` per auto-fix matrix (spec §3.6) — requires human review
-  - Recommendation: {category-specific — e.g., for LOGIC_BUG: "real product bug; assign to backend team"}
-{end for}
-
-{if both empty: "All triaged failures resolved successfully."}
-
-## Summary
-
-| Outcome | Count |
-|---|---|
-| Resolved (closed) | {N} |
-| Fix-failed (open, labeled `pipeline-fix-failed`) | {N} |
-| Issue-only (open, no fix attempted) | {N} |
-| **Total** | **{N}** |
-
-## Next Session
-
-Resume by reviewing the unresolved Issues:
-```bash
-gh issue list --label pipeline-failure --state open
-```
-
-To re-run the pipeline against just the unresolved tests:
-```bash
-/test-pipeline --only-issues {comma-separated unresolved issue numbers}
-```
-
-(REQ-S001 — flag implementation deferred per spec §5)
-
----
-*Generated by `/escalation-report` from triage state at `{state-json-path}`.*
-```
-
----
-
-## STEP 3: Optional notifications + reviewer auto-assign (REQ-C002, REQ-C004)
-
-### REQ-C002: Slack notification
-
-If `SLACK_WEBHOOK_URL` env var is set, post a summary to Slack:
-
-```bash
-if [ -n "$SLACK_WEBHOOK_URL" ]; then
-    SUMMARY="🚨 Test pipeline escalation — run ${run_id}\n\nResolved: ${resolved_count}\nFix-failed: ${fix_failed_count}\nIssue-only: ${issue_only_count}\n\nReport: test-results/escalation-report.md\nOpen Issues: \`gh issue list --label pipeline-fix-failed --state open\`"
-    curl -fsS -X POST -H 'Content-type: application/json' \
-         --data "{\"text\": \"$SUMMARY\"}" \
-         "$SLACK_WEBHOOK_URL" || echo "WARN: Slack post failed (non-fatal)"
-fi
-```
-
-Best-effort. Failures here MUST NOT abort the escalation report itself (fail-soft for notifications).
-
-### REQ-C004: CODEOWNERS auto-assign
-
-For each `fix_failed` Issue, parse `CODEOWNERS` (or `.github/CODEOWNERS`) to find owners of the failing test file path, then auto-assign:
-
-```bash
-CODEOWNERS_FILE=$(find . -maxdepth 3 -iname CODEOWNERS | head -1)
-if [ -n "$CODEOWNERS_FILE" ]; then
-    for issue in $fix_failed_issues; do
-        test_file=$(extract_test_file_from_issue "$issue")
-        owners=$(grep_codeowners_for_path "$CODEOWNERS_FILE" "$test_file")
-        if [ -n "$owners" ]; then
-            for owner in $owners; do
-                gh issue edit "$issue" --add-assignee "$owner" 2>/dev/null || true
-            done
-        fi
-    done
-fi
-```
-
-Best-effort; auto-assign failures (e.g., user not a repo collaborator) MUST NOT abort.
-
-## STEP 4: Return contract
-
-```json
-{
-  "report_path": "test-results/escalation-report.md",
-  "resolved_count": <N>,
-  "fix_failed_count": <N>,
-  "issue_only_count": <N>,
-  "labels_applied": <N>,
-  "slack_notified": <true|false>,
-  "reviewers_assigned": <N>
-}
-```
-
----
-
-## CRITICAL RULES
-
-- MUST write to `test-results/escalation-report.md` (NOT to `test-results/fixes/` or `test-evidence/`)
-- MUST best-effort apply `pipeline-fix-failed` label (non-fatal on `gh` errors — escalation report still ships)
-- MUST include category-specific recommendations per spec §3.11 template (not generic "investigate")
-- MUST surface the abort_reason explicitly (RETRY_BUDGET_EXHAUSTED vs DISPATCH_BUDGET_EXCEEDED vs WALL_CLOCK_EXHAUSTED — different remediation paths)
-- MUST NOT re-attempt any fixes — escalation = stop fixing, just report
+- **Single source of truth** — plugin updates reach every project via
+  `/plugin update cbp-build-test-workflows`; copied templates drift silently.
+- **Closure completeness** — the plugin bundles its full sub-skill + agent closure, so
+  an install never hits a missing-worker preflight block.
+- **Shadowing trap** — a provisioned copy of a same-named skill SHADOWS the installed
+  plugin's version, so plugin-covered skills are excluded from copy-provision
+  (`config/plugin-recommendations.yml` is the SSOT `recommend.py` consults).

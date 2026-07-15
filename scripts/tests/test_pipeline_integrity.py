@@ -10,6 +10,7 @@ Validates that the 11-stage pipeline is fully connected:
   - Governance constraints (agent-orchestration rule) are satisfied
 """
 
+from scripts.tests.skill_paths import resolve_skill_md
 import json
 import re
 from pathlib import Path
@@ -30,7 +31,7 @@ ORCHESTRATOR_AGENT = CORE_CLAUDE / "agents" / "project-manager-agent.md"
 ORCHESTRATOR_SKILL = CORE_CLAUDE / "skills" / "pipeline-orchestrator" / "SKILL.md"
 ORCHESTRATION_RULE = CORE_CLAUDE / "rules" / "agent-orchestration.md"
 ORCHESTRATION_GUIDE = CORE_CLAUDE / "skills" / "anthropic-agent-orchestration-guide" / "SKILL.md"
-REVIEW_GATE_SKILL = CORE_CLAUDE / "skills" / "review-gate" / "SKILL.md"
+REVIEW_GATE_SKILL = resolve_skill_md("review-gate")
 SUBAGENT_SKILL = CORE_CLAUDE / "skills" / "subagent-driven-dev" / "SKILL.md"
 SUBAGENT_REFS = CORE_CLAUDE / "skills" / "subagent-driven-dev" / "references"
 

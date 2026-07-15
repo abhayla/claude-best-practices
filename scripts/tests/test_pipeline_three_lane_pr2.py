@@ -12,6 +12,7 @@ behaviors that require live agents to verify.
 """
 
 from __future__ import annotations
+from scripts.tests.skill_paths import resolve_skill_md
 
 import json
 import subprocess
@@ -33,12 +34,12 @@ SCRIPTS_DIR = REPO_ROOT / "scripts"
 
 
 def test_create_github_issue_skill_exists():
-    skill_path = SKILLS_DIR / "create-github-issue" / "SKILL.md"
+    skill_path = resolve_skill_md("create-github-issue")
     assert skill_path.exists(), f"missing {skill_path}"
 
 
 def test_create_github_issue_has_4_preflight_checks():
-    body = (SKILLS_DIR / "create-github-issue" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("create-github-issue").read_text(encoding="utf-8")
     # Each preflight check must be enumerated in the table
     for marker in ["gh installed", "gh authenticated", "Origin remote is github.com", "Token has Issue creation permission"]:
         assert marker in body, f"preflight check '{marker}' missing from /create-github-issue body"
@@ -46,7 +47,7 @@ def test_create_github_issue_has_4_preflight_checks():
 
 def test_create_github_issue_uses_3_field_dedup_hash():
     """Closes Reviewer Gap N3 — must include failing_commit_sha_short."""
-    body = (SKILLS_DIR / "create-github-issue" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("create-github-issue").read_text(encoding="utf-8")
     assert "failing_commit_sha_short" in body, (
         "3-field dedup hash MUST include failing_commit_sha_short — without it, "
         "refactors create false-duplicates per spec §3.7 N3"
@@ -57,7 +58,7 @@ def test_create_github_issue_uses_3_field_dedup_hash():
 
 def test_create_github_issue_returns_blocked_on_preflight_fail():
     """Skill body must document the BLOCKED contract shape."""
-    body = (SKILLS_DIR / "create-github-issue" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("create-github-issue").read_text(encoding="utf-8")
     assert '"result": "BLOCKED"' in body
     assert '"blocker": "GITHUB_NOT_CONNECTED"' in body
     assert '"failed_check"' in body
@@ -66,7 +67,7 @@ def test_create_github_issue_returns_blocked_on_preflight_fail():
 
 def test_create_github_issue_body_has_empty_field_placeholders():
     """Closes spec G17 — empty fields render with placeholder, not blank lines."""
-    body = (SKILLS_DIR / "create-github-issue" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("create-github-issue").read_text(encoding="utf-8")
     assert "(no details captured)" in body or "(no stderr captured)" in body
 
 
@@ -100,18 +101,18 @@ def test_serialize_fixes_skill_exists():
 
 
 def test_serialize_fixes_uses_git_apply_check_first():
-    body = (SKILLS_DIR / "serialize-fixes" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("serialize-fixes").read_text(encoding="utf-8")
     assert "git apply --check" in body, "Phase A MUST run --check first (atomic guard)"
 
 
 def test_serialize_fixes_resets_hard_on_failure():
-    body = (SKILLS_DIR / "serialize-fixes" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("serialize-fixes").read_text(encoding="utf-8")
     assert "git reset --hard HEAD" in body, "Cleanup MUST run on any failure between apply and commit"
 
 
 def test_serialize_fixes_discards_stale_diff_on_conflict():
     """Closes spec §3.9.3 G8 — stale diffs discarded so fresh diff next iteration."""
-    body = (SKILLS_DIR / "serialize-fixes" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("serialize-fixes").read_text(encoding="utf-8")
     assert "rm" in body and "stale_diff_discarded" in body
 
 
@@ -119,11 +120,11 @@ def test_serialize_fixes_discards_stale_diff_on_conflict():
 
 
 def test_escalation_report_skill_exists():
-    assert (SKILLS_DIR / "escalation-report" / "SKILL.md").exists()
+    assert resolve_skill_md("escalation-report").exists()
 
 
 def test_escalation_report_writes_to_test_results():
-    body = (SKILLS_DIR / "escalation-report" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("escalation-report").read_text(encoding="utf-8")
     assert "test-results/escalation-report.md" in body
 
 
@@ -131,19 +132,19 @@ def test_escalation_report_writes_to_test_results():
 
 
 def test_fix_github_issue_diff_only_flag_documented():
-    body = (SKILLS_DIR / "fix-github-issue" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("fix-github-issue").read_text(encoding="utf-8")
     assert "--diff-only" in body, "/fix-github-issue MUST document --diff-only flag"
 
 
 def test_fix_github_issue_diff_only_writes_diff_no_commit():
-    body = (SKILLS_DIR / "fix-github-issue" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("fix-github-issue").read_text(encoding="utf-8")
     assert "test-results/fixes/" in body, "diff-only MUST write to test-results/fixes/"
     assert "DIFF_WRITTEN" in body or "no_commit" in body
 
 
 def test_fix_github_issue_default_mode_unchanged():
     """Backward compat: default mode (no flag) still calls /post-fix-pipeline."""
-    body = (SKILLS_DIR / "fix-github-issue" / "SKILL.md").read_text(encoding="utf-8")
+    body = resolve_skill_md("fix-github-issue").read_text(encoding="utf-8")
     assert "post-fix-pipeline" in body
 
 

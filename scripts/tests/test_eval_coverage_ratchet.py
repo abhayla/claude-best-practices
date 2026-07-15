@@ -79,3 +79,32 @@ def test_grandfather_entries_are_real_and_still_uncovered():
 def test_gate_wired_with_enforce():
     wf = (ROOT / ".github" / "workflows" / "validate-pr.yml").read_text(encoding="utf-8")
     assert "check_eval_coverage.py --enforce" in wf
+
+
+class TestReferenceSkillExemption:
+    """`type: reference` skills (lookup docs / #346 thin plugin pointers) need no evals —
+    but only genuine reference skills are exempt; workflow skills still ratchet."""
+
+    def _mk_skill(self, tmp_path, name, skill_type):
+        d = tmp_path / "core" / ".claude" / "skills" / name
+        d.mkdir(parents=True)
+        (d / "SKILL.md").write_text(
+            f"---\nname: {name}\ntype: {skill_type}\nversion: \"1.0.0\"\n---\n\n# {name}\n",
+            encoding="utf-8",
+        )
+        return d
+
+    def test_reference_skill_is_exempt(self, tmp_path):
+        from scripts.check_eval_coverage import uncovered_changed_skills
+
+        self._mk_skill(tmp_path, "some-pointer", "reference")
+        changed = ["core/.claude/skills/some-pointer/SKILL.md"]
+        assert uncovered_changed_skills(changed, tmp_path) == []
+
+    def test_workflow_skill_still_ratchets(self, tmp_path):
+        from scripts.check_eval_coverage import uncovered_changed_skills
+
+        self._mk_skill(tmp_path, "some-workflow", "workflow")
+        changed = ["core/.claude/skills/some-workflow/SKILL.md"]
+        flagged = uncovered_changed_skills(changed, tmp_path)
+        assert [f["skill"] for f in flagged] == ["some-workflow"]

@@ -5,13 +5,14 @@ adversarial verification stage. These tests pin the contract that protects the
 default path and the dual-mode agent wiring — NOT the empirical review quality,
 which needs a live run.
 """
+from scripts.tests.skill_paths import resolve_skill_md
 from pathlib import Path
 
 import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
-SKILL = REPO / "core/.claude/skills/code-review-workflow/SKILL.md"
+SKILL = resolve_skill_md("code-review-workflow")
 CODE_REVIEWER = REPO / "core/.claude/agents/code-reviewer-agent.md"
 SECURITY_AUDITOR = REPO / "core/.claude/agents/security-auditor-agent.md"
 ORCHESTRATION = REPO / "core/.claude/rules/agent-orchestration.md"

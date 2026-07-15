@@ -10,6 +10,7 @@ config/eval-coverage-grandfather.yml — a shrink-only allowlist of the skills t
 predate the gate. New skills must ship with evals from day one.
 """
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -36,6 +37,16 @@ def _has_eval_report(skill_dir: Path) -> bool:
     return any(evals_dir.glob("*.md"))
 
 
+def _is_reference_skill(skill_dir: Path) -> bool:
+    """True when the skill's frontmatter declares `type: reference`."""
+    skill_md = skill_dir / "SKILL.md"
+    try:
+        head = skill_md.read_text(encoding="utf-8")[:2000]
+    except OSError:
+        return False
+    return bool(re.search(r"^type:\s*reference\s*$", head, re.MULTILINE))
+
+
 def uncovered_changed_skills(changed_files: list, root: Path) -> list:
     """Flag changed skills whose sibling evals/ dir is absent or empty.
 
@@ -51,6 +62,13 @@ def uncovered_changed_skills(changed_files: list, root: Path) -> list:
         if skill_dir in seen:
             continue
         seen.add(skill_dir)
+        if _is_reference_skill(skill_dir):
+            # `type: reference` skills are lookup docs / plugin pointers (e.g. the #346
+            # stage-2 thin pointers), not executable workflows — evals don't apply.
+            # Workflow skills can't dodge the ratchet this way: entry-skill conformance
+            # (test_workflow_orchestration_conformance.py) only accepts type:reference
+            # for the exact /plugin-install pointer shape.
+            continue
         if not _has_eval_report(skill_dir):
             results.append({
                 "skill": skill_dir.name,
