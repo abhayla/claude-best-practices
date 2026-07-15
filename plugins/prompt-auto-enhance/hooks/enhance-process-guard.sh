@@ -135,7 +135,10 @@ printf '%s' "$full" | grep -qE "diagnosis:|changes applied|missing_role|missing_
 # transcript — its absence there is NOT evidence it wasn't rendered. The model attests the render
 # by touching .claude/.enhance-card-rendered in the same turn (reset per real user prompt by
 # prompt-enhance-reminder.sh). The marker credits card + overall + substance like persisted text.
-if [ -f "$root/.claude/.enhance-card-rendered" ]; then
+# SESSION-SCOPED marker (2026-07-15 incident: a concurrent session's reminder wiped the shared
+# marker) — check this session's own marker first; legacy unscoped name accepted for compat.
+sid=$(printf '%s' "$input" | jq -r '.session_id // ""' 2>/dev/null)
+if { [ -n "$sid" ] && [ -f "$root/.claude/.enhance-card-rendered.$sid" ]; } || [ -f "$root/.claude/.enhance-card-rendered" ]; then
   card="1"; overall="1"; substance="1"
 fi
 

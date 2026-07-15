@@ -161,11 +161,14 @@ printf '%s' "$full" | grep -qE "overall|[a-f] *(→|->) *[a-f]|weighted total" &
 # text blocks that share one API response with tool_use blocks — a correctly-rendered
 # pre-execution card (the owner-mandated ordering, prompt-auto-enhance.md) never persists to
 # the transcript on such turns, so its absence there is NOT evidence it wasn't rendered.
-# The model attests the render by touching .claude/.enhance-card-rendered in the same turn
-# (reset on every real user prompt by prompt-enhance-reminder.sh). Marker credits the card,
-# its Overall row, and the diagnosis substance exactly like persisted card text would.
+# The model attests the render by touching .claude/.enhance-card-rendered.<session_id> in the
+# same turn (reset per real user prompt by prompt-enhance-reminder.sh). SESSION-SCOPED (live
+# incident 2026-07-15: a concurrent worker session's reminder wiped the shared marker) — each
+# session touches/checks only its own; the guard also accepts the legacy unscoped name from
+# the same fix-day so an in-flight session isn't re-broken.
+sid=$(printf '%s' "$input" | jq -r '.session_id // ""')
 card_marker=""
-if [ -f "$root/.claude/.enhance-card-rendered" ]; then
+if { [ -n "$sid" ] && [ -f "$root/.claude/.enhance-card-rendered.$sid" ]; } || [ -f "$root/.claude/.enhance-card-rendered" ]; then
   card_marker="1"; card="1"; overall="1"
 fi
 # G7: block on substantive + not-trivial + (NO card OR NO overall row), regardless of banner

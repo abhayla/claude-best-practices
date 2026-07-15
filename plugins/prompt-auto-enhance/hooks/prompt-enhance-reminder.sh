@@ -36,6 +36,10 @@ input=$(cat)
 # Reset the card-rendered attestation marker (enhance-process-guard.sh): the harness drops
 # assistant text that shares an API response with tool_use, so the model attests a
 # pre-execution card render by touching this marker; it must never outlive the user turn.
+# SESSION-SCOPED (2026-07-15): reset ONLY this session's marker + the legacy unscoped name —
+# a concurrent session's attestation must never be wiped by another session's prompt.
+_sid=$(printf '%s' "$input" | jq -r '.session_id // ""' 2>/dev/null)
+[ -n "$_sid" ] && rm -f "$root/.claude/.enhance-card-rendered.$_sid" 2>/dev/null
 rm -f "$root/.claude/.enhance-card-rendered" 2>/dev/null
 
 emit_full() {
