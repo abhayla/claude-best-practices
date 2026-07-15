@@ -106,6 +106,9 @@ Evidence store: `D:\Abhay\VibeCoding\GetWorkDone\evidence\<YYYY-MM-DD>-<task-id>
 
 Mitigations are baked into the architecture above, keyed G1–G20: G1 answer return path · G2 atomic queue claim · G3 heartbeat/liveness + reconcile · G4 maker≠checker evidence · G5 break-task dedup · G6 revert-first rollback · G7 fix-loop circuit breaker · G8 local (not cloud) unattended sweeper · G9 diff-enforced deploy tier · G10 fleet budget breaker · G11 cancel verb · G12 priority lanes · G13 per-repo merge serialization · G14 secrets discipline · G15 refusal ≠ success · G16 blast-radius gate · G17 alert debounce · G18 repo-identity assert · G19 queue outside git · G20 evidence retention + write-failure = task failure.
 
+## Point-by-point lock ledger (owner walkthrough, 22 steps — 2026-07-15)
+- **P1 LOCKED:** state root = `D:\Abhay\VibeCoding\GetWorkDone\` (single folder: inbox/queue/heartbeats/evidence + ledgers), local machine, outside all git repos; VPSes join as workers at 5b; queue→private-git earmarked only if a VPS fleet-keeper is wanted.
+
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
 2. **Dispatcher context rot** — all state on disk; any session resumes the fleet from `GetWorkDone\queue\`.
