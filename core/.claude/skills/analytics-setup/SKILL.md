@@ -8,10 +8,13 @@ description: >
   instrumenting CTA/affiliate conversions, or when a site is shipping without
   measurement. For web visitor/marketing measurement ONLY — not application or
   infra observability (metrics, logs, traces, uptime/error alerting), which is
-  /monitoring-setup.
+  /monitoring-setup. This is the per-framework instrumentation ENGINE; for fully
+  autonomous end-to-end setup (property provisioning + injection + verification,
+  service-account based) prefer /auto-google-analytics, the orchestrator that
+  wraps this skill, when its plugin is installed.
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "[site-url-or-path] [--ga G-XXXXXXXXXX] [--gtm GTM-XXXXXXX]"
-version: "1.1.0"
+version: "1.1.2"
 type: workflow
 triggers:
   - analytics setup

@@ -117,6 +117,27 @@ def send_mp(measurement_id, secret, client_id):
         MP + "/mp/collect" + qs, data=body, method="POST")).read()
 
 
+def record_verdict(inv_path, origin_key, verdict):
+    """Persist the verify verdict back to the inventory (`last_verify` per origin) so
+    `--audit` has a real on-disk record to report. Best-effort: a reporting failure must
+    never mask the verify result itself."""
+    if not inv_path or not origin_key:
+        return
+    try:
+        with open(inv_path, encoding="utf-8") as f:
+            inv = json.load(f)
+        rec = inv.get("sites", {}).get(origin_key)
+        if rec is None:
+            return
+        rec["last_verify"] = {"verdict": verdict, "event": EVENT,
+                              "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+        with open(inv_path, "w", encoding="utf-8") as f:
+            json.dump(inv, f, indent=2)
+            f.write("\n")
+    except Exception:
+        pass
+
+
 def poll_realtime(prop, tok, tries=10, delay=3):
     url = f"{DATA}/{prop}:runRealtimeReport"
     payload = json.dumps(
@@ -153,11 +174,16 @@ def main():
     args = ap.parse_args()
 
     prop, stream, mid = args.property, args.stream, args.id
+    origin_key = ""
     if args.from_inventory:
         with open(args.from_inventory, encoding="utf-8") as f:
             sites = json.load(f).get("sites", {})
-        rec = sites.get(args.origin) if args.origin else (
-            next(iter(sites.values())) if len(sites) == 1 else None)
+        if args.origin:
+            origin_key, rec = args.origin, sites.get(args.origin)
+        elif len(sites) == 1:
+            origin_key, rec = next(iter(sites.items()))
+        else:
+            rec = None
         if not rec:
             _die(2, "INVENTORY_AMBIGUOUS: pass --origin to pick a site from the inventory.")
         prop, stream, mid = rec["property"], rec["stream"], rec["measurement_id"]
@@ -174,8 +200,10 @@ def main():
     send_mp(mid, secret, cid)
     print("# polling realtime report...")
     if poll_realtime(prop, tok):
+        record_verdict(args.from_inventory, origin_key, "VERIFIED")
         print(f"VERIFIED: '{EVENT}' is visible in {prop} realtime — data is flowing.")
         sys.exit(0)
+    record_verdict(args.from_inventory, origin_key, "NOT_SEEN")
     _die(4, "NOT_SEEN: event sent but not visible in realtime within the window "
             "(realtime can lag; re-run, or check the property/stream).")
 
