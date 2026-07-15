@@ -45,6 +45,10 @@ printf '0' > "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/.keepgoing-co
 printf '0' > "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/.reviewcard-count" 2>/dev/null
 # Same for the diagnose→fix substance enforcement loop-guard (no-overask-guard.sh).
 printf '0' > "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/.diagnosis-count" 2>/dev/null
+# Reset the card-rendered attestation marker (no-overask-guard.sh): the harness drops
+# assistant text that shares an API response with tool_use, so the model attests a
+# pre-execution card render by touching this marker; it must never outlive the user turn.
+rm -f "$(git rev-parse --show-toplevel 2>/dev/null)/.claude/.enhance-card-rendered" 2>/dev/null
 
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 

@@ -56,6 +56,10 @@ context-blind reviewer dispatch (it produces the card's Reviewer-after column). 
 sequence: (1) dispatch blind reviewer; (2) render banner + transcript + card + Original→Final
 + Role; (3) only then execute (research, edits, worker dispatches). Research needed to ANSWER
 the prompt never precedes the card — the card grades the prompt, not the answer.
+**Marker attestation:** the harness drops assistant text that shares an API response with
+tool_use, so a pre-execution card may never reach the transcript. After rendering the card,
+`touch .claude/.enhance-card-rendered` in the FIRST execution tool batch — that marker is the
+Stop guard's evidence the process ran (reset per user prompt by prompt-enhance-reminder.sh).
 
 ## The unified per-prompt pipeline (0 → 6)
 
