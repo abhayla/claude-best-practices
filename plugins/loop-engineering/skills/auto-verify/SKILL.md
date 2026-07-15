@@ -40,6 +40,19 @@ enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 
 ---
 
+## STEP -1: PREFLIGHT (dependency gate — degrade gracefully on missing workers)
+
+Before dispatching `tester-agent`, probe runtime dispatchability (file presence at
+`.claude/agents/<name>.md` or a bundled plugin copy is necessary but NOT sufficient —
+the agent registry is pinned at session start). If a required agent is missing or
+undispatchable: do NOT crash mid-dispatch — BLOCK with verdict
+`WORKER_REGISTRY_NOT_LOADED`, list what is missing, and emit: "provision the closure
+(or reinstall the plugin), then RESTART the session, then re-run." This plugin bundles
+`tester-agent` precisely so a fresh install has them; the gate covers provisioning gaps and
+registry pinning.
+
+---
+
 ## STEP 0: Gate Check — Read Upstream Results
 
 Check if the upstream `fix-loop` stage passed:

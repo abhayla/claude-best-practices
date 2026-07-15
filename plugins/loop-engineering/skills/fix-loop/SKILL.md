@@ -62,6 +62,19 @@ Analyze failures, apply minimal fixes, and optionally retest until resolved.
 
 ---
 
+## STEP 0.5: PREFLIGHT (dependency gate — degrade gracefully on missing workers)
+
+Before dispatching `test-failure-analyzer-agent`, probe runtime dispatchability (file presence at
+`.claude/agents/<name>.md` or a bundled plugin copy is necessary but NOT sufficient —
+the agent registry is pinned at session start). If a required agent is missing or
+undispatchable: do NOT crash mid-dispatch — BLOCK with verdict
+`WORKER_REGISTRY_NOT_LOADED`, list what is missing, and emit: "provision the closure
+(or reinstall the plugin), then RESTART the session, then re-run." This plugin bundles
+`test-failure-analyzer-agent` precisely so a fresh install has them; the gate covers provisioning gaps and
+registry pinning.
+
+---
+
 ## STEP 1: Analyze Failure (via test-failure-analyzer-agent)
 
 If `failure_output` is empty but a `retest_command` was provided, run the retest command first to capture the failure output.

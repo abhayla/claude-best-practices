@@ -59,3 +59,10 @@ reproduced every gate itself rather than trusting either worker's self-report.
 - **0.1.0** (2026-07-03) — Initial plugin scaffold: 13 skills + 2 agents, the loop's full
   dependency closure, registered in the hub marketplace. Pending: `/plugin install` validation in
   a second project (the open G6-graduation proof).
+- **0.2.0–0.4.0** — G6 graduation (second-project install validated 2026-07-03) + incremental
+  content syncs from the hub (PR trail: the hub's `registry/changelog.md`).
+- **0.5.0** (2026-07-15) — Plugin QA review: bundle `tester-agent`,
+  `test-failure-analyzer-agent`, `debugger-agent` so the closure claim is true on a fresh
+  install (they were dispatched by `auto-verify`/`fix-loop`/`debugging-loop` but not shipped);
+  PREFLIGHT gates added to `fix-loop` + `auto-verify` (missing worker now BLOCKS with an
+  actionable message instead of crashing mid-dispatch); now 5 agents + 13 skills.

@@ -209,7 +209,7 @@ strongest persona pattern for Claude 4.x.
 
 **R1 ≠ R2 — the conflation that caused real misses:** the
 `Role: <name> — <why>` line rendered at STEP 4.7 is the **R2 operating
-engineering role** (`engineering-roles.md`) and does NOT satisfy this
+engineering role** (`engineering-roles.md (rule-file citations like this resolve only in projects that provision the hub rules — treat them as optional context elsewhere)`) and does NOT satisfy this
 policy. R1 is the persona INSIDE the strengthened prompt text — the
 Final-prompt block (STEP 4.6) MUST open with `Act as …` whenever
 Role & Framing < 7, even when an R2 `Role:` line is also rendered in
@@ -684,7 +684,7 @@ Classify each decision under DACI (`decision-authority.md`):
 
 ## STEP 6: Git (conditional)
 
-If the turn produced committable changes, dispatch `git-manager-agent` to
+If the turn produced committable changes, dispatch `git-manager-agent (if that agent is not dispatchable in this project, perform the same git steps inline via Bash — never skip the secret-scan)` to
 stage → secret-scan → commit (conventional + the Co-Authored-By trailer) → push;
 `.githooks/pre-commit` is the deterministic secret gate. Branch + `--no-ff` merge
 for cohesive multi-file work; gate scaled to the change (code → type-check + tests,

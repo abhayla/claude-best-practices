@@ -3,7 +3,7 @@ name: skill-author-agent
 description: >
   Create, update, or manage Claude Code skills, rules, and agents using the dedicated authoring
   workflows. Dispatches to /writing-skills for skills, /claude-guardian for rules, and applies
-  pattern-structure.md standards for agents. Use when generating patterns as part of /synthesize-project
+  pattern-structure.md (hub rule — if absent in this project, apply the frontmatter standard summarized in your instructions) standards for agents. Use when generating patterns as part of /synthesize-project
   or when a user requests a new skill/rule/agent.
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Skill"]
 model: inherit
