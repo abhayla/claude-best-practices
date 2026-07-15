@@ -778,3 +778,7 @@ effect at the consumer (§13 of the manual — the incident that section was wri
   writer (record_verdict) over deleting the promise — the claim was the right UX.
 - **Skill step-number references rot**: "skip to STEP 3" pointed the no-key fallback into the
   key-requiring step. Guard step-target references with a cheap text regression test.
+
+## 2026-07-15 — Headless dispatch: prompt via STDIN, never as argument
+- **Mistake:** dispatched a fleet worker with `claude -p "<contract>"` where the contract began with `---` YAML frontmatter — the CLI parsed it as an unknown option and the worker died instantly.
+- **Rule:** headless workers always get their prompt via stdin (`claude -p --flags < prompt.txt`); build a prompt file per task (contract + worker mandate + output shape). Codified in get-work-done SKILL.md STEP 6.
