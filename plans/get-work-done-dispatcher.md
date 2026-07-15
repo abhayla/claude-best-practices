@@ -120,6 +120,7 @@ Mitigations are baked into the architecture above, keyed G1–G20: G1 answer ret
 - **P7 LOCKED:** heartbeat liveness — PID + ~60s tick per worker; fresh+live → hands off (slow ≠ dead); stale/dead → provable terminate + re-dispatch exactly once; 2 deaths on one task → park + escalate.
 - **P8 LOCKED:** `cancel <id>`/`cancel all` (kill PID via heartbeat, close PR, record reason) + daily fleet token ceiling checked at dispatch admission (calibrated from cost_ledger data in week one), central backoff on rate limits.
 - **P9 LOCKED:** Phase-2 exit = staged sabotage: (1) 2 concurrent repos, green PRs, zero cross-contamination (diff-audited); (2) mid-task kill → stale heartbeat detected, terminate, re-dispatch ONCE, auditable death→restart→done log; (3) cancel → dead within a tick, PR closed, branch deleted, nothing merges.
+- **P10 LOCKED (amended):** Notifier wiring per GLOBAL.md §2 recipe (`projects.claude-hub` + thin client), Cowork-style option cards, per-task dedupeKey + batch-into-one, P2 blockers / P3 FYIs; ping windows CONFIGURABLE + MULTI-WINDOW in `GetWorkDone\settings.json` — default `["09:00-21:00"]` IST, owner may set e.g. `["09:00-11:00","14:00-18:00"]` by editing or asking; settings.json is the single fleet knobs file (windows, soft cap, daily ceiling, heartbeat interval).
 
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
