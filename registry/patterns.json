@@ -6841,13 +6841,13 @@
     "tier": "must-have"
   },
   "branch-choice": {
-    "hash": "543cb0117f92f7ed53701fc684fad57f29d7e2f9201d884eb160debdaed7b2a1",
+    "hash": "08904560c017279e26c4e50531d9ebd18f179222909439c48de4ba2994790169",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-27",
-    "last_updated": "2026-06-27",
+    "last_updated": "2026-07-15",
     "dependencies": [],
     "visibility": "public",
     "description": "Present the once-per-session branch menu at the FIRST file edit of a session (new from main / keep existing / switch / merge-then-new / stash) and handle owner-approved landing of stale (>24h) branches reported by the stale-branch reaper. Use before the first file change of a session, or when the reaper reports STALE_BRANCH lines needing approval.",
@@ -6857,7 +6857,7 @@
       "session-lifecycle",
       "workflow"
     ],
-    "changelog": "v1.0.0 (2026-06-27): Initial — owner-driven once-per-session branch menu + stale-branch approval; promoted to core with its 3 companion hooks.",
+    "changelog": "v1.0.0 (2026-06-27): Initial — owner-driven once-per-session branch menu + stale-branch approval; promoted to core with its 3 companion hooks. | v1.1.0: non-interactive sessions are pre-authorized by definition — never dead-end a headless run on the menu (fire-drill #416)",
     "tier": "nice-to-have"
   },
   "stale-branch-reaper": {

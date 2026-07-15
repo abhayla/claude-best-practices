@@ -45,11 +45,17 @@ enforcing quality gates. Does NOT apply fixes — fixing belongs in `/fix-loop`.
 Before dispatching `tester-agent`, probe runtime dispatchability (file presence at
 `.claude/agents/<name>.md` or a bundled plugin copy is necessary but NOT sufficient —
 the agent registry is pinned at session start). If a required agent is missing or
-undispatchable: do NOT crash mid-dispatch — BLOCK with verdict
-`WORKER_REGISTRY_NOT_LOADED`, list what is missing, and emit: "provision the closure
-(or reinstall the plugin), then RESTART the session, then re-run." This plugin bundles
-`tester-agent` precisely so a fresh install has them; the gate covers provisioning gaps and
-registry pinning.
+undispatchable, you MUST take exactly one of these two paths — SILENT inline
+execution is a DEFECT:
+1. (Preferred) BLOCK with verdict `WORKER_REGISTRY_NOT_LOADED`: list what is missing and
+   emit "provision the closure (or reinstall the plugin), then RESTART the session, then
+   re-run."
+2. (Only when inline execution is clearly safe for this run) DEGRADE OPENLY: your FIRST
+   output line MUST announce it — "DEGRADED: `tester-agent` unavailable — running inline." —
+   before any work.
+This plugin bundles `tester-agent` precisely so a fresh install has them; the gate covers
+provisioning gaps and registry pinning. Fire-drill 2026-07-15 (hub #415) showed the old
+soft wording let a session inline silently — announce or block, never silence.
 
 ---
 
