@@ -35,6 +35,10 @@ Root: `D:\Abhay\VibeCoding\GetWorkDone\` (sibling of the repos, like GLOBAL.md �
 
 Evidence store: `D:\Abhay\VibeCoding\GetWorkDone\evidence\<YYYY-MM-DD>-<task-id>\` + append-only `LEDGER.md`. Retention: prune >90 days; an evidence-write failure is a HARD task failure, never a skip (G20).
 
+## Cross-cutting principle — FAIL AT INTAKE, NOT AT MIDNIGHT (owner directive 2026-07-15)
+
+Every precondition verifiable early is verified DURING INTAKE while the owner is present — repo path + remote identity, branch protection + secret-scan gates on the target, credentials/tools present on the executing machine, deploy-tier approvals, anything abort-capable. Questions raised by these checks are asked IMMEDIATELY in the intake batch. The same checks re-run at dispatch/runtime only as a cheap last-line guard against state that changed since intake — runtime must never be the FIRST time a knowable problem surfaces. Applies to every guard in this plan, present and future.
+
 ## Architecture
 
 - **`/get-work-done`** (`.claude/skills/get-work-done/SKILL.md`, hub-only) — the front door: INTAKE → GATE → CLARIFY (batched, incl. approval-class) → CONTRACT → DISPATCH → CHECK (maker≠checker) → REPORT.
@@ -109,6 +113,7 @@ Mitigations are baked into the architecture above, keyed G1–G20: G1 answer ret
 ## Point-by-point lock ledger (owner walkthrough, 22 steps — 2026-07-15)
 - **P1 LOCKED:** state root = `D:\Abhay\VibeCoding\GetWorkDone\` (single folder: inbox/queue/heartbeats/evidence + ledgers), local machine, outside all git repos; VPSes join as workers at 5b; queue→private-git earmarked only if a VPS fleet-keeper is wanted.
 - **P2 LOCKED:** /get-work-done front-door flow (scout → blast-radius gate → ONE upfront question batch incl. approvals → contract → dispatch → report); trivial-turned-deep re-enters intake; contracts authored via the EXISTING `/goal-creator` skill (loop-engineering plugin) extended with dispatcher fields — one contract format hub-wide (owner-confirmed).
+- **P3 LOCKED (amended):** day-one guards — repo-identity check, refusal≠success, atomic claim — PLUS the fail-at-intake principle: all abort-capable verifications run at INTAKE while the owner is present (questions asked immediately); dispatch-time re-checks are last-line guards only, never first detection.
 
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
