@@ -9,6 +9,19 @@
 
 **Research basis (fetched 2026-07-15, both agents' reports in session):** background subagents GA + default (CC v2.1.198); nested depth 5; per-subagent `model:`/`isolation: worktree`; `claude --bg`/`claude agents` fleet (research preview); headless `claude -p` run **in the target repo's dir** loads that repo's own CLAUDE.md/plugins (`--add-dir` grants file access only, NOT config — so dispatch = spawn in the child's home); Routines for recurring cloud jobs (min 1h cadence); pricing Haiku $1/$5 · Sonnet $2/$10 (intro→$3/$15 Sep 1) · Opus $5/$25 · Fable $10/$50 per MTok. MSR '26 (33,596 agent PRs): Claude Code 59% merge rate → PR+CI gating is load-bearing. Context-rot mitigation: fresh session per task, on-disk state (ralph-loop pattern).
 
+## Intake sources (owner addition 2026-07-15) — one central queue, four origins
+
+Every task enters the SAME queue (`tasks/queue/`) via a producer-agnostic inbox (`tasks/inbox/*.md`, small frontmatter: `source`, `repo`, `type`, `evidence`). Anything that can write a file can file work — Cowork sessions, cron, hooks, monitors, or a human note. The dispatcher sweeps the inbox at session start and on a scheduled Routine.
+
+| Source | Example | Authorization |
+|---|---|---|
+| **A. Owner ask** | "add X to IPODhan" | Approvals batched at intake (decision 4) |
+| **B. Break-fix** | live app down / CI red / standing-goal predicate fails | **Pre-authorized** — auto-dispatch P1 fix contract immediately (restore known-good; PR + evidence still required); ping owner FYI |
+| **C. Cowork scout → feature for existing app** | scheduled task proposes an enhancement | Status `PROPOSED` → owner one-line approval (daytime ping / morning digest) → contract |
+| **D. Cowork scout → new app** | scheduled task proposes a new product | `PROPOSED` → full strategic gate: BA discovery + owner approval BEFORE any build (standing rule, never auto-built) |
+
+Break detection feeds (wired progressively, not all Phase 1): Gatus health checks on the VPS portfolio, `standing-goals.yml` sentinel failures, CI-red PRs from `auto-pr-reconcile`, and Notifier-relayed alerts.
+
 ## Architecture (what gets built)
 
 One hub-only skill + three on-disk stores + reuse of everything that exists:
@@ -34,7 +47,7 @@ Per worker: budget caps in the contract. On failure → max 2 structured attempt
 
 **Phase 1 — MVP front door (this repo, ~1 session)**
 - [ ] `/task-intake` SKILL.md v1: intake → complexity gate (trivial = ≤1 file, no deploy, no unknowns → do now; else decompose) → batched clarification incl. approval-class → contract file → SEQUENTIAL dispatch (one background worker) → evidence check → report.
-- [ ] `tasks/` dir + contract template + `OWNER-QUESTIONS.md` skeleton; `task-evidence/` + LEDGER.md.
+- [ ] `tasks/` dir + contract template + `inbox/` convention (source/repo/type frontmatter) + `OWNER-QUESTIONS.md` skeleton; `task-evidence/` + LEDGER.md.
 - [ ] Eval per check_eval_coverage ratchet (new skill ⇒ evals from day one).
 - Verify: dry-run on a synthetic 2-task brief (one hub task, one calculatekaro task); worker lands a real PR; evidence folder populated.
 
@@ -50,7 +63,14 @@ Per worker: budget caps in the contract. On failure → max 2 structured attempt
 - [ ] Budget caps in dispatch cmd; park flow; two-tier deploy gate in contract template (re-deploy autonomy needs: app already live + same domain/infra + full gate + evidence).
 - Verify: injected failing task parks after 2 structured attempts and fleet continues; re-deploy of a live static site auto-lands with screenshots.
 
-**Phase 5 — Codification + dogfood + graduate**
+**Phase 5 — Multi-source intake live**
+- [ ] Inbox sweep in /task-intake (session start) + a scheduled Routine (cloud, ≥1h cadence) sweeping when no session is open.
+- [ ] Break-fix bridge v1: standing-goals sentinel failure + CI-red PR → auto-file P1 inbox item; Gatus→inbox bridge (VPS script POSTing an inbox file via git or Notifier relay).
+- [ ] Cowork drop convention documented in GLOBAL.md (so any Cowork scheduled task knows where to file proposals).
+- [ ] PROPOSED-status approval flow: morning digest + daytime ping; approval recorded in the contract.
+- Verify: one synthetic inbox item per source (A–D) flows to the correct authorization path; break-fix auto-dispatches, proposals wait.
+
+**Phase 6 — Codification + dogfood + graduate**
 - [ ] PATTERNS-SEEN tally + 3× trigger → skill-factory proposal.
 - [ ] Dogfood: run 3 real owner tasks through the full pipeline; capture lessons (/learn-n-improve).
 - [ ] Then consider G6 packaging as a plugin (owner-approved, one-at-a-time rule) — NOT before dogfood proves it.
