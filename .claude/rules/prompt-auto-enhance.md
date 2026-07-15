@@ -50,6 +50,13 @@ Skipping BOTH the full process AND the Grade-A declaration on a substantive turn
 (`no-overask-guard.sh`'s `gradea` detector still blocks it). SSOT for FORMAT when the card
 renders; skill stages 4–4.7 produce content. Compact format-A only on explicit user request.
 
+**Ordering (owner defect report 2026-07-15):** the full process renders BEFORE any execution
+tool call — never after the work. The ONLY tool call permitted before the render is the
+context-blind reviewer dispatch (it produces the card's Reviewer-after column). Per-turn
+sequence: (1) dispatch blind reviewer; (2) render banner + transcript + card + Original→Final
++ Role; (3) only then execute (research, edits, worker dispatches). Research needed to ANSWER
+the prompt never precedes the card — the card grades the prompt, not the answer.
+
 ## The unified per-prompt pipeline (0 → 6)
 
 Stages 0–4.6 strengthen the prompt; 4.7–6 govern execution. Pointer pattern — each
