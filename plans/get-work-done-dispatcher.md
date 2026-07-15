@@ -1,6 +1,6 @@
 # /get-work-done — the "mother hub" central work dispatcher
 
-**Status:** APPROVED design (gap-audited), phased build pending owner go
+**Status:** FULLY RATIFIED — all 22 walkthrough points owner-locked 2026-07-15 (see lock ledger); build pending owner go
 **Skill name:** `/get-work-done` (plain-English naming rule; renamed from working title `/task-intake`, 2026-07-15)
 
 **Owner decisions locked (2026-07-15):**
@@ -110,7 +110,8 @@ Every precondition verifiable early is verified DURING INTAKE while the owner is
 
 Mitigations are baked into the architecture above, keyed G1–G20: G1 answer return path · G2 atomic queue claim · G3 heartbeat/liveness + reconcile · G4 maker≠checker evidence · G5 break-task dedup · G6 revert-first rollback · G7 fix-loop circuit breaker · G8 local (not cloud) unattended sweeper · G9 diff-enforced deploy tier · G10 fleet budget breaker · G11 cancel verb · G12 priority lanes · G13 per-repo merge serialization · G14 secrets discipline · G15 refusal ≠ success · G16 blast-radius gate · G17 alert debounce · G18 repo-identity assert · G19 queue outside git · G20 evidence retention + write-failure = task failure.
 
-## Point-by-point lock ledger (owner walkthrough, 22 steps — 2026-07-15)
+## Point-by-point lock ledger (owner walkthrough, 22 steps — 2026-07-15) — **COMPLETE: ALL 22 LOCKED**
+- **P22 LOCKED:** graduation gate — after final exam + real volume, an evidence-based owner decision (one-at-a-time G6 rule) on packaging /get-work-done as an installable plugin; interfaces never frozen before dogfood; "stays hub infrastructure" is a valid outcome.
 - **P1 LOCKED:** state root = `D:\Abhay\VibeCoding\GetWorkDone\` (single folder: inbox/queue/heartbeats/evidence + ledgers), local machine, outside all git repos; VPSes join as workers at 5b; queue→private-git earmarked only if a VPS fleet-keeper is wanted.
 - **P2 LOCKED:** /get-work-done front-door flow (scout → blast-radius gate → ONE upfront question batch incl. approvals → contract → dispatch → report); trivial-turned-deep re-enters intake; contracts authored via the EXISTING `/goal-creator` skill (loop-engineering plugin) extended with dispatcher fields — one contract format hub-wide (owner-confirmed).
 - **P3 LOCKED (amended):** day-one guards — repo-identity check, refusal≠success, atomic claim — PLUS the fail-at-intake principle: all abort-capable verifications run at INTAKE while the owner is present (questions asked immediately); dispatch-time re-checks are last-line guards only, never first detection.
