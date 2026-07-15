@@ -763,3 +763,18 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Mistake:** designed a Windows Task Scheduler sweeper for the /get-work-done dispatcher while Anthropic's built-in `/loop` command (visible in my own session's skill list) already did the job better; owner had to point it out.
 - **Root cause:** jumped to familiar OS-level tooling without first inventorying what the platform ships; same failure class as verify-before-suggest (training-memory habit over live capability check).
 - **Rule:** before designing ANY orchestration/automation mechanism (scheduler, poller, queue, notifier), first enumerate what Claude Code/Anthropic already ships for it (built-in skills list, docs) and prefer the built-in; a custom mechanism needs a stated reason the built-in can't do it.
+
+## 2026-07-15 — auto-google-analytics eval+fix batch (PR #420)
+- **Wrapper skill vs bundled engine trigger rivalry**: a plugin that ships an orchestrator AND
+  its engine (auto-google-analytics + analytics-setup) needs RECIPROCAL boundary language in
+  BOTH descriptions, or the engine cannibalizes the orchestrator's activations (measured: 7/10
+  queries routed to the engine in one blind pass; strict activation 66%→80% + 0 false triggers
+  after adding boundaries + a "not for code metrics/test coverage" scope list).
+- **Plugin-bundled core skills are outside every drift gate**: dual-home-resources.yml only
+  pairs .claude/↔core/. A core skill copied into a plugin (analytics-setup) had NO sync guard —
+  fix pattern: a byte-identity pytest (scripts/tests/test_auto_google_analytics_plugin.py).
+- **Docs that promise state nothing writes**: --audit promised a "last verify verdict" no code
+  persisted. When an eval finds a promised-but-unwritten artifact, prefer implementing the
+  writer (record_verdict) over deleting the promise — the claim was the right UX.
+- **Skill step-number references rot**: "skip to STEP 3" pointed the no-key fallback into the
+  key-requiring step. Guard step-target references with a cheap text regression test.
