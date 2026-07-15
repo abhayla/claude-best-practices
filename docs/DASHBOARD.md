@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-15 01:55 UTC (auto-generated)
+> Last updated: 2026-07-15 03:26 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -40,7 +40,7 @@
 | ba-usecase-discovery-reminder | hook | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | brainstorm | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
-| branch-choice | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| branch-choice | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | branch-choice-gate | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | branching | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | bug-triage-discipline | rule | 1.0.0 | project:firekaro-planner | — |
