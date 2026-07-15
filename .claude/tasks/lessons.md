@@ -758,3 +758,27 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Never re-sort/reformat `registry/patterns.json` when adding an entry** — the file is not alphabetized; a sorted rewrite produced a 2989-line diff. Load with `object_pairs_hook=OrderedDict`, append the key, dump with matching indent/ensure_ascii.
 - **Registry `hash` = `dedup_check.hash_pattern()` (whitespace-normalized), NOT raw sha256** — compute via the validator's own function, never by hand.
 - **Run `check_eval_coverage.py --enforce --base origin/main` AFTER committing, not before** — it diffs committed history (`base...HEAD`), so a pre-commit run sees "no changed files" and green-lights a branch that CI will fail (bit PR #407).
+
+## 2026-07-15 — Check platform built-ins BEFORE designing custom mechanisms
+- **Mistake:** designed a Windows Task Scheduler sweeper for the /get-work-done dispatcher while Anthropic's built-in `/loop` command (visible in my own session's skill list) already did the job better; owner had to point it out.
+- **Root cause:** jumped to familiar OS-level tooling without first inventorying what the platform ships; same failure class as verify-before-suggest (training-memory habit over live capability check).
+- **Rule:** before designing ANY orchestration/automation mechanism (scheduler, poller, queue, notifier), first enumerate what Claude Code/Anthropic already ships for it (built-in skills list, docs) and prefer the built-in; a custom mechanism needs a stated reason the built-in can't do it.
+
+## 2026-07-15 — auto-google-analytics eval+fix batch (PR #420)
+- **Wrapper skill vs bundled engine trigger rivalry**: a plugin that ships an orchestrator AND
+  its engine (auto-google-analytics + analytics-setup) needs RECIPROCAL boundary language in
+  BOTH descriptions, or the engine cannibalizes the orchestrator's activations (measured: 7/10
+  queries routed to the engine in one blind pass; strict activation 66%→80% + 0 false triggers
+  after adding boundaries + a "not for code metrics/test coverage" scope list).
+- **Plugin-bundled core skills are outside every drift gate**: dual-home-resources.yml only
+  pairs .claude/↔core/. A core skill copied into a plugin (analytics-setup) had NO sync guard —
+  fix pattern: a byte-identity pytest (scripts/tests/test_auto_google_analytics_plugin.py).
+- **Docs that promise state nothing writes**: --audit promised a "last verify verdict" no code
+  persisted. When an eval finds a promised-but-unwritten artifact, prefer implementing the
+  writer (record_verdict) over deleting the promise — the claim was the right UX.
+- **Skill step-number references rot**: "skip to STEP 3" pointed the no-key fallback into the
+  key-requiring step. Guard step-target references with a cheap text regression test.
+
+## 2026-07-15 — Headless dispatch: prompt via STDIN, never as argument
+- **Mistake:** dispatched a fleet worker with `claude -p "<contract>"` where the contract began with `---` YAML frontmatter — the CLI parsed it as an unknown option and the worker died instantly.
+- **Rule:** headless workers always get their prompt via stdin (`claude -p --flags < prompt.txt`); build a prompt file per task (contract + worker mandate + output shape). Codified in get-work-done SKILL.md STEP 6.

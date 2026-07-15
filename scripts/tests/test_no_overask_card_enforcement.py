@@ -655,3 +655,89 @@ def test_registry_hashes_in_sync():
     for name, fp in [("no-overask-guard", CORE / GUARD)]:
         assert reg[name]["type"] == "hook"
         assert reg[name]["hash"] == h(fp), f"{name} registry hash drifted — resync it"
+
+
+# ── Marker attestation (2026-07-15 root-cause fix, session fedaf490) ──
+# The harness DROPS assistant text blocks that share one API response with tool_use blocks
+# (live repro: a correctly-rendered pre-execution enhance card never persisted to the
+# transcript — only thinking/tool_use entries and the final text did). The ordering rule
+# (prompt-auto-enhance.md) requires the card BEFORE execution tool calls, so on tool-using
+# turns the transcript is NOT evidence of card absence, and the guard false-blocked 5x in one
+# session. Fix: the model touches .claude/.enhance-card-rendered in the same turn as the
+# render; the guard credits marker OR persisted card text; prompt-enhance-reminder.sh resets
+# the marker on every real user prompt so it cannot carry over.
+_DROPPED_CARD_TOOL_TURN = [
+    {"type": "user", "message": {"role": "user", "content": "do the thing"}},
+    # No early text entry AT ALL — the harness dropped it (text + tool_use in one response).
+    {
+        "type": "assistant",
+        "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "echo hi"}}]},
+    },
+    {
+        "type": "user",
+        "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "hi"}]},
+    },
+    {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _LONG_CARDLESS_FINAL_BLOCK}]}},
+]
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_credits_marker_when_card_text_was_dropped(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    (scratch / ".claude").mkdir(exist_ok=True)
+    (scratch / ".claude" / ".enhance-card-rendered").write_text("attested", encoding="utf-8")
+    out = _run_guard(HUB / GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
+    assert not _is_block(out), (
+        f"hub {GUARD} must credit the .enhance-card-rendered marker on a tool-using turn whose "
+        f"card text the harness dropped (mid-turn text does not persist beside tool_use): {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_hub_guard_still_blocks_dropped_card_shape_without_marker(tmp_path_factory):
+    # No-hole control: same tool-using cardless shape, NO marker → the block must stand,
+    # or the marker fix would have silently disabled enforcement on all tool-using turns.
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(HUB / GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
+    assert _is_block(out), (
+        f"hub {GUARD} must STILL block a cardless tool-using turn when no marker exists: {out}"
+    )
+
+
+def test_reminder_resets_card_marker():
+    rem = _reminder()
+    assert ".enhance-card-rendered" in rem, (
+        "prompt-enhance-reminder.sh must reset the .enhance-card-rendered marker each real "
+        "user prompt, or a single render would attest every later turn"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_credits_marker_when_card_text_was_dropped(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    (scratch / ".claude").mkdir(exist_ok=True)
+    (scratch / ".claude" / ".enhance-card-rendered").write_text("attested", encoding="utf-8")
+    out = _run_guard(PLUGIN_GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
+    assert not _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} must credit the .enhance-card-rendered marker on a "
+        f"tool-using turn whose card text the harness dropped: {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_still_blocks_dropped_card_shape_without_marker(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
+    assert _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} must STILL block a cardless tool-using turn with no marker: {out}"
+    )
+
+
+def test_plugin_reminder_resets_card_marker():
+    rem = (ROOT / "plugins" / "prompt-auto-enhance" / "hooks" / "prompt-enhance-reminder.sh").read_text(
+        encoding="utf-8"
+    )
+    assert ".enhance-card-rendered" in rem, (
+        "the plugin's prompt-enhance-reminder.sh must reset the .enhance-card-rendered marker "
+        "each real user prompt (mirrors the hub reminder)"
+    )
