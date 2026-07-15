@@ -50,6 +50,14 @@ Evidence store: `D:\Abhay\VibeCoding\task-evidence\<YYYY-MM-DD>-<task-id>\` + ap
 - **Deploy safety (G6/G9):** contract records the pre-deploy known-good ref; post-deploy destination probe; a break right after an auto-deploy → REVERT to recorded ref first, forward-fix second. Dispatcher computes deploy tier from the PR diff (auth/payment/DNS/migration paths → forced hold) regardless of intake classification.
 - **Break-fix guards:** debounce = 2 consecutive failed probes before filing (G17); task-level dedup key repo+failure-signature at inbox promotion (G5); circuit breaker = 2 auto-fixes on the same target in 24h → freeze target, escalate P1 park (G7).
 - **Answer return path (G1):** every ping carries the task-id; answers land via (a) any hub session, or (b) the morning sweep reading WhatsApp replies through the Wati MCP (`wati_get_messages`) and appending to OWNER-QUESTIONS.md. A park resolves only when an answer is IN the file.
+- **WhatsApp question format (owner requirement 2026-07-15):** every question rendered like a Cowork/AskUserQuestion card — numbered options, the recommended one FIRST and marked `(Recommended — <one-line why>)`, single- or multi-select stated per question. Reply protocol is deterministic: `<task-id> <option-number(s)>` (e.g. `42 1` or `42 1,3` for multi); free text after the number = "Other" with notes. Template:
+  `[T-042 · IPODhan · blocker]`
+  `Q: Which auth provider for login?`
+  `1. Firebase Auth (Recommended — already used in KKB, free tier)`
+  `2. Supabase Auth`
+  `3. Custom JWT`
+  `Reply: 42 <n>  (this one: pick ONE)`
+  v1 = plain text numbered list via Notifier; OPTIONAL later upgrade to Wati interactive list/button messages (max 3 buttons / 10 rows) only if text replies prove error-prone (YAGNI).
 - **Secrets (G14):** contracts reference secrets by path only (never inline); secret-scan inbox/queue/evidence before any indexing; verify each downstream repo's secret-scan gate as a Phase-1 prerequisite check.
 - **Unattended operation (G8):** the sweeper that runs with no session open is a **local Windows Task Scheduler job** launching `claude -p` (machine must be awake — stated constraint). Cloud Routines are notification/filing only; they cannot reach this disk.
 
@@ -68,7 +76,8 @@ Evidence store: `D:\Abhay\VibeCoding\task-evidence\<YYYY-MM-DD>-<task-id>\` + ap
 
 **Phase 3 — Question queue + pings + answer path**
 - [ ] Notifier client (`projects.claude-hub`), 09–21 IST window, per-task dedupeKey, morning sweep incl. Wati-inbound answer reading.
-- Verify: forced blocker → WhatsApp arrives (destination probe); reply via WhatsApp → unparks the task next sweep; night blocker → queued, no ping.
+- [ ] Question-card formatter (numbered options, Recommended-first, single/multi marker) + reply parser (`<task-id> <n[,n]>`, free text = Other).
+- Verify: forced blocker → WhatsApp card arrives with numbered options (destination probe); replies `42 1`, `42 1,3`, and `42 2 use staging first` all parse correctly and unpark; night blocker → queued, no ping.
 
 **Phase 4 — Deploy tiers + break-fix guards**
 - [ ] Diff-computed deploy tier, pre-deploy ref capture + revert-first rule, debounce, dedup key, 24h fix-loop circuit breaker.
