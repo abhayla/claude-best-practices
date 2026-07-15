@@ -758,3 +758,8 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Never re-sort/reformat `registry/patterns.json` when adding an entry** — the file is not alphabetized; a sorted rewrite produced a 2989-line diff. Load with `object_pairs_hook=OrderedDict`, append the key, dump with matching indent/ensure_ascii.
 - **Registry `hash` = `dedup_check.hash_pattern()` (whitespace-normalized), NOT raw sha256** — compute via the validator's own function, never by hand.
 - **Run `check_eval_coverage.py --enforce --base origin/main` AFTER committing, not before** — it diffs committed history (`base...HEAD`), so a pre-commit run sees "no changed files" and green-lights a branch that CI will fail (bit PR #407).
+
+## 2026-07-15 — Check platform built-ins BEFORE designing custom mechanisms
+- **Mistake:** designed a Windows Task Scheduler sweeper for the /get-work-done dispatcher while Anthropic's built-in `/loop` command (visible in my own session's skill list) already did the job better; owner had to point it out.
+- **Root cause:** jumped to familiar OS-level tooling without first inventorying what the platform ships; same failure class as verify-before-suggest (training-memory habit over live capability check).
+- **Rule:** before designing ANY orchestration/automation mechanism (scheduler, poller, queue, notifier), first enumerate what Claude Code/Anthropic already ships for it (built-in skills list, docs) and prefer the built-in; a custom mechanism needs a stated reason the built-in can't do it.
