@@ -6472,10 +6472,10 @@
     "last_updated": "2026-06-25"
   },
   "analytics-setup": {
-    "hash": "79c94e737522cadefd4d4c4b9b74fb210db4d1e4167ec43088132a6534c7af1f",
+    "hash": "27569afc2e4018706e926abb443fd77b80cf5c7830a4cd26b05ec1e547d8c3ed",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-18",
     "dependencies": [
@@ -6483,7 +6483,7 @@
       "verify-screenshots"
     ],
     "visibility": "public",
-    "description": "Set up GA4 (one property per site) via GTM, add explicit GA4 events for CTAs and affiliate links, configure Consent Mode v2, verify per-domain Search Console, and verify a real collect hit before marking done. Use for web visitor/marketing measurement (GA4/GTM/conversion/affiliate tracking) — not app/infra observability (that is monitoring-setup).",
+    "description": "Set up GA4 (one property per site) via GTM, add explicit GA4 events for CTAs and affiliate links, configure Consent Mode v2, verify per-domain Search Console, and verify a real collect hit before marking done. Use for web visitor/marketing measurement (GA4/GTM/conversion/affiliate tracking) — not app/infra observability (that is monitoring-setup). The per-framework instrumentation engine; for autonomous end-to-end setup prefer auto-google-analytics (plugin), the orchestrator that wraps it.",
     "tags": [
       "analytics",
       "ga4",
