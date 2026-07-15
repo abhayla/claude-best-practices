@@ -161,11 +161,14 @@ printf '%s' "$full" | grep -qE "overall|[a-f] *(→|->) *[a-f]|weighted total" &
 # text blocks that share one API response with tool_use blocks — a correctly-rendered
 # pre-execution card (the owner-mandated ordering, prompt-auto-enhance.md) never persists to
 # the transcript on such turns, so its absence there is NOT evidence it wasn't rendered.
-# The model attests the render by touching .claude/.enhance-card-rendered in the same turn
-# (reset on every real user prompt by prompt-enhance-reminder.sh). Marker credits the card,
-# its Overall row, and the diagnosis substance exactly like persisted card text would.
+# The model attests the render by touching .claude/.enhance-card-rendered.<session_id> in the
+# same turn (reset per real user prompt by prompt-enhance-reminder.sh). SESSION-SCOPED (live
+# incident 2026-07-15: a concurrent worker session's reminder wiped the shared marker) — each
+# session touches/checks only its own; the guard also accepts the legacy unscoped name from
+# the same fix-day so an in-flight session isn't re-broken.
+sid=$(printf '%s' "$input" | jq -r '.session_id // ""')
 card_marker=""
-if [ -f "$root/.claude/.enhance-card-rendered" ]; then
+if { [ -n "$sid" ] && [ -f "$root/.claude/.enhance-card-rendered.$sid" ]; } || [ -f "$root/.claude/.enhance-card-rendered" ]; then
   card_marker="1"; card="1"; overall="1"
 fi
 # G7: block on substantive + not-trivial + (NO card OR NO overall row), regardless of banner
@@ -178,7 +181,7 @@ if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] &&
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
   if [ "$rn" -lt 4 ]; then
     printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column and/or its closing 'Overall' total row (weighted total + letter-grade transition) (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + an Overall row + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead. If this was a STRONG/Grade-A prompt needing no strengthening (#290 sampled ceremony), the full card is OPTIONAL — but you must then declare it in the FIRST 3 LINES, e.g. '*Enhanced: … — Grade A, no strengthening needed*'. If you ALREADY rendered the card earlier this turn before tool calls (mid-turn text beside tool_use does not persist to the transcript), attest it instead: touch .claude/.enhance-card-rendered and re-state only a one-line banner." '{decision:"block", reason:$r}'
+    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column and/or its closing 'Overall' total row (weighted total + letter-grade transition) (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + an Overall row + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead. If this was a STRONG/Grade-A prompt needing no strengthening (#290 sampled ceremony), the full card is OPTIONAL — but you must then declare it in the FIRST 3 LINES, e.g. '*Enhanced: … — Grade A, no strengthening needed*'. If you ALREADY rendered the card earlier this turn before tool calls (mid-turn text beside tool_use does not persist to the transcript), attest it instead: touch .claude/.enhance-card-rendered.<your-session-id> and re-state only a one-line banner." '{decision:"block", reason:$r}'
     exit 0
   else
     # G9: cap exhausted — the turn escaped without the card; log a distinct escalation line.
