@@ -118,6 +118,7 @@ Mitigations are baked into the architecture above, keyed G1–G20: G1 answer ret
 - **P5 LOCKED:** Phase-1 exit test = two real tasks (hub + calculatekaro) through the FULL chain with checker-written evidence, zero manual interventions; permission walls found are fixed as setup (fail-at-intake).
 - **P6 LOCKED:** parallel fleet — soft cap 6 (exceedable for mechanical independent work), lanes P1 break-fix > P2 owner > P3 proposals with P1 always admitted, same-repo serialized / cross-repo free, `/get-work-done status` fleet view.
 - **P7 LOCKED:** heartbeat liveness — PID + ~60s tick per worker; fresh+live → hands off (slow ≠ dead); stale/dead → provable terminate + re-dispatch exactly once; 2 deaths on one task → park + escalate.
+- **P8 LOCKED:** `cancel <id>`/`cancel all` (kill PID via heartbeat, close PR, record reason) + daily fleet token ceiling checked at dispatch admission (calibrated from cost_ledger data in week one), central backoff on rate limits.
 
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
