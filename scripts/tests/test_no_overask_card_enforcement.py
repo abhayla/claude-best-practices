@@ -710,3 +710,34 @@ def test_reminder_resets_card_marker():
         "prompt-enhance-reminder.sh must reset the .enhance-card-rendered marker each real "
         "user prompt, or a single render would attest every later turn"
     )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_credits_marker_when_card_text_was_dropped(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    (scratch / ".claude").mkdir(exist_ok=True)
+    (scratch / ".claude" / ".enhance-card-rendered").write_text("attested", encoding="utf-8")
+    out = _run_guard(PLUGIN_GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
+    assert not _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} must credit the .enhance-card-rendered marker on a "
+        f"tool-using turn whose card text the harness dropped: {out}"
+    )
+
+
+@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+def test_plugin_guard_still_blocks_dropped_card_shape_without_marker(tmp_path_factory):
+    scratch = _scratch_repo(tmp_path_factory)
+    out = _run_guard(PLUGIN_GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
+    assert _is_block(out), (
+        f"plugin {PLUGIN_GUARD.name} must STILL block a cardless tool-using turn with no marker: {out}"
+    )
+
+
+def test_plugin_reminder_resets_card_marker():
+    rem = (ROOT / "plugins" / "prompt-auto-enhance" / "hooks" / "prompt-enhance-reminder.sh").read_text(
+        encoding="utf-8"
+    )
+    assert ".enhance-card-rendered" in rem, (
+        "the plugin's prompt-enhance-reminder.sh must reset the .enhance-card-rendered marker "
+        "each real user prompt (mirrors the hub reminder)"
+    )
