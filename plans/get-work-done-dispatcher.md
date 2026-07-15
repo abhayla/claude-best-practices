@@ -108,6 +108,7 @@ Mitigations are baked into the architecture above, keyed G1–G20: G1 answer ret
 
 ## Point-by-point lock ledger (owner walkthrough, 22 steps — 2026-07-15)
 - **P1 LOCKED:** state root = `D:\Abhay\VibeCoding\GetWorkDone\` (single folder: inbox/queue/heartbeats/evidence + ledgers), local machine, outside all git repos; VPSes join as workers at 5b; queue→private-git earmarked only if a VPS fleet-keeper is wanted.
+- **P2 LOCKED:** /get-work-done front-door flow (scout → blast-radius gate → ONE upfront question batch incl. approvals → contract → dispatch → report); trivial-turned-deep re-enters intake; contracts authored via the EXISTING `/goal-creator` skill (loop-engineering plugin) extended with dispatcher fields — one contract format hub-wide (owner-confirmed).
 
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
