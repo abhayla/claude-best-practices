@@ -782,3 +782,8 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 ## 2026-07-15 — Headless dispatch: prompt via STDIN, never as argument
 - **Mistake:** dispatched a fleet worker with `claude -p "<contract>"` where the contract began with `---` YAML frontmatter — the CLI parsed it as an unknown option and the worker died instantly.
 - **Rule:** headless workers always get their prompt via stdin (`claude -p --flags < prompt.txt`); build a prompt file per task (contract + worker mandate + output shape). Codified in get-work-done SKILL.md STEP 6.
+
+## 2026-07-15 — Fleet live-fire lessons (Phase-1 exit test)
+- Private/free GitHub repos have NO branch protection: auto-merge merges red instantly. Fleet rule: on private repos, workers `gh pr checks --watch` → merge only on SUCCESS; never arm auto-merge.
+- A killed worker ≠ failed task: T-002's process died before writing its result JSON while its PR had already merged — always probe the DESTINATION (PR state, check runs) before re-dispatching or declaring failure.
+- A new CI gate can expose pre-existing repo defects (calculatekaro lockfile drift) — treat the first-ever gate run as a discovery, and budget a follow-up fix.
