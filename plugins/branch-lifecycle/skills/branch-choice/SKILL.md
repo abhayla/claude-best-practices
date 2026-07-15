@@ -100,3 +100,7 @@ Merging stale work to `main` is consequential → it is ALWAYS owner-approved, n
 - MUST get explicit owner approval before landing any stale branch; MUST NOT merge red/unfinished work.
 - Honors pre-authorization: if the owner delegated ("you decide" / silent mode), pick option 1
   (new from `main`) with a derived name and state the choice as an assumption — do not block.
+- A NON-INTERACTIVE session (headless `claude -p`, an autonomous run — no human present to
+  answer a menu) is pre-authorized BY DEFINITION: never render the menu; pick option 1
+  silently, state the assumption in the output, and continue. Dead-ending an unattended run
+  on an interactive menu is a defect (fire-drill 2026-07-15, hub #416).
