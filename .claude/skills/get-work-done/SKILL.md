@@ -119,7 +119,11 @@ card, P20).
 - MUST branch on `stop_reason` from the worker's JSON — refusal ≠ success; reroute to opus.
 - MUST keep maker ≠ checker: evidence + LEDGER are checker-written only; a worker's
   self-reported pass is never recorded as proof.
-- MUST land ALL work via PR + CI-gated auto-merge — never direct-to-main, never manual merge.
+- MUST land ALL work via PR gated on the repo's CI. PUBLIC repos: arm auto-merge (protection
+  enforces the check). PRIVATE repos (free plan — NO branch protection possible; live finding
+  2026-07-15: IPODhan, RealFuelPrices, calculatekaro): NEVER arm auto-merge (it merges
+  instantly regardless of CI) — the worker `gh pr checks --watch`es until the gate is SUCCESS
+  and only then merges; red = never merged, no exceptions.
 - MUST route models cheapest-correct (sonnet default, haiku mechanical, opus deep/security);
   Fable is NEVER dispatched as a worker.
 - MUST honor the deploy-tier table computed from the ACTUAL diff at check time (G9) — a task
