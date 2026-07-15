@@ -47,7 +47,7 @@ Evidence store: `D:\Abhay\VibeCoding\task-evidence\<YYYY-MM-DD>-<task-id>\` + ap
 - **Stuck protocol:** budget caps → 2 structured attempts (/fix-loop → /systematic-debugging) → PARK: escalation report + OWNER-QUESTIONS.md + daytime ping; fleet continues. **`cancel` verb** (G11): mark contract cancelled, kill worker PID via heartbeat wrapper, close its PR.
 - **Reconciliation at every hub-session start (G3):** contracts `claimed/dispatched` with a dead PID or stale heartbeat → provably terminate, then re-dispatch; live PID → leave alone (idle ≠ dead).
 - **Fleet budget circuit breaker (G10):** daily aggregate token/USD ceiling checked at dispatch admission (cost_ledger data); on rate-limit responses, central backoff — no per-worker retry storms.
-- **Deploy safety (G6/G9):** contract records the pre-deploy known-good ref; post-deploy destination probe; a break right after an auto-deploy → REVERT to recorded ref first, forward-fix second. Dispatcher computes deploy tier from the PR diff (auth/payment/DNS/migration paths → forced hold) regardless of intake classification.
+- **Deploy safety (G6/G9 — G9 LOCKED 2026-07-15, owner-delegated):** contract records the pre-deploy known-good ref; post-deploy destination probe; a break right after an auto-deploy → REVERT to recorded ref first, forward-fix second. Dispatcher computes deploy tier from the PR diff (auth/payment/DNS/migration paths → forced hold) regardless of intake classification — policy enforced by the controller from observed artifacts, never agent self-attestation.
 - **Break-fix guards:** debounce = 2 consecutive failed probes before filing (G17); task-level dedup key repo+failure-signature at inbox promotion (G5); circuit breaker = 2 auto-fixes on the same target in 24h → freeze target, escalate P1 park (G7).
 - **Answer return path (G1):** every ping carries the task-id; answers land via (a) any hub session, or (b) the morning sweep reading WhatsApp replies through the Wati MCP (`wati_get_messages`) and appending to OWNER-QUESTIONS.md. A park resolves only when an answer is IN the file.
 - **WhatsApp question format (owner requirement 2026-07-15):** every question rendered like a Cowork/AskUserQuestion card — numbered options, the recommended one FIRST and marked `(Recommended — <one-line why>)`, single- or multi-select stated per question. Reply protocol is deterministic: `<task-id> <option-number(s)>` (e.g. `42 1` or `42 1,3` for multi); free text after the number = "Other" with notes. Template:
@@ -59,7 +59,14 @@ Evidence store: `D:\Abhay\VibeCoding\task-evidence\<YYYY-MM-DD>-<task-id>\` + ap
   `Reply: 42 <n>  (this one: pick ONE)`
   v1 = plain text numbered list via Notifier; OPTIONAL later upgrade to Wati interactive list/button messages (max 3 buttons / 10 rows) only if text replies prove error-prone (YAGNI).
 - **Secrets (G14):** contracts reference secrets by path only (never inline); secret-scan inbox/queue/evidence before any indexing; verify each downstream repo's secret-scan gate as a Phase-1 prerequisite check.
-- **Unattended operation (G8):** the sweeper that runs with no session open is a **local Windows Task Scheduler job** launching `claude -p` (machine must be awake — stated constraint). Cloud Routines are notification/filing only; they cannot reach this disk.
+- **Unattended operation (G8, revised 2026-07-15 owner input):** the sweeper is a dedicated **fleet-keeper session running `/loop`** (built-in) — `/loop 20m /get-work-done sweep`; each tick sweeps the inbox (**inbox files ARE the flag** — no separate flag state), claims atomically, dispatches. Task Scheduler keeps ONE job: restart the fleet-keeper at boot. Cloud Routines remain notification/filing only (cannot reach local disk). Idle ticks cost a few tokens — acceptable; pause the loop when the queue has been empty > N hours (resume at next session or boot).
+- **Worker pools (owner addition 2026-07-15) — run workers where nothing sleeps:**
+  | Pool | Machine | Routed work |
+  |---|---|---|
+  | L | Local Windows PC | default while attended |
+  | W | Windows VPS `103.118.16.189` | IPODhan/AlgoChanakya tasks (apps hosted there) + unattended hours |
+  | H | Hostinger VPS `72.61.240.224` | firekaro/RFP/calculatekaro/static-site tasks + unattended hours; Notifier local |
+  Routing: app hosted on a VPS → prefer that pool; overnight → VPS pools by default. Dispatch transport: SSH from the fleet-keeper (existing keys); heartbeats per pool, fetched over SSH. Per-VPS one-time setup: Claude Code CLI + **owner-entered auth token (`claude setup-token` — named human step)**, repo clones (fetch-fresh at dispatch), headless Chromium (Linux), per-project `.env` (largely present — apps already run there). Local-PC sleep stops mattering; do NOT force the PC awake (YAGNI).
 
 ## Phases
 
@@ -84,8 +91,13 @@ Evidence store: `D:\Abhay\VibeCoding\task-evidence\<YYYY-MM-DD>-<task-id>\` + ap
 - Verify: re-deploy of a live static site auto-lands with evidence; a diff touching an auth path forces a hold despite "re-deploy" intake class; injected flapping alert files ONE task.
 
 **Phase 5 — Multi-source intake live**
-- [ ] Inbox sweep at session start + local Task Scheduler unattended sweep (NOT a cloud Routine); break-fix bridges (standing-goals, CI-red, Gatus→inbox); Cowork drop convention documented in GLOBAL.md; PROPOSED approval flow (morning digest + daytime ping).
-- Verify: one synthetic item per source A–D routes to the correct authorization path; break-fix auto-dispatches, proposals wait.
+- [ ] Inbox sweep at session start + fleet-keeper `/loop` sweeper (Task Scheduler = boot-restart only, NOT a cloud Routine); break-fix bridges (standing-goals, CI-red, Gatus→inbox); Cowork drop convention documented in GLOBAL.md; PROPOSED approval flow (morning digest + daytime ping).
+- Verify: one synthetic item per source A–D routes to the correct authorization path; break-fix auto-dispatches, proposals wait; fleet-keeper tick dispatches with no interactive session open.
+
+**Phase 5b — VPS worker pools (pilot)**
+- [ ] Pool H first (Hostinger — Notifier local, most sites hosted there): CLI install, owner auth token (human step, batched), repo clones, headless Chromium, SSH dispatch + remote heartbeat readback. Then Pool W (Windows VPS) same recipe.
+- [ ] Routing rule in dispatch: app-hosted-on-VPS → that pool; unattended hours → VPS pools.
+- Verify: one real task dispatched over SSH to Pool H lands a green PR with checker-written evidence while the local PC is OFF (the actual failure mode this phase exists to kill).
 
 **Phase 6 — Codify + dogfood + graduate**
 - [ ] PATTERNS-SEEN 3× trigger → skill-factory proposal; dogfood 3 real owner tasks end-to-end; /learn-n-improve capture; then (owner-approved) consider G6 plugin packaging — NOT before dogfood proves it.
@@ -97,5 +109,5 @@ Mitigations are baked into the architecture above, keyed G1–G20: G1 answer ret
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
 2. **Dispatcher context rot** — all state on disk; any session resumes the fleet from `tasks\queue\`.
-3. **Machine-awake dependency** for unattended sweeps — stated constraint; revisit cloud execution only if it bites in practice (YAGNI).
+3. **Machine-awake dependency** — largely retired by Phase 5b VPS pools; residual: the fleet-keeper's own host. Mitigation: run a second fleet-keeper on a VPS pool once 5b lands (dispatcher redundancy via atomic claims — G2 already makes double-keepers safe).
 4. **Fable burning tokens on routine work** — hard-coded dispatch tiers + weekly `cost_ledger.py --report` audit.
