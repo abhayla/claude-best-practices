@@ -78,8 +78,11 @@ status_log: []
 
 1. **Atomic claim**: rename `…queued.md → …claimed.<session-id>.md`. Rename failed → another
    session owns it; skip.
-2. **Last-line re-checks** (cheap; intake already passed them): registry path exists, remote
-   matches. Mismatch → abort + park with a question (should be near-impossible after STEP 4).
+2. **Deterministic preflight gate (Phase 2, P3/G18 + owner Q2):** run
+   `powershell -NoProfile -ExecutionPolicy Bypass -File GWD\preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <registry remote>` —
+   exit 0 = OK; non-zero BLOCKS (model not haiku|sonnet|opus incl. Fable-as-worker → exit 4; repo
+   identity mismatch → exit 6). This makes cheapest-correct routing + wrong-repo protection
+   machine-enforced, not prose-dependent. Blocked → park with the reason, never dispatch.
 3. **Workspace (owner design 2026-07-16, clone-on-demand):** on the fleet-home box, the target
    repo is cloned FRESH at dispatch (`git clone --filter=blob:none`, per-machine path from
    settings.json) unless a workspace from the retention window already exists AND is clean. The
