@@ -79,7 +79,14 @@ status_log: []
    session owns it; skip.
 2. **Last-line re-checks** (cheap; intake already passed them): registry path exists, remote
    matches. Mismatch → abort + park with a question (should be near-impossible after STEP 4).
-3. Launch via background Bash, IN the target repo's directory so its own CLAUDE.md/plugins load.
+3. **Workspace (owner design 2026-07-16, clone-on-demand):** on the fleet-home box, the target
+   repo is cloned FRESH at dispatch (`git clone --filter=blob:none`, per-machine path from
+   settings.json) unless a workspace from the retention window already exists AND is clean. The
+   keeper's janitor deletes workspaces idle past `workspaces.retention_days` ONLY when provably
+   clean (no uncommitted changes, no unpushed branches) — dirty workspaces are escalated to the
+   owner, NEVER deleted (live save 2026-07-16: pre-existing IPODhan WIP). Permanent exceptions:
+   the bus, the hub clone (keeper engine), GLOBAL.md/GLOBAL.env scp-copies (never in git).
+4. Launch via background Bash, IN the workspace directory so the repo's own CLAUDE.md/plugins load.
    The prompt goes via STDIN — never as an argument (a contract starting with `---` frontmatter
    is parsed as a CLI flag; live failure 2026-07-15):
    ```bash
@@ -90,10 +97,10 @@ status_log: []
    ```
    Same-repo-as-dispatcher tasks: the contract MUST order the worker into its own git worktree
    (two sessions must never share one checkout).
-4. On exit, parse the JSON **`stop_reason` — a refusal is NOT success** (exit code lies):
+5. On exit, parse the JSON **`stop_reason` — a refusal is NOT success** (exit code lies):
    refusal → re-route once to opus (append `status_log`), continue. Error → one retry, then
    park with the error text.
-5. Phase 1 is SEQUENTIAL: wait for this worker (background Bash notifies) before dispatching
+6. Phase 1 is SEQUENTIAL: wait for this worker (background Bash notifies) before dispatching
    the next task; report progress to the owner between tasks.
 
 ## STEP 7 — CHECK + REPORT: maker ≠ checker (P5)
