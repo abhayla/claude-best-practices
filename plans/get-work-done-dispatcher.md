@@ -91,6 +91,9 @@ Preflight DONE over SSH (key `~/.ssh/ipodhan_vps`, `-EncodedCommand` for quoting
 - [ ] Local PC demoted to intake surface + optional worker pool; local GetWorkDone\ becomes a mirror clone.
 - Verify (the owner's exact scenario): file a task from the LOCAL PC → shut the local PC off → the VPS keeper picks it up, worker lands a green PR, evidence + ledger update in the mirror — zero local involvement after filing.
 
+**Phase 3 — Owner pings + answers (BUILT 2026-07-16, channel-amended)**
+Notifier `claude-hub` project added (5th; Telegram+WhatsApp, healthy). Outbound cards PROVEN (HTTP 202 → Telegram). CHANNEL AMENDMENT: interactive numbered-option cards go via **Telegram** (WhatsApp Business requires pre-approved templates that can't render arbitrary numbered options — real constraint found at build); WhatsApp kept for simple FYI alerts. Clients on the bus: notify-owner.ps1 (window-gated, dedupeKey), read-answers.ps1 (Telegram getUpdates, deterministic parse, first-answer-wins). OPEN: keeper→Notifier cross-VPS reach (Windows VPS can't hit Hostinger localhost:3300) — owner security fork (dedicated-user SSH vs nginx public proxy). Incident: my first config edit crash-looped the shared Notifier ~90s (double-shell-quoting blanked a ${VAR}); restored from backup, re-did via scp'd file; lesson recorded.
+
 **Phase 2 — Parallel fleet**
 - [ ] Multi-task dispatch (soft cap 6, P1 lane), heartbeat wrapper + session-start reconciliation, `cancel` verb, fleet budget admission check, TaskCreate/TaskList tracking.
 - Verify: 2 concurrent repos land green PRs, zero cross-contamination; a killed worker is detected and re-dispatched exactly once; cancel kills PID + closes PR.

@@ -787,3 +787,7 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - Private/free GitHub repos have NO branch protection: auto-merge merges red instantly. Fleet rule: on private repos, workers `gh pr checks --watch` → merge only on SUCCESS; never arm auto-merge.
 - A killed worker ≠ failed task: T-002's process died before writing its result JSON while its PR had already merged — always probe the DESTINATION (PR state, check runs) before re-dispatching or declaring failure.
 - A new CI gate can expose pre-existing repo defects (calculatekaro lockfile drift) — treat the first-ever gate run as a discovery, and budget a follow-up fix.
+
+## 2026-07-16 — Editing shared prod config: never pass ${VAR} through nested shell layers; validate before reload
+- **Mistake:** inserted a Notifier project block via `ssh "python3 <<HEREDOC ... ${TELEGRAM_CHAT_ID_OPS} ..."`. Double shell-quoting expanded the var to EMPTY before python wrote it; the Notifier's zod schema (chatId min(1)) rejected it and the SHARED service crash-looped (4 live alerting projects affected ~90s).
+- **Rule:** to edit a remote config that contains `${VAR}` literals, write the block to a LOCAL file and scp it (no shell expansion of the content), assert the literal survives (`'${VAR}' in text`), back up, insert, and health-check AFTER reload. Keep the pre-change backup; restore-first on any red. Applies to all shared-infra edits.
