@@ -206,7 +206,18 @@ def test_guard_makes_no_git_mutations(tmp_path):
     assert before == after, "concurrency guard must not change any git ref or HEAD"
 
 
-# ---- auto-pr.sh fast-exit on clean main (the "Hook cancelled" mitigation) --
+# ---- auto-pr.sh fast-exit on main (the "Hook cancelled" mitigation) --------
+#
+# Parameterized over BOTH shipping copies. The hub hook and the branch-lifecycle plugin's hook are
+# independent files with no parity gate between them, and that is exactly how the plugin kept the
+# narrow main-only guard after the hub's was widened (PR #428) — shipping the "Hook cancelled" race
+# to every downstream install. Their scaffolding legitimately differs (the plugin sources
+# _settings.sh and resolves CLAUDE_PLUGIN_ROOT), so parity is asserted on BEHAVIOUR, not on text.
+AUTOPR_COPIES = [
+    pytest.param(AUTOPR, id="hub"),
+    pytest.param(ROOT / "plugins" / "branch-lifecycle" / "hooks" / "auto-pr.sh", id="plugin"),
+]
+
 
 def test_autopr_main_guard_precedes_network_calls():
     """Structural companion to the behavioural test below: the main/master guard must sit ABOVE the
@@ -251,7 +262,8 @@ def test_autopr_fast_exits_on_main_only_repo(tmp_path):
 
 
 @pytest.mark.skipif(not (shutil.which("bash") and shutil.which("git")), reason="needs bash+git")
-def test_autopr_fast_exits_on_main_with_other_local_branches(tmp_path):
+@pytest.mark.parametrize("hook", AUTOPR_COPIES)
+def test_autopr_fast_exits_on_main_with_other_local_branches(tmp_path, hook):
     """REGRESSION (2026-07-16 'Hook cancelled'): the fast-exit used to require main to be the ONLY
     local branch, so any leftover branch sent SessionEnd into `git fetch --prune` + a `gh pr view`
     per stale branch — multi-second network I/O that the shutdown window kills. On main there is
@@ -291,8 +303,8 @@ def test_autopr_fast_exits_on_main_with_other_local_branches(tmp_path):
         (shim / f).chmod(0o755)
     shim_env = dict(env, PATH=f"{shim}{os.pathsep}{os.environ['PATH']}")
 
-    r = subprocess.run([bash, str(AUTOPR)], cwd=repo, capture_output=True, text=True, env=shim_env)
-    assert r.returncode == 0, f"auto-pr.sh must be fail-safe (exit 0), got {r.returncode}: {r.stderr}"
+    r = subprocess.run([bash, str(hook)], cwd=repo, capture_output=True, text=True, env=shim_env)
+    assert r.returncode == 0, f"{hook.name} must be fail-safe (exit 0), got {r.returncode}: {r.stderr}"
     assert not marker.exists(), (
         "fast-exit must make NO network call on main — got:\n"
         + marker.read_text(encoding="utf-8")
