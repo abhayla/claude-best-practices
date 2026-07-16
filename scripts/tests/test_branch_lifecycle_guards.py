@@ -299,3 +299,55 @@ def test_autopr_fast_exits_on_main_with_other_local_branches(tmp_path):
     )
     after = g("for-each-ref", "--format=%(refname) %(objectname)").stdout
     assert before == after, "fast-exit must not prune/mutate refs on main"
+
+
+@pytest.mark.skipif(not (shutil.which("bash") and shutil.which("git")), reason="needs bash+git")
+def test_autopr_does_not_fast_exit_on_a_task_branch(tmp_path):
+    """The other side of the guard — the one the main-path tests CANNOT catch. If the fast-exit
+    matched too broadly, every task branch would silently stop landing (a worse bug than the
+    'Hook cancelled' race it fixes) and every main-path assertion would still pass. On a task
+    branch the hook MUST fall through to the landing path (session-git-landing.sh -> gh)."""
+    bash, git = shutil.which("bash"), shutil.which("git")
+    repo = tmp_path / "r"; repo.mkdir(); (repo / ".claude" / "hooks").mkdir(parents=True)
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull)
+
+    def g(*a):
+        return subprocess.run([git, *a], cwd=repo, capture_output=True, text=True, env=env)
+
+    # A local bare remote: `land` pushes before it ever touches gh, so without an origin the test
+    # would pass for the WRONG reason (bailing at push, never proving the guard let it through).
+    bare = tmp_path / "origin.git"
+    subprocess.run([git, "init", "-q", "--bare", str(bare)], capture_output=True, env=env)
+
+    g("init", "-q", "-b", "main")
+    g("config", "user.email", "t@t.test"); g("config", "user.name", "t")
+    g("remote", "add", "origin", str(bare))
+    (repo / "a.txt").write_text("x", encoding="utf-8"); g("add", "-A"); g("commit", "-qm", "i")
+    g("push", "-q", "-u", "origin", "main")
+    g("checkout", "-q", "-b", "task/some-work")
+    (repo / "b.txt").write_text("y", encoding="utf-8"); g("add", "-A"); g("commit", "-qm", "w")
+
+    # The hook resolves the landing lib as $(git rev-parse --show-toplevel)/.claude/hooks/, so the
+    # REAL session-git-landing.sh must sit at that path inside the fixture repo.
+    shutil.copy(
+        AUTOPR.parent / "session-git-landing.sh", repo / ".claude" / "hooks" / "session-git-landing.sh"
+    )
+
+    calls = tmp_path / "gh-calls"
+    shim = tmp_path / "shim"; shim.mkdir()
+    (shim / "gh").write_text(
+        "#!/usr/bin/env bash\n" f'echo "gh $*" >> "{calls.as_posix()}"\nexit 0\n', encoding="utf-8"
+    )
+    (shim / "gh").chmod(0o755)
+    shim_env = dict(env, PATH=f"{shim}{os.pathsep}{os.environ['PATH']}", AUTO_MERGE="0")
+
+    r = subprocess.run([bash, str(AUTOPR)], cwd=repo, capture_output=True, text=True, env=shim_env)
+    assert r.returncode == 0, f"auto-pr.sh must be fail-safe (exit 0), got {r.returncode}: {r.stderr}"
+    log_body = (repo / ".claude" / ".auto-git.log").read_text(encoding="utf-8")
+    assert "fast-exit" not in log_body, (
+        "auto-pr.sh must NOT fast-exit on a task branch — the guard is too broad:\n" + log_body
+    )
+    assert calls.exists(), (
+        "auto-pr.sh on a task branch must reach the landing path (gh) — it never called gh.\n"
+        f"log:\n{log_body}"
+    )
