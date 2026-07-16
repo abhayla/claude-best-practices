@@ -56,6 +56,15 @@ option FIRST with a one-line why; single/multi-select stated). Include approval-
 | New app onto a `sandbox_domains` subdomain | AUTO (Tier 1) — pre-authorized by the grant |
 | First deploy / DNS / new domain / auth or payment surface | HOLD (Tier 2) — collect the yes/no NOW |
 
+**Deploy execution (Phase 4, P12/P13):** when a task's tier resolves to AUTO, the deploy runs via
+`GWD\deploy-site.sh` ON the Hostinger VPS (where nginx/certbot/webroots live; bus-driven like the
+relay). It captures the current webroot as KNOWN-GOOD first, builds niced (never starves live sites),
+swaps in the new build, `nginx -t`-gates the reload, PROBES the live URL, and on any probe/​config
+failure RESTORES the known-good + reloads (revert-first, P13) — the forward-fix is a separate P1 task.
+NEW-APP subdomains (P12): the dispatcher first creates the `<app>.<sandbox>` DNS A-record via the
+GoDaddy/Cloudflare API (GLOBAL.env), then the runner adds the vhost + certbot TLS. **Requires a granted
+`settings.sandbox_domains` entry — until the owner provides one, new-app auto-deploy stays Tier-2 (HOLD).**
+
 Nothing answerable from GLOBAL.md, the repo, or the registry may be asked.
 
 ## STEP 5 — CONTRACT: via /goal-creator, extended
