@@ -86,7 +86,7 @@ Build log: scaffold ✅ (`GetWorkDone\` + settings.json with VERIFIED repo regis
 Preflight DONE over SSH (key `~/.ssh/ipodhan_vps`, `-EncodedCommand` for quoting): git 2.51 ✓ node 24 ✓ gh 2.67 ✓ **Claude Code 2.1.211 installed AND authed ✓** (haiku probe answered) · 27.3 GB free · PM2 prod apps online (resource caps apply per P19) · **gh NOT authed (401) — the one human step**.
 - [ ] HUMAN (batched): GitHub auth on the VPS — either owner drops a repo-scope PAT into GLOBAL.env (I run `gh auth login --with-token` remotely) or a one-time interactive `gh auth login` via RDP. PAT route recommended.
 - [ ] Create private state repo `abhayla/getworkdone-state`; seed with current `GetWorkDone\` content (minus evidence binaries — evidence stays per-machine, ledger + queue + questions + settings sync).
-- [ ] VPS: `C:\GetWorkDone\` clone of the state repo; fleet repos cloned under `C:\Fleet\repos\` (calculatekaro, IPODhan, AlgoChanakya, RFP, KKB, hub); registry paths get per-machine sections in settings.json.
+- [ ] VPS: `C:\Abhay\GetWorkDone\` clone of the state repo (path owner-picked); fleet repos cloned under `C:\Fleet\repos\` (calculatekaro, IPODhan, AlgoChanakya, RFP, KKB, hub); registry paths get per-machine sections in settings.json.
 - [ ] Keeper on VPS: `/loop` session under a Task Scheduler at-boot job; every tick syncs the state mirror; workers spawned niced below PM2 production.
 - [ ] Local PC demoted to intake surface + optional worker pool; local GetWorkDone\ becomes a mirror clone.
 - Verify (the owner's exact scenario): file a task from the LOCAL PC → shut the local PC off → the VPS keeper picks it up, worker lands a green PR, evidence + ledger update in the mirror — zero local involvement after filing.
