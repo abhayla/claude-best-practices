@@ -123,6 +123,14 @@ Notifier `claude-hub` project added (5th; Telegram+WhatsApp, healthy). Outbound 
 
 Mitigations are baked into the architecture above, keyed G1–G20: G1 answer return path · G2 atomic queue claim · G3 heartbeat/liveness + reconcile · G4 maker≠checker evidence · G5 break-task dedup · G6 revert-first rollback · G7 fix-loop circuit breaker · G8 local (not cloud) unattended sweeper · G9 diff-enforced deploy tier · G10 fleet budget breaker · G11 cancel verb · G12 priority lanes · G13 per-repo merge serialization · G14 secrets discipline · G15 refusal ≠ success · G16 blast-radius gate · G17 alert debounce · G18 repo-identity assert · G19 queue outside git · G20 evidence retention + write-failure = task failure.
 
+## Build status (2026-07-16 completion pass)
+- **Phases 1–3 LIVE:** intake→contract→parallel workers→checker→PR; fleet home on Windows VPS; Telegram Q&A via bus relay. Keeper first tick verified (swept inbox → T-007..T-010).
+- **Phase 4 BUILT, gated:** deploy-site.sh (known-good→build→nginx-gate→probe→revert-first); new-app subdomains via DNS+vhost+certbot. Real deploy needs sandbox domain (T-011) + owner go.
+- **Phase 5 LIVE:** break-detect.sh files P1 for genuine BUILD/TEST breaks only (env deploy/e2e checks ignored — finding: IPODhan/AlgoChanakya main red was deploy-only, not code). Cowork drop convention in GLOBAL.md.
+- **Phase 5b OPEN (T-012):** Hostinger worker pool needs Claude auth there. **Phase 6:** codify wired (3×→skill-factory); graduation deferred to real dogfood volume.
+- **Architecture diagram** delivered (colorful, owner-requested).
+- **Open for owner:** T-011 sandbox domain · T-012 Hostinger worker auth · T-004 private-repo CI tier · T-006 IPODhan unpushed WIP.
+
 ## Point-by-point lock ledger (owner walkthrough, 22 steps — 2026-07-15) — **COMPLETE: ALL 22 LOCKED**
 - **P22 LOCKED:** graduation gate — after final exam + real volume, an evidence-based owner decision (one-at-a-time G6 rule) on packaging /get-work-done as an installable plugin; interfaces never frozen before dogfood; "stays hub infrastructure" is a valid outcome.
 - **P1 RE-LOCKED (owner amendment 2026-07-15 evening):** fleet home = **Windows VPS `103.118.16.189`** (`C:\GetWorkDone\`), NOT the local PC — owner reason: family shut the PC down mid-run TODAY (killed worker T-002 mid-flight); an always-on box is now a requirement, not an upgrade. The **private-git state mirror is PROMOTED from earmark to REQUIRED** (repo `abhayla/getworkdone-state`, private): the queue/inbox/questions/ledger bus every machine syncs through — this is how intake from the local PC / any session reaches the VPS keeper, and it gives backup+history for free. Local `D:\Abhay\VibeCoding\GetWorkDone\` becomes a sync replica + intake surface, never the brain. Structure/format/rules of P1 otherwise unchanged. Migration = **Phase 1b** below.
