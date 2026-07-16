@@ -208,11 +208,22 @@ def test_guard_makes_no_git_mutations(tmp_path):
 
 # ---- auto-pr.sh fast-exit on clean main (the "Hook cancelled" mitigation) --
 
-def test_autopr_has_main_only_fast_exit():
-    body = _read(AUTOPR)
-    assert "fast-exit" in body, "auto-pr.sh must fast-exit on main with no other local branches"
-    assert "for-each-ref" in body and "refs/heads/" in body, (
-        "fast-exit must be a pure-local branch check (no network) before the slow git fetch/gh calls"
+def test_autopr_main_guard_precedes_network_calls():
+    """Structural companion to the behavioural test below: the main/master guard must sit ABOVE the
+    first network call in the CODE (comments stripped — the prose legitimately names `git fetch`)."""
+    code = [
+        ln for ln in _read(AUTOPR).splitlines()
+        if ln.strip() and not ln.lstrip().startswith("#")
+    ]
+    guard_at = next(
+        (i for i, ln in enumerate(code) if "main|master" in ln or '"$_cur" = "main"' in ln), None
+    )
+    assert guard_at is not None, "auto-pr.sh must guard on main/master before doing network work"
+    net_at = next(
+        (i for i, ln in enumerate(code) if "git fetch" in ln or "gh pr " in ln), len(code)
+    )
+    assert guard_at < net_at, (
+        f"main/master guard (line {guard_at}) must precede the first network call (line {net_at})"
     )
 
 
@@ -237,3 +248,54 @@ def test_autopr_fast_exits_on_main_only_repo(tmp_path):
     after = g("for-each-ref", "--format=%(refname) %(objectname)").stdout
     assert before == after, "fast-exit must not create branches/refs on a clean main-only repo"
     assert g("rev-parse", "--abbrev-ref", "HEAD").stdout.strip() == "main", "must stay on main"
+
+
+@pytest.mark.skipif(not (shutil.which("bash") and shutil.which("git")), reason="needs bash+git")
+def test_autopr_fast_exits_on_main_with_other_local_branches(tmp_path):
+    """REGRESSION (2026-07-16 'Hook cancelled'): the fast-exit used to require main to be the ONLY
+    local branch, so any leftover branch sent SessionEnd into `git fetch --prune` + a `gh pr view`
+    per stale branch — multi-second network I/O that the shutdown window kills. On main there is
+    nothing to LAND (session-git-landing.sh skips main), so it must fast-exit regardless of how
+    many other local branches exist; pruning is auto-pr-reconcile.sh's job at SessionStart."""
+    bash, git = shutil.which("bash"), shutil.which("git")
+    repo = tmp_path / "r"; repo.mkdir(); (repo / ".claude").mkdir()
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull)
+
+    def g(*a):
+        return subprocess.run([git, *a], cwd=repo, capture_output=True, text=True, env=env)
+
+    g("init", "-q", "-b", "main")
+    g("config", "user.email", "t@t.test"); g("config", "user.name", "t")
+    (repo / "a.txt").write_text("x", encoding="utf-8"); g("add", "-A"); g("commit", "-qm", "i")
+    g("branch", "leftover/one"); g("branch", "leftover/two")
+    before = g("for-each-ref", "--format=%(refname) %(objectname)").stdout
+
+    # Shim `git` + `gh` on PATH so any NETWORK call leaves a hard marker. Asserting absence needs
+    # this: the hook swallows `git fetch` output (`>/dev/null 2>&1 || true`), so a clean exit alone
+    # cannot distinguish "skipped the fetch" from "fetched and failed quietly" — and it is exactly
+    # that multi-second network I/O the SessionEnd shutdown window cancels.
+    marker = tmp_path / "network-was-called"
+    shim = tmp_path / "shim"; shim.mkdir()
+    (shim / "git").write_text(
+        "#!/usr/bin/env bash\n"
+        'for a in "$@"; do case "$a" in\n'
+        f'  fetch|push|ls-remote) echo "git $*" >> "{marker.as_posix()}";;\n'
+        "esac; done\n"
+        f'exec "{git}" "$@"\n',
+        encoding="utf-8",
+    )
+    (shim / "gh").write_text(
+        "#!/usr/bin/env bash\n" f'echo "gh $*" >> "{marker.as_posix()}"\nexit 0\n', encoding="utf-8"
+    )
+    for f in ("git", "gh"):
+        (shim / f).chmod(0o755)
+    shim_env = dict(env, PATH=f"{shim}{os.pathsep}{os.environ['PATH']}")
+
+    r = subprocess.run([bash, str(AUTOPR)], cwd=repo, capture_output=True, text=True, env=shim_env)
+    assert r.returncode == 0, f"auto-pr.sh must be fail-safe (exit 0), got {r.returncode}: {r.stderr}"
+    assert not marker.exists(), (
+        "fast-exit must make NO network call on main — got:\n"
+        + marker.read_text(encoding="utf-8")
+    )
+    after = g("for-each-ref", "--format=%(refname) %(objectname)").stdout
+    assert before == after, "fast-exit must not prune/mutate refs on main"
