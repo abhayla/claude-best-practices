@@ -32,17 +32,21 @@ log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] auto-pr: $*" >> "$LOG" 2>/dev/null;
 
 command -v gh >/dev/null 2>&1 || { log "gh not installed; skipping"; exit 0; }
 
-# Fast-exit: if we're on main/master AND it's the ONLY local branch, there is nothing to land or
-# prune — skip the slow network I/O (git fetch + gh calls). This is the common "ended the session on
-# main, everything already merged" case; doing network work there only races the SessionEnd shutdown
-# window and surfaces a benign "Hook cancelled". Anything genuinely pending is still swept by
-# auto-pr-reconcile.sh at the reliably-firing SessionStart. (Pure local check — no network.)
+# Fast-exit on main/master/detached HEAD: there is nothing to LAND here — session-git-landing.sh's
+# `land` skips those outright — so the only work left would be janitorial branch pruning, which
+# auto-pr-reconcile.sh already does at the reliably-firing SessionStart. Doing it HERE instead races
+# the SessionEnd shutdown window: `git fetch --prune` plus one `gh pr view` per stale branch is
+# multi-second network I/O, and the platform kills the hook when the session process exits —
+# surfacing "Hook cancelled" to the user. Nothing is lost; reconcile sweeps it next session.
+# (An earlier version only fast-exited when main was the ONLY local branch, so a single leftover
+# branch was enough to re-enter the network path and trigger the cancel. Pure local check.)
 _cur="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-if [ "$_cur" = "main" ] || [ "$_cur" = "master" ]; then
-  _other="$(git for-each-ref --format='%(refname:short)' refs/heads/ 2>/dev/null \
-            | grep -vxE 'main|master' | head -1)"
-  [ -z "$_other" ] && { log "on '$_cur', no other local branches — nothing to land/prune; fast-exit"; exit 0; }
-fi
+case "$_cur" in
+  main|master|HEAD|"")
+    log "on '$_cur' — nothing to land; pruning deferred to auto-pr-reconcile.sh; fast-exit"
+    exit 0
+    ;;
+esac
 
 # Prune merged branches so they never accumulate. `fetch --prune` drops stale remote refs (safe);
 # a LOCAL branch is hard-deleted ONLY when gh confirms its PR is MERGED — its content is already on
