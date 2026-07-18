@@ -162,6 +162,15 @@ outcome, PR link, evidence path, cost tier used; plus anything parked and why. A
 task's shape signature to `GWD\PATTERNS-SEEN.md` (3rd occurrence → file a PROPOSED codify
 card, P20).
 
+## ARTIFACT PLACEMENT (rule 2026-07-18 — owner question)
+Where a created artifact lives is determined by WHAT it is, not where the fleet runs:
+- **Project-SPECIFIC artifact** (a tool/script/config for ONE app — e.g. an IPODhan audit tool) → lands
+  IN that project's repo via a PR (versioned with the app, discoverable by its team, covered by its CI).
+  NEVER the bus or hub. (Defect fixed: ipo-audit.py was wrongly put in the bus → moved to IPODhan #112.)
+- **Fleet-GENERIC machinery** (dispatcher, keeper, contract-lint, bus-sync, guards) → the hub / bus scripts.
+- **Fleet runtime STATE** (queue, ledger, evidence, questions) → the GetWorkDone bus only.
+Litmus test before saving: "would the target project's team want this in their repo?" If yes → their repo.
+
 ## CRITICAL RULES
 
 - MUST resolve every repo through `GWD\settings.json repo_registry` and assert
