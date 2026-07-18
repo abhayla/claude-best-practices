@@ -141,6 +141,18 @@ status_log: []
 
 ## STEP 7 — CHECK + REPORT: maker ≠ checker (P5)
 
+**AUDIT-GAP FIXES 2026-07-18 (from the T-014 self-review):**
+- **Worker cwd:** launch the worker in the TARGET repo's dir (or a neutral working dir like the app's
+  deploy path) — NEVER the hub repo dir. Running in the hub made a worker inherit hub governance and
+  emit the `*Enhanced:*` ceremony in its report (leak). The dispatch cwd is the target, not `claude-best-practices`.
+- **Checker is MANDATORY and AUTO-CHAINED, never manual.** STEP 7 is not optional and not owner-triggered:
+  every task with `evidence: required` (all non-trivial) automatically spawns a SEPARATE checker agent (in a
+  neutral dir) that re-verifies a sample from SOURCE before the task is reported done. On T-014 the checker
+  CONFIRMED a real bug (a duplicate DB row) AND REFUTED a false one (worker claimed "price data missing" —
+  it was present under a differently-named column). A worker report without a checker verdict is INCOMPLETE.
+- **Evidence = raw pulls + report + checker verdict**, all saved to `GWD\evidence\<date>-<id>\` — not just the
+  final prose. The raw data is what lets the checker (and owner) independently re-examine claims later.
+
 The worker's "done" claim is input, not truth. Dispatch a CHECKER (separate `Agent()`, sonnet)
 against the worker's PR: re-run the project's test gate, run the verify-effect-at-destination
 probe (deploy tasks: probe the LIVE URL), capture the screenshot, and write BOTH the evidence
