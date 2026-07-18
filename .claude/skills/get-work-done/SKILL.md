@@ -44,6 +44,16 @@ mid-flight STOPS and re-enters here as a full contract — it never limps on.
 
 ## STEP 4 — CLARIFY: one batch, everything, while the owner is present
 
+**NON-SKIPPABLE (defect fix 2026-07-18):** "run it" / "go ahead" means PROCEED — it does NOT mean skip
+this step. A non-trivial task ALWAYS resolves its material unknowns before dispatch. TWO layers:
+(a) DETERMINE, don't ask, anything you can scout — e.g. "compare IPODhan's data" → the authoritative
+source is the app's OWN DB/API, NOT scraping its public site; scout the data layer and use it. Asking
+what you can determine is itself a defect. (b) For a GENUINE material unknown (2+ valid answers that
+change the OUTCOME, unscoutable) → ask it in the upfront batch. Applying "decide-don't-ask" to a
+material outcome-changing unknown (as happened on T-013: assumed public-scrape, hit a WAF, asked after)
+is a MISAPPLICATION — that rule is for reversible EXECUTION details only, never for what-to-build /
+which-source intent. If in doubt whether an unknown is material: it is → resolve at intake.
+
 FAIL AT INTAKE, NOT AT MIDNIGHT (locked principle): run every abort-capable check NOW —
 registry/remote identity (done in scout), branch protection + secret-scan gate on the target
 (P4 audit re-check via `gh api`), needed credentials/tools present, deploy tier per the table
