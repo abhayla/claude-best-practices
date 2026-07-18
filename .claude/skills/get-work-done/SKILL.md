@@ -97,6 +97,7 @@ status_log: []
 
 1. **Atomic claim**: rename `…queued.md → …claimed.<session-id>.md`. Rename failed → another
    session owns it; skip.
+2. **Contract-lint gate (root-cause fix for T-013, 2026-07-18):** `python GWD\contract-lint.py <contract>` — exit 0 to proceed, non-zero BLOCKS: it refuses any contract carrying an unresolved assumption (assume/probably/public-site/TBD) or a data-reading task with no declared `data_source:`. This makes 'dispatched a guess' STRUCTURALLY IMPOSSIBLE (not a prose reminder). A block means: go back to INTAKE and resolve it.
 2. **Deterministic preflight gate (Phase 2, P3/G18 + owner Q2):** run
    `powershell -NoProfile -ExecutionPolicy Bypass -File GWD\preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <registry remote>` —
    exit 0 = OK; non-zero BLOCKS (model not haiku|sonnet|opus incl. Fable-as-worker → exit 4; repo
