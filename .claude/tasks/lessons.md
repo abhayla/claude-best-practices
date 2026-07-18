@@ -791,3 +791,7 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 ## 2026-07-16 — Editing shared prod config: never pass ${VAR} through nested shell layers; validate before reload
 - **Mistake:** inserted a Notifier project block via `ssh "python3 <<HEREDOC ... ${TELEGRAM_CHAT_ID_OPS} ..."`. Double shell-quoting expanded the var to EMPTY before python wrote it; the Notifier's zod schema (chatId min(1)) rejected it and the SHARED service crash-looped (4 live alerting projects affected ~90s).
 - **Rule:** to edit a remote config that contains `${VAR}` literals, write the block to a LOCAL file and scp it (no shell expansion of the content), assert the literal survives (`'${VAR}' in text`), back up, insert, and health-check AFTER reload. Keep the pre-change backup; restore-first on any red. Applies to all shared-infra edits.
+
+## 2026-07-18 — VPS worker dispatch: PowerShell has no `<` stdin redirect
+- **Mistake:** dispatched a fleet worker on the Windows VPS via `ssh powershell "claude -p ... < prompt.txt"` — PowerShell does NOT support `<` input redirection (reserved operator), so the worker got no prompt and exited 1 with empty output. (Local git-bash workers use `< file` fine — that's why T-001/002 worked; they ran locally, not via PowerShell.)
+- **Rule:** on the Windows VPS (PowerShell), feed the worker prompt with `Get-Content <file> -Raw | claude -p ...`. On Linux/Hostinger (bash), `< file` is fine. Encode per-pool in the dispatch helper.
