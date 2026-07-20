@@ -97,19 +97,27 @@ status_log: []
 
 1. **Atomic claim**: rename `…queued.md → …claimed.<session-id>.md`. Rename failed → another
    session owns it; skip.
-2. **Deterministic preflight gate (Phase 2, P3/G18 + owner Q2):** run
+2. **Contract lint (deterministic, runs FIRST — T-020 2026-07-20):** run
+   `python GWD\contract-lint.py <claimed contract path>` — exit 0 = clean to dispatch; non-zero
+   BLOCKS (reason on stderr: missing/empty required field, unresolved assumption language, or a
+   data-reading task with no declared `data_source:`). Blocked → park the contract with the
+   lint's stderr as the reason, never dispatch it. This runs BEFORE the preflight gate so a
+   malformed contract is rejected before any workspace is cloned. The gate was dead prose until
+   this call site existed (`check_fleet_script_health.py` dead-gate finding); `SKILL.md` is the
+   canonical caller — keep this step and the script in sync or the health gate re-fires.
+3. **Deterministic preflight gate (Phase 2, P3/G18 + owner Q2):** run
    `powershell -NoProfile -ExecutionPolicy Bypass -File GWD\preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <registry remote>` —
    exit 0 = OK; non-zero BLOCKS (model not haiku|sonnet|opus incl. Fable-as-worker → exit 4; repo
    identity mismatch → exit 6). This makes cheapest-correct routing + wrong-repo protection
    machine-enforced, not prose-dependent. Blocked → park with the reason, never dispatch.
-3. **Workspace (owner design 2026-07-16, clone-on-demand):** on the fleet-home box, the target
+4. **Workspace (owner design 2026-07-16, clone-on-demand):** on the fleet-home box, the target
    repo is cloned FRESH at dispatch (`git clone --filter=blob:none`, per-machine path from
    settings.json) unless a workspace from the retention window already exists AND is clean. The
    keeper's janitor deletes workspaces idle past `workspaces.retention_days` ONLY when provably
    clean (no uncommitted changes, no unpushed branches) — dirty workspaces are escalated to the
    owner, NEVER deleted (live save 2026-07-16: pre-existing IPODhan WIP). Permanent exceptions:
    the bus, the hub clone (keeper engine), GLOBAL.md/GLOBAL.env scp-copies (never in git).
-4. Launch via background Bash, IN the workspace directory so the repo's own CLAUDE.md/plugins load.
+5. Launch via background Bash, IN the workspace directory so the repo's own CLAUDE.md/plugins load.
    The prompt goes via STDIN — never as an argument (a contract starting with `---` frontmatter
    is parsed as a CLI flag; live failure 2026-07-15):
    ```bash
@@ -120,20 +128,20 @@ status_log: []
    ```
    Same-repo-as-dispatcher tasks: the contract MUST order the worker into its own git worktree
    (two sessions must never share one checkout).
-5. On exit, parse the JSON **`stop_reason` — a refusal is NOT success** (exit code lies):
+6. On exit, parse the JSON **`stop_reason` — a refusal is NOT success** (exit code lies):
    refusal → re-route once to opus (append `status_log`), continue. Error → one retry, then
    park with the error text.
-6. **Parallel lanes (Phase 2, P6/P12):** dispatch up to `settings.soft_concurrency_cap`
+7. **Parallel lanes (Phase 2, P6/P12):** dispatch up to `settings.soft_concurrency_cap`
    workers concurrently — SAME-repo tasks always serialize; different repos run in parallel.
    Priority P1 > P2 > P3; a P1 is ALWAYS admitted even at the cap. Exceeding the soft cap is
    allowed only for mechanical, independent tasks. Before each dispatch check the DAILY
    CEILING: dispatches today >= `settings.max_dispatches_per_day` → pause new dispatches, ping
    the owner once (fleet-paused), never retry-storm.
-7. **Heartbeat dispatch (P7):** on Windows machines launch via the wrapper —
+8. **Heartbeat dispatch (P7):** on Windows machines launch via the wrapper —
    `powershell -File GWD\worker-wrapper.ps1 -TaskId <id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap>`
    (prompt file at `GWD\heartbeats\<id>.prompt.txt` first). The wrapper writes
    `<id>.hb` (PID + tick, ~60s) and the result JSON.
-8. **Reconcile (keeper duty, every tick):** for each `claimed` contract read its `.hb` —
+9. **Reconcile (keeper duty, every tick):** for each `claimed` contract read its `.hb` —
    fresh tick + live PID → leave alone (slow ≠ dead); `EXITED` → route to CHECK; stale (> 
    `settings.heartbeat_stale_after_seconds`) or dead PID → kill remnant, append status_log,
    re-queue ONCE; a SECOND death on the same task → park + owner card. Also run the JANITOR
