@@ -15,6 +15,10 @@ import pytest
 from scripts.check_fleet_script_health import run
 
 CHECKER = Path(__file__).resolve().parents[1] / "check_fleet_script_health.py"
+# The dispatcher lives in the hub, outside the fleet dir, but is contract-lint.py's real caller.
+_DISPATCHER_SKILL = (
+    Path(__file__).resolve().parents[2] / ".claude" / "skills" / "get-work-done" / "SKILL.md"
+)
 
 
 def _checks(findings, name):
@@ -251,18 +255,45 @@ def test_cli_missing_path_is_loud(tmp_path: Path):
 # ------------------------------------------------- regression: the gate must fire on the REAL fleet
 
 
-def test_gate_fires_on_the_real_fleet_scripts():
-    """dead-gate/discarded are live on the real fleet; if this ever goes quiet, the fleet was fixed (update the test).
+def test_real_fleet_has_no_silent_failure_findings():
+    """The live fleet must stay clean of all four audited shapes.
 
-    grep-count/interpreter are deliberately NOT asserted here: this same 2026-07-20 audit fixed
-    both live in break-detect.sh (loud interpreter abort + `grep -c ... || true` debounce fix), so
-    asserting their presence would fail against the fix this task itself shipped.
+    History: T-015 fixed grep-count + interpreter in break-detect.sh; T-020 fixed the last two
+    (contract-lint.py dead-gate — wired into /get-work-done SKILL.md STEP 6.2; keeper-tick.cmd
+    discarded exits — both guards' errorlevel now tested). This assertion is the ratchet: it was
+    previously written to assert the defects were PRESENT, which meant the suite would have gone
+    red the moment they were fixed. Direction matters — a regression test must fail on the
+    DEFECT, never on the FIX.
     """
     fleet = Path("C:/Abhay/GetWorkDone")
     if not fleet.exists():
         pytest.skip("fleet checkout not present on this host")
-    findings = run(fleet)
-    checks = {f.check for f in findings}
-    assert "dead-gate" in checks or "discarded" in checks, (
-        "gate found none of the audited HIGH defects on the real fleet — it is not gating"
+    findings = run(fleet, extra_callers=[_DISPATCHER_SKILL])
+    assert not findings, "silent-failure defects present on the live fleet:\n" + "\n".join(
+        f"{f.path.name}:{f.line}: [{f.check}] {f.message}" for f in findings
     )
+
+
+def test_keeper_tick_checks_both_guard_exit_codes():
+    """Regression: every guard invocation in keeper-tick.cmd is followed by an errorlevel test."""
+    tick = Path("C:/Abhay/GetWorkDone/keeper-tick.cmd")
+    if not tick.exists():
+        pytest.skip("fleet checkout not present on this host")
+    lines = tick.read_text(encoding="utf-8", errors="replace").splitlines()
+    for i, line in enumerate(lines):
+        if ".sh" not in line or "bash.exe" not in line:
+            continue
+        following = "\n".join(lines[i + 1 : i + 4]).lower()
+        assert "errorlevel" in following, (
+            f"keeper-tick.cmd:{i + 1} runs a guard but never tests its exit code:\n  {line.strip()}"
+        )
+
+
+def test_contract_lint_is_wired_into_the_dispatch_path():
+    """Regression: the dispatcher must actually invoke contract-lint.py before launching a worker."""
+    body = _DISPATCHER_SKILL.read_text(encoding="utf-8")
+    assert "contract-lint.py" in body, (
+        "contract-lint.py has no call site in the dispatcher — the gate is prose again"
+    )
+    step6 = body.split("## STEP 6")[1].split("## STEP 7")[0]
+    assert "contract-lint.py" in step6, "contract-lint must be invoked in STEP 6 (the dispatch path)"
