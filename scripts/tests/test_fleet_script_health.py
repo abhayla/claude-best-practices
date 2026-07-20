@@ -252,12 +252,17 @@ def test_cli_missing_path_is_loud(tmp_path: Path):
 
 
 def test_gate_fires_on_the_real_fleet_scripts():
-    """The audited defects are live; if this ever goes quiet, the fleet was fixed (update the test)."""
+    """dead-gate/discarded are live on the real fleet; if this ever goes quiet, the fleet was fixed (update the test).
+
+    grep-count/interpreter are deliberately NOT asserted here: this same 2026-07-20 audit fixed
+    both live in break-detect.sh (loud interpreter abort + `grep -c ... || true` debounce fix), so
+    asserting their presence would fail against the fix this task itself shipped.
+    """
     fleet = Path("C:/Abhay/GetWorkDone")
     if not fleet.exists():
         pytest.skip("fleet checkout not present on this host")
     findings = run(fleet)
     checks = {f.check for f in findings}
-    assert "grep-count" in checks or "interpreter" in checks, (
+    assert "dead-gate" in checks or "discarded" in checks, (
         "gate found none of the audited HIGH defects on the real fleet — it is not gating"
     )
