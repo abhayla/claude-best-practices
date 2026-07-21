@@ -9,7 +9,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "[plan or decision to grill]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Grill With Docs
@@ -18,7 +18,7 @@ Interview the user relentlessly about every aspect of their plan until shared un
 
 **What to grill:** $ARGUMENTS
 
-Ask questions **one at a time**, waiting for feedback on each before continuing. If a question can be answered by exploring the codebase, explore the codebase instead — do not ask what you can resolve yourself.
+Ask dependent questions **one at a time**; batch answer-independent questions into one card, and on receiving an answer ask the next independent question FIRST, processing the answer after, so the user never waits on processing (owner directive 2026-07-21). If a question can be answered by exploring the codebase, explore the codebase instead — do not ask what you can resolve yourself.
 
 ---
 
@@ -96,7 +96,7 @@ If any of the three is missing, skip the ADR. Use the format in `references/ADR-
 
 ## MUST DO
 
-- Ask exactly one question per turn — wait for the answer before the next
+- Batch independent questions into one card; a dependent question gets its own turn, asked first on receipt of the prior answer
 - Recommend an answer to every question — don't leave the user to fill in the blanks
 - Explore the codebase BEFORE asking what you can resolve yourself
 - Update `CONTEXT.md` inline the moment a term crystallises — do not batch

@@ -2746,10 +2746,10 @@
     }
   },
   "grill-me": {
-    "hash": "97800f2544a95d3a1486d1b002146aef0629228dbb03e537001edd119db26fa8",
+    "hash": "d26adc7bb94b190b156726f6cd6991ecaf6ce70ee1a916cad31c8f03a24789a3",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "scan:mattpocock/skills",
     "discovered": "2026-05-24",
     "last_updated": "2026-05-24",
@@ -5735,10 +5735,10 @@
     }
   },
   "grill-with-docs": {
-    "hash": "0f7db518881271fc675ca81a47b17ebafd9d8920984bdef23617e63011d642b2",
+    "hash": "0a957d12e724ef2258640cba4ac7e08611afc77febbb62b61bcd6c9cc03fa4cc",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "upstream:mattpocock/skills@engineering/grill-with-docs",
     "discovered": "2026-05-28",
     "last_updated": "2026-05-28",
@@ -5900,10 +5900,10 @@
     }
   },
   "decision-authority": {
-    "hash": "9530c34a694b1b76dc34fcb985828edbab7270171d417252caf5e413d506582c",
+    "hash": "1ade77f82a625af9795d08b9b9a93b5711e9dca860df5f96f1f0fcf6815108b2",
     "type": "rule",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-10",
     "last_updated": "2026-06-21",
@@ -6429,10 +6429,10 @@
     }
   },
   "ba-discovery-checklist": {
-    "hash": "983c40cea655b1819b53574b74817b79336f01c3044d5f11b9fa6b6ec4dd850b",
+    "hash": "e4bfbf3fcdfcda00049e3f004608d50fef212ffb3cbaabc2a3818aa9f1bd8a5c",
     "type": "rule",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-18",
     "last_updated": "2026-06-18",

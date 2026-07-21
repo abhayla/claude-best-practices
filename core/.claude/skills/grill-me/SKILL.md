@@ -2,14 +2,14 @@
 name: grill-me
 description: Audit a plan or design by interviewing the user relentlessly until shared understanding is reached, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
 type: workflow
-version: 1.0.0
+version: 1.1.0
 allowed-tools: Read, Grep, Glob
 argument-hint: [optional context about the plan or design]
 ---
 
 Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 
-Ask the questions one at a time.
+Ask dependent questions one at a time; batch answer-independent questions into one card so the user never waits between them (owner directive 2026-07-21).
 
 If a question can be answered by exploring the codebase, explore the codebase instead.
 
@@ -43,16 +43,20 @@ If the question can be answered by reading the code, read the relevant files fir
 Only ask the user if real ambiguity remains after the read.
 This prevents wasting the user's time on questions you could have answered yourself.
 
-## STEP 4: Ask ONE question with your recommended answer
+## STEP 4: Ask the next question(s) with your recommended answer
 
-Frame the question as a single decision with an explicit recommendation.
+Frame each question as a single decision with an explicit recommendation.
 Example: "Should X be A or B? Recommended: A, because Y."
-Do not batch multiple questions into one turn.
+Batch questions ONLY when they are answer-independent (neither's existence nor
+wording depends on the other's answer); a dependent question waits for its turn.
 
 ## STEP 5: Wait for the response
 
 Block on the user's answer.
-Do not move to the next branch until this one is resolved or explicitly deferred.
+When it arrives, if the next branch's question does NOT depend on that answer,
+ask it IMMEDIATELY — before processing the answer — then process while the user
+types. Do not move deeper into the current branch until it is resolved or
+explicitly deferred.
 
 ## STEP 6: Update the tree and repeat
 

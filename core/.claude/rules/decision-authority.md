@@ -2,7 +2,7 @@
 
 # Decision Authority — default to deciding, escalate only by exception
 
-version: "1.0.0"
+version: "1.3.0"
 
 On reversible, internal, best-practice-clear work, **DECIDE and report — do not
 ask**. Reserve the user's approval for the few decisions that are irreversible,
@@ -19,9 +19,9 @@ about what the user is asking**, never approval-seeking:
 
 - **≥ ~95% confident** — can state "done" in one unambiguous sentence, no
   consequential fork → proceed, decide-and-report.
-- **< ~95% with 1–2 missing details** → ask the Clarification Gate (one
-  targeted question at a time, answered from the codebase first — see the
-  `/prompt-auto-enhance` rule).
+- **< ~95% with 1–2 missing details** → ask the Clarification Gate (independent
+  questions batched into one card, dependent ones pipelined ask-first-then-process,
+  answered from the codebase first — see the `/prompt-auto-enhance` rule).
 - **< ~95% on a consequential fork** (expensive to reverse, materially changes
   the product, OR 2+ materially different valid ways to build it, with no clear
   best-practice winner) → **converge first, don't guess**: run `/grill-me`
