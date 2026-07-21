@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-15 17:49 UTC (auto-generated)
+> Last updated: 2026-07-21 14:39 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -36,7 +36,7 @@
 | auto-git | hook | 1.1.1 | hub:abhayla/claude-best-practices | — |
 | auto-pr | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | auto-verify | skill | 5.0.0 | hub:abhayla/claude-best-practices | regression-test, tester-agent, code-quality-gate, contract-test, perf-test |
-| ba-discovery-checklist | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| ba-discovery-checklist | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | ba-usecase-discovery-reminder | hook | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | batch | skill | 1.0.1 | hub:abhayla/claude-best-practices | — |
 | brainstorm | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
@@ -72,7 +72,7 @@
 | db-migrate-verify | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | debugger-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | debugging-loop | skill | 3.0.0 | hub:abhayla/claude-best-practices | auto-verify, debugger-agent, fix-loop, learn-n-improve, systematic-debugging, test-failure-analyzer-agent, workflow-contracts |
-| decision-authority | rule | 1.2.0 | project:firekaro-planner | — |
+| decision-authority | rule | 1.3.0 | project:firekaro-planner | — |
 | dependency-migration-triage | skill | 1.0.0 | hub:abhayla/claude-best-practices | fix-loop, systematic-debugging |
 | deploy-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | ci-cd-setup, k8s-deploy |
 | design-principles | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
@@ -116,8 +116,8 @@
 | github-issue-manager-agent | agent | 1.0.0 | hub:abhayla/claude-best-practices | create-github-issue |
 | goal-anchored-decisions | rule | 1.0.0 | project:firekaro-planner | — |
 | goal-creator | skill | 3.0.0 | project:firekaro-planner | — |
-| grill-me | skill | 1.0.0 | scan:mattpocock/skills | — |
-| grill-with-docs | skill | 1.0.0 | upstream:mattpocock/skills@engineering/grill-with-docs | adr |
+| grill-me | skill | 1.1.0 | scan:mattpocock/skills | — |
+| grill-with-docs | skill | 1.1.0 | upstream:mattpocock/skills@engineering/grill-with-docs | adr |
 | handover | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | hono-conventions | rule | 1.0.0 | project:firekaro-planner | — |
 | human-approval-gates | rule | 1.1.1 | hub:abhayla/claude-best-practices | — |
