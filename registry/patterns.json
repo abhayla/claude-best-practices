@@ -7025,13 +7025,13 @@
     "tier": "must-have"
   },
   "verify-before-suggest-do-before-delegate": {
-    "hash": "1cd1100eb65c28370bd12d694c362d73c77edf9dcfa6ac0697806e32b253d3ab",
+    "hash": "e2af340bfd313918ec46199bc00e3badff3cd26b18cbb2c088e1f38e7679f439",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-07-14",
-    "last_updated": "2026-07-14",
+    "last_updated": "2026-07-21",
     "dependencies": [],
     "visibility": "public",
     "description": "Two-part governance rule from an owner-reported failure pair: (A) any ACTIONABLE tool/service/process recommendation is live-verified before being presented (evidence = source + fetch date + version checked against the project's pinned versions), degrading to inline 'unverified' labels — never fabricating, never stalling — when no verification tool exists; cheap-tests limited to side-effect-free, non-billed, non-interactive probes. (B) the agent is the DEFAULT executor: a step is assigned to the human only after an attempt or verified block, with a named blocker (credential/spend/irreversible/physical/tool-or-permission), rendered as an explicit 'I will do / You need to do' split batched to minimal interruptions. Global scope.",

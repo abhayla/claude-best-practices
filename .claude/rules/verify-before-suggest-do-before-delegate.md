@@ -38,6 +38,11 @@ a brainstorm survey is exempt until an option is put forward for action; then ve
 - Dispatched workers: a worker without fetch tools returns claims labeled unverified; the T0
   orchestrator verifies before presenting to the human. Dispatch prompts for
   recommendation-producing workers MUST carry this mandate.
+- SELF-capability claims are recommendations to yourself: "I will do X via Y" carries the same
+  live-verify bar on Y as recommending Y to the user — verify the mechanism exists (the project's
+  capability inventory, a proven pattern, or a cheap probe) BEFORE promising, or state "mechanism
+  unverified — probing first". (Owner correction 2026-07-21: promised Wati template deletion via
+  API; no such endpoint exists.)
 
 ## Part B — the agent is the DEFAULT executor; human steps are justified exceptions
 
