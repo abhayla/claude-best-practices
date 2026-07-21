@@ -90,11 +90,11 @@ Merged intent-resolution gate (Clarification Gate + `decision-authority.md`
 confidence gate), tiered. The gate question opens with the `*Sync-check:*` marker — a
 required-intent stop the `no-overask-guard.sh` hook EXEMPTS, never an over-ask:
 
-- **Exactly 1 small gap** → ONE question per turn (no upper limit; stop when confident, not at
-  a count). Hold the full list internally; ask the next only after the current is answered,
-  sequenced on prior answers — never ask what's already answered, implied, or contradicted.
-  Each question gives a **recommended** option + one-line why. Ask only what's unanswerable
-  from Tier 1/2 context.
+- **Exactly 1 small gap** → targeted questions (no upper limit; stop when confident). Hold the
+  list internally; **pipeline independent questions (owner 2026-07-21):** batch answer-independent
+  questions into ONE card (≤4), serialize ONLY on a true dependency — then ask the next question
+  FIRST on receiving an answer, processing it after; never ask what's answered/implied/contradicted,
+  give a **recommended** option + one-line why, ask only what's unanswerable from Tier 1/2 context.
 - **≥2 material unknowns, OR a fork expensive to reverse with no best-practice default**
   (confidence in WHAT to build < ~95%) → `/grill-me` (or `/grill-with-docs` for ADR-worthy
   calls); converge BEFORE strengthening — don't collapse 2+ forks into one question, don't guess.

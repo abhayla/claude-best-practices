@@ -57,7 +57,7 @@ explains each one in one line. Quick reference:
 | `improving.dont_rewrite_if_prompt_is_already` = `excellent` \| `good_or_better` \| `never` | Leave an already-good prompt alone |
 | `improving.always_add_a_role` | Always add an "Act as …" role, regardless of score |
 | `scoring_criteria[]` (weights sum to 1.0) | The rubric used to score a prompt |
-| `ask_clarifying_questions.{enabled, method, ask_until_confidence, max_questions}` | Ask via **grill-me** (one question at a time) when the request is ambiguous |
+| `ask_clarifying_questions.{enabled, method, ask_until_confidence, max_questions}` | Ask via **grill-me** (independent questions batched; dependent ones one at a time) when the request is ambiguous |
 | `make_sure_steps_were_shown` = `strict` \| `relaxed` \| `off`, `keep_a_quiet_log` | The improver's own self-check that it showed its work |
 | `background_research` = `light` \| `normal` \| `deep` | How much project context to read first |
 

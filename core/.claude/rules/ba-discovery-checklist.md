@@ -19,8 +19,8 @@ This is the operational SSOT for BA completeness. It composes with `engineering-
 ## Step 0 — understand the PROBLEM before recommending a SOLUTION
 
 Do NOT ask the user the form factor / technology cold — that is a SOLUTION decision the architect
-RECOMMENDS, not an opening question. FIRST gather the requirements, one question at a time
-(`engineering-roles.md` engagement style):
+RECOMMENDS, not an opening question. FIRST gather the requirements — independent questions
+batched into one card, dependent ones one at a time (`engineering-roles.md` engagement style):
 
 - **What** they want to build + its **purpose/goal** (the problem it solves).
 - **Who** the target users are and roughly **how many**.

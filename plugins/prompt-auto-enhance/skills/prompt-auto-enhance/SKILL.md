@@ -730,13 +730,17 @@ deterministically by the hook). For every prompt that reaches this skill,
 evaluate whether ambiguity remains after strengthening. If yes, ask
 clarifying questions.
 
-**Question budget:** no upper limit. Ask one question at a time and keep
-asking until you have full confidence in the user's intent. Stop when
-confidence is reached, not when a question count is hit.
+**Question budget:** no upper limit. Keep asking until you have full
+confidence in the user's intent; stop when confidence is reached, not when a
+question count is hit. Pipeline independent questions (owner 2026-07-21):
+batch answer-independent questions into one card (≤4); serialize a question
+ONLY when its existence or wording depends on the pending answer.
 
 **How:**
-- One question per turn, with a count ("Question N of unbounded") and a
-  recommendation labeled clearly
+- Independent questions batched into one card; a dependent question gets its
+  own turn, asked FIRST on receiving the prior answer (process that answer
+  after asking, so the user is never waiting on processing), with a count
+  ("Question N of unbounded") and a recommendation labeled clearly
 - Read the codebase before asking — do not ask what you can answer yourself
 - Each question must be unanswerable from Tier 1/2 context
 - Present any plan section by section after questions resolve, not all at once
@@ -941,7 +945,7 @@ These are the load-bearing contracts. The rest of the skill is procedure.
 - Gather Tier 1 context before responding to any prompt — without it, responses risk duplicating existing patterns or contradicting CLAUDE.md
 - Show the grade card, step transcript, and final prompt every time strengthening activates — silent changes erode trust
 - Include the strengthening count in the `*Enhanced:*` indicator when fixes are applied
-- Run the Clarification Gate after strengthening when ambiguity remains — ask one question at a time, no upper limit
+- Run the Clarification Gate after strengthening when ambiguity remains — batch independent questions, serialize only dependent ones (ask-first-then-process), no upper limit
 - Read relevant code before asking a clarification question — asking answerable questions wastes the user's time
 - Apply the measurability test to every constraint added: "Can a reviewer objectively verify this was followed?"
 - Guardrail 2 (Intent Preservation) is a hard contract — a rewrite that changes the user's action verb, target, or output type is invalid
