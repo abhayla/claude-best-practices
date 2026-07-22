@@ -11,6 +11,16 @@ description: >
   any variant of it. The animation mechanics generalize: for a non-pipeline animated
   diagram, reuse the engine here with a different node/edge model. Not for static Mermaid
   (use a plain ```mermaid block) or charts of quantitative data (use the dataviz skill).
+type: workflow
+allowed-tools: "Skill Read Write Edit Bash Artifact"
+version: "1.0.0"
+triggers:
+  - modern data pipeline diagram
+  - data pipeline diagram
+  - data platform architecture diagram
+  - animated architecture diagram
+  - data flow wiring map
+  - lakehouse architecture picture
 ---
 
 # Modern data pipeline diagram
