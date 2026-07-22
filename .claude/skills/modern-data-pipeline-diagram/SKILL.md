@@ -46,7 +46,9 @@ Data lake → Batch processing → Data science | Business intelligence), column
 streaming lane (Data streams → Event queue → Lakehouse → Stream processing → Self-service |
 ML services); shared Data lake takes the seam column. The layout-reset control is named
 **Auto-arrange** — it snaps dragged cards back into this hierarchy. Collapse to 1 column
-(`grid-column:auto !important`) under 640px.
+(`grid-column:auto !important`) under 640px. **Uniform card size (owner rule 2026-07-22):**
+every card is single-column width — never span columns for visual filler; a span is allowed
+ONLY when a card's content genuinely needs the room.
 
 **Visual defaults (owner GLOBAL.md §3, applied 2026-07-22):** LIGHT theme — white/near-white
 ground, Inter-first font stack (system fallback; no webfont URL — CSP), and a colorful-but-SOFT
