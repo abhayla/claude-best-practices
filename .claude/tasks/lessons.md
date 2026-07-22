@@ -835,3 +835,35 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Interactive browser sessions can't be cheaply delegated:** an authenticated live dashboard is bound
   to the main loop; mechanical DOM-scrape ran on Opus (heavier than ideal) — for bulk capture, a fresh
   cheaper-driven session is the economical path.
+
+## 2026-07-22 — Consolidate into the owner's review surface; don't stream per-item approval asks
+**Surfaced during:** Wati-PIFS resume. The handoff said "walk through open items, ask one at a time",
+so I opened with an AskUserQuestion card (T1 sign-off + superlative fix). Owner stopped it: nothing is
+approved yet; ALL pending changes must first be consolidated into the review HTML (wati-chat-flow.html
+artifact — "it connects all the dots") + the SSOT doc; the owner reviews THERE, then gives ONE-PASS
+approval, and only then Meta submissions / dashboard edits proceed.
+**Rule:** when a project has a designated review artifact, the sequence is: make the artifact COMPLETE
+(every pending item, its live-vs-target state, and an explicit approval-gates list) → owner reviews →
+one-pass sign-off → execute. Per-item approval cards before the consolidated review are premature even
+when a prior handoff scripted them — the owner's current directive supersedes the script. Record the
+review-gate state in the SSOT + handoff so the next session doesn't re-ask either.
+
+## 2026-07-22 — Wati capture + live-state verification lessons
+- **Verify at the WIRING source, not the catalog.** The Wati "approved templates" list (84) is full of
+  dead/other-project templates; the ACTUAL wired set = Zoho `rule_template_map` (COQL) + Deluge
+  `fallbackTemplate` literals. Same for chatbots: the live keyword-action list (Automations→Keyword
+  Action) is authoritative, not the reply-material library (which holds unwired legacy flows too).
+- **Live state drifts from documented inventory.** The July-09 inventory said 9 keyword actions; live
+  (2026-07-22) is only 4 (all referral) — product keyword actions were removed. ALWAYS re-verify live
+  before designing off an old capture. (root cause: docs age; the dashboard is the truth.)
+- **Browser-capture technique for Wati (dashboard-only flows):** screenshots + read_page TIME OUT on
+  the team-inbox SPA (never reaches document_idle); `javascript_tool` works (runs without idle). The
+  safety filter BLOCKS output containing URL query strings / long alnum ids → strip them
+  (`.replace(/https?:\/\/\S+/g,'[LINK]').replace(/[A-Za-z0-9]{16,}/g,'[id]')`) before returning.
+  Open a flow by CLICKING its card from Reply Material→Chatbots (a fresh /flowbuilder?flowId= URL throws
+  "Something went wrong"); return to the list via the TOP-LEFT back-arrow beside the flow name. Extract
+  graph via `.react-flow__node` innerText + edge `aria-label`="Edge from X to Y". Two Chromes connected
+  (local HP + Windows-VPS) → `switch_browser` to the VPS one for Wati work.
+- **Interactive browser sessions can't be cheaply delegated:** an authenticated live dashboard is bound
+  to the main loop; mechanical DOM-scrape ran on Opus (heavier than ideal) — for bulk capture, a fresh
+  cheaper-driven session is the economical path.
