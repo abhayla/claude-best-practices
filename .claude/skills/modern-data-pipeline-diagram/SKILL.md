@@ -109,6 +109,13 @@ is untouched — and `wireAll()` re-run live during the drag so connectors stay 
 scale-invariant. Include the controls + `#viewport`/`#zoomable` wrappers in every diagram this skill
 produces unless the user asks for a static picture.
 
+**Identity travels with the card (owner rule 2026-07-22):** when cards are draggable, each card
+must carry its own context — stamp every `.node` at load with its tier's stage eyebrow
+(`STAGE 02 · INGEST`, stage-tinted, from the rail's `.n`/`.s`) and the rail caption as a dim
+italic footer (`.stagecap`), derived from the DOM (never hand-duplicated per card). A card dragged
+two rows away must still read as its stage. A moved card keeps `z-index` above static ones so it
+never gets buried under a later tier; reset-layout clears it.
+
 ## Reference
 - `references/wiring-engine.js` — the drop-in connector/packet engine (`wireAll()` + ambient field
   + the optional zoom/drag interaction layer).
