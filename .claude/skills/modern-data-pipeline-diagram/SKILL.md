@@ -99,7 +99,18 @@ static stroke, reveals shown immediately.
 5. Verify: resize to a phone width (arrows re-route, no sideways scroll), and confirm reduced-motion
    renders static-but-complete.
 
+## Interaction layer (default ON for this skill's output)
+The engine file also ships an optional zoom + drag module (activates only when its markup exists —
+see the comment block in `references/wiring-engine.js`): zoom 0.5×–2× via +/−/1:1 buttons and
+ctrl+wheel (viewport height is compensated so zoom never overlaps later sections), and pointer-drag
+on every `.node` (mouse + touch) with offsets stored in `left/top` — the float animation's transform
+is untouched — and `wireAll()` re-run live during the drag so connectors stay attached; a
+"Reset layout" button clears all offsets. Zoom needs no engine change: the wires' viewBox math is
+scale-invariant. Include the controls + `#viewport`/`#zoomable` wrappers in every diagram this skill
+produces unless the user asks for a static picture.
+
 ## Reference
-- `references/wiring-engine.js` — the drop-in connector/packet engine (`wireAll()` + ambient field).
+- `references/wiring-engine.js` — the drop-in connector/packet engine (`wireAll()` + ambient field
+  + the optional zoom/drag interaction layer).
 - Worked example: the PIFS WhatsApp "living estate" map (artifact 2dc71e77) — 6 wired panels,
   flowing packets, breathing nodes, committed dark console world.

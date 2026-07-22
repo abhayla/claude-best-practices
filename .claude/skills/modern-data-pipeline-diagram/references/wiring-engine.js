@@ -88,3 +88,71 @@
     var rt; window.addEventListener("resize",function(){ clearTimeout(rt); rt=setTimeout(boot,150); });
   }
 })();
+
+/* Optional interaction layer — zoom (buttons + ctrl+wheel) and draggable nodes with live rewiring.
+ * Activates only when the markup exists:
+ *   <div class="controls"><button id="zout">&minus;</button><span id="zlab">100%</span>
+ *     <button id="zin">+</button><button id="zreset">1:1</button><button id="lreset">Reset layout</button></div>
+ *   <div class="viewport" id="viewport"><div id="zoomable"> ...stages... </div></div>
+ * CSS: #zoomable{transform-origin:0 0}  .viewport{overflow:auto}  .node{touch-action:none;cursor:grab}
+ *      .node.dragging{animation:none;cursor:grabbing;z-index:6;transition:none}
+ * Drag offsets go to left/top (position:relative nodes) so the float animation's transform is untouched. */
+(function(){
+  var Z=1, ZMIN=.5, ZMAX=2;
+  var zoomable=document.getElementById("zoomable"), vp=document.getElementById("viewport"),
+      zlab=document.getElementById("zlab");
+  if(!zoomable||!vp) return;
+
+  var lastWire=0;
+  function wireNow(){ var n=Date.now(); if(n-lastWire>16){ lastWire=n; window.wireAll&&window.wireAll(); } }
+
+  function applyZoom(nz){
+    Z=Math.min(ZMAX,Math.max(ZMIN,Math.round(nz*100)/100));
+    zoomable.style.transform= Z===1 ? "" : "scale("+Z+")";
+    /* transform doesn't change layout height — size the viewport so sections below never overlap */
+    vp.style.height= Z===1 ? "" : (zoomable.offsetHeight*Z)+"px";
+    if(zlab) zlab.textContent=Math.round(Z*100)+"%";
+    window.wireAll&&window.wireAll();
+  }
+  document.getElementById("zin").addEventListener("click",function(){applyZoom(Z+.15)});
+  document.getElementById("zout").addEventListener("click",function(){applyZoom(Z-.15)});
+  document.getElementById("zreset").addEventListener("click",function(){applyZoom(1)});
+  vp.addEventListener("wheel",function(e){
+    if(!e.ctrlKey) return; e.preventDefault();
+    applyZoom(Z + (e.deltaY<0 ? .1 : -.1));
+  },{passive:false});
+
+  var drag=null;
+  document.querySelectorAll(".node").forEach(function(node){
+    node.addEventListener("pointerdown",function(e){
+      if(e.button!==undefined && e.button!==0) return;
+      drag={node:node, sx:e.clientX, sy:e.clientY,
+            ox:parseFloat(node.dataset.ox||0), oy:parseFloat(node.dataset.oy||0)};
+      node.classList.add("dragging");
+      try{ node.setPointerCapture&&node.setPointerCapture(e.pointerId); }catch(_){/* synthetic events have no active pointer */}
+      e.preventDefault();
+    });
+    node.addEventListener("pointermove",function(e){
+      if(!drag||drag.node!==node) return;
+      var nx=drag.ox+(e.clientX-drag.sx)/Z, ny=drag.oy+(e.clientY-drag.sy)/Z;
+      node.dataset.ox=nx; node.dataset.oy=ny;
+      node.style.left=nx+"px"; node.style.top=ny+"px";
+      wireNow();
+    });
+    function end(){
+      if(!drag||drag.node!==node) return;
+      node.classList.remove("dragging"); drag=null;
+      window.wireAll&&window.wireAll();
+    }
+    node.addEventListener("pointerup",end);
+    node.addEventListener("pointercancel",end);
+  });
+
+  var lreset=document.getElementById("lreset");
+  if(lreset) lreset.addEventListener("click",function(){
+    document.querySelectorAll(".node").forEach(function(n){
+      n.style.left=""; n.style.top=""; delete n.dataset.ox; delete n.dataset.oy;
+    });
+    window.wireAll&&window.wireAll();
+  });
+})();
