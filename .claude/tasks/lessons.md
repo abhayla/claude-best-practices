@@ -811,3 +811,23 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Mistake:** owner asked for stage identity ON each draggable card; I stamped the cards but left the left stage rail in place — the owner had to point out the now-redundant rail ("you did not remove the stages from left").
 - **Root cause:** treated the request as pure addition; didn't re-check what the addition made redundant. Moving/copying information has a second half: retire the original display (or flag why it should stay).
 - **Rule:** whenever a change duplicates information into a new home, sweep for the old home in the same pass — remove it or explicitly flag why both should remain. "Does this addition make something else redundant?" is part of the change, not a follow-up.
+
+## 2026-07-22 — Wati capture + live-state verification lessons
+- **Verify at the WIRING source, not the catalog.** The Wati "approved templates" list (84) is full of
+  dead/other-project templates; the ACTUAL wired set = Zoho `rule_template_map` (COQL) + Deluge
+  `fallbackTemplate` literals. Same for chatbots: the live keyword-action list (Automations→Keyword
+  Action) is authoritative, not the reply-material library (which holds unwired legacy flows too).
+- **Live state drifts from documented inventory.** The July-09 inventory said 9 keyword actions; live
+  (2026-07-22) is only 4 (all referral) — product keyword actions were removed. ALWAYS re-verify live
+  before designing off an old capture. (root cause: docs age; the dashboard is the truth.)
+- **Browser-capture technique for Wati (dashboard-only flows):** screenshots + read_page TIME OUT on
+  the team-inbox SPA (never reaches document_idle); `javascript_tool` works (runs without idle). The
+  safety filter BLOCKS output containing URL query strings / long alnum ids → strip them
+  (`.replace(/https?:\/\/\S+/g,'[LINK]').replace(/[A-Za-z0-9]{16,}/g,'[id]')`) before returning.
+  Open a flow by CLICKING its card from Reply Material→Chatbots (a fresh /flowbuilder?flowId= URL throws
+  "Something went wrong"); return to the list via the TOP-LEFT back-arrow beside the flow name. Extract
+  graph via `.react-flow__node` innerText + edge `aria-label`="Edge from X to Y". Two Chromes connected
+  (local HP + Windows-VPS) → `switch_browser` to the VPS one for Wati work.
+- **Interactive browser sessions can't be cheaply delegated:** an authenticated live dashboard is bound
+  to the main loop; mechanical DOM-scrape ran on Opus (heavier than ideal) — for bulk capture, a fresh
+  cheaper-driven session is the economical path.
