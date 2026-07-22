@@ -32,11 +32,21 @@ that skill owns the *visual identity*.
 ## The canonical subject — the modern data pipeline (default node/edge model)
 
 Five stages (ByteByteGo model, captured 2026-07-22: "A Modern Data Pipeline: From Raw Data
-to Business Value"), rendered as five full-width vertical tiers — NO side stage rail: each
-tier carries `data-n`/`data-s`/`data-c` attributes and every card is stamped with its stage
-identity from them (owner correction 2026-07-22: a rail duplicates what the cards already
-say). Two edge semantics: `live` = batch path (cool/teal), `build` = streaming path (warm) —
-reusing the engine's two packet-colored kinds.
+to Business Value"), rendered as five full-width vertical tiers — NO side stage rail and NO
+tier-divider lines: each tier carries `data-n`/`data-s`/`data-c` attributes and every card is
+stamped with its stage identity from them (owner corrections 2026-07-22: rails/dividers
+duplicate what the cards already say). Two edge semantics: `live` = batch path (cool/teal),
+`build` = streaming path (warm) — reusing the engine's two packet-colored kinds.
+
+**Hierarchical lane layout (owner rule 2026-07-22):** the default arrangement is strictly
+topological — every consumer card sits BELOW its producer. All tier grids share one uniform
+4-column grid (`repeat(4,1fr)` + `grid-auto-flow:row dense`; explicit `grid-column` per card):
+columns 1–2 are the batch lane (Data stores | Applications → Data load → Data warehouse |
+Data lake → Batch processing → Data science | Business intelligence), columns 3–4 the
+streaming lane (Data streams → Event queue → Lakehouse → Stream processing → Self-service |
+ML services); shared Data lake takes the seam column. The layout-reset control is named
+**Auto-arrange** — it snaps dragged cards back into this hierarchy. Collapse to 1 column
+(`grid-column:auto !important`) under 640px.
 
 **Visual defaults (owner GLOBAL.md §3, applied 2026-07-22):** LIGHT theme — white/near-white
 ground, Inter-first font stack (system fallback; no webfont URL — CSP), and a colorful-but-SOFT
