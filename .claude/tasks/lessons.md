@@ -797,6 +797,10 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Root cause:** mis-applied decide-don't-ask (which is for reversible EXECUTION details) to a MATERIAL outcome-changing unknown (which source = totally different result). Also failed determine-don't-ask: IPODhan's authoritative data is its own DB, not its public site — determinable, shouldn't have assumed the worst source.
 - **Rule:** non-trivial task → resolve material unknowns BEFORE dispatch. "run it" means proceed, not skip questions. First DETERMINE (scout the app's data layer / authoritative source); only genuinely-unscoutable material unknowns get asked, in the upfront batch. Hardened get-work-done SKILL.md STEP 4 (NON-SKIPPABLE).
 
+## 2026-07-18 — VPS worker dispatch: PowerShell has no `<` stdin redirect
+- **Mistake:** dispatched a fleet worker on the Windows VPS via `ssh powershell "claude -p ... < prompt.txt"` — PowerShell does NOT support `<` input redirection (reserved operator), so the worker got no prompt and exited 1 with empty output. (Local git-bash workers use `< file` fine — that's why T-001/002 worked; they ran locally, not via PowerShell.)
+- **Rule:** on the Windows VPS (PowerShell), feed the worker prompt with `Get-Content <file> -Raw | claude -p ...`. On Linux/Hostinger (bash), `< file` is fine. Encode per-pool in the dispatch helper.
+
 ## 2026-07-18 — Audit-task process gaps (T-014 self-review) + checker's proven value
 - **Gaps found reviewing a GOOD output:** (1) the checker did not auto-run — maker≠checker was skipped until I launched it manually; (2) the worker ran in the HUB dir and inherited hub governance (emitted the enhance ceremony in its report); (3) no raw evidence (DB rows, API JSON) was saved, only the prose report.
 - **Checker's value, demonstrated:** on T-014 the independent checker CONFIRMED a real finding (duplicate Caliber IPO row, 450cr vs 332cr) AND REFUTED a false one (worker said "price band empty = missing core data"; checker found the data present in `price_range_min/max`, a differently-named column). Without the checker I'd have reported a non-bug to the owner.
