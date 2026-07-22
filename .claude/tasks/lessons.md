@@ -843,3 +843,21 @@ approval, and only then Meta submissions / dashboard edits proceed.
 one-pass sign-off → execute. Per-item approval cards before the consolidated review are premature even
 when a prior handoff scripted them — the owner's current directive supersedes the script. Record the
 review-gate state in the SSOT + handoff so the next session doesn't re-ask either.
+
+## 2026-07-22 — Model-routing miss: Fable executed cheap mechanical work inline (owner correction)
+**Surfaced during:** the Wati-PIFS session. Fable 5 (the session driver) spent hours of tokens on
+work sonnet/opus handles fine — browser click-loops in the Wati dashboard, doc scp/appends, API
+sends, HTML edits. Owner: "Fable 5 is too costly for this; cheapest sufficient model; fix the root
+cause." The model-routing rule ALREADY mandates this (session-level routing: Fable's standing duty
+is to make the routing call AT TASK INTAKE and hand off) — the failure was not a missing rule but
+skipping the intake routing decision on a resumed/remote-control session.
+**Root cause:** /remote-control resume prompts feel like "continue where you left off", so the
+intake routing checkpoint (is this session's work Fable-only?) never ran.
+**Rule (apply, don't re-learn):** EVERY session start/resume — including /remote-control and
+continuation sessions — begins with the explicit routing call: if the work is execution against a
+written plan/known procedures (dashboard edits, copy application, doc sync, API probes), either
+recommend the owner relaunch with an Opus driver or drive dispatch-first (sonnet/opus workers do
+the work; Fable only orchestrates + verifies). Fable executing inline is the EXCEPTION and needs a
+one-line justification in the turn. Fixed mid-session here: the review-surface audit ran on a
+sonnet worker (16 fixes, ~225k tokens at sonnet rates); recorded in the Wati handoff that future
+Wati sessions use a cheaper driver.
