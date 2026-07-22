@@ -117,7 +117,9 @@ on every `.node` (mouse + touch) with offsets stored in `left/top` — the float
 is untouched — and `wireAll()` re-run live during the drag so connectors stay attached; a
 "Reset layout" button clears all offsets. Zoom needs no engine change: the wires' viewBox math is
 scale-invariant. Include the controls + `#viewport`/`#zoomable` wrappers in every diagram this skill
-produces unless the user asks for a static picture.
+produces unless the user asks for a static picture. The `.viewport` hides its scrollbar chrome
+(`scrollbar-width:none` + `::-webkit-scrollbar{display:none}`) while staying scrollable — drag/zoom
+overflow must never pop a visible scrollbar or shift layout (owner rule 2026-07-22).
 
 **Identity travels with the card (owner rule 2026-07-22):** when cards are draggable, each card
 must carry its own context — stamp every `.node` at load with its tier's stage eyebrow
