@@ -831,3 +831,15 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Interactive browser sessions can't be cheaply delegated:** an authenticated live dashboard is bound
   to the main loop; mechanical DOM-scrape ran on Opus (heavier than ideal) — for bulk capture, a fresh
   cheaper-driven session is the economical path.
+
+## 2026-07-22 — Consolidate into the owner's review surface; don't stream per-item approval asks
+**Surfaced during:** Wati-PIFS resume. The handoff said "walk through open items, ask one at a time",
+so I opened with an AskUserQuestion card (T1 sign-off + superlative fix). Owner stopped it: nothing is
+approved yet; ALL pending changes must first be consolidated into the review HTML (wati-chat-flow.html
+artifact — "it connects all the dots") + the SSOT doc; the owner reviews THERE, then gives ONE-PASS
+approval, and only then Meta submissions / dashboard edits proceed.
+**Rule:** when a project has a designated review artifact, the sequence is: make the artifact COMPLETE
+(every pending item, its live-vs-target state, and an explicit approval-gates list) → owner reviews →
+one-pass sign-off → execute. Per-item approval cards before the consolidated review are premature even
+when a prior handoff scripted them — the owner's current directive supersedes the script. Record the
+review-gate state in the SSOT + handoff so the next session doesn't re-ask either.
