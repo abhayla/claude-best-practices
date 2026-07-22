@@ -32,9 +32,19 @@ that skill owns the *visual identity*.
 ## The canonical subject — the modern data pipeline (default node/edge model)
 
 Five stages (ByteByteGo model, captured 2026-07-22: "A Modern Data Pipeline: From Raw Data
-to Business Value"), rendered as five vertical tiers with a stage rail. Two edge semantics:
-`live` = batch path (cool/teal), `build` = streaming path (warm) — reusing the engine's two
-packet-colored kinds.
+to Business Value"), rendered as five full-width vertical tiers — NO side stage rail: each
+tier carries `data-n`/`data-s`/`data-c` attributes and every card is stamped with its stage
+identity from them (owner correction 2026-07-22: a rail duplicates what the cards already
+say). Two edge semantics: `live` = batch path (cool/teal), `build` = streaming path (warm) —
+reusing the engine's two packet-colored kinds.
+
+**Visual defaults (owner GLOBAL.md §3, applied 2026-07-22):** LIGHT theme — white/near-white
+ground, Inter-first font stack (system fallback; no webfont URL — CSP), and a colorful-but-SOFT
+per-stage palette: each tier sets `--sc` (stage color) and every card derives its pastel
+gradient fill, border, 3px top edge, title tint, chip, and hover glow from it via `color-mix`
+(c1 blue #4A90D9 · c2 coral #E0685A · c3 violet #8B72E0 · c4 green #3FA46F · c5 gold #C9962E
+on white). The earlier dark "operations console" world remains a legitimate deliberate
+alternative when the owner asks for it.
 
 | Stage | Nodes | Edges out |
 |---|---|---|
