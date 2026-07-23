@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-21 17:29 UTC (auto-generated)
+> Last updated: 2026-07-23 15:03 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -134,7 +134,7 @@
 | merge-strategy | skill | 1.0.0 | hub:abhayla/claude-best-practices | branching |
 | mock-data-hunter | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | monorepo | skill | 1.0.0 | hub:abhayla/claude-best-practices | — |
-| no-overask-guard | hook | 1.2.2 | project:firekaro-planner | — |
+| no-overask-guard | hook | 1.2.3 | project:firekaro-planner | — |
 | notifier-integration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | orchestrator-responsibility-allowlist | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | output-plausibility-verification | rule | 1.0.1 | project:firekaro-planner | — |
