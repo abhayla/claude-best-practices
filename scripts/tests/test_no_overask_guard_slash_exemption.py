@@ -139,6 +139,40 @@ def test_stop_feedback_retry_after_human_prompt_still_blocked(tmp_repo):
     assert '"decision":"block"' in out
 
 
+# Narrate-and-stop substring false positive (live incident 2026-07-23, session 7dab66ac):
+# `one (narrow|thin)` matched the ordinary phrase "one thing" as the substring "one thin",
+# blocking a turn that legitimately ended at a user-gated blocker. Fixed with a boundary
+# (`([^a-z]|$)`) plus new blocker-exemption tokens ("gated on your", "yours to do").
+GRADEA_LINE = "*Enhanced: checked against the change — Grade A, no strengthening needed*\n"
+
+
+def test_one_thing_phrase_is_not_narrate_and_stop(tmp_repo):
+    """'one thing' must not match the 'one (narrow|thin)' narrate pattern as a substring."""
+    text = GRADEA_LINE + SUBSTANTIVE + (
+        " That flag check is the one thing the second reviewer looked at, and it holds."
+    )
+    out = _run_guard(tmp_repo, [_user(HUMAN_PROMPT), _assistant(text)])
+    assert '"decision":"block"' not in out, f"'one thing' false-blocked: {out}"
+
+
+def test_true_narrate_and_stop_still_blocked(tmp_repo):
+    """Control: genuine deferred-next-step language must still be blocked."""
+    text = GRADEA_LINE + SUBSTANTIVE + (
+        " From here: one thin layer remains and next I'll wire the sender."
+    )
+    out = _run_guard(tmp_repo, [_user(HUMAN_PROMPT), _assistant(text)])
+    assert '"decision":"block"' in out and "narrate-and-stop" in out
+
+
+def test_user_gated_closing_is_exempt(tmp_repo):
+    """A turn ending at an explicitly user-gated remainder is a legitimate stop."""
+    text = GRADEA_LINE + SUBSTANTIVE + (
+        " The remaining item stays yours to do later — it is gated on your dashboard approval."
+    )
+    out = _run_guard(tmp_repo, [_user(HUMAN_PROMPT), _assistant(text)])
+    assert '"decision":"block"' not in out, f"user-gated stop false-blocked: {out}"
+
+
 @pytest.mark.parametrize(
     "first_line",
     [

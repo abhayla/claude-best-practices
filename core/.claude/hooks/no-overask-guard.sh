@@ -242,7 +242,7 @@ fi
 # when already in sync — those carry no marker and still match the over-ask patterns below.)
 # Honest use is governed by decision-authority.md "Confidence gate"; abuse is visible (the
 # banner renders to the user).
-if printf '%s' "$full" | grep -qE "push to prod|deploy|dns|cutover|force[- ]push|--force|spend|publish|destructive|drop (table|column)|delete (the )?(branch|remote)|escalat|blocked on|need (your|you to)|your (credential|password|approval|login|call)|waiting on (you|the user)|log in yourself|run .* yourself|requires? your|sync-check"; then
+if printf '%s' "$full" | grep -qE "push to prod|deploy|dns|cutover|force[- ]push|--force|spend|publish|destructive|drop (table|column)|delete (the )?(branch|remote)|escalat|blocked on|gated on (you|your)|yours to (do|run|paste)|need (your|you to)|your (credential|password|approval|login|call)|waiting on (you|the user)|log in yourself|run .* yourself|requires? your|sync-check"; then
   exit 0
 fi
 
@@ -278,7 +278,7 @@ ends_q=$(printf '%s' "$tail_part" | grep -qE '\?[[:space:]]*$' && echo 1 || echo
 [ -z "$flag" ] && [ "$ends_q" = "1" ] && printf '%s' "$full" | grep -qE "recommend" && flag="over-ask: recommendation+question"
 
 # ── B. Narrate-and-stop detection (deferred next-step language) ──
-[ -z "$flag" ] && printf '%s' "$tail_part" | grep -qE "next step|next, i|next i('|’)?ll|the continuation|continuation from here|from here[.:]|immediate next|next up|i('|’)?ll (work|tackle|start|do|continue|extend|implement|build|close|fix|add|wire|drive|cover)|remaining[^.]{0,40}(tracked|stays|remain|in #)|the rest[^.]{0,40}(tracked|stays|remain|in #)|that('|’)?s the continuation|is the continuation|work #[0-9]|items? (left|remain)|the only[^.]{0,40}(left|remain|item)|remainder|narrow (remainder|bit|layer|follow|scope|item)|separate[, ]{0,3}(thin )?scope|thin scope|follow-?up|noted in #[0-9]|tracked in #[0-9]|are (genuinely )?separate|stays? (a |as )?follow|two items|one (narrow|thin)" && flag="narrate-and-stop"
+[ -z "$flag" ] && printf '%s' "$tail_part" | grep -qE "next step|next, i|next i('|’)?ll|the continuation|continuation from here|from here[.:]|immediate next|next up|i('|’)?ll (work|tackle|start|do|continue|extend|implement|build|close|fix|add|wire|drive|cover)|remaining[^.]{0,40}(tracked|stays|remain|in #)|the rest[^.]{0,40}(tracked|stays|remain|in #)|that('|’)?s the continuation|is the continuation|work #[0-9]|items? (left|remain)|the only[^.]{0,40}(left|remain|item)|remainder|narrow (remainder|bit|layer|follow|scope|item)|separate[, ]{0,3}(thin )?scope|thin scope|follow-?up|noted in #[0-9]|tracked in #[0-9]|are (genuinely )?separate|stays? (a |as )?follow|two items|one (narrow|thin)([^a-z]|$)" && flag="narrate-and-stop"
 
 [ -z "$flag" ] && exit 0
 

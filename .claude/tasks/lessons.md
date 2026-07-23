@@ -861,3 +861,14 @@ the work; Fable only orchestrates + verifies). Fable executing inline is the EXC
 one-line justification in the turn. Fixed mid-session here: the review-surface audit ran on a
 sonnet worker (16 fixes, ~225k tokens at sonnet rates); recorded in the Wati handoff that future
 Wati sessions use a cheaper driver.
+
+## 2026-07-23 — Stop-guard regex substring false positive ("one thing" matched as "one thin")
+- Mistake: `no-overask-guard.sh` narrate-and-stop token `one (narrow|thin)` matched the ordinary
+  phrase "one thing" as a substring, STOP-blocking a legitimate turn that ended at a user-gated
+  blocker ("…the one thing gated on your expose step"). Second same-day block: a turn ending
+  "yours to do later" matched `follow-?up` with no exemption token covering user-gate phrasing.
+- Root cause: unboundaried word-final alternation in a `grep -E` token list + the genuine-blocker
+  exemption list missing common user-gate phrasings ("gated on your", "yours to do").
+- Rule: word-final tokens in guard regexes need a boundary (`([^a-z]|$)` — portable, no `\b`);
+  test new narrate tokens against ordinary prose ("one thing", "following") before shipping;
+  regression tests pinned in `scripts/tests/test_no_overask_guard_slash_exemption.py`.
