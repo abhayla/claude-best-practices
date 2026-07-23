@@ -797,6 +797,10 @@ effect at the consumer (§13 of the manual — the incident that section was wri
 - **Root cause:** mis-applied decide-don't-ask (which is for reversible EXECUTION details) to a MATERIAL outcome-changing unknown (which source = totally different result). Also failed determine-don't-ask: IPODhan's authoritative data is its own DB, not its public site — determinable, shouldn't have assumed the worst source.
 - **Rule:** non-trivial task → resolve material unknowns BEFORE dispatch. "run it" means proceed, not skip questions. First DETERMINE (scout the app's data layer / authoritative source); only genuinely-unscoutable material unknowns get asked, in the upfront batch. Hardened get-work-done SKILL.md STEP 4 (NON-SKIPPABLE).
 
+## 2026-07-18 — VPS worker dispatch: PowerShell has no `<` stdin redirect
+- **Mistake:** dispatched a fleet worker on the Windows VPS via `ssh powershell "claude -p ... < prompt.txt"` — PowerShell does NOT support `<` input redirection (reserved operator), so the worker got no prompt and exited 1 with empty output. (Local git-bash workers use `< file` fine — that's why T-001/002 worked; they ran locally, not via PowerShell.)
+- **Rule:** on the Windows VPS (PowerShell), feed the worker prompt with `Get-Content <file> -Raw | claude -p ...`. On Linux/Hostinger (bash), `< file` is fine. Encode per-pool in the dispatch helper.
+
 ## 2026-07-18 — Audit-task process gaps (T-014 self-review) + checker's proven value
 - **Gaps found reviewing a GOOD output:** (1) the checker did not auto-run — maker≠checker was skipped until I launched it manually; (2) the worker ran in the HUB dir and inherited hub governance (emitted the enhance ceremony in its report); (3) no raw evidence (DB rows, API JSON) was saved, only the prose report.
 - **Checker's value, demonstrated:** on T-014 the independent checker CONFIRMED a real finding (duplicate Caliber IPO row, 450cr vs 332cr) AND REFUTED a false one (worker said "price band empty = missing core data"; checker found the data present in `price_range_min/max`, a differently-named column). Without the checker I'd have reported a non-bug to the owner.
@@ -861,6 +865,26 @@ the work; Fable only orchestrates + verifies). Fable executing inline is the EXC
 one-line justification in the turn. Fixed mid-session here: the review-surface audit ran on a
 sonnet worker (16 fixes, ~225k tokens at sonnet rates); recorded in the Wati handoff that future
 Wati sessions use a cheaper driver.
+
+## 2026-07-22 — Wati capture + live-state verification lessons
+- **Verify at the WIRING source, not the catalog.** The Wati "approved templates" list (84) is full of
+  dead/other-project templates; the ACTUAL wired set = Zoho `rule_template_map` (COQL) + Deluge
+  `fallbackTemplate` literals. Same for chatbots: the live keyword-action list (Automations→Keyword
+  Action) is authoritative, not the reply-material library (which holds unwired legacy flows too).
+- **Live state drifts from documented inventory.** The July-09 inventory said 9 keyword actions; live
+  (2026-07-22) is only 4 (all referral) — product keyword actions were removed. ALWAYS re-verify live
+  before designing off an old capture. (root cause: docs age; the dashboard is the truth.)
+- **Browser-capture technique for Wati (dashboard-only flows):** screenshots + read_page TIME OUT on
+  the team-inbox SPA (never reaches document_idle); `javascript_tool` works (runs without idle). The
+  safety filter BLOCKS output containing URL query strings / long alnum ids → strip them
+  (`.replace(/https?:\/\/\S+/g,'[LINK]').replace(/[A-Za-z0-9]{16,}/g,'[id]')`) before returning.
+  Open a flow by CLICKING its card from Reply Material→Chatbots (a fresh /flowbuilder?flowId= URL throws
+  "Something went wrong"); return to the list via the TOP-LEFT back-arrow beside the flow name. Extract
+  graph via `.react-flow__node` innerText + edge `aria-label`="Edge from X to Y". Two Chromes connected
+  (local HP + Windows-VPS) → `switch_browser` to the VPS one for Wati work.
+- **Interactive browser sessions can't be cheaply delegated:** an authenticated live dashboard is bound
+  to the main loop; mechanical DOM-scrape ran on Opus (heavier than ideal) — for bulk capture, a fresh
+  cheaper-driven session is the economical path.
 
 ## 2026-07-23 — Stop-guard regex substring false positive ("one thing" matched as "one thin")
 - Mistake: `no-overask-guard.sh` narrate-and-stop token `one (narrow|thin)` matched the ordinary
