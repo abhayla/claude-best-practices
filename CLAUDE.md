@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- Audit trail (full-audit dates; scoped addenda in git history): 2026-06-19 full audit; 2026-06-20 trust-score addendum (PR #163); 2026-06-22 G6 refresh (PR #195); 2026-06-29 branch-choice addendum (PRs #217/#218/#227); 2026-07-14 /init audit (CI gates, config list, rule list — PR #396); 2026-07-14 owner-approved compression of the G6 + hooks narratives (history detail → changelog/graduation docs). How to audit this file: see "Maintaining This File" at the bottom. NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
+<!-- Audit trail (full-audit dates; scoped addenda in git history): 2026-06-19 full audit; 2026-06-20 trust-score addendum (PR #163); 2026-06-22 G6 refresh (PR #195); 2026-06-29 branch-choice addendum (PRs #217/#218/#227); 2026-07-14 /init audit (CI gates, config list, rule list — PR #396); 2026-07-14 owner-approved compression of the G6 + hooks narratives (history detail → changelog/graduation docs); 2026-07-24 /init audit (added missing global rule verify-before-suggest-do-before-delegate.md to rule list; plugins/config/CI/workflow-map/skills all verified in sync). How to audit this file: see "Maintaining This File" at the bottom. NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
 
 ## Critical: Two `.claude/` Directories
 
@@ -262,6 +262,7 @@ Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load alwa
 - `.claude/rules/context-management.md` — progressive disclosure, scratchpad usage, subagent delegation, compaction survival
 - `.claude/rules/model-routing.md` — cheapest sufficient model per dispatch (haiku/sonnet/opus tiers, inherit Fable only for frontier judgment), preemptive security-category routing to opus, refusal→fallback playbook, per-pass effort dial, session-level routing
 - `.claude/rules/prompt-auto-enhance.md` — Tier 1/2 context gathering, grade pipeline, clarification gate, resource CRUD detection
+- `.claude/rules/verify-before-suggest-do-before-delegate.md` — live-verify actionable recommendations before presenting (evidence: source+date+version); agent is default executor, human steps carry a named blocker
 
 (`notifier-integration.md` is a distributable rule living only in `core/.claude/rules/` — it is not hub-auto-loaded; the Notifier gateway itself is documented in the user-global CLAUDE.md / `GLOBAL.md` §2.)
 - `.claude/rules/workflow.md` — 7-step development workflow (understand → test → implement → fix-loop → verify → commit)
