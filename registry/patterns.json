@@ -112,9 +112,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "adr": {
@@ -137,10 +137,10 @@
     "changelog": "v1.0.0: Initial release â€” Michael Nygard template, lifecycle management, index generation | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "adversarial-review": {
@@ -162,8 +162,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "agent-evaluator": {
@@ -213,8 +213,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "ai-gemini-api": {
@@ -234,10 +234,10 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "android": {
@@ -256,9 +256,9 @@
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "android-adb-test": {
@@ -310,10 +310,10 @@
     "changelog": "v2.0.0: Merged with claude-android-ninja references and templates",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "android-build-fixer-agent": {
@@ -405,10 +405,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "android-kotlin": {
@@ -433,9 +433,9 @@
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "android-kotlin-reviewer-agent": {
@@ -488,10 +488,10 @@
     "changelog": "v1.0.0: Initial â€” consolidated from ChrisWW + TaeseongYun repos",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "android-run-e2e": {
@@ -598,8 +598,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "anthropic-multi-agent-research-system-skill": {
@@ -681,10 +681,10 @@
     "changelog": "v1.0.0: Initial release â€” multi-framework OpenAPI generation, validation, CI integration | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "architecture-fitness": {
@@ -709,8 +709,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "auto-format": {
@@ -749,10 +749,10 @@
     "changelog": "v4.5.0: STEP 2.5.2b substance check - demo/seeded/fabricated data rendering cleanly is an override, not a pass (fable-harvest B, class B) | v5.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "batch": {
@@ -774,8 +774,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "brainstorm": {
@@ -795,10 +795,10 @@
     "changelog": "v1.0.0: Initial registration; added --team advisor-panel mode note (Stage D: read-only multi-lens debate; self-gated)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "branching": {
@@ -820,8 +820,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "bun-elysia": {
@@ -896,8 +896,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "changelog-contributing": {
@@ -922,8 +922,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "chaos-resilience": {
@@ -947,9 +947,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "ci-cd-setup": {
@@ -972,8 +972,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "claude-behavior": {
@@ -993,8 +993,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "claude-guardian": {
@@ -1014,10 +1014,10 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "code-quality-gate": {
@@ -1043,8 +1043,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "code-readability": {
@@ -1119,10 +1119,10 @@
     "changelog": "v2.0.0: Genericized and restructured; v2.1.1: added a NON-NEGOTIABLE section (review-only, no destructive re-runs, file:line verdicts, stay flat) closing an eval nit | v2.2.0: Evidence-Derived Review section citing references/evidence-review-rubrics.md (Fable-harvest Session C rubric-mining)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "compose-ui": {
@@ -1143,10 +1143,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "configuration-ssot": {
@@ -1172,8 +1172,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "context-management": {
@@ -1193,8 +1193,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "context-reducer-agent": {
@@ -1282,10 +1282,10 @@
     "changelog": "v1.1.0: Add triggers, preamble, strengthen RULES to CRITICAL RULES, differentiate from /start-session and /handover | v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "contract-test": {
@@ -1309,10 +1309,10 @@
     "changelog": "v1.0.0: Initial release â€” Pact consumer/provider, broker, CI integration | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 0.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "contribute-practice": {
@@ -1359,8 +1359,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "create-github-issue": {
@@ -1406,10 +1406,10 @@
     "changelog": "v1.0.0: Initial registration",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "d3-viz": {
@@ -1475,9 +1475,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "db-migrate": {
@@ -1506,8 +1506,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "db-migrate-verify": {
@@ -1529,8 +1529,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "debugger-agent": {
@@ -1550,8 +1550,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "debugging-loop": {
@@ -1614,8 +1614,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "design-principles": {
@@ -1726,8 +1726,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "disaster-recovery": {
@@ -1756,9 +1756,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "doc-staleness": {
@@ -1781,10 +1781,10 @@
     "changelog": "v1.0.0: Initial release â€” file/symbol/command/link staleness detection, severity-prioritized report | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "doc-structure-enforcer": {
@@ -1808,10 +1808,10 @@
     "changelog": "v1.0.0: Initial release â€” stage-based folder structure, pattern + content classification, git mv + ref updates | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "docker-optimize": {
@@ -1832,10 +1832,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "docs-manager-agent": {
@@ -2093,8 +2093,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "expo-dev": {
@@ -2135,10 +2135,10 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "fastapi-backend": {
@@ -2198,10 +2198,10 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 0.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "fastapi-db-migrate": {
@@ -2224,10 +2224,10 @@
     "changelog": "v1.1.0: Add triggers, boundary clarification with db-migrate/db-migrate-verify, flesh out check mode, add output format, expand CRITICAL RULES | v1.0.1: Initial release",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "fastapi-deploy": {
@@ -2252,10 +2252,10 @@
     "changelog": "v1.1.0: Add triggers, fix blocking uvicorn (background+no-reload), flesh out seed loop, add CRITICAL RULES, cross-refs, rollback guidance | v1.0.0: Initial release",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 0.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "fastapi-run-backend-tests": {
@@ -2279,10 +2279,10 @@
     "changelog": "v2.2.0: Add triggers, fix monorepo detection (collect all dirs), add failure-count guard (>10 asks user), optional dependency skip | v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 0.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "feature-flag": {
@@ -2306,8 +2306,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "five-advisors": {
@@ -2357,9 +2357,9 @@
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "firebase-ai": {
@@ -2380,10 +2380,10 @@
     "changelog": "v1.0.2: Add TOC, version caveat, remove internal nickname, fix Node.js version | v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "firebase-data-connect": {
@@ -2404,10 +2404,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "firebase-dev": {
@@ -2428,10 +2428,10 @@
     "changelog": "v1.0.2: Add TOC, add deleteDoc to Write Operations (complete CRUD) | v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "firebase-test": {
@@ -2454,10 +2454,10 @@
     "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "fix-github-issue": {
@@ -2517,10 +2517,10 @@
     "changelog": "v1.6.0 (2026-07-02): MINOR — operationalize the /systematic-debugging escalation handoff (ESCALATION step 4 invokes Skill(\"/systematic-debugging\") with accumulated failure context before any UNRESOLVED report), result enum aligned to testing.md canonical PASSED|FAILED|FIXED, Single Fix flaky handling defined (no re-run without a retest command — note suspicion in report), description names the /autofix-pr boundary + Single Fix runtime-error fit, flag-precedence and empty-failure_output notes; registry deps expanded to the real delegation closure (debugger-agent + delegated skills) | v1.3.0: Add triggers list, add Agent to allowed-tools (required for test-failure-analyzer-agent delegation), add test-failure-analyzer-agent dependency | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "flutter": {
@@ -2567,10 +2567,10 @@
     "changelog": "v1.0.0: Initial release â€” grounded in cric repo patterns",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 0.67,
+      "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "flutter-dev": {
@@ -2686,10 +2686,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research; v1.1.1: noted the gitignored-env-files gotcha (secrets/deps don't travel with a fresh worktree; build-time-baked config like NEXT_PUBLIC_* silently breaks) in the post-creation setup step | v2.0.0: MAJOR — retired as a copied template; thin pointer to loop-engineering (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "github": {
@@ -2788,8 +2788,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "hono-backend": {
@@ -2839,9 +2839,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "iac-deploy": {
@@ -2862,10 +2862,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "implement": {
@@ -2887,10 +2887,10 @@
     "changelog": "v2.2.0: Added triggers, empty-args guard, test-framework fallback, fixed orphaned lines, strengthened CRITICAL RULES; v2.1.0: Enhanced with community patterns; v2.0.0: Initial structured workflow; added --team note (disjoint-partition only; points to development-loop STEP 4-TEAM) | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "incident-response": {
@@ -2911,9 +2911,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "integration-test": {
@@ -2935,10 +2935,10 @@
     "changelog": "v1.0.0: Initial release | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "jest-dev": {
@@ -2985,10 +2985,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.67,
+      "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "learn-n-improve": {
@@ -3011,10 +3011,10 @@
     "changelog": "v2.5.0 (2026-07-03): MINOR — add STEP 3.5 success-pattern capture (what-worked/why/reuse-trigger/evidence, typed GENERIC/PRODUCT-SPECIFIC per learnings-routing.md, filed under success_patterns in the same learnings.json), wire success signals into STEP 2's decision table and capture triggers, extend STEP 4/5.5/6 to cover success patterns alongside failure learnings (loop-engineering-adoption plan item 4.1) | v2.3.0: Add triggers, preamble constraints, strengthen RULES to CRITICAL RULES with MUST/MUST NOT, registry sync | v2.1.0: Enhanced with community patterns | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-learning-workflow (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "learning-self-improvement": {
@@ -3096,8 +3096,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "middleware-test": {
@@ -3119,9 +3119,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "mobile-a11y-test": {
@@ -3145,10 +3145,10 @@
     "changelog": "v1.0.0: Initial release",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "mock-server": {
@@ -3172,9 +3172,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "monitoring-setup": {
@@ -3195,9 +3195,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "monorepo": {
@@ -3363,9 +3363,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "pattern-portability": {
@@ -3468,8 +3468,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "pg-query": {
@@ -3491,8 +3491,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "pipeline-fix-pr": {
@@ -3546,8 +3546,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "plan-executor-agent": {
@@ -3590,8 +3590,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "planner-researcher-agent": {
@@ -3609,10 +3609,10 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "playwright": {
@@ -3634,8 +3634,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "pm2-deploy": {
@@ -3685,10 +3685,10 @@
     "changelog": "v3.0.0: Add triggers, preamble constraints, CRITICAL RULES, dependencies, registry sync | v2.0.0: Genericized and restructured | v4.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "pr-standards": {
@@ -3710,8 +3710,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "prd-parser": {
@@ -3738,8 +3738,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "prisma-orm": {
@@ -3792,8 +3792,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "project-scaffold": {
@@ -3820,8 +3820,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "prompt-auto-enhance": {
@@ -3853,10 +3853,10 @@
     "changelog": "v4.0.0 (2026-06-22): RETIRED the core/ distributable copy in favor of the installable plugin (G6); core/ is now a thin pointer. Removed the duplicated rule + hook registry entries (plugin owns them downstream; hub keeps its operational copy in .claude/). | v3.2.0: Replace STEP 4.7 Execution Mode menu with one-line skill hint (lighter advisory, never gating). v3.1.1: Execution Mode Selection Gate. v3.0.0: Mandatory step transcript + final prompt preview rendering, no upper limit on Clarification Gate. v2.0.0: Step 0 prompt grading (6 weighted dimensions), 11 failure categories, 3 guardrails. | v3.6.0: Promoted firekaro v3.3-v3.6 battle-tested upgrades (4 verification campaigns): cap-exempt grade-independent role fix, half-open grade bands, role tie-break, STEP 3.6 re-grade + lift gate, STEP 0-pre transcription normalization, evidence-override lane, blind re-grade audit, enhance-misses telemetry loop",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "prompt-logger": {
@@ -3899,10 +3899,10 @@
     "changelog": "v1.0.0: Initial release",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 0.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "quality-gate-evaluator-agent": {
@@ -3925,9 +3925,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "react-native-dev": {
@@ -4047,10 +4047,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "reddit": {
@@ -4095,9 +4095,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "regression-test": {
@@ -4121,8 +4121,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "remotion-video": {
@@ -4165,10 +4165,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "research-mode": {
@@ -4225,10 +4225,10 @@
     "changelog": "v2.0.0: Parallelized into 3 batches (A: quality+arch, B: security+risk, C: adversarial+pr-standards), fixed tool scoping, renumbered steps; added --team note (parallel gate-checks share+challenge; -> code-review-workflow STEP 2-TEAM discipline) | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "rule-curation": {
@@ -4281,8 +4281,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "end-session": {
@@ -4331,8 +4331,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     },
     "deprecated": true,
     "deprecated_by": "end-session"
@@ -4362,8 +4362,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "secret-scanner": {
@@ -4401,8 +4401,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "security-auditor-agent": {
@@ -4420,10 +4420,10 @@
     "changelog": "v1.0.0: Initial registration; added teammate-readiness note (no Skill tool as a teammate -> inline OWASP review path)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "security-baseline": {
@@ -4470,8 +4470,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "serialize-fixes": {
@@ -4565,10 +4565,10 @@
     "changelog": "v2.0.0: Genericized and restructured",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "skill-author-agent": {
@@ -4594,10 +4594,10 @@
     "changelog": "v1.0.0: Initial release â€” routes pattern creation to appropriate authoring workflows with quality validation",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "skill-authoring-workflow": {
@@ -4675,10 +4675,10 @@
     "changelog": "v2.0.0: Genericized and restructured | v4.0.0: MAJOR — retired as a copied template; thin pointer to cbp-learning-workflow (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "skill-master": {
@@ -4698,10 +4698,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "solidity-audit": {
@@ -4753,8 +4753,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "start-session": {
@@ -4778,10 +4778,10 @@
     "changelog": "v1.1.0: Add triggers for natural language discoverability | v1.0.0: Initial release â€” session restoration with priority-ordered file loading",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "status": {
@@ -4801,10 +4801,10 @@
     "changelog": "v2.0.0: Genericized and restructured | v3.0.0: MAJOR — retired as a copied template; thin pointer to loop-engineering (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "strategic-architect": {
@@ -4826,8 +4826,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "subagent-driven-dev": {
@@ -4851,8 +4851,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "supply-chain-audit": {
@@ -4875,8 +4875,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "systematic-debugging": {
@@ -4896,10 +4896,10 @@
     "changelog": "1.1.1: reciprocal routing boundary to /fix-loop in description (companion to fix-loop v1.6.0 escalation fix; deferred item from the fix-loop eval).\nv1.1.0: Fix orphaned code blocks, add inline step summaries, improve triggers, add preamble constraints, fix step reference, sync registry description | v2.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "tailwind-dev": {
@@ -4948,8 +4948,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "tdd-failing-test-generator": {
@@ -5002,8 +5002,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "test-data-management": {
@@ -5028,8 +5028,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "test-failure-analyzer-agent": {
@@ -5100,10 +5100,10 @@
     "changelog": "v2.0.0: Genericized and restructured | v3.0.0: MAJOR — retired as a copied template; thin pointer to cbp-learning-workflow (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "test-maintenance": {
@@ -5128,8 +5128,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "test-pipeline": {
@@ -5164,10 +5164,10 @@
     "changelog": "v3.1.0: first-run test-debt baseline - pre-existing failures filed as one consolidated debt issue + known_debt exclusion from triage (fable-harvest B, class E) | v4.0.0: MAJOR — retired as a copied template; thin pointer to cbp-build-test-workflows (plugins-first-only, owner decision 2026-07-14)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "test-scout-agent": {
@@ -5211,10 +5211,10 @@
     "changelog": "v2.0.0: Genericized and restructured | v2.2.0 (2026-04-24): Playwright ARIA snapshot capture alongside screenshot — lifts visual-inspector-agent confidence MEDIUM→HIGH (dual-signal per spec v2.2 §3.2)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "testing": {
@@ -5234,8 +5234,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "trace-test": {
@@ -5257,9 +5257,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "twitter-x": {
@@ -5306,8 +5306,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "update-practices": {
@@ -5352,8 +5352,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "visual-inspector-agent": {
@@ -5504,8 +5504,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "web-research-specialist-agent": {
@@ -5529,8 +5529,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "web-scraper": {
@@ -5577,9 +5577,9 @@
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "workflow": {
@@ -5599,8 +5599,8 @@
     "effectiveness": {
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "workflow-master-template": {
@@ -5646,10 +5646,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research; added team-compatibility note (Stage D: planning stays single-owner/non-team)",
     "tier": "must-have",
     "effectiveness": {
-      "adoption_rate": 1.0,
+      "adoption_rate": 0.0,
       "retention_days_p50": 0,
-      "sample_size": 3,
-      "last_updated": "2026-06-20"
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "writing-skills": {
@@ -5698,10 +5698,10 @@
     "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
-      "adoption_rate": 0.5,
-      "retention_days_p50": 0.0,
-      "sample_size": 2,
-      "last_updated": "2026-06-20"
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0,
+      "sample_size": 1,
+      "last_updated": "2026-07-24"
     }
   },
   "improve-codebase-architecture": {
