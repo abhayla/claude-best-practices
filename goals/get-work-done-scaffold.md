@@ -6,19 +6,21 @@ source: "/get-work-done dispatcher Phase 1 (plan: plans/get-work-done-dispatcher
 last_verified: "2026-07-15"
 predicates:
   - kind: file
-    path: "D:\\Abhay\\VibeCoding\\GetWorkDone\\settings.json"
+    path: "C:\\Abhay\\GetWorkDone\\settings.json"
   - kind: file
-    path: "D:\\Abhay\\VibeCoding\\GetWorkDone\\OWNER-QUESTIONS.md"
+    path: "C:\\Abhay\\GetWorkDone\\OWNER-QUESTIONS.md"
   - kind: file
-    path: "D:\\Abhay\\VibeCoding\\GetWorkDone\\LEDGER.md"
+    path: "C:\\Abhay\\GetWorkDone\\LEDGER.md"
   - kind: file
     path: .claude/skills/get-work-done/SKILL.md
-on_failure: "The GetWorkDone fleet scaffold (D:\\Abhay\\VibeCoding\\GetWorkDone\\ settings/inbox/ledger, or the hub's /get-work-done dispatcher skill) went missing — the Phase 1 dispatcher can no longer run. Restore from plans/get-work-done-dispatcher.md and the Phase 1 skill commit."
+on_failure: "The GetWorkDone fleet scaffold (C:\\Abhay\\GetWorkDone\\ settings/inbox/ledger, or the hub's /get-work-done dispatcher skill) went missing — the Phase 1 dispatcher can no longer run. Restore from plans/get-work-done-dispatcher.md and the Phase 1 skill commit."
 ---
 
 The `/get-work-done` dispatcher is the mother-hub central task-intake fleet (owner GO
-2026-07-15). Its scaffold lives outside the repo at `D:\Abhay\VibeCoding\GetWorkDone\`
-(`settings.json`, `OWNER-QUESTIONS.md`, `LEDGER.md`) plus the in-repo dispatcher skill at
+2026-07-15). Its scaffold lives at the fleet home `C:\Abhay\GetWorkDone\` on the Windows
+VPS (owner amendment 2026-07-15 — see settings.json `fleet_home`; `D:\Abhay\VibeCoding\
+GetWorkDone\` on the local PC is a sync replica, not the canonical scaffold) — `settings.json`,
+`OWNER-QUESTIONS.md`, `LEDGER.md` — plus the in-repo dispatcher skill at
 `.claude/skills/get-work-done/SKILL.md`. Silent death of any of these four files breaks
 task intake/dispatch with nothing re-checking it — this goal re-verifies the scaffold
 stays intact.
