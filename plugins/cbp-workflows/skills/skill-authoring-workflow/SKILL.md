@@ -13,7 +13,7 @@ description: >
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<skill name, learning reference, or pattern description>"
-version: "2.1.1"
+version: "2.2.0"
 ---
 
 # /skill-authoring-workflow — Skill-at-T0 Orchestrator
@@ -153,6 +153,14 @@ Skill("/claude-guardian", args="validate <draft path> --strict")
 - pattern-self-containment.md (no placeholders, size limits, cross-refs)
 - Registry fit (overlap + tier assignment)
 
+Additionally verify the authored pattern's **prerequisites contract** (skill drafts only):
+- The draft SKILL.md has a `## Prerequisites` section (or an explicit `Prerequisites: none` line)
+- If any prerequisite is declared, the draft's first executable step is a `## STEP 0: Preflight`
+  that verifies every declared item (tools, credentials, files, services, AND user
+  inputs/decisions) up front — while the user is present at invocation — and hard-stops with a
+  complete missing-items list rather than stalling mid-run or improvising an undeclared fallback
+- Missing contract → validation verdict FAILED (same BLOCKED path as the guardian gates)
+
 Produces `test-results/skill-authoring-validation.json`.
 
 Gate: if `verdict != "PASSED"` → `step_status.VALIDATE = blocked`,
@@ -234,6 +242,10 @@ Capture the registry entry (or the n/a marker) into `state.artifacts.registered`
   containment.md).
 - MUST NOT bypass VALIDATE (STEP 3) — quality gates are mandatory and
   BLOCKING. No silent FAIL → ship path.
+- MUST block a skill draft that lacks the prerequisites contract (`## Prerequisites` — or
+  explicit `Prerequisites: none` — plus a `## STEP 0: Preflight` when any prerequisite is
+  declared). A skill that discovers a missing tool/credential/input mid-run dead-ends
+  unattended sessions or improvises an unacceptable alternative.
 - MUST use `/writing-skills` for the authoring step — never direct file
   write. The 6-step protocol catches frontmatter + structural errors early.
 - MUST NOT auto-register a pattern that failed validation — unvalidated

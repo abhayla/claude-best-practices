@@ -4,11 +4,13 @@ description: >
   Validate pattern files (skills, agents, rules) against quality, portability,
   structure, and curation standards. Run when editing or creating files in
   core/.claude/ or .claude/ pattern directories. Consolidates all pattern
-  quality checks into one on-demand workflow.
+  quality checks into one on-demand workflow. Structural FILE validation only —
+  for trigger/output/behavioral evaluation use /skill-evaluator; for authoring
+  or updating skill content use /writing-skills.
 type: workflow
 allowed-tools: "Read Grep Glob Bash"
 argument-hint: "[path/to/pattern.md]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Pattern Quality Gate
@@ -49,6 +51,7 @@ Read the appropriate checklist reference file for the detailed requirements.
 3. Scan for placeholder markers (`<!-- TODO: -->`, `<!-- FIXME: -->`)
 4. Verify `## CRITICAL RULES` section exists (skills)
 5. Check description starts with verb and includes "when" clause
+6. For skills: verify the prerequisites contract — a `## Prerequisites` section (or an explicit `Prerequisites: none` line); when any prerequisite is declared, a `## STEP 0: Preflight` step that verifies every declared item (tools, credentials, files, services, AND user inputs/decisions) before STEP 1 and hard-stops with a complete missing-items list. NEW skills FAIL without it; skills predating 2026-07-26 WARN until the hub-wide sweep enrolls them
 
 ## STEP 4: Validate Portability
 
@@ -63,7 +66,7 @@ Read `references/portability-rules.md` and check:
 
 1. If pattern references other skills/agents via `Skill()`, `Agent()`, or `/skill-name` — verify targets exist on disk
 2. If in `core/.claude/` — verify matching entry in `registry/patterns.json` with matching version
-3. If in `.claude/` (hub-only) — verify NO entry in `registry/patterns.json`
+3. If in `.claude/` — check `config/dual-home-resources.yml` FIRST: a classified dual-home resource (synced/shared/divergent) legitimately HAS a registry entry (it tracks the `core/` twin); only a genuinely hub-only pattern (unclassified there) must have NO entry in `registry/patterns.json`
 4. Check `config/workflow-groups.yml` for stale seeds if renaming/deleting
 
 ## STEP 6: Validate Workflow Integrity
@@ -116,6 +119,7 @@ Issues: <list any failures>
 ## CRITICAL RULES
 
 - MUST run this skill when creating or modifying ANY pattern file
+- MUST fail a NEW skill lacking the prerequisites contract (`## Prerequisites` or explicit none + STEP 0 preflight when prerequisites exist) — mid-run prerequisite discovery stalls unattended runs
 - MUST NOT commit if the validator script fails
 - MUST verify cross-references exist on disk — do not assume from memory
 - MUST check registry sync for core/.claude/ patterns

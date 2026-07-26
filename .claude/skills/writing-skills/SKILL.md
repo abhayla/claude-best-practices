@@ -20,7 +20,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "3.2.0"
+version: "3.3.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -134,10 +134,46 @@ Before writing steps and constraints, identify the 3 most likely failure modes f
 | Wrong/stale input | Validation step | Step 1 or earliest data-reading step |
 | Destructive action without confirmation | User approval gate | Step before the destructive action |
 | Partial execution leaving broken state | Rollback or atomic commit | Step that modifies state |
-| Missing prerequisites | Precondition check | Step 1 |
+| Missing prerequisites | STEP 0 preflight gate (mandatory — see 2.3b) | STEP 0, before all other steps |
 | Ambiguous output format | Locked output template | Output-producing step + MUST DO |
 
 **Output format MUST be locked.** Every skill that produces structured output (JSON, reports, tables) MUST define the exact output format in a code block template within the output-producing step. Ambiguity in output format is the #1 cause of inconsistent skill behavior — lock it down with a concrete template, not prose descriptions.
+
+### 2.3b Prerequisites & Preflight Gate (STEP 0) — mandatory in every authored skill
+
+Every skill MUST make its runtime needs explicit and verify them BEFORE execution starts
+(owner mandate 2026-07-26). The defect class this eliminates: a skill that stalls mid-run
+asking for something — or silently improvises an alternative path — after the user has
+walked away.
+
+**Declare.** The SKILL.md carries a `## Prerequisites` section (directly after the title
+block) listing EVERYTHING the skill needs to complete its work:
+
+| Prerequisite class | Examples |
+|---|---|
+| Tools / CLIs | `gh`, `jq`, a test runner, a language runtime (with version if it matters) |
+| Credentials / env | API keys, tokens, env vars, logged-in CLIs |
+| Files / paths | config files, input artifacts, expected directories |
+| Services / connectivity | reachable APIs, MCP servers, DB connections |
+| User inputs & decisions | EVERY answer, choice, or approval the skill will need during its run |
+
+A skill with no needs states `Prerequisites: none` explicitly — an absent section is a
+defect, not a default.
+
+**Verify (STEP 0).** The skill's FIRST executable step is `## STEP 0: Preflight` — it probes
+each declared item with a cheap side-effect-free check (`--version`, file-exists, env-var
+set, read-only ping) and collects ALL declared user inputs/decisions up front, while the
+user is still present at invocation.
+
+**Gate.** If anything is missing: report ALL missing items in ONE consolidated list (never
+one at a time), ask the user to supply or fix them NOW, and proceed only when every item is
+green. If unresolvable → HARD-STOP with the complete list and what to do about each item.
+
+Gate rules:
+- MUST NOT begin execution with a known-missing prerequisite
+- MUST NOT pause mid-run to request an input that STEP 0 could have collected
+- MUST NOT improvise an undeclared fallback when something is missing — fallback ladders are
+  allowed only when declared in the SKILL.md and requiring no mid-run user input
 
 ### 2.4 Multi-Skill Decomposition (When One Prompt → Multiple Skills)
 
@@ -423,6 +459,7 @@ Before saving the skill, validate every item. Do NOT skip this step.
 | No high-risk indicators without justification | Scripts, MCP refs, network access, or broad file access are documented and necessary (see `references/security-review.md` risk tiers) |
 | `argument-hint` uses `<>` and `[]` correctly | Required in angle brackets, optional in square brackets |
 | No placeholder markers | No TODO/FIXME/PLACEHOLDER HTML comment markers in the body |
+| Prerequisites contract present | A `## Prerequisites` section exists (or an explicit `Prerequisites: none` line); when any prerequisite is declared, the first executable step is `## STEP 0: Preflight` verifying every declared item and collecting all user inputs before STEP 1 (see 2.3b) |
 | Reference self-update mechanism present | Skills with `references/` include: (1) `references/self-update-protocol.md` copied from this skill, (2) a Reference Completeness Check step pointing to it, (3) an empty `references/CHANGELOG.jsonl` |
 
 ### 5.2 Content Validation
@@ -688,6 +725,7 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always present the draft to the user for review before saving
 - Always test the skill with 5 scenarios from Step 6 (3 happy-path + 2 edge-case)
 - Always complete failure mode analysis (Step 2.3) before writing constraints — prevention beats diagnosis
+- Always author the prerequisites contract (Step 2.3b): a `## Prerequisites` declaration plus a `## STEP 0: Preflight` that verifies every item and collects all user inputs before STEP 1 — Why: a skill that discovers a missing tool, credential, or input mid-run stalls when the user is away or improvises an unacceptable alternative
 - Always include a `— Why:` justification on every MUST DO / MUST NOT DO item
 - Always lock the output format with a code block template for skills that produce structured output — Why: ambiguous output formats cause inconsistent behavior across invocations
 - Always produce a failure prevention map (Step 6.5) before hub promotion — Why: makes guardrails visible and auditable during review
@@ -707,6 +745,7 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 ## MUST NOT DO
 
 - MUST NOT create a skill for something that should be a rule — if it has no steps, use `.claude/rules/`
+- MUST NOT author a skill that requests user input mid-run for something knowable at invocation — collect every declared input in STEP 0 Preflight instead (Step 2.3b) — Why: mid-run prompts dead-end unattended runs and force the skill to stop or improvise
 - MUST NOT use vague step language ("consider", "think about", "ensure quality") — use specific actions instead
 - MUST NOT create skills with >10 steps — split into sub-skills or use delegation
 - MUST NOT add tools to `allowed-tools` that the skill does not use

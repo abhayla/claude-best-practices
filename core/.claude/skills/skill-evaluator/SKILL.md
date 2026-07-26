@@ -6,6 +6,8 @@ description: >
   promotion, auditing existing skills for trigger conflicts, or verifying
   a skill adds value over the agent's baseline. Invoked automatically by
   /writing-skills during authoring, or standalone for auditing existing skills.
+  For structural pattern-FILE validation (frontmatter, portability, registry
+  sync) use /pattern-quality instead.
 triggers:
   - skill-evaluator
   - evaluate skill
@@ -19,7 +21,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<trigger|output|full|conflicts|trap> <skill-path> [--baseline] [--model sonnet] [--cases <path>] [--bar all|0.9]"
 type: workflow
-version: "2.4.0"
+version: "2.5.0"
 ---
 
 # Skill Evaluator — Evaluate Skill Quality
@@ -95,7 +97,25 @@ For skills that have a `references/` directory, verify the full self-update prot
 
 **Overall severity:** Skills with `references/` that lack the self-update mechanism entirely get a **MAJOR** finding. Missing user approval gate is **CRITICAL**.
 
-If ANY check in 0.1-0.4 fails, report it in the evaluation output as a
+### 0.5 Prerequisites & Preflight Contract
+
+Every skill must front-load its runtime needs (owner mandate 2026-07-26): DECLARE them,
+VERIFY them in a STEP 0 preflight while the user is present at invocation, and HARD-STOP
+with a complete missing-items list on gaps — never stall mid-run waiting for an absent
+user, never improvise an undeclared fallback.
+
+| Check | How | Fail Condition | Severity |
+|-------|-----|----------------|----------|
+| Prerequisites declared | Scan for a `## Prerequisites` section (or an explicit `Prerequisites: none` line) | Neither present | MAJOR |
+| Preflight gate present | If any prerequisite is declared, verify the first executable step is a `## STEP 0: Preflight` (or equivalently named preflight step) covering every declared item | Declared prerequisites with no preflight step | MAJOR |
+| User inputs front-loaded | Scan steps after the preflight for mid-run user prompts requesting inputs that were knowable at invocation | Mid-run prompt for a collectable input | MAJOR |
+| No undeclared fallback | Any fallback/alternative path in the body is declared in the Prerequisites section and needs no mid-run user input | Improvised fallback on a missing prerequisite | MAJOR |
+
+**Grandfather rule:** skills predating this contract (created before 2026-07-26 without a
+`## Prerequisites` section) get a WARN — report the gap, do not fail solely on it — until
+the hub-wide compliance sweep enrolls them. NEW skills and renamed/rewritten skills FAIL.
+
+If ANY check in 0.1-0.5 fails, report it in the evaluation output as a
 **PRE-FLIGHT FAILURE** and include it in the fix recommendations. Do not skip
 these checks — they caught issues in 5/5 evaluated skills.
 
@@ -450,6 +470,7 @@ percentage in place of naming missed case IDs.
 - Always validate name constraints (64 chars, lowercase/hyphens, no reserved words) in pre-flight — Why: platform rejects non-conforming names
 - Always check description is third-person in pre-flight — Why: first/second person causes discovery problems per platform docs
 - Always check reference depth ≤1 from SKILL.md in pre-flight — Why: Claude partially reads deeply nested files
+- Always run the prerequisites-contract check (0.5) — Why: a skill that discovers a missing tool, credential, or user input mid-run stalls unattended sessions; a NEW skill without the declare→verify→hard-stop contract must not pass evaluation
 - Always run all 10 pre-flight checks (0.4) for skills with `references/` — Why: the protocol file, CHANGELOG, entry format, mode detection, admission gate, scoring, two-tier structure, and approval gate must all be present for the self-update mechanism to work
 - Always run Tests A-E (3.4b) for skills with `references/` during output evaluation — Why: structural presence is not enough; mode detection, gap detection, scoring, approval gating, and post-update integrity must all work at runtime
 - Always test both FULL and STANDALONE modes when learn-n-improve is available in the project — Why: downstream projects may or may not have learn-n-improve; skills must work correctly in both environments

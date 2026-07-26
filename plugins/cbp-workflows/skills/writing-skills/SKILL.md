@@ -20,7 +20,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "3.2.0"
+version: "3.3.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -59,6 +59,41 @@ iterate in Step 6. Focus on failure prevention from the start.
 
 
 **Read:** `references/skill-authoring-from-scratch.md` for detailed step 2: skill authoring — from scratch reference material.
+
+### 2.3b Prerequisites & Preflight Gate (STEP 0) — mandatory in every authored skill
+
+Every skill MUST make its runtime needs explicit and verify them BEFORE execution starts.
+The defect class this eliminates: a skill that stalls mid-run asking for something — or
+silently improvises an alternative path — after the user has walked away.
+
+**Declare.** The SKILL.md carries a `## Prerequisites` section (directly after the title
+block) listing EVERYTHING the skill needs to complete its work:
+
+| Prerequisite class | Examples |
+|---|---|
+| Tools / CLIs | `gh`, `jq`, a test runner, a language runtime (with version if it matters) |
+| Credentials / env | API keys, tokens, env vars, logged-in CLIs |
+| Files / paths | config files, input artifacts, expected directories |
+| Services / connectivity | reachable APIs, MCP servers, DB connections |
+| User inputs & decisions | EVERY answer, choice, or approval the skill will need during its run |
+
+A skill with no needs states `Prerequisites: none` explicitly — an absent section is a
+defect, not a default.
+
+**Verify (STEP 0).** The skill's FIRST executable step is `## STEP 0: Preflight` — it probes
+each declared item with a cheap side-effect-free check (`--version`, file-exists, env-var
+set, read-only ping) and collects ALL declared user inputs/decisions up front, while the
+user is still present at invocation.
+
+**Gate.** If anything is missing: report ALL missing items in ONE consolidated list (never
+one at a time), ask the user to supply or fix them NOW, and proceed only when every item is
+green. If unresolvable → HARD-STOP with the complete list and what to do about each item.
+
+Gate rules:
+- MUST NOT begin execution with a known-missing prerequisite
+- MUST NOT pause mid-run to request an input that STEP 0 could have collected
+- MUST NOT improvise an undeclared fallback when something is missing — fallback ladders are
+  allowed only when declared in the SKILL.md and requiring no mid-run user input
 
 ## STEP N: Action Verb + Object
 
@@ -365,6 +400,7 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always present the draft to the user for review before saving
 - Always test the skill with 5 scenarios from Step 6 (3 happy-path + 2 edge-case)
 - Always complete failure mode analysis (Step 2.3) before writing constraints — prevention beats diagnosis
+- Always author the prerequisites contract (Step 2.3b): a `## Prerequisites` declaration plus a `## STEP 0: Preflight` that verifies every item and collects all user inputs before STEP 1 — Why: a skill that discovers a missing tool, credential, or input mid-run stalls when the user is away or improvises an unacceptable alternative
 - Always include a `— Why:` justification on every MUST DO / MUST NOT DO item
 - Always lock the output format with a code block template for skills that produce structured output — Why: ambiguous output formats cause inconsistent behavior across invocations
 - Always produce a failure prevention map (Step 6.5) before hub promotion — Why: makes guardrails visible and auditable during review
@@ -384,6 +420,7 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 ## MUST NOT DO
 
 - MUST NOT create a skill for something that should be a rule — if it has no steps, use `.claude/rules/`
+- MUST NOT author a skill that requests user input mid-run for something knowable at invocation — collect every declared input in STEP 0 Preflight instead (Step 2.3b) — Why: mid-run prompts dead-end unattended runs and force the skill to stop or improvise
 - MUST NOT use vague step language ("consider", "think about", "ensure quality") — use specific actions instead
 - MUST NOT create skills with >10 steps — split into sub-skills or use delegation
 - MUST NOT add tools to `allowed-tools` that the skill does not use
