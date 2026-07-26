@@ -13,7 +13,7 @@ triggers:
   - bulk create issues from plan
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<plan-file-path or plan text>"
-version: "1.2.0"
+version: "1.3.0"
 type: workflow
 ---
 
@@ -26,6 +26,19 @@ Parse a structured plan into tracked GitHub Issues.
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — `gh` CLI, authenticated with repo access. Probe: `gh auth status`.
+- **Files / user inputs** — a plan file path or inline plan text via `$ARGUMENTS`; if empty, ask the user for one now.
+
+## STEP 0: Preflight
+
+Before parsing anything:
+
+1. Verify `$ARGUMENTS` is non-empty — if empty, ask the user for a plan file path or inline plan text now, rather than discovering the gap after duplicate-checking starts.
+2. Verify `gh` is installed and authenticated: `gh auth status`.
+3. If either check fails, report both in one list and stop — do not create issues without confirmed `gh` access.
 
 ## STEP 1: Parse Plan
 

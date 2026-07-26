@@ -8,7 +8,7 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "[file path or area to zoom out from]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Zoom Out
@@ -18,6 +18,12 @@ The agent has been working close to the code and now needs altitude. Stop, go up
 **Focus area:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+None — read-only code-navigation skill (`Read`/`Grep`/`Glob` only) with no external tools,
+credentials, or services; the target repo being present is the only requirement and is
+trivially true whenever this skill is invoked.
 
 ## Process
 

@@ -13,7 +13,7 @@ triggers:
   - build-logic
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<task-description or 'setup' or 'optimize' or 'diagnose'>"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -22,6 +22,22 @@ type: workflow
 Configure scalable, maintainable Gradle builds for Android projects using Convention Plugins, Version Catalogs, and 12 proven performance optimization patterns.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools:** an existing Gradle project (`./gradlew` at the project root)
+- **Files:** `gradle/libs.versions.toml`, module `build.gradle.kts` files (read/edited by this skill)
+- **User inputs:** the task type — `setup`, `optimize`, `diagnose`, or a free-text task description (`$ARGUMENTS`)
+
+## STEP 0: Preflight
+
+1. Confirm `./gradlew` exists at the project root (`test -f gradlew`) and runs (`./gradlew --version`). Missing → stop, ask for the correct project root.
+2. Confirm the task type from `$ARGUMENTS` (`setup` / `optimize` / `diagnose` / description); if absent, ask now.
+3. For `optimize`/`diagnose`, note that a baseline build scan (`./gradlew assembleDebug --scan`) needs network access on first run to accept Gradle's Terms of Service — flag if the environment is offline.
+
+Report all missing items together before starting STEP 1.
 
 ---
 

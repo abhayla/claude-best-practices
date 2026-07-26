@@ -14,7 +14,7 @@ triggers:
   - visual regression test
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<user-flow-or-test-description>"
-version: "1.2.0"
+version: "1.3.0"
 type: workflow
 ---
 
@@ -27,6 +27,22 @@ Write, run, and debug Playwright end-to-end tests for the requested user flow or
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — Node.js/npm; `@playwright/test` and its browsers (`npx playwright install`) — STEP 1.1 installs these if missing.
+- **Files** — a `playwright.config.ts`/`.js`, or confirmation this is a fresh setup.
+- **Services / network** — the app under test must be reachable, either via the config's `webServer` auto-start or an already-running dev server at `baseURL`.
+- **User inputs** — the user flow/scenario to test (via `$ARGUMENTS`), and the base URL if it isn't the default `http://localhost:3000`.
+
+## STEP 0: Preflight
+
+Before writing or running tests:
+
+1. Confirm (from `$ARGUMENTS` or by asking) the user flow/scenario to test and the base URL if not the default `http://localhost:3000`.
+2. Probe for Node.js/npm: `node -v && npm -v`.
+3. Probe for an existing Playwright setup: `ls playwright.config.ts playwright.config.js 2>/dev/null` — STEP 1.1 handles installation if absent, so a missing config is not a hard stop here, just noted.
+4. If the target app needs to be running (no `webServer` auto-start configured), verify it's reachable before running tests against it.
 
 ## STEP 1: Project Setup & Configuration
 

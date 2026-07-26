@@ -6,7 +6,7 @@ description: >
   observability. Use when designing or optimizing Redis-backed features.
 allowed-tools: "Read Grep Glob"
 argument-hint: "<redis-task-or-question>"
-version: "1.0.1"
+version: "1.1.0"
 type: reference
 ---
 
@@ -18,6 +18,14 @@ the official Redis agent-skills repository (29 rules across 11 categories).
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `redis-cli`, or the project's Redis client library already installed (`redis-py`, `ioredis`, `node-redis`, etc.)
+- **Services/network:** a reachable Redis 7+ instance for any pattern that is actually run/verified live (`redis-cli ping`)
+- **Credentials/env:** `REDIS_PASSWORD`/`REDIS_URL` when the target instance requires auth or TLS
+
+This is a reference/lookup skill (no STEP flow) — verify the above only when a pattern is about to be run against a live instance, not before reading/applying the reference material.
 
 ## Data Structure Selection
 

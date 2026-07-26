@@ -1,7 +1,7 @@
 ---
 name: mock-data-hunter
 description: Sweep a codebase for hardcoded, demo, or seed data serving on PRODUCTION paths before ship — fabricated metrics, placeholder entities, future-dated records, "for MVP" fallbacks that shape-only checks never catch. Use before a deploy, when auditing a live site's data credibility, or after any incident where fake data reached users.
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 triggers:
   - /mock-data-hunter
@@ -21,6 +21,23 @@ calculations'`, demonstration trackers with fake companies and future dates, and
 dummy registrar rows — four sibling incidents, one class, all invisible to every automated check
 the project ran. A blind reviewer's verdict on the result: "trust=2/10 — would not trust anything
 else on this site."
+
+## Prerequisites
+
+- **Tools** — `grep` (or ripgrep).
+- **Files/paths** — the `[path-or-url]` scope to sweep — defaults to the repo root when omitted.
+- **Credentials/env & Services** — a DB connection (credentials + reachability) — required ONLY when `--include-db` is passed (STEP 3).
+- **User inputs** — `[path-or-url]` and `--include-db` — already collectible from `$ARGUMENTS`; resolve them now rather than discovering mid-sweep.
+
+## STEP 0: Preflight
+
+Resolve the sweep scope from `$ARGUMENTS` (default: repo root) and confirm the path exists.
+Confirm `grep` is available. If `--include-db` was passed, verify the DB connection
+credentials/env vars are set and do one read-only reachability check (a cheap `SELECT 1`-style
+ping) — the STEP 3 seeded-rows query needs a live connection, not a promise of one. Report any
+missing path, tool, or DB credential in one consolidated list and ask the user to fix it now;
+HARD-STOP only if the sweep path itself doesn't exist (a missing `--include-db` credential
+degrades to skipping the DB check, noted in the STEP 5 scope line, not a hard stop).
 
 ## STEP 1: Grep Sweep the Source for Fabrication Markers
 

@@ -4,6 +4,26 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-26 — prerequisites-contract compliance sweep, waves 1–2 (112 skills)
+
+First execution phase of the sweep (plan: `plans/prereq-contract-sweep.md`; standing tool:
+`scripts/check_prereq_contract.py`, report-only). Every swept skill now DECLARES its
+prerequisites (`## Prerequisites`, explicit `None` where empty) and — where real environmental
+prerequisites exist — VERIFIES them in a `## STEP 0: Preflight` gate (consolidated missing-items
+list, hard-stop, no mid-run input requests, no undeclared fallbacks). MINOR version bump each;
+registry hash/version/changelog resynced for all 112.
+
+- **Wave 1** (8 hub+core synced pairs, no plugin twin): anthropic-multi-agent-research-system-skill,
+  executing-plans, five-advisors, github (existing AUTH CHECK upgraded in place), grill-me, reddit,
+  twitter-x, youtube-transcript (3-layer fallback ladder formalized as declared)
+- **Wave 2** (104 core-only skills, a11y-audit → zoom-out): full preflights for executable skills;
+  explicit-none for pure-reference skills; pre-existing STEP 0/gate steps extended or
+  cross-referenced, never renumbered; several previously mid-run decisions front-loaded
+  (schema-designer DB engine, disaster-recovery compliance regime, feature-flag provider)
+- Compliance counter: 14 → 134 compliant of 286 SKILL.md (37 exempt pointers/deprecated stubs);
+  remaining: wave 3 (plugin-grouped bodies + twins), wave 4 (23 ratchet-blocked, eval-paired),
+  wave 5 (CI ratchet — owner-gated)
+
 ### 2026-07-26 — prerequisites-preflight contract across the skill-authoring toolchain
 
 Owner mandate: a skill must never discover a missing prerequisite mid-run — stalling for an

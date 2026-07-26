@@ -19,7 +19,7 @@ triggers:
   - github.com
 allowed-tools: "Bash Read Write Edit Grep Glob WebFetch WebSearch Agent"
 argument-hint: "<action> [options] — e.g., 'search repos for claude skills --stars \">100\"', 'search code \"allowed-tools\" --filename SKILL.md', 'inspect owner/repo --files \"*.md\"'"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -33,15 +33,27 @@ Determine which mode to use based on the user's request, then follow that sectio
 
 ---
 
-## STEP 0: AUTH CHECK
+## Prerequisites
 
-Before any operation, verify GitHub CLI authentication:
+- **Tools/CLIs:** `gh` (GitHub CLI) installed
+- **Credentials/env:** an authenticated `gh` session (`gh auth login` completed)
+- **Services/network:** reachable `api.github.com`
+- **User inputs & decisions:** which mode + target query/repo (parsed from the request);
+  runtime-only confirmations that can't be front-loaded because they depend on probed data —
+  multi-repo inspect >5 repos, deep-clone target >500 MB (CRITICAL RULES 7)
+
+## STEP 0: Preflight
+
+Verify GitHub CLI auth before any operation:
 
 ```bash
 gh auth status
 ```
 
-If this fails, tell the user to run `gh auth login` first and stop.
+If this fails, tell the user to run `gh auth login` first and HARD-STOP — no mode can proceed
+without it. No other prerequisite exists (no env vars, no input files); mode-specific runtime
+confirmations (bulk multi-repo, large deep-clone) are handled at their own step since they depend
+on data only known after the query runs.
 
 ---
 

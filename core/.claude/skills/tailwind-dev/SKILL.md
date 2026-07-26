@@ -7,7 +7,7 @@ description: >
 allowed-tools: "Read Grep Glob"
 triggers: "tailwind, tailwindcss, utility css, tailwind config, tailwind theme, cn utility"
 argument-hint: "<pattern-to-look-up or 'setup' or 'theme' or 'component' or 'migrate'>"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 ---
 
@@ -17,6 +17,14 @@ Tailwind CSS v3 and v4 patterns for configuration, component styling, theming, r
 design, and performance. Covers CVA, tailwind-merge, dark mode, and migration guidance.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+None — a pure reference/lookup skill (`type: reference`, `allowed-tools: Read Grep Glob`).
+No execution, no tools, no credentials, no user inputs beyond the lookup topic in
+`$ARGUMENTS`.
 
 ---
 

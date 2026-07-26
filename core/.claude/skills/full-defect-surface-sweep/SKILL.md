@@ -1,7 +1,7 @@
 ---
 name: full-defect-surface-sweep
 description: Enumerate every sibling instance of a just-diagnosed root cause repo-wide BEFORE closing the bug — fix them or file explicitly-linked residual issues. Use after any root-cause diagnosis and before declaring a bug fixed; a fix without a surface sweep is a partial fix. This is the executable sweep procedure behind the bug-triage-discipline rule's sibling-audit requirement — invoke it even when no formal issue is being filed (pre-issue sweeps, data defects, config classes).
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 triggers:
   - /full-defect-surface-sweep
@@ -21,7 +21,20 @@ discovered one at a time. The pattern is constant — the fix treats the INSTANC
 reported, while the CLASS lives on elsewhere. This skill runs between "root cause found" and
 "bug closed".
 
-## STEP 0: Confirm the Root Cause Is Actually Isolated
+## Prerequisites
+
+- **Tools/CLIs:** none beyond `Read`/`Grep`/`Glob`/`Bash` — all built-in; `gh` only if STEP 4
+  files a residual GitHub issue
+- **Credentials/env:** an authenticated `gh` session, needed only when STEP 4 files a residual
+  issue — not needed for a fix-and-sweep with no issue filing
+- **User inputs & decisions:** `<root-cause-description>` and the optional
+  `[fix-pr-or-commit]` reference, both supplied at invocation
+
+## STEP 0: Preflight + Confirm the Root Cause Is Actually Isolated
+
+**Preflight:** if this sweep is expected to file residual issues, confirm `gh auth status`
+succeeds now. A missing `gh` session blocks STEP 4's issue-filing alone, never the sweep itself —
+fall back to listing residuals for the user to file by hand.
 
 This skill consumes a DIAGNOSED root cause; it cannot rescue an undiagnosed one. If the root
 cause is still a hypothesis (symptoms observed, mechanism unconfirmed), run `/systematic-debugging`

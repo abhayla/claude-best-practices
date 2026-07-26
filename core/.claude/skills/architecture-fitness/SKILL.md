@@ -14,7 +14,7 @@ triggers:
   - layer violations
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<directory to analyze, or 'all changed files'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -23,6 +23,25 @@ type: workflow
 Run automated architecture fitness functions to verify structural integrity. Use as part of the review gate before merge.
 
 **Scope:** $ARGUMENTS
+
+## Prerequisites
+
+- Tools: `git` (`git --version`) — used for the ADR-review diff scan (Step 6.3); standard POSIX shell utilities (`grep`, `find`, `wc`) — used throughout Steps 2-5, assumed present on any Bash-tool environment
+- Tools (optional, best-effort): language-specific dependency analyzers referenced in Step 3.1 (`pydeps`, `madge`, `go vet`, `detekt`) — probed with a quick `--version`/`--help` call; if absent, the skill falls back to the manual grep-based cycle detection already declared in Step 3.2 (no mid-run user input needed for this fallback)
+- Files / paths: the directory or file set named in `$ARGUMENTS` must exist and be readable; `docs/adr/` is optional — its absence just means Step 6 (ADR Lifecycle Review) is skipped, not a hard-stop
+- User inputs / decisions: the analysis scope itself (`$ARGUMENTS` — "<directory to analyze>" or "all changed files") must be known before Step 1 begins
+
+---
+
+## STEP 0: Preflight
+
+Before detecting the architecture style, confirm the run can actually proceed:
+
+1. Resolve the scope: if `$ARGUMENTS` is empty or ambiguous, ask the user now for the directory/file set to analyze (or confirm "all changed files" via `git diff origin/main...HEAD --name-only`) — don't discover this gap mid-scan.
+2. Verify `git --version` succeeds (needed for Step 6.3's diff-based missing-ADR detection). If `git` is unavailable, note that Step 6.3 will be skipped rather than silently guessing.
+3. Verify the resolved scope path(s) exist on disk (`find <scope> -maxdepth 0`); if not, that is a hard-stop — report the missing path and ask for a corrected scope.
+4. Best-effort probe the optional tools from Step 3.1 (`pydeps --version`, `npx madge --version`, `go version`, `detekt --version` — whichever matches the project's language). Missing tools are NOT blocking; record which ones are available so Step 3 knows whether to use the tool-assisted path or the manual grep fallback.
+5. If any REQUIRED item (scope resolved, scope path exists) is missing, report the full consolidated list in one message and wait for the user to supply it before proceeding to Step 1. Optional-tool gaps are reported informationally only, never blocking.
 
 ---
 

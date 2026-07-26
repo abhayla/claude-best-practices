@@ -7,7 +7,7 @@ description: >
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<pattern-path>"
 type: workflow
-version: "2.0.0"
+version: "2.1.0"
 ---
 
 # Contribute Practice — Submit Pattern to Hub
@@ -17,6 +17,21 @@ Validate a local pattern and submit it to the best practices hub as a PR.
 **Pattern path:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — `gh` CLI installed and authenticated with write access to the hub repo (fork/push/PR) — probe: `command -v gh && gh auth status`
+- **Files** — the pattern path from `$ARGUMENTS` must exist; `synthesis-config.yml` (optional — read if present for `strip_before_sharing`/`private_patterns` lists)
+- **Services / network** — reachable hub GitHub repo (clone/fork target)
+- **User inputs** — sanitization-preview approval ("Continue with submission? [y/n]" at STEP 4) — this cannot be front-loaded since it depends on the computed sanitization diff; declared here for transparency, asked at STEP 4 as designed
+
+## STEP 0: Preflight
+
+1. Verify `$ARGUMENTS` resolves to an existing file — missing → HARD-STOP, report the path.
+2. Verify `gh` is installed and authenticated — missing → report the exact fix (`gh auth login`) and HARD-STOP.
+3. Read `synthesis-config.yml` if present (used later in STEP 4).
+4. Proceed to STEP 1. (The STEP 4 approval gate is a declared exception — it depends on
+   content STEP 1-4 compute, so it is asked there, not collected here.)
 
 ## STEP 1: Validate Pattern
 

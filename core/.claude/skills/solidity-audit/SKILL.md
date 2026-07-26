@@ -17,7 +17,7 @@ triggers:
   - ERC-721
 allowed-tools: "Bash Read Write Grep Glob Agent"
 argument-hint: "<action: audit|develop|test|deploy|upgrade|optimize> <contract or description>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -29,9 +29,29 @@ Production-grade Solidity development with security-first practices and audit me
 
 ---
 
-## STEP 0: Private Key Safety Gate
+## Prerequisites
 
-**Before ANY operation**, check for exposed secrets:
+- **Tools** — `forge`/Foundry OR `hardhat` (detected in STEP 2): `forge --version` / `npx hardhat --version`. `slither` and `aderyn` (STEP 5 static analysis) — degrade to whichever is installed if only one is present, note the gap in the report.
+- **Credentials/env** — none for `audit`/`develop`/`test`/`optimize`. `deploy`/`upgrade` actions need `PRIVATE_KEY` and an RPC URL in `.env` (never in source — this is also what STEP 0 below scans for).
+- **Files** — project root with `foundry.toml` or `hardhat.config.*` (checked in STEP 2).
+- **User inputs** — action + contract/description via `$ARGUMENTS` (`audit|develop|test|deploy|upgrade|optimize`), already required at invocation.
+
+## STEP 0: Preflight + Private Key Safety Gate
+
+**Before ANY operation**, verify tools and check for exposed secrets:
+
+```bash
+# Tool availability (consolidated — report all gaps at once)
+forge --version 2>/dev/null || npx hardhat --version 2>/dev/null || echo "MISSING: forge or hardhat"
+slither --version 2>/dev/null || echo "OPTIONAL-MISSING: slither"
+aderyn --version 2>/dev/null || echo "OPTIONAL-MISSING: aderyn"
+```
+
+- Neither `forge` nor `hardhat` available → HARD-STOP: report the gap, ask the user to install one (`curl -L https://foundry.paradigm.xyz | bash && foundryup`, or `npm install --save-dev hardhat`).
+- `slither` or `aderyn` missing (not both) → proceed with the one installed; note the skipped tool in the final audit report (STEP 10) rather than silently dropping coverage.
+- Action is `deploy`/`upgrade` and `PRIVATE_KEY`/RPC URL are not set in `.env` → report missing env vars now and ask the user to supply them before continuing.
+
+**Then** check for exposed secrets:
 
 ```bash
 # Scan for private keys, mnemonics, and API keys in the project

@@ -13,7 +13,7 @@ triggers:
   - project skeleton
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<stack name and project description, or PRD file path>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -24,6 +24,18 @@ Initialize a production-ready project skeleton with build, lint, test, CI, secur
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `git`; `docker` (for STEP 7 Docker/dev-env and STEP 11 gate check); the stack toolchain itself (npm/python/go/cargo/gradle) is determined in STEP 1 and only that stack's tool is required
+- **User inputs:** stack name + project description or a PRD path (already carried as `$ARGUMENTS`); license choice (STEP 10.1) — collectable up front instead of mid-run
+
+## STEP 0: Preflight
+
+1. Verify `git` and `docker` are available: `git --version`, `docker --version`. Missing either → report and ask whether to proceed without Docker (STEP 7/11 would then be skipped) or install first.
+2. If `$ARGUMENTS` did not name a stack, ask now (Python / Node-TS / Android / React-Next.js / Go / Rust) rather than deferring to STEP 1's confirmation gate.
+3. Ask for the license choice (STEP 10.1) now — default MIT — so it does not interrupt the run later.
+4. Proceed to STEP 1 once the stack and license are known and tools are confirmed.
 
 ## STEP 1: Determine Stack & Scope
 

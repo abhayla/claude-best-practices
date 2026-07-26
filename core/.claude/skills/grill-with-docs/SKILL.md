@@ -9,7 +9,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "[plan or decision to grill]"
-version: "1.1.0"
+version: "1.2.0"
 ---
 
 # Grill With Docs
@@ -19,6 +19,20 @@ Interview the user relentlessly about every aspect of their plan until shared un
 **What to grill:** $ARGUMENTS
 
 Ask dependent questions **one at a time**; batch answer-independent questions into one card, and on receiving an answer ask the next independent question FIRST, processing the answer after, so the user never waits on processing (owner directive 2026-07-21). If a question can be answered by exploring the codebase, explore the codebase instead — do not ask what you can resolve yourself.
+
+---
+
+## Prerequisites
+
+- **User inputs & decisions:** an available user for interactive dialogue — this skill's entire
+  purpose is a live, turn-by-turn grilling session, not a one-shot report; the plan/decision to
+  grill ($ARGUMENTS)
+- **Files:** none required — `CONTEXT.md` and `docs/adr/` are created lazily (STEP 1) only when
+  the first term/decision needing them actually resolves
+
+No tools, credentials, or services beyond the built-in Read/Write/Edit/Grep/Glob are needed, so
+no `STEP 0: Preflight` gate applies — the only "prerequisite" this skill has is the user's
+presence, which is inherent to invoking it.
 
 ---
 

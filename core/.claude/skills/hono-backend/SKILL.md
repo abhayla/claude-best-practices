@@ -5,7 +5,7 @@ description: >
   Use when building APIs, middleware, or server-side logic with Hono.
 allowed-tools: "Read Grep Glob"
 argument-hint: "[route|middleware|auth|validation]"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 triggers: hono, hono-backend
 ---
@@ -13,6 +13,13 @@ triggers: hono, hono-backend
 # Hono Backend Reference
 
 Hono web framework for TypeScript backends across runtimes (Node.js, Bun, Deno, Cloudflare Workers).
+
+## Prerequisites
+
+None — this is a pure code-pattern reference (routes, middleware, validation, error handling)
+applied directly to whatever Node.js/Bun/Deno/Cloudflare Workers project the user already has
+open. It runs no CLI command, touches no credentials or external service, and requires no input
+beyond the optional `$ARGUMENTS` topic hint — so no `STEP 0: Preflight` gate applies.
 
 ## Project Setup
 

@@ -5,7 +5,7 @@ description: >
   Use when setting up, managing, or troubleshooting monorepo configurations.
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[setup|workspace|shared|turborepo]"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 triggers: monorepo, workspaces, workspace, turborepo
 ---
@@ -13,6 +13,21 @@ triggers: monorepo, workspaces, workspace, turborepo
 # Monorepo Management Reference
 
 Monorepo patterns for npm/pnpm/yarn workspaces with optional Turborepo orchestration.
+
+## Prerequisites
+
+- **Tools** — Node.js + the project's package manager (npm, pnpm, or yarn); the Turborepo CLI (`turbo`) only if the repo uses `turbo.json`. Probe: `node -v && npm -v` (or `pnpm -v` / `yarn -v`), `npx turbo --version` if `turbo.json` is present.
+- **Files** — a root `package.json` (npm/yarn) or `pnpm-workspace.yaml` (pnpm) declaring the workspace globs. Probe: check for these files at the repo root.
+- **User inputs** — which package manager the project already uses, and whether Turborepo is in play, if not obvious from the files above.
+
+## STEP 0: Preflight
+
+Before applying any workspace pattern below, confirm the environment:
+
+1. Detect the package manager from lockfiles (`package-lock.json` → npm, `pnpm-lock.yaml` → pnpm, `yarn.lock` → yarn), or ask the user if none exist yet.
+2. Verify the detected/chosen manager's CLI is installed (`node -v`, then `npm -v` / `pnpm -v` / `yarn -v`).
+3. Check for `turbo.json` at the root — if present, verify `npx turbo --version` resolves; if the user wants Turborepo but it's absent, that's part of this skill's setup guidance, not a missing prerequisite.
+4. Report any missing tool in one consolidated list and ask the user to install it before proceeding — do not start editing `package.json` / `pnpm-workspace.yaml` against an unconfirmed package manager.
 
 ## Workspace Setup
 

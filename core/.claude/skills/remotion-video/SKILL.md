@@ -14,7 +14,7 @@ triggers:
   - animation
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<action: create|animate|render|caption|3d|chart|batch> <description>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -25,6 +25,17 @@ Create, animate, and render videos using React components with Remotion.
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** Node.js + npm/npx (`node --version`, `npx --version`)
+- **Files:** an existing Remotion project (`remotion.config.ts`, `src/Root.tsx`) is checked for in STEP 2.1 — its absence is not fatal, STEP 2.2 scaffolds a new one via `npx create-video@latest`
+
+## STEP 0: Preflight
+
+1. Verify Node.js and npx are available: `node --version`, `npx --version`. Missing either → HARD-STOP; Remotion cannot scaffold, animate, or render without them.
+2. Determine the requested action from `$ARGUMENTS` (create/animate/render/caption/3d/chart/batch) per STEP 1's table — if ambiguous, ask now instead of guessing mid-run.
+3. Proceed to STEP 1.
 
 ## STEP 1: Detect Action
 

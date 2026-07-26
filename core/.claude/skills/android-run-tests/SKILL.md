@@ -15,7 +15,7 @@ triggers:
   - run kotlin tests
 allowed-tools: "Bash Read Write Grep Glob Skill"
 argument-hint: "<TestClassName> [--unit|--ui|--e2e] [-x]"
-version: "2.2.0"
+version: "2.3.0"
 type: workflow
 ---
 
@@ -24,6 +24,22 @@ type: workflow
 Run Android tests with class name resolution and type auto-detection.
 
 **Arguments:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools:** `./gradlew` within the detected Android directory (STEP 1); `adb` for instrumented/UI/E2E tests
+- **Files:** the Android project root (`build.gradle.kts`/`build.gradle`), the target test class source file
+- **User inputs:** `<TestClassName>` and optional `--unit|--ui|--e2e` type override, optional `-x`
+
+## STEP 0: Preflight
+
+1. Confirm `<TestClassName>` was supplied in `$ARGUMENTS`. Missing → ask the user for the class name now.
+2. Confirm a Gradle project root is discoverable (checked fully in STEP 1); if none of `android/`, `app/`, `.` has a `build.gradle(.kts)`, stop and ask for the correct root.
+3. If the test type resolves to UI/E2E (checked in STEP 3), confirm `adb devices` lists a device now rather than discovering the gap after compiling.
+
+Report all missing items together before STEP 1.
 
 ---
 

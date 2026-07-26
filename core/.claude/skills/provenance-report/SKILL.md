@@ -10,7 +10,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "[--open]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # /provenance-report — per-project "Behind the Scenes" report
@@ -23,6 +23,18 @@ design — each project has a different process, so each report differs.
 session, not fully on disk. So this report is **authored at session end from real
 on-disk data + the session's known sequence** — most accurate when run while the
 build is fresh. Auto-harvest from `loop-engineering` state/events is a future upgrade.
+
+## Prerequisites
+
+- **Tools:** `git` (STEP 1 reads `git log`); a browser or `open`/`start` command for `--open` (STEP 4)
+- **Files:** none are hard-required — STEP 1 harvests whatever of `.claude/learnings.json`, `.workflows/`, `.pipeline/state.json`, `test-results/`, `docs/**` is actually present and degrades gracefully when absent
+- Write access to `docs/process-report/` in the current project
+
+## STEP 0: Preflight
+
+1. Confirm the current directory is inside a git repo: `git rev-parse --is-inside-work-tree`. If not, HARD-STOP — this skill reports on a project's git-tracked history.
+2. Note which optional sources exist (`.claude/learnings.json`, `.workflows/`, `test-results/`) — their absence is not an error, just fewer sections to populate.
+3. If `--open` was passed, confirm a way to open the file exists (`open`/`start`/`xdg-open`) — else fall back to just printing the path.
 
 ## STEP 1: Harvest the real, on-disk data
 - `git -C <project> log --oneline` (+ stat) → commits / what changed when.

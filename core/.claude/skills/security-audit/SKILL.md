@@ -9,7 +9,7 @@ description: >
 allowed-tools: "Bash Read Write Grep Glob"
 triggers: "security audit, vulnerability, codeql, semgrep, sarif, static analysis, security review, insecure defaults"
 argument-hint: "<'full-audit' or 'diff-review' or 'variant <CVE/pattern>' or 'actions-audit'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -18,6 +18,31 @@ type: workflow
 Run a structured security audit on the target codebase, combining automated static analysis with manual review patterns.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools** — `semgrep` (required, STEP 2/7): `semgrep --version`. `codeql` (optional, STEP 2 CodeQL scan): `codeql --version` — degrade to semgrep-only if absent. `python3` (SARIF triage, STEP 2): `python3 --version`. `git` (diff review, STEP 4): `git --version`.
+- **Files/Services** — target codebase available on disk; no network access required.
+- **User inputs** — audit mode via `$ARGUMENTS` (`full-audit` / `diff-review` / `variant <CVE/pattern>` / `actions-audit`), already required at invocation.
+
+## STEP 0: Preflight
+
+Probe every declared tool before scanning:
+
+```bash
+semgrep --version || echo "MISSING: semgrep"
+python3 --version || echo "MISSING: python3"
+git --version || echo "MISSING: git"
+codeql --version 2>/dev/null || echo "OPTIONAL-MISSING: codeql (CodeQL scan will be skipped, semgrep-only coverage)"
+```
+
+Consolidate results in ONE report:
+- `semgrep`, `python3`, or `git` missing → HARD-STOP: list every missing tool and its install command (`pip install semgrep`, standard git install) — these are load-bearing for every mode.
+- `codeql` missing → proceed, but note in the final report's Executive Summary that CodeQL coverage was skipped (semgrep-only).
+
+Only when the required tools are present, continue to STEP 1.
 
 ---
 

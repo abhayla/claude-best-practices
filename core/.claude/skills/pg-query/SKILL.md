@@ -7,7 +7,7 @@ description: >
 triggers: "postgresql postgres pg database query schema explain sql"
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<sql-query or question about database schema/performance>"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 ---
 
@@ -19,6 +19,23 @@ Based on PostgreSQL best practices and the jawwadfirdousi/agent-skills repositor
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — `psql` CLI. Probe: `psql --version`.
+- **Credentials / env** — `DATABASE_URL` (connection string with credentials). Probe: check it's set; never print its value.
+- **Services / network** — a reachable PostgreSQL instance. Probe: `pg_isready` against the parsed host/port, or a cheap `SELECT 1`.
+- **User inputs** — which environment to connect to (dev/staging) — per the Security Guardrails below, this skill must never connect to production without explicit confirmation, so ask up front.
+
+## STEP 0: Preflight
+
+Before running any query:
+
+1. Ask which environment to connect to (dev/staging) if not already stated — never assume production, and never connect to it without the user's explicit confirmation.
+2. Verify `DATABASE_URL` is set for that environment (check presence only — never print or log its value).
+3. Verify `psql` is installed: `psql --version`.
+4. Verify the database is reachable: `pg_isready -d "$DATABASE_URL"` (or a lightweight `psql "$DATABASE_URL" -c "SELECT 1;"`).
+5. If anything is missing or unreachable, report the full list and stop — do not attempt a query against an unverified connection.
 
 ## CRITICAL SAFETY RULES
 

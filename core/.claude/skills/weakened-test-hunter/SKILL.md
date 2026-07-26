@@ -1,7 +1,7 @@
 ---
 name: weakened-test-hunter
 description: Verify a claimed fix did not go green by weakening its tests — re-run the claimed checks, diff every test change against the pre-change baseline, and classify each loosened/deleted assertion as legitimate (spec-backed) or weakening. Returns VERIFIED / CAVEATS / REFUTED (or INCONCLUSIVE when the baseline cannot be made to run). Use before accepting any "tests pass now" claim on a change that touches test files, and in review gates on fix PRs. Complements /auto-verify (which catches zero-test vacuous greens); this catches non-zero-but-defanged greens.
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 triggers:
   - /weakened-test-hunter
@@ -26,6 +26,20 @@ is the dedicated hunt for that class, run on a change AFTER its author claims "t
 The non-negotiable that makes it work: **re-run every claimed check yourself — a pasted or
 described test run is never evidence here**, because a misleading green is exactly what is being
 hunted.
+
+## Prerequisites
+
+- **Tools:** `git` (required); `gh` (only if the audit target is a PR number — a commit range or
+  `working-tree` target does not need it).
+- **Credentials:** `gh` authenticated, only for a PR target.
+- **User inputs:** the audit target (`<pr-number | commit-range | working-tree>`) and optional
+  `[claimed-check-command]` — supplied via `$ARGUMENTS`.
+
+## STEP 0: Preflight
+
+Probe `git --version`. If the target (from `$ARGUMENTS`) is a PR number, probe `gh --version`
+and `gh auth status` — unavailable/unauthenticated → fall back to asking for the equivalent
+commit range (STEP 1.1 already documents this fallback) rather than stalling mid-run.
 
 ## STEP 1: Establish the Claim and the Diff Scope
 

@@ -20,7 +20,7 @@ triggers:
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "[section-name] [--update-baselines]"
-version: "5.1.0"
+version: "5.2.0"
 ---
 
 # /e2e-visual-run — Skill-at-T0 Orchestrator (Playwright)
@@ -40,6 +40,23 @@ T0 orchestrations with their own `run_id` scopes.
 
 ---
 
+## Prerequisites
+
+- **Tools/CLIs:** Node.js + `npx` (runs `npx playwright test`); Playwright installed
+  in the project.
+- **Files:** a Playwright config (`playwright.config.ts`/`.js`/`.mjs`) — STEP 1 item 2
+  hard-aborts with `NOT_PLAYWRIGHT_PROJECT` if absent.
+- **Services/connectivity:** the app-under-test must be reachable per whatever
+  `baseURL`/`webServer` the Playwright config points at.
+- **User inputs & decisions:** none collected mid-run — `section-name` and
+  `--update-baselines` are supplied as arguments and parsed in STEP 1.
+- **Dependency closure** (already gated at STEP 1.5, not duplicated here):
+  `test-scout-agent`, `tester-agent`, `visual-inspector-agent`, `test-healer-agent`,
+  and sub-skills `serialize-fixes` / `fix-loop` / `verify-screenshots` must be
+  dispatchable.
+
+---
+
 ## CLI Signature
 
 ```
@@ -52,6 +69,22 @@ T0 orchestrations with their own `run_id` scopes.
 | `<section-name>` | Restrict to tests matching the section (describe title / test title substring / `@tag` / file path glob) |
 | `--update-baselines` | Baseline-update mode — capture screenshots + regenerate ARIA YAML; skip verification + healing |
 | `<section-name> --update-baselines` | Baseline-update restricted to section |
+
+---
+
+## STEP 0: Preflight
+
+Cheap probes ahead of the deeper checks already built into this pipeline (STEP 1 item 2
+validates the Playwright config; STEP 1.5 validates the worker/skill dependency
+closure — this step fronts the cheapest checks, it does not duplicate their logic):
+
+1. Probe `npx --version` — Node/npx must be on PATH to run `npx playwright test`.
+2. Probe for a Playwright config file (`playwright.config.ts|.js|.mjs`) in the
+   project root.
+
+If either probe fails, report both in one list (`Node/npx not found`, `no Playwright
+config`) and stop — don't proceed into STEP 1 only to hit `NOT_PLAYWRIGHT_PROJECT`
+after state has already been initialized.
 
 ---
 

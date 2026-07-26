@@ -11,7 +11,7 @@ triggers:
   - mobile e2e
   - e2e test android
 argument-hint: "[feature-group|all] [--maestro|--gradle]"
-version: "2.1.0"
+version: "2.2.0"
 type: reference
 ---
 
@@ -20,6 +20,24 @@ type: reference
 Run E2E tests organized by feature group with automatic fix delegation.
 
 **Arguments:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools:** `./gradlew` (Gradle-based Espresso/Compose E2E) and/or Maestro CLI (`maestro --version` — installed via `curl -Ls https://get.maestro.mobile.dev | bash` if missing, declared fallback in the Setup section below); `adb`
+- **Services:** a running Android emulator/device (`adb wait-for-device`) — both Gradle instrumented tests and Maestro require one
+- **Files:** feature-group test classes (Gradle) or `e2e/maestro/<group>/*.yaml` flows (Maestro); `e2e/maestro/baselines/<group>/` for visual regression comparison
+- **User inputs:** `feature-group|all` and `--maestro|--gradle`; `--update-baselines` decision if visual baselines need refreshing
+
+## STEP 0: Preflight
+
+1. Confirm `adb devices` lists a connected device/emulator. Missing → ask the user to start an emulator (`emulator -avd <name>`) now, before running any group.
+2. Confirm the chosen framework's CLI is available: `./gradlew --version` for Gradle groups, `maestro --version` for Maestro groups (install via the Setup section below if missing).
+3. Confirm `feature-group|all` and `--maestro|--gradle` are known from `$ARGUMENTS`; if ambiguous, ask now rather than defaulting silently.
+4. If visual regression is in scope, confirm whether this run intends `--update-baselines` — collect that decision up front, not after seeing a mismatch.
+
+Report all missing items together; proceed once a device is connected and the framework CLI resolves.
 
 ---
 

@@ -1,12 +1,12 @@
 {
   "provenance-report": {
-    "hash": "60b24b402ae1f4f8ca94eb3c51a04b1857a3f18b0bc2c29d8f8ca34e1a8b4bdc",
+    "hash": "6690802e1862871372da6e0a0f38fab5b47b29759ca3143cb7cca95163d63074",
     "type": "skill",
     "category": "core",
     "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-17",
-    "last_updated": "2026-06-17",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Generate an owner-facing 'Behind the Scenes' build-provenance HTML report for the CURRENT project: what was done, how, with which roles/skills/agents/workflows/hooks, in what sequence, done-vs-open, plus a loophole/edge-case audit. Self-contained offline HTML written to docs/process-report/ in the TARGET project (per-project, differs per project) from real on-disk data + the session's known sequence; never fabricated.",
@@ -17,7 +17,7 @@
       "html",
       "transparency"
     ],
-    "changelog": "v1.0.0 (2026-06-17): Initial — per-project behind-the-scenes provenance report (timeline, roles, patterns used, agents, gates, done-vs-open, loophole audit). | v1.1.0 (2026-06-17): require a featured INTERACTIVE inline-SVG process-flow diagram (actual stages + labeled loops + gate markers; clickable nodes → per-stage roles/skills/agents/hooks/rules/gate/outputs).",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0 (2026-06-17): Initial — per-project behind-the-scenes provenance report (timeline, roles, patterns used, agents, gates, done-vs-open, loophole audit). | v1.1.0 (2026-06-17): require a featured INTERACTIVE inline-SVG process-flow diagram (actual stages + labeled loops + gate markers; clickable nodes → per-stage roles/skills/agents/hooks/rules/gate/outputs).",
     "tier": "nice-to-have"
   },
   "full-space-first": {
@@ -89,13 +89,13 @@
     }
   },
   "a11y-audit": {
-    "hash": "d58c6e73b7d3b9658664716d7932624b04781bbb6e01e2f0785ee31e92d58854",
+    "hash": "e0e2191d4067ef675bd8124564745a285e2d18e33c6359bfc0c7a17a0a760d8f",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "playwright"
     ],
@@ -108,7 +108,7 @@
       "axe-core",
       "Lighthouse"
     ],
-    "changelog": "v1.0.0: Initial release â€” axe-core, Lighthouse a11y, WCAG checklist",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” axe-core, Lighthouse a11y, WCAG checklist",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -144,20 +144,20 @@
     }
   },
   "adversarial-review": {
-    "hash": "0778a0bd401e39b14fab8de42ffd6fb1ef26eb173c6df5144826f66aff6dd2c5",
+    "hash": "80da4798b1dd63cebc6711baf3e6cd54df5f3b0dcb606e472d91a7d7fc0d7884",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Cross-model multi-round debate for plans and code review",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -167,13 +167,13 @@
     }
   },
   "agent-evaluator": {
-    "hash": "521bd9df9d493357a4263ca904556a73960d0a2595479eab038e5689d1f47bcb",
+    "hash": "9fc4558b3652fa9d76ea355edd2e5f3f3e769820dcf0e302b118e700eedcb69f",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-04-23",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Evaluate Claude Code agents against scenario files using LLM-as-judge with 5-criterion rubric (trigger reliability, output structure, NON-NEGOTIABLE adherence, side-effect correctness, error propagation). Distinct from /skill-evaluator.",
@@ -183,7 +183,7 @@
       "agents",
       "rubric"
     ],
-    "changelog": "v1.0.0: Initial release per spec test-pipeline-three-lane PR1 REQ-M036",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release per spec test-pipeline-three-lane PR1 REQ-M036",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -218,20 +218,20 @@
     }
   },
   "ai-gemini-api": {
-    "hash": "cecec051a4655c1a2e62bafd61c6469bea44a2de8bbd599d9de743c9738ee8ed",
+    "hash": "816ac1b6188992f8be149cf75dbc5df085b9a66842ddcca0f2bf4196c8c516c6",
     "type": "skill",
     "category": "need-basis",
-    "version": "2.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Apply Google Gemini API patterns including client setup with google-genai SDK, structured output, prompt design, and troubleshooting. Use when integrating or debugging Gemini-powered features.",
     "tags": [
       "reference"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.0.0: Genericized and restructured",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -287,13 +287,13 @@
     }
   },
   "android-arch": {
-    "hash": "1c33f79bd3e5db2cc654ff9c9f72ee6f2f6b079b02c2ef01346c0d174a4561a8",
+    "hash": "e79f50af427ed9c718820c63ca5b0bcc8440e93a55b88f863cbf424eb887dafe",
     "type": "skill",
     "category": "need-basis",
-    "version": "2.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Android architecture with 24 deep-dive references and Gradle convention plugin templates",
@@ -307,7 +307,7 @@
       "testing",
       "gradle"
     ],
-    "changelog": "v2.0.0: Merged with claude-android-ninja references and templates",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.0.0: Merged with claude-android-ninja references and templates",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -388,13 +388,13 @@
     }
   },
   "android-gradle": {
-    "hash": "48ed64dc0618935c453b92e21d0036a5a0d12673d366cf227c99cac8deabe616",
+    "hash": "c4cad3fd8425d0f8e15406437be36314c1a116c77204c7f8bf5c41733fbb8240",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Android Gradle build optimization and plugin configuration",
@@ -402,7 +402,7 @@
       "android",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -467,13 +467,13 @@
     }
   },
   "android-mvi-scaffold": {
-    "hash": "24a263cd1bb9293923671afdaafd9aeca4c4d71353bf22895959ef456fd93b59",
+    "hash": "f29d8f0146eafdeace2310c7b8958d1cc8eae58801e4cb4bbbb75999d509bf96",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "scan:ChrisWW/claude-code-android-skills+TaeseongYun/everything-claude-code-android",
     "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "MVI feature scaffolder â€” generates Contract, ViewModel, Screen, UseCase, Repository, DI module",
@@ -485,7 +485,7 @@
       "compose",
       "architecture"
     ],
-    "changelog": "v1.0.0: Initial â€” consolidated from ChrisWW + TaeseongYun repos",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial â€” consolidated from ChrisWW + TaeseongYun repos",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -495,13 +495,13 @@
     }
   },
   "android-run-e2e": {
-    "hash": "4532522d50158ad5e12a9e91c84437233e6386fc99b4728bdb17a55103175cd9",
+    "hash": "5891737651f63439d595ee601d3e4f8396bdda0ec4f7045f048cee4b03125c89",
     "type": "skill",
     "category": "need-basis",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Run Android E2E tests via Gradle or Maestro with auto-fix on failure",
@@ -510,7 +510,7 @@
       "android",
       "reference"
     ],
-    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "changelog": "v2.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -520,13 +520,13 @@
     }
   },
   "android-run-tests": {
-    "hash": "527c4d0eb53e9a780c4a6ba57b2505ee78b355e9c082a78c1152767d37c4b59c",
+    "hash": "6cd2b74cf1c13f67e9caa6d11e3c21c98070ce06b9a399937b5dd24121a60a20",
     "type": "skill",
     "category": "need-basis",
-    "version": "2.1.0",
+    "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Run Android tests with class name resolution and auto-fix on failure",
@@ -535,7 +535,7 @@
       "android",
       "workflow"
     ],
-    "changelog": "v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "changelog": "v2.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -545,13 +545,13 @@
     }
   },
   "android-test-patterns": {
-    "hash": "15d45b4d2bacb83272582c8dcd6899f5872e54f5017dc34d9ac51ee34eaed5c7",
+    "hash": "8304ab246319f5fbe1f13cb97645dd9aae7aba33435395345cc77a21a55cdd9b",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:pipeline-audit",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "android-run-tests",
       "android-run-e2e"
@@ -567,7 +567,7 @@
       "turbine",
       "mockk"
     ],
-    "changelog": "v1.0.0: Initial â€” JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial â€” JUnit 5 unit, Compose UI, Espresso E2E, Hilt DI, Room, coroutine patterns",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -577,13 +577,13 @@
     }
   },
   "anthropic-agent-orchestration-guide": {
-    "hash": "3d00e0fd06b096bf9b15293640e62cfd747dbc06a46c132a16cf0f5aaa36965d",
+    "hash": "c207386025a92c696ff3d4aadd39e4d3e961baf5e6ebb3cddc00399afd59606b",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Reference guide covering Anthropic's 5 workflow patterns, agent vs skill decision framework, orchestration architecture, anti-patterns, and context management",
@@ -593,7 +593,7 @@
       "patterns",
       "agents"
     ],
-    "changelog": "v1.0.0: Initial creation â€” comprehensive orchestration reference",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation â€” comprehensive orchestration reference",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -603,13 +603,13 @@
     }
   },
   "anthropic-multi-agent-research-system-skill": {
-    "hash": "c00b8affa9182d8604a6d950a6e546302086a3f418a4a80f9880ccb1c4b84283",
+    "hash": "809393654c79590a6c99bf8ee7002be650cd6e2d1e4719076e934fb898768ed7",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-31",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "anthropic-agent-orchestration-guide"
     ],
@@ -623,7 +623,7 @@
       "production",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial creation — 8 principles, evaluation methodology, production patterns from Anthropic research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation — 8 principles, evaluation methodology, production patterns from Anthropic research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -688,13 +688,13 @@
     }
   },
   "architecture-fitness": {
-    "hash": "a36604fc1be8158ab84273bf9aa9c2085c37e320a76dfcf6247289dcd72e24d6",
+    "hash": "5554dd254538fb010d8e72289b53b30958725d734117ca195e741c2ccdef40a7",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Architecture conformance checks: dependency direction validation, circular dependency detection, coupling/cohesion metrics, module boundary analysis, and ADR review",
@@ -704,7 +704,7 @@
       "coupling",
       "dependencies"
     ],
-    "changelog": "v1.0.0: Initial release â€” dependency direction, circular deps, coupling, ADR review",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” dependency direction, circular deps, coupling, ADR review",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -756,20 +756,20 @@
     }
   },
   "batch": {
-    "hash": "a5abebc995484db64eed0c2ab8776c795e0d6570e8b102e3edae016bc22521c1",
+    "hash": "01344b26cfca5a03886f4c6986b9e88b880e33101a372e86722885a2b2c2ff6c",
     "type": "skill",
     "category": "core",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Parallel codebase-wide changes, renames, API migrations",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -802,20 +802,20 @@
     }
   },
   "branching": {
-    "hash": "666d32dad58a08e07cd04fdbc67645e36d78346a3da95bdad633db690fa99749",
+    "hash": "f6a60af8eea4bf6a448674aaac8a795034858bfd84749734876d58c1364860c2",
     "type": "skill",
     "category": "core",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Full branch lifecycle: create with naming conventions + finish with merge",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -850,13 +850,13 @@
     }
   },
   "bun-elysia-test": {
-    "hash": "57c9cb09cd284f60049e39c8785975c51ec73e66c207037dfdb8a8167e0e9e0f",
+    "hash": "fd51ab963b2fca250ee48a557daf3b6631901ae42dfb3ae81a44c898879426dc",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Bun + Elysia testing workflow with bun:test, Eden treaty client, plugin and WebSocket testing. Auto-fix on failure.",
@@ -865,7 +865,7 @@
       "elysia",
       "testing"
     ],
-    "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -875,13 +875,13 @@
     }
   },
   "change-risk-scoring": {
-    "hash": "0ee7825de55c68cb532feb6b2091f77bc5f96724af46eefa7627d93cc2cbb7bb",
+    "hash": "7cc2da8532293dc11c84f01aa2c7083fe95436c5c201950f4ee48c18deed7deb",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Quantified change risk score (files Ãƒâ€” complexity Ãƒâ€” inverse coverage) for deploy go/no-go decisions with hotspot analysis",
@@ -891,7 +891,7 @@
       "deploy",
       "metrics"
     ],
-    "changelog": "v1.0.0: Initial release â€” composite risk scoring, hotspot analysis",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” composite risk scoring, hotspot analysis",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -901,13 +901,13 @@
     }
   },
   "changelog-contributing": {
-    "hash": "934fc57b04efb346df539615d135c382c00aba21ab6e108092f0fa2aa524b170",
+    "hash": "a59c9eaba3e8ff7a3f0a80c14623b116d4bca13994b7659665fc252c672dc533",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Auto-generate CHANGELOG from conventional commits and CONTRIBUTING.md with project-specific guidelines",
@@ -917,7 +917,7 @@
       "conventional-commits",
       "documentation"
     ],
-    "changelog": "v1.0.0: Initial release â€” CHANGELOG + CONTRIBUTING generation",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” CHANGELOG + CONTRIBUTING generation",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -927,13 +927,13 @@
     }
   },
   "chaos-resilience": {
-    "hash": "c725e895fa93dc5c1da90b2eaa0be2eb932add91ea7cd11b42cf9ef7729612d1",
+    "hash": "a28243a7b5064b39e4d5f89bc2b6fe7e61618306d066ef213625869ece20f14e",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Chaos engineering and resilience testing: failure injection, graceful degradation, circuit breaker validation, gameday planning",
@@ -943,7 +943,7 @@
       "failure-injection",
       "circuit-breaker"
     ],
-    "changelog": "v1.0.0: Initial release â€” failure injection, degradation verification, gameday",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” failure injection, degradation verification, gameday",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -953,13 +953,13 @@
     }
   },
   "ci-cd-setup": {
-    "hash": "8f08ff9470e6743c1f27d12792426293ecd086eabb1e0663c7341fae6f24cdaa",
+    "hash": "cabbdaca4e2cd326511a736a0328db2f502cec107031d7f3283761a732fa9f4c",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "GitHub Actions, GitLab CI, pipeline stages, environment promotion",
@@ -967,7 +967,7 @@
       "deployment",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1021,13 +1021,13 @@
     }
   },
   "code-quality-gate": {
-    "hash": "fd881794cc1f54f3fc86cd7d430cc9cfa296b5c1a9e5c0a82fd804a51256d2d2",
+    "hash": "e465a5e3253e57a88d4d2df0b53083bb5772eed636a24039cdbbc0436710f810",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Post-implementation code quality enforcement with cyclomatic complexity, duplication detection, SOLID checklist, structured logging audit, TDD refactor phase, and clean architecture layer validation",
@@ -1038,7 +1038,7 @@
       "refactoring",
       "logging"
     ],
-    "changelog": "v1.0.0: Initial release â€” complexity, duplication, SOLID, logging, refactor, layer checks",
+    "changelog": "v1.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” complexity, duplication, SOLID, logging, refactor, layer checks",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1126,13 +1126,13 @@
     }
   },
   "compose-ui": {
-    "hash": "e41b7978d0926404a5dc3674fb7991b6673791868b51b0f464af98b6acf99be4",
+    "hash": "7bf9b7572a6d73cd01fc75ee88bb60679b1c72ed91b2534dd9cad1fd5213493e",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Jetpack Compose UI patterns, theming, accessibility",
@@ -1140,7 +1140,7 @@
       "android",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1316,20 +1316,20 @@
     }
   },
   "contribute-practice": {
-    "hash": "846f08afd6a5ffe90d2aa80a4f24c3f2cf6faa452d9fc16ea199b880f8655113",
+    "hash": "b68b64f4dc77ed6afe03ca06c0b09555eb2e7c8085e0a6fd73aa50e189dae963",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Push a pattern from your project to the best practices hub by validating structure, checking for duplicates, and creating a PR. Use when you have a battle-tested pattern worth sharing with other projects.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v2.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.0.0: Genericized and restructured",
     "tier": "skip",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1339,13 +1339,13 @@
     }
   },
   "coverage-analysis": {
-    "hash": "8d5655ccc00d75ad7f9b532b3de3544b3004219557f4fb6404c5dc5bb88e720d",
+    "hash": "afe4ecce62aa1493f4cf92e886dee99d533dd8ff6c6705e6fa5f30d222581d31",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Analyze test coverage across a project, identify gaps in critical code paths, and prioritize which files and functions to test next.",
@@ -1354,7 +1354,7 @@
       "coverage",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1364,13 +1364,13 @@
     }
   },
   "create-github-issue": {
-    "hash": "4c7f00aac5f58785a6c62a02695bde2a45ad22a1252276b9594031a913c1289f",
+    "hash": "526bef6887115f90f42347d8876ddbfc1306b0a59dc9b8b136fccfde870dacf2",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-23",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Universal skill to create GitHub Issues from a structured failure profile. Use when an agent needs to surface a failure as a tracked work item. Hard-fails on missing GitHub (no silent skip). 4 preflight checks + 3-field sha256 dedup.",
@@ -1380,7 +1380,7 @@
       "testing-pipeline",
       "failure-tracking"
     ],
-    "changelog": "v1.1.0: SIG2 root-cause recurrence check (open+closed, 90d) + Recurrence body section (fable-harvest B, class F)",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.1.0: SIG2 root-cause recurrence check (open+closed, 90d) + Recurrence body section (fable-harvest B, class F)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1390,20 +1390,20 @@
     }
   },
   "cross-platform-visual": {
-    "hash": "5d9a973d7d94488d2003348b480f7a16c425a8ed9068b894e927df40cc2dfbb1",
+    "hash": "195e82885989da1bab9ae7f5f9e8c8fb6833f51a2244281edbac899f49c1820c",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Validate visual consistency by capturing the same screen across Android, Web, and Flutter, comparing for visual parity, and flagging divergence. Use when verifying design consistency across platforms after UI changes.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial registration",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1413,20 +1413,20 @@
     }
   },
   "d3-viz": {
-    "hash": "108d4cd7bef1a442883e63bba5cc592dc4b230f67dc14d77e7ec98f4098852f3",
+    "hash": "f1bd01a6ba42f3f696b3a1a8398a275b1d014b47f953bcbc607a873d43bd8340",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "D3.js data visualization: selections, scales, 9 chart types, interactions",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1451,13 +1451,13 @@
     "tier": "must-have"
   },
   "dast-scan": {
-    "hash": "e7ab15cc1d311fd7abfcd834344bf4a569abbf804ac128b928931a5cc4dbb122",
+    "hash": "208d41fc277cb7b84c4e9636ac59590f605362c4955cc722a4759634219bc550",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "security-audit"
     ],
@@ -1471,7 +1471,7 @@
       "nuclei",
       "fuzzing"
     ],
-    "changelog": "v1.0.0: Initial release â€” ZAP, Nuclei, headers, sessions, fuzzing, CI",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” ZAP, Nuclei, headers, sessions, fuzzing, CI",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1481,13 +1481,13 @@
     }
   },
   "db-migrate": {
-    "hash": "ea68c8aa074b059c61fae3cdb2451a1c7d31121b7d926c1362d469c5ae272087",
+    "hash": "b12eaf19559bcae135e73bea8f80a00e505c1c316134980217cb30f0a724f2db",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "schema-designer"
     ],
@@ -1501,7 +1501,7 @@
       "Django",
       "TypeORM"
     ],
-    "changelog": "v1.0.0: Initial release â€” multi-ORM migration with safety rules",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” multi-ORM migration with safety rules",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1511,20 +1511,20 @@
     }
   },
   "db-migrate-verify": {
-    "hash": "c2cde662e6525b33ea2872b3218c15006d7ad95f364b116e178567df59f2fe3c",
+    "hash": "4237f68efd6933d5fa9da0962f7b0b6553220d22e3bae752c156ac38a3bd7a07",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Verify database migrations: run forward, validate schema, run backward, validate rollback. Tests with seeded data to catch data-loss migrations.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial registration",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1588,13 +1588,13 @@
     }
   },
   "deploy-strategy": {
-    "hash": "21023ec63f543eef2938e490e3863455ad52dd0571367f12df61b78262f3ccae",
+    "hash": "8ea4bd1a7fcb670d48b3f019158ff0731121dbf32d1dfafab39d4aff23c49c32",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "ci-cd-setup",
       "k8s-deploy"
@@ -1609,7 +1609,7 @@
       "zero-downtime",
       "PRR"
     ],
-    "changelog": "v1.0.0: Initial release â€” GitOps, canary, blue-green, DB migration ordering, PRR",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” GitOps, canary, blue-green, DB migration ordering, PRR",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1705,13 +1705,13 @@
     }
   },
   "diataxis-docs": {
-    "hash": "f529e2ba1d9261d63021fbed4796c2aceb3f39edb7b49d0c518020b23c6803e0",
+    "hash": "882a55479b2ba6cbd29d82a669c3525de4b439ab5028bef864a01ff1aa084a51",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Organize documentation using the DiÃƒÂ¡taxis framework: tutorials, how-to guides, reference, explanation with templates per category",
@@ -1721,7 +1721,7 @@
       "tutorials",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release â€” DiÃƒÂ¡taxis categorization, templates, migration",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” DiÃƒÂ¡taxis categorization, templates, migration",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1731,13 +1731,13 @@
     }
   },
   "disaster-recovery": {
-    "hash": "e27314a8c4d64310049662f1720ec0c503e883c280cdbe9da5fe466614526a2a",
+    "hash": "dd63d2d05b93df560471d2f0cac6b97a100677889c80946bbbb9dcc3987159e8",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-03-13",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "monitoring-setup",
       "incident-response"
@@ -1752,7 +1752,7 @@
       "RTO",
       "RPO"
     ],
-    "changelog": "v1.0.0: Initial release â€” RTO/RPO, backup, restore, failover, DR drills",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” RTO/RPO, backup, restore, failover, DR drills",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1815,13 +1815,13 @@
     }
   },
   "docker-optimize": {
-    "hash": "dddfb491b02ea13a13e91a2c1adf01cb78b6903145275326241d302c35bcb41f",
+    "hash": "e05cabfabbc9303e5deb252f577678cf858195e2c22cc0d194dac6693de379cd",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Multi-stage Docker builds, layer caching, security scanning",
@@ -1829,7 +1829,7 @@
       "documentation",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1892,13 +1892,13 @@
     }
   },
   "drizzle-orm": {
-    "hash": "688992e15810aee165976d6e05dc9b4e4447ee5a5f6ebe89d381a401d6c880aa",
+    "hash": "c4121a95b1539643cf980ef2cbfd26bbf1e1289ca5ed2b2b6777d723e3c29516",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Drizzle ORM schema, migrations, queries for TypeScript",
@@ -1907,7 +1907,7 @@
       "typescript",
       "database"
     ],
-    "changelog": "v1.0.0: Initial creation",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1917,13 +1917,13 @@
     }
   },
   "e2e-best-practices": {
-    "hash": "3a61db8c34ed220b79830cde28a1b6a386aa429ae243ffdbff47b5b85bbb3f99",
+    "hash": "5a000940e66289199ff60ba5890203e558d188d4239d9af546cba029b39a87aa",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-28",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Cross-framework E2E testing best practices for selector strategy, test data isolation, CI pipeline tiering, mock decisions, auth patterns, and parallel execution",
@@ -1933,7 +1933,7 @@
       "best-practices",
       "cross-framework"
     ],
-    "changelog": "v1.0.0: Initial release â€” 10 sections covering gaps across existing E2E skills",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” 10 sections covering gaps across existing E2E skills",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -1989,13 +1989,13 @@
     }
   },
   "e2e-visual-run": {
-    "hash": "8c33c3259d1bc7aca6292973682d55c9cbe7ce9c7a17dfcad25d91673324e3a4",
+    "hash": "8bf85e67b523955068c94be97cd539c4be5c969aaeb287b5e7ed9ffa104dd9eb",
     "type": "skill",
     "category": "core",
-    "version": "5.1.0",
+    "version": "5.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-27",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "fix-loop",
       "serialize-fixes",
@@ -2015,7 +2015,7 @@
       "accessibility",
       "playwright"
     ],
-    "changelog": "v5.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (parity with the other orchestrator workflows). | deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing. | v5.0.0 (2026-04-24): MAJOR — full body rewrite as independent skill-at-T0 orchestrator; no longer dispatches deprecated e2e-conductor-agent; dispatches scout/tester/visual-inspector/healer workers directly from T0",
+    "changelog": "v5.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v5.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (parity with the other orchestrator workflows). | deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v3.0.0: BREAKING - scope reduced to Playwright only (Cypress/Selenium/Detox/Flutter removed). Added expected_changes queue, git-status pre-check in Step 6, flakiness decay/probe-run rule, section filter semantics, PID-safety and port-in-use guards.\nv4.0.0: Thin wrapper that dispatches e2e-conductor-agent. Promoted to must-have 2026-04-23 alongside its agent-backed implementation.\nv1.0.0: Initial release - queue-based orchestration, dual-signal verification, 8-classification healing. | v5.0.0 (2026-04-24): MAJOR — full body rewrite as independent skill-at-T0 orchestrator; no longer dispatches deprecated e2e-conductor-agent; dispatches scout/tester/visual-inspector/healer workers directly from T0",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2075,20 +2075,20 @@
     }
   },
   "executing-plans": {
-    "hash": "f3fa3a42e8935b436c04aa7ecc5598f2cd29b35128789e6e502d111c1892098a",
+    "hash": "19812271b9d6560fc05ee01c3a5c7dc3e8bac234848c072c2f237df70dce8be3",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-06-23",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Bridge writing-plans to plan-to-issues pipeline with execution tracking",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research; added --team note (parallel waves only when disjoint file sets; points to development-loop STEP 4-TEAM discipline)",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research; added --team note (parallel waves only when disjoint file sets; points to development-loop STEP 4-TEAM discipline)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2098,20 +2098,20 @@
     }
   },
   "expo-dev": {
-    "hash": "6607ae97f5cf98834524078f676b4598289fd2e2257beb52695fa5db2484008f",
+    "hash": "bc04d66879d7a63bc87af86a3cbf17824f74e3c735d9f0af9841035820f98254",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Expo/React Native development, routing, deployment",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -2286,13 +2286,13 @@
     }
   },
   "feature-flag": {
-    "hash": "91605c6d99d5172eff2e8b481ddff097d3ad8e92fa04d5f17e54ecba65917c15",
+    "hash": "229119f97447bdf4feba9410c9df77783e708735a60ca60c782cc768312f8173",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Feature toggle patterns (release, experiment, ops, permission) with LaunchDarkly, Unleash, env-var flags, and cleanup checklist",
@@ -2301,7 +2301,7 @@
       "toggles",
       "gradual-rollout"
     ],
-    "changelog": "v1.0.0: Initial release â€” flag types, implementation patterns, cleanup",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” flag types, implementation patterns, cleanup",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2311,13 +2311,13 @@
     }
   },
   "five-advisors": {
-    "hash": "61a81205b7361b0a5caa16d67e4dd3f9020a8a3d26122fc0f885a98b5f8a1bbd",
+    "hash": "5b43edb7871f804720234b2ab1915a52ad0e9851c8f6c05dac1d00a5fb291b78",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-30",
-    "last_updated": "2026-04-30",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Run any question, idea, or decision through Five Advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict. Based on Karpathy's LLM Council methodology. Use when a decision has stakes, multiple options, and benefits from being pressure-tested from multiple angles.",
@@ -2328,7 +2328,7 @@
       "multi-perspective",
       "stress-test"
     ],
-    "changelog": "v1.0.0: Initial release â€” 5 advisor lenses (Contrarian, Strategist, Operator, Customer, Realist) with anonymous peer review and chairman synthesis. Adapted from Andrej Karpathy's LLM Council methodology.",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” 5 advisor lenses (Contrarian, Strategist, Operator, Customer, Realist) with anonymous peer review and chairman synthesis. Adapted from Andrej Karpathy's LLM Council methodology.",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2387,13 +2387,13 @@
     }
   },
   "firebase-data-connect": {
-    "hash": "e784aba821e1dd4d2f642ef128fc64791ab7e84c0ce63c0f71449d41b46a9dc0",
+    "hash": "923091790b0c7b170c2a8b36d7b78ad5308e25e049682209714079469cb689e8",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Firebase Data Connect with PostgreSQL and GraphQL",
@@ -2401,7 +2401,7 @@
       "firebase",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2411,13 +2411,13 @@
     }
   },
   "firebase-dev": {
-    "hash": "e7caa42829b54dc495669d9ea3dd6e137de78cefd476d8d320252c696d791b49",
+    "hash": "cd609e24fb76d097552e73701b77b9bcd1a00a9b1f69f515324bff9a22dc824b",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-03",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Build Firebase-backed apps with project setup, CLI, Authentication, and Firestore. Covers providers, tokens, security rules, CRUD, transactions, realtime listeners, and indexes.",
@@ -2425,7 +2425,7 @@
       "firebase",
       "reference"
     ],
-    "changelog": "v1.0.2: Add TOC, add deleteDoc to Write Operations (complete CRUD) | v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.2: Add TOC, add deleteDoc to Write Operations (complete CRUD) | v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2435,13 +2435,13 @@
     }
   },
   "firebase-test": {
-    "hash": "7c91fa95906356fe35ade63c6431ee0ad11b13217bb9bc605d7dec1e1995954b",
+    "hash": "0683b1d0e3a3f164e532a37261dad6568b84026c8627562e9bf72e6aa8f988ea",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Firebase testing workflow with Emulator Suite, Firestore rules, Cloud Functions, and Auth triggers. Auto-fix on failure.",
@@ -2451,7 +2451,7 @@
       "emulator",
       "firestore"
     ],
-    "changelog": "v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.1.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2574,13 +2574,13 @@
     }
   },
   "flutter-dev": {
-    "hash": "900e8f4dbf4ac2e056aec45a3d498b2f2ca36d790a70985de86218dd74912706",
+    "hash": "10847f4083b2b56da6fdd86f3ea0d29c9d991cfb4f13cdabd73295262319e100",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Flutter 3+ development: widgets, state management, navigation, builds",
@@ -2588,7 +2588,7 @@
       "flutter",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -2598,13 +2598,13 @@
     }
   },
   "flutter-e2e-test": {
-    "hash": "992c0b48d253745b7d5812b61872c49ca077cd89bafed176381cc7bccd465238",
+    "hash": "b318a0ea99da224cb1dba73e94426ad5fb7ac9a4cd857b36804df32db7845e75",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.2.1",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Flutter E2E testing across mobile platforms with auto-fix on failure",
@@ -2613,7 +2613,7 @@
       "flutter",
       "workflow"
     ],
-    "changelog": "v1.2.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
+    "changelog": "v1.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.2.0: Auto-invoke /fix-loop + /learn-n-improve on failure",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -2693,13 +2693,13 @@
     }
   },
   "github": {
-    "hash": "b7ebc3a39b0334afce9a55f1faa3af9a76c173c407c017f3208e9b2b95088be2",
+    "hash": "5e4069348b3a5d4b366a25c9712879a6dbf14a88b962ed7e6a0b5f669bf1ef3f",
     "type": "skill",
     "category": "third-party",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
-    "last_updated": "2026-06-30",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "GitHub search and discovery: search repos, search code, deep-inspect repositories",
@@ -2708,7 +2708,7 @@
       "search",
       "discovery"
     ],
-    "changelog": "v1.0.0: Initial release â€” repo search, code search, deep inspect modes",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” repo search, code search, deep inspect modes",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2746,13 +2746,13 @@
     }
   },
   "grill-me": {
-    "hash": "d26adc7bb94b190b156726f6cd6991ecaf6ce70ee1a916cad31c8f03a24789a3",
+    "hash": "0a5d3a01140d34dd977972323434bdbe53ecb08dcc8b577c3fbcf838e963e748",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "scan:mattpocock/skills",
     "discovered": "2026-05-24",
-    "last_updated": "2026-05-24",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Audit a plan or design by interviewing the user relentlessly until shared understanding is reached, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions \"grill me\".",
@@ -2760,7 +2760,7 @@
       "workflow",
       "productivity"
     ],
-    "changelog": "v1.0.0: Initial registration (sourced from mattpocock/skills, MIT). Tier promoted nice-to-have -> must-have: universal core skill, companion grill-with-docs already must-have.",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial registration (sourced from mattpocock/skills, MIT). Tier promoted nice-to-have -> must-have: universal core skill, companion grill-with-docs already must-have.",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2770,20 +2770,20 @@
     }
   },
   "handover": {
-    "hash": "006c635be599c94015a375586494825b391817c69b834d5f5e1f3d1d48f5efe0",
+    "hash": "05116bff9e0323448e41c787d57d404ced1043bc26054fdd82d1964b1f6d703d",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Session continuity with decision log, pitfalls, next steps, ADR format",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2793,13 +2793,13 @@
     }
   },
   "hono-backend": {
-    "hash": "b68e588a62aed476db95a79b4c2b221d46f447c6c5d03f10d7b33b0621662edb",
+    "hash": "b9c4ba34bf7bb59de1c2ca3055fe45f28f7e170a36ef2e7400698c231e3a0ff3",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Hono web framework patterns for TypeScript backends",
@@ -2808,7 +2808,7 @@
       "typescript",
       "backend"
     ],
-    "changelog": "v1.0.0: Initial creation",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2818,13 +2818,13 @@
     }
   },
   "html-prototype": {
-    "hash": "55c51711fa7618eb340b1f39b1e9a1d980ec38ab57cf2c0fd016e23983604bfb",
+    "hash": "3c1c323687bb0e506efb7514173b3779e6a74a60361c4f3b590b0c4b5a84140c",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Single-file HTML prototype generation with design tokens, Nielsen's heuristics, PRD traceability annotations, and mobile-responsive layout",
@@ -2835,7 +2835,7 @@
       "demo",
       "Nielsen"
     ],
-    "changelog": "v1.0.0: Initial release â€” single-file prototypes with heuristic validation",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” single-file prototypes with heuristic validation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2845,13 +2845,13 @@
     }
   },
   "iac-deploy": {
-    "hash": "68ee18a7db5f14bba3d697bd538e12765264d1a5ed7f74b743cfba9285f00388",
+    "hash": "8c989990f336fee43ca47320e302feea3abf146b0b162139de9be3eea67ac6b7",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.1",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Infrastructure as Code: Terraform, Pulumi, state management",
@@ -2859,7 +2859,7 @@
       "deployment",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -2968,13 +2968,13 @@
     }
   },
   "k8s-deploy": {
-    "hash": "cc65a059af3aa6a8524f6f63311b3b0cee83a3b73b503642fadd6eb3d5d3b2d9",
+    "hash": "dce47370d60a710c41eff59f1e591006bf4267a72d4e1829db153ec5a16f7f11",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Kubernetes manifests, probes, HPA, RBAC, Helm charts",
@@ -2982,7 +2982,7 @@
       "deployment",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3050,20 +3050,20 @@
     }
   },
   "mcp-server-builder": {
-    "hash": "151b891925204bc3a51e083d34395962bf3abaa62339b9103dc8d6c0da74f224",
+    "hash": "4acc6dd654269925bd0c157de7b47839dc61d4d11f62a84cc91b3c54e32d85cd",
     "type": "skill",
     "category": "third-party",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Build MCP (Model Context Protocol) servers that extend Claude Code's capabilities. Covers agent-centric design, Python FastMCP and Node/TypeScript SDK, registration, resource management, error handling, and evaluation-driven development.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial registration",
     "tier": "skip",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3073,13 +3073,13 @@
     }
   },
   "merge-strategy": {
-    "hash": "cbd44cf05cc2c293063542f6f140099f135dd0262943489b1e9e23442ecb3843",
+    "hash": "0ed8c9f48104e78f4bddde185b30f6d57804f58795b22fc423aadc552601e98a",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "branching"
     ],
@@ -3091,7 +3091,7 @@
       "branching",
       "post-merge"
     ],
-    "changelog": "v1.0.0: Initial release â€” strategy matrix, pre/post-merge checklists",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” strategy matrix, pre/post-merge checklists",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3101,13 +3101,13 @@
     }
   },
   "middleware-test": {
-    "hash": "ba3f587d07a10aeff74c6606836160db1836297d97c3b9b84b57a2df734c4724",
+    "hash": "933cbfcc8de8c8cfd0195aef7a08f0591f981c9f01c945e06feaf11f1e761bfa",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Test middleware layers: auth (multi-layer), rate limiting, caching, request validation. Covers pass-through, rejection, and edge cases for each middleware type.",
@@ -3115,7 +3115,7 @@
       "testing",
       "reference"
     ],
-    "changelog": "v1.0.0: Initial registration",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial registration",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3125,13 +3125,13 @@
     }
   },
   "mobile-a11y-test": {
-    "hash": "f0b9cc5d9aa7d519739e0537a55f5866053764c71ab4ed921ef2f2d35be591a1",
+    "hash": "867a7255604e89bbb179504f78d5729d2949d4195cb72debb4dab5b668c4c63e",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Run mobile accessibility tests for Android (Compose/XML) and Flutter projects. Detects platform, runs automated checks.",
@@ -3142,7 +3142,7 @@
       "android",
       "flutter"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3152,13 +3152,13 @@
     }
   },
   "mock-server": {
-    "hash": "6660051f763120e6dc8957c4fd64f4afc544a730ca085bbecbe8cbf455e536c8",
+    "hash": "9021d729efb227449d9154eeb77620bfc230166ff900655561fffe0583f6aec9",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Set up and configure API mock/stub servers for development and testing. Covers MSW, WireMock, nock, VCR/cassette patterns.",
@@ -3168,7 +3168,7 @@
       "API",
       "development"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3178,20 +3178,20 @@
     }
   },
   "monitoring-setup": {
-    "hash": "3df218890c163f09c1d799df8d9820de8c4b4c19a4ce4c1a867a8076339acb0f",
+    "hash": "318e30e034617af26c698824a28a05c477abf598c5e0127d83694bb2254fe128",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Prometheus, Grafana, alerting, SLO/SLI dashboards",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3201,13 +3201,13 @@
     }
   },
   "monorepo": {
-    "hash": "0ece2a4193372c0b6f9ee69920b6a8ff8b1faf82894911345a99dabb8bdee2e9",
+    "hash": "901d510ecf5c5cf08d3cc5dc2329ac72f3aa46cb79d53bfbc118ab7897d492e3",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Monorepo management for npm/pnpm/yarn workspaces",
@@ -3216,7 +3216,7 @@
       "workspaces",
       "turborepo"
     ],
-    "changelog": "v1.0.0: Initial creation",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3251,13 +3251,13 @@
     }
   },
   "node-backend-dev": {
-    "hash": "c2a112cafc37b72e26c6c2fb923889484a23973b076907a3b1ed63260a009dd6",
+    "hash": "527849c352467c25b8b38fbaf5bc8559858377eb5585d8c4b57392fb5292dfca",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Node.js backends: Express, Hono, ElysiaJS â€” routing, middleware, DB, auth, WebSocket",
@@ -3268,7 +3268,7 @@
       "hono",
       "elysia"
     ],
-    "changelog": "v1.0.0: Initial release â€” grounded in FIREKaro + BestDematAccount + cric patterns",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” grounded in FIREKaro + BestDematAccount + cric patterns",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3278,20 +3278,20 @@
     }
   },
   "nuxt-dev": {
-    "hash": "d3590e76e07ea0a66f36ebf1ce8735c8ec02e85c4bb131275ed7a826b8926677",
+    "hash": "8db114d19104681d8aae0819cc89a1ce0ebe9f9318b2c6a934a2f7155897e702",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Nuxt 3 development: SSR, server routes, modules, deployment",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3301,20 +3301,20 @@
     }
   },
   "obsidian": {
-    "hash": "1b8e24011738a2f38247a28b72143868acca3f3c35e4b1ddbce3689c368b0a0b",
+    "hash": "a35e311ce1511e05bf41e59b0fc6aceed167daf061e04300f5df4be0c92a58a7",
     "type": "skill",
     "category": "third-party",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Obsidian vault management: .md, .base, .canvas, CLI, dev brain logging",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "skip",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -3444,13 +3444,13 @@
     }
   },
   "perf-test": {
-    "hash": "8ea91b0b580d94bd35f3214c387411b5544c8ddfc837d34243cbefa9d9b8d1c2",
+    "hash": "825bd1f80f7fe12a57598f7bafdbd36599998c5610ed7899ea46848965d8bc8f",
     "type": "skill",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "web-quality"
     ],
@@ -3463,7 +3463,7 @@
       "Lighthouse",
       "bundle"
     ],
-    "changelog": "v1.2.0: Add test-results/perf-test.json structured output for stage gate aggregator",
+    "changelog": "v1.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.2.0: Add test-results/perf-test.json structured output for stage gate aggregator",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3473,20 +3473,20 @@
     }
   },
   "pg-query": {
-    "hash": "271b09ff3373b6985bbe59e82b6096dc14fc2984269e3a2d5a1c3d7105fe5d2d",
+    "hash": "809c0fcbbe9c029bee3f1ff40e34ba17fe95d3d1f54f8acf85bc7c6623591ab4",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "PostgreSQL read-only queries with validation and timeouts",
     "tags": [
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3524,13 +3524,13 @@
     }
   },
   "pipeline-orchestrator": {
-    "hash": "1c3e867e7cfba0250e9013ca2192f597fe065ce32b535cdc57b8385e3c41c2b2",
+    "hash": "74da16838d8dd954cf83034b9f553a8e49a01e4bb7e2d747937ab2c34d1a046a",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "project-manager-agent"
     ],
@@ -3541,7 +3541,7 @@
       "orchestration",
       "DAG"
     ],
-    "changelog": "v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent",
+    "changelog": "v2.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.0.0: Converted to thin skill wrapper; orchestration logic moved to pipeline-orchestrator agent",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3572,20 +3572,20 @@
     }
   },
   "plan-to-issues": {
-    "hash": "f44e3dd3bf80d00a5a5a0624253c6fa40039642bcd25dc0d0dbcb5b88f2d69ac",
+    "hash": "96c736a0bb4a126c3620f927ac01766fc5ca9355d67d394ccdaa4a6f64e251fc",
     "type": "skill",
     "category": "core",
-    "version": "2.1.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Parse a markdown plan into GitHub Issues with labels and duplicate detection. Supports text input or file path.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
+    "changelog": "v1.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3616,20 +3616,20 @@
     }
   },
   "playwright": {
-    "hash": "5938c4e03ddd0a80527d8797e058a1614297609f3f25d0dde4ba1bcafcee8ad7",
+    "hash": "c3a1d2e9a78e36e567fec9b47af601b920d0833d156cbf5aefd58fa0bcf5eeed",
     "type": "skill",
     "category": "core",
-    "version": "1.1.2",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Browser automation, E2E test generation, Page Object Model",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3639,13 +3639,13 @@
     }
   },
   "pm2-deploy": {
-    "hash": "d43372a9d6417346559c4c5fd8472bdd17afc98887401fd4469e7b728f55ff8f",
+    "hash": "311209ec00ce26309377dd20d0c0fad105edc0365bb2fd7024c66a3bfb25cc87",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "PM2 process management and deployment patterns",
@@ -3654,7 +3654,7 @@
       "pm2",
       "nodejs"
     ],
-    "changelog": "v1.0.0: Initial creation",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3692,20 +3692,20 @@
     }
   },
   "pr-standards": {
-    "hash": "676c9131243cbdbf8ab9a0b5407eb1f1c538304bc22cda253c76ccc30b9a2f37",
+    "hash": "95a25f4518ae006202f243562d277d9de9498376965a807141536c82b8b1ea70",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Team standards enforcement against PR diffs",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3715,13 +3715,13 @@
     }
   },
   "prd-parser": {
-    "hash": "a31b1c858e1eab8c956c9bd4f44fb184320b72fa49f24ee54342c15c589bdbb6",
+    "hash": "5fc7e4fd509bb2a1b997571e508cf40834d209e9807cc115fce18524ebfe3bc5",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "brainstorm"
     ],
@@ -3733,7 +3733,7 @@
       "IEEE-830",
       "parser"
     ],
-    "changelog": "v1.0.0: Initial release â€” multi-format PRD parsing and normalization",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” multi-format PRD parsing and normalization",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3743,13 +3743,13 @@
     }
   },
   "prisma-orm": {
-    "hash": "6cb871452e04228bae25ee149598b87a68e5d1f85b3aca6911555b3b549dc1c8",
+    "hash": "172e89a2c04fee9a187f285d7b094ce4fcb8d60772ef71947cc4789e5b31dcae",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Prisma ORM schema, migrations, queries for TypeScript",
@@ -3759,7 +3759,7 @@
       "typescript",
       "database"
     ],
-    "changelog": "v1.0.0: Initial creation",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -3797,13 +3797,13 @@
     }
   },
   "project-scaffold": {
-    "hash": "5b7d030cb7194cda8b556035916f7215cd04c6c76326eacfa506abb971c6f636",
+    "hash": "4e1502b4ff902ab7be6833edf52a4962eea5447a4705743d8efb33a989314408",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "ci-cd-setup"
     ],
@@ -3815,7 +3815,7 @@
       "12-factor",
       "security-baseline"
     ],
-    "changelog": "v1.0.0: Initial release â€” covers Python, Node/TS, Android, Go, Rust",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” covers Python, Node/TS, Android, Go, Rust",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4054,13 +4054,13 @@
     }
   },
   "reddit": {
-    "hash": "ec26b2c49a8c9132ad5158032d4388585044b20877b1543cf8c32920d6a03997",
+    "hash": "1a24d49f81bfb365c7d653971d46672bcc3e7de694b846fa5db499244393ee1d",
     "type": "skill",
     "category": "third-party",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
-    "last_updated": "2026-06-30",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Comprehensive Reddit skill: read, compose, analyze, search, post, monitor",
@@ -4068,7 +4068,7 @@
       "reddit",
       "social"
     ],
-    "changelog": "v1.0.0: Initial registry entry",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial registry entry",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -4078,20 +4078,20 @@
     }
   },
   "redis-patterns": {
-    "hash": "da4325233710ff4d429424ef7539f4c622f8a9a54766206bc63ee58bcb830b32",
+    "hash": "fd40d0e4876eda18b08810470ac62855be2a3feb889d96a9b6fe35ddd8998ffe",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Redis 7+ patterns: caching, rate limiting, pub/sub, vector search",
     "tags": [
       "reference"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4101,13 +4101,13 @@
     }
   },
   "regression-test": {
-    "hash": "e8cd80048dea92d0d4914338fb9b96d1c08fba6cf4abe26e4b44d60fae6c66b8",
+    "hash": "ed8c2f8bc6d9787d6d1f4e684014856c4c3d63245812eaba9c80eb1f5c4e30e7",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Run targeted regression tests based on code changes. Analyze git diffs to identify affected source files and map them to tests.",
@@ -4116,7 +4116,7 @@
       "regression",
       "git"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4126,20 +4126,20 @@
     }
   },
   "remotion-video": {
-    "hash": "d5da8a983c2f852bc671739258f73de7a0db7f8ecb8f0a2f8c7d6a2c548ee605",
+    "hash": "c83639615a670c2630d8cbbfc61df6cdaae97eb0fe7b96a76254f0dc1da5570b",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Programmatic video with React/Remotion: animations, audio, 3D, captions",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -4172,13 +4172,13 @@
     }
   },
   "research-mode": {
-    "hash": "c5348e47e1a7d80cad858f2c8a0f2154a6b59dc9ba05fcb1f385a59c7984be0b",
+    "hash": "032eca4491baf1b69566bdef50b7cec0c918e5815abdb045ac1cd9c09efb3d7d",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-24",
-    "last_updated": "2026-06-23",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "web-research-specialist-agent"
     ],
@@ -4190,7 +4190,7 @@
       "citations",
       "fact-checking"
     ],
-    "changelog": "deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output; added --team parallel-research note (Stage D: read-only; self-gated)",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. deps corrected to real runtime closure (add dispatched worker agents) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Initial release â€” 3 anti-hallucination constraints, structured research brief output; added --team parallel-research note (Stage D: read-only; self-gated)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4338,13 +4338,13 @@
     "deprecated_by": "end-session"
   },
   "schema-designer": {
-    "hash": "9c1d65b7a56face0d0d8b39ff3d5f86b5033851f0ce20250c3689013d3b1eb0d",
+    "hash": "859663f8f766f5619f4eb523e278660584348407f39cc5f24cea804844733281",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "pg-query",
       "fastapi-db-migrate"
@@ -4357,7 +4357,7 @@
       "migration",
       "data-modeling"
     ],
-    "changelog": "v1.0.0: Initial release â€” ER design, PII, evolution, API alignment",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” ER design, PII, evolution, API alignment",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4382,13 +4382,13 @@
     "tier": "must-have"
   },
   "security-audit": {
-    "hash": "efdce93663fee1828f29d9e988002ddd6529330842799b2d2f217ee8852db79d",
+    "hash": "d6a7b63091340a97d8585f75d655071030f4a19cf1aae1d40b23747e9566dcce",
     "type": "skill",
     "category": "core",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Code security scanning: OWASP Top 10, SAST/DAST, dependency audit",
@@ -4396,7 +4396,7 @@
       "security",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4452,20 +4452,20 @@
     }
   },
   "semgrep-rules": {
-    "hash": "f87fe1c7afd5f405a046cdcd7a40dc24866b7480222677fb20e3f6ffbecfd6a2",
+    "hash": "66fcadc4e61b13c70cc84d6132c3a96fd46c969bf7e53268ca92c9d72fa8a571",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Semgrep custom rule creation and security pattern matching",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4501,13 +4501,13 @@
     }
   },
   "session-continuity": {
-    "hash": "fabb7d5ade305336cfd103d730eb8c6ec12b6438030e3fa0920849054668125c",
+    "hash": "60d646400d1917f77cd2e62791a716530daaeb4e53040221e3207de988fc12fb",
     "type": "skill",
     "category": "core",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-30",
-    "last_updated": "2026-06-15",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "handover",
       "end-session",
@@ -4522,7 +4522,7 @@
       "workflow",
       "session"
     ],
-    "changelog": "v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
+    "changelog": "v2.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.1.0 (2026-06-15): MINOR — add STEP 1.5 PREFLIGHT dependency-closure gate (BLOCK WORKER_REGISTRY_NOT_LOADED on missing workers/sub-skills), parity with development-loop. | deps corrected to real runtime closure (drop deprecated master-agent / add dispatched workers+skills) so the closure co-provisions downstream — sibling fix of development-loop class, 2026-06-15 | v1.0.0: Add triggers, registry sync | v2.0.0 (2026-04-25): MAJOR skill-at-T0 rewrite (Phase 3.6)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4705,13 +4705,13 @@
     }
   },
   "solidity-audit": {
-    "hash": "45f09776dbae4b11e2271542bac0c282a9144276944edee7774df73dfb9020f3",
+    "hash": "67be3288ea1c4bb0825a4a9a778dc8f29e56ac6dfb8501f2a06c5f853c621167",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Solidity smart contract security: CEI, Foundry, UUPS, gas optimization",
@@ -4719,7 +4719,7 @@
       "security",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -4729,13 +4729,13 @@
     }
   },
   "ssot-audit": {
-    "hash": "e33c331b6af06d3de8e67a642e22f45e35bda8a29a6030b40e50bb7b61600eb6",
+    "hash": "faacd3ebb11d969a5f52b4280ffdf68f39a6905f77b7927a770430e162cbc6ed",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-19",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "configuration-ssot"
     ],
@@ -4748,7 +4748,7 @@
       "duplication",
       "quality"
     ],
-    "changelog": "v1.0.0: Initial release â€” 6-step audit workflow, cross-layer duplication detection, health scoring",
+    "changelog": "v1.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” 6-step audit workflow, cross-layer duplication detection, health scoring",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4808,20 +4808,20 @@
     }
   },
   "strategic-architect": {
-    "hash": "f2d7c1ccc997dfae9cb1d7b6916b05e0a6cacd0b0b109ebf1a814afcf2aaa87e",
+    "hash": "90b4186c1f974e5c4e34a47b0359d3d5e4557a706c8b842f8a9f47aaf4bd36cc",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Diagnose project health and create strategic plans by identifying bottlenecks, assessing architecture fitness, and building improvement roadmaps. Use when the team needs a structured assessment, project health check, or strategic planning.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.0.0: Genericized and restructured",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.0.0: Genericized and restructured",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4831,13 +4831,13 @@
     }
   },
   "subagent-driven-dev": {
-    "hash": "807a1ddf15ea70a53d3108b26345c3b61dc4cf475a94d2e7abe1c913cc5f32b9",
+    "hash": "a6146fc46558e7d796d8107a68533cae43cf970cffc0e01128966bd538713fba",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Orchestration patterns for delegating work to subagents with file conflict avoidance and advanced dispatch patterns",
@@ -4846,7 +4846,7 @@
       "orchestration",
       "parallel"
     ],
-    "changelog": "v1.1.0: Extracted Steps 8-10 to references/orchestration-patterns.md, trimmed to ~400 lines",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.1.0: Extracted Steps 8-10 to references/orchestration-patterns.md, trimmed to ~400 lines",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4856,13 +4856,13 @@
     }
   },
   "supply-chain-audit": {
-    "hash": "d4cd17e7624c1b82638156e0283b4337a744692d9c7ad79e495a15168cbc168b",
+    "hash": "9482cc782a63aa6a77b76eb1b123efb425d21ea7ef9149e97a5c63494a012300",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Dependency security: SBOMs, vulnerability scanning, license compliance",
@@ -4870,7 +4870,7 @@
       "security",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4903,13 +4903,13 @@
     }
   },
   "tailwind-dev": {
-    "hash": "a0ad693a26df2ec4db5d224aec9c2e0824933e065a14e59b3bd65b30e851ce1e",
+    "hash": "37f11bba9a34f66cc4e5848267b2300f9fe887a7040003bdaaf983c2969f396a",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Tailwind CSS v3/v4: setup, CVA variants, cn() utility, theming, migration",
@@ -4918,7 +4918,7 @@
       "css",
       "frontend"
     ],
-    "changelog": "v1.0.0: Initial release â€” grounded in AlgoChanakya + IPODhan patterns",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release â€” grounded in AlgoChanakya + IPODhan patterns",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4928,13 +4928,13 @@
     }
   },
   "tdd": {
-    "hash": "558f8f1810e5e241fca67569ba0e26f7ced52072a6e6dba5528735dba105ebe3",
+    "hash": "c6682cb511a6d5600340e3d25f19474807ea0f2f9cd72571ff8d383c5ed9b80f",
     "type": "skill",
     "category": "core",
-    "version": "1.0.1",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Strict red-green-refactor TDD cycle with phase gates, regression checks, and refactoring discipline. Use for new logic where correctness matters.",
@@ -4943,7 +4943,7 @@
       "tdd",
       "workflow"
     ],
-    "changelog": "v1.0.1: Registry sync — hash, version, description, tags | v1.0.0: Initial release",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.1: Registry sync — hash, version, description, tags | v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -4953,13 +4953,13 @@
     }
   },
   "tdd-failing-test-generator": {
-    "hash": "40ab98da1f8f4cfe1d93e03e566802a19a9a78e5715d0eebd2106b4b8c094269",
+    "hash": "a1979b6c2e507e805732fb47547d31b675d52ee14b8557b63773038bbf9f38e6",
     "type": "skill",
     "category": "core",
-    "version": "2.0.0",
+    "version": "2.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-13",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "tdd",
       "playwright"
@@ -4973,7 +4973,7 @@
       "coverage",
       "mutation-testing"
     ],
-    "changelog": "v2.0.0: Renamed from test-generator to tdd-failing-test-generator for clarity",
+    "changelog": "v2.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.0.0: Renamed from test-generator to tdd-failing-test-generator for clarity",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5007,13 +5007,13 @@
     }
   },
   "test-data-management": {
-    "hash": "2ce78eb94d30afca07a90946e7ab446d90b40b98ecdcec3e51e9b8907b82479d",
+    "hash": "8ac6699daf18aad6e5300598fe8f86cc70ac1cc27bde3496a17238fc2eb6c5a0",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-03-15",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Manage test data across Python and TypeScript projects using factories, fakers, seeders, builders, and fixtures.",
@@ -5023,7 +5023,7 @@
       "fixtures",
       "factories"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5107,13 +5107,13 @@
     }
   },
   "test-maintenance": {
-    "hash": "3a8b53daeb3231a94e32ce3b3193c3c6165d226429112cf6bde09b49073bbabb",
+    "hash": "e16487ca2e11392f3f2ea716a462b1f00aaedb2efa29dab2a5d7ec3d3017a854",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Audit, clean up, and optimize a test suite. Identifies dead tests, duplicates, slow tests, and readability issues.",
@@ -5123,7 +5123,7 @@
       "cleanup",
       "optimization"
     ],
-    "changelog": "v1.0.0: Initial release",
+    "changelog": "v1.4.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5263,13 +5263,13 @@
     }
   },
   "twitter-x": {
-    "hash": "b819d12c21b19de2005fca3d0c5dd822519f0a3aa6af6e9e863507fa36a59c7e",
+    "hash": "90fb42893149f76931b4712296ab3a66d175e39c714c3bd94c20b17262e05dc5",
     "type": "skill",
     "category": "third-party",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-11",
-    "last_updated": "2026-06-30",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Comprehensive Twitter/X skill: read/capture, compose, score, search, post, monitor — fires on any shared x.com/twitter.com link or X/Twitter mention",
@@ -5277,7 +5277,7 @@
       "twitter",
       "social"
     ],
-    "changelog": "v1.0.2: STEP 1 fallback ladder (ADHX->fxtwitter->Jina->browser) + WebFetch-402 note + browser fallback for threads; description+triggers expanded so the skill fires on any shared x.com/twitter.com link or X/Twitter mention",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.2: STEP 1 fallback ladder (ADHX->fxtwitter->Jina->browser) + WebFetch-402 note + browser fallback for threads; description+triggers expanded so the skill fires on any shared x.com/twitter.com link or X/Twitter mention",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -5334,20 +5334,20 @@
     }
   },
   "verify-screenshots": {
-    "hash": "8ab20f3da5ed2e6fbb0c56e4ce9a4d2cf0812f937566a6e2efcf492d62b7440f",
+    "hash": "ba2937c3a4956c139e4de1e80d003730aa5aced152bac498dfa5d2d0e4ea796c",
     "type": "skill",
     "category": "core",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-10",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Validate screenshots against baselines using multimodal content analysis for visual regression testing. Manages baseline storage and integrates with CI for automated visual diff reporting.",
     "tags": [
       "workflow"
     ],
-    "changelog": "v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
+    "changelog": "v2.3.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v2.1.0: Enhanced with community patterns from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5436,13 +5436,13 @@
     }
   },
   "vue-dev": {
-    "hash": "4dbae3acf182a41c51845dd7a6398ce0a4ef90030aa562c84d797176736a62b9",
+    "hash": "e252138b715f66f0bc88a0d74195b933d513c97642863c069365a2b9c9d93951",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Vue 3 development: Composition API, Pinia, Vite, testing",
@@ -5450,7 +5450,7 @@
       "vue",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5460,13 +5460,13 @@
     }
   },
   "vue-test": {
-    "hash": "d5a8970e63bd31b6ab2f44f332a1fea3d0f215813b656484fb0984a45c3e94d6",
+    "hash": "11799db56d2ef41c9b0593836fe0dd873fe0fc443349fba2d15bd11c2f056ddf",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-15",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Vue.js testing workflow with Vitest, Vue Test Utils, Pinia store testing, composable testing, and Nuxt support",
@@ -5476,7 +5476,7 @@
       "vitest",
       "pinia"
     ],
-    "changelog": "v1.0.0: Initial creation from testing gap audit",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation from testing gap audit",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5486,20 +5486,20 @@
     }
   },
   "web-quality": {
-    "hash": "7ab5ed263119a04bfbb97c4f62097fd0c7830528f1e41dbdbb3c9c61cf1ca7db",
+    "hash": "774903caab7931cf9a63c31eff7f8506375ef775c55605fd1d2b694ca05e6e4f",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Core Web Vitals, accessibility, SEO, performance, responsive design",
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5534,13 +5534,13 @@
     }
   },
   "web-scraper": {
-    "hash": "d3abd173cb3be1bd8b75283a84faea99becd25e3310cc70474a40ac6a95a1022",
+    "hash": "0315ebe49cc2cb2bf2b4a30a87eee3db798e9ffc95ca48a3dcb06a3faf818e6b",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Web scraping with Puppeteer, Cheerio, and pipelines",
@@ -5549,7 +5549,7 @@
       "puppeteer",
       "cheerio"
     ],
-    "changelog": "v1.0.0: Initial creation",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5559,13 +5559,13 @@
     }
   },
   "websocket-patterns": {
-    "hash": "8f823b06700e351995427b46e8fb6d11350516259cb487bf28331ef9584f28b2",
+    "hash": "e116ef4befe6b599d79e33f0fe0d90f02cf0d134a4db2e076ba8c126e97356af",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-14",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "WebSocket implementation patterns for real-time features",
@@ -5573,7 +5573,7 @@
       "websocket",
       "realtime"
     ],
-    "changelog": "v1.0.0: Initial creation",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial creation",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5681,13 +5681,13 @@
     }
   },
   "xml-to-compose": {
-    "hash": "9e8f752ae62eab85b18509b0e86abb2d75d14ac81970e6e0b015c3fede0a805f",
+    "hash": "26f9a3b5f4e49b4fccc00d1b389e881068709fcf12686347c7d2b4d4c8a7dd17",
     "type": "skill",
     "category": "need-basis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Android XML layout to Jetpack Compose migration",
@@ -5695,7 +5695,7 @@
       "android",
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5705,13 +5705,13 @@
     }
   },
   "improve-codebase-architecture": {
-    "hash": "46863c531cc7c364045df1fa09ddfb63364d6a3c6eeef66c50737b63eda905c7",
+    "hash": "241488b2364b7707bbe4db278f1b3491708e5cc20b93f6e9d5540a273937b1d3",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "upstream:mattpocock/skills@engineering/improve-codebase-architecture",
     "discovered": "2026-05-28",
-    "last_updated": "2026-05-28",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "grill-with-docs",
       "adr"
@@ -5725,7 +5725,7 @@
       "design",
       "review"
     ],
-    "changelog": "v1.0.0: Initial port from mattpocock/skills with hub-portability adaptations (no auto-open, Agent-tool dispatch, references/ layout)",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial port from mattpocock/skills with hub-portability adaptations (no auto-open, Agent-tool dispatch, references/ layout)",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5735,13 +5735,13 @@
     }
   },
   "grill-with-docs": {
-    "hash": "0a957d12e724ef2258640cba4ac7e08611afc77febbb62b61bcd6c9cc03fa4cc",
+    "hash": "e22618368bd74a2cb3f8c681e78490a8bbf61771045471608e180ca74441b4b3",
     "type": "skill",
     "category": "core",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "source": "upstream:mattpocock/skills@engineering/grill-with-docs",
     "discovered": "2026-05-28",
-    "last_updated": "2026-05-28",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "adr"
     ],
@@ -5754,7 +5754,7 @@
       "adr",
       "glossary"
     ],
-    "changelog": "v1.0.0: Initial port from mattpocock/skills; companion to /improve-codebase-architecture",
+    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial port from mattpocock/skills; companion to /improve-codebase-architecture",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5764,13 +5764,13 @@
     }
   },
   "zoom-out": {
-    "hash": "a4528d649eb071f17d73d667145dcbcb445b0523a7263a9b6d4f60cdde45ba51",
+    "hash": "6564b013e9a48a7876e28e77c02a58a9036614043991f217d271fb16f8ddd76c",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "upstream:mattpocock/skills@engineering/zoom-out",
     "discovered": "2026-05-28",
-    "last_updated": "2026-05-28",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Go up one layer of abstraction and produce a map of surrounding modules, callers, and how the current code fits into the bigger picture. Uses project domain vocabulary when available.",
@@ -5780,7 +5780,7 @@
       "mapping",
       "navigation"
     ],
-    "changelog": "v1.0.0: Initial port from mattpocock/skills",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial port from mattpocock/skills",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5790,13 +5790,13 @@
     }
   },
   "to-prd": {
-    "hash": "1a24bb473e6fa546ac7e61e4115a585e853e515ad35240cec7c6751ce32afe62",
+    "hash": "02d5a8049eb20dbb73eeb9f5eac3212d1cc2e644ae5131655626d640ecbe7210",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "upstream:mattpocock/skills@engineering/to-prd",
     "discovered": "2026-05-28",
-    "last_updated": "2026-05-28",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "improve-codebase-architecture",
       "plan-to-issues"
@@ -5809,7 +5809,7 @@
       "synthesis",
       "specification"
     ],
-    "changelog": "v1.0.0: Initial port from mattpocock/skills",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial port from mattpocock/skills",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6518,13 +6518,13 @@
     "tier": "nice-to-have"
   },
   "vps-deploy": {
-    "hash": "43784cba3e0af1c225895648d2ef6c321d7df3d66d0293ba896ae1b4101f4aa3",
+    "hash": "d2c25b29b7106c47dce7fadf56dbd86adc66d1715ca31fa7afffb5b6caf66b4d",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-19",
-    "last_updated": "2026-06-19",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "deploy-strategy",
       "pm2-deploy",
@@ -6543,7 +6543,7 @@
       "rollback",
       "smoke-test"
     ],
-    "changelog": "v1.0.0: Initial release — SSH+rsync static/PM2 deploy to a self-managed Linux VPS; nginx -t gated reload, live-URL smoke, backup+rollback, G3 human-approval gate. Closes idea-to-deploy-readiness Unit 3 (the deploy=finish-line gap).",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release — SSH+rsync static/PM2 deploy to a self-managed Linux VPS; nginx -t gated reload, live-URL smoke, backup+rollback, G3 human-approval gate. Closes idea-to-deploy-readiness Unit 3 (the deploy=finish-line gap).",
     "tier": "nice-to-have"
   },
   "cross-project-context-capture": {
@@ -6568,13 +6568,13 @@
     "tier": "must-have"
   },
   "karpathy-advisor": {
-    "hash": "432626edf214fc143c48ca8ce42b02f91e913388b3afdc51547428c76a6c03e3",
+    "hash": "554a0521ade1cfc3b3efc5522e815f4ca024c497699394ec89b1e7d2e774f646",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-20",
-    "last_updated": "2026-06-20",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Apply Andrej Karpathy's documented lens to a decision, design, or situation ('what would Karpathy do/think here?'). Channels his decision heuristics (build-from-scratch to understand, march of nines, demo!=product, autonomy slider, verifiability gate, decade-not-year-of-agents, data over architecture, KISS minimal reference impls) to pressure-test a plan, choose between options, or sanity-check an AI/ML/eng claim. Full profile + sources in references/understanding.md.",
@@ -6586,7 +6586,7 @@
       "ai-ml",
       "anti-hype"
     ],
-    "changelog": "v1.0.0 (2026-06-20): Initial - Karpathy decision-lens advisor skill built from his essays, talks, code, and 2025-26 writing; verbatim/paraphrase integrity flags; X-402 sourcing limit noted.",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0 (2026-06-20): Initial - Karpathy decision-lens advisor skill built from his essays, talks, code, and 2025-26 writing; verbatim/paraphrase integrity flags; X-402 sourcing limit noted.",
     "tier": "nice-to-have"
   },
   "karpathy-advisor-agent": {
@@ -6819,13 +6819,13 @@
     "changelog": "v1.0.0 (2026-06-25): web deploy-readiness DoD (recovered after an unpushed-branch loss)."
   },
   "youtube-transcript": {
-    "hash": "436fa1d43f8bb3457c37adafb94e862a6db520e925a97efa530932a48d19e581",
+    "hash": "d4c887be85c718abaf1dc828bb0d5463dbf91d1db9c7c2010ed31845a63f0e12",
     "type": "skill",
     "category": "core",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-06-27",
-    "last_updated": "2026-06-30",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Extract the full transcript (and optional metadata) of ANY YouTube video — short, long, or Shorts — given just its link. Tries clean captions first, falls back to yt-dlp subtitle download, and finally to audio + Whisper speech-to-text when a video has NO captions at all. Use whenever the user pastes a YouTube URL and wants the spoken content as text, or asks to summarize / analyze / search a video.",
@@ -6837,7 +6837,7 @@
       "asr",
       "media"
     ],
-    "changelog": "v1.0.1 (2026-06-29): Default transcript output to .md (Markdown) instead of .txt — updated argument-hint, example, and STEP 1 filename guidance.\nv1.0.0 (2026-06-27): Initial — captions->yt-dlp subtitles->Whisper ASR fallback transcript extractor; promoted from hub-only to distributable core.",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.1 (2026-06-29): Default transcript output to .md (Markdown) instead of .txt — updated argument-hint, example, and STEP 1 filename guidance.\nv1.0.0 (2026-06-27): Initial — captions->yt-dlp subtitles->Whisper ASR fallback transcript extractor; promoted from hub-only to distributable core.",
     "tier": "must-have"
   },
   "branch-choice": {
@@ -6924,13 +6924,13 @@
     "tier": "nice-to-have"
   },
   "full-defect-surface-sweep": {
-    "hash": "8206d9dbccb28562ce10805dfe993328744191d7d427327a8e9a3f8f00eb3f20",
+    "hash": "57fb078e5519d2c9ed51ba666e61407d7bd1740a3e7043d83db9cf3cd793f255",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-07-13",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "systematic-debugging"
     ],
@@ -6941,17 +6941,17 @@
       "quality",
       "sweep"
     ],
-    "changelog": "v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
     "tier": "nice-to-have"
   },
   "dependency-migration-triage": {
-    "hash": "58bbb1bdd57b21e34c62db1e8dd17c44056761035271b014b5c62964a07ec6eb",
+    "hash": "9c5a4a9b2548c5cc36b19d672cc3e5a42ff2ff31e45d3a0ebe7536019d1e8fb2",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-07-13",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "fix-loop",
       "systematic-debugging"
@@ -6963,17 +6963,17 @@
       "migration",
       "triage"
     ],
-    "changelog": "v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
     "tier": "nice-to-have"
   },
   "mock-data-hunter": {
-    "hash": "7c4f2403542f65700984ae1fa2141cdf37f2679964bec9cf741d8d79b4276149",
+    "hash": "f8c2a53a18f7298c23161e9d0e0125f4c21a272ed01b8cca0e7fb19de0880420",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-07-13",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Sweep a codebase for hardcoded, demo, or seed data serving on PRODUCTION paths before ship — fabricated metrics, placeholder entities, future-dated records, \"for MVP\" fallbacks that shape-only checks never catch. Use before a deploy, when auditing a live site's data credibility, or after any incident where fake data reached users.",
@@ -6982,17 +6982,17 @@
       "data",
       "production"
     ],
-    "changelog": "v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: initial - Fable-harvest Session B failure-archaeology skill (docs/governance/fable-failure-archaeology-2026-07-13.md)",
     "tier": "nice-to-have"
   },
   "weakened-test-hunter": {
-    "hash": "14e39b3304ca09b068ab2c438f520ee284adf8a3fe525d50d7dd12d951e9aae9",
+    "hash": "809fceca4c3322808e57408c329debe08bc1c052e0be90485aacd4ada3f9feb7",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-07-13",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
     "description": "Verify a claimed fix did not go green by weakening its tests - re-run the claimed checks, diff every test change against the pre-change baseline, and classify each loosened or deleted assertion as legitimate (spec-backed) or weakening; returns VERIFIED / CAVEATS / REFUTED (or INCONCLUSIVE when the baseline cannot be made to run). Use before accepting any \"tests pass now\" claim on a change that touches test files. Complements /auto-verify (zero-test vacuous greens); this catches non-zero-but-defanged greens.",
@@ -7001,7 +7001,7 @@
       "testing",
       "verification"
     ],
-    "changelog": "v1.0.0: initial - Fable-harvest Session C weakened-test hunter (plans/fable-harvest-window.md Session C)",
+    "changelog": "v1.1.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: initial - Fable-harvest Session C weakened-test hunter (plans/fable-harvest-window.md Session C)",
     "tier": "nice-to-have"
   },
   "untrusted-content-handling": {

@@ -15,7 +15,7 @@ triggers:
   - android test patterns
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<feature-name|test-type> [--unit|--ui|--e2e|--all]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -24,6 +24,22 @@ type: workflow
 Write Android tests following project conventions: JUnit 5 for unit, Compose Test for UI, Espresso for E2E.
 
 **Target:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools:** `./gradlew` (STEP 8 test execution)
+- **Files:** `build.gradle.kts` (test dependency versions verified/added in STEP 2); the feature's source files (ViewModels/Composables/Repositories) to identify what needs testing
+- **User inputs:** `<feature-name|test-type>` and optional `--unit|--ui|--e2e|--all` (`$ARGUMENTS`)
+
+## STEP 0: Preflight
+
+1. Confirm `<feature-name|test-type>` was supplied in `$ARGUMENTS`; missing → ask the user now rather than guessing scope.
+2. Confirm `build.gradle.kts` exists at the module root (the test dependencies added in STEP 2 depend on it existing).
+3. Confirm the relevant feature source files are readable (ViewModel/Composable/Repository) before assessing scope in STEP 1.
+
+Report all missing items together; proceed once the feature/type is known and the module root resolves.
 
 ---
 

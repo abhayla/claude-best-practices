@@ -6,7 +6,7 @@ description: >
   queries, mutations, security, vector search, or deploying web apps to Firebase.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<what to build — e.g. 'create movie review schema' or 'deploy Next.js app'>"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 ---
 
@@ -15,6 +15,42 @@ type: reference
 Reference for Data Connect (PostgreSQL-backed GraphQL), static Hosting, and App Hosting.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** `firebase-tools` CLI, invoked via `npx -y firebase-tools@latest` —
+  no global install required, but `npx` itself must be on PATH.
+- **Credentials/env:** an authenticated Firebase CLI session (`firebase login`) with
+  a linked project (`firebase use <project>` or a resolvable `.firebaserc`).
+- **Files:** `dataconnect.yaml` + `schema/schema.gql` for Data Connect work;
+  `firebase.json` for Hosting/App Hosting deploys — created by this skill if absent,
+  but required for the emulator/deploy commands shown to succeed.
+- **Services/connectivity:** a reachable Firebase project; App Hosting (SSR)
+  specifically requires the Blaze billing plan.
+- **User inputs & decisions:** which surface the request targets — Data Connect
+  schema/queries, static Hosting, or App Hosting (SSR) — carried in `$ARGUMENTS`.
+
+---
+
+## STEP 0: Preflight
+
+Applies only when this skill is about to run a Firebase CLI command (emulator start,
+schema deploy, hosting deploy, App Hosting rollout) — pure schema/query reference
+lookups need nothing below.
+
+1. Probe `npx --version` — the CLI runs via `npx`, not a global install.
+2. Confirm an authenticated session and active project: `firebase projects:list`
+   (fails closed if not logged in) and confirm `firebase use` or `.firebaserc`
+   resolves to a project.
+3. For an App Hosting (SSR) deploy specifically: confirm the project is on the
+   Blaze plan — App Hosting hard-requires it and fails otherwise.
+
+Report all missing items together (not logged in, no active project, still on Spark
+plan) and ask the user to `firebase login` / `firebase use <project>` / upgrade
+billing before running any deploy or emulator command. Schema/query authoring work
+continues regardless.
 
 ---
 

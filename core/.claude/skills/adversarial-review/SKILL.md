@@ -16,7 +16,7 @@ triggers:
   - challenge this code
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<file-path, plan-path, or PR-diff> [--mode plan|code] [--severity-filter critical|major|minor] [--max-rounds 1-3]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -28,9 +28,21 @@ Launch a structured adversarial review of a plan or code change. A subagent with
 
 ---
 
+## Prerequisites
+
+- **Tools:** `git` (diffs); `gh` (only when reviewing a PR by number)
+- **Files:** the target itself (file/plan/diff/PR); optionally `CLAUDE.md`, `.claude/rules/*.md`, `docs/ARCHITECTURE.md`, `docs/ADR/*.md` (best-effort — absence tolerated, STEP 0.3)
+- **User inputs:** explicit review mode (`--mode plan|code`) when ambiguous; `--severity-filter`, `--max-rounds`; the project's test/lint commands (needed later at STEP 8.2 — collect now, not when verification starts)
+
+STEP 0 below is this skill's preflight gate — verification is folded into its new 0.0 subsection rather than a separate STEP.
+
 ## STEP 0: Determine Review Mode and Gather Context
 
 Before launching the reviewer, determine what is being reviewed and collect all necessary context.
+
+### 0.0 Preflight
+
+Verify `git --version` succeeds (required for diffs). If the target is a PR number, verify `gh --version` and `gh auth status` succeed — missing/unauthenticated → report and stop, ask the user to install/authenticate `gh` or supply a diff/file path instead. Collect now, while the user is present: explicit `--mode` if ambiguous, `--severity-filter`, `--max-rounds`, and the project's test/lint commands (needed at STEP 8.2) — do not wait until STEP 8 to ask.
 
 ### 0.1 Detect Review Mode
 

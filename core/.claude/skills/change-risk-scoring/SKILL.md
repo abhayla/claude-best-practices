@@ -14,7 +14,7 @@ triggers:
   - change risk score
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<branch, commit range, or 'staged'> [--threshold 50] [--format json|markdown]"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -23,6 +23,54 @@ type: workflow
 Compute a composite risk score for a set of code changes. The score drives deploy decisions: low-risk changes auto-deploy, high-risk changes require human review or extra testing.
 
 **Target:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- Tools: `git` CLI (`git --version`); `gh` CLI authenticated (`gh auth
+  status`) for the open-PR concurrent-modification check in the MUST DO rules
+- Tools (optional — complexity/coverage measurement; skill falls back to
+  grep/file-existence heuristics if absent): `radon` (Python complexity),
+  `eslint`/`npx` (JS/TS complexity), `pytest`+`pytest-cov` (Python coverage),
+  `jest`/`vitest` (JS/TS coverage)
+- Files/paths: must run inside a git repository with the target branch,
+  commit range, or staged changes reachable from HEAD
+- Credentials/env: `git config user.email` must be set (used to compute the
+  Author Familiarity factor in STEP 2.5)
+- User inputs: the `<branch, commit range, or 'staged'>` target argument, and
+  optional `--threshold` / `--format json|markdown` flags, all supplied at
+  invocation
+
+---
+
+## STEP 0: Preflight
+
+Confirm the tools and inputs this skill needs are available before computing
+any risk factors.
+
+1. Verify git is available and this is a git repository:
+
+```bash
+git --version && git rev-parse --is-inside-work-tree
+```
+
+2. Confirm `git config user.email` returns a value (needed for the Author
+   Familiarity factor). If empty, ask the user to set it, or proceed noting
+   the Author Familiarity factor will be degraded.
+3. Check `gh auth status` for the concurrent-open-PR check. If `gh` is
+   missing or unauthenticated, note it and skip that MUST DO check rather
+   than failing the whole run.
+4. Probe optional complexity/coverage tools (`radon --version`, `npx eslint
+   --version`, `pytest --version`, `npx jest --version`) — record which are
+   present; missing ones trigger the documented fallback heuristics in
+   STEP 2, not a hard stop.
+5. Confirm the target argument (`<branch, commit range, or 'staged'>`) was
+   supplied. If missing, ask the user now before proceeding.
+
+Report ALL missing/failed checks in one consolidated list. HARD-STOP only if
+git itself is unavailable or the directory is not a git repository — every
+other gap degrades to its documented fallback rather than blocking the run.
 
 ---
 

@@ -13,7 +13,7 @@ triggers:
   - docs framework
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "[docs-directory-path] [--audit-only] [--skip-templates]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -38,6 +38,34 @@ classify it, fill gaps, and produce a navigable docs directory.
 **Key distinctions:**
 - **Tutorial vs How-to**: Tutorials teach by doing (guided lesson); how-to guides solve a specific problem (recipe).
 - **Reference vs Explanation**: Reference describes what things are (API signatures, config options); explanation describes why they exist.
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** `git` — STEP 5's restructuring uses `git mv` to preserve file history
+  when moving docs into their category directories. Probe: `git rev-parse --is-inside-work-tree`.
+- **Files:** none required — the four-category structure is created even if no docs
+  exist yet (gaps just get flagged in STEP 3).
+- **User inputs & decisions:** none required upfront — `$ARGUMENTS` (docs directory
+  path, `--audit-only`, `--skip-templates`) is supplied at invocation.
+
+---
+
+## STEP 0: Preflight
+
+Verify the one real dependency this skill needs before touching any files:
+
+1. Confirm `git` is installed and the target directory is inside a git repository —
+   run `git rev-parse --is-inside-work-tree`. STEP 5's restructuring depends on `git mv`
+   to preserve history; without a repo it would silently lose history or fail mid-move.
+2. Confirm the target docs path from `$ARGUMENTS` (or the project root if omitted)
+   exists and is readable.
+
+If `git rev-parse` fails, report `git repository required — <path> is not a git repo`
+and ask the user to `git init` or point at a real repo — unless `--audit-only` is set,
+in which case restructuring (STEP 5) never runs and the audit can proceed regardless.
+Once green, continue to STEP 1.
 
 ---
 

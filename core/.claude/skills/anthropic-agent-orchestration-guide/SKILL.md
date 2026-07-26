@@ -7,7 +7,7 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "[pattern name or question about orchestration]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Agent Orchestration Guide
@@ -15,6 +15,10 @@ version: "1.0.0"
 Reference for designing and operating multi-agent systems. Covers workflow patterns, decision frameworks, architecture, anti-patterns, and context management.
 
 **Query:** $ARGUMENTS
+
+## Prerequisites
+
+None — this is a pure reference/knowledge skill. It answers questions and gives design guidance from its own body text; it does not require any tool, credential, service, or file to exist, and it asks no mid-run user inputs.
 
 ---
 

@@ -8,7 +8,7 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "<tool-or-question> [language/framework]"
-version: "1.0.0"
+version: "1.1.0"
 triggers:
   - mock server
   - stub server
@@ -25,6 +25,14 @@ Guide to API mocking tools for development, testing, and CI.
 Select the right tool, configure it, and integrate it into your test suite.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+None — pure reference skill (`allowed-tools: Read Grep Glob`, no `Bash`). It never installs or
+runs MSW/WireMock/nock/VCR itself; it returns tool-selection guidance, config snippets, and
+setup/teardown code for the user's own project to adopt.
 
 ---
 

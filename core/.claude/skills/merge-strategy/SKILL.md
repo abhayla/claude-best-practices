@@ -13,7 +13,7 @@ triggers:
   - how should I merge
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<branch-name or PR-number> [--strategy squash|merge|rebase|auto]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -23,6 +23,24 @@ Determine the optimal merge strategy for a branch, execute a pre-merge checklist
 the merge, run post-merge smoke tests, and clean up.
 
 **Target:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools** — `git`, `gh` (GitHub CLI).
+- **Credentials/env** — `gh` authenticated (`gh auth status`).
+- **Services/network** — reachable GitHub API (PR checks, review decision, post-merge workflow status all go through `gh`).
+- **User inputs** — target branch/PR and optional `--strategy` override — already collectible from `$ARGUMENTS`.
+
+## STEP 0: Preflight
+
+Probe `git --version` and `gh --version`, then `gh auth status` to confirm the CLI is
+authenticated and can reach GitHub. Resolve the target branch from `$ARGUMENTS` or the current
+branch, and confirm a matching PR exists. If `--strategy` wasn't passed, note that the
+automatic branch-type recommendation (STEP 2) will apply. Report every missing/unauthenticated
+tool in one consolidated list and ask the user to fix it now; HARD-STOP if `git`/`gh` are
+unavailable or unauthenticated — none of the later steps can run without them.
 
 ---
 

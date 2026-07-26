@@ -15,7 +15,7 @@ triggers:
   - analyze document
 allowed-tools: "Read Grep Glob Agent WebSearch WebFetch"
 argument-hint: "<question or file-path> [--deep]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -32,6 +32,17 @@ a source. Unsupported claims are retracted, not softened.
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `WebSearch` + `WebFetch` for knowledge/deep research (external sources); `Grep`/`Glob`/`Read` for codebase and document analysis; `Agent` for `--deep` mode's parallel subagents
+- **Files:** if `$ARGUMENTS` is a file path (Document Analysis mode), that path must exist and be readable
+
+## STEP 0: Preflight
+
+1. If `$ARGUMENTS` is a file path, verify it exists: `test -f "$ARGUMENTS"` — HARD-STOP if missing.
+2. If the research type will need `WebSearch`/`WebFetch` (knowledge or deep research) and those tools are unavailable in this environment, note the degradation now — proceed codebase-only and say so in the final brief, rather than discovering the gap mid-run.
+3. Proceed to STEP 1.
 
 ## STEP 1: Classify Input & Scope
 

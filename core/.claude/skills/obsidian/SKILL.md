@@ -14,7 +14,7 @@ triggers:
   - PKM
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<action: create|edit|search|daily|canvas|base|organize|log> <details>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -25,6 +25,20 @@ Manage Obsidian vaults with proper Obsidian-specific syntax. Create, edit, searc
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — none required; direct file access covers every operation. Obsidian CLI v1.12+ is optional (enables faster search/graph queries) — probe: `command -v obsidian`.
+- **Files** — an Obsidian vault: a directory containing `.obsidian/`. Probe: `find . -name ".obsidian" -type d -maxdepth 3`.
+- **User inputs** — the vault path, if none is auto-detected.
+
+## STEP 0: Preflight
+
+Before parsing the requested action:
+
+1. Probe for the vault: `find . -name ".obsidian" -type d -maxdepth 3 2>/dev/null | head -5` (the same check STEP 2 runs below). If none found, ask the user for the vault path now rather than discovering the gap mid-action.
+2. Probe for the Obsidian CLI: `command -v obsidian`. Its absence is not blocking — STEP 4 already falls back to direct file access.
+3. If the vault path is still unknown after asking, HARD-STOP: every action in this skill needs a vault to read from or write to.
 
 ## STEP 1: Detect Action
 

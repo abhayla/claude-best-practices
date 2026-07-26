@@ -8,7 +8,7 @@ description: >
 triggers: "xml to compose, migrate xml, convert layout, xml migration, view to compose"
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<xml-file-path or 'plan' or 'audit' or 'interop'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -19,6 +19,21 @@ Systematically convert Android XML layouts to idiomatic Jetpack Compose, preserv
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `./gradlew` (Android Gradle wrapper, used by STEP 7 to verify compilation).
+- **Files:** an Android project with `app/src/main/res/layout/` XML files, or a specific
+  `<xml-file-path>` supplied via `$ARGUMENTS`.
+- **User inputs:** none required up front — `$ARGUMENTS` selects a file path or a mode
+  (`plan`/`audit`/`interop`).
+
+## STEP 0: Preflight
+
+Confirm `./gradlew` exists at the project root (probe: `ls gradlew`). Resolve `$ARGUMENTS`: a
+specific XML file path (confirm it exists), or a mode keyword (`plan`/`audit`/`interop`) with no
+single-file target. Missing `gradlew` → note that STEP 7's compile verification will be skipped
+and ask the user how to verify instead; missing target file → report and ask for the correct path.
 
 ## STEP 1: Analyze the XML Layout
 

@@ -15,7 +15,7 @@ triggers:
   - recomposition
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<composable-name or 'navigation' or 'performance' or 'theme' or 'images'>"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -31,6 +31,23 @@ Before applying Compose patterns, verify the project uses Compose
 `/xml-to-compose` for migration.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Files** — `build.gradle` / `build.gradle.kts` declaring `implementation("androidx.compose...")` — probe: `grep -rl "androidx.compose" build.gradle* app/build.gradle* 2>/dev/null`
+- **Tools** — Kotlin/Gradle toolchain already configured for the project (no separate install; this skill edits/generates Compose source, it does not invoke Gradle itself)
+
+## STEP 0: Preflight
+
+Confirm the project actually uses Compose before applying any pattern below — every step
+assumes a working Compose Gradle setup.
+
+1. Run the Files probe above.
+2. Missing → report it and recommend `/xml-to-compose` for migration instead of proceeding
+   with Compose-specific patterns; HARD-STOP this skill's steps.
+3. Present → proceed to STEP 1.
 
 ---
 

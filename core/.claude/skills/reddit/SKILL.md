@@ -24,7 +24,7 @@ triggers:
   - compose reddit
   - reddit engagement
 argument-hint: "<action> [options] — e.g., 'read https://reddit.com/r/...', 'compose post about AI for r/programming', 'analyze thread https://...', 'search r/python for async patterns', 'monitor r/startups for my-product'"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 allowed-tools: "Bash Read Write Grep Glob WebFetch WebSearch Agent"
 ---
@@ -36,6 +36,35 @@ allowed-tools: "Bash Read Write Grep Glob WebFetch WebSearch Agent"
 ---
 
 Determine which mode to use based on the user's request, then follow that section.
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** `curl` (all modes); `jq` (search/monitor JSON parsing); `tmux` + `gemini` CLI
+  (Mode 1 Option C fallback only, when the JSON API and WebFetch both 403)
+- **Credentials/env (mode-dependent):**
+  - Modes 5 (OAuth search), 6 (post/engage), 7 (karma), 10 (moderation) —
+    `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USERNAME`, `REDDIT_PASSWORD`
+  - Mode 10 additionally requires the account to hold moderator permissions on the target subreddit
+- **Services/network:** reachable `reddit.com` JSON endpoints and `oauth.reddit.com`
+- **User inputs & decisions:** which mode to run (see body); explicit approval before any
+  POST/DELETE call (CRITICAL RULE 1)
+- **Declared fallback:** Mode 1 read ladder — Reddit JSON API → WebFetch → Gemini CLI via tmux —
+  legal, no mid-run user input needed
+
+## STEP 0: Preflight
+
+Determine the mode from the request, then verify only what it needs:
+- **Mode 1 (Read):** no credential required — the fetch ladder handles it.
+- **Modes 5/6/7/10 (OAuth-backed):** confirm `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET`/
+  `REDDIT_USERNAME`/`REDDIT_PASSWORD` are set and non-empty; Mode 10 also needs mod
+  permissions on the target subreddit (check via the account-info endpoint).
+- **Modes 2/3/4/8/9 (Compose/Analyze/Score/Monitor/Strategy):** no OAuth credential required —
+  read-only JSON endpoints suffice.
+- If a required credential is missing: report every missing item in ONE list and ask the user
+  to supply it now. Modes 6/7/10 HARD-STOP without OAuth credentials — write/moderation actions
+  cannot proceed on guesses.
 
 ---
 

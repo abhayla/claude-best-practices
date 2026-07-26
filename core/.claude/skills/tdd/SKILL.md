@@ -14,7 +14,7 @@ triggers:
   - failing test first
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<feature-or-behavior-description>"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -28,6 +28,16 @@ starting TDD cycles, use `/tdd-failing-test-generator` instead.
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** the project's language test runner (pytest / Jest / Vitest / JUnit — detected in
+  STEP 0), `git` (used to undo a failed refactor). Probe: run the detected runner's `--version`
+  and `git --version`.
+- **Files:** an existing test suite / test directory convention to follow. Probe: locate the
+  project's test directory and config file.
+- **User inputs:** none required up front — if no test framework is found, STEP 0 stops and asks
+  the user to pick one (framework choice is genuinely unknowable before inspecting the project).
 
 ## Overview
 
@@ -48,7 +58,7 @@ not one large implementation.
 
 ---
 
-## BEFORE STARTING: Environment Check
+## STEP 0: Preflight
 
 1. Identify the project's test framework and test runner command
 2. Run the existing test suite to establish a green baseline

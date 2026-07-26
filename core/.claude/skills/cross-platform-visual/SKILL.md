@@ -11,7 +11,7 @@ triggers:
   - platform comparison
   - design parity
 argument-hint: "<feature-name|screen-name> [--platforms android,web,flutter] [--threshold=N]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -22,6 +22,22 @@ Compare the same UI feature across Android, Web, and Flutter to ensure design pa
 **Arguments:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — `maestro` CLI (Android), `npx playwright` (Web), `flutter` CLI (Flutter) — only for the platforms named in `--platforms` (default all three) — probe: `maestro --version` / `npx playwright --version` / `flutter --version`
+- **Services / network** — a connected Android device/emulator (Maestro), installed Playwright browsers (Web), and a connected device/emulator or supported target (Flutter integration tests) for each platform being compared
+- **Files** — the per-platform test paths for the target feature: `e2e/maestro/{feature}/`, `e2e/tests/{feature}.spec.ts`, `integration_test/{feature}_test.dart` (only the ones for the requested `--platforms`)
+
+## STEP 0: Preflight
+
+1. Parse `--platforms` (default: android,web,flutter).
+2. For each requested platform, probe its CLI/tool per the table above and confirm its
+   test path from STEP 1 exists.
+3. Missing tool or missing test path for a requested platform → report ALL missing items
+   in one list; either drop that platform (with the user's OK) or HARD-STOP if the user
+   needs all three.
+4. All clear → proceed to STEP 1.
 
 ## STEP 1: Identify Target Screens
 

@@ -2,7 +2,7 @@
 name: youtube-transcript
 description: Extract the full transcript (and optional metadata) of ANY YouTube video — short, long, or Shorts — given just its link. Tries clean captions first, falls back to yt-dlp subtitle download, and finally to audio + Whisper speech-to-text when a video has NO captions at all. Use whenever the user pastes a YouTube URL and wants the spoken content as text, or asks to summarize / analyze / search a video.
 type: workflow
-version: 1.0.1
+version: 1.1.0
 allowed-tools: Bash, Read, Write
 argument-hint: "<youtube-url> [--out file.md] [--meta]"
 ---
@@ -12,6 +12,32 @@ argument-hint: "<youtube-url> [--out file.md] [--meta]"
 Give it a YouTube link → get the full spoken text back. Handles any length and any URL
 form (`watch?v=`, `youtu.be/`, `/shorts/`, `/live/`, or a bare 11-char id). The worker is
 `yt_transcript.py` in this skill directory; the steps below drive it.
+
+## Prerequisites
+
+- **Tools/CLIs:** Python 3.x; `yt-dlp` + `youtube-transcript-api` (layers 1–2); `faster-whisper`
+  + `ffmpeg` on PATH (layer 3, ASR fallback only — not needed when captions exist)
+- **Files:** `yt_transcript.py` (ships in this skill directory)
+- **Services/network:** reachable youtube.com, ideally from a non-cloud/residential IP — YouTube
+  blocks known cloud-provider IPs for caption endpoints (see Gotchas)
+- **User inputs & decisions:** the YouTube URL; optional `--out` path, `--meta`, `--lang`,
+  `--force-asr`/`--asr-model` — collect these up front
+- **Declared fallback:** the 3-layer chain — youtube-transcript-api → yt-dlp subtitles →
+  yt-dlp audio + faster-whisper ASR — legal, no mid-run user input needed
+
+## STEP 0: Preflight
+
+```bash
+python -c "import yt_dlp, youtube_transcript_api" 2>&1   # layers 1-2, required
+python -c "import faster_whisper" 2>&1                    # layer 3, optional
+ffmpeg -version >/dev/null 2>&1 && echo ffmpeg-ok || echo ffmpeg-missing   # layer 3, optional
+```
+
+Collect the URL and output preferences (STEP 1 below) while the user is present. If BOTH
+`yt_dlp` and `youtube_transcript_api` are missing, report that in one line and HARD-STOP
+(`pip install yt-dlp youtube-transcript-api`) — no layer could run. If only `faster_whisper`/
+`ffmpeg` are missing, warn once and continue — the ASR layer degrades gracefully rather than
+blocking layers 1–2.
 
 ## STEP 1: Resolve the link and pick the output
 

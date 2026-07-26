@@ -7,7 +7,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<test-scope> [--component|--store|--composable|--e2e]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Vue.js Test Runner
@@ -19,6 +19,19 @@ Run, author, and validate tests for Vue.js applications — components, Pinia st
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `node`/`npm`, and the project's test runner (`vitest` or `jest`, detected in STEP 1).
+- **Files:** a Vue project with `vitest.config.*`/`jest.config.*` (or one is created if neither
+  exists — STEP 1 default).
+- **User inputs:** none required up front — `<test-scope>` and mode flags come from `$ARGUMENTS`.
+
+## STEP 0: Preflight
+
+Probe `node --version` and `npm --version`. Confirm this is a Vue project (`package.json`
+declares `vue`). Missing Node/npm → report and stop; missing `vue` in `package.json` → confirm
+with the user this is the intended target before continuing to STEP 1's framework detection.
 
 ## STEP 1: Detect Test Framework and Configuration
 

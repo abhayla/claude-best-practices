@@ -15,7 +15,7 @@ triggers:
   - nfr thresholds
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<project directory, PRD path, or baseline results path>"
-version: "1.2.0"
+version: "1.3.0"
 type: workflow
 ---
 
@@ -26,6 +26,22 @@ Run load tests, web performance audits, and bundle analysis with baseline compar
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — `k6` (load testing), `lighthouse` CLI (web performance), Node.js/npm (bundle analyzers: `webpack-bundle-analyzer`, `source-map-explorer`, `@next/bundle-analyzer`), `python3` (baseline comparison scripts). Probe: `which k6`, `which lighthouse` (or `npx lighthouse --version`), `node -v`, `python3 --version`.
+- **Services / network** — the target application must be running and reachable (default `http://localhost:3000`) for both k6 and Lighthouse.
+- **Files** — a PRD/NFR document to extract thresholds from (optional — falls back to the documented industry-standard defaults if absent); `perf/baselines/` for regression comparison (created on first run).
+- **User inputs** — which test types to run (smoke/load/stress, Lighthouse, bundle analysis, or all) and the base URL if not `localhost:3000`.
+
+## STEP 0: Preflight
+
+Before extracting thresholds or running anything:
+
+1. Confirm (from `$ARGUMENTS` or by asking) which test types are in scope — k6 (smoke/load/stress), Lighthouse, bundle analysis, or all — and the target base URL if it isn't `http://localhost:3000`.
+2. Verify the target app is actually running and reachable at that URL — a cheap `curl -sf <url> -o /dev/null` suffices.
+3. Probe for each tool this run needs: `which k6`, `which lighthouse` (or `npx lighthouse --version`), `node -v`, `python3 --version`.
+4. Report every missing tool/unreachable service in one consolidated list and ask the user to install/start it now — do not start a k6 or Lighthouse run against a target that isn't up.
 
 ## STEP 1: Extract NFR Thresholds from PRD
 

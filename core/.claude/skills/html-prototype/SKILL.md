@@ -16,7 +16,7 @@ triggers:
   - app demo
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<PRD/spec file path, screen name, or feature description>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -25,6 +25,27 @@ type: workflow
 Generate a fully interactive, multi-file HTML prototype for a website or mobile app. The prototype serves as both a stakeholder demo and the implementation specification for the target platform.
 
 **Input:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Files:** the PRD/spec file, if `$ARGUMENTS` points at a path rather than a bare screen
+  name or feature description — must exist and be readable before STEP 1 can extract screens
+- **User inputs & decisions:** `$ARGUMENTS` itself (PRD/spec file path, screen name, or feature
+  description), already required at invocation
+
+No CLI tools, credentials, or network services are required — this skill only reads local
+input (if a path was given) and writes local HTML/CSS/JS files.
+
+## STEP 0: Preflight
+
+1. If `$ARGUMENTS` looks like a file path, confirm it exists and is readable
+   (`test -f "<path>" && echo found || echo missing`). Missing → report the path and ask the
+   user for a valid PRD/spec path, a screen name, or a feature description instead — do not
+   guess screens from nothing.
+2. If `$ARGUMENTS` is a screen name or feature description (no file path), proceed directly —
+   STEP 1 works from the description text itself.
 
 ---
 

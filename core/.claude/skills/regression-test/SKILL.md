@@ -14,7 +14,7 @@ triggers:
   - affected tests
   - impact analysis
   - change impact
-version: "1.2.0"
+version: "1.3.0"
 ---
 
 # Regression Test — Change-Aware Test Execution
@@ -31,6 +31,19 @@ all downstream consumers.
 **Target:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `git`, plus the project's test runner (pytest / jest / vitest / gradle / go test / rspec) — auto-detected from `pyproject.toml`, `package.json`, `build.gradle`, `go.mod`, or `Gemfile`
+- **Files:** the project must be inside a git repository (`.git` present); a test-runner config file must exist — absence is a declared hard stop (STEP 4 already writes `result: "FAILED"`, `confidence: "BLOCKED"`), not silently skipped
+- **Files (optional):** `coverage.json` / `coverage-final.json` improve STEP 2.3 mapping when present; their absence just falls back to naming + import-graph mapping
+
+## STEP 0: Preflight
+
+1. Confirm a git repository: `git rev-parse --is-inside-work-tree` — HARD-STOP if not a repo.
+2. Probe for a recognizable test-runner config (`pyproject.toml`, `package.json`, `build.gradle`, `go.mod`, `Gemfile`) — if none is found, report this now rather than discovering it only at STEP 4's execution attempt.
+3. Note whether `coverage.json`/`coverage-final.json` exists (optional enhancement for STEP 2.3).
+4. Proceed to STEP 1 once the repo and test-runner presence are confirmed.
 
 ## STEP 1: Identify Changes
 

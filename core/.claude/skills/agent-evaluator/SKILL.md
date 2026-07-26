@@ -20,7 +20,7 @@ triggers:
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<agent-path>"
 type: workflow
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Agent Evaluator — Evaluate Agent Quality
@@ -35,6 +35,14 @@ gate (REQ-M033) but reusable for any agent with `evals/scenarios/*.json`.
 > Spec reference: `docs/specs/test-pipeline-three-lane-spec.md` v1.6 §4 EVALS
 
 ---
+
+## Prerequisites
+
+- **Tools:** none beyond the skill's own Bash/Read/Grep/Glob — no external CLI required
+- **Files:** the target agent file (resolved from `<agent-path>`) and its `evals/scenarios/*.json` directory
+- **User inputs:** `<agent-path>` (name or path); optional `--ci` flag or `CI=true` env var (selects exit-code behavior, STEP 6)
+
+STEP 0 below already performs this skill's preflight gate (file existence, scenario discovery, NON-NEGOTIABLE presence) — no separate STEP 0 is added.
 
 ## STEP 0: Pre-Flight Checks
 

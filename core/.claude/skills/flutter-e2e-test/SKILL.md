@@ -8,7 +8,7 @@ description: >
 triggers: "flutter test, e2e, integration test, end-to-end, widget test, UI test"
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<test-scope: 'all' | feature-name | 'setup' | 'visual' | 'monkey'>"
-version: "1.2.1"
+version: "1.3.0"
 type: workflow
 ---
 
@@ -17,6 +17,34 @@ type: workflow
 Run and author end-to-end tests for Flutter apps across Android, Web, and desktop platforms using semantic element recognition and the `integration_test` package.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** Flutter SDK (`flutter --version`); `adb` + a running emulator/device for
+  Android runs (STEP 6); `chromedriver` on PATH for Web runs (STEP 6); Xcode/`xcodebuild` for iOS
+- **Files:** `pubspec.yaml` with `integration_test`/`flutter_test`/`flutter_driver` dev
+  dependencies (STEP 1); `test_driver/integration_test.dart` driver entry point
+- **User inputs & decisions:** `<test-scope>` — `all`, a feature name, `setup`, `visual`, or
+  `monkey` (supplied at invocation); which platform(s) to target (Android/Web/desktop) if not
+  obvious from the project
+- **Declared fallback:** none — a missing platform toolchain (no device, no ChromeDriver) skips
+  that platform's run rather than improvising a substitute
+
+## STEP 0: Preflight
+
+1. Confirm `flutter --version` succeeds. Missing → HARD-STOP, ask the user to install Flutter.
+2. Confirm `<test-scope>` was supplied; if missing, ask for it now (`all`, a feature name,
+   `setup`, `visual`, or `monkey`) rather than defaulting silently.
+3. Resolve which platform(s) STEP 6 will need to run against, then check only those:
+   Android → `flutter devices` / `adb devices`; Web → `chromedriver --version`; desktop → the
+   relevant native toolchain. Report any platform whose toolchain is missing — that platform's
+   tests are skipped, not blocked, unless it's the only target requested (then HARD-STOP).
+4. Confirm `pubspec.yaml` declares `integration_test`/`flutter_test` — STEP 1 will add them if
+   absent, so this is a note, not a blocker.
+
+Report all gaps in ONE consolidated list before proceeding to STEP 1.
 
 ---
 

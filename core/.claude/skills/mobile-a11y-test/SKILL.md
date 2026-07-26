@@ -14,7 +14,7 @@ triggers:
   - accessibility scanner
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[--platform android|flutter] [--scope screen|app] [--dark-mode]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -25,6 +25,26 @@ Run automated and semi-automated accessibility checks for Android and Flutter pr
 **Arguments:** $ARGUMENTS
 
 CRITICAL: Every interactive element (buttons, links, inputs, toggles) MUST have an accessibility label AND a touch target of at least 48dp.
+
+---
+
+## Prerequisites
+
+- **Tools** — Android: `./gradlew` (Gradle wrapper) + `adb`; Flutter: the `flutter` CLI. Only the toolchain for the detected/selected platform is required.
+- **Files** — `build.gradle`/`build.gradle.kts` (Android) or `pubspec.yaml` with a `flutter:` dependency (Flutter) — STEP 1 detects these; hard-stop if neither exists and `--platform` wasn't passed.
+- **Services** — a connected Android device/emulator for the STEP 2 instrumented tests and the STEP 3 `adb` scanner dump.
+- **User inputs** — `--platform`, `--scope`, `--dark-mode` — already collectible from `$ARGUMENTS`.
+
+## STEP 0: Preflight
+
+Resolve `--platform` from `$ARGUMENTS` (skip auto-detection if given), otherwise run STEP 1's
+detection now. Probe the matching toolchain: `./gradlew --version` for Android, `flutter
+--version` for Flutter. For Android, also run `adb devices` and confirm at least one
+device/emulator is attached — STEP 2's instrumented tests and STEP 3's `uiautomator dump` both
+need one. Record `--scope` and `--dark-mode` for the STEP 7 report header. Report every
+missing tool, undetected platform, or disconnected device in one consolidated list and ask the
+user to fix it now; HARD-STOP if no platform can be detected/selected or its toolchain is
+unavailable.
 
 ---
 

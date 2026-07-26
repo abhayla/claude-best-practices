@@ -21,7 +21,7 @@ triggers:
   - fastlane
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<deployment target description, or 'review current strategy'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -30,6 +30,16 @@ type: workflow
 Configure advanced deployment strategies for production-grade releases.
 
 **Input:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+None — this is an advisory/analysis skill: STEP 1 reads existing deployment config
+read-only and tolerant of absence (`2>/dev/null`), and every subsequent step produces
+recommendations, YAML templates, and runbooks for the user to adopt. It does not itself
+execute a deploy, migration, or infra command, so it has no required external tool,
+credential, or service prerequisite.
 
 ---
 
