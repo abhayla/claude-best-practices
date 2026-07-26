@@ -7,7 +7,7 @@ description: >
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: scan|propose|create|list> [details]"
 type: workflow
-version: "3.0.0"
+version: "3.1.0"
 ---
 
 # Skill Factory — Pattern Detector & Automation Classifier
@@ -118,6 +118,13 @@ Create the resource using the appropriate authoring tool for its category:
 
 Delegate to `/writing-skills` which handles templates, quality checklists, and trigger overlap scans.
 
+The created skill MUST carry the **prerequisites contract**: a `## Prerequisites` section (or an
+explicit `Prerequisites: none` line) and, when any prerequisite is declared, a `## STEP 0:
+Preflight` first step that verifies every declared item (tools, credentials, files, services, AND
+user inputs/decisions) before execution starts — hard-stopping with a complete missing-items list
+rather than stalling mid-run or improvising an undeclared fallback. `/writing-skills` Step 2.3b
+authors this; verify it is present before accepting the draft.
+
 ### Agent Creation
 
 Write directly using this structure:
@@ -222,3 +229,4 @@ Total: [N] automations
 - NEVER create hooks for advisory guidance — hooks are for deterministic enforcement only
 - NEVER create MCP servers when a simple Bash command suffices — MCP is for persistent service connections
 - NEVER create rules for multi-step procedures — rules are static constraints, use skills for workflows
+- NEVER accept a skill draft without the prerequisites contract (`## Prerequisites` or explicit none + `## STEP 0: Preflight` when prerequisites exist) — mid-run prerequisite discovery stalls unattended runs

@@ -4572,13 +4572,13 @@
     }
   },
   "skill-author-agent": {
-    "hash": "6468fceb82f958c9efd58beaf59f160f15b98263b97e65105eeeed067a7c3218",
+    "hash": "c2db5d6456336d2eccf8f4274e05bda51d4492688fe02b30b2c1e8e963a1bedf",
     "type": "agent",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-17",
-    "last_updated": "2026-04-02",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "writing-skills",
       "pattern-structure"
@@ -4591,7 +4591,7 @@
       "agent",
       "patterns"
     ],
-    "changelog": "v1.0.0: Initial release â€” routes pattern creation to appropriate authoring workflows with quality validation",
+    "changelog": "v1.1.0: Added prerequisites-contract validation to skill workflow and quality gate",
     "tier": "nice-to-have",
     "effectiveness": {
       "adoption_rate": 0.0,
@@ -4632,16 +4632,16 @@
     }
   },
   "skill-evaluator": {
-    "hash": "8aae266cc2ffd2ff6fb45c780657ad98aec71b17b854fc243fc51602c22dde9d",
+    "hash": "1d6906728a734098c839f2de5e705760f5f3d8e3af4eaee1646462c89e9f2d02",
     "type": "skill",
     "category": "core",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-02",
-    "last_updated": "2026-07-10",
+    "last_updated": "2026-07-26",
     "dependencies": [],
     "visibility": "public",
-    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Includes pre-flight checks for registry sync, frontmatter completeness, structural integrity, and v8 platform compliance. Trap mode (v2.4.0) certifies an asset (skill, manual, rule) still produces disciplined, correct behavior when driven by a cheap model, via a planted-defect exam + blind judging.",
+    "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Includes pre-flight checks for registry sync, frontmatter completeness, structural integrity, and v8 platform compliance. Trap mode (v2.4.0) certifies an asset (skill, manual, rule) still produces disciplined, correct behavior when driven by a cheap model, via a planted-defect exam + blind judging. For structural pattern-file validation (frontmatter, portability, registry sync) use /pattern-quality instead.",
     "tags": [
       "evaluation",
       "skills",
@@ -4649,7 +4649,7 @@
       "quality",
       "trap-test"
     ],
-    "changelog": "v2.4.0: Add trap mode — cheap-model certification via planted-defect cases + blind opus judging, generalized from the fable-operating-manual model-parity-test harness (references/trap-test-protocol.md) | v2.3.0: (pre-existing, undocumented in prior changelog) | v2.1.0: Add v8 platform compliance (name constraints, third-person descriptions, reference depth, model matrix testing) | v2.0.0: Add Step 0 pre-flight checks (registry sync, frontmatter completeness, structural integrity), cross-skill intelligence (bidirectional signposting, near-duplicate resolution, skill-vs-rule overlap), delegation edge cases in stress test | v1.0.0: Initial release",
+    "changelog": "v2.5.0: Added pre-flight check 0.5: prerequisites-contract validation (declare/preflight/front-loaded inputs/no undeclared fallback); new skills FAIL, pre-2026-07-26 skills WARN",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -5653,13 +5653,13 @@
     }
   },
   "writing-skills": {
-    "hash": "9a74fdc785df99886576a9a40985e80e9c5fe45e9f193a8bea3d50d311f6d546",
+    "hash": "c63af13904ce53335c8fa5d651b0450361f7635979fbb86222943ce7d48cd99d",
     "type": "skill",
     "category": "core",
-    "version": "2.8.0",
+    "version": "3.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-04-03",
+    "last_updated": "2026-07-26",
     "dependencies": [
       "skill-evaluator"
     ],
@@ -5671,7 +5671,7 @@
       "evaluation",
       "quality"
     ],
-    "changelog": "v2.8.0: Add v8 platform compliance (naming conventions, content quality, reference structure, model compatibility, third-person descriptions, voodoo constants, solve-dont-punt) | v2.7.0: Add skill necessity check (Step 1.1), context budget guidance (Step 2.2b), instruction writing patterns reference, skill-evaluator integration (Step 6), domain pattern review (Step 6.6), expanded MUST DO/MUST NOT DO sections",
+    "changelog": "v3.3.0: Added mandatory Prerequisites & Preflight (STEP 0) authoring contract (2.3b): declare all prerequisites incl. user inputs, verify up front, hard-stop with complete missing list",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,
@@ -6226,7 +6226,7 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-26",
     "total_patterns": 285
   },
   "plan-before-coding": {

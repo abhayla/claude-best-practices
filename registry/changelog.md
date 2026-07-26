@@ -4,6 +4,34 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-07-26 — prerequisites-preflight contract across the skill-authoring toolchain
+
+Owner mandate: a skill must never discover a missing prerequisite mid-run — stalling for an
+absent user or improvising an undeclared fallback is the defect class. New contract: every NEW
+skill DECLARES its prerequisites (tools/CLIs, credentials, files, services, AND every user
+input/decision it will need), VERIFIES them in a `## STEP 0: Preflight` first step while the
+user is present at invocation, and HARD-STOPS with one consolidated missing-items list on gaps.
+Fallback ladders allowed only when declared and needing no mid-run user input;
+`Prerequisites: none` must be explicit. Enforced at authoring + review layer (CI ratchet
+deferred to the existing-skill sweep):
+
+- **updated** skill `writing-skills` → 3.3.0 (hub + core/plugin variants) — new Step 2.3b
+  authoring contract, quality-checklist row, MUST DO / MUST NOT DO items
+- **updated** skill `skill-evaluator` → 2.5.0 (synced hub+core) — new pre-flight check 0.5
+  (declared / preflight-present / inputs-front-loaded / no-undeclared-fallback); NEW skills
+  FAIL, pre-contract skills WARN pending the sweep
+- **updated** agent `skill-author-agent` → 1.1.0 (hub/core/plugin) — contract validation in the
+  skill workflow + quality gate
+- **updated** plugin `cbp-workflows` → 0.3.0 — `skill-authoring-workflow` 2.2.0 (STEP 3 VALIDATE
+  now blocks drafts lacking the contract) + synced `writing-skills`/`skill-author-agent` copies
+- **updated** plugin `cbp-learning-workflow` → 0.2.0 — `skill-factory` 3.1.0 (Create Mode
+  requires the contract before accepting a draft)
+- **updated** hub-only skills `pattern-quality` → 1.1.0 (content-quality check 6) and
+  `promote-to-core` → 1.1.0 (STEP 2 promotion bar)
+
+Deferred phase (owner-approved): sweep EXISTING skills for compliance, then consider a blocking
+CI ratchet modeled on eval-coverage.
+
 ### 2026-07-14 — verify-before-suggest-do-before-delegate (new must-have global rule)
 
 Owner-reported failure pair: workflows recommending tools/processes from training memory without

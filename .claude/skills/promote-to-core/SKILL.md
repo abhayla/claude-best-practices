@@ -2,7 +2,13 @@
 name: promote-to-core
 description: Promote a hub-only pattern (a skill/agent/rule living only in .claude/) into the distributable core/.claude/ template so downstream projects can provision it. Codifies every convention — frontmatter standard, registry entry + hash + tier, dual-home classification, docs regen, the full CI gate, and landing — so the promotion is a 5-step recipe instead of a 30-step rediscovery. Use when the user says "promote X to core", "make X distributable", or "ship X to downstream projects".
 type: workflow
-version: 1.0.0
+version: 1.1.0
+triggers:
+  - promote to core
+  - make distributable
+  - ship to downstream projects
+  - promote pattern
+  - move skill to core
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob
 argument-hint: "<pattern-name> [--tier must-have|nice-to-have]"
 ---
@@ -40,8 +46,18 @@ For a **skill** (`SKILL.md`), the quality gate REQUIRES these frontmatter fields
   `Write`/`Edit` in `allowed-tools`.
 - `description` should start with an action verb and include a "Use when…" clause.
 - SKILL.md must be ≤ 1000 lines (warns over 500).
+- The prerequisites contract MUST be present before promotion: a `## Prerequisites` section
+  (or an explicit `Prerequisites: none` line), plus a `## STEP 0: Preflight` when any
+  prerequisite is declared — verify every item (tools, credentials, files, services, AND user
+  inputs) up front, hard-stop with the complete missing list, no mid-run input requests, no
+  undeclared fallbacks. A skill entering `core/` ships to downstream projects where unattended
+  runs are common — the contract is non-negotiable at this boundary.
 For an **agent** (`*.md` in `agents/`): required frontmatter `name, description, model` (or
 `tools`); match an existing core agent's shape.
+For a **rule** (`*.md` in `rules/`): a scope declaration is required (`# Scope: global` or
+`globs:` frontmatter) and the file must fit the ≤100-line rule budget the pattern test enforces.
+For a **hook** (`*.sh`): `bash -n` clean, executable, and wired into `core/.claude/settings.json`
+under the right event block in STEP 3 (see the companion-hook bullet in STEP 1).
 Make the edits in the `.claude/` copy first; the `core/` copy will be identical.
 
 ## STEP 3: Copy into the `core/` tree
@@ -88,7 +104,7 @@ This updates `docs/`, `README.md` counts, and may auto-add the pattern to
 `config/workflow-groups.yml` (benign). An "orphan pattern" warning just means no workflow
 group — non-blocking.
 
-## STEP 7: Run the full gate (dispatch `checks-runner-agent`)
+## STEP 7: Run the full gate (dispatch `pre-git-merge-checker-agent`)
 
 Run the entire local CI in an isolated context so its output never floods the session —
 dispatch the **`pre-git-merge-checker-agent`** and act on its PASS/FAIL verdict. It runs:

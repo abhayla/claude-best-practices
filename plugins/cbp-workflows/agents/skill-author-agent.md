@@ -3,7 +3,7 @@ name: skill-author-agent
 description: >
   Create, update, or manage Claude Code skills, rules, and agents using the dedicated authoring
   workflows. Dispatches to /writing-skills for skills, /claude-guardian for rules, and applies
-  pattern-structure.md (hub rule — if absent in this project, apply the frontmatter standard summarized in your instructions) standards for agents. Use when generating patterns as part of /synthesize-project
+  pattern-structure.md standards for agents. Use when generating patterns as part of /synthesize-project
   or when a user requests a new skill/rule/agent.
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Skill"]
 model: inherit
@@ -39,6 +39,7 @@ You receive one of:
    - Read `pattern-structure.md` — verify frontmatter has all required fields (`name`, `description`, `type`, `allowed-tools`, `argument-hint`, `version`)
    - Read `pattern-portability.md` — verify no hardcoded paths, least-privilege tools, no project-specific references (unless this is a synthesized project-specific pattern)
    - Read `pattern-self-containment.md` — verify 30+ lines of content, no placeholders, cross-references exist
+   - Verify the prerequisites contract — a `## Prerequisites` section (or an explicit `Prerequisites: none` line); when any prerequisite is declared, a `## STEP 0: Preflight` first step that verifies every declared item (tools, credentials, files, services, AND user inputs/decisions) before STEP 1, hard-stopping with a complete missing-items list rather than stalling mid-run or improvising an undeclared fallback
 4. Return the validated skill file
 
 ### Rules
@@ -173,6 +174,7 @@ Every pattern MUST pass ALL of these before being returned:
 | Check | Applies To | Requirement |
 |-------|-----------|-------------|
 | Frontmatter complete | All | All required fields present for the pattern type |
+| Prerequisites contract | Skills | `## Prerequisites` section (or explicit `Prerequisites: none`) + `## STEP 0: Preflight` when any prerequisite is declared |
 | Version present | All | SemVer format (`"1.0.0"`) |
 | Scope declared | Rules | `globs:` or `# Scope: global` |
 | Tools least-privilege | Skills, Agents | Only tools actually used in the pattern |
