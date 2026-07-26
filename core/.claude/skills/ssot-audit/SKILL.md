@@ -15,7 +15,7 @@ triggers:
 type: workflow
 allowed-tools: "Read Grep Glob"
 argument-hint: "[--fix]"
-version: "1.2.0"
+version: "1.3.0"
 ---
 
 # SSOT Audit
@@ -28,6 +28,14 @@ MUST distinguish intentional pointers (e.g., "see .claude/rules/X.md") from actu
 **Default mode is read-only.** Pass `--fix` to get concrete edit suggestions for each violation.
 
 **Arguments:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+None — this is a read-only static analysis of `CLAUDE.md` / `.claude/` files that may
+legitimately be absent (e.g. no `settings.json`, no nested `CLAUDE.md`); absence is a
+finding to report (STEP 1), not a blocker.
 
 ---
 

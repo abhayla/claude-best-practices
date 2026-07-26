@@ -7,7 +7,7 @@ description: >
   Use when adding observability to a new or existing service.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<service-or-component-to-monitor>"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 triggers:
   - /monitoring
@@ -21,6 +21,16 @@ triggers:
 Set up production-grade monitoring and observability for the target service or component.
 
 **Target:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+None — local-only authoring workflow. STEP 1 itself is the assessment (existing configs, stack,
+instrumentation libraries) via `find`/`grep`, both standard on any dev/CI shell; everything
+downstream authors/edits local config files (Prometheus rules, Grafana dashboard JSON,
+instrumentation code) via Read/Grep/Glob/Write/Edit. No external tool, credential, or live
+cluster/Prometheus/Grafana connectivity is required to do the work.
 
 ---
 

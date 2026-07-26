@@ -14,7 +14,7 @@ triggers:
   - test matrix
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<PRD file path, plan file path, schema file path, feature description, or coverage gap report>"
-version: "2.1.0"
+version: "2.2.0"
 type: workflow
 ---
 
@@ -27,6 +27,24 @@ stubs. If `$ARGUMENTS` is empty, ask the user for at least one source: PRD file 
 file path, API spec, feature description, or coverage gap report path.
 
 **Input:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Files** — at least one of: PRD file path, plan file path, schema file path, feature
+  description, or coverage gap report path, via `$ARGUMENTS`.
+- **Tools** — the project's test framework, auto-detected in STEP 2 (pytest, Jest, Vitest,
+  JUnit 5, Playwright, k6); if none is detected, this skill recommends and sets one up
+  (STEP 2's existing fallback — no change here).
+
+## STEP 0: Preflight
+
+Verify `$ARGUMENTS` contains at least one usable source (PRD/plan/schema/API-spec path or
+a coverage gap report path or a feature description). If empty, ask the user now for at
+least one source — do not proceed to STEP 1 without one, and do not discover the gap
+mid-run. (Test-framework detection stays in STEP 2, where it belongs — that step already
+degrades gracefully when nothing is found.)
 
 ---
 

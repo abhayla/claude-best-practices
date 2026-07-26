@@ -2,7 +2,7 @@
 name: grill-me
 description: Audit a plan or design by interviewing the user relentlessly until shared understanding is reached, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
 type: workflow
-version: 1.1.0
+version: 1.2.0
 allowed-tools: Read, Grep, Glob
 argument-hint: [optional context about the plan or design]
 ---
@@ -12,6 +12,18 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 Ask dependent questions one at a time; batch answer-independent questions into one card so the user never waits between them (owner directive 2026-07-21).
 
 If a question can be answered by exploring the codebase, explore the codebase instead.
+
+## Prerequisites
+
+- **User inputs & decisions:** an available user for interactive dialogue — the plan, design,
+  or question to pressure-test (via `$ARGUMENTS` or shared context), and an answer to each
+  batched/dependent question as the interview proceeds. This skill is interactive by design;
+  the interview IS the skill's purpose, not a mid-run gap.
+- **Tools:** `Read`, `Grep`, `Glob` (already declared above) to explore the codebase before
+  asking anything answerable from it. No credentials, external services, or network access.
+
+No `STEP 0` — beyond the user's presence/topic and the read-only tools already declared, there
+are no environmental prerequisites to preflight.
 
 ## When to use
 

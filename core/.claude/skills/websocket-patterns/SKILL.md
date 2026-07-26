@@ -5,7 +5,7 @@ description: >
   Use when building real-time data streaming, live updates, chat, or push notifications.
 allowed-tools: "Read Grep Glob"
 argument-hint: "[server|client|reconnect|scaling]"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 triggers: websocket, ws, real-time, realtime, live-updates
 ---
@@ -13,6 +13,13 @@ triggers: websocket, ws, real-time, realtime, live-updates
 # WebSocket Patterns Reference
 
 Real-time WebSocket implementation across server frameworks and client platforms.
+
+## Prerequisites
+
+None — this is a reference skill (code patterns to copy into the target project); it does not
+execute anything itself. Framework/library installs (`ws`, `hono`, `elysia`, `okhttp`,
+`web_socket_channel`, `ioredis`, etc.) are preconditions of the USER's project once a pattern is
+adopted, not of reading this reference.
 
 ## Server Implementations
 

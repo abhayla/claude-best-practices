@@ -7,7 +7,7 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "nuxt, nuxt4, nuxt module, nuxthub, nuxt content, nuxt ui, nuxt auth, server routes, SSR"
 argument-hint: "<feature-description or 'setup' or 'api' or 'module' or 'deploy'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -18,6 +18,23 @@ Build full-stack Nuxt 4.3+ applications with auto-imports, server routes, SSR/SS
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — Node.js + npm (or the project's package manager). Probe: `node -v && npm -v`.
+- **Credentials / env** — none by default; NuxtHub deploy (STEP 5) needs Cloudflare/NuxtHub auth (`npx nuxthub deploy` prompts for login on first use); `nuxt-better-auth` (STEP 8) needs its own secret/env vars once configured.
+- **Files** — an existing Nuxt project, or confirmation this is a fresh scaffold via `npx nuxi init`.
+- **User inputs** — which feature area this run covers (setup / server routes / module / NuxtHub / Content / UI / auth / deploy), so the run doesn't stall mid-way asking.
+
+## STEP 0: Preflight
+
+Before touching the project:
+
+1. Confirm (from `$ARGUMENTS` or by asking) which feature area this run covers — setup, server routes, a module, NuxtHub, Content, UI, auth, or deploy — since later steps assume that scope.
+2. Verify Node.js/npm are installed: `node -v && npm -v`.
+3. If deploy (STEP 5) is in scope, note that `npx nuxthub deploy` requires an interactive Cloudflare/NuxtHub login — flag this now rather than mid-deploy.
+4. If auth (STEP 8) is in scope, confirm the project accepts `nuxt-better-auth`'s alpha status, or pick a fallback strategy now.
+5. Report any missing tool and ask the user to install it before STEP 1 begins.
 
 ## STEP 1: Project Setup & Configuration
 

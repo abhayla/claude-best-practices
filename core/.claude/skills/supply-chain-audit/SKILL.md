@@ -8,7 +8,7 @@ description: >
 allowed-tools: "Bash Read Grep Glob"
 triggers: "supply chain, dependency audit, npm audit, pip audit, typosquatting, vulnerable dependency, CVE"
 argument-hint: "<'full-audit' or 'scan <package-name>' or 'license-check' or 'lockfile-verify'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -17,6 +17,35 @@ type: workflow
 Audit the software supply chain for vulnerable, malicious, abandoned, or non-compliant dependencies.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools** — ecosystem-specific scanners, only for the ecosystem(s) actually detected: `npm`/`npm audit`, `pip-audit` or `safety`, `cargo audit`, `bundle-audit`, `govulncheck`, `osv-scanner` (cross-ecosystem fallback), `license-checker`/`pip-licenses`/`cargo license`/`go-licenses`. A missing ecosystem-specific scanner degrades to `osv-scanner` (already the documented fallback in Troubleshooting) — never silently skip an ecosystem without noting it in the report.
+- **Files** — manifest/lockfiles for whichever ecosystems are present (detected in STEP 1).
+- **User inputs** — audit mode via `$ARGUMENTS` (`full-audit` / `scan <package-name>` / `license-check` / `lockfile-verify`), already required at invocation.
+
+## STEP 0: Preflight
+
+Quick ecosystem + tool probe before the full inventory in STEP 1:
+
+```bash
+# Coarse ecosystem detection (STEP 1 does the full manifest listing)
+for f in package.json requirements.txt Cargo.toml go.mod Gemfile pom.xml build.gradle; do
+  test -f "$f" && echo "ecosystem-signal: $f"
+done
+
+# Tool availability for whatever ecosystem(s) matched above
+npm --version 2>/dev/null; pip-audit --version 2>/dev/null || safety --version 2>/dev/null
+cargo audit --version 2>/dev/null; bundle-audit version 2>/dev/null
+govulncheck -version 2>/dev/null; osv-scanner --version 2>/dev/null
+```
+
+Report every missing scanner for a detected ecosystem in ONE consolidated list. Proceed
+using `osv-scanner` (if present) as the cross-ecosystem fallback for any gap; if neither
+the ecosystem-specific tool NOR `osv-scanner` is available, mark that ecosystem's
+vulnerability scan as SKIPPED in the final report — never fabricate a clean result.
 
 ---
 

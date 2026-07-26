@@ -6,7 +6,7 @@ description: >
   Use when deploying, configuring, or troubleshooting Kubernetes workloads.
 allowed-tools: "Read Grep Glob"
 argument-hint: "<deployment-task-or-question>"
-version: "1.0.2"
+version: "1.1.0"
 type: reference
 triggers:
   - kubernetes deploy
@@ -21,6 +21,14 @@ triggers:
 Deploy, configure, and troubleshoot Kubernetes workloads.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+None — pure reference skill (`allowed-tools: Read Grep Glob`, no `Bash`). It never itself
+runs `kubectl`/`helm`/`docker`; it only reads/greps project files and returns YAML manifests,
+commands, and guidance for the user or a separate execution step to run.
 
 ---
 

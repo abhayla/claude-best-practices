@@ -7,7 +7,7 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "<test-data-concern> [language]"
-version: "1.1.0"
+version: "1.2.0"
 triggers:
   - test data management
   - test factory
@@ -29,6 +29,13 @@ For pytest fixture mechanics (scope, yield, autouse), see `/pytest-dev`.
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+None — this is a reference skill (patterns and code snippets to copy into the target project);
+it does not execute anything itself. The `factory_boy`/`Faker` or `Fishery`/`@faker-js/faker`
+install commands shown below are for the USER's project when they adopt a pattern, not a
+precondition of reading this reference.
 
 ## Factory Pattern
 

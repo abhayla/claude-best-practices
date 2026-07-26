@@ -13,7 +13,7 @@ triggers:
   - pre-review check
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[PR-number] [--fix] [--strict] [--rules-file <path>]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -24,6 +24,13 @@ Enforce team standards against the current PR diff before requesting human revie
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `git` (always); `gh` CLI, authenticated (`gh auth status`) — only when a `<PR-number>` argument is used to fetch the diff via `gh pr diff`
+- **Files:** the path passed via `--rules-file <path>` must exist — probe with `test -f <path>`
+- **User inputs:** auto-fix confirmation is collected per-violation in STEP 6 unless `--fix` is passed up front
+- Verification of these lives in the existing **STEP 0 § 0.3 Validate Preconditions** below — no separate preflight step is added since STEP 0 already gates entry.
 
 ## STEP 0: Parse Arguments and Determine Mode
 

@@ -7,7 +7,7 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "express, hono, elysia, node backend, api server, route handler, node.js server"
 argument-hint: "<feature-description or 'setup' or 'middleware' or 'auth' or 'websocket'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -19,6 +19,22 @@ middleware, validation, database access, error handling, auth, WebSocket, and te
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — Node.js (or Bun, for ElysiaJS) and its package manager; the chosen framework's package (Express/Hono/ElysiaJS/Fastify). Probe: `node -v` (or `bun -v`), `npm -v`.
+- **Credentials / env** — `DATABASE_URL` if STEP 5 (Database Access) will run; `JWT_SECRET` if STEP 7 (Auth) uses token-based auth. Probe: check the env/`.env` file for these keys.
+- **Files** — an existing project directory, or confirmation this is a fresh scaffold via `npm init` / `bun init`.
+- **User inputs** — which framework (Express / Hono / ElysiaJS / Fastify) and which auth strategy (session, JWT, or none) this run needs — both currently decided ad hoc inside STEP 1 / STEP 7; collect them up front instead.
+
+## STEP 0: Preflight
+
+Before scaffolding or extending the backend:
+
+1. Ask (if not already stated in `$ARGUMENTS`) which framework — Express, Hono, ElysiaJS, or Fastify — and which auth strategy, if any, this feature needs.
+2. Verify the runtime is installed: `node -v` (Express/Hono/Fastify) or `bun -v` (ElysiaJS).
+3. If STEP 5 (Database Access) will run, verify `DATABASE_URL` is set; if STEP 7 (Auth) will run with JWT, verify `JWT_SECRET` is set.
+4. Report all missing tools/env vars in one consolidated list and ask the user to supply them now — do not begin STEP 1 with an unconfirmed framework or a known-missing `DATABASE_URL` / `JWT_SECRET`.
 
 ## STEP 1: Project Setup
 

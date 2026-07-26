@@ -8,7 +8,7 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "semgrep, semgrep rule, custom rule, code pattern, linter rule, security pattern"
 argument-hint: "<'create <pattern-description>' or 'port <rule-id> to <language>' or 'optimize <rule-file>' or 'test <rule-file>'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -17,6 +17,22 @@ type: workflow
 Create production-quality Semgrep rules for detecting security vulnerabilities, bug patterns, and code standards violations.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools** — `semgrep` (required for every step: `--test`, `--validate`, `--dump-ast`, `--debug`): `semgrep --version`.
+- **Files** — none required beyond the target rule/test files this skill creates.
+- **User inputs** — action + pattern description via `$ARGUMENTS` (`create <pattern-description>` / `port <rule-id> to <language>` / `optimize <rule-file>` / `test <rule-file>`), already required at invocation.
+
+## STEP 0: Preflight
+
+```bash
+semgrep --version || echo "MISSING: semgrep"
+```
+
+If missing → HARD-STOP: "semgrep not found — install with `pip install semgrep`, then re-run." No rule work can proceed without it (STEP 2 test running, STEP 3 AST inspection, STEP 5 iteration all depend on it).
 
 ---
 

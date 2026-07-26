@@ -1,7 +1,7 @@
 ---
 name: dependency-migration-triage
 description: Triage the TEST-SUITE failures a dependency upgrade, removal, or framework migration surfaces — snapshot the failure set, cluster by error signature, classify each cluster (masked quirk vs latent real bug vs genuine incompatibility), and fix in waves with full-suite re-runs. Use when a dep bump/removal/migration turns tests red at scale (5+ failures), before fixing anything test-by-test. NOT for production incidents or runtime outages (use /incident-response or /systematic-debugging); a single known failure with a retest command goes to /fix-loop.
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 triggers:
   - /dependency-migration-triage
@@ -20,6 +20,26 @@ each wave's fix uncovered the next class: first the below-fold UI assertions the
 had tolerated, then 13 test classes structurally coupled to it, then 29 latent test bugs the old
 framework's quirks had been masking. Triage first, and the waves become a plan instead of four
 surprises.
+
+## Prerequisites
+
+- **Tools** — the project's test runner, invoked via the full-suite command (either the
+  optional `[test-command]` argument or auto-detected from the project, e.g. `pytest`,
+  `npm test`, `./gradlew test`)
+- **Files** — the dependency change (bump/removal/migration) must already be applied to the
+  project before triage starts — this skill triages the resulting failures, it does not apply the change
+- **User inputs** — the full-suite retest command, if not supplied via `[test-command]` —
+  collected up front since STEP 1 needs it for the baseline snapshot and every wave re-run
+
+## STEP 0: Preflight
+
+1. Confirm the dependency change has already landed (bump/removal/migration applied) —
+   if not, this is the wrong skill; direct to whatever applies the change first.
+2. Resolve the full-suite retest command: use `[test-command]` if given, else auto-detect
+   from the project (test runner config) and confirm with the user before running it.
+3. Fewer than ~5 known failures already? Skip this skill's ceremony per STEP 1 — route to
+   `/fix-loop` or `/systematic-debugging` instead.
+4. Command resolved → proceed to STEP 1.
 
 ## STEP 1: Snapshot the Failure Set Before Touching Anything
 

@@ -14,7 +14,7 @@ triggers:
   - migration status
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<migration description, or 'run' or 'rollback' or 'status'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -28,6 +28,27 @@ of migrations in CI/CD pipelines, delegate to `/deploy-strategy`.
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — the project's migration CLI, auto-detected in STEP 1 (`npx prisma`, `npx knex`,
+  `python manage.py` for Django, `npx typeorm`, `npx drizzle-kit`, `alembic`, `./gradlew` for
+  Room, or `psql`/equivalent for raw SQL) — the exact tool is unknown until STEP 1 detects it,
+  so it is not re-probed here
+- **Credentials / env** — a working database connection for whichever tool is detected
+  (e.g. `$DATABASE_URL`, `ormconfig`/`data-source.ts` credentials, Django `settings.py` DB config)
+- **Files** — the migration-tool indicator file for the project's stack (see STEP 1's
+  Auto-Detection Table)
+- **User inputs** — which tool to use, ONLY if STEP 1 detects more than one candidate
+  (unknowable before detection runs — asked there, not collectible up front)
+
+## STEP 0: Preflight
+
+1. Confirm a database connection is configured (env var or config file for the stack in
+   use) — missing → report it and HARD-STOP; STEP 3/5 cannot run without one.
+2. Migration-tool detection itself happens in STEP 1 — do not duplicate it here; if STEP 1
+   finds multiple candidates it already asks the user which one to use.
+3. All clear → proceed to STEP 1.
 
 ## STEP 1: Detect ORM / Migration Tool
 

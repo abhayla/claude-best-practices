@@ -6,7 +6,7 @@ description: >
   team needs a structured assessment, project health check, or strategic planning.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<mode: diagnose|check-in|reassess> [context]"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -25,6 +25,23 @@ Structured project assessment with constraint identification and action planning
 | `diagnose` | Full assessment | 5-round diagnostic with questions → constraint identification → action plan |
 | `check-in` | Progress review | Review progress against previous plan, adjust priorities |
 | `reassess` | Re-evaluate | Full re-evaluation when circumstances have changed |
+
+---
+
+## Prerequisites
+
+- **Files** — `check-in`/`reassess` modes need a prior report at `plans/strategic-assessment-*.md`.
+- **User inputs** — `diagnose` mode's 20 questions (5 rounds) are answered progressively
+  as the diagnostic itself — later rounds build on earlier answers, so they are NOT
+  front-loadable prerequisite inputs; they are the workflow.
+
+## STEP 0: Preflight
+
+1. Mode is already selected via `$ARGUMENTS` (`diagnose`/`check-in`/`reassess`).
+2. If mode is `check-in` or `reassess`: Glob `plans/strategic-assessment-*.md`. If none
+   found, report "No prior assessment found — run `diagnose` first" and HARD-STOP (or
+   offer to switch to `diagnose` now).
+3. If mode is `diagnose`: no environmental prerequisite exists — proceed straight to STEP 1.
 
 ---
 

@@ -5,7 +5,7 @@ description: >
   Use when building scrapers, crawlers, or data extraction workflows.
 allowed-tools: "Read Grep Glob"
 argument-hint: "[cheerio|puppeteer|pipeline|anti-detection]"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 triggers: scraper, scraping, puppeteer, cheerio, crawl, crawler
 ---
@@ -13,6 +13,13 @@ triggers: scraper, scraping, puppeteer, cheerio, crawl, crawler
 # Web Scraper Reference
 
 Web scraping with Cheerio (HTML parsing), Puppeteer (headless browser), and pipeline orchestration.
+
+## Prerequisites
+
+None — this is a reference skill (code patterns to copy into the target project); it does not
+execute anything itself. Package installs (`cheerio`, `puppeteer`, `pdf-parse`, `rss-parser`,
+etc.) are preconditions of the USER's project once a pattern is adopted, not of reading this
+reference.
 
 ## Cheerio (Static HTML Parsing)
 

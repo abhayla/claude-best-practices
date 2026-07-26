@@ -4,10 +4,23 @@ description: "Run any question, idea, or decision through Five Advisors who inde
 type: reference
 allowed-tools: "Read Grep Glob Agent Skill"
 argument-hint: "<question or decision to pressure-test>"
-version: "1.0.0"
+version: "1.1.0"
 ---
 # Five Advisors
 You ask one AI a question, you get one answer. That answer might be great. It might be mid. You have no way to tell because you only saw one perspective.
+
+## Prerequisites
+
+- **User inputs & decisions:** an available user for interactive dialogue — the question or
+  decision to pressure-test (via `$ARGUMENTS`), and one clarifying answer if the framed
+  question is too vague (step 1). This skill is interactive by design; the dialogue with the
+  user IS the skill's purpose, not a mid-run gap.
+- **Tools:** `Agent` (spawn the 5 advisors, 5 peer reviewers, and chairman) and file-write
+  access to the workspace (save the HTML report + transcript, steps 5-6) — both standard
+  Claude Code capabilities; no external credentials, CLIs, or network services are needed.
+
+No `STEP 0` — beyond the user's presence/topic and standard dispatch/write capability, there
+are no environmental prerequisites (no CLI, credential, or service) to preflight.
 
 ## Invocation
 

@@ -5,7 +5,7 @@ description: >
   for TypeScript projects. Use when working with Prisma in any TypeScript backend.
 allowed-tools: "Read Grep Glob"
 argument-hint: "[schema|migrate|query|seed]"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 triggers: prisma, prisma-orm, prisma-client
 ---
@@ -13,6 +13,15 @@ triggers: prisma, prisma-orm, prisma-client
 # Prisma ORM Reference
 
 Prisma ORM with Prisma Client and Prisma Migrate for TypeScript projects.
+
+## Prerequisites
+
+- **Tools:** Node.js + npm/npx with Prisma installed (`npx prisma --version`)
+- **Credentials/env:** `DATABASE_URL` (or the datasource env var named in `schema.prisma`) set in the environment or `.env`
+- **Files:** `prisma/schema.prisma` must exist for migrate/generate/studio commands (`test -f prisma/schema.prisma`) — absent only when scaffolding a brand-new project
+- **Services/network:** a reachable database at `DATABASE_URL` for `migrate dev/deploy/reset`, `db push/pull`, and `studio`
+
+This is a reference/lookup skill (no STEP flow) — verify the above before running any of the commands documented here, not as a separate gated step.
 
 ## Schema Definition
 

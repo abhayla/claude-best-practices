@@ -12,7 +12,7 @@ triggers:
   - android mvi
 allowed-tools: "Read Write Edit Grep Glob Bash"
 argument-hint: "<feature name to scaffold, e.g., 'ItemList' or 'UserProfile'>"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -21,6 +21,21 @@ type: workflow
 Scaffold a complete MVI feature module following clean architecture conventions.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Files:** `build.gradle.kts`/`settings.gradle.kts` at the project root; an existing feature module to pattern-match against (read in STEP 1)
+- **User inputs:** the feature name to scaffold (`$ARGUMENTS`, e.g. `ItemList`) — required, no default
+
+## STEP 0: Preflight
+
+1. Confirm a feature name was supplied in `$ARGUMENTS` (e.g. `ItemList`). Missing → ask the user for the feature name now — do not guess mid-scaffold.
+2. Confirm `build.gradle.kts` or `settings.gradle.kts` exists at the project root. Missing → stop; ask for the correct project root.
+3. DI framework and existing-pattern detection happen next in STEP 1 — this step only confirms the inputs needed to run it.
+
+Report all missing items together; proceed once the feature name and project root are confirmed.
 
 ---
 

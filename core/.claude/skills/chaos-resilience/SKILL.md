@@ -13,7 +13,7 @@ triggers:
   - fault injection
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<target-service> [--type crash|network|latency|disk|oom|dependency] [--env local|k8s] [--duration 60s] [--abort-on-critical]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -24,6 +24,33 @@ Run controlled chaos experiments against a service to verify resilience under fa
 **Target:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- Tools: `docker` (with `compose` subcommand) for local/container targets; `curl` for health/latency probes; `tc` (iproute2) for network/latency injection; `iptables` for dependency/DNS blocking; `fallocate` for disk-full injection; `stress-ng` for OOM/CPU exhaustion; `kubectl` when `--env k8s` (Chaos Mesh or Litmus CRDs installed in-cluster)
+- Credentials / env: cluster/context credentials already configured for `kubectl` when `--env k8s`; container/host access sufficient to run `iptables`/`tc` (typically root or `NET_ADMIN` capability)
+- Files / paths: none beyond the target service's own compose file or k8s manifests already present in the repo
+- Services / network: target service reachable at `http://localhost:${PORT}/health` (local/docker) or via cluster DNS (k8s); `${SERVICE}`, `${ENDPOINT}`, `${PORT}`, `${DEP_PORT}`, `${LIMIT}`, `${DURATION}` resolved from `$ARGUMENTS` or project defaults before injection
+- User inputs / decisions: target service + `--type` (crash/network/latency/disk/oom/dependency) + `--env` (local/k8s) + `--duration`, all from `$ARGUMENTS`; if the target is production, explicit written approval from the service owner and on-call engineer (see MUST NOT DO) — this is a hard-stop, not a soft warning
+
+## STEP 0: Preflight
+
+Verify tooling and gather every decision needed before the first failure is injected — chaos experiments must never pause mid-run to ask "which service?" or "is this approved?":
+
+```bash
+docker --version 2>/dev/null || echo "MISSING: docker"
+curl --version 2>/dev/null | head -1 || echo "MISSING: curl"
+command -v tc >/dev/null 2>&1 || echo "MISSING: tc (iproute2)"
+command -v iptables >/dev/null 2>&1 || echo "MISSING: iptables"
+command -v fallocate >/dev/null 2>&1 || echo "MISSING: fallocate"
+command -v stress-ng >/dev/null 2>&1 || echo "MISSING: stress-ng"
+[ "${ENV:-local}" = "k8s" ] && { kubectl version --client 2>/dev/null || echo "MISSING: kubectl"; }
+
+# Confirm target reachability before baselining
+curl -sf http://localhost:${PORT}/health >/dev/null || echo "WARNING: target not reachable at declared PORT — confirm target before proceeding"
+```
+
+Only the tools required by the selected `--type` are hard requirements (e.g. skip the `stress-ng` check for a pure network-partition run) — report which subset applies given `--type`, then check ALL missing/unreachable items in ONE consolidated list. If the target is production, STOP and require the named written approval before continuing; do not proceed on an assumed approval. Resolve `--env`, `--duration`, and target identifiers now so STEP 3 never has to ask mid-injection. Proceed to STEP 1 only once every applicable item is green and every decision is settled.
 
 ## STEP 1: Define Steady State
 

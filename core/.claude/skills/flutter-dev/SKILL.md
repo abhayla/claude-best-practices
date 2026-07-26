@@ -7,7 +7,7 @@ description: >
 allowed-tools: "Bash Read Grep Glob Write Edit"
 triggers: "flutter, dart, widget, riverpod, bloc, gorouter, cross-platform mobile"
 argument-hint: "<feature-description or 'setup' or 'test' or 'optimize'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -16,6 +16,29 @@ type: workflow
 Build cross-platform Flutter 3+ applications with structured architecture, robust state management, and native performance.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** Flutter SDK 3+ (`flutter --version`); Dart (bundled with Flutter)
+- **Files:** a `pubspec.yaml` at the project root — created by this skill in STEP 1 if the
+  project is greenfield, otherwise must already exist
+- **Services/network:** `pub.dev` reachability to fetch the packages listed in STEP 1
+  (`flutter pub get`)
+- **User inputs & decisions:** the requested feature/action ($ARGUMENTS — a feature
+  description, or `setup`/`test`/`optimize`)
+
+## STEP 0: Preflight
+
+1. Confirm the Flutter SDK is installed and on PATH: `flutter --version`. Missing → report and
+   ask the user to install Flutter before continuing — nothing in STEP 1 onward can run without it.
+2. Confirm `$ARGUMENTS` states what to build/test/optimize; if it's ambiguous, ask now rather
+   than guessing mid-workflow.
+3. Note whether `pubspec.yaml` already exists (greenfield vs. existing project) — STEP 1 branches
+   on this but the check itself belongs here, before any file is touched.
+
+Report all gaps in ONE list; HARD-STOP only on a missing Flutter SDK.
 
 ---
 

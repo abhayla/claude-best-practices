@@ -14,7 +14,7 @@ triggers:
   - hilt dependency injection
   - offline-first android
 argument-hint: "<feature-name or 'setup' or 'debug' or 'offline-sync'>"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -23,6 +23,22 @@ type: workflow
 Build modern Android applications with Clean Architecture, Hilt DI, offline-first data, and structured concurrency.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools:** an existing Android/Gradle project (`./gradlew` at the project root); `adb` only if using STEP 7 (ADB Debugging)
+- **Files:** `build.gradle.kts`/`settings.gradle.kts` (module structure) for feature/module work
+- **User inputs:** the task type — feature name, `setup`, `debug`, or `offline-sync` (`$ARGUMENTS`)
+
+## STEP 0: Preflight
+
+1. Confirm an Android/Gradle project exists at the working directory: `test -f gradlew || test -f build.gradle.kts`. Missing → stop, ask the user for the correct project root or to scaffold the project first.
+2. If the request targets ADB debugging (STEP 7), confirm `adb devices` lists a connected device/emulator; missing → ask the user to start one before that step (other steps are unaffected).
+3. Confirm the task type from `$ARGUMENTS` (feature name / `setup` / `debug` / `offline-sync`); if absent, ask now rather than guessing mid-workflow.
+
+Report all missing items together; proceed once the project root is confirmed.
 
 ---
 

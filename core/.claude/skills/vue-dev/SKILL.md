@@ -7,7 +7,7 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "vue, vue3, composition api, composable, vue component, vue router, reka-ui"
 argument-hint: "<feature-description or 'setup' or 'test' or 'composable' or 'component'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -18,6 +18,20 @@ Build Vue 3.5+ applications with Composition API, TypeScript, Reka UI headless p
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `node`/`npm` (or `yarn`/`pnpm`), `vue-tsc` for type-checking.
+- **Files:** `package.json` (present, or scaffolded fresh in STEP 1 if this is a new project).
+- **User inputs:** none required up front — `$ARGUMENTS` selects the task (feature description,
+  `setup`, `test`, `composable`, `component`).
+
+## STEP 0: Preflight
+
+Probe `node --version` and `npm --version` (or the project's package manager). Check whether
+`package.json` exists: if present, confirm it declares `vue` (^3.5+); if absent, this is a fresh
+scaffold — proceed to STEP 1 to create it. Missing Node/npm entirely → report and stop; this
+skill cannot scaffold or run a Vue project without a JS runtime.
 
 ## STEP 1: Setup
 

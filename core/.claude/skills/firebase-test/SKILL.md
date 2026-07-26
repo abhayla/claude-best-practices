@@ -8,7 +8,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<test-scope> [--rules|--functions|--auth|--emulator]"
-version: "1.1.1"
+version: "1.2.0"
 ---
 
 # Firebase Test Runner
@@ -21,6 +21,39 @@ production or staging Firebase projects. Set `FIRESTORE_EMULATOR_HOST` and
 `FIREBASE_AUTH_EMULATOR_HOST` environment variables before every test run.**
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** `firebase-tools` CLI (`npx -y firebase-tools@latest --version`); a JS test
+  runner — `jest` or `mocha` (STEP 8); Gradle/`xcodebuild` only if mobile Test Lab (STEP 6) is
+  in scope
+- **Files:** `firebase.json` + `.firebaserc` at the project root (STEP 1); `functions/package.json`
+  if Cloud Functions are tested; mobile build files (`app/build.gradle*`, `*.xcodeproj`/`Podfile`)
+  only when Test Lab applies
+- **Services/network:** the Firebase Emulator Suite must be able to bind local ports
+  (Firestore 8080, Auth 9099, Functions 5001, Storage 9199, UI 4000) — no live/production
+  Firebase project or credentials are ever used
+- **User inputs & decisions:** `<test-scope>` and the `--rules|--functions|--auth|--emulator`
+  flag (STEP 8), both supplied at invocation
+
+No credentials are required or accepted — this skill is emulator-only by design (see CRITICAL
+above).
+
+## STEP 0: Preflight
+
+1. Confirm `firebase.json` exists at the project root (STEP 1 does the full read; this is just
+   the existence gate). Missing → report and stop: this skill cannot run without it.
+2. Confirm the emulator ports (8080/9099/5001/9199/4000) are free:
+   `lsof -ti:8080,9099,5001,9199,4000 || echo ports-free`. Occupied → report which ports are
+   busy and ask the user to free them or accept a delayed start after STEP 10 teardown of a
+   stale run.
+3. Confirm `<test-scope>` and any `--rules|--functions|--auth|--emulator` flag were supplied;
+   if not, ask now — do not discover the missing scope mid-run at STEP 8.
+4. Confirm `npx -y firebase-tools@latest --version` succeeds. Missing/broken → report and stop.
+
+Report all gaps found above in ONE consolidated list before proceeding to STEP 1.
 
 ---
 

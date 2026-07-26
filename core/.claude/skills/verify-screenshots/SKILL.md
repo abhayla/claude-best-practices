@@ -17,7 +17,7 @@ triggers:
   - visual proof verification
 allowed-tools: "Bash Read Write Grep Glob"
 argument-hint: "<screenshot-path or directory> [--update-baselines] [--strict] [--threshold=N] [--proof-mode --run-id=<id>]"
-version: "2.2.0"
+version: "2.3.0"
 type: workflow
 ---
 
@@ -34,6 +34,21 @@ If `$ARGUMENTS` is empty or contains only flags (no path and no `--proof-mode`):
 2. Otherwise: error "No screenshot path provided. Usage: `/verify-screenshots <path> [--update-baselines] [--proof-mode --run-id=<id>]`"
 
 ---
+
+## Prerequisites
+
+- **Files:** the target screenshot path or directory (`$ARGUMENTS`), OR — in `--proof-mode` — a
+  `test-evidence/{run_id}/manifest.json` (most recent one if `--run-id` omitted).
+- **Tools:** `ls`, `file` (basic file-type/existence checks).
+- **User inputs:** the target path/flags themselves — already required and checked above (empty
+  `$ARGUMENTS` with no `--proof-mode` errors out before this point).
+
+## STEP 0: Preflight
+
+Confirm the resolved target from the check above: for standard mode, `ls` the target path/dir
+and confirm at least one file exists; for `--proof-mode`, confirm the manifest.json resolves
+(explicit `--run-id` or most-recent by timestamp). Missing target or manifest → report and stop
+before STEP 0.5/STEP 1 — do not silently skip to a generic-mode review.
 
 ## STEP 0.5: Proof Mode (if --proof-mode)
 

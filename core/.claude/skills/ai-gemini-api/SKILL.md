@@ -6,7 +6,7 @@ description: >
   or debugging Gemini-powered features.
 allowed-tools: "Read Grep Glob"
 argument-hint: ""
-version: "1.0.1"
+version: "1.1.0"
 type: reference
 ---
 
@@ -15,6 +15,10 @@ type: reference
 Quick-reference for Gemini API integration patterns.
 
 ---
+
+## Prerequisites
+
+None — reference-only skill; it documents patterns to apply in your project's own code and executes nothing itself (`allowed-tools: Read Grep Glob`).
 
 ## SDK & Client Setup
 

@@ -7,7 +7,7 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "[principle name, evaluation question, or production concern]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Anthropic Multi-Agent Research System
@@ -25,6 +25,11 @@ methodology, and production engineering patterns.
 - `anthropic-agent-orchestration-guide` covers the 5 workflow patterns and decision frameworks
 - `agent-orchestration.md` rule covers structural constraints (tiers, state, retries)
 - THIS skill covers the **operational principles** — how to make agents effective at runtime
+
+## Prerequisites
+
+None — this is a read-only reference skill. It queries no CLIs, credentials, services, or
+files, and needs no user input beyond `$ARGUMENTS` (the principle/topic to look up).
 
 ---
 

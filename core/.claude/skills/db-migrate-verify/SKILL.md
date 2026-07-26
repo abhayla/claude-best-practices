@@ -12,7 +12,7 @@ triggers:
   - alembic verify
   - flyway verify
 argument-hint: "[migration-id|all|latest] [--rollback] [--seed-data]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -23,6 +23,31 @@ Verify database migrations are safe, reversible, and data-preserving.
 **Arguments:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — the project's migration CLI, auto-detected in STEP 1 (`alembic`, `flyway`,
+  `prisma`, `manage.py`/Django, or `liquibase`); `pg_dump`/`sqlite3` (STEP 2/4/6 schema dumps);
+  `docker` (STEP 7A Testcontainers, only if that section is used)
+- **Credentials / env** — `$DATABASE_URL` (or equivalent connection config) pointing at a
+  reachable database
+- **Services / network** — a reachable database — MUST be a test/staging instance, never
+  production (this skill runs destructive rollback + seed-data operations)
+- **Files** — migration files present for the detected framework (e.g. `alembic/versions/`)
+- **User inputs** — confirmation that the target database is non-production before STEP 3
+  runs the forward migration
+
+## STEP 0: Preflight
+
+1. Verify `$DATABASE_URL` (or the framework's equivalent connection setting) is set —
+   missing → report it and HARD-STOP (nothing in this skill can run without DB connectivity).
+2. Confirm the target database is a test/staging instance, not production — ask the user
+   if this isn't already obvious from the connection string/environment; unresolvable →
+   HARD-STOP (destructive rollback tests must never touch production).
+3. Verify `pg_dump`/`sqlite3` (whichever applies) is available for schema dumps.
+4. If `--seed-data` is passed, confirm the `tests.factories.seed_test_data` module (or
+   project equivalent) exists.
+5. Migration-framework detection itself happens in STEP 1 — do not duplicate it here.
 
 ## STEP 1: Detect Migration Framework
 

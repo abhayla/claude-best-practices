@@ -7,7 +7,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "[target-directory] [--threshold LINE:BRANCH e.g. 80:70]"
-version: "1.0.0"
+version: "1.1.0"
 triggers:
   - "coverage analysis"
   - "test coverage"
@@ -35,6 +35,24 @@ Always read project configuration first. Only fall back to defaults when no
 project-level targets are defined.
 
 ---
+
+## Prerequisites
+
+- **Tools** — a language runtime (Python/Node/JVM) and the project's coverage tool
+  (`pytest-cov`, `vitest`+coverage provider, `jest`, `c8`/`nyc`, or `jacoco`/Gradle) — the
+  EXACT tool is auto-detected in STEP 1, not probed here to avoid duplicating that logic
+- **Tools** — `git` (used in STEP 5 for change-frequency scoring) — probe: `command -v git`
+- **Files** — project config (`pyproject.toml`/`jest.config.*`/`vitest.config.*`/`build.gradle`) if present, else defaults apply
+- **User inputs** — which framework to use, ONLY if STEP 1 cannot auto-detect one (unknowable
+  before detection runs, so it is asked there — not collectible up front)
+
+## STEP 0: Preflight
+
+1. Verify `git` is available — missing → note it, change-frequency scoring (STEP 5, Signal 2)
+   degrades to criticality+coverage-delta only; continue (not a hard-stop, this signal is 30% weight not a blocker).
+2. Confirm a target directory was given (or defaults to project root).
+3. Framework/coverage-tool detection itself happens in STEP 1 — do not duplicate it here;
+   if STEP 1 finds no framework, it already asks the user which one to use.
 
 ## STEP 1: Detect Framework
 

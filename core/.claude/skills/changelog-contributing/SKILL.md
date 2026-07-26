@@ -12,7 +12,7 @@ triggers:
   - changelog contributing
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[--changelog-only | --contributing-only] [--since <tag-or-date>] [--unreleased] [--output-dir <path>]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -23,6 +23,29 @@ Auto-generate CHANGELOG.md from conventional commits and create CONTRIBUTING.md 
 **Arguments:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- Tools: `git` (log/tag/symbolic-ref parsing) — probe: `git --version`
+- Files / paths: a git repository with commit history at the current working directory — probe: `git rev-parse --is-inside-work-tree`
+- Services / network: none required for CHANGELOG/CONTRIBUTING generation; a reachable GitHub/GitLab remote is only needed to emit comparison links (falls back to no links if absent)
+- User inputs / decisions: which mode to run (`--changelog-only` / `--contributing-only` / both), and — only if CI integration is requested in STEP 6 — which changelog tool/ecosystem to wire in
+
+## STEP 0: Preflight
+
+Before touching any files, verify the environment can support generation:
+
+```bash
+git --version || echo "MISSING: git"
+git rev-parse --is-inside-work-tree 2>/dev/null || echo "MISSING: not inside a git repository"
+```
+
+Also resolve, from `$ARGUMENTS` or by asking once up front if not supplied:
+- Scope: changelog only, contributing only, or both (default: both)
+- Range flags: `--since <tag-or-date>` / `--unreleased` (default: auto-detect per STEP 2's table)
+- Whether CI integration (STEP 6) should be generated now or skipped
+
+If `git` is missing or the current directory is not a git repository, report the complete list of missing items and STOP — do not attempt a best-effort generation without commit history. Otherwise proceed to STEP 1 with all scope/range decisions already settled.
 
 ## STEP 1: Detect Commit Convention and Project Context
 

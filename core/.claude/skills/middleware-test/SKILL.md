@@ -11,7 +11,7 @@ triggers:
   - rate limit test
   - cache test
 argument-hint: "<middleware-type: auth|rate-limit|cache|validation|all>"
-version: "1.0.1"
+version: "1.1.0"
 type: reference
 ---
 
@@ -20,6 +20,14 @@ type: reference
 Test middleware at multiple layers with pass-through, rejection, and edge case coverage.
 
 **Arguments:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+None — pure reference skill (`allowed-tools: Read Grep Glob`, no `Bash`). It never executes
+the sample test suites shown below; it returns test-pattern code (Python/pytest-style) for the
+user's own test runner to execute.
 
 ---
 

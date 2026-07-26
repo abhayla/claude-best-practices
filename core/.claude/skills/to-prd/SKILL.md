@@ -9,7 +9,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "[optional: issue tracker target, e.g. github | linear | local-file]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # To-PRD
@@ -23,6 +23,21 @@ Turn the current conversation context into a PRD.
 For the inverse direction (parsing an existing PRD into structured form), use `/prd-parser`. For breaking the resulting PRD into tracked issues, use `/plan-to-issues` after this skill completes.
 
 ---
+
+## Prerequisites
+
+- **Files:** none required — `CONTEXT.md`/`CONTEXT-MAP.md` and `docs/adr/` are read if present,
+  used-if-absent otherwise (STEP 1).
+- **User inputs & decisions:** the publication target (`github` | `linear` | `local-file`),
+  resolved from `$ARGUMENTS` — defaults to `local-file` if omitted.
+- **Credentials/tools (conditional):** only if a remote target is requested — `gh` authenticated
+  for `github`, or a Linear API key for `linear`. Not needed for the default local-file target.
+
+## STEP 0: Preflight
+
+Resolve the publication target from `$ARGUMENTS` (default `local-file`). If a remote target was
+requested, probe its credential/tool now (`gh auth status`, or the Linear API key env var) —
+missing → report it and ask the user to supply it or fall back to `local-file` before proceeding.
 
 ## STEP 1: Explore the Repo
 

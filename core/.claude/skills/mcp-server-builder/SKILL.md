@@ -12,7 +12,7 @@ triggers:
   - model context protocol
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<what the MCP server should do, e.g., 'connect to Jira API' or 'manage Docker containers'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -21,6 +21,26 @@ type: workflow
 Build an MCP server that extends Claude Code with new tools, resources, or prompts.
 
 **Server Purpose:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools** — Python path: `python3` + `pip` (for FastMCP); Node path: `node` + `npm` (bundles `npx`, used for the STEP 6 MCP Inspector). Only the chosen SDK's toolchain is required.
+- **Credentials/env** — whatever the new server's target external API needs (e.g. an API token env var) — project-specific, named while scoping STEP 1.
+- **Files** — the project's `.mcp.json` (created if absent, merged if present) for STEP 5 registration.
+- **User inputs** — which SDK to build with, Python/FastMCP or Node/TypeScript (STEP 2's choice) — collect this now, not mid-build.
+
+## STEP 0: Preflight
+
+Ask which SDK to use — Python/FastMCP or Node/TypeScript — before scaffolding anything (STEP
+2 needs this decided, not discovered mid-run). Probe the matching toolchain: `python3
+--version` + `pip --version`, or `node --version` + `npm --version`. Check whether `.mcp.json`
+already exists at the project root so STEP 5 knows to merge rather than create. Ask now what
+credential/env var the target external API will need (STEP 3.4/5.2 assume it's already
+decided). Report every missing tool or unanswered input in one consolidated list and ask the
+user to fix/answer now; HARD-STOP if a required toolchain is unavailable and can't be
+installed in this session.
 
 ---
 

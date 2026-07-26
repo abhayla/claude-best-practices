@@ -20,7 +20,7 @@ triggers:
   - replace deprecated
 allowed-tools: "Bash Read Write Edit Grep Glob Agent Skill"
 argument-hint: "<description of codebase-wide change, e.g. 'rename UserService to AccountService' or 'migrate from axios v0.x to v1.x'>"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -32,6 +32,51 @@ decomposed into independent batches, executed in parallel via isolated subagents
 verified for full-codebase consistency.
 
 **Change Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools:** `git` (rollback tags, per-batch commits, worktree isolation); `grep` (exhaustive
+  multi-strategy search in Step 1.1); a language-appropriate type checker / linter / test runner
+  for the target codebase (auto-detected at Step 4 — no fixed version required)
+- **Services/environment:** `git worktree` support (needed for isolated parallel subagent
+  execution in Step 3)
+- **Files/paths:** none fixed — batch operates on whatever files the search in Step 1 finds
+- **User inputs/decisions:** approval of the proposed batch plan before parallel execution
+  begins (Step 2.4/MUST NOT rules) — this decision depends on the impact-analysis output, so
+  it is genuinely collected at Step 2, not front-loadable into Step 0
+
+## STEP 0: Preflight
+
+Before analyzing the codebase, verify the environment can actually support batch execution —
+catching a missing tool now is cheaper than discovering it mid-batch.
+
+1. Confirm `git` is available and the current directory is a git repository:
+   ```bash
+   git --version || echo "MISSING: git"
+   git rev-parse --is-inside-work-tree >/dev/null 2>&1 || echo "MISSING: not a git repository"
+   ```
+2. Confirm worktree support is usable (Step 3 dispatches each batch subagent into its own
+   worktree):
+   ```bash
+   git worktree list || echo "MISSING: git worktree unsupported"
+   ```
+3. Confirm `grep` is available for the exhaustive search in Step 1.1:
+   ```bash
+   grep --version || echo "MISSING: grep"
+   ```
+4. Confirm the change request ($ARGUMENTS) names a specific symbol, pattern, or migration —
+   a vague description ("clean things up") cannot be searched exhaustively; ask the user to
+   name the exact old/new value before proceeding.
+5. Note: the type checker / linter / test runner used in Step 4 is stack-dependent and
+   detected there — no upfront probe needed beyond confirming the repo builds today if that
+   is already a known project convention.
+
+If ANY item above is missing, STOP and report the full consolidated list to the user with what
+is needed to fix each — do not begin Step 1 with a known-missing prerequisite. The batch-plan
+approval gate (Step 2.4) stays mid-flow by design: it depends on analysis output this step
+cannot yet produce.
 
 ---
 

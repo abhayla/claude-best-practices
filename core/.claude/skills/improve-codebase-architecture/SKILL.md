@@ -9,7 +9,7 @@ description: >
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "[area or module path to focus on]"
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Improve Codebase Architecture
@@ -19,6 +19,24 @@ Surface architectural friction and propose **deepening opportunities** — refac
 **Scope:** $ARGUMENTS
 
 This skill is _informed_ by the project's domain model. The domain language (`CONTEXT.md` or `CONTEXT-MAP.md` — see `/grill-with-docs`) gives names to good seams; ADRs in `docs/adr/` record decisions the skill MUST NOT re-litigate.
+
+---
+
+## Prerequisites
+
+- **Tools** — none external; uses the built-in `Agent` dispatch (the `Explore` agent, falling back to a general-purpose subagent) and file writes, both always available. Probe: none needed.
+- **Files** — `CONTEXT.md`/`CONTEXT-MAP.md` and `docs/adr/` are optional context, not hard requirements — STEP 1 already degrades gracefully (proceeds and flags) when they're absent.
+- **Services/environment** — write access to the OS temp directory (`$TMPDIR`, `/tmp`, or `%TEMP%`) for the STEP 2 HTML report. Probe: write and remove a scratch file there.
+- **User inputs** — none collectible up front; which candidate to explore (STEP 3) depends on the STEP 2 report generated during the run, so it cannot be front-loaded.
+
+## STEP 0: Preflight
+
+Verify the one real environmental need before exploring: resolve the OS temp directory
+(`$TMPDIR`, falling back to `/tmp` on Unix or `%TEMP%` on Windows) and confirm a file can be
+written there and removed — that's where STEP 2's HTML report lands. If it isn't writable,
+HARD-STOP and report the resolved path plus the failure so the user can fix permissions or
+point to a different writable location. `CONTEXT.md`/`docs/adr/` are optional and already
+handled by STEP 1's graceful degradation — don't gate on their absence here.
 
 ---
 

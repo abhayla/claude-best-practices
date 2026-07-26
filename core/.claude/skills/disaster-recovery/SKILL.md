@@ -12,7 +12,7 @@ triggers:
   - rto rpo
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<prd-or-nfr-path> [--scope db|storage|secrets|all] [--multi-region] [--drill]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -21,6 +21,34 @@ type: workflow
 Create a disaster recovery plan with backup strategies, restore procedures, and failover runbooks.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Files:** the PRD/NFR document path in `$ARGUMENTS` MUST exist and be readable —
+  STEP 1 reads it to derive RTO/RPO tiers; everything downstream depends on it.
+- **Tools/CLIs:** none required to author the plan itself — the scripts in STEP 7A/7B
+  (`pg_dump`, `vault`, `aws`, etc.) are templates for the user's own backup tooling,
+  not commands this skill executes.
+- **User inputs & decisions:** compliance regime applicability (GDPR / HIPAA / PCI-DSS /
+  SOC 2) if not already stated in the PRD/NFR — STEP 7A needs this and otherwise asks
+  mid-plan; collect it up front instead.
+
+---
+
+## STEP 0: Preflight
+
+1. Verify the PRD/NFR path in `$ARGUMENTS` exists and is readable (`test -f <path>`).
+   Everything downstream — RTO/RPO tiers, backup schedule, runbook — derives from this
+   document; starting without it produces a fabricated plan.
+2. Ask up front (don't wait for STEP 7A): "Does this project have compliance
+   requirements (GDPR, HIPAA, PCI-DSS, SOC 2), or none?" — collecting this now avoids a
+   mid-plan interruption when STEP 7A needs it.
+
+If the PRD/NFR path is missing or unreadable, report it and ask the user for a valid
+path — do not proceed with assumed targets. Once the file is confirmed and compliance
+scope is answered, continue to STEP 1.
 
 ---
 

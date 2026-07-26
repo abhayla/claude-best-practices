@@ -13,7 +13,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read"
 argument-hint: "<failure-profile-json-path>"
-version: "1.1.0"
+version: "1.2.0"
 ---
 
 # Create GitHub Issue — Universal Skill
@@ -28,6 +28,15 @@ that agent is deprecated and the responsibility moved to this skill + T0 orchest
 > Spec reference: `docs/specs/test-pipeline-three-lane-spec.md` v1.6 §3.7
 
 ---
+
+## Prerequisites
+
+- **Tools** — `gh` CLI installed
+- **Credentials / env** — `gh` authenticated, with Issue-creation permission (`WRITE`/`ADMIN`/`MAINTAIN`/`TRIAGE`) on this repo
+- **Services / network** — origin remote is a `github.com` repo
+- **Files** — the failure-profile JSON path passed via `$ARGUMENTS` must exist and parse (required fields listed in STEP 1)
+
+All four are verified by the existing STEP 0 below (HARD FAIL contract) — not duplicated here.
 
 ## STEP 0: Preflight (HARD FAIL)
 

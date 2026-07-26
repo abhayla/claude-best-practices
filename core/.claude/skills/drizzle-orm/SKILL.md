@@ -6,7 +6,7 @@ description: >
   (Next.js, Bun, Hono, Express).
 allowed-tools: "Read Grep Glob"
 argument-hint: "[schema|migrate|query|relations]"
-version: "1.0.0"
+version: "1.1.0"
 type: reference
 triggers: drizzle, drizzle-orm, drizzle-kit
 ---
@@ -14,6 +14,12 @@ triggers: drizzle, drizzle-orm, drizzle-kit
 # Drizzle ORM Reference
 
 Drizzle ORM with drizzle-kit for TypeScript projects using PostgreSQL, MySQL, or SQLite.
+
+## Prerequisites
+
+None — pure reference skill (`allowed-tools: Read Grep Glob` only). It returns Drizzle
+ORM patterns and snippets; it does not execute code, run migrations, or invoke any CLI
+itself.
 
 ## Schema Definition
 

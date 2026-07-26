@@ -6,7 +6,7 @@ description: >
   transactions, realtime listeners, indexes). Use when building Firebase-backed apps.
 allowed-tools: "Read Grep Glob"
 argument-hint: "<what to set up or implement — e.g. 'add Google auth' or 'create Firestore rules for user posts'>"
-version: "1.0.2"
+version: "1.1.0"
 type: reference
 ---
 
@@ -15,6 +15,33 @@ type: reference
 Reference for Firebase project setup, Authentication, and Firestore.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** Node.js v20+ (`node --version`); `firebase-tools` CLI, self-installed on
+  demand via `npx -y firebase-tools@latest` — no separate install required
+- **Credentials/env:** a `firebase login` session, needed only for CLI actions that touch a
+  real project (`projects:create`, `apps:sdkconfig`, `deploy`) — not needed when only writing
+  SDK code or security rules
+- **Services/network:** a reachable Firebase project, needed only for the same CLI/live-project
+  actions above
+- **User inputs & decisions:** the requested feature/topic ($ARGUMENTS — e.g. "add Google auth",
+  "create Firestore rules for user posts")
+
+## STEP 0: Preflight
+
+This skill is mostly reference material (SDK code, security-rule syntax) that needs no
+environment check to consult. Verify only when the request implies an actual CLI/live-project
+action:
+
+1. If the request touches CLI/project setup (login, create project, deploy, fetch SDK config):
+   confirm `node --version` reports v20+ and that a `firebase login` session exists
+   (`npx -y firebase-tools@latest login:list`). Missing → report both gaps together and ask the
+   user to install Node 20+ / run `firebase login` before continuing.
+2. If the request is purely about SDK code, Auth patterns, or Firestore rules/queries (no live
+   project touched): skip the checks above — nothing to preflight.
 
 ---
 

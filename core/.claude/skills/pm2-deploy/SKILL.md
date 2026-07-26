@@ -7,7 +7,7 @@ description: >
   or FastAPI-specific orchestration (use /fastapi-deploy).
 allowed-tools: "Read Grep Glob"
 argument-hint: "[setup|status|deploy|logs]"
-version: "1.1.0"
+version: "1.2.0"
 type: reference
 triggers:
   - pm2
@@ -21,6 +21,22 @@ triggers:
 # PM2 Deployment Reference
 
 PM2 process management for Node.js, Next.js, and static site deployments.
+
+## Prerequisites
+
+- **Tools** — `pm2` CLI installed (globally or via npx); Node.js (for Node/Next.js apps) and/or Python3 (for the FastAPI/uvicorn pattern). Probe: `pm2 --version`, `node -v`, `python3 --version` as applicable.
+- **Files** — an `ecosystem.config.js`, or confirmation one needs to be created from the templates below.
+- **User inputs** — which app(s) this covers and whether cluster or fork mode is intended, since that decides the ecosystem file shape.
+
+## STEP 0: Preflight
+
+Before configuring or running PM2:
+
+1. Confirm which app(s) are in scope and whether cluster mode (web/API) or fork mode (workers/cron) is intended.
+2. Probe for `pm2`: `pm2 --version`. If absent, install it (`npm install -g pm2`) before continuing.
+3. Probe for the app's runtime: `node -v` for Node/Next.js apps, `python3 --version` for the FastAPI/uvicorn pattern.
+4. Check for an existing `ecosystem.config.js` — if present, read it before proposing changes rather than overwriting blind.
+5. Report any missing tool in one consolidated list and resolve it before running any `pm2` command.
 
 ## Ecosystem Configuration
 

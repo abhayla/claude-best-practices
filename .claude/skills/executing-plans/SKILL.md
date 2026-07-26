@@ -13,7 +13,7 @@ triggers:
   - work through plan
 allowed-tools: "Bash Read Write Edit Grep Glob Skill Agent"
 argument-hint: "<plan-file-path or inline plan>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -22,6 +22,35 @@ type: workflow
 Execute a pre-written implementation plan, task by task, with verification and progress tracking.
 
 **Plan:** $ARGUMENTS
+
+## Prerequisites
+
+- **Tools/CLIs:** `git` (checkpoint, rollback, per-task commits). Task-level tools (e.g.
+  `npm`, `pytest`) are declared inside the plan's own `Verify:`/setup commands and are
+  verified when each task runs — not duplicated here.
+- **Files:** the plan itself, supplied via `$ARGUMENTS` — either a file path (must exist and
+  be readable) or inline plan text (must be non-empty).
+- **User inputs & decisions:** approval of the computed execution order (Step 1.3), the
+  escalation choice after 3 failed fix attempts (Step 4.3), disposition of verification
+  warnings (Step 7.5), and confirmation of any manual/credential-setup tasks the plan itself
+  specifies (Step 7.3). These depend on the parsed plan's content and live results, so they
+  happen inline during the run rather than being collectible at invocation — STEP 0 verifies
+  only what CAN be known up front.
+
+---
+
+## STEP 0: Preflight
+
+Verify what can be known before parsing the plan; collect nothing that depends on plan content.
+
+1. Run `git --version` and `git status` — confirm git is installed and the cwd is inside a
+   repo (needed for the rollback hash, checkpoints, and per-task commits).
+2. Confirm the plan input is present: a file path in `$ARGUMENTS` exists and is readable, OR
+   inline plan text was actually provided (non-empty).
+
+If anything is missing, report ALL missing items in ONE consolidated list and ask the user to
+fix them now. If unresolvable (e.g., not in a git repo and none can be initialized), HARD-STOP
+with the complete list rather than starting Step 1.
 
 ---
 

@@ -8,7 +8,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<test-scope> [--endpoint|--plugin|--websocket]"
-version: "1.1.0"
+version: "1.2.0"
 ---
 
 # Bun + Elysia Test Workflow
@@ -18,6 +18,48 @@ handlers, and mocked dependencies. Outputs structured results as JSON.
 
 **Constraint**: Never install global packages. Never modify production source
 files. All test artifacts go to `test-results/`.
+
+---
+
+## Prerequisites
+
+- Tools: `bun` CLI (`bun --version`); `@elysiajs/eden` dev dependency, checked
+  in STEP 1 and auto-suggested via `bun add -d @elysiajs/eden` if missing
+- Files: `bunfig.toml` or `bun.lockb` at the project root
+  (`ls bunfig.toml bun.lockb`); `package.json` with `elysia` listed as a
+  dependency (`grep -q '"elysia"' package.json`)
+- User inputs: the `<test-scope>` argument (file pattern, test-name pattern,
+  or full suite) and optional `--endpoint|--plugin|--websocket` scope flag,
+  both supplied at invocation
+
+No credentials or network services are required — this skill only runs local
+Bun processes against the project on disk.
+
+---
+
+## STEP 0: Preflight
+
+Before executing anything, confirm the runtime and inputs this skill needs are
+present — surfacing gaps now, not mid-run.
+
+1. Verify Bun is installed:
+
+```bash
+bun --version
+```
+
+2. Confirm the `<test-scope>` argument was provided at invocation (a file
+   pattern, test-name pattern, or the literal `all`) and note any
+   `--endpoint|--plugin|--websocket` flag. If `<test-scope>` is missing, ask
+   the user for it now — do not proceed to STEP 1 without it.
+3. If `bun --version` fails, HARD-STOP: report "Bun is not installed — install
+   Bun before running this skill" and do not proceed.
+4. Proceed to STEP 1 for the full Bun + Elysia project detection (marker
+   files, Elysia dependency, `@elysiajs/eden`).
+
+If any check fails, report ALL missing items together in one consolidated
+list (e.g., "Missing: Bun CLI, test-scope argument") and wait for the user to
+resolve them before continuing.
 
 ---
 

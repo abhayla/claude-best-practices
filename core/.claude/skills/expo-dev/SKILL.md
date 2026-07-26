@@ -7,7 +7,7 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "expo, expo router, expo sdk, eas build, eas submit, app store deploy, expo upgrade"
 argument-hint: "<feature-description or 'setup' or 'deploy' or 'upgrade' or 'navigate'>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -16,6 +16,39 @@ type: workflow
 Build, deploy, and maintain React Native applications with Expo SDK, Expo Router, and EAS.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** Node.js + npm/npx; `eas-cli` (`npm install -g eas-cli`) for any
+  build/submit/update flow (STEP 5).
+- **Credentials/env:** an `eas login` session for build/submit/update; for iOS
+  submission, an Apple ID + App Store Connect app ID (`ascAppId`) in `eas.json`; for
+  Android submission, a Google Play service account JSON (`serviceAccountKeyPath`).
+- **Files:** an existing Expo project (`app.json`/`package.json`) for any mode except
+  a fresh `setup`.
+- **User inputs & decisions:** which mode is requested — `setup` / `deploy` / `upgrade`
+  / `navigate` — carried in `$ARGUMENTS`; for `deploy`, which platform(s) (iOS/Android)
+  and which EAS profile (development/preview/production).
+
+---
+
+## STEP 0: Preflight
+
+1. Probe `node --version` and `npx --version` — required for every mode.
+2. If the request involves EAS (`deploy`, build, submit, or update — STEP 5): probe
+   `eas --version` (or note it installs via `npm install -g eas-cli`) and confirm an
+   active session with `eas whoami`; for a submit, confirm `eas.json` carries the
+   target platform's credentials (`ascAppId`/`appleId` for iOS,
+   `serviceAccountKeyPath` for Android).
+3. If the mode is anything but a fresh `setup`: confirm `app.json`/`package.json`
+   exist — this skill upgrades/deploys/navigates an existing Expo project, it does
+   not infer one from nothing.
+
+Report all missing items together (e.g. "not logged into EAS", "no app.json found")
+and ask the user to `eas login` / point at the right project before continuing.
+`setup` mode proceeds regardless — it is the path that creates these files.
 
 ---
 

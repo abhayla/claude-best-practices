@@ -8,7 +8,7 @@ description: >
 type: workflow
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "[test_directory] [framework: pytest|jest|vitest] [focus: audit|dead|dupes|slow|readability|optimize|all]"
-version: "1.3.0"
+version: "1.4.0"
 triggers:
   - test maintenance
   - test cleanup
@@ -31,6 +31,15 @@ so the user can review before applying.
 
 ---
 
+## Prerequisites
+
+- **Tools:** the project's test runner (`pytest` / `jest` / `vitest`) and `git`. Probe: the
+  runner's `--version` and `git --version`.
+- **Files:** a test directory (`[test_directory]` argument, or auto-detected — see Framework
+  Detection below).
+- **User inputs:** none required up front — `[framework]` and `[focus]` default to
+  auto-detect/`all` when omitted.
+
 ## Framework Detection
 
 If the user does not specify a framework, detect it automatically:
@@ -51,6 +60,18 @@ Default test directories by framework:
 | vitest | `**/*.test.{js,ts,tsx}`, `**/*.spec.{js,ts,tsx}` |
 
 ---
+
+## STEP 0: Preflight
+
+1. Verify `git status --porcelain` is clean (or changes are the user's own known WIP) —
+   this skill modifies test files and requires a clean recovery point. Dirty tree with
+   unknown provenance → stop and ask the user to commit or stash first.
+2. Confirm the test runner from Framework Detection above resolves (`--version` succeeds);
+   no framework detected → ask the user which one to use before proceeding.
+3. Resolve `[test_directory]` from `$ARGUMENTS` or the framework's default directories above.
+4. Confirm `[focus]` from `$ARGUMENTS`, defaulting to `all`.
+
+Missing/ambiguous items → report them together and ask before STEP 1.
 
 ## STEP 1: Audit Test Suite
 

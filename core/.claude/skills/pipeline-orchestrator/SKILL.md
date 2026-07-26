@@ -15,7 +15,7 @@ triggers:
   - run pipeline
 allowed-tools: "Agent Read Glob"
 argument-hint: "<feature description, PRD file path, or GitHub Issue URL>"
-version: "2.1.0"
+version: "2.2.0"
 type: workflow
 ---
 
@@ -26,6 +26,18 @@ type: workflow
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Files** — `config/pipeline-stages.yaml` must exist (the DAG the orchestrator loads). Probe: check the file exists at the repo root.
+- **User inputs** — `$ARGUMENTS` must be non-empty (feature description, PRD path, or GitHub Issue URL).
+- **Services / network** — none directly; the dispatched `project-manager-agent` may need GitHub access (Issue URL input) or file access (PRD path input) depending on the input type.
+
+## STEP 0: Preflight
+
+1. Verify `$ARGUMENTS` is non-empty — if empty, ask the user for a feature description, PRD path, or GitHub Issue URL now.
+2. Verify `config/pipeline-stages.yaml` exists at the repo root — if missing, HARD-STOP and report the missing DAG config rather than dispatching an agent that will fail immediately.
+3. Check for an existing `.pipeline/state.json` — if present and its run looks active, warn the user before starting a concurrent pipeline that would corrupt shared state.
 
 ## STEP 1: Dispatch Pipeline Orchestrator Agent
 

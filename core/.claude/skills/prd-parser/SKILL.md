@@ -13,7 +13,7 @@ triggers:
   - prd parser
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<path to PRD file or directory>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -25,6 +25,19 @@ structure, validate against IEEE 830, and produce a gap report.
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Files:** the PRD file or directory path passed as `$ARGUMENTS` must exist and be readable
+- **User inputs:** output file location preference (defaults to `docs/specs/{feature-name}-prd-normalized.md` if unstated) — collectable up front
+- Format-confidence confirmation (STEP 1) and the gap-report acknowledgment (STEP 5) depend on parse results and cannot be front-loaded — they stay as mid-run checkpoints
+
+## STEP 0: Preflight
+
+1. Verify the input path exists: `test -e "$ARGUMENTS"` (file or directory) — if missing, HARD-STOP and ask for a valid path.
+2. If a directory was given, confirm it contains at least one parseable file (`.md`, `.csv`, `.json`) — if empty, HARD-STOP.
+3. Ask the user (or accept a stated default) for the output path preference now, so STEP 6 does not need to interrupt later.
+4. Proceed to STEP 1 only once the input path is confirmed readable.
 
 ## STEP 1: Detect Format
 

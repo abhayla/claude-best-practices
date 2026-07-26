@@ -14,7 +14,7 @@ triggers:
   - entity relationship
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<PRD file path, data model description, or existing schema to evolve>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -25,6 +25,17 @@ Design production-ready database schemas with normalization, evolution strategy,
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Files:** if `$ARGUMENTS` names a PRD file or existing schema file, it must exist and be readable
+- **User inputs:** target database engine (PostgreSQL / MySQL / SQLite / MongoDB) — MUST NOT be assumed as PostgreSQL by default; collectable up front instead of discovered later. Entity-list confirmation (STEP 1) and multi-tenancy strategy depend on parsed input and stay as mid-run checkpoints.
+
+## STEP 0: Preflight
+
+1. If `$ARGUMENTS` names a file (PRD or existing schema), verify it exists: `test -f <path>` — HARD-STOP if missing.
+2. Ask which database engine this schema targets (default suggestion: PostgreSQL, but require an explicit answer or stated default per the MUST NOT DO rule below) — collect now rather than assuming.
+3. Proceed to STEP 1.
 
 ## STEP 1: Gather Requirements
 

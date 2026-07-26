@@ -9,7 +9,7 @@ description: >
   strategy (use /deploy-strategy first).
 allowed-tools: "Bash Read Grep Glob"
 argument-hint: "<artifact-dir> [--app static|pm2] [--staging] [--no-rollback]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 triggers:
   - vps deploy
@@ -30,6 +30,19 @@ leaves a half-deployed site live.
 > outward action. This skill MUST be invoked with explicit user go for the target
 > environment; it does not self-trigger. For first-time or high-risk deploys, run
 > `/deploy-strategy` first to choose the approach.
+
+## Prerequisites
+
+- **Tools:** `ssh`, `rsync`, `nginx` (or `pm2` for `--app pm2`), `curl`, `tar`.
+- **Credentials/env:** `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_WEBROOT`,
+  `DEPLOY_URL` (required); `DEPLOY_VHOST`, `DEPLOY_PM2_NAME` (optional, mode-dependent) — full
+  table below.
+- **Files:** the local artifact directory (`$ARGUMENTS`), non-empty.
+- **Services/network:** the target VPS reachable over SSH.
+- **User inputs:** explicit go-ahead for the target environment (G3 gate above) — this skill
+  does not self-trigger.
+
+All of the above are verified by STEP 0 below before any write.
 
 ## Deploy coordinates (env contract — never hardcode host/keys in the skill)
 

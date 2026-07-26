@@ -6,7 +6,7 @@ description: >
   assessing web application quality or preparing for performance and accessibility reviews.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<url-or-file-path> [--focus=vitals|a11y|seo|perf|responsive|all]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -17,6 +17,23 @@ Perform a comprehensive web quality audit on the target.
 **Target:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `lighthouse` CLI (recommended, `npm i -g lighthouse`), `axe` CLI (optional),
+  `curl`. Missing tools degrade gracefully — the relevant automated scan is skipped and noted
+  in the STEP 9 report; manual checks (STEP 8.2) still apply.
+- **Files/target:** a URL, local file path, or project directory (`$ARGUMENTS`).
+- **Services/network:** the target URL reachable, if auditing a live URL.
+- **User inputs:** none required up front — `--focus` defaults to `all`.
+
+## STEP 0: Preflight
+
+Resolve the target type (URL / file / project dir) and the `--focus` flag from `$ARGUMENTS`
+(default `all`). Probe `lighthouse --version` and `axe --version`; note which are unavailable —
+report all missing tools together rather than failing mid-audit on the first missing one. If
+the target is a URL, a reachability probe (`curl -fsS -o /dev/null -w '%{http_code}' <URL>`)
+confirms it resolves before STEP 2 onward.
 
 ## STEP 1: Identify Audit Scope
 

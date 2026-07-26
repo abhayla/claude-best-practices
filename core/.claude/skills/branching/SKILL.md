@@ -14,7 +14,7 @@ triggers:
   - /finalize
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "'create <feature-name>' | 'finish <branch-name or PR-number>'"
-version: "1.0.1"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -24,6 +24,47 @@ Manage the complete branch lifecycle: create feature branches with conventions, 
 them with pre-merge checks, merge, verification, and cleanup.
 
 **Command:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools:** `git`; `gh` (GitHub CLI) — used throughout for PR review decisions, CI check
+  status, merge conflict detection, merging, commenting, and changelog metadata
+- **Credentials/env:** an authenticated `gh` session (`gh auth status`) with write access to
+  the repository — needed to merge PRs, post comments, and delete remote branches
+- **Services/network:** the GitHub API reachable, and `origin` pointing at a GitHub repo
+- **Files/paths:** none fixed — Step 6 auto-detects a test/build runner if present
+  (`package.json`, `pytest.ini`/`pyproject.toml`/`setup.cfg`, `build.gradle(.kts)`,
+  `Cargo.toml`, `go.mod`, `Makefile`) and degrades to a warning when none is found
+- **User inputs/decisions:** the command itself (`create <feature-name>` or
+  `finish <branch-name or PR-number>`); if `finish` is called with no target, the current
+  branch is used; merge strategy (squash/merge/rebase — defaults to squash per Step 5.2,
+  confirm up front if this project's convention differs)
+
+## STEP 0 (Preflight)
+
+Before creating or finishing a branch, verify the tools this skill depends on are actually
+present and confirm any decision it will need — asking mid-merge is worse than asking now.
+
+1. Confirm `git` and `gh` are installed and `gh` is authenticated:
+   ```bash
+   git --version || echo "MISSING: git"
+   gh --version || echo "MISSING: gh (GitHub CLI)"
+   gh auth status || echo "MISSING: gh not authenticated — run 'gh auth login'"
+   ```
+2. Confirm `origin` is a GitHub repo `gh` can operate on:
+   ```bash
+   gh repo view --json nameWithOwner --jq '.nameWithOwner' || echo "MISSING: origin is not a GitHub repo gh can reach"
+   ```
+3. Collect the two decisions this run needs before starting: (a) is this a `create` or
+   `finish` command, and which branch/PR does it target; (b) which merge strategy applies —
+   confirm squash (the default) or ask now if this project merges differently.
+4. Note: the test/build runner used in Step 6 is auto-detected per-project at that step and
+   degrades to a warning if none is found — no upfront probe needed.
+
+If ANY item in 1–2 is missing, STOP and report the full consolidated list with what to fix —
+do not begin branch creation or a merge with a known-missing prerequisite.
 
 ---
 

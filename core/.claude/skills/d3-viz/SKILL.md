@@ -15,7 +15,7 @@ triggers:
   - treemap
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<chart-type: bar|line|scatter|pie|heatmap|chord|force|treemap|choropleth> <description>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -26,6 +26,19 @@ Create publication-quality, interactive data visualizations with D3.js.
 **Input:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — the `d3` package available to the target project (npm dependency, or the CDN `<script src="https://d3js.org/d3.v7.min.js">` tag for vanilla HTML) — probe: `grep -l '"d3"' package.json 2>/dev/null` or confirm a CDN tag is acceptable for the target
+- **Files** — an input data file (CSV/JSON/TSV) when the chart is data-driven (STEP 8) — not required for chart types built from inline/sample data
+
+## STEP 0: Preflight
+
+1. Confirm `d3` is installed (Node/React projects) or a CDN script tag is acceptable
+   (vanilla HTML) — missing in a Node project → report the install command
+   (`npm install d3` / `npm install -D @types/d3`) and ask before proceeding.
+2. If the requested chart is data-driven, confirm the input data file path exists.
+3. All clear → proceed to STEP 1.
 
 ## STEP 1: Detect Chart Type
 

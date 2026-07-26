@@ -9,7 +9,7 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "<topic: selectors|data|ci|mocks|auth|parallel|all>"
-version: "1.1.0"
+version: "1.2.0"
 triggers:
   - e2e best practices
   - e2e patterns
@@ -27,6 +27,14 @@ This reference covers the universal principles — apply them regardless of fram
 **Read:** `references/edge-cases.md` for platform and environment edge cases.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+None — pure reference skill (`allowed-tools: Read Grep Glob` only). It returns
+cross-framework E2E testing patterns and does not execute tests, CI pipelines, or any
+CLI itself.
 
 ---
 

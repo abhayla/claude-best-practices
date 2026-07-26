@@ -13,7 +13,7 @@ triggers:
   - feature gate
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<feature-name> [--type release|experiment|ops|permission] [--provider env|launchdarkly|unleash|custom]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -22,6 +22,35 @@ type: workflow
 Implement feature flags for gradual rollout, experimentation, or incomplete feature management.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Credentials/env** (conditional on `--provider`): `LAUNCHDARKLY_SDK_KEY` when
+  `--provider launchdarkly`; `UNLEASH_URL` + `UNLEASH_API_KEY` when `--provider
+  unleash`. No credentials needed for the default `env` provider or `custom`.
+- **User inputs & decisions:** the flag's `--type` (release/experiment/ops/permission)
+  and `--provider` if not already supplied in `$ARGUMENTS` — STEP 2 needs the type and
+  STEP 3 needs the provider before generating code.
+- **Files:** none required — `flags.yml` is created/updated by the skill, not read
+  as input.
+
+---
+
+## STEP 0: Preflight
+
+1. If `$ARGUMENTS` already carries `--type` and `--provider`, skip to the checks
+   below. Otherwise ask now, up front: which flag type (release/experiment/ops/
+   permission) and which provider (env/launchdarkly/unleash/custom) — STEP 2 and
+   STEP 3 need both and there's no reason to discover a missing answer mid-implementation.
+2. If `--provider launchdarkly`: probe that `LAUNCHDARKLY_SDK_KEY` is set in the
+   environment.
+3. If `--provider unleash`: probe that `UNLEASH_URL` and `UNLEASH_API_KEY` are set.
+
+Missing provider credentials → report them together and ask the user to supply the
+env vars (or fall back to `--provider env`) before generating provider-specific code.
+The default `env`/`custom` providers need nothing from this step.
 
 ---
 

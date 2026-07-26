@@ -16,7 +16,7 @@ triggers:
   - orchestrate agents
 allowed-tools: "Bash Read Write Edit Grep Glob Agent Skill"
 argument-hint: "<task description or plan with parallelizable subtasks>"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -25,6 +25,29 @@ type: workflow
 Orchestrate work across multiple subagents for faster, parallelized development.
 
 **Task:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools** — `git` (STEP 2.3 pre-work commits, STEP 5.3 conflict check, STEP 5.5 aggregated commit): `git --version` + inside a git repo (`git rev-parse --is-inside-work-tree`). The project's own test runner (whatever it already uses — `pytest`, `npm test`, `./gradlew test`, etc.), needed for STEP 5.4 integration verification.
+- **User inputs** — the task/plan description via `$ARGUMENTS`, already required at invocation. The STEP 5.4 verification command must be known BEFORE dispatching subagents (not discovered mid-orchestration), since every subagent prompt needs a verification command (STEP 3.1).
+
+## STEP 0: Preflight
+
+```bash
+git rev-parse --is-inside-work-tree || echo "MISSING: not a git repository"
+```
+
+Identify the project's test/verification command by checking for existing config
+(`package.json` scripts, `pytest.ini`/`pyproject.toml`, `build.gradle*`, `Makefile`). If
+none can be determined, ask the user for the exact verification command NOW — every
+subagent prompt (STEP 3.1) and the integration check (STEP 5.4) depend on it, and
+discovering it mid-wave would strand already-dispatched subagents without a pass/fail
+signal.
+
+If not inside a git repo → HARD-STOP: subagent-driven development requires git for
+pre-work commits, conflict detection, and aggregated commits (STEP 2.3, 5.3, 5.5).
 
 ---
 

@@ -13,7 +13,7 @@ description: >
 type: reference
 allowed-tools: "Read Grep Glob"
 argument-hint: "<situation, decision, or question to view through Karpathy's lens>"
-version: "1.0.0"
+version: "1.1.0"
 triggers:
   - what would karpathy do
   - karpathy advisor
@@ -29,6 +29,12 @@ Give advice **as Andrej Karpathy would** — grounded in his documented heuristi
 opinions. The full profile (bio, mental models, sources, integrity flags) lives in
 [`references/understanding.md`](references/understanding.md). Read it when you need depth, an
 exact quote, or his stance on a specific topic. This procedure is the *applyable lens*.
+
+## Prerequisites
+
+None — pure advisor/reference skill. It applies a documented decision lens to whatever the
+user already described; it reads only its own `references/understanding.md` and performs no
+execution, external lookups, or credentialed access.
 
 ## When to use
 - "What would Karpathy do about X?" / "What's Karpathy's take on Y?"

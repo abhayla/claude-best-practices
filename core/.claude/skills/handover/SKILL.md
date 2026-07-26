@@ -11,7 +11,7 @@ triggers:
   - wrap-up
 allowed-tools: "Bash Read Grep Glob Write Edit Skill"
 argument-hint: "<optional: focus area or notes for next session>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -20,6 +20,31 @@ type: workflow
 Generate a comprehensive handover document so the next session can resume with full context.
 
 **Focus/Notes:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** `git` (STEP 5.1, STEP 9); a way to run the project's test suite if capturing
+  current test status (STEP 5.2) — optional, degrades to "not run" if unavailable
+- **Files:** none required — previous handover, scratchpad, `.claude/memory/*`, and plan
+  companion files (STEPs 1.1–1.3, 10.2) are all read conditionally with `2>/dev/null` fallbacks
+- **User inputs & decisions:** optional focus/notes ($ARGUMENTS) supplied at invocation;
+  runtime-only confirmations (commit now? push now? archive the previous handover? add
+  `.gitignore` entries?) that depend on probed git/file state and cannot be front-loaded — these
+  stay in STEP 9 where the state becomes known, not moved to STEP 0
+
+## STEP 0: Preflight
+
+1. Confirm `git` is available (`git --version`) and the working directory is a git repo
+   (`git rev-parse --is-inside-work-tree`). Missing → report that git-derived sections
+   (STEP 5.1, STEP 9) will be skipped, and continue — a handover without git state is degraded,
+   not blocked.
+2. Note any `$ARGUMENTS` focus/notes now, before drafting begins.
+3. All other inputs (whether to commit/push/archive) are genuinely runtime-dependent — they are
+   deferred to STEP 9 by design, not an oversight (see Prerequisites above).
+
+Report only the git-availability gap, if any; nothing else in this skill blocks on preflight.
 
 ---
 

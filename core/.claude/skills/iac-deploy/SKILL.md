@@ -9,7 +9,7 @@ description: >
 allowed-tools: "Bash Read Write Edit Grep Glob"
 triggers: "iac, terraform, pulumi, infrastructure, infrastructure as code, tf plan, tf apply, cloud provisioning"
 argument-hint: "<'plan' or 'write <resource>' or 'review' or 'migrate-state' or 'modularize' or 'drift-check'>"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 ---
 
@@ -18,6 +18,39 @@ type: workflow
 Deploy and manage cloud infrastructure using declarative IaC tools.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** `terraform` or `pulumi` — whichever the project uses (detected in STEP 1);
+  `infracost` only if the `plan` action runs FinOps cost checks (STEP 11); a cloud provider CLI
+  (`aws`/`gcloud`/`az`) only if `plan`/`drift-check` needs live credentials
+- **Credentials/env:** cloud provider credentials (ideally OIDC-federated, never long-lived keys)
+  — needed only for `plan`/`drift-check` against a real backend; not needed for `write`/`review`/
+  `modularize` actions that only edit local `.tf`/Pulumi source
+- **Services/network:** the configured cloud provider's API and the state backend (S3/GCS/Azure/
+  Pulumi Cloud) — needed only for the same live actions above
+- **Files:** existing `.tf`/`Pulumi.yaml` files if the project is not greenfield (STEP 1 detects
+  either case)
+- **User inputs & decisions:** the action mode via `$ARGUMENTS` (`plan`/`write <resource>`/
+  `review`/`migrate-state`/`modularize`/`drift-check`), supplied at invocation; clarifying which
+  tool to use if STEP 1 finds both Terraform and Pulumi present (hybrid case)
+
+## STEP 0: Preflight
+
+1. Determine the action from `$ARGUMENTS`; if it's ambiguous or missing, ask now rather than
+   guessing which of the six modes to run.
+2. If the action is `plan` or `drift-check` (touches a live backend): confirm the relevant CLI
+   is installed (`terraform --version` / `pulumi version`) and cloud credentials are present in
+   the environment. Missing → report the gap and ask the user to supply credentials/install the
+   CLI before continuing — never plan/apply against a guessed credential state.
+3. If the action is `write`/`review`/`modularize` (local-only): skip the credential check above —
+   these actions never touch a live provider.
+4. Note whether existing `.tf`/`Pulumi.yaml` files are present — STEP 1 does the full discovery,
+   this is just the up-front signal for whether the project is greenfield or existing.
+
+Report all gaps found in ONE consolidated list before proceeding to STEP 1.
 
 ---
 

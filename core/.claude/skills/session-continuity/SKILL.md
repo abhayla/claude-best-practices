@@ -12,7 +12,7 @@ description: >
 type: workflow
 allowed-tools: "Agent Bash Read Write Edit Grep Glob Skill"
 argument-hint: "<'save', 'restore', 'handover', or session file path>"
-version: "2.1.1"
+version: "2.2.0"
 triggers:
   - session continuity
   - manage session
@@ -38,6 +38,19 @@ warning the user; never overwrite existing session files (always timestamp-
 new-ones); always surface freshness assessment on restore.
 
 **Input:** `$ARGUMENTS` — mode keyword or session-file path.
+
+---
+
+## Prerequisites
+
+- **Sub-skills** — `/end-session`, `/start-session`, `/handover` must exist at `.claude/skills/<name>/SKILL.md` (only those on the path this run will actually take).
+- **Worker agents** — `session-summarizer-agent` must exist and be dispatchable, only when `--deep-summary` is used.
+- **Files** — `.claude/sessions/` for save/restore artifacts; `.claude/handovers/` for handover docs.
+- **User inputs** — mode (`save`/`restore`/`handover`/session-file-path) via `$ARGUMENTS`, already required at invocation.
+
+Verified by **STEP 1.5: PREFLIGHT** below — that step IS this skill's preflight gate (kept
+at 1.5, after mode detection in STEP 1, rather than a redundant STEP 0, since it already
+blocks on every declared item before any dispatch).
 
 ---
 

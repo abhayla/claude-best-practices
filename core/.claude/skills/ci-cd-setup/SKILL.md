@@ -8,7 +8,7 @@ description: >
   strategy design (use /deploy-strategy).
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<platform: github-actions|gitlab-ci> [options: stages, caching, secrets, deploy, matrix, notifications]"
-version: "1.1.0"
+version: "1.2.0"
 type: workflow
 triggers:
   - ci cd setup
@@ -30,6 +30,37 @@ If `$ARGUMENTS` is empty, ask the user which platform (GitHub Actions or GitLab 
 **Request:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools:** `git` (used in STEP 5 to create/push a test branch) — probe: `git --version`
+- **Services / connectivity:** a pushable `origin` remote, and the repo's CI/CD platform
+  (GitHub Actions or GitLab CI) enabled on the host — probe: `git remote -v` (confirm `origin`
+  is present and writable)
+- **Files:** none required up front — build-tool manifests (`package.json`, `pyproject.toml`,
+  `Makefile`, `Cargo.toml`, `build.gradle(.kts)`, `pom.xml`, `go.mod`) are probed in STEP 1;
+  their absence only triggers a user question, never a hard stop on their own
+- **User inputs / decisions** (all collected up front in STEP 0, not deferred mid-run):
+  1. Target platform — GitHub Actions or GitLab CI (skip if `$ARGUMENTS` already states it)
+  2. Intent of this run — new pipeline, optimize an existing one, or debug a broken one
+  3. Build/test commands, IF no build-tool manifest is found
+  4. Fix vs. replace, IF an existing CI config file is found
+
+## STEP 0: Preflight
+
+1. Verify `git` is available: `git --version`. If missing, HARD-STOP — this skill cannot
+   create or push the test branch STEP 5 needs.
+2. Confirm a writable `origin` remote exists: `git remote -v`. If it's missing or read-only,
+   report it now and ask the user to add a pushable remote before continuing.
+3. Resolve the platform: use `$ARGUMENTS` if it already names `github-actions` or `gitlab-ci`;
+   otherwise ASK NOW which platform, and whether this run is a new pipeline, an optimization,
+   or a debug session — don't wait for STEP 2 to surface this.
+4. Do a cheap scan for build-tool manifests (see Prerequisites above). If none is found, ASK
+   NOW for the build/test commands rather than letting STEP 1 stall on it later.
+5. If an existing CI config (`.github/workflows/*.yml` or `.gitlab-ci.yml`) is present, ASK NOW
+   whether to fix or replace it.
+6. If anything above is missing or unanswered, report ALL gaps in ONE consolidated list and
+   wait for the user before starting STEP 1 — never begin with a known-missing item.
 
 ## STEP 1: Assess Current State
 

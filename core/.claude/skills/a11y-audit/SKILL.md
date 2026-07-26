@@ -12,7 +12,7 @@ triggers:
   - accessibility check
 allowed-tools: "Bash Read Write Edit Grep Glob"
 argument-hint: "<URL or path/to/file.html> [--scope page|site] [--threshold 90]"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -21,6 +21,23 @@ type: workflow
 Run automated WCAG 2.1 AA compliance checks combining axe-core, Lighthouse, and a manual checklist.
 
 **Target:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools:** Node.js + npm (`node --version`); `@axe-core/playwright` + Playwright's Chromium (`npm ls @axe-core/playwright` — auto-installed in STEP 2 if missing, declared fallback); `npx lighthouse` (installed on demand via npx)
+- **Files:** the target — a URL, `.html` file, or directory; when none is given, `index.html`/`dist/`/`build/`/a running dev server must exist (STEP 1)
+- **User inputs:** target (URL or path), optional `--scope page|site` (default: page), optional `--threshold` (default: 90)
+
+## STEP 0: Preflight
+
+1. Confirm `node --version` and `npm --version` succeed — required for the `npx` tooling below. Missing → report and stop; ask the user to install Node.js.
+2. Resolve the target per the STEP 1 table (URL / `.html` file / directory / auto-detected `index.html`/`dist`/`build`/dev server). Unresolvable → ask for an explicit path or URL now, before running anything.
+3. Confirm `--scope` and `--threshold` up front if the user wants non-defaults; otherwise default to `page` and `90`.
+4. Note whether `@axe-core/playwright`, Chromium, or `lighthouse` are already installed — if not, STEP 2/3's declared auto-install will handle it (not a mid-run improvisation).
+
+Report all missing items in ONE list; proceed only when the target resolves and Node/npm are present.
 
 ---
 

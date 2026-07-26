@@ -17,7 +17,7 @@ triggers:
   - mutation testing
 allowed-tools: "Bash Read Write Grep Glob Agent"
 argument-hint: "<target URL (http://localhost:8000), or 'all endpoints' with base URL>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -28,6 +28,31 @@ Run runtime security scans against a live application to find vulnerabilities th
 **Target:** $ARGUMENTS
 
 ---
+
+## Prerequisites
+
+- **Tools** — `curl` (header/session checks, always); `docker` (OWASP ZAP, STEP 3); `nuclei`
+  (STEP 4, `go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest` if absent);
+  optional: `ffuf` (STEP 6.4 endpoint discovery), `dotnet`+RESTler (STEP 6.4 stateful fuzzing) —
+  probe: `command -v curl`, `command -v docker`, `command -v nuclei`
+- **Services / network** — a RUNNING target application, reachable at `$ARGUMENTS`, and
+  confirmed NON-production (verified by the existing STEP 1 below — not duplicated here)
+- **User inputs** — test auth credentials if the app requires login (collected in STEP 1
+  item 3); explicit authorization to scan the target (STEP 1's non-production confirmation
+  IS this authorization — no separate prompt)
+
+## STEP 0: Preflight
+
+1. Probe `curl`, `docker`, `nuclei` per the table above; missing optional tools
+   (`ffuf`/`dotnet`) only narrow which of STEP 6.4's automated fuzzers are available — note
+   and continue. Missing `curl` is a hard-stop (STEP 2/5/6 depend on it with no fallback).
+2. Missing `docker` → STEP 3 (ZAP) is unavailable; report this and continue with
+   header/nuclei/fuzz checks only, per this skill's own MUST-NOT-DO ("MUST NOT skip header
+   checks even if ZAP is not available").
+3. Missing `nuclei` → report the install command from STEP 4.1 and either install now or skip STEP 4.
+4. Report all missing tools in ONE consolidated list before proceeding.
+5. Target reachability, non-production confirmation, auth credentials, and scan scope are
+   verified by STEP 1 immediately below — do not re-check them here.
 
 ## STEP 1: Pre-flight Checks
 

@@ -7,7 +7,7 @@ description: >
   builds and large images.
 allowed-tools: "Bash Read Grep Glob Write Edit"
 argument-hint: "<dockerfile-path-or-optimization-goal>"
-version: "1.0.0"
+version: "1.1.0"
 type: workflow
 triggers:
   - docker optimize
@@ -22,6 +22,34 @@ triggers:
 Analyze and optimize Docker configurations for the specified target.
 
 **Request:** $ARGUMENTS
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** `docker` (build/inspect images); `hadolint` for STEP 10 linting (or
+  the `docker run --rm -i hadolint/hadolint` fallback already declared there); `trivy`
+  for STEP 5's security scan — probe each with `--version`.
+- **Services/connectivity:** the Docker daemon must be reachable (`docker info`) for
+  STEP 1's `docker images` check and STEP 12's build/size comparison.
+- **Files:** at least one Dockerfile or `docker-compose*.yml` in the project — STEP 1
+  locates them; this skill optimizes existing containers, it does not scaffold new ones.
+
+---
+
+## STEP 0: Preflight
+
+1. Confirm the Docker daemon is reachable: `docker info` (needed for STEP 1's
+   `docker images` check and STEP 12's build/compare).
+2. Confirm at least one Dockerfile or `docker-compose*.yml` exists in the project.
+3. Probe `hadolint --version`; if absent, note that STEP 10's
+   `docker run --rm -i hadolint/hadolint` fallback covers it — no separate install needed.
+4. Probe `trivy --version` for STEP 5's security scan; if absent, flag it as missing
+   (no bundled fallback exists for this one).
+
+Report all missing items together (e.g. "Docker daemon unreachable" + "trivy not
+installed") and ask the user to start Docker / install trivy before continuing. Proceed
+to STEP 1 only once the daemon is reachable and at least one Dockerfile is found.
 
 ---
 

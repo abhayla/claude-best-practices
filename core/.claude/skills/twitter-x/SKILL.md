@@ -38,7 +38,7 @@ triggers:
   - twitter monitor
 allowed-tools: "Bash Read Write Edit Grep Glob WebFetch WebSearch Agent"
 argument-hint: "<action> [options] — e.g., 'read https://x.com/user/status/123', 'compose tweet about AI', 'score my tweet', 'search AI agents', 'post Hello world'"
-version: "1.0.2"
+version: "1.1.0"
 type: workflow
 ---
 
@@ -49,6 +49,27 @@ type: workflow
 ---
 
 Determine which mode to use based on the user's request, then follow that section.
+
+---
+
+## Prerequisites
+
+- **Tools/CLIs:** `curl` (all modes); `jq` (Mode 5 thread/media posting only)
+- **Credentials/env (mode-dependent):**
+  - Mode 1 Option B only — `JINA_API_KEY`
+  - Modes 4/5/6/7/8 (API search, post/engage, social, health, monitor) — `X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN`, `X_ACCESS_TOKEN_SECRET`; optional `X_API_BEARER_TOKEN` (full-archive search, trends)
+  - Mode 4 no-API fallback — `rnet` installed + browser cookies configured
+- **Services/network:** reachable `adhx.com`, `fxtwitter`/`fixupx` mirrors, `r.jina.ai`, `api.x.com`; a logged-in Claude-in-Chrome/Playwright session as the declared last-resort fetch fallback (Mode 1)
+- **User inputs & decisions:** which mode to run (see QUICK REFERENCE); for Mode 5, explicit approval before any POST/DELETE call (CRITICAL RULE 4)
+- **Declared fallbacks:** Mode 1 fetch ladder ADHX → fxtwitter mirror → Jina Reader → logged-in browser; Mode 4 API search → cookie-based `rnet` search when no API keys — both legal, no mid-run user input needed
+
+## STEP 0: Preflight
+
+Determine the mode from the request first, then verify only what that mode needs:
+- **Mode 1 (Read):** no credential required — the fetch ladder handles it; check `JINA_API_KEY` only if the user has pre-selected Option B.
+- **Modes 4/5/6/7/8 (API-based):** confirm `X_API_KEY`/`X_API_SECRET`/`X_ACCESS_TOKEN`/`X_ACCESS_TOKEN_SECRET` are set and non-empty. If missing and the request is Mode 4 (search), check for the `rnet` + cookies fallback before treating it as missing.
+- **Modes 2/3/9 (Compose/Score/Strategy):** no external prerequisite — proceed directly.
+- If a needed credential is missing with no declared fallback for that mode: report every missing item in ONE list and ask the user to supply it now. Modes 5/6/7/8 HARD-STOP without credentials — posting/social/monitoring actions cannot proceed on guesses.
 
 ---
 
