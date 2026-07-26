@@ -35,8 +35,6 @@ type: workflow
 
 ## STEP 0: Preflight
 
-Before dispatching the orchestrator agent:
-
 1. Verify `$ARGUMENTS` is non-empty — if empty, ask the user for a feature description, PRD path, or GitHub Issue URL now.
 2. Verify `config/pipeline-stages.yaml` exists at the repo root — if missing, HARD-STOP and report the missing DAG config rather than dispatching an agent that will fail immediately.
 3. Check for an existing `.pipeline/state.json` — if present and its run looks active, warn the user before starting a concurrent pipeline that would corrupt shared state.

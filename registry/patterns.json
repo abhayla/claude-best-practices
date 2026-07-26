@@ -3524,7 +3524,7 @@
     }
   },
   "pipeline-orchestrator": {
-    "hash": "74da16838d8dd954cf83034b9f553a8e49a01e4bb7e2d747937ab2c34d1a046a",
+    "hash": "a6aab908fe55f966384312d8d30bd5fba00fe06445d5eb67a84f812a2a278eb4",
     "type": "skill",
     "category": "core",
     "version": "2.2.0",
