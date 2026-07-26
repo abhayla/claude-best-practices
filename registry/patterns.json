@@ -4685,7 +4685,7 @@
     "hash": "ed870df0772c812b4772c2f06dfe7e7a62a86d1f6b70e9e96e033453caf012d3",
     "type": "skill",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
     "last_updated": "2026-04-02",
@@ -4695,7 +4695,7 @@
     "tags": [
       "workflow"
     ],
-    "changelog": "v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.1.0: Add triggers, validation, and edge case handling (42-core-skill improvement pass). v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 0.0,
