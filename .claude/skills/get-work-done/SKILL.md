@@ -89,13 +89,21 @@ fields and write to `GWD\queue\T-<nnn>-<slug>.queued.md`:
 ```yaml
 repo: <registry key>            # path + remote resolved from settings.json at dispatch
 model: haiku|sonnet|opus        # + MANDATORY one-line rationale on this line (lint-enforced)
+deliverable: code|deploy|content|claude-resource|data   # lint-enforced (fix V2 2026-07-27) — selects the checker procedure
 priority: P1|P2|P3
 deploy_tier: none|auto|hold-approved|hold-denied
 approvals: [<granted at intake>]
 budget: {max_turns: <settings.worker_defaults.max_turns_by_tier[model], fallback max_turns>, wall_clock_hours: 4}
 evidence: required              # checker-written, never worker-written
+dod:                            # lint-enforced (fix V2): CHECKABLE completion predicates, dod-verbs discipline
+  - <ACTION + COMPLETENESS BAR, verifiable by a stranger — never "write good docs">
 status_log: []
 ```
+
+`dod:` items follow /goal-creator's dod-verbs rule: state the ACTION **and** the completeness
+bar ("contract doc documents the per-partner pattern INCLUDING the two fallbacks", not
+"update the doc") — an autonomous worker satisfies the weakest literal reading, and the
+CHECKER can only verify what is written as a predicate.
 
 **Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
 global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
@@ -202,14 +210,31 @@ pick after evidence; a wrong expensive pick is never detected.
 
 The worker's "done" claim is input, not truth. Dispatch a CHECKER (separate `Agent()`; tier =
 **opus when the contract's model is opus, sonnet otherwise** — fix #11: the checker is never
-weaker than the maker) against the worker's PR: FIRST run the deterministic tier receipt
+weaker than the maker) against the worker's output. FIRST run the deterministic tier receipt
 `python GWD\verify-model-tier.py <contract> GWD\heartbeats\<id>.result.json` (fix #1 — asserts
 tier-as-run == tier-as-contracted from `modelUsage`; non-zero = a task FAILURE line in
-status_log + LEDGER, never a silent pass), then re-run the project's test gate, run the
-verify-effect-at-destination probe (deploy tasks: probe the LIVE URL), capture the screenshot,
-and write BOTH the evidence folder `GWD\evidence\<date>-T-<id>\` (screenshot + test output +
-SHA + PR URL) AND the `GWD\LEDGER.md` line — including the tier + costUSD from the receipt,
-so the P21 cost audit reads receipts, not claims. The WORKER NEVER writes evidence. Then report to the owner: per task —
+status_log + LEDGER, never a silent pass). Then verify **every `dod:` predicate** via the
+procedure for the contract's `deliverable:` type (fixes V1/V3/V4, 2026-07-27 — before this
+table only code/deploy had a defined procedure; content and skills could pass on checker
+opinion):
+
+| `deliverable:` | Checker procedure (re-derivation, never review-and-agree) |
+|---|---|
+| `code` | Re-run the project's OWN full test gate from scratch; CI green on the PR; diff inspected against dod predicates |
+| `deploy` | verify-effect-at-destination: probe the LIVE URL, capture the screenshot, config-validity gate |
+| `content` (docs/reports/research) | Trace EVERY factual/technical claim in the deliverable to its source (code, PR diff, captured data) — a claim with no source row is a FINDING; check placement + structure against the repo's conventions; check each dod predicate individually. Sample floor: ALL claims when ≤10, else 10 + every number |
+| `claude-resource` (skill/agent/rule/hook) | Run the hub's `/skill-evaluator` (output mode minimum; full for new skills) from the hub checkout; if the target repo can't run it, execute the resource's own trigger + one real scenario end-to-end and capture the transcript. An unexercised skill is UNVERIFIED, never done |
+| `data` | Independently re-pull a sample from the contract's `data_source:` and re-derive the worker's headline numbers (T-014 precedent: checker CONFIRMED a real dup-row bug AND REFUTED a false "missing data" claim) |
+
+**Evidence = re-derivation artifacts, not attestations (fix V4):** the evidence folder
+`GWD\evidence\<date>-T-<id>\` must contain the checker's raw proof (test output / probe
+screenshot / claim→source table / eval report or scenario transcript / re-pulled sample +
+recomputation) plus SHA + PR URL, AND the `GWD\LEDGER.md` line — including the tier +
+costUSD from the receipt, so the P21 cost audit reads receipts, not claims. A checker
+verdict consisting of an opinion ("reviewed, looks correct") with no re-derivation artifact
+is INCOMPLETE — treat it as no verdict. The WORKER NEVER writes evidence. Foolproof it is
+not (a checker can err) — but every verdict leaves auditable raw evidence a later session
+or the owner can re-examine, and CI re-gates anything code-shaped at merge. Then report to the owner: per task —
 outcome, PR link, evidence path, cost tier used; plus anything parked and why. Append the
 task's shape signature to `GWD\PATTERNS-SEEN.md` (3rd occurrence → file a PROPOSED codify
 card, P20).

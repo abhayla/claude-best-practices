@@ -178,6 +178,17 @@ pointer skill lack the hub rule); Fable-driven sessions no longer execute trivia
 inline; checker tier = opus when the maker was opus; per-tier `max_turns_by_tier`
 (haiku 25 / sonnet 40 / opus 60) in settings.
 
+**Round 2 same day — verification hardening (V1–V4, owner follow-up):** the checker procedure
+was code/deploy-shaped; content and claude-resource deliverables could pass on checker opinion.
+Now: contracts carry `deliverable: code|deploy|content|claude-resource|data` + a checkable
+`dod:` (both lint-BLOCKED when missing/empty — an unverifiable contract never dispatches);
+STEP 7 selects the checker procedure by deliverable type (content → every claim traced to
+source; claude-resource → /skill-evaluator or a captured scenario run; data → independent
+re-pull + re-derivation, T-014 precedent); evidence must be re-derivation ARTIFACTS — an
+attestation without artifacts is treated as no verdict. Maker≠checker unchanged (separate
+agent, worker never writes evidence); not foolproof by nature — bounded by auditable raw
+evidence + CI re-gating code at merge + trust-score calibration.
+
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
 2. **Dispatcher context rot** — all state on disk; any session resumes the fleet from `GetWorkDone\queue\`.
