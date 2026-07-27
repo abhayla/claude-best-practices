@@ -158,6 +158,26 @@ Mitigations are baked into the architecture above, keyed G1–G21: G1 answer ret
 - **P12 LOCKED (amended — sandbox domain):** two-tier deploy gate live; tier computed from the ACTUAL merged diff (G9), destination probe + evidence on every auto-deploy. NEW: owner grants sandbox domain(s) (recorded in settings.json `sandbox_domains` + GLOBAL.md when given) — the grant pre-authorizes new-app first deploys as `<app>.{sandbox}` subdomains incl. their DNS records → Tier 1 auto. Auth/payment surfaces stay Tier 2 everywhere; graduation to a dedicated domain = separate owner-initiated process. Until a sandbox domain is provided, new-app deploys remain Tier 2.
 - **P11 LOCKED (amended — channel-agnostic answers):** OWNER-QUESTIONS.md is the single answer ledger; adapters: (1) any LOCAL Claude session writes directly; (2) WhatsApp via Wati sweep; (3) Telegram via the Notifier bot (same sweep pattern, added on demand); (4) Claude mobile app / claude.ai / GitHub app via a tiny PRIVATE GitHub repo mirroring OWNER-QUESTIONS.md two-way at every sweep (slice of the queue-git upgrade pulled forward into Phase 3). Same reply protocol everywhere; first answer wins across channels; unparseable replies get ONE clarify-ping, never a guess; night answers read by the morning sweep.
 
+## Amendment 2026-07-27 — model-routing gap hardening (owner-approved "fix all", 12 gaps)
+
+Audit of the cheapest-correct delegation path found the floor machine-enforced (tier membership,
+never-Fable) but "cheapest-correct" itself prose-only. Fixes landed (SKILL v0.3 + bus scripts):
+**receipts** — `verify-model-tier.py` asserts tier-as-run (result.json `modelUsage`) == contract
+tier at STEP 7; wrapper `-Model` now mandatory (silent sonnet default removed); LEDGER records
+tier+costUSD from the receipt. **lint** — contract-lint blocks a `model:` line without rationale
+and security-category tasks on non-opus (preemptive routing, model-routing.md); advisory WARN on
+opus-for-mechanical. **terminal states** — refusal reroute EDITS the contract tier + re-lints +
+re-preflights before relaunch; refusal on opus parks immediately (no second reroute); 2nd
+capability-class failure escalates exactly ONE tier then parks (env-class still parks; keeper
+deaths never escalate). **cost visibility** — `cost-rollup.py` rolls every result.json's
+modelUsage into bus-synced `costs.jsonl` on the keeper tick; `daily_token_ceiling` now numeric
+(10M input+output+cacheCreation tokens, pre-calibration; recalibrate from costs.jsonl after a
+real week) and enforced via `--check-ceiling` (exit 2 → keeper failures log → dispatch pause).
+**misc** — routing table inlined in SKILL STEP 5 (non-hub dispatch sessions via the global
+pointer skill lack the hub rule); Fable-driven sessions no longer execute trivial-gate tasks
+inline; checker tier = opus when the maker was opus; per-tier `max_turns_by_tier`
+(haiku 25 / sonnet 40 / opus 60) in settings.
+
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
 2. **Dispatcher context rot** — all state on disk; any session resumes the fleet from `GetWorkDone\queue\`.

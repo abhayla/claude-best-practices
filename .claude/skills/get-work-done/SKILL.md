@@ -3,7 +3,7 @@ name: get-work-done
 description: Central work dispatcher (the "mother hub" front door). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, asks ALL questions in one upfront batch (including approvals), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
 ---
 
-# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.2)
+# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.3 — routing-gap hardening 2026-07-27)
 
 State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\VibeCoding\GetWorkDone\`,
 fleet home `C:\Abhay\GetWorkDone` on the Windows VPS (**GWD** below = whichever this machine uses).
@@ -39,8 +39,12 @@ in the prompt alone.
 
 **Trivial** = touches NO sensitive path (auth, payments, config, DB migration, deploy surface)
 AND zero unknowns after the scout → do it NOW in this session (normal branch + PR discipline),
-skip to STEP 7 report. Everything else → full contract. A "trivial" task that turns deep
-mid-flight STOPS and re-enters here as a full contract — it never limps on.
+skip to STEP 7 report. **Fable-session exception (fix #4, 2026-07-27):** if THIS dispatching
+session runs on Fable/Mythos, do NOT execute the task inline — the cheapest work must not burn
+the priciest model (plan risk #4). Dispatch it as a normal contract on haiku/sonnet instead
+(the contract ceremony costs less than Fable executing the edit). Everything else → full
+contract. A "trivial" task that turns deep mid-flight STOPS and re-enters here as a full
+contract — it never limps on.
 
 ## STEP 4 — CLARIFY: one batch, everything, while the owner is present
 
@@ -84,14 +88,28 @@ fields and write to `GWD\queue\T-<nnn>-<slug>.queued.md`:
 
 ```yaml
 repo: <registry key>            # path + remote resolved from settings.json at dispatch
-model: haiku|sonnet|opus        # + one-line rationale (model-routing.md; Fable NEVER)
+model: haiku|sonnet|opus        # + MANDATORY one-line rationale on this line (lint-enforced)
 priority: P1|P2|P3
 deploy_tier: none|auto|hold-approved|hold-denied
 approvals: [<granted at intake>]
-budget: {max_turns: <from settings.worker_defaults>, wall_clock_hours: 4}
+budget: {max_turns: <settings.worker_defaults.max_turns_by_tier[model], fallback max_turns>, wall_clock_hours: 4}
 evidence: required              # checker-written, never worker-written
 status_log: []
 ```
+
+**Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
+global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
+`D:\Abhay\VibeCoding\claude-best-practices\.claude\rules\model-routing.md`):**
+
+| Tier | Contract it for |
+|---|---|
+| `haiku` | rubric scoring, classification, extraction, format checks, mechanical single-file edits |
+| `sonnet` (DEFAULT) | any explicit brief + machine-checkable gate: code edits per plan, tests, research, docs |
+| `opus` | deep debugging, architecture, multi-file design freedom — AND **preemptively for ALL security-category work** (security scan/audit, vulnerability analysis, exploit-adjacent, authz, prompt-injection; fix #8 — avoids the refusal round-trip; contract-lint BLOCKS security-on-cheaper-tier) |
+| Fable/Mythos | NEVER a worker (preflight-guard exit 4) |
+
+When torn, pick the cheaper tier — the escalation rule (STEP 6.6) recovers a wrong cheap
+pick after evidence; a wrong expensive pick is never detected.
 
 ## STEP 6 — DISPATCH: one background worker, guarded
 
@@ -99,8 +117,9 @@ status_log: []
    session owns it; skip.
 2. **Contract lint (deterministic, runs FIRST — T-020 2026-07-20):** run
    `python GWD\contract-lint.py <claimed contract path>` — exit 0 = clean to dispatch; non-zero
-   BLOCKS (reason on stderr: missing/empty required field, unresolved assumption language, or a
-   data-reading task with no declared `data_source:`). Blocked → park the contract with the
+   BLOCKS (reason on stderr: missing/empty required field, unresolved assumption language, a
+   data-reading task with no declared `data_source:`, a `model:` line with no routing rationale,
+   or a security-category task on a non-opus tier — fixes #6/#8 2026-07-27). Blocked → park the contract with the
    lint's stderr as the reason, never dispatch it. This runs BEFORE the preflight gate so a
    malformed contract is rejected before any workspace is cloned. The gate was dead prose until
    this call site existed (`check_fleet_script_health.py` dead-gate finding); `SKILL.md` is the
@@ -128,15 +147,35 @@ status_log: []
    ```
    Same-repo-as-dispatcher tasks: the contract MUST order the worker into its own git worktree
    (two sessions must never share one checkout).
-6. On exit, parse the JSON **`stop_reason` — a refusal is NOT success** (exit code lies):
-   refusal → re-route once to opus (append `status_log`), continue. Error → one retry, then
-   park with the error text.
+6. On exit, parse the JSON **`stop_reason` — a refusal is NOT success** (exit code lies).
+   Terminal-state rules (fixes #2/#3/#7, 2026-07-27):
+   - **Refusal on haiku/sonnet → reroute to opus via the FULL procedure**, never a bare
+     relaunch: (a) EDIT the contract's `model:` to `opus  # rerouted: refusal on <tier>`,
+     (b) append the reroute to `status_log`, (c) re-run contract-lint + preflight-guard,
+     (d) relaunch. Skipping (a) records the wrong tier in LEDGER/evidence and corrupts the
+     cost audit (P21) — the contract must always state the tier that actually runs.
+   - **Refusal on opus (original or rerouted) → PARK immediately** with an owner card
+     carrying the refusal category. There is NO second reroute, ever.
+   - **Error → one retry on the SAME tier** (most errors are environmental). A **2nd
+     failure** on the same task: classify it — environmental (missing tool/auth/network/
+     trust-dialog/OOM) → park with the error text as before; **capability/quality class
+     (worker ran fine but produced wrong/insufficient work) → escalate ONE tier**
+     (haiku→sonnet→opus) via the same edit-contract + re-lint + re-preflight procedure,
+     record the routing lesson in `status_log`, and relaunch once; already at opus → park
+     (model-routing.md: "escalate ONE tier after 2 supervised failures"). Max ONE
+     escalation per task — if the escalated relaunch also fails, PARK; never chain
+     haiku→sonnet→opus on one task.
+   - Keeper DEATHS stay un-escalated (STEP 6.9): a dead PID is environmental by
+     definition — re-queue once at the same tier, park on the second death.
 7. **Parallel lanes (Phase 2, P6/P12):** dispatch up to `settings.soft_concurrency_cap`
    workers concurrently — SAME-repo tasks always serialize; different repos run in parallel.
    Priority P1 > P2 > P3; a P1 is ALWAYS admitted even at the cap. Exceeding the soft cap is
    allowed only for mechanical, independent tasks. Before each dispatch check the DAILY
-   CEILING: dispatches today >= `settings.max_dispatches_per_day` → pause new dispatches, ping
-   the owner once (fleet-paused), never retry-storm.
+   CEILINGS (both, fix #10 2026-07-27): (a) dispatches today >= `settings.max_dispatches_per_day`,
+   OR (b) the keeper's failures log (`GWD\heartbeats\keeper-tick-failures.log`) shows a
+   CEILING-EXCEEDED line dated today (written by `cost-rollup.py --check-ceiling` against the
+   numeric `settings.daily_token_ceiling`) → pause new dispatches, ping the owner once
+   (fleet-paused), never retry-storm.
 8. **Heartbeat dispatch (P7):** on Windows machines launch via the wrapper —
    `powershell -File GWD\worker-wrapper.ps1 -TaskId <id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap>`
    (prompt file at `GWD\heartbeats\<id>.prompt.txt` first). The wrapper writes
@@ -161,11 +200,16 @@ status_log: []
 - **Evidence = raw pulls + report + checker verdict**, all saved to `GWD\evidence\<date>-<id>\` — not just the
   final prose. The raw data is what lets the checker (and owner) independently re-examine claims later.
 
-The worker's "done" claim is input, not truth. Dispatch a CHECKER (separate `Agent()`, sonnet)
-against the worker's PR: re-run the project's test gate, run the verify-effect-at-destination
-probe (deploy tasks: probe the LIVE URL), capture the screenshot, and write BOTH the evidence
-folder `GWD\evidence\<date>-T-<id>\` (screenshot + test output + SHA + PR URL) AND the
-`GWD\LEDGER.md` line. The WORKER NEVER writes evidence. Then report to the owner: per task —
+The worker's "done" claim is input, not truth. Dispatch a CHECKER (separate `Agent()`; tier =
+**opus when the contract's model is opus, sonnet otherwise** — fix #11: the checker is never
+weaker than the maker) against the worker's PR: FIRST run the deterministic tier receipt
+`python GWD\verify-model-tier.py <contract> GWD\heartbeats\<id>.result.json` (fix #1 — asserts
+tier-as-run == tier-as-contracted from `modelUsage`; non-zero = a task FAILURE line in
+status_log + LEDGER, never a silent pass), then re-run the project's test gate, run the
+verify-effect-at-destination probe (deploy tasks: probe the LIVE URL), capture the screenshot,
+and write BOTH the evidence folder `GWD\evidence\<date>-T-<id>\` (screenshot + test output +
+SHA + PR URL) AND the `GWD\LEDGER.md` line — including the tier + costUSD from the receipt,
+so the P21 cost audit reads receipts, not claims. The WORKER NEVER writes evidence. Then report to the owner: per task —
 outcome, PR link, evidence path, cost tier used; plus anything parked and why. Append the
 task's shape signature to `GWD\PATTERNS-SEEN.md` (3rd occurrence → file a PROPOSED codify
 card, P20).
@@ -196,8 +240,11 @@ Litmus test before saving: "would the target project's team want this in their r
   2026-07-15: IPODhan, RealFuelPrices, calculatekaro): NEVER arm auto-merge (it merges
   instantly regardless of CI) — the worker `gh pr checks --watch`es until the gate is SUCCESS
   and only then merges; red = never merged, no exceptions.
-- MUST route models cheapest-correct (sonnet default, haiku mechanical, opus deep/security);
-  Fable is NEVER dispatched as a worker.
+- MUST route models cheapest-correct (sonnet default, haiku mechanical, opus deep AND
+  preemptively for security-category); Fable is NEVER dispatched as a worker. The `model:`
+  line carries its rationale (lint-blocked otherwise); every reroute/escalation EDITS the
+  contract tier before relaunch; the checker verifies the tier receipt (verify-model-tier.py)
+  — a tier the contract didn't state, or a receipt that contradicts it, is a task FAILURE.
 - MUST honor the deploy-tier table computed from the ACTUAL diff at check time (G9) — a task
   whose merged diff touches auth/payment/DNS/migration paths force-upgrades to HOLD regardless
   of intake classification.
