@@ -16,6 +16,19 @@ Checks:
   discarded    — a .cmd line runs a guard whose non-zero exit is the verdict, then redirects that
                  exit into a log and never tests errorlevel.
 
+The 2026-07-27 audit added two more of the same family — a verdict IS produced, but the check
+reads the wrong property of it, so a failure scores as a pass:
+
+  shape-only   — a health guard over `claude -p --output-format json` asserts the output's SHAPE
+                 (`{` + `"type":"result"`) without asserting its OUTCOME (`is_error` / `subtype`).
+                 A worker that dies on `error_max_turns` emits BOTH markers, so the failed run is
+                 recorded as a healthy tick. (T-015 — a fleet audit that ran out of turns — is the
+                 live instance: its result JSON passes the guard verbatim.)
+  silent-push  — `git push` with its exit code discarded (`>nul 2>&1`, `>/dev/null 2>&1`, `|| true`)
+                 and no bus_push/errorlevel/`if` retry. bus-guard.sh already treats this class as
+                 blocking, but only matched the `|| true` spelling, so the redirect spelling in the
+                 fleet's own keeper went unseen: a rejected push looks exactly like a landed one.
+
 Exit 0 = clean; 1 = findings (printed to stdout). Read-only; changes nothing.
 """
 from __future__ import annotations
@@ -71,6 +84,26 @@ CMD_GUARD_INVOKE = re.compile(
     re.I,
 )
 ERRORLEVEL_TEST = re.compile(r"\b(errorlevel|%ERRORLEVEL%)\b", re.I)
+
+# --- shape-only: a `claude -p --output-format json` health guard that never reads the outcome ---
+# The guard is recognised by it searching the result file for the `"type":"result"` marker; the
+# defect is that neither `is_error` nor `subtype` is examined anywhere in the same file.
+RESULT_TYPE_PROBE = re.compile(r'\\?"type\\?"\s*:\s*\\?"result', re.I)
+OUTCOME_PROBE = re.compile(r'\bis_error\b|\bsubtype\b|error_max_turns', re.I)
+# Only files that actually consume a headless-claude result JSON can carry this defect.
+CLAUDE_RESULT_CONSUMER = re.compile(r"--output-format\s+json|\.result\.json|keeper-last\.json", re.I)
+
+# --- silent-push: `git push` whose exit code is thrown away -------------------------------------
+# All three spellings discard the verdict: a rejected (non-fast-forward / auth-failed) push is
+# indistinguishable from a landed one, which is the data-loss class bus-guard.sh already blocks.
+SILENT_PUSH = re.compile(
+    r"git\s+push\b(?P<rest>[^\n]*?)(?P<sink>>\s*(nul|/dev/null)\b[^\n]*?2>&1|\|\|\s*true\b)", re.I
+)
+# Evidence the verdict IS consumed: the safe helper, an explicit exit test, or a conditional.
+PUSH_VERDICT_TESTED = re.compile(
+    r"\bbus_push\b|\berrorlevel\b|\$\?|\bLASTEXITCODE\b|\bif\s+git\s+push\b|\|\|\s*(?!true\b)\S",
+    re.I,
+)
 
 
 @dataclass(frozen=True)
@@ -203,6 +236,70 @@ def check_discarded_exit(path: Path) -> list[Finding]:
     return out
 
 
+def check_shape_only_result_guard(path: Path) -> list[Finding]:
+    """A result-JSON health guard that checks SHAPE but never OUTCOME passes failed runs as healthy."""
+    if path.suffix not in {".cmd", ".sh", ".ps1"}:
+        return []
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if not CLAUDE_RESULT_CONSUMER.search(text):
+        return []
+    lines = _lines(path)
+    # The outcome must be read by CODE. A `rem`/`#` line narrating a past bug (keeper-tick.cmd
+    # explains a 2026-07-24 is_error fix in a comment) must never clear a live finding — that is
+    # the same "prose counted as enforcement" mistake the dead-gate check exists to prevent.
+    code = "\n".join(l for l in lines if not l.lstrip().startswith(("#", "rem ", "REM ")))
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("#", "rem ", "REM ")):
+            continue
+        if not RESULT_TYPE_PROBE.search(line):
+            continue
+        # The outcome must be read SOMEWHERE in this file's CODE — not necessarily the same line.
+        if OUTCOME_PROBE.search(code):
+            return []
+        out.append(
+            Finding(
+                "shape-only",
+                path,
+                i,
+                "the result-JSON guard asserts SHAPE (`\"type\":\"result\"`) but never reads the "
+                "OUTCOME (`is_error` / `subtype`) — a run that ends in `error_max_turns` emits both "
+                "shape markers and is recorded as a healthy tick. Also assert is_error is false.",
+            )
+        )
+        break
+    return out
+
+
+def check_silent_push(path: Path) -> list[Finding]:
+    """`git push` with its exit code discarded — a rejected push looks exactly like a landed one."""
+    if path.suffix not in {".cmd", ".sh", ".ps1"}:
+        return []
+    out: list[Finding] = []
+    lines = _lines(path)
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("#", "rem ", "REM ")):
+            continue
+        m = SILENT_PUSH.search(line)
+        if not m:
+            continue
+        # A verdict test on the same line or the two after it clears the finding.
+        window = "\n".join(lines[i - 1 : i + 3])
+        if PUSH_VERDICT_TESTED.search(window):
+            continue
+        out.append(
+            Finding(
+                "silent-push",
+                path,
+                i,
+                f"`git push` sends its verdict to `{m.group('sink').strip()}` and nothing tests it — "
+                "a rejected/auth-failed push is indistinguishable from a landed one (the bus "
+                "data-loss class). Use bus_push, or test the exit code and log loudly on failure.",
+            )
+        )
+    return out
+
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -222,6 +319,8 @@ def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
         findings.extend(check_grep_count_fallback(path))
         findings.extend(check_interpreter_suppressed(path))
         findings.extend(check_discarded_exit(path))
+        findings.extend(check_shape_only_result_guard(path))
+        findings.extend(check_silent_push(path))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 
