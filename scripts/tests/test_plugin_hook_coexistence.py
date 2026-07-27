@@ -38,14 +38,47 @@ GIT = shutil.which("git")
 pytestmark = pytest.mark.skipif(not (BASH and GIT), reason="bash+git required")
 
 
+SIDE_EFFECT_MARKERS = ("git fetch", "git push", "gh pr", "gh api", "curl ")
+
+
+def _first_code_index(text: str, marker: str):
+    """Index of `marker`'s first occurrence OUTSIDE a `#` comment line, or None."""
+    search_from = 0
+    while True:
+        idx = text.find(marker, search_from)
+        if idx == -1:
+            return None
+        line_start = text.rfind("\n", 0, idx) + 1
+        line = text[line_start:text.find("\n", idx)]
+        if not line.lstrip().startswith("#") and "#" not in text[line_start:idx]:
+            return idx
+        search_from = idx + len(marker)
+
+
 @pytest.mark.parametrize("hook", PATCHED, ids=lambda p: p.name)
 def test_standdown_block_present(hook):
     text = hook.read_text(encoding="utf-8")
     assert "Coexistence stand-down" in text, f"{hook.name} missing the stand-down block"
-    assert text.index("Coexistence stand-down") < 400, (
-        f"{hook.name}: stand-down must run FIRST (immediately after the shebang), "
-        "before any side effect"
-    )
+    standdown_idx = text.index("Coexistence stand-down")
+    # The real invariant is "stand-down precedes any network/mutating side effect" — a
+    # pure-local, side-effect-free early exit (e.g. a branch-name check) is allowed to run
+    # before it (auto-pr.sh 0.1.6, PR #473: hoisted for Windows spawn-latency). A hard byte
+    # offset was too rigid once a second legitimate fast-exit existed. Only CODE occurrences
+    # count — a marker mentioned in an explanatory comment must not trip the check.
+    candidates = [
+        idx for idx in (_first_code_index(text, marker) for marker in SIDE_EFFECT_MARKERS)
+        if idx is not None
+    ]
+    first_side_effect_idx = min(candidates, default=None)
+    if first_side_effect_idx is not None:
+        assert standdown_idx < first_side_effect_idx, (
+            f"{hook.name}: stand-down must run before any network/mutating side effect"
+        )
+    else:
+        assert standdown_idx < 400, (
+            f"{hook.name}: stand-down must run FIRST (immediately after the shebang), "
+            "before any side effect"
+        )
 
 
 def _host_project(tmp_path, with_own_copy: bool, hook_name: str) -> Path:
