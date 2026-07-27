@@ -47,6 +47,27 @@ sonnet, then park (max ONE escalation — no tier-chaining); (d) trivial task in
 → dispatched to a cheap worker, not executed inline. All references resolve (scripts exist on
 the bus; settings keys present).
 
+## Round 2 (same day) — verification-gap hardening (V1–V4)
+
+Owner follow-up audit of WHO verifies non-code deliverables found the checker procedure
+code/deploy-shaped only. Fixes: `deliverable:` + checkable `dod:` contract fields
+(lint-enforced), STEP 7 deliverable-aware checker table (content → claim→source tracing;
+claude-resource → /skill-evaluator or scenario run; data → independent re-pull), and the
+re-derivation evidence standard (an opinion verdict with no artifact = no verdict).
+
+### contract-lint.py V-additions — 7/7
+| Case | Expected | Result |
+|---|---|---|
+| Full contract (deliverable: content + dod list) | OK | PASS |
+| Missing `deliverable:` | BLOCK | PASS |
+| `deliverable: prose` (bad value) | BLOCK | PASS |
+| `dod:` key with no items | BLOCK | PASS |
+| Inline `dod: <text>` (data task + data_source) | OK | PASS |
+| Legacy-style contract (no new fields — T-028 shape) | BLOCK w/ explicit reason (intended ratchet; sweep amends at re-queue) | PASS |
+| Security-on-sonnet with new fields present (regression) | BLOCK (fix #8 still fires) | PASS |
+
+`check_fleet_script_health.py --caller SKILL.md` → clean after round 2.
+
 ## Not covered (honest gaps)
 - No live end-to-end fleet dispatch exercising the new reroute/escalation paths — needs a real
   refusal/failure, which can't be fabricated honestly. First live occurrences will be the proof;
