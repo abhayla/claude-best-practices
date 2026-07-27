@@ -176,6 +176,116 @@ def test_checked_guard_exit_is_clean(tmp_path: Path):
     assert not _checks(run(tmp_path), "discarded")
 
 
+# ------------------------------------------------- shape-only (HIGH 2026-07-27: keeper-tick.cmd)
+
+
+def test_shape_only_result_guard_is_flagged(tmp_path: Path):
+    """Asserting `"type":"result"` without asserting the OUTCOME passes a failed sweep as healthy."""
+    (tmp_path / "keeper-tick.cmd").write_text(
+        "@echo off\n"
+        "claude -p --output-format json \"/sweep\" > heartbeats\\keeper-last.json 2>&1\n"
+        "set GUARD_FAIL=0\n"
+        'findstr /b /c:"{" heartbeats\\keeper-last.json >nul\n'
+        "if errorlevel 1 set GUARD_FAIL=1\n"
+        'findstr /c:"\\"type\\":\\"result\\"" heartbeats\\keeper-last.json >nul\n'
+        "if errorlevel 1 set GUARD_FAIL=1\n",
+        encoding="utf-8",
+    )
+    findings = _checks(run(tmp_path), "shape-only")
+    assert findings, "gate missed the shape-without-outcome result guard"
+    assert "is_error" in findings[0].message
+
+
+def test_outcome_checked_result_guard_is_clean(tmp_path: Path):
+    """Adding the `is_error:false` assertion must silence the finding."""
+    (tmp_path / "keeper-tick.cmd").write_text(
+        "@echo off\n"
+        "claude -p --output-format json \"/sweep\" > heartbeats\\keeper-last.json 2>&1\n"
+        'findstr /c:"\\"type\\":\\"result\\"" heartbeats\\keeper-last.json >nul\n'
+        "if errorlevel 1 set GUARD_FAIL=1\n"
+        'findstr /c:"\\"is_error\\":false" heartbeats\\keeper-last.json >nul\n'
+        "if errorlevel 1 set GUARD_FAIL=1\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "shape-only")
+
+
+def test_outcome_mentioned_only_in_a_comment_still_flags(tmp_path: Path):
+    """A `rem` narrating a past is_error fix is prose — it must not clear a live finding.
+
+    keeper-tick.cmd really does carry such a comment, so a naive whole-file search for `is_error`
+    reported the file clean while the code checked only the shape. Prose is not enforcement.
+    """
+    (tmp_path / "keeper-tick.cmd").write_text(
+        "@echo off\n"
+        "claude -p --output-format json \"/sweep\" > heartbeats\\keeper-last.json 2>&1\n"
+        "rem NOTE: claude -p keys \"is_error\" first, so an old subtype anchor false-positived.\n"
+        'findstr /c:"\\"type\\":\\"result\\"" heartbeats\\keeper-last.json >nul\n'
+        "if errorlevel 1 set GUARD_FAIL=1\n",
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "shape-only"), "a comment mentioning is_error must not count"
+
+
+def test_error_max_turns_payload_defeats_a_shape_only_guard():
+    """Ground truth: T-015's REAL failed-run JSON satisfies both shape markers.
+
+    This is the defect's proof-of-harm — the previous occurrence of this very fleet audit died on
+    error_max_turns and its output was recorded as a healthy tick.
+    """
+    payload = (
+        '{"type":"result","subtype":"error_max_turns","is_error":true,"num_turns":41}'
+    )
+    assert payload.startswith("{")
+    assert '"type":"result"' in payload
+    assert '"is_error":false' not in payload, (
+        "the outcome assertion is what separates a failed run from a healthy one"
+    )
+
+
+# -------------------------------------------------- silent-push (HIGH 2026-07-27: keeper-tick.cmd)
+
+
+def test_silent_push_redirect_is_flagged(tmp_path: Path):
+    """`git push ... >nul 2>&1` discards the verdict exactly like `|| true` does."""
+    (tmp_path / "keeper-tick.cmd").write_text(
+        "@echo off\ngit add -A >nul 2>&1\ngit push --quiet origin main >nul 2>&1\n",
+        encoding="utf-8",
+    )
+    findings = _checks(run(tmp_path), "silent-push")
+    assert findings, "gate missed the redirect spelling of the discarded-push verdict"
+    assert "rejected" in findings[0].message
+
+
+def test_silent_push_or_true_is_flagged(tmp_path: Path):
+    """The original `|| true` spelling stays covered."""
+    (tmp_path / "writer.sh").write_text(
+        "#!/bin/bash\ngit push origin main || true\n", encoding="utf-8"
+    )
+    assert _checks(run(tmp_path), "silent-push")
+
+
+def test_push_with_errorlevel_test_is_clean(tmp_path: Path):
+    """Testing the exit code on the following line must clear the finding."""
+    (tmp_path / "keeper-tick.cmd").write_text(
+        "@echo off\n"
+        "git push --quiet origin main >nul 2>&1\n"
+        "if errorlevel 1 (\n"
+        "  echo push FAILED >> heartbeats\\keeper-tick-failures.log\n"
+        ")\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "silent-push")
+
+
+def test_push_via_bus_push_helper_is_clean(tmp_path: Path):
+    """The safe helper is the sanctioned form and must never be flagged."""
+    (tmp_path / "bus-relay.sh").write_text(
+        "#!/bin/bash\ngit commit -q -m x 2>/dev/null && bus_push\n", encoding="utf-8"
+    )
+    assert not _checks(run(tmp_path), "silent-push")
+
+
 # --------------------------------------------------- precision: a noisy gate is an ignored gate
 
 
@@ -256,14 +366,16 @@ def test_cli_missing_path_is_loud(tmp_path: Path):
 
 
 def test_real_fleet_has_no_silent_failure_findings():
-    """The live fleet must stay clean of all four audited shapes.
+    """The live fleet must stay clean of all six audited shapes.
 
     History: T-015 fixed grep-count + interpreter in break-detect.sh; T-020 fixed the last two
     (contract-lint.py dead-gate — wired into /get-work-done SKILL.md STEP 6.2; keeper-tick.cmd
     discarded exits — both guards' errorlevel now tested). This assertion is the ratchet: it was
     previously written to assert the defects were PRESENT, which meant the suite would have gone
     red the moment they were fixed. Direction matters — a regression test must fail on the
-    DEFECT, never on the FIX.
+    DEFECT, never on the FIX. T-027 (2026-07-27) added the last two: keeper-tick.cmd's result
+    guard now asserts `is_error:false` (not just the JSON shape), and its bus push now tests its
+    own exit code — both previously let a failed run score as a healthy tick.
     """
     fleet = Path("C:/Abhay/GetWorkDone")
     if not fleet.exists():
@@ -286,6 +398,40 @@ def test_keeper_tick_checks_both_guard_exit_codes():
         following = "\n".join(lines[i + 1 : i + 4]).lower()
         assert "errorlevel" in following, (
             f"keeper-tick.cmd:{i + 1} runs a guard but never tests its exit code:\n  {line.strip()}"
+        )
+
+
+def test_keeper_tick_asserts_sweep_outcome_not_just_shape():
+    """Regression (T-027): the tick guard must assert is_error:false, not only the JSON shape."""
+    tick = Path("C:/Abhay/GetWorkDone/keeper-tick.cmd")
+    if not tick.exists():
+        pytest.skip("fleet checkout not present on this host")
+    code = "\n".join(
+        l
+        for l in tick.read_text(encoding="utf-8", errors="replace").splitlines()
+        if not l.lstrip().lower().startswith("rem ")
+    )
+    assert "is_error" in code, (
+        "keeper-tick.cmd checks the sweep JSON's shape but not its outcome — an error_max_turns "
+        "run (like T-015) emits `type\":\"result\"` too and would score as a healthy tick"
+    )
+
+
+def test_keeper_tick_push_verdict_is_tested():
+    """Regression (T-027): every git push in the tick must have its exit code tested."""
+    tick = Path("C:/Abhay/GetWorkDone/keeper-tick.cmd")
+    if not tick.exists():
+        pytest.skip("fleet checkout not present on this host")
+    lines = tick.read_text(encoding="utf-8", errors="replace").splitlines()
+    for i, line in enumerate(lines):
+        # An actual invocation starts the statement; `echo ... git push FAILED ...` is a log
+        # message, not a push, and must not be mistaken for one.
+        if not line.strip().lower().startswith("git push"):
+            continue
+        window = "\n".join(lines[i : i + 3]).lower()
+        assert "errorlevel" in window or "bus_push" in window, (
+            f"keeper-tick.cmd:{i + 1} pushes without testing the verdict — a rejected push is "
+            f"indistinguishable from a landed one:\n  {line.strip()}"
         )
 
 
