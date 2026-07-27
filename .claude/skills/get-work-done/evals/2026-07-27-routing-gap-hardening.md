@@ -68,6 +68,31 @@ re-derivation evidence standard (an opinion verdict with no artifact = no verdic
 
 `check_fleet_script_health.py --caller SKILL.md` → clean after round 2.
 
+## Round 3 (same day) — LIVE FIRE: T-029, owner-directed end-to-end content task
+
+Real task ("document the new verification & cost tooling in the bus README" + fix the stale
+"outside every git repo" header claim), dispatched through the full v0.3 path. Every new
+mechanism fired live:
+
+| Leg | Live result |
+|---|---|
+| Fix #4 Fable-trivial guard | Dispatching session was Fable → task went to a sonnet worker via contract, not inline |
+| V2 lint (live BLOCK) | Lint blocked the dispatcher's own first contract — "assume" in a prohibition sentence tripped the assumption marker. False-positive class recorded (negated context); contract reworded; re-lint green. Gate demonstrably enforcing |
+| Preflight | PREFLIGHT-OK on the newly registered `getworkdone-bus` repo |
+| Worker | sonnet, 27 turns, $1.15, scope respected (README only), pushed 3a8d22da |
+| Fix #1 tier receipt | TIER-OK live: contracted=sonnet ran=claude-sonnet-5 |
+| V1/V4 checker (content procedure) | Independent sonnet checker re-derived ALL 15 README claims against script source (claim→source table with file:line per row), verified all 4 dod predicates, wrote evidence folder + LEDGER line. Verdict PASS. Supervisor spot-check of the checker's own artifacts: genuine |
+| Fleet cost ledger | T-029 receipt visible; VPS keeper separately confirmed live (8 VPS tasks rolled into costs.jsonl at the 12:36 IST tick, incl. opus T-015 $8.25) |
+
+**New defect FOUND by the live fire (and fixed):** the user-level branch-lifecycle plugin's
+auto-git hook fired INSIDE the worker session, committing the worker's turn onto an
+`auto/work-*` branch — the rebase collision stranded the T-029 contract + the settings.json
+registry edit on that branch (recovered via `git checkout <checkpoint> -- <files>`). Fix:
+`worker-wrapper.ps1` now launches every worker with `AUTO_GIT_DISABLE=1` + `AUTO_PR_DISABLE=1`
+(bus @697cfde) — workers own their git per contract, session hooks must never rotate branches
+under them. Residual: workers launched WITHOUT the wrapper (raw `claude -p`, Hostinger
+launcher) don't get this env — set it in those launch paths when they next change.
+
 ## Not covered (honest gaps)
 - No live end-to-end fleet dispatch exercising the new reroute/escalation paths — needs a real
   refusal/failure, which can't be fabricated honestly. First live occurrences will be the proof;
