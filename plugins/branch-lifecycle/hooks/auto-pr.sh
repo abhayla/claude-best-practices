@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 
-# -- Coexistence stand-down (hub lesson, calculatekaro migration 2026-07-12; mirrors the
-# enhance-process-guard precedent, PR #309): when the HOST project wires its OWN copy of this
-# hook in .claude/settings.json, the project's copy wins and this plugin copy stands down --
-# otherwise both fire (double gates/PRs/reminders). Downstream projects with no local copy
-# are unaffected.
-_std_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-_std_self="$(basename "$0")"
-if [ -f "$_std_root/.claude/hooks/$_std_self" ] && grep -q "$_std_self" "$_std_root/.claude/settings.json" 2>/dev/null; then
-  exit 0
-fi
 # Autonomous PR + auto-merge handler — so closing a session lands the work without touching git.
 # (branch-lifecycle PLUGIN version — self-contained.)
 #
@@ -36,23 +26,12 @@ fi
 
 set -uo pipefail
 
-SELFDIR="${CLAUDE_PLUGIN_ROOT:+$CLAUDE_PLUGIN_ROOT/hooks}"
-SELFDIR="${SELFDIR:-$(cd "$(dirname "$0")" && pwd)}"
-
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 cd "$ROOT" || exit 0
-
-PROJECT_ROOT="$ROOT"
-# shellcheck source=/dev/null
-[ -f "$SELFDIR/_settings.sh" ] && . "$SELFDIR/_settings.sh"
-
-[ "${AUTO_PR_DISABLE:-0}" = "1" ] && exit 0
 
 mkdir -p "$ROOT/.claude" 2>/dev/null || true   # state dir may not exist in a downstream repo
 LOG="$ROOT/.claude/.auto-git.log"
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] auto-pr: $*" >> "$LOG" 2>/dev/null; }
-
-command -v gh >/dev/null 2>&1 || { log "gh not installed; skipping"; exit 0; }
 
 # Fast-exit on main/master/detached HEAD: there is nothing to LAND here — session-git-landing.sh's
 # `land` skips those outright — so the only work left would be janitorial branch pruning, which
@@ -62,6 +41,11 @@ command -v gh >/dev/null 2>&1 || { log "gh not installed; skipping"; exit 0; }
 # surfacing "Hook cancelled" to the user. Nothing is lost; reconcile sweeps it next session.
 # (An earlier version only fast-exited when main was the ONLY local branch, so a single leftover
 # branch was enough to re-enter the network path and trigger the cancel. Pure local check.)
+#
+# This check runs FIRST — before the coexistence grep and before sourcing _settings.sh — because
+# on Windows the ~15 subprocesses they spawn (jq per settings key, basename, grep) cost ~2s of
+# wall clock (measured 2026-07-27, gorefer), enough for the SessionEnd shutdown window to cancel
+# the hook even though the script was about to exit 0 on this very fast-exit path.
 _cur="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 case "$_cur" in
   main|master|HEAD|"")
@@ -69,6 +53,27 @@ case "$_cur" in
     exit 0
     ;;
 esac
+
+# -- Coexistence stand-down (hub lesson, calculatekaro migration 2026-07-12; mirrors the
+# enhance-process-guard precedent, PR #309): when the HOST project wires its OWN copy of this
+# hook in .claude/settings.json, the project's copy wins and this plugin copy stands down --
+# otherwise both fire (double gates/PRs/reminders). Downstream projects with no local copy
+# are unaffected. (${0##*/} instead of basename: saves a fork on the latency-critical path.)
+_std_self="${0##*/}"
+if [ -f "$ROOT/.claude/hooks/$_std_self" ] && grep -q "$_std_self" "$ROOT/.claude/settings.json" 2>/dev/null; then
+  exit 0
+fi
+
+SELFDIR="${CLAUDE_PLUGIN_ROOT:+$CLAUDE_PLUGIN_ROOT/hooks}"
+SELFDIR="${SELFDIR:-$(cd "$(dirname "$0")" && pwd)}"
+
+PROJECT_ROOT="$ROOT"
+# shellcheck source=/dev/null
+[ -f "$SELFDIR/_settings.sh" ] && . "$SELFDIR/_settings.sh"
+
+[ "${AUTO_PR_DISABLE:-0}" = "1" ] && exit 0
+
+command -v gh >/dev/null 2>&1 || { log "gh not installed; skipping"; exit 0; }
 
 # Prune merged branches so they never accumulate. `fetch --prune` drops stale remote refs (safe);
 # a LOCAL branch is hard-deleted ONLY when gh confirms its PR is MERGED — its content is already on
