@@ -896,3 +896,10 @@ Wati sessions use a cheaper driver.
 - Rule: word-final tokens in guard regexes need a boundary (`([^a-z]|$)` — portable, no `\b`);
   test new narrate tokens against ordinary prose ("one thing", "following") before shipping;
   regression tests pinned in `scripts/tests/test_no_overask_guard_slash_exemption.py`.
+
+## 2026-07-27 — RFP data-quality incident (root-cause + auto-fix session)
+- **Chronic alert ≠ fresh incident.** When the owner forwards a monitoring alert, first establish how long it has been firing (per-day dedupe keys hide repetition). VALUE STUCK had false-fired daily for ~a month — the root cause was the ALERT'S design (assumed prices always move; they're administratively frozen), not the data. Rule: before treating an alert as an incident, check its firing history and whether the monitor's own cross-checks contradict it.
+- **A WAF block can mask a removed page.** BPCL "403 from VPS CIDR" was hiding that the price page was deleted upstream (302→ErrorPage even from a residential IP). Probe from a second vantage before classifying blocked-vs-gone — the remediation paths are completely different (rotate egress vs retire source).
+- **Detect-only monitors never auto-fix.** The alert path was Notifier→owner phone with no fleet-inbox route, no playbook, no debounced escalation. Pattern now live: app publishes a public health JSON (consecutive_p1_days) → fleet break-detect polls it → episode-keyed P1 card with a bounded playbook at ≥2 days. Reuse for other apps via GWD settings.health_endpoints.
+- **Encode the publisher's calendar, not just an age threshold.** Gov sources that skip weekends (PPAC) make every Monday "3 days stale" — a fixed >2d threshold false-alarms weekly. Freshness thresholds must model the upstream publishing calendar, and fixed-time scrapes racing a publisher need a conditional retry (systemd ExecCondition guard = clean skip semantics).
+- **Retirement is a config flip, not code deletion.** Dead sources formalized via enabled:false + ADR with dated evidence + one-line revival path; scraper code kept. An activeScrapers() filter beats deleting scrapers that upstream might resurrect.
