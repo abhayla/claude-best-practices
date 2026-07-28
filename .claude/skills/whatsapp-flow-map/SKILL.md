@@ -71,8 +71,15 @@ The **validation layer** runs at load and the AUTHOR runs the same audit at buil
 - the map's own standing rules resolve the CLEAR cases (e.g. a universal "Know More" →
   the KM menu route; "Talk to advisor" → the advisor handoff; "Call me" → the callback
   flow). Wire those as `design` edges citing the rule.
-- **Anything without a clear instruction is left visibly UNWIRED and turned into an owner
-  question. NEVER silently invent a route or a reply card.** A proposed new card, if the
+- **Label precedent IS a clear instruction (owner ruling 2026-07-28):** a button whose
+  label matches or nearly matches an already-wired button follows that precedent —
+  same label → same target ("Share" follows the wired "Share on WhatsApp"; "Open
+  account" follows the wired "Open demat account"). Wire it (`design` if the route
+  isn't live yet); do NOT park it as an owner question. When two precedents conflict,
+  decide by the audience/context notes already on the map (e.g. a fixnote forbidding
+  a route for new prospects) and record the reasoning in the card's subnote.
+- **Only a label with NO wired precedent and no standing rule is left visibly UNWIRED
+  and turned into an owner question. NEVER silently invent a route or a reply card.** A proposed new card, if the
   owner asks for one, is tagged `DRAFT — needs owner review` (nothing goes to Meta/Wati
   from an unrecorded draft).
 
