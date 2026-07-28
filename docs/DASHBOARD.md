@@ -1,16 +1,16 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-07-26 13:25 UTC (auto-generated)
+> Last updated: 2026-07-28 14:13 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 285 |
-| Core (universal) | 212 |
+| Total Patterns | 286 |
+| Core (universal) | 213 |
 | Stack-specific | 73 |
 | Agents | 29 |
 | Configs | 3 |
 | Hooks | 22 |
-| Rules | 57 |
+| Rules | 58 |
 | Skills | 174 |
 
 ## Pattern Inventory
@@ -133,6 +133,7 @@
 | loop-engineering | skill | 2.0.0 | hub:abhayla/claude-best-practices | auto-verify, brainstorm, code-reviewer-agent, debugging-loop, escalation-report, fix-loop, learn-n-improve, plan-executor-agent, post-fix-pipeline, status, systematic-debugging, workflow-contracts, writing-plans |
 | merge-strategy | skill | 1.1.0 | hub:abhayla/claude-best-practices | branching |
 | mock-data-hunter | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
+| model-cost-routing | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | monorepo | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | no-overask-guard | hook | 1.2.3 | project:firekaro-planner | — |
 | notifier-integration | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
