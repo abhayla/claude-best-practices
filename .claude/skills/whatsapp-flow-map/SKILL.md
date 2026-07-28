@@ -91,6 +91,28 @@ Build-time audit (adapt paths):
 #  (terminal confirmations and info cards are legitimately unwired).
 ```
 
+### 4. The map is a working surface: fold, filter, versions, live variables (owner rules 2026-07-28)
+- **Foldable annotations:** big non-card panels (approval gates, changelogs) are `<details class="gates"><summary>…</summary>…</details>` — collapsed by default so cards get the space; the reader chooses to see them.
+- **State filter bar:** a sticky chip row (`#wffilter`, engine module) filters cards by state,
+  derived from each card's `.bstat` tag (live / build / design→pending / review / retire; no
+  tag → info). Multi-select; **retired is OFF by default** — retired cards are hidden, not
+  deleted. Toggling refires `wireAll()`; the engine skips edges with a hidden endpoint.
+- **Version model — max TWO versions per message:** a true rewrite (v1→v2, interim→new) is
+  ONE message with two cards tagged `data-ver="current"` / `data-ver="previous"`. The version
+  switch shows one set at a time (Current default; deleted messages live on as `previous`).
+  Anything older than the previous version is removed from the map. Never stack several
+  versions' copy inside one card.
+- **One card = one message, strictly:** sequential sends (Day-3 / Day-7 / Day-14 nudges) are
+  DIFFERENT messages, not versions — split packed cards into one card per message, each with
+  its own buttons and wires.
+- **Named live variables, never positional, never hardcoded samples:** bodies carry
+  `<span class="wfvar" data-var="client_id"></span>` chips using the REAL parameter names
+  ({{name}}/{{client_id}}-style, per the Wati paramName rule) — never `{{1}}`, never a baked-in
+  "Rahul". One shared sticky **Sample values** bar (`input[data-var-input=…]`, pre-filled with
+  the canonical sample identities) live-fills every chip on the page simultaneously — exactly
+  like Wati's template-creator preview — so a tester can type one value and verify it flows
+  consistently across ALL messages. Empty field → the chip shows its `{{var_name}}`.
+
 ## Conversation-UX quality bar (check every card you author or edit)
 These mirror the estate's standing invariants — a card violating them is a defect:
 - every in-session bot reply ENDS with ≤3 context-relevant next-action buttons (>3 options

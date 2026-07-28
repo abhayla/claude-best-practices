@@ -39,6 +39,8 @@
     spec.forEach(function(e,i){
       var m=e.match(/^([\w-]+)>([\w-]+)(?::(\w+))?$/); if(!m) return;
       var A=stage.querySelector("#"+m[1]), B=stage.querySelector("#"+m[2]); if(!A||!B) return;
+      /* filtered-out / version-hidden endpoints draw no wire */
+      if((A.offsetWidth===0&&A.offsetHeight===0)||(B.offsetWidth===0&&B.offsetHeight===0)) return;
       var kind=m[3]||"live";
       var pts=anchor(A.getBoundingClientRect(),B.getBoundingClientRect(),cb), p1=pts[0],p2=pts[1],horiz=pts[2];
       var mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2, c1,c2;
@@ -171,7 +173,62 @@
     if(bad && window.console) console.warn("whatsapp-flow-map broken wires:", broken);
   }
 
-  function boot(){ phoneStamp(); navWire(); audit(); wireAll(); }
+  /* ---------- 6. STATE FILTER + VERSION SWITCH ----------
+   * Markup: <div id="wffilter"> <span class="fc" data-state="live|build|design|review|retire|info">…</span>…
+   *         <span class="fv" data-ver="current">Current</span><span class="fv" data-ver="previous">Previous</span> </div>
+   * Node state = its .bstat class (design counts as pending); no .bstat → "info".
+   * Chips multi-select (class "on"); retire ships OFF by default (set in markup).
+   * Version: cards tagged data-ver="current"/"previous" are a rewrite pair — the switch shows
+   * one side; untagged cards always show. Any change refires wireAll(). */
+  function applyFilter(){
+    var bar=document.getElementById("wffilter"); if(!bar) return;
+    var on={}; bar.querySelectorAll(".fc").forEach(function(c){ on[c.dataset.state]=c.classList.contains("on"); });
+    var verEl=bar.querySelector(".fv.on"), ver=verEl?verEl.dataset.ver:"current";
+    document.querySelectorAll(".node").forEach(function(n){
+      var st="info", b=n.querySelector(".bstat");
+      if(b){ ["live","build","design","review","retire"].forEach(function(k){ if(b.classList.contains(k)) st=k; }); }
+      var v=n.getAttribute("data-ver");
+      /* a version-paired card obeys ONLY the version switch — previous versions are
+       * naturally retire-tagged, and the state chips must not double-hide them */
+      if(v){ n.style.display=(v===ver)?"":"none"; }
+      else { n.style.display=(on[st]!==false)?"":"none"; }
+    });
+    window.wireAll&&window.wireAll();
+  }
+  function filterWire(){
+    var bar=document.getElementById("wffilter"); if(!bar) return;
+    bar.querySelectorAll(".fc").forEach(function(c){
+      c.addEventListener("click",function(){ c.classList.toggle("on"); applyFilter(); });
+    });
+    bar.querySelectorAll(".fv").forEach(function(c){
+      c.addEventListener("click",function(){
+        bar.querySelectorAll(".fv").forEach(function(x){ x.classList.remove("on"); });
+        c.classList.add("on"); applyFilter();
+      });
+    });
+    applyFilter();
+  }
+
+  /* ---------- 7. LIVE VARIABLES ----------
+   * Bodies carry <span class="wfvar" data-var="client_id"></span>; a shared bar has
+   * <input data-var-input="client_id" value="RJ4521">. Typing updates every chip at once;
+   * empty value → the chip shows {{var_name}}. */
+  function varFill(name,val){
+    document.querySelectorAll('.wfvar[data-var="'+name+'"]').forEach(function(s){
+      if(val){ s.textContent=val; s.classList.remove("empty"); }
+      else{ s.textContent="{{"+name+"}}"; s.classList.add("empty"); }
+      s.title="{{"+name+"}}";
+    });
+  }
+  function varWire(){
+    document.querySelectorAll("[data-var-input]").forEach(function(inp){
+      var name=inp.getAttribute("data-var-input");
+      varFill(name, inp.value);
+      inp.addEventListener("input",function(){ varFill(name, inp.value); });
+    });
+  }
+
+  function boot(){ phoneStamp(); navWire(); audit(); varWire(); filterWire(); wireAll(); }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot); else boot();
 })();
 
