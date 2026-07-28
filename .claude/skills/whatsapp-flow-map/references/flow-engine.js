@@ -386,8 +386,15 @@
     window.__lintRun();
   }
 
-  /* ---------- 12. CONVERSATION SIMULATOR — ▶ on data-entry cards ---------- */
-  var simPane=null, simThread=null, simCrumbs=null, simStack=[];
+  /* ---------- 12. CONVERSATION SIMULATOR — ▶ on data-entry cards + free-text composer ----------
+   * Free text routes through #wfroutes — the LIVE-VERIFIED keyword registry (rules with
+   * literal keywords, exact/contains, on/off, per-keyword target card) + the verified
+   * default behavior. Faithful mode: what production does. Design hints (clearly marked)
+   * come from the map's typed-intent cards. An open question/collector card (data-question)
+   * consumes typed input BEFORE keyword routing — the live trap class, modeled honestly. */
+  var ROUTES=null;
+  try{ var rEl=document.getElementById("wfroutes"); if(rEl) ROUTES=JSON.parse(rEl.textContent); }catch(_){ ROUTES=null; }
+  var simPane=null, simThread=null, simCrumbs=null, simStack=[], simLastCard=null;
   function simClose(){ if(simPane){ simPane.remove(); simPane=null; simStack=[]; } }
   function simPulse(n){
     document.querySelectorAll(".node.simhl").forEach(function(x){ x.classList.remove("simhl"); });
@@ -424,7 +431,75 @@
     simThread.scrollTop=simThread.scrollHeight;
     simCrumbs.textContent+=(simCrumbs.textContent?" → ":"")+crumbLabel(node);
     simPulse(node);
+    simLastCard=node;
     return wrap;
+  }
+  function simNote(cls,text){
+    var d=document.createElement("div"); d.className=cls; d.textContent=text;
+    simThread.appendChild(d); simThread.scrollTop=simThread.scrollHeight;
+    return d;
+  }
+  function intentHint(text,group){
+    /* design-intent bank = the map's typed-intent cards wired to guardrails (NOT live routing) */
+    var bank=[]; (ROUTES&&ROUTES.intents||[]).forEach(function(i){ bank.push(i); });
+    var words=text.toLowerCase().split(/[^a-zऀ-ॿ0-9]+/).filter(function(w){return w.length>3;});
+    var best=null,bestScore=0;
+    bank.forEach(function(i){
+      var s=0; words.forEach(function(w){ if(i.text.toLowerCase().indexOf(w)>=0) s++; });
+      if(s>bestScore){ bestScore=s; best=i; }
+    });
+    if(!best) return;
+    var d=document.createElement("div"); d.className="sim-hint";
+    d.appendChild(document.createTextNode("design intent (NOT live behavior): similar to “"+best.text+"” → "));
+    var b=document.createElement("span"); b.className="sim-pick"; b.textContent="show intended reply";
+    b.addEventListener("click",function(){
+      var n=nodeOf(best.target); if(!n) return;
+      d.remove();
+      var w=simMsg(n); if(w){ group.push(w); }
+      var tag=simNote("sim-hint","↑ design card — this reply is NOT wired live yet");
+      group.push(tag);
+    });
+    d.appendChild(b);
+    simThread.appendChild(d); simThread.scrollTop=simThread.scrollHeight;
+    group.push(d);
+  }
+  function simType(text){
+    text=text.trim(); if(!text) return;
+    var group=[];
+    var tap=document.createElement("div"); tap.className="sim-msg sim-out";
+    tap.innerHTML='<div class="sim-tap"></div>'; tap.querySelector(".sim-tap").textContent=text;
+    simThread.appendChild(tap); group.push(tap);
+    var firstMsg=!simLastCard;
+    /* 1. an open question/collector card consumes input before any keyword routing */
+    if(simLastCard && simLastCard.hasAttribute("data-question")){
+      group.push(simNote("sim-sys","✉ captured by the open collector/question ("+crumbLabel(simLastCard)+") — validators apply; keyword routing is SUSPENDED until it completes or 3 failed answers (live-verified behavior)"));
+      simAppendGroup(group); return;
+    }
+    /* 2. live keyword rules (literal, case-sensitive as enumerated live) */
+    var hit=null, disabledHit=null;
+    (ROUTES&&ROUTES.routes||[]).forEach(function(r){
+      if(hit) return;
+      var m=(r.m==="exact") ? (r.k===text) : (text.indexOf(r.k)>=0);
+      if(m){ if(r.on) hit=r; else if(!disabledHit) disabledHit=r; }
+    });
+    if(hit){
+      var n=nodeOf(hit.t);
+      if(n){ var w=simMsg(n); if(w) group.push(w); }
+      simAppendGroup(group); return;
+    }
+    if(disabledHit){
+      group.push(simNote("sim-dead","⚠ matches rule “"+disabledHit.name+"” — but that rule is DISABLED live (verified "+(ROUTES.verified||"")+") → falls through to default"));
+    }
+    /* 3. default behavior (live-verified) */
+    if(firstMsg && ROUTES && ROUTES.dflt && ROUTES.dflt.welcome){
+      var wn=nodeOf(ROUTES.dflt.welcome);
+      group.push(simNote("sim-sys","new conversation → welcome flow fires (verified: welcome ON, once per new chat)"));
+      if(wn){ var w2=simMsg(wn); if(w2) group.push(w2); }
+    } else {
+      group.push(simNote("sim-sys","no keyword rule matches → LIVE DEFAULT: no bot reply (fallback slot OFF, verified "+(ROUTES?ROUTES.verified:"")+"). In working hours an agent is expected (R2 nudge after ~3 min, once); off-hours → R1 auto-reply (once per session)."));
+      intentHint(text,group);
+    }
+    simAppendGroup(group);
   }
   function simTap(id,label){
     var group=[];
@@ -462,15 +537,21 @@
       '<span class="sim-ctl" data-a="undo" title="undo last tap">&#8617;</span>'+
       '<span class="sim-ctl" data-a="restart" title="restart">&#10226;</span>'+
       '<span class="sim-ctl" data-a="close" title="close">&#10005;</span></div>'+
-      '<div class="sim-crumbs"></div><div class="sim-thread"></div>';
+      '<div class="sim-crumbs"></div><div class="sim-thread"></div>'+
+      '<div class="sim-compose"><input type="text" placeholder="Type a message as the customer…"><span class="sim-send">➤</span></div>';
     document.body.appendChild(simPane);
     simThread=simPane.querySelector(".sim-thread");
     simCrumbs=simPane.querySelector(".sim-crumbs");
+    simLastCard=null;
+    var cin=simPane.querySelector(".sim-compose input");
+    function sendTyped(){ var v=cin.value; cin.value=""; simType(v); }
+    cin.addEventListener("keydown",function(e){ if(e.key==="Enter") sendTyped(); });
+    simPane.querySelector(".sim-send").addEventListener("click",sendTyped);
     simPane.querySelectorAll(".sim-ctl").forEach(function(c){
       c.addEventListener("click",function(){
         var a=c.dataset.a;
         if(a==="close") simClose();
-        else if(a==="restart"){ simThread.innerHTML=""; simCrumbs.textContent=""; simStack=[]; simMsg(entry); if(entry.classList.contains("out")&&entry.id&&REG[entry.id]) simFollow(entry.id); }
+        else if(a==="restart"){ simThread.innerHTML=""; simCrumbs.textContent=""; simStack=[]; simLastCard=null; if(entry){ simMsg(entry); if(entry.classList.contains("out")&&entry.id&&REG[entry.id]) simFollow(entry.id); } }
         else if(a==="undo"){
           var g=simStack.pop();
           if(g) g.forEach(function(el){ el.remove(); });
@@ -478,8 +559,12 @@
         }
       });
     });
-    simMsg(entry);
-    if(entry.classList.contains("out") && entry.id && REG[entry.id]) simFollow(entry.id);
+    if(entry){
+      simMsg(entry);
+      if(entry.classList.contains("out") && entry.id && REG[entry.id]) simFollow(entry.id);
+    } else {
+      simNote("sim-sys","new empty chat — type the customer's first message below");
+    }
   }
   function simFollow(id){
     var outs=REG[id]||[], seen={}, group=[];
@@ -493,6 +578,8 @@
       b.addEventListener("click",function(e){ e.stopPropagation(); simStart(n); });
       head.insertBefore(b, head.querySelector(".ph-link"));
     });
+    var nc=document.getElementById("wfnewchat");
+    if(nc) nc.addEventListener("click",function(){ simStart(null); });
   }
 
   function boot(){
