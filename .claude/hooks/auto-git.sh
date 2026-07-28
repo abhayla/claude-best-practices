@@ -16,6 +16,11 @@
 # OFF-SWITCHES:
 #   AUTO_GIT_DISABLE=1  -> do nothing at all.
 #   AUTO_GIT_PUSH=0     -> commit locally but do not push.
+# PER-REPO OPT-OUT:
+#   A repo root containing .claude/.auto-git-direct-to-main commits straight to its current
+#   branch (no rotation off main, no PR) — for repos that document their own direct-commit
+#   convention (e.g. a state/bus repo with no CI to gate a PR on). See getworkdone-state
+#   (recurring stray-checkpoint-PR pattern, PRs #36-#42, PATTERNS-SEEN.md 2026-07-28).
 
 set -uo pipefail
 
@@ -32,8 +37,12 @@ log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG" 2>/dev/null; }
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" || exit 0
 
+direct_to_main=0
+[ -f "$ROOT/.claude/.auto-git-direct-to-main" ] && direct_to_main=1
+
 # Guardrail 1: keep main/master clean — carry uncommitted work onto a new branch.
-if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+# Skipped for repos opted into direct-to-main commits (see PER-REPO OPT-OUT above).
+if [ "$direct_to_main" = "0" ] && { [ "$branch" = "main" ] || [ "$branch" = "master" ]; }; then
   newb="auto/work-$(date '+%Y%m%d-%H%M%S')"
   if git checkout -b "$newb" >/dev/null 2>&1; then
     log "moved uncommitted work off '$branch' onto '$newb'"
@@ -54,7 +63,7 @@ fi
 # Both are true-merged signals (content is provably/authoritatively on main), so rotating the
 # new work onto a fresh branch cut from latest main is always safe. A fresh branch has 0 commits
 # ahead, so it never false-triggers.
-if [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
+if [ "$direct_to_main" = "0" ] && [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
   git fetch origin main >/dev/null 2>&1 || true
   merged=""
   if command -v gh >/dev/null 2>&1 \
@@ -112,7 +121,8 @@ fi
 # Ensure a PR exists once the branch is ahead of main, so a long session (or one reset with
 # `/clear`) never leaves work un-PR'd waiting on SessionEnd. CREATE only — NO `--auto` here:
 # merge-arming stays owned by auto-pr.sh at SessionEnd, so work never merges mid-session.
-if command -v gh >/dev/null 2>&1; then
+# Skipped entirely for direct-to-main repos — their commits already landed on main above.
+if [ "$direct_to_main" = "0" ] && command -v gh >/dev/null 2>&1; then
   ahead="$(git rev-list --count origin/main..HEAD 2>/dev/null || echo 0)"
   if [ "${ahead:-0}" -gt 0 ] && ! gh pr view "$branch" --json number >/dev/null 2>&1; then
     gh pr create --base main --head "$branch" --fill >/dev/null 2>&1 \
