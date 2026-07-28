@@ -76,8 +76,8 @@ The **validation layer** runs at load and the AUTHOR runs the same audit at buil
   same label → same target ("Share" follows the wired "Share on WhatsApp"; "Open
   account" follows the wired "Open demat account"). Wire it (`design` if the route
   isn't live yet); do NOT park it as an owner question. When two precedents conflict,
-  decide by the audience/context notes already on the map (e.g. a fixnote forbidding
-  a route for new prospects) and record the reasoning in the card's subnote.
+  decide by the audience/context the map records and log the reasoning in the
+  changelog/commit — never as text under the card (see "Cards carry NO commentary").
 - **Only a label with NO wired precedent and no standing rule is left visibly UNWIRED
   and turned into an owner question. NEVER silently invent a route or a reply card.** A proposed new card, if the
   owner asks for one, is tagged `DRAFT — needs owner review` (nothing goes to Meta/Wati
@@ -105,6 +105,14 @@ Build-time audit (adapt paths):
 - **One card = one message, strictly:** sequential sends (Day-3 / Day-7 / Day-14 nudges) are
   DIFFERENT messages, not versions — split packed cards into one card per message, each with
   its own buttons and wires.
+- **Cards carry NO commentary (owner ruling 2026-07-29, option b):** no subnotes, no
+  fixnotes, no version sagas, no forensic timestamps under or inside cards — a card is the
+  message, its header identity (template name · category chip · state tag · date chip), and
+  its buttons, nothing else. History lives in the artifact's version archive; functional
+  rules live in the design SSOT doc; unresolved issues surface through the audit pills;
+  never-shipped failed candidates (a v6 that Meta flipped and was never wired) are deleted,
+  not stacked. A struck-through "deleted from live" remnant inside a body is previous-copy
+  debris — remove it.
 - **Named live variables, never positional, never hardcoded samples:** bodies carry
   `<span class="wfvar" data-var="client_id"></span>` chips using the REAL parameter names
   ({{name}}/{{client_id}}-style, per the Wati paramName rule) — never `{{1}}`, never a baked-in
