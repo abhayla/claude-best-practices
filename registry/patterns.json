@@ -6226,8 +6226,8 @@
   },
   "_meta": {
     "version": "3.1.0",
-    "last_updated": "2026-07-26",
-    "total_patterns": 285
+    "last_updated": "2026-07-28",
+    "total_patterns": 286
   },
   "plan-before-coding": {
     "hash": "eb657aae689d29a5fd0157dbebe26e8f0cf5b9108b96b6552161c5fcda40e240",
@@ -7043,6 +7043,26 @@
       "recommendations"
     ],
     "changelog": "v1.0.0: Initial release — owner-reported failure pair 2026-07-14 (unverified suggestions + human-push execution); 21-finding adversarial gap-scan baked in (offline degrade path, evidence-not-attestation, cheap-test bounds, worker propagation, mid-work wall behavior)",
+    "tier": "must-have"
+  },
+  "model-cost-routing": {
+    "hash": "49b568c69f7b4644387f353f8209abee19ca82ffabf5a5750373e7b70a91ec28",
+    "type": "rule",
+    "category": "core",
+    "version": "1.0.0",
+    "source": "hub:abhayla/claude-best-practices",
+    "discovered": "2026-07-28",
+    "last_updated": "2026-07-28",
+    "dependencies": [],
+    "visibility": "public",
+    "description": "When the session's own model is a premium tier (Fable/Mythos/Opus), routes dispatchable execution work to /get-work-done (cheapest-correct model) instead of burning it on the premium loop; mechanical in-session subtasks route to cheap subagents; decisioning, secrets, and authenticated live-system work stay in-session. Includes a self-improvement loop for routing misfires. Global scope.",
+    "tags": [
+      "governance",
+      "model-routing",
+      "cost-control",
+      "get-work-done"
+    ],
+    "changelog": "v1.0.0: Initial release — owner directive 2026-07-28 (gorefer main session, running Fable 5)",
     "tier": "must-have"
   }
 }
