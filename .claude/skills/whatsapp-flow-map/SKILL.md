@@ -148,6 +148,24 @@ Build-time audit (adapt paths):
   taps append the wired reply, multi-target taps offer a chooser, unwired taps show an
   honest dead-end, breadcrumb + undo/restart, sample values applied. Plays ONLY what is
   wired; never invents a reply; sends nothing.
+- **Free-text composer + LIVE-VERIFIED routing (owner-approved 2026-07-29):** the pane has
+  a type-a-message composer (+ a "▶ new chat" chip for a blank session). Typed text routes
+  through `<script type="application/json" id="wfroutes">` — the keyword registry **pulled
+  from the live tenant** (per-rule GET on the automation-rules API + getDefaultReply),
+  never assumed: each entry = literal keyword, exact/contains, on/off, target card;
+  `dflt` = the verified welcome/fallback/off-hours/slow-reply behavior. Routing order:
+  (1) an OPEN question/collector card (`data-question`) consumes input first — keyword
+  routing SUSPENDED, exactly like the live trap class; (2) exact rules, then contains
+  (literal, case-sensitive as the live rules enumerate case variants); a rule that matches
+  but is DISABLED live says so and falls to default; (3) default: first message in a new
+  chat → the welcome flow; else the verified no-match truth (e.g. fallback OFF → "no bot
+  reply; R2 after N min in-hours; R1 off-hours") + an optional **design-intent hint**
+  (from the map's typed-intent cards) ALWAYS labeled "NOT live behavior". Registry
+  verification is part of the build: pull the rules live, reconcile drift onto the map
+  (§6c: a stale rules card, a disabled rule behind live-wired buttons, a changed default
+  are DEFECTS to record), stamp `verified` with the date. Known unknown to re-verify per
+  tenant: whether a keyword rule beats the welcome flow when both match a first message
+  (this build assumes keyword-first).
 
 ## Conversation-UX quality bar (check every card you author or edit)
 These mirror the estate's standing invariants — a card violating them is a defect:
