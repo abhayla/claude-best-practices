@@ -113,6 +113,42 @@ Build-time audit (adapt paths):
   like Wati's template-creator preview — so a tester can type one value and verify it flows
   consistently across ALL messages. Empty field → the chip shows its `{{var_name}}`.
 
+### 5. The map is a test bench: manifest, lint, search, links, lenses, simulator (owner-approved 2026-07-29)
+- **Machine-readable manifest (build FIRST — highest bug-prevention value):** the build step
+  GENERATES `<script type="application/json" id="wfmanifest">` from the cards (never
+  hand-maintained): per card — id, template name, state, category, version, buttons
+  (label→targets), last-updated. Any session can then diff map-vs-live-Wati mechanically,
+  turning the "map vs Meta drift is a bug" law into an automated check.
+- **Invariant lint pill** (`#wflint`, bottom-left twin of the wiring pill): checks
+  current-version, non-retired, customer-facing cards for — bare endings (no next-action
+  buttons; explicit `data-terminal` exempts), >3 buttons, staff names, reward-amount/credited
+  claims, referral terms without the disclosure link, button labels >20 chars, missing HI
+  twin (grey, HI mode only). Red = compliance, amber = craft, grey = coverage. Exemptions
+  live visibly in the HTML, never inside the checker. The same button rules are ALSO
+  enforced at authoring time by `wati-template-create-and-track` (pre-submit validation);
+  the rule text lives once, in the Meta categorization policy doc §4b — both skills reference it.
+- **Search** (`#wfsearch` in the filter bar): ≥2 chars matches bodies, template names,
+  ids, button labels among VISIBLE cards; first hit centers + pulses; Enter steps; Esc clears.
+- **Deep links:** `#card-id` in the URL centers + pulses that card on load, auto-enabling
+  whatever filter hides it. Every phone header carries a 🔗 copy-link (canonical artifact
+  URL from `data-canonical` on `#wffilter` — NEVER the iframe src, which holds a token).
+  Verify hash survival in the artifact viewer per deployment; search box is the fallback.
+- **Category-cost lens** (`#wflens`): retints cards by Meta cost class (MKT red · UTILITY
+  green · session/flow blue · internal violet) + a visible count line — answers "how much
+  of the estate is exposed to the marketing cap" at a glance.
+- **Last-updated chips:** build extracts the latest date per card into `data-upd`; shown
+  as a chip; a "recent 7d" filter chip isolates fresh changes. Cards without a date are
+  unaffected (coverage fills incrementally).
+- **EN/HI toggle** (frame-first): HI mode swaps to `[data-lang="hi"]` bodies where recorded;
+  a card without one shows a marked "HI twin not recorded on the map" placeholder (counted
+  grey by lint) — missing twins become visible, never invisible, and are ported
+  incrementally from the sign-off pack, never invented.
+- **Conversation simulator:** ▶ on entry-point cards (`data-entry`: outbound templates +
+  typed-keyword cards) opens a fixed phone pane that plays the flow as a real thread —
+  taps append the wired reply, multi-target taps offer a chooser, unwired taps show an
+  honest dead-end, breadcrumb + undo/restart, sample values applied. Plays ONLY what is
+  wired; never invents a reply; sends nothing.
+
 ## Conversation-UX quality bar (check every card you author or edit)
 These mirror the estate's standing invariants — a card violating them is a defect:
 - every in-session bot reply ENDS with ≤3 context-relevant next-action buttons (>3 options

@@ -96,8 +96,21 @@
       var ph=document.createElement("div"); ph.className="ph "+cls;
       var head=document.createElement("div"); head.className="ph-head";
       head.innerHTML='<span class="ph-av">'+(cls==="me"?"Y":cls==="staff"?"S":cls==="bot"?"W":"P")+
-        '</span><span class="ph-who"><b></b><i></i></span><span class="ph-ic">&#128222;&nbsp;&#8942;</span>';
+        '</span><span class="ph-who"><b></b><i></i></span><span class="ph-link" title="copy link to this card">&#128279;</span>';
       head.querySelector("b").textContent=who; head.querySelector("i").textContent=sub;
+      head.querySelector(".ph-link").addEventListener("click",function(e){
+        e.stopPropagation();
+        var base=(document.getElementById("wffilter")||document.body).getAttribute("data-canonical")||"";
+        var url=base+"#"+node.id;
+        try{ navigator.clipboard.writeText(url).then(function(){ e.target.textContent="✓"; setTimeout(function(){e.target.innerHTML="&#128279;";},900); }); }
+        catch(_){ window.prompt("Copy link:",url); }
+      });
+      if(node.getAttribute("data-upd")){
+        var d=new Date(node.getAttribute("data-upd"));
+        var chip=document.createElement("span"); chip.className="updchip";
+        chip.textContent=d.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()];
+        var eye=node.querySelector(".eye"); if(eye) eye.appendChild(chip);
+      }
       var body=document.createElement("div"); body.className="ph-body";
       node.insertBefore(ph, bub); ph.appendChild(head); ph.appendChild(body); body.appendChild(bub);
       var fix=node.querySelector(":scope > .fixnote"); if(fix) body.appendChild(fix);
@@ -190,15 +203,38 @@
       var v=n.getAttribute("data-ver");
       /* a version-paired card obeys ONLY the version switch — previous versions are
        * naturally retire-tagged, and the state chips must not double-hide them */
-      if(v){ n.style.display=(v===ver)?"":"none"; }
-      else { n.style.display=(on[st]!==false)?"":"none"; }
+      var show;
+      if(v){ show=(v===ver); }
+      else { show=(on[st]!==false); }
+      /* recent-7d chip narrows whatever is otherwise visible */
+      var rc=bar.querySelector('.fc[data-age].on');
+      if(show && rc){
+        var u=n.getAttribute("data-upd");
+        show=!!u && (Date.now()-Date.parse(u))<=7*86400000;
+      }
+      n.style.display=show?"":"none";
     });
     window.wireAll&&window.wireAll();
+    window.__lintRun&&window.__lintRun();
   }
   function filterWire(){
     var bar=document.getElementById("wffilter"); if(!bar) return;
     bar.querySelectorAll(".fc").forEach(function(c){
       c.addEventListener("click",function(){ c.classList.toggle("on"); applyFilter(); });
+    });
+    bar.querySelectorAll(".flang").forEach(function(c){
+      c.addEventListener("click",function(){
+        bar.querySelectorAll(".flang").forEach(function(x){ x.classList.remove("on"); });
+        c.classList.add("on");
+        var hi=c.dataset.lang==="hi";
+        document.body.classList.toggle("himode",hi);
+        document.querySelectorAll(".node").forEach(function(n){
+          if(n.classList.contains("ext")) return;
+          var has=n.querySelector('[data-lang="hi"]');
+          n.classList.toggle("hi-missing", hi && !has && !!n.querySelector(".btxt"));
+        });
+        window.__lintRun&&window.__lintRun();
+      });
     });
     bar.querySelectorAll(".fv").forEach(function(c){
       c.addEventListener("click",function(){
@@ -228,7 +264,241 @@
     });
   }
 
-  function boot(){ phoneStamp(); navWire(); audit(); varWire(); filterWire(); wireAll(); }
+  /* ---------- 8. SEARCH — #wfsearch input in the filter bar ---------- */
+  function searchWire(){
+    var inp=document.getElementById("wfsearch"); if(!inp) return;
+    var hits=[], idx=-1;
+    function clearHits(){ hits.forEach(function(n){ n.classList.remove("hit"); }); hits=[]; idx=-1; }
+    function focusHit(){
+      var n=hits[idx]; if(!n) return;
+      n.scrollIntoView({behavior:RM?"auto":"smooth", block:"center", inline:"center"});
+      document.querySelectorAll(".node.rx").forEach(function(x){ x.classList.remove("rx"); });
+      void n.offsetWidth; n.classList.add("rx");
+    }
+    function run(){
+      clearHits();
+      var q=inp.value.trim().toLowerCase(); if(q.length<2) return;
+      document.querySelectorAll(".node").forEach(function(n){
+        if(n.offsetWidth===0) return;
+        if(n.textContent.toLowerCase().indexOf(q)>=0 || (n.id||"").toLowerCase().indexOf(q)>=0){
+          n.classList.add("hit"); hits.push(n);
+        }
+      });
+      if(hits.length){ idx=0; focusHit(); }
+    }
+    var t; inp.addEventListener("input",function(){ clearTimeout(t); t=setTimeout(run,250); });
+    inp.addEventListener("keydown",function(e){
+      if(e.key==="Enter" && hits.length){ idx=(idx+1)%hits.length; focusHit(); }
+      if(e.key==="Escape"){ inp.value=""; clearHits(); }
+    });
+  }
+
+  /* ---------- 9. DEEP LINKS — #card-id opens centered+pulsed; filters auto-enable ---------- */
+  function deepLink(){
+    var id=(location.hash||"").replace(/^#/,""); if(!id) return;
+    var el=document.getElementById(id); if(!el) return;
+    var n=el.closest(".node")||el;
+    var bar=document.getElementById("wffilter");
+    if(bar && n.offsetWidth===0){
+      var v=n.getAttribute("data-ver");
+      if(v) bar.querySelectorAll(".fv").forEach(function(x){ x.classList.toggle("on",x.dataset.ver===v); });
+      var b=n.querySelector(".bstat"), st="info";
+      if(b) ["live","build","design","review","retire"].forEach(function(k){ if(b.classList.contains(k)) st=k; });
+      var chip=bar.querySelector('.fc[data-state="'+st+'"]'); if(chip) chip.classList.add("on");
+      applyFilter();
+    }
+    setTimeout(function(){
+      n.scrollIntoView({behavior:RM?"auto":"smooth", block:"center", inline:"center"});
+      n.classList.add("rx");
+      setTimeout(function(){ n.classList.remove("rx"); },4000);
+    },400);
+  }
+
+  /* ---------- 10. CATEGORY-COST LENS — #wflens toggle + #wflenscount ---------- */
+  function lensWire(){
+    document.querySelectorAll(".node").forEach(function(n){
+      var c=n.querySelector(".eye .cat"), cat="session";
+      if(n.classList.contains("out")) cat="customer";
+      else if(n.classList.contains("ext")) cat="external";
+      else if(c){
+        if(c.classList.contains("mkt")) cat="mkt";
+        else if(c.classList.contains("util")) cat="util";
+        else if(c.classList.contains("int")) cat="internal";
+      }
+      n.dataset.cat=cat;
+    });
+    var btn=document.getElementById("wflens"), lab=document.getElementById("wflenscount");
+    if(!btn) return;
+    btn.addEventListener("click",function(){
+      var on=document.body.classList.toggle("catlens");
+      btn.classList.toggle("on",on);
+      if(lab){
+        if(on){
+          var ct={};
+          document.querySelectorAll(".node").forEach(function(n){ if(n.offsetWidth>0) ct[n.dataset.cat]=(ct[n.dataset.cat]||0)+1; });
+          lab.textContent=(ct.mkt||0)+" MKT · "+(ct.util||0)+" UTILITY · "+(ct.session||0)+" session · "+(ct.internal||0)+" internal";
+        } else lab.textContent="";
+      }
+    });
+  }
+
+  /* ---------- 11. INVARIANT LINT — #wflint pill (auto-created, bottom-left) ---------- */
+  function lintWire(){
+    var pill=document.createElement("div"); pill.id="wflint"; document.body.appendChild(pill);
+    var flags=[], idx=-1;
+    window.__lintRun=function(){
+      flags=[]; idx=-1;
+      document.querySelectorAll(".node").forEach(function(n){
+        if(n.style.display==="none") return;
+        if(n.getAttribute("data-ver")==="previous") return;
+        var st=n.querySelector(".bstat");
+        if(st && st.classList.contains("retire")) return;
+        var body=n.querySelector(".btxt"); if(!body) return;
+        var txt=body.textContent, msgs=[];
+        var isCust=!n.classList.contains("int") && !n.classList.contains("ext") && !n.classList.contains("out") && !n.classList.contains("kw");
+        var btns=n.querySelectorAll(".qr .b");
+        if(isCust && !n.hasAttribute("data-terminal") && btns.length===0) msgs.push(["amber","ends bare — no next-action buttons"]);
+        if(btns.length>3) msgs.push(["amber",btns.length+" buttons > 3 (use a list message)"]);
+        if(isCust && /\bAshok\b/.test(txt)) msgs.push(["red","staff name in customer copy"]);
+        if(isCust && /credited|₹\s?\d/.test(txt)) msgs.push(["red","reward amount / credited claim"]);
+        if(isCust && /(10% brokerage|reward points)/i.test(txt) && txt.indexOf("gorefer.in/d/pifs")<0) msgs.push(["red","referral terms without disclosure link"]);
+        btns.forEach(function(b){
+          var lbl=b.textContent.replace(/UNWIRED$/,"").trim().replace(/^[^A-Za-z0-9ऀ-ॿ(]+\s*/,"");
+          if(lbl.length>20) msgs.push(["amber",'label "'+lbl+'" '+lbl.length+">20 chars"]);
+        });
+        if(document.body.classList.contains("himode") && n.classList.contains("hi-missing")) msgs.push(["grey","HI twin not recorded"]);
+        if(msgs.length) flags.push({n:n,msgs:msgs});
+      });
+      var red=0,amber=0,grey=0;
+      flags.forEach(function(f){ f.msgs.forEach(function(m){ if(m[0]==="red")red++; else if(m[0]==="amber")amber++; else grey++; }); });
+      if(!flags.length){ pill.className="ok"; pill.textContent="rules clean ✓"; }
+      else { pill.className="bad"; pill.textContent="⚠ rules: "+red+" red · "+amber+" amber"+(grey?" · "+grey+" grey":"")+" — click to step"; }
+    };
+    pill.addEventListener("click",function(){
+      if(!flags.length) return;
+      idx=(idx+1)%flags.length;
+      var f=flags[idx];
+      f.n.scrollIntoView({behavior:RM?"auto":"smooth", block:"center", inline:"center"});
+      document.querySelectorAll(".node.rx").forEach(function(x){ x.classList.remove("rx"); });
+      void f.n.offsetWidth; f.n.classList.add("rx");
+      pill.textContent="rule "+(idx+1)+"/"+flags.length+": "+f.msgs.map(function(m){ return m[1]; }).join(" · ");
+    });
+    window.__lintRun();
+  }
+
+  /* ---------- 12. CONVERSATION SIMULATOR — ▶ on data-entry cards ---------- */
+  var simPane=null, simThread=null, simCrumbs=null, simStack=[];
+  function simClose(){ if(simPane){ simPane.remove(); simPane=null; simStack=[]; } }
+  function simPulse(n){
+    document.querySelectorAll(".node.simhl").forEach(function(x){ x.classList.remove("simhl"); });
+    n.classList.add("simhl");
+  }
+  function crumbLabel(n){
+    var eye=n.querySelector(".eye"), t=n.id;
+    if(eye){
+      var cl=eye.cloneNode(true);
+      cl.querySelectorAll(".updchip,.cat").forEach(function(x){ x.remove(); });
+      t=cl.textContent.trim();
+    }
+    return (t||n.id).slice(0,34);
+  }
+  function simAppendGroup(els){ simStack.push(els); }
+  function simMsg(node){
+    var bub=node.querySelector(".bub"); if(!bub) return;
+    var cl=bub.cloneNode(true);
+    var bs=cl.querySelector(".bstat"); if(bs) bs.remove();
+    var fx=cl.querySelector(".fixnote"); if(fx) fx.remove();
+    var wrap=document.createElement("div");
+    wrap.className="sim-msg "+(node.classList.contains("out")?"sim-out":"sim-in");
+    wrap.appendChild(cl);
+    /* rewire cloned buttons to sim taps */
+    cl.querySelectorAll(".qr .b").forEach(function(b){
+      var id=b.getAttribute("id"); b.removeAttribute("id");
+      b.classList.remove("unwired");
+      b.addEventListener("click",function(e){
+        e.stopPropagation();
+        simTap(id, b.textContent.replace(/UNWIRED$/,"").trim());
+      });
+    });
+    simThread.appendChild(wrap);
+    simThread.scrollTop=simThread.scrollHeight;
+    simCrumbs.textContent+=(simCrumbs.textContent?" → ":"")+crumbLabel(node);
+    simPulse(node);
+    return wrap;
+  }
+  function simTap(id,label){
+    var group=[];
+    var tap=document.createElement("div"); tap.className="sim-msg sim-out";
+    tap.innerHTML='<div class="sim-tap"></div>'; tap.querySelector(".sim-tap").textContent=label;
+    simThread.appendChild(tap); group.push(tap);
+    var outs=id?REG[id]:null;
+    if(!outs||!outs.length){
+      var d=document.createElement("div"); d.className="sim-dead";
+      d.textContent="⚠ dead end — this tap is not wired to any reply";
+      simThread.appendChild(d); group.push(d);
+      simThread.scrollTop=simThread.scrollHeight;
+      simAppendGroup(group); return;
+    }
+    var seen={}, targets=[];
+    outs.forEach(function(o){ var n=nodeOf(o.to); if(n && !seen[n.id]){ seen[n.id]=1; targets.push(n); } });
+    if(targets.length===1){ var w=simMsg(targets[0]); if(w) group.push(w); }
+    else{
+      var ch=document.createElement("div"); ch.className="sim-choice";
+      ch.appendChild(document.createTextNode(targets.length+" possible replies — pick one: "));
+      targets.forEach(function(t){
+        var b=document.createElement("span"); b.className="sim-pick"; b.textContent=crumbLabel(t);
+        b.addEventListener("click",function(){ ch.remove(); var w=simMsg(t); if(w) simStack[simStack.length-1].push(w); });
+        ch.appendChild(b);
+      });
+      simThread.appendChild(ch); group.push(ch);
+    }
+    simThread.scrollTop=simThread.scrollHeight;
+    simAppendGroup(group);
+  }
+  function simStart(entry){
+    simClose();
+    simPane=document.createElement("div"); simPane.id="wfsim";
+    simPane.innerHTML='<div class="sim-head"><span class="ph-av">P</span><b>Simulator</b>'+
+      '<span class="sim-ctl" data-a="undo" title="undo last tap">&#8617;</span>'+
+      '<span class="sim-ctl" data-a="restart" title="restart">&#10226;</span>'+
+      '<span class="sim-ctl" data-a="close" title="close">&#10005;</span></div>'+
+      '<div class="sim-crumbs"></div><div class="sim-thread"></div>';
+    document.body.appendChild(simPane);
+    simThread=simPane.querySelector(".sim-thread");
+    simCrumbs=simPane.querySelector(".sim-crumbs");
+    simPane.querySelectorAll(".sim-ctl").forEach(function(c){
+      c.addEventListener("click",function(){
+        var a=c.dataset.a;
+        if(a==="close") simClose();
+        else if(a==="restart"){ simThread.innerHTML=""; simCrumbs.textContent=""; simStack=[]; simMsg(entry); if(entry.classList.contains("out")&&entry.id&&REG[entry.id]) simFollow(entry.id); }
+        else if(a==="undo"){
+          var g=simStack.pop();
+          if(g) g.forEach(function(el){ el.remove(); });
+          var parts=simCrumbs.textContent.split(" → "); parts.pop(); simCrumbs.textContent=parts.join(" → ");
+        }
+      });
+    });
+    simMsg(entry);
+    if(entry.classList.contains("out") && entry.id && REG[entry.id]) simFollow(entry.id);
+  }
+  function simFollow(id){
+    var outs=REG[id]||[], seen={}, group=[];
+    outs.forEach(function(o){ var n=nodeOf(o.to); if(n && !seen[n.id]){ seen[n.id]=1; var w=simMsg(n); if(w) group.push(w); } });
+    if(group.length) simAppendGroup(group);
+  }
+  function simWire(){
+    document.querySelectorAll(".node[data-entry]").forEach(function(n){
+      var head=n.querySelector(".ph-head"); if(!head) return;
+      var b=document.createElement("span"); b.className="ph-play"; b.title="Play this conversation"; b.textContent="▶";
+      b.addEventListener("click",function(e){ e.stopPropagation(); simStart(n); });
+      head.insertBefore(b, head.querySelector(".ph-link"));
+    });
+  }
+
+  function boot(){
+    phoneStamp(); navWire(); audit(); varWire(); filterWire();
+    searchWire(); lensWire(); lintWire(); simWire(); deepLink(); wireAll();
+  }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot); else boot();
 })();
 
