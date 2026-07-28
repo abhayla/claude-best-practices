@@ -119,18 +119,25 @@
     });
     if(first) first.scrollIntoView({behavior: RM?"auto":"smooth", block:"center", inline:"center"});
     clearTimeout(rxTimer);
-    rxTimer=setTimeout(function(){ document.querySelectorAll(".node.rx").forEach(function(n){ n.classList.remove("rx"); }); }, 2600);
+    rxTimer=setTimeout(function(){ document.querySelectorAll(".node.rx").forEach(function(n){ n.classList.remove("rx"); }); }, 4000);
   }
+  /* Per-element click listeners break under pointer capture: when the drag module captures
+   * the pointer, the browser retargets the derived click at the CARD, so a listener on the
+   * button never fires (real taps only — programmatic .click() hides this). Delegate at the
+   * document instead, resolving the tap from the element the pointer actually went DOWN on. */
+  var lastDown=null;
+  document.addEventListener("pointerdown",function(e){ lastDown=e.target; },true);
   function navWire(){
     Object.keys(REG).forEach(function(fromId){
-      var el=document.getElementById(fromId); if(!el) return;
-      el.classList.add("tap");
-      el.addEventListener("click",function(ev){
-        if(suppressTap) return;
-        ev.stopPropagation();
-        navigate(fromId);
-      });
+      var el=document.getElementById(fromId); if(el) el.classList.add("tap");
     });
+    document.addEventListener("click",function(e){
+      if(suppressTap) return;
+      var src=(lastDown && document.contains(lastDown)) ? lastDown : e.target;
+      if(!src || !src.closest) return;
+      var el=src.closest(".tap");
+      if(el && el.id && REG[el.id]) navigate(el.id);
+    },true);
   }
 
   /* ---------- 4. AUDIT — every tap must be wired; gaps get badges + the pill ---------- */
@@ -199,15 +206,20 @@
   document.querySelectorAll(".node").forEach(function(node){
     node.addEventListener("pointerdown",function(e){
       if(e.button!==undefined && e.button!==0) return;
-      drag={node:node, sx:e.clientX, sy:e.clientY, moved:false,
+      drag={node:node, sx:e.clientX, sy:e.clientY, moved:false, pid:e.pointerId,
             ox:parseFloat(node.dataset.ox||0), oy:parseFloat(node.dataset.oy||0)};
-      try{ node.setPointerCapture&&node.setPointerCapture(e.pointerId); }catch(_){}
+      /* NO pointer capture here — capturing on press retargets the tap's click at the
+       * card and kills button navigation. Capture only once a drag actually starts. */
     });
     node.addEventListener("pointermove",function(e){
       if(!drag||drag.node!==node) return;
       var dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
       if(!drag.moved && dx*dx+dy*dy<16) return;      /* 4px dead zone keeps taps clickable */
-      if(!drag.moved){ drag.moved=true; node.classList.add("dragging"); window.WF_setSuppress&&window.WF_setSuppress(true); }
+      if(!drag.moved){
+        drag.moved=true; node.classList.add("dragging");
+        try{ node.setPointerCapture&&node.setPointerCapture(drag.pid); }catch(_){}
+        window.WF_setSuppress&&window.WF_setSuppress(true);
+      }
       var nx=drag.ox+dx/Z, ny=drag.oy+dy/Z;
       node.dataset.ox=nx; node.dataset.oy=ny;
       node.style.left=nx+"px"; node.style.top=ny+"px";
