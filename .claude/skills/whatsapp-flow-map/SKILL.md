@@ -169,7 +169,13 @@ Build-time audit (adapt paths):
   chat → the welcome flow; else the verified no-match truth (e.g. fallback OFF → "no bot
   reply; R2 after N min in-hours; R1 off-hours") + an optional **design-intent hint**
   (from the map's typed-intent cards) ALWAYS labeled "NOT live behavior". Registry
-  verification is part of the build: pull the rules live, reconcile drift onto the map
+  verification is part of the build: pull the rules live, reconcile drift onto the map.
+  **Sync direction (owner-confirmed 2026-07-29): map follows the live system ONLY for
+  LIVE-state cards** — cards whose claim is "this is what production says today" are a
+  RECORD, and the live system is the fact; correct the record. **Design/intent cards
+  always win over the live system** — there, live disagreement is the defect, and the
+  fix flows map → Wati after an owner ruling. Reads from Wati are always safe; never
+  write to Wati as part of a map build.
   (§6c: a stale rules card, a disabled rule behind live-wired buttons, a changed default
   are DEFECTS to record), stamp `verified` with the date. Known unknown to re-verify per
   tenant: whether a keyword rule beats the welcome flow when both match a first message
