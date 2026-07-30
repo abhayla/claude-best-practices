@@ -185,6 +185,14 @@ Build-time audit (adapt paths):
 These mirror the estate's standing invariants — a card violating them is a defect:
 - every in-session bot reply ENDS with ≤3 context-relevant next-action buttons (>3 options
   → a list message, 10-row cap); no bot message ends bare;
+- **NEVER force typing — always give buttons (owner standard 2026-07-29, applies to ALL
+  interactions, existing and new):** a customer must never have to TYPE to move forward
+  ("Reply Call me" is a defect; a [Call me] button is the fix). The next step is always
+  obvious and tappable. Exemptions, each deliberate: question/collector steps where typing
+  IS the interaction; Wati Default-Action slots (R1/R2 — platform text-only, no buttons
+  possible); deliberate terminals (opt-out confirmation, advisor handoff). Every button
+  label must already route via a live keyword rule or flow wiring — a tapped button must
+  never be dead UI;
 - no personal staff names in customer-facing copy — role words only ("our representative");
 - no reward amounts or credited-confirmations — fixed program terms + Console pointer only;
 - referral content carries the disclosure link; risk line where the estate requires it;
