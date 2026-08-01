@@ -62,6 +62,10 @@ def uncovered_changed_skills(changed_files: list, root: Path) -> list:
         if skill_dir in seen:
             continue
         seen.add(skill_dir)
+        if not skill_dir.exists():
+            # Skill directory is gone entirely (a deletion/move, not an edit) —
+            # nothing to evaluate, so it can't be "uncovered".
+            continue
         if _is_reference_skill(skill_dir):
             # `type: reference` skills are lookup docs / plugin pointers (e.g. the #346
             # stage-2 thin pointers), not executable workflows — evals don't apply.
