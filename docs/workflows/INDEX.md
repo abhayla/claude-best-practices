@@ -150,5 +150,4 @@ Add them to `config/workflow-groups.yml` if they belong to a workflow.
 - ssot-workflow-audit (skill)
 - synthesize-hub (skill)
 - verify-effect-at-destination (skill)
-- whatsapp-flow-map (skill)
 - workflow-doc-reviewer (skill)
