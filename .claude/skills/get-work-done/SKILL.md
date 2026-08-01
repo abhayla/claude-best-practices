@@ -185,7 +185,10 @@ pick after evidence; a wrong expensive pick is never detected.
    numeric `settings.daily_token_ceiling`) → pause new dispatches, ping the owner once
    (fleet-paused), never retry-storm.
 8. **Heartbeat dispatch (P7):** on Windows machines launch via the wrapper —
-   `powershell -File GWD\worker-wrapper.ps1 -TaskId <id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap>`
+   `powershell -File GWD\worker-wrapper.ps1 -TaskId <id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap> -StateRoot <GWD>`
+   — `-StateRoot` is MANDATORY off the VPS: its default is the VPS fleet home
+   `C:\Abhay\GetWorkDone`, so omitting it on the local PC fails with "prompt file
+   missing" (live misfire T-038, 2026-08-01). Pass THIS machine's GWD path.
    (prompt file at `GWD\heartbeats\<id>.prompt.txt` first). The wrapper writes
    `<id>.hb` (PID + tick, ~60s) and the result JSON.
 9. **Reconcile (keeper duty, every tick):** for each `claimed` contract read its `.hb` —
