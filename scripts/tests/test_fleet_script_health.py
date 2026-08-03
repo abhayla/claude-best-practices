@@ -286,6 +286,184 @@ def test_push_via_bus_push_helper_is_clean(tmp_path: Path):
     assert not _checks(run(tmp_path), "silent-push")
 
 
+# ------------------------------------------------ stale-receipt (HIGH 2026-08-03: cost-rollup.py)
+
+
+def _ledger_script(body: str) -> str:
+    """A minimal roll-up over per-task result.json receipts appending to costs.jsonl."""
+    return (
+        "import glob, json, os, re\n"
+        "LEDGER = 'costs.jsonl'\n"
+        "def load_seen():\n"
+        "    seen = set()\n"
+        "    for line in open(LEDGER):\n"
+        "        seen.add(json.loads(line)['task'])\n"
+        "    return seen\n"
+        "def rollup():\n"
+        "    seen = load_seen()\n"
+        "    for path in sorted(glob.glob('heartbeats/*.result.json')):\n"
+        "        task = re.sub(r'\\.result\\.json$', '', os.path.basename(path))\n" + body
+    )
+
+
+def test_stale_receipt_ledger_is_flagged(tmp_path: Path):
+    """Dedup on the task id alone lets a REWRITTEN receipt keep its superseded numbers forever."""
+    (tmp_path / "cost-rollup.py").write_text(
+        _ledger_script(
+            "        if task in seen:\n"
+            "            continue\n"
+            "        data = json.load(open(path))\n"
+            "        print(data['modelUsage'])\n"
+        ),
+        encoding="utf-8",
+    )
+    findings = _checks(run(tmp_path), "stale-receipt")
+    assert findings, "gate missed the id-keyed ledger over mutable receipts"
+    assert "superseded" in findings[0].message
+
+
+def test_content_keyed_ledger_is_clean(tmp_path: Path):
+    """Folding a content digest into the identity makes a rewritten receipt detectable."""
+    (tmp_path / "cost-rollup.py").write_text(
+        _ledger_script(
+            "        data = json.load(open(path))\n"
+            "        import hashlib\n"
+            "        digest = hashlib.sha256(open(path, 'rb').read()).hexdigest()\n"
+            "        if task in seen and seen[task] == digest:\n"
+            "            continue\n"
+            "        print(data['modelUsage'], digest)\n"
+        ),
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "stale-receipt")
+
+
+def test_mtime_reconciled_ledger_is_clean(tmp_path: Path):
+    """Comparing the receipt's mtime against the recorded one is an equally valid fix."""
+    (tmp_path / "cost-rollup.py").write_text(
+        _ledger_script(
+            "        if task in seen and os.path.getmtime(path) == seen[task]:\n"
+            "            continue\n"
+            "        data = json.load(open(path))\n"
+            "        print(data['modelUsage'])\n"
+        ),
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "stale-receipt")
+
+
+def test_non_receipt_seen_set_is_not_flagged(tmp_path: Path):
+    """A dedup set over IMMUTABLE inputs is not this defect — precision guard."""
+    (tmp_path / "dedupe.py").write_text(
+        "import json\n"
+        "seen = set()\n"
+        "for line in open('urls.txt'):\n"
+        "    if line in seen:\n"
+        "        continue\n"
+        "    seen.add(line)\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "stale-receipt")
+
+
+def test_rewritten_receipt_defect_is_real_not_theoretical():
+    """Ground truth from the live fleet: T-037's ledger row contradicts its own receipt.
+
+    costs.jsonl records T-037 as sonnet/109,494 tok/$1.9766 — byte-identical to the row for
+    T-037.2nd-attempt-error_max_turns — while heartbeats/T-037.result.json is an opus run of
+    119,515 tok/$4.1413. The roll-up saw the retry's content first, banked the task id, and never
+    re-read the file after it was overwritten with the real run.
+    """
+    import json as _json
+
+    ledger = Path("C:/Abhay/GetWorkDone/costs.jsonl")
+    receipt = Path("C:/Abhay/GetWorkDone/heartbeats/T-037.result.json")
+    if not ledger.exists() or not receipt.exists():
+        pytest.skip("fleet checkout not present on this host")
+    rows = [
+        _json.loads(l)
+        for l in ledger.read_text(encoding="utf-8").splitlines()
+        if l.strip() and _json.loads(l).get("task") == "T-037"
+    ]
+    if not rows:
+        pytest.skip("T-037 no longer in the ledger")
+    usage = _json.loads(receipt.read_text(encoding="utf-8")).get("modelUsage") or {}
+    if not usage:
+        pytest.skip("receipt carries no modelUsage")
+    truth = sum(
+        u.get("inputTokens", 0) + u.get("outputTokens", 0) + u.get("cacheCreationInputTokens", 0)
+        for u in usage.values()
+    )
+    assert rows[0]["total_tokens"] != truth, (
+        "the live divergence this gate exists for has been reconciled — if the ledger was "
+        "repaired, keep the gate but retire this ground-truth assertion"
+    )
+
+
+# -------------------------------------- unchecked-read (HIGH 2026-08-03: checkpoint-pr-merge.sh)
+
+
+def test_unchecked_registry_read_is_flagged(tmp_path: Path):
+    """A python registry read with no rc capture turns "no interpreter" into "nothing to do"."""
+    (tmp_path / "checkpoint-pr-merge.sh").write_text(
+        "#!/bin/bash\n"
+        'repos=$(python -c "\n'
+        "import json\n"
+        "print('a/b')\n"
+        '")\n'
+        "while IFS= read -r nwo; do\n"
+        '  [ -z "$nwo" ] && continue\n'
+        '  echo "$nwo"\n'
+        'done <<< "$repos"\n'
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    findings = _checks(run(tmp_path), "unchecked-read")
+    assert findings, "gate missed the unguarded registry read feeding an empty loop"
+    assert "indistinguishable" in findings[0].message
+
+
+def test_registry_read_with_rc_capture_is_clean(tmp_path: Path):
+    """Capturing the exit code and failing loudly on an empty registry must pass."""
+    (tmp_path / "checkpoint-pr-merge.sh").write_text(
+        "#!/bin/bash\n"
+        'repos=$(python -c "print(1)"); repos_rc=$?\n'
+        "if [ $repos_rc -ne 0 ]; then\n"
+        '  echo "registry read FAILED — not a clean sweep" >&2; exit 4\n'
+        "fi\n"
+        "while IFS= read -r nwo; do\n"
+        '  echo "$nwo"\n'
+        'done <<< "$repos"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-read")
+
+
+def test_registry_read_with_loud_empty_test_is_clean(tmp_path: Path):
+    """An explicit loud emptiness test is an equally valid fix for the same class."""
+    (tmp_path / "checkpoint-pr-merge.sh").write_text(
+        "#!/bin/bash\n"
+        'repos=$(python -c "print(1)")\n'
+        '[ -z "$repos" ] && { echo "registry empty — FATAL, not a clean sweep" >&2; exit 4; }\n'
+        "while IFS= read -r nwo; do\n"
+        '  echo "$nwo"\n'
+        'done <<< "$repos"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-read")
+
+
+def test_read_not_feeding_a_loop_is_not_flagged(tmp_path: Path):
+    """A one-off value read is not the "iterated over nothing" shape — precision guard."""
+    (tmp_path / "helper.sh").write_text(
+        "#!/bin/bash\n"
+        'ignore=$(python -c "print(1)")\n'
+        'for f in a b; do echo "$f $ignore"; done\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-read")
+
+
 # --------------------------------------------------- precision: a noisy gate is an ignored gate
 
 
@@ -365,24 +543,52 @@ def test_cli_missing_path_is_loud(tmp_path: Path):
 # ------------------------------------------------- regression: the gate must fire on the REAL fleet
 
 
-def test_real_fleet_has_no_silent_failure_findings():
-    """The live fleet must stay clean of all six audited shapes.
+# The two defects the 2026-08-03 audit CONFIRMED live on the fleet. Fixing them is a fleet-repo
+# change (out of scope for this hub PR, which delivers the gates); until then they are the known
+# ratchet floor. RULE: this set may only SHRINK. Adding to it is how a gate rots into a to-do list.
+KNOWN_OPEN_FLEET_FINDINGS = {
+    ("cost-rollup.py", "stale-receipt"),
+    ("checkpoint-pr-merge.sh", "unchecked-read"),
+}
+
+
+def test_real_fleet_has_no_unknown_silent_failure_findings():
+    """The live fleet must carry no silent-failure shape beyond the known-open ratchet floor.
 
     History: T-015 fixed grep-count + interpreter in break-detect.sh; T-020 fixed the last two
     (contract-lint.py dead-gate — wired into /get-work-done SKILL.md STEP 6.2; keeper-tick.cmd
     discarded exits — both guards' errorlevel now tested). This assertion is the ratchet: it was
     previously written to assert the defects were PRESENT, which meant the suite would have gone
     red the moment they were fixed. Direction matters — a regression test must fail on the
-    DEFECT, never on the FIX. T-027 (2026-07-27) added the last two: keeper-tick.cmd's result
+    DEFECT, never on the FIX. T-027 (2026-07-27) added the next two: keeper-tick.cmd's result
     guard now asserts `is_error:false` (not just the JSON shape), and its bus push now tests its
-    own exit code — both previously let a failed run score as a healthy tick.
+    own exit code. T-039 (2026-08-03) added stale-receipt + unchecked-read; both are confirmed
+    live and listed above until the fleet repo lands their fixes.
     """
     fleet = Path("C:/Abhay/GetWorkDone")
     if not fleet.exists():
         pytest.skip("fleet checkout not present on this host")
     findings = run(fleet, extra_callers=[_DISPATCHER_SKILL])
-    assert not findings, "silent-failure defects present on the live fleet:\n" + "\n".join(
-        f"{f.path.name}:{f.line}: [{f.check}] {f.message}" for f in findings
+    unexpected = [
+        f for f in findings if (f.path.name, f.check) not in KNOWN_OPEN_FLEET_FINDINGS
+    ]
+    assert not unexpected, "NEW silent-failure defects present on the live fleet:\n" + "\n".join(
+        f"{f.path.name}:{f.line}: [{f.check}] {f.message}" for f in unexpected
+    )
+
+
+def test_known_open_fleet_findings_still_reproduce():
+    """The ratchet floor must be real: each known-open entry still fires, or it should be removed.
+
+    Guards the opposite rot — a stale allowlist that silently excuses defects already fixed.
+    """
+    fleet = Path("C:/Abhay/GetWorkDone")
+    if not fleet.exists():
+        pytest.skip("fleet checkout not present on this host")
+    seen = {(f.path.name, f.check) for f in run(fleet, extra_callers=[_DISPATCHER_SKILL])}
+    stale = KNOWN_OPEN_FLEET_FINDINGS - seen
+    assert not stale, (
+        f"these known-open findings no longer reproduce — remove them from the ratchet: {stale}"
     )
 
 
