@@ -29,6 +29,22 @@ reads the wrong property of it, so a failure scores as a pass:
                  blocking, but only matched the `|| true` spelling, so the redirect spelling in the
                  fleet's own keeper went unseen: a rejected push looks exactly like a landed one.
 
+The 2026-08-03 audit added two more. Both are the "checked nothing, reported clean" shape rather
+than "read the wrong property", and both were live-reproduced against the running fleet:
+
+  stale-receipt — an append-only ledger keyed by a MUTABLE artifact's id, where the id is recorded
+                 as "already seen" but the artifact's CONTENT is never re-checked. A receipt that is
+                 rewritten after its first roll-up (retry overwrites `<task>.result.json`) freezes
+                 the ledger at the superseded numbers forever. Live instance: costs.jsonl records
+                 T-037 as sonnet/109,494 tok/$1.98 while the real T-037.result.json is
+                 opus/119,515 tok/$4.14 — the budget ceiling gates on the under-count.
+  unchecked-read — a registry/config read via an unguarded `$(python ...)`/`$(gh ...)` command
+                 substitution whose exit code is never captured, feeding a loop that iterates zero
+                 times and a script that then exits 0. "Read nothing" is indistinguishable from
+                 "nothing to do" — the same class break-detect.sh's empty-registry guard fixed,
+                 still live in checkpoint-pr-merge.sh (which also lacks its siblings' Python PATH
+                 hardening, so Task Scheduler's bare PATH is the exact trigger).
+
 Exit 0 = clean; 1 = findings (printed to stdout). Read-only; changes nothing.
 """
 from __future__ import annotations
@@ -104,6 +120,40 @@ PUSH_VERDICT_TESTED = re.compile(
     r"\bbus_push\b|\berrorlevel\b|\$\?|\bLASTEXITCODE\b|\bif\s+git\s+push\b|\|\|\s*(?!true\b)\S",
     re.I,
 )
+
+
+# --- stale-receipt: an append-only ledger keyed by a MUTABLE artifact's id -----------------------
+# The dedup key is derived from a FILENAME (a task id), but the numbers come from that file's
+# CONTENT. Once the id is in the ledger the content is never re-read, so a receipt rewritten after
+# its first roll-up (a retry overwriting <task>.result.json) is accounted at the superseded values.
+# Recognised by: a "seen" set built from the ledger, and a skip-if-seen guard in the roll-up loop.
+SEEN_SET_BUILD = re.compile(r"\b(seen)\b\s*=\s*set\(\)|\bseen\.add\(", re.I)
+SEEN_SKIP_GUARD = re.compile(r"\bif\s+\w+\s+in\s+seen\b")
+# Evidence the CONTENT is part of the identity: a digest/mtime/size recorded per entry, or an
+# explicit supersede/refresh path that rewrites an existing row.
+RECEIPT_CONTENT_KEYED = re.compile(
+    # Content folded into the IDENTITY: a digest, or an mtime compared against the value the
+    # ledger already stored for this task. Deliberately narrow on two counts:
+    #   - a `getsize(path) == 0` zero-byte skip is NOT content-identity (cost-rollup.py has one,
+    #     and treating it as the fix silently cleared the real finding during development);
+    #   - a bare `getmtime(path)` used only to DATE a row (cost-rollup.py does that too) changes
+    #     nothing about which content was banked.
+    r"\b(sha1|sha256|md5|hashlib|digest|checksum|content_hash|"
+    r"supersede|resolve_duplicate|rewrite_entry|update_entry)\b"
+    r"|\b(st_mtime|getmtime)\b[^\n]*(==|!=|<|>)[^\n]*\b(seen|ledger|recorded|prev|known)\b"
+    r"|\b(seen|ledger|recorded|prev|known)\b[^\n]*(==|!=|<|>)[^\n]*\b(st_mtime|getmtime)\b",
+    re.I,
+)
+# Only a ledger fed by per-task receipt files can carry this defect.
+RECEIPT_LEDGER_CONSUMER = re.compile(r"\.result\.json|result\.json['\"]?\s*\)|costs\.jsonl", re.I)
+
+# --- unchecked-read: a registry read whose failure is indistinguishable from "nothing to do" ------
+# `x=$(python ...)` / `$(gh ...)` with no `$?` capture, feeding a loop, in a script that exits 0.
+UNCHECKED_REGISTRY_READ = re.compile(
+    r"^\s*(?P<var>\w+)=\$\(\s*(?P<cmd>python3?|gh|jq)\b(?![^\n]*\|\|)", re.I
+)
+# The read is GUARDED when its exit code is captured, or the result is emptiness-tested loudly.
+READ_VERDICT_TESTED = r"(\b{var}_rc\b|\brc=\$\?|;\s*\w*rc=\$\?|\[\s*-z\s*\"?\$\{{?{var}\b[^]]*\]\s*(&&|\|\|)?[^\n]*(exit|fail|FATAL|>&2))"
 
 
 @dataclass(frozen=True)
@@ -300,6 +350,91 @@ def check_silent_push(path: Path) -> list[Finding]:
     return out
 
 
+def check_stale_receipt_ledger(path: Path) -> list[Finding]:
+    """An id-keyed ledger over MUTABLE receipts freezes at whatever content it saw first.
+
+    The idempotency key ("task already in the ledger") is derived from the FILENAME, but every
+    recorded number is read from that file's CONTENT. A receipt that is rewritten after its first
+    roll-up — the fleet overwrites `<task>.result.json` when a task is retried — is therefore
+    accounted forever at the SUPERSEDED values, and nothing ever re-reconciles it. The spend the
+    daily ceiling gates on is silently wrong, which is the un-gated budget class.
+    """
+    if path.suffix != ".py":
+        return []
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if not RECEIPT_LEDGER_CONSUMER.search(text) or not SEEN_SET_BUILD.search(text):
+        return []
+    lines = _lines(path)
+    code = "\n".join(l for l in lines if not l.lstrip().startswith("#"))
+    # Content-derived identity (a digest, an mtime comparison, an explicit supersede path) means
+    # a rewritten receipt is detectable — that is the fix, so it clears the finding.
+    if RECEIPT_CONTENT_KEYED.search(code):
+        return []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith("#"):
+            continue
+        if not SEEN_SKIP_GUARD.search(line):
+            continue
+        return [
+            Finding(
+                "stale-receipt",
+                path,
+                i,
+                "the ledger dedups on a task id parsed from a MUTABLE receipt file, but never on "
+                "that file's CONTENT — a receipt rewritten after its first roll-up (a retry "
+                "overwriting <task>.result.json) is accounted forever at the superseded numbers "
+                "and the daily ceiling gates on the under-count. Key on a content digest/mtime, "
+                "or re-reconcile a changed receipt.",
+            )
+        ]
+    return []
+
+
+def check_unchecked_registry_read(path: Path) -> list[Finding]:
+    """A registry read whose failure yields an empty loop and a clean exit 0.
+
+    `repos=$(python -c ...)` with the exit code never captured: when the interpreter is missing
+    (Task Scheduler's bare PATH — the fleet's own recurring trigger) the variable is empty, the
+    `while read` body never runs, and the script exits 0. "Read zero repos" then renders exactly
+    like "no repos needed work", which is the silent-failure shape this gate exists to prevent.
+    """
+    if path.suffix != ".sh":
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    # Only fires for a read that actually FEEDS a loop — a bare assignment used inline is not
+    # the "iterated over nothing and called it clean" shape.
+    if not re.search(r"(while\s+(IFS=[^\s]*\s+)?read\b|\bfor\s+\w+\s+in\b)", text):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith("#"):
+            continue
+        m = UNCHECKED_REGISTRY_READ.match(line)
+        if not m:
+            continue
+        var = re.escape(m.group("var"))
+        # A verdict test anywhere in the file clears it (the rc may be checked below the loop).
+        if re.search(READ_VERDICT_TESTED.format(var=var), text, re.I):
+            continue
+        # The read must actually drive a loop for the empty result to masquerade as "nothing to do".
+        if not re.search(rf"<<<\s*\"?\${{?{var}\b|\$\{{?{var}\b[^\n]*\|\s*while", text):
+            continue
+        out.append(
+            Finding(
+                "unchecked-read",
+                path,
+                i,
+                f"`{m.group('cmd')}` registry read into `${m.group('var')}` never captures its exit "
+                "code; on failure (missing interpreter / auth expiry) the variable is empty, the "
+                "loop below iterates ZERO times and the script still exits 0 — 'read nothing' is "
+                "indistinguishable from 'nothing to do'. Capture the rc and fail loudly on an "
+                "empty registry.",
+            )
+        )
+    return out
+
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -321,6 +456,8 @@ def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
         findings.extend(check_discarded_exit(path))
         findings.extend(check_shape_only_result_guard(path))
         findings.extend(check_silent_push(path))
+        findings.extend(check_stale_receipt_ledger(path))
+        findings.extend(check_unchecked_registry_read(path))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 
