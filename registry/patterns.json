@@ -4632,7 +4632,7 @@
     }
   },
   "skill-evaluator": {
-    "hash": "cf913d1dc1bf675918a5fac53c5b59733308516100afb0415c2f9110f9b0682a",
+    "hash": "e5d68efecf6b012c3f208f7b4bbb5c2777fde86ee61742cf151b13787aaa4cbc",
     "type": "skill",
     "category": "core",
     "version": "2.6.0",
