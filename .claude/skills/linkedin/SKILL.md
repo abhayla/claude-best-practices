@@ -1,12 +1,12 @@
 ---
-name: linkedin-post-fetch
+name: linkedin
 description: >
   Fetch everything retrievable from a public LinkedIn post link — author,
   date, full post text, engagement counts, comments, and media — using an
   anonymous extraction ladder built on LinkedIn's server-rendered JSON-LD
   (no login, no partner API). Use when the user shares a linkedin.com/posts/
   or /feed/update/ URL and wants its information or content captured. Do NOT
-  use for Instagram links (use instagram-post-fetch), X/Twitter links (use
+  use for Instagram links (use the instagram skill), X/Twitter links (use
   twitter-x), or LinkedIn PROFILE pages (different surface, aggressive
   authwall — not covered here).
 triggers:
@@ -21,7 +21,7 @@ type: workflow
 version: "1.0.0"
 ---
 
-# LinkedIn Post Fetch — Anonymous Extraction Ladder
+# LinkedIn — Anonymous Post-Extraction Ladder
 
 Extract a public LinkedIn post's full information without logging in.
 Codified from live-verified probes (2026-08-06, 3 different public posts:
@@ -152,7 +152,7 @@ cap comment list — counts are from JSON-LD, not a full comment crawl>
 
 ## STEP 7: Capture Learnings (self-learning loop — MANDATORY)
 
-Same contract as instagram-post-fetch: after EVERY run —
+Same contract as the instagram skill: after EVERY run —
 
 | Event this run | Action |
 |---|---|
@@ -162,7 +162,7 @@ Same contract as instagram-post-fetch: after EVERY run —
 | Lesson reaches 2+ occurrences | Promote: edit THIS SKILL.md, bump minor version, mark APPLIED |
 | Clean run | Append nothing |
 
-Entry format: same as `instagram-post-fetch/LEARNINGS.md` (date, symptom,
+Entry format: same as `../instagram/LEARNINGS.md` (date, symptom,
 rung, evidence, status CANDIDATE/CONFIRMED/APPLIED).
 
 ## Known dead ends (do NOT attempt first — verified or sourced)
