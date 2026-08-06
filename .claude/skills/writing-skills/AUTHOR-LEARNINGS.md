@@ -31,3 +31,18 @@ Promote to SKILL.md at 2+ occurrences.
   is a registered pattern. Candidate SKILL.md fix: add this check to
   Step 1.3 Update mode.
 - Status: CANDIDATE
+
+## 2026-08-06 — Registry hash is NORMALIZED, never hand-roll it (2 red CI runs)
+
+- Skill authored/updated: skill-evaluator registry entry (same PR #495)
+- What went wrong / what was learned: hand-rolled the registry hash twice
+  (raw-bytes sha256 of the CRLF working copy, then of the LF git blob) —
+  both wrong, two red CI runs. The registry hash is
+  `scripts/dedup_check.py::hash_pattern()` — line-stripped,
+  space-collapsed, line-ending-independent. ALWAYS compute it with that
+  function (`from dedup_check import hash_pattern`), and ALWAYS run
+  `PYTHONPATH=. python scripts/dedup_check.py --validate-all` locally
+  before pushing a registry change — it is the exact CI step that judges
+  the hash. Root process failure: skipped reading the validator source
+  before mimicking it (Operating Manual: open the canonical source FIRST).
+- Status: CANDIDATE
