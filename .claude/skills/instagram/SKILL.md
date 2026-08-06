@@ -1,5 +1,5 @@
 ---
-name: instagram-post-fetch
+name: instagram
 description: >
   Fetch everything retrievable from a public Instagram post link — author,
   engagement, verbatim caption, and the full content of every carousel slide
@@ -21,7 +21,7 @@ type: workflow
 version: "1.0.0"
 ---
 
-# Instagram Post Fetch — Anonymous Extraction Ladder
+# Instagram — Anonymous Post-Extraction Ladder
 
 Extract a public Instagram post's full information without logging in.
 Codified from a real successful run (2026-08-06, 8-slide carousel captured

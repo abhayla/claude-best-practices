@@ -1,4 +1,7 @@
-# linkedin-post-fetch — Learnings Log
+# linkedin — Learnings Log
+
+> Renamed from `linkedin-post-fetch` on 2026-08-06 (owner directive).
+> Entries below predating the rename use the old name — historically accurate.
 
 The living correction layer for the extraction ladder. Read at STEP 0 of
 every run; append per STEP 7. Promote at 2+ occurrences (CONFIRMED), then
