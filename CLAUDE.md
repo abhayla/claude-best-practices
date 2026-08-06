@@ -261,6 +261,7 @@ Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load alwa
 
 - `.claude/rules/claude-behavior.md` — task approach, self-improvement, git hygiene, code quality, scope discipline
 - `.claude/rules/context-management.md` — progressive disclosure, scratchpad usage, subagent delegation, compaction survival
+- `.claude/rules/learning-to-gate-doctrine.md` — every failure-learning becomes a machine-enforced gate where possible (5-whys to the class, gate-with-self-test, recurrence ratchet); prose-only fixes for gateable classes are defects
 - `.claude/rules/model-routing.md` — cheapest sufficient model per dispatch (haiku/sonnet/opus tiers, inherit Fable only for frontier judgment), preemptive security-category routing to opus, refusal→fallback playbook, per-pass effort dial, session-level routing
 - `.claude/rules/prompt-auto-enhance.md` — Tier 1/2 context gathering, grade pipeline, clarification gate, resource CRUD detection
 - `.claude/rules/verify-before-suggest-do-before-delegate.md` — live-verify actionable recommendations before presenting (evidence: source+date+version); agent is default executor, human steps carry a named blocker
