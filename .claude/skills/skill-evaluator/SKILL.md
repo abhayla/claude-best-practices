@@ -21,7 +21,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<trigger|output|full|conflicts|trap> <skill-path> [--baseline] [--model sonnet] [--cases <path>] [--bar all|0.9]"
 type: workflow
-version: "2.5.0"
+version: "2.6.0"
 ---
 
 # Skill Evaluator — Evaluate Skill Quality
@@ -35,6 +35,16 @@ evidence and recommended fixes.
 ---
 
 ## STEP 0: Pre-Flight Checks
+
+### 0.0 Read Eval Learnings (self-learning loop, entry gate)
+
+**Read `EVAL-LEARNINGS.md` in this skill's directory before evaluating.**
+It records what past evaluations MISSED (found manually afterward) and the
+improvements proposed from those misses. Apply every pending "proposed
+evaluator improvement" as an extra ad-hoc check during THIS run — a recorded
+miss that recurs because the log was never read is a process failure, not an
+evaluator gap. This applies to standalone runs too, not only EVAL-WORKFLOW
+batch runs.
 
 Run these checks BEFORE evaluation. They catch the issues most commonly missed
 during Skills #1-5 evaluation batch (registry drift, missing frontmatter,
@@ -456,8 +466,29 @@ percentage in place of naming missed case IDs.
 
 ---
 
+## STEP 8: Capture Eval Lesson (self-learning loop, exit gate — MANDATORY)
+
+After returning the verdict, append to `EVAL-LEARNINGS.md` (standalone AND
+delegated runs — this replaces the batch-only capture in EVAL-WORKFLOW.md
+for single evals):
+
+| Event this run | Action |
+|---|---|
+| Something was found OUTSIDE the standard checks (ad-hoc, prompted, or manual) | Append it + a "proposed evaluator improvement" checkbox |
+| A pending proposed improvement from 0.0 caught a real issue again (2+ evidence) | Promote: edit THIS SKILL.md's check tables, bump minor version, tick the checkbox as applied |
+| A standard check produced a false positive/negative | Append it — check-calibration lesson |
+| Clean run, all findings from standard checks | Append the one-line header only (skill, date, verdict) — per EVAL-WORKFLOW rule 8, absence of findings is data |
+
+Use the existing EVAL-LEARNINGS.md entry format (verdict / caught / missed /
+proposed improvements). Why this exists: the log had entries but no read gate
+and no standalone-run capture — misses recorded in April were still pending
+in August because nothing forced a re-read.
+
+---
+
 ## MUST DO
 
+- Always read `EVAL-LEARNINGS.md` before evaluating (Step 0.0) and capture lessons after (Step 8) — Why: recorded misses that recur because the log was never read are process failures; the log is only useful if it gates every run
 - Always run each eval in clean context (subagent isolation) — Why: leftover state produces unreliable results
 - Always test both trigger AND output for full mode — Why: a skill that triggers correctly but produces bad output is broken
 - Always check cross-skill conflicts, not just target in isolation — Why: isolated testing misses real activation conflicts

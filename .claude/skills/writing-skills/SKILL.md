@@ -20,7 +20,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "3.3.0"
+version: "3.4.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -34,6 +34,16 @@ Author new Claude Code skills or update existing ones — from scratch, from obs
 > Aligned with Anthropic's [Skill Authoring Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) and [Skills for Enterprise](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/enterprise) as of 2026-04.
 
 ## STEP 1: Determine Authoring Mode
+
+### 1.0 Read Author Learnings (self-learning loop, entry gate)
+
+**Read `AUTHOR-LEARNINGS.md` in this skill's directory before authoring.**
+It records process lessons from past authoring runs — mistakes made while
+WRITING skills (not domain knowledge of authored skills; that lives in each
+skill's own references/). Apply every ACTIVE lesson to this run. If the file
+does not exist yet, create it from the entry format in STEP 10 and continue.
+This is distinct from Step 2.6 (reference self-update), which improves the
+*authored* skill — this loop improves the *authoring process itself*.
 
 Parse `$ARGUMENTS` to choose the path:
 
@@ -713,9 +723,39 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 
 ---
 
+## STEP 10: Capture Authoring Lesson (self-learning loop, exit gate — MANDATORY)
+
+After every authoring/update run, compare what happened against this skill's
+own procedure and record process lessons in `AUTHOR-LEARNINGS.md`:
+
+| Event this run | Action |
+|---|---|
+| A step was wrong, missing, or misleading for this case | Append a dated lesson naming the step and the correction |
+| The evaluator (Step 6) caught something this skill's checklist should have caught first | Append it — checklist gap |
+| A workaround was improvised that future runs will need | Append it as CANDIDATE |
+| Same lesson reaches 2+ occurrences | Promote: edit THIS SKILL.md, bump minor version, mark the entry APPLIED |
+| Clean run, nothing new | Append nothing — no ritual entries |
+
+Entry format (append to `AUTHOR-LEARNINGS.md`):
+
+```markdown
+## YYYY-MM-DD — <one-line summary>
+- Skill authored/updated: <name>
+- What went wrong / what was learned: <specific, with the step number>
+- Status: CANDIDATE | CONFIRMED (2+ runs) | APPLIED (SKILL.md edited vN)
+```
+
+Why this exists: Step 2.6 makes AUTHORED skills self-improving; nothing made
+the AUTHORING PROCESS self-improving. Without this loop, the same authoring
+mistake (e.g., forgetting the prerequisites contract existed before 2026-07)
+repeats until a human notices.
+
+---
+
 
 ## MUST DO
 
+- Always read `AUTHOR-LEARNINGS.md` before authoring (Step 1.0) and capture process lessons after (Step 10) — Why: without the loop, the same authoring mistake repeats across runs until a human notices
 - Always read at least 2 existing skills before authoring a new one — pattern-match from working examples
 - Always validate with the quality checklist (Step 5) before saving
 - Always check for trigger overlap with existing skills
