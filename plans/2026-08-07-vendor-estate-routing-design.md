@@ -16,7 +16,23 @@
 
 ## The rule (three enforcement points — Approach A, owner-approved)
 
-### 1. Global rule (all sessions) — goes in `~/.claude/CLAUDE.md`
+### 1. Global rule (all sessions) — body in the HUB, pointer in each machine's `~/.claude/CLAUDE.md`
+
+**v1.1 amendment (owner, 2026-08-07): the rule must also govern the Windows VPS.** The VPS
+runs the same projects (synced from GitHub) — but `~/.claude/CLAUDE.md` is a per-machine file
+that git cannot sync. So the rule body does NOT live there. It lives in the hub:
+`core/.claude/rules/vendor-estate-routing.md` — the same pattern as `decision-authority.md`
+and `model-cost-routing.md`, which the global file already only points at. Each machine's
+`~/.claude/CLAUDE.md` gets a 3-line always-on reinforcement + pointer (one-time edit per
+machine, rarely changes). The hub repo git-syncs to the VPS, so the body arrives with a
+normal pull — no second copy to drift.
+
+**Path roots differ per machine** — the rule file states both, like the get-work-done
+pointer already does: PC root `D:\Abhay\VibeCoding\`, Windows VPS root `C:\Abhay\`
+(so Zoho lane = `D:\Abhay\VibeCoding\5Wealths\Zoho-Project` on the PC,
+`C:\Abhay\5Wealths\Zoho-Project` on the VPS; Wati lane likewise).
+
+The rule text (goes in the hub rules file):
 
 > **Vendor-estate routing (owner rule, 2026-08-07).** Work that changes a vendor estate
 > runs in that vendor's project lane:
@@ -67,6 +83,21 @@
     CRM-Plus tab-recycle + stale-list-cache traps, the v8-API-first rule + missing
     settings scope).
 
+## Fleet propagation — what syncs itself vs what needs hands (v1.1)
+
+| Artifact | Reaches the VPS how |
+|---|---|
+| Rule body (`core/.claude/rules/vendor-estate-routing.md`) | hub repo `git pull` — automatic |
+| get-work-done intake step (hub SKILL.md) | hub repo `git pull` — automatic |
+| GWD registry entry (`settings.json`) | GetWorkDone repo `git pull` — automatic |
+| `Zoho-Project\CLAUDE.md` | 5wealths repo `git pull` — automatic (root-level file, NOT under the gitignored `.claude/`) |
+| `~/.claude/CLAUDE.md` 3-line pointer | **manual, once per machine** — PC in this session; VPS in the next VPS session (or a TODO-Manual card if no session is planned) |
+
+Honest limit: the per-machine pointer is the one thing that can drift — a fresh machine or a
+reinstalled profile silently loses the rule until the pointer is re-added. Mitigation: keep the
+pointer to 3 lines so re-adding is trivial, and the hub rule file is the SSOT either way (a
+session that reads the hub rules dir still finds it).
+
 ## What this rule would have changed, concretely
 
 - The deluge skill would have been authored in Zoho-Project on day one.
@@ -84,12 +115,17 @@
 
 ## Implementation checklist (≈1–2 h)
 
-1. `~/.claude/CLAUDE.md`: add the global rule block (§1 above).
-2. Hub `get-work-done` SKILL.md STEP 1: add the estate-classification paragraph (§2);
+1. Write the rule body to hub `core/.claude/rules/vendor-estate-routing.md` (§1, with both
+   machine path roots); commit + push hub main → VPS gets it on next pull.
+2. `~/.claude/CLAUDE.md` (this PC): add the 3-line reinforcement + pointer.
+3. Hub `get-work-done` SKILL.md STEP 1: add the estate-classification paragraph (§2);
    the thin pointer copies in projects need no change.
-3. `GWD\settings.json`: add the `zoho-project` registry entry (§3).
-4. Write `Zoho-Project\CLAUDE.md`; commit to 5wealths.
-5. Record the rule's existence in gorefer `COORDINATION.md` (one STATUS line) so the
+4. `GWD\settings.json`: add the `zoho-project` registry entry (§3) — syncs to the VPS via
+   the GetWorkDone repo.
+5. Write `Zoho-Project\CLAUDE.md`; commit to 5wealths — syncs to the VPS via git.
+6. VPS `~/.claude/CLAUDE.md`: add the same 3-line pointer — next VPS session, or a
+   TODO-Manual card if none is planned.
+7. Record the rule's existence in gorefer `COORDINATION.md` (one STATUS line) so the
    Engineer/DA channel knows routing changed.
 
 ## Risks / honest limits
