@@ -191,6 +191,29 @@ pick after evidence; a wrong expensive pick is never detected.
    missing" (live misfire T-038, 2026-08-01). Pass THIS machine's GWD path.
    (prompt file at `GWD\heartbeats\<id>.prompt.txt` first). The wrapper writes
    `<id>.hb` (PID + tick, ~60s) and the result JSON.
+8b. **ARM A WATCHER IN THE SAME TURN AS THE LAUNCH (fix #13, 2026-08-08 — owner-reported).**
+   A worker launched **detached** (PowerShell `Start-Process`, `nohup`, anything the harness holds
+   no handle on) emits **NO completion notification** — nothing tells the dispatcher it died. In
+   the SAME turn as the dispatch, arm a `Monitor` until-loop (or a `ScheduleWakeup` tick sized to
+   the expected run) that breaks on **every terminal state, not just success**: result JSON
+   written, `.hb` reading `EXITED`, or heartbeat older than
+   `settings.heartbeat_stale_after_seconds`. Silence is not success — a filter that only matches
+   the happy path is indistinguishable from a crash.
+   **Live incident:** 2026-08-08 T-056 — relaunched detached to survive shell reaping (the known
+   background-Bash trap), hit its turn cap 9 minutes later, and the failure sat **unnoticed for
+   35 minutes** until the owner asked "everything done?". Recovery must never wait on the owner.
+   The two traps are a pair: background Bash gets reaped and kills its child; detached survives
+   but goes dark. Use detached **AND** a watcher, never one alone.
+
+8c. **BUDGET FROM TASK SHAPE, NOT TIER DEFAULT (fix #14, same incident).** `max_turns` is set at
+   intake from what the task must actually DO, not from `worker_defaults`. Any contract whose DoD
+   includes running a full test suite, rebuilding assets, writing docs AND driving a PR to merge
+   is a **≥70-turn** task however small its diff — the PR/CI/merge tail alone costs 10-15 turns.
+   T-056 was a ~40-line fix budgeted at 40 turns; it wrote correct code and died one turn short of
+   running the suite. On a turn-cap death, RESUME INTO THE SAME WORKTREE with a raised budget
+   (the prompt must name the branch, the uncommitted files, and forbid restarting from scratch) —
+   never relaunch from origin/main and redo finished work.
+
 9. **Reconcile (keeper duty, every tick):** for each `claimed` contract read its `.hb` —
    fresh tick + live PID → leave alone (slow ≠ dead); `EXITED` → route to CHECK; stale (> 
    `settings.heartbeat_stale_after_seconds`) or dead PID → kill remnant, append status_log,
