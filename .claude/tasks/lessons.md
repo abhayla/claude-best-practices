@@ -909,3 +909,19 @@ Wati sessions use a cheaper driver.
 - **Detect-only monitors never auto-fix.** The alert path was Notifier→owner phone with no fleet-inbox route, no playbook, no debounced escalation. Pattern now live: app publishes a public health JSON (consecutive_p1_days) → fleet break-detect polls it → episode-keyed P1 card with a bounded playbook at ≥2 days. Reuse for other apps via GWD settings.health_endpoints.
 - **Encode the publisher's calendar, not just an age threshold.** Gov sources that skip weekends (PPAC) make every Monday "3 days stale" — a fixed >2d threshold false-alarms weekly. Freshness thresholds must model the upstream publishing calendar, and fixed-time scrapes racing a publisher need a conditional retry (systemd ExecCondition guard = clean skip semantics).
 - **Retirement is a config flip, not code deletion.** Dead sources formalized via enabled:false + ADR with dated evidence + one-line revival path; scraper code kept. An activeScrapers() filter beats deleting scrapers that upstream might resurrect.
+
+## 2026-08-09 — Windows PS 5.1 reads UTF-8-no-BOM .ps1 as ANSI: em-dash in a STRING = parse error
+- Mistake class (fleet, not a correction): notify-owner.ps1 carried a UTF-8 em-dash inside a
+  double-quoted string since Jul 16. PowerShell 7 ran it fine; the keeper's `powershell` (5.1)
+  read the file as ANSI, the dash's 0x94 byte became a curly quote that TERMINATED the string,
+  and the whole script failed to parse — every owner card silently died once 5.1 became a caller.
+- Rule: bus/fleet .ps1 files keep STRINGS pure ASCII (comments may carry unicode). Need a
+  unicode char in a string/regex → build it with `[char]0xNNNN`. Parse-gate new/edited .ps1 via
+  `[System.Management.Automation.PSParser]::Tokenize` under Windows PowerShell 5.1 before push.
+- Same incident, second lesson: a self-gating job must NOT stamp its interval marker on FAILURE
+  (feature-sweep stamped 6d before the success guard → one transient failure silently cost the
+  owner a week's card). Stamp-for-storm-protection is fine, but a failed run backdates the stamp
+  to retry on the next natural window (e.g. next day), never the full interval.
+- Third: heartbeats are MACHINE-LOCAL (gitignored) — a keeper must never death-classify a
+  contract claimed by another machine (T-060 double-dispatch). Death requires a LOCAL dispatch
+  artifact; foreign claims wait out wall_clock_hours (SKILL.md reconcile updated, PR #510).
