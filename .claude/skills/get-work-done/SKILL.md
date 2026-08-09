@@ -1,9 +1,9 @@
 ---
 name: get-work-done
-description: Central work dispatcher (the "mother hub" front door). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, asks ALL questions in one upfront batch (including approvals), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
+description: Central work dispatcher (the "mother hub" front door). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session only grills/contracts/queues/dispatches and NEVER executes work inline, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
 ---
 
-# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.3 — routing-gap hardening 2026-07-27)
+# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.4 — always-available intake + 95%-gate 2026-08-09)
 
 State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\VibeCoding\GetWorkDone\`,
 fleet home `C:\Abhay\GetWorkDone` on the Windows VPS (**GWD** below = whichever this machine uses).
@@ -16,9 +16,10 @@ reconciliation, full `cancel`, and a daily dispatch ceiling. Pings + VPS pools =
 | Invocation | Mode |
 |---|---|
 | `/get-work-done <task text …>` | INTAKE (steps 1–7) |
+| `/get-work-done intake` | INTAKE-ONLY standing mode (owner directive 2026-08-09): loop — take the owner's next task, run steps 1–6 (grill → contract → queue → dispatch), then return to "ready for your next task" IMMEDIATELY. NEVER executes a task inline (trivial included — dispatch on haiku instead); STEP 7 check/report arrives via the armed watcher, between intakes. The owner is never blocked from handing over work |
 | `/get-work-done status` | STATUS: render fleet state from `GWD\queue\` + `GWD\heartbeats\` + LEDGER tail |
 | `/get-work-done cancel <T-id>` | CANCEL (Phase 2, full): read `GWD\heartbeats\<id>.hb` → kill that PID tree; rename contract to `<id>.cancelled.md` with reason; `gh pr close --delete-branch` any PR it opened; ledger a cancelled line. `cancel all` = every claimed task |
-| `/get-work-done sweep` | SWEEP: promote/reject `GWD\inbox\` items per the P17 authorization table, then run INTAKE steps 4–7 on promoted items |
+| `/get-work-done sweep` | SWEEP: promote/reject `GWD\inbox\` items per the P17 authorization table, then run INTAKE steps 4–7 on promoted items; then claim + dispatch (steps 6.1–6.8) any unclaimed `*.queued.md` a dead/interrupted session left behind — queued work must never sit undispatched (always-available guarantee, 2026-08-09) |
 
 ## STEP 1 — INTAKE: parse the ask
 
@@ -44,7 +45,9 @@ session runs on Fable/Mythos, do NOT execute the task inline — the cheapest wo
 the priciest model (plan risk #4). Dispatch it as a normal contract on haiku/sonnet instead
 (the contract ceremony costs less than Fable executing the edit). Everything else → full
 contract. A "trivial" task that turns deep mid-flight STOPS and re-enters here as a full
-contract — it never limps on.
+contract — it never limps on. **Intake-mode exception (2026-08-09):** in `/get-work-done intake`
+mode NOTHING executes inline — even a trivial task is contracted + dispatched (haiku), because
+the intake session's one job is staying free for the owner's next task.
 
 ## STEP 4 — CLARIFY: one batch, everything, while the owner is present
 
@@ -61,8 +64,14 @@ which-source intent. If in doubt whether an unknown is material: it is → resol
 FAIL AT INTAKE, NOT AT MIDNIGHT (locked principle): run every abort-capable check NOW —
 registry/remote identity (done in scout), branch protection + secret-scan gate on the target
 (P4 audit re-check via `gh api`), needed credentials/tools present, deploy tier per the table
-below. Then ask ALL resulting questions in ONE batch of numbered option cards (recommended
-option FIRST with a one-line why; single/multi-select stated). Include approval-class items:
+below. Then resolve the genuine unknowns via the owner's **95%-confidence gate** (global
+CLAUDE.md standing rule 2026-08-07; re-ratified for fleet intake 2026-08-09 — supersedes the
+old one-batch format): do NOT queue or dispatch a task below >95% confidence of WHAT is being
+asked. Ask **ONE question per turn**, opening with `*Sync-check:*` (grill-me style), each with
+a **recommended answer FIRST + a one-line justification**; keep going until confidence exceeds
+95%. Approval-class items (deploy tier below) are asked the same way, as their own question.
+The fail-at-intake principle is unchanged — every unknown is still resolved while the owner is
+present, only the question FORMAT changed (serialized, not batched):
 
 | Deploy situation | Tier |
 |---|---|
@@ -90,7 +99,7 @@ fields and write to `GWD\queue\T-<nnn>-<slug>.queued.md`:
 repo: <registry key>            # path + remote resolved from settings.json at dispatch
 model: haiku|sonnet|opus        # + MANDATORY one-line rationale on this line (lint-enforced)
 deliverable: code|deploy|content|claude-resource|data   # lint-enforced (fix V2 2026-07-27) — selects the checker procedure
-priority: P1|P2|P3
+priority: P1|P2|P3               # dispatcher-assigned AUTONOMOUSLY (owner 2026-08-09): P1 prod-broken/blocking/owner-says-urgent, P2 normal feature/fix, P3 cleanup/nice-to-have — never ask the owner to rank
 deploy_tier: none|auto|hold-approved|hold-denied
 approvals: [<granted at intake>]
 budget: {max_turns: <settings.worker_defaults.max_turns_by_tier[model], fallback max_turns>, wall_clock_hours: 4}
@@ -178,7 +187,12 @@ pick after evidence; a wrong expensive pick is never detected.
 7. **Parallel lanes (Phase 2, P6/P12):** dispatch up to `settings.soft_concurrency_cap`
    workers concurrently — SAME-repo tasks always serialize; different repos run in parallel.
    Priority P1 > P2 > P3; a P1 is ALWAYS admitted even at the cap. Exceeding the soft cap is
-   allowed only for mechanical, independent tasks. Before each dispatch check the DAILY
+   allowed only for mechanical, independent tasks. **Reprioritization (owner 2026-08-09):**
+   when a NEW task arrives, the dispatcher re-judges priority across the whole QUEUE on its
+   own — a more urgent task is queued ahead (edit the contracts' `priority:` fields; same-repo
+   serialization still holds). REORDER ONLY: a running worker is NEVER preempted or killed for
+   priority (cancel stays owner-only); urgency is served by P1 always-admitted, not by killing
+   in-flight work. Before each dispatch check the DAILY
    CEILINGS (both, fix #10 2026-07-27): (a) dispatches today >= `settings.max_dispatches_per_day`,
    OR (b) the keeper's failures log (`GWD\heartbeats\keeper-tick-failures.log`) shows a
    CEILING-EXCEEDED line dated today (written by `cost-rollup.py --check-ceiling` against the
@@ -281,8 +295,15 @@ Litmus test before saving: "would the target project's team want this in their r
   (calculatekaro=`calculator`; OFO shares algochanakya's remote — never dispatch into OFO).
 - MUST run every abort-capable check at INTAKE while the owner is present; runtime re-checks
   are last-line guards, never first detection.
-- MUST ask all questions in ONE upfront batch of numbered option cards (recommended first);
-  MUST NOT ask anything answerable from GLOBAL.md / the repo / the registry.
+- MUST grill at intake to >95% confidence of WHAT is asked (owner standing rule): ONE
+  question per turn, `*Sync-check:*` opener, recommended answer + one-line justification on
+  each, until the gate passes — no queueing/dispatch below it. MUST NOT ask anything
+  answerable from GLOBAL.md / the repo / the registry.
+- MUST keep the intake surface always available: in `intake` mode nothing executes inline
+  (contract + dispatch everything, return to ready immediately); SWEEP claims + dispatches
+  any unclaimed `*.queued.md` so queued work never sits.
+- MUST reprioritize by REORDERING the queue only — a running worker is never preempted for
+  priority.
 - MUST branch on `stop_reason` from the worker's JSON — refusal ≠ success; reroute to opus.
 - MUST keep maker ≠ checker: evidence + LEDGER are checker-written only; a worker's
   self-reported pass is never recorded as proof.
