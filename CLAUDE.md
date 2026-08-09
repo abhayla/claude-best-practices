@@ -255,7 +255,7 @@ Invoke via the `/skill-evaluator` skill: `/skill-evaluator full <skill-path>` (m
 
 ## Rules for Claude
 
-> Demoted to on-demand docs (owner-approved 2026-07-12, rule-compliance lint): the docs-cache procedure → `docs/claude-references/README.md` (check the cache before fetching Anthropic docs; save every fetch); product incubation → `docs/governance/product-incubation.md` (read BEFORE placing product code in/near the hub — product code lives in sibling repos).
+> Demoted to on-demand docs (owner-approved 2026-07-12, rule-compliance lint): the docs-cache procedure → `docs/claude-references/README.md` (check the cache before fetching Anthropic docs; save every fetch); product incubation → `docs/governance/product-incubation.md` (read BEFORE placing product code in/near the hub — product code lives in sibling repos); learning-to-gate doctrine → `docs/governance/learning-to-gate-doctrine.md` (read when converting a failure-learning into a fix: gate-with-self-test where deterministic, recurrence ratchet otherwise; salvaged via PR #501, kept doc-not-rule by the lean-rules gate).
 
 Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when editing matching files. Rule files:
 
