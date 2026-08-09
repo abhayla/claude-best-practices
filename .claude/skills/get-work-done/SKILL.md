@@ -231,7 +231,14 @@ pick after evidence; a wrong expensive pick is never detected.
 9. **Reconcile (keeper duty, every tick):** for each `claimed` contract read its `.hb` —
    fresh tick + live PID → leave alone (slow ≠ dead); `EXITED` → route to CHECK; stale (> 
    `settings.heartbeat_stale_after_seconds`) or dead PID → kill remnant, append status_log,
-   re-queue ONCE; a SECOND death on the same task → park + owner card. Also run the JANITOR
+   re-queue ONCE; a SECOND death on the same task → park + owner card.
+   **FOREIGN-MACHINE CLAIMS ARE NOT DEAD (live defect 2026-08-09, T-060 double-dispatch):**
+   heartbeats are machine-local (gitignored), so a contract claimed by ANOTHER machine's
+   session has NO local `.hb` BY DESIGN. Before treating a claimed contract as dead, require
+   a local dispatch artifact (`.hb` or `.prompt.txt`) proving it was launched FROM THIS
+   machine. A claim with no local artifact is FOREIGN: leave it alone until the contract's
+   `budget.wall_clock_hours` has elapsed since the claim rename (bus git log dates it), and
+   even then re-queue only with a status_log note naming the foreign session id. Also run the JANITOR
    here (workspaces idle past retention, clean-only delete, dirty → escalate).
    **Turn-cap AUTO-RESUME (owner-approved 2026-08-09):** a result JSON with subtype
    `error_max_turns` is NOT routed to CHECK and NOT treated as a death — AUTO-RESUME once:
