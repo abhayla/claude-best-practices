@@ -3,7 +3,7 @@ name: get-work-done
 description: Central work dispatcher (the "mother hub" front door). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session only grills/contracts/queues/dispatches and NEVER executes work inline, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
 ---
 
-# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.5 — terminal-state cards + auto-resume + parked digest 2026-08-09)
+# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.7 — origin-session affinity + dedup gate + on-screen status, cards fallback-only 2026-08-10)
 
 State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\VibeCoding\GetWorkDone\`,
 fleet home `C:\Abhay\GetWorkDone` on the Windows VPS (**GWD** below = whichever this machine uses).
