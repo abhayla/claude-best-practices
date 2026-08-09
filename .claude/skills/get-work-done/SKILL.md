@@ -3,7 +3,7 @@ name: get-work-done
 description: Central work dispatcher (the "mother hub" front door). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session only grills/contracts/queues/dispatches and NEVER executes work inline, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
 ---
 
-# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.4 — always-available intake + 95%-gate 2026-08-09)
+# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.5 — terminal-state cards + auto-resume + parked digest 2026-08-09)
 
 State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\VibeCoding\GetWorkDone\`,
 fleet home `C:\Abhay\GetWorkDone` on the Windows VPS (**GWD** below = whichever this machine uses).
@@ -233,6 +233,13 @@ pick after evidence; a wrong expensive pick is never detected.
    `settings.heartbeat_stale_after_seconds`) or dead PID → kill remnant, append status_log,
    re-queue ONCE; a SECOND death on the same task → park + owner card. Also run the JANITOR
    here (workspaces idle past retention, clean-only delete, dirty → escalate).
+   **Turn-cap AUTO-RESUME (owner-approved 2026-08-09):** a result JSON with subtype
+   `error_max_turns` is NOT routed to CHECK and NOT treated as a death — AUTO-RESUME once:
+   (a) edit the contract's `budget.max_turns` to min(2x current, 200) with a one-line note,
+   (b) append the resume to `status_log`, (c) relaunch INTO THE SAME WORKTREE with a prompt
+   that names the branch + the uncommitted files and FORBIDS restarting from scratch (8c).
+   ONE auto-resume per task, ever — a second cap death parks with an owner card. (T-056
+   would have self-healed instead of sitting dead 35 min.)
 
 ## STEP 7 — CHECK + REPORT: maker ≠ checker (P5)
 
@@ -279,6 +286,21 @@ outcome, PR link, evidence path, cost tier used; plus anything parked and why. A
 task's shape signature to `GWD\PATTERNS-SEEN.md` (3rd occurrence → file a PROPOSED codify
 card, P20).
 
+**TERMINAL-STATE CARDS (owner-approved 2026-08-09):** every task sends the owner ONE
+WhatsApp card at its terminal state via `GWD\notify-owner.ps1` — DONE (P3: outcome + PR
+link + tier) / PARKED or FAILED (P2: reason). Silence is never success: the owner must
+never have to ask "everything done?" (T-056 sat dead 35 min because no card fired).
+Delivery trap on a NON-VPS machine: `notify-owner.ps1` only writes the ping file to the
+local bus `pings\` outbox — the Hostinger relay reads the BUS REPO, so after writing the
+card you MUST commit+push the bus or the card never delivers (a written-but-unpushed ping
+is the detect-then-discard defect class).
+
+**PARKED DIGEST (owner-approved 2026-08-09):** parked must never mean forgotten. The
+deterministic weekly `GWD\parked-digest.ps1` (keeper-tick step, self-gated like the
+feature sweep) cards the owner every `*.parked.md` with age + reason. The owner replies
+`<T-id> retry` (SWEEP re-queues at the same tier) or `<T-id> drop` (SWEEP renames to
+`<T-id>.dropped.md`); the sweep processes these replies like any owner answer.
+
 ## ARTIFACT PLACEMENT (rule 2026-07-18 — owner question)
 Where a created artifact lives is determined by WHAT it is, not where the fleet runs:
 - **Project-SPECIFIC artifact** (a tool/script/config for ONE app — e.g. an IPODhan audit tool) → lands
@@ -304,6 +326,10 @@ Litmus test before saving: "would the target project's team want this in their r
   any unclaimed `*.queued.md` so queued work never sits.
 - MUST reprioritize by REORDERING the queue only — a running worker is never preempted for
   priority.
+- MUST send a terminal-state card (DONE/PARKED/FAILED) for every task — and on a non-VPS
+  machine MUST push the bus after writing the ping or the card never delivers.
+- MUST auto-resume an `error_max_turns` death exactly ONCE (doubled budget, same worktree,
+  no restart-from-scratch); a second cap death parks with an owner card.
 - MUST branch on `stop_reason` from the worker's JSON — refusal ≠ success; reroute to opus.
 - MUST keep maker ≠ checker: evidence + LEDGER are checker-written only; a worker's
   self-reported pass is never recorded as proof.
