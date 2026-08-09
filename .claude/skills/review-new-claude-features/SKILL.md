@@ -29,6 +29,13 @@ costs only the usage of the session you are already in — no scheduled cloud ag
 > **Cost contract (load-bearing):** this skill MUST NOT create a scheduled cloud routine,
 > call any billed/`ultra` feature, or spend money. It runs in-session only. The paid
 > scheduled-routine version is a separate owner decision (issue #153) — never auto-enact it.
+>
+> **Owner-approved standing invocation (2026-08-09):** the GetWorkDone keeper runs this skill
+> WEEKLY, headless, on the VPS (`GWD\feature-adoption-sweep.ps1`, self-gated marker + IST
+> delivery window; verdict card delivered via `notify-owner.ps1`; baseline advanced in
+> `heartbeats\feature-sweep-baseline.txt`, default 2.1.226). This is plan-usage `claude -p` on
+> owned hardware — NOT the billed cloud routine #153 gated on — and satisfies the contract:
+> the OWNER scheduled it; the skill still never schedules itself.
 
 **Arguments:** `$ARGUMENTS` — default is `--dry-run` (report only; file nothing).
 
