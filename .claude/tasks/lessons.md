@@ -903,3 +903,17 @@ Wati sessions use a cheaper driver.
 - **Detect-only monitors never auto-fix.** The alert path was Notifier→owner phone with no fleet-inbox route, no playbook, no debounced escalation. Pattern now live: app publishes a public health JSON (consecutive_p1_days) → fleet break-detect polls it → episode-keyed P1 card with a bounded playbook at ≥2 days. Reuse for other apps via GWD settings.health_endpoints.
 - **Encode the publisher's calendar, not just an age threshold.** Gov sources that skip weekends (PPAC) make every Monday "3 days stale" — a fixed >2d threshold false-alarms weekly. Freshness thresholds must model the upstream publishing calendar, and fixed-time scrapes racing a publisher need a conditional retry (systemd ExecCondition guard = clean skip semantics).
 - **Retirement is a config flip, not code deletion.** Dead sources formalized via enabled:false + ADR with dated evidence + one-line revival path; scraper code kept. An activeScrapers() filter beats deleting scrapers that upstream might resurrect.
+
+## 2026-08-10 — Owner correction #2: skipped the 95%-gate while implementing the owner's fleet requirements
+- Mistake: owner stated requirements conversationally ("updates only in that session, right?"
+  + "how do you dedup?"); I implemented v0.6 immediately, resolving at least one MATERIAL fork
+  by assumption (do terminal Telegram cards still fire for session-origin tasks, or does
+  "only in that session" suppress them?). The exact misapplication the skill's own STEP 4
+  documents (decide-don't-ask is for execution details, never intent) — written by me, then
+  violated by me within the hour.
+- Rule: when the owner STATES REQUIREMENTS (even phrased as questions/complaints), the
+  95%-gate applies BEFORE building: enumerate the forks in what they asked; any fork that
+  changes what the OWNER EXPERIENCES (channels, reports, approvals, visible behavior) is
+  intent-level — grill it one question per turn, recommendation + one-line justification,
+  grill-me style. "The fix is reversible" never waives the gate — the gate is about WHAT is
+  being asked, not the cost of redoing it.
