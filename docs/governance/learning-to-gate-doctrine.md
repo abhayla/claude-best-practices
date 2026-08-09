@@ -1,6 +1,9 @@
-# Scope: global
-
 # Learning → Gate, not Prose (root-cause doctrine)
+
+> On-demand governance doc (demoted from an auto-loaded rule at PR #501 landing, 2026-08-09:
+> the hub's lean-rules gate `test_hub_rules_are_approved_set` correctly resisted a new global
+> rule; the doctrine itself argues gates > prose — a doc + the recurrence ratchet is its own
+> correct form). Read when converting a failure-learning into a fix.
 
 version: "1.0.0"
 

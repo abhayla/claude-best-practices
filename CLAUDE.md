@@ -255,13 +255,12 @@ Invoke via the `/skill-evaluator` skill: `/skill-evaluator full <skill-path>` (m
 
 ## Rules for Claude
 
-> Demoted to on-demand docs (owner-approved 2026-07-12, rule-compliance lint): the docs-cache procedure → `docs/claude-references/README.md` (check the cache before fetching Anthropic docs; save every fetch); product incubation → `docs/governance/product-incubation.md` (read BEFORE placing product code in/near the hub — product code lives in sibling repos).
+> Demoted to on-demand docs (owner-approved 2026-07-12, rule-compliance lint): the docs-cache procedure → `docs/claude-references/README.md` (check the cache before fetching Anthropic docs; save every fetch); product incubation → `docs/governance/product-incubation.md` (read BEFORE placing product code in/near the hub — product code lives in sibling repos); learning-to-gate doctrine → `docs/governance/learning-to-gate-doctrine.md` (read when converting a failure-learning into a fix: gate-with-self-test where deterministic, recurrence ratchet otherwise; salvaged via PR #501, kept doc-not-rule by the lean-rules gate).
 
 Auto-loaded from `.claude/rules/` — global rules (`# Scope: global`) load always; path-scoped rules (`globs:` frontmatter) load only when editing matching files. Rule files:
 
 - `.claude/rules/claude-behavior.md` — task approach, self-improvement, git hygiene, code quality, scope discipline
 - `.claude/rules/context-management.md` — progressive disclosure, scratchpad usage, subagent delegation, compaction survival
-- `.claude/rules/learning-to-gate-doctrine.md` — every failure-learning becomes a machine-enforced gate where possible (5-whys to the class, gate-with-self-test, recurrence ratchet); prose-only fixes for gateable classes are defects
 - `.claude/rules/model-routing.md` — cheapest sufficient model per dispatch (haiku/sonnet/opus tiers, inherit Fable only for frontier judgment), preemptive security-category routing to opus, refusal→fallback playbook, per-pass effort dial, session-level routing
 - `.claude/rules/prompt-auto-enhance.md` — Tier 1/2 context gathering, grade pipeline, clarification gate, resource CRUD detection
 - `.claude/rules/verify-before-suggest-do-before-delegate.md` — live-verify actionable recommendations before presenting (evidence: source+date+version); agent is default executor, human steps carry a named blocker
