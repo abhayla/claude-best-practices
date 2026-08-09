@@ -221,6 +221,11 @@ pick after evidence; a wrong expensive pick is never detected.
    missing" (live misfire T-038, 2026-08-01). Pass THIS machine's GWD path.
    (prompt file at `GWD\heartbeats\<id>.prompt.txt` first). The wrapper writes
    `<id>.hb` (PID + tick, ~60s) and the result JSON.
+8a-bis. **ON-SCREEN QUEUE ACK (owner requirement 2026-08-10):** the moment a task is queued or
+   dispatched, RENDER a visible confirmation in the origin session's chat — T-id, target repo,
+   model tier, priority, budget, one-line DoD summary. The owner must SEE on screen that the
+   task entered the fleet, in the same session where they gave it — a silent queue insert is a
+   defect.
 8b. **ARM A WATCHER IN THE SAME TURN AS THE LAUNCH (fix #13, 2026-08-08 — owner-reported).**
    A worker launched **detached** (PowerShell `Start-Process`, `nohup`, anything the harness holds
    no handle on) emits **NO completion notification** — nothing tells the dispatcher it died. In
@@ -234,6 +239,11 @@ pick after evidence; a wrong expensive pick is never detected.
    35 minutes** until the owner asked "everything done?". Recovery must never wait on the owner.
    The two traps are a pair: background Bash gets reaped and kills its child; detached survives
    but goes dark. Use detached **AND** a watcher, never one alone.
+   **ON-SCREEN COMPLETION STATUS (owner requirement 2026-08-10):** when the watcher fires on a
+   terminal state, the origin session AUTOMATICALLY renders the task's status card on screen in
+   that session's chat — outcome (DONE/PARKED/FAILED), PR link, checker verdict, evidence path,
+   tier — without the owner having to ask. Queue ack (8a-bis) + this completion render are the
+   PRIMARY owner-facing reporting for session-origin tasks.
 
 8c. **BUDGET FROM TASK SHAPE, NOT TIER DEFAULT (fix #14, same incident).** `max_turns` is set at
    intake from what the task must actually DO, not from `worker_defaults`. Any contract whose DoD
@@ -320,10 +330,15 @@ outcome, PR link, evidence path, cost tier used; plus anything parked and why. A
 task's shape signature to `GWD\PATTERNS-SEEN.md` (3rd occurrence → file a PROPOSED codify
 card, P20).
 
-**TERMINAL-STATE CARDS (owner-approved 2026-08-09):** every task sends the owner ONE
-WhatsApp card at its terminal state via `GWD\notify-owner.ps1` — DONE (P3: outcome + PR
-link + tier) / PARKED or FAILED (P2: reason). Silence is never success: the owner must
-never have to ask "everything done?" (T-056 sat dead 35 min because no card fired).
+**TERMINAL-STATE CARDS — FALLBACK-ONLY for session-origin tasks (owner pick 2026-08-10,
+supersedes the 2026-08-09 always-card rule):** for a task with a session `origin:`, the
+PRIMARY report is the origin session's on-screen render (8a-bis + 8b watcher). The
+Telegram/WhatsApp card via `GWD\notify-owner.ps1` fires ONLY when the origin session is
+dead/closed at terminal time (keeper/sweep detects no live origin — the card then opens
+with "origin session gone"). Tasks with NO session origin (inbox promotions, keeper break-fix)
+keep the card as their primary channel — DONE (P3→info: outcome + PR link + tier) / PARKED or
+FAILED (P2: reason). The invariant is unchanged: silence is never success; the owner must
+never have to ask "everything done?" (T-056 sat dead 35 min because nothing fired).
 Delivery trap on a NON-VPS machine: `notify-owner.ps1` only writes the ping file to the
 local bus `pings\` outbox — the Hostinger relay reads the BUS REPO, so after writing the
 card you MUST commit+push the bus or the card never delivers (a written-but-unpushed ping
@@ -366,8 +381,12 @@ Litmus test before saving: "would the target project's team want this in their r
   any unclaimed `*.queued.md` so queued work never sits.
 - MUST reprioritize by REORDERING the queue only — a running worker is never preempted for
   priority.
-- MUST send a terminal-state card (DONE/PARKED/FAILED) for every task — and on a non-VPS
-  machine MUST push the bus after writing the ping or the card never delivers.
+- MUST show the owner on-screen, in the origin session: a queue ack at dispatch AND the
+  terminal status card when the watcher fires (8a-bis/8b) — the owner never has to ask.
+- MUST send a terminal-state card (DONE/PARKED/FAILED) as FALLBACK for session-origin tasks
+  (only when the origin session is dead at terminal time, labeled "origin session gone") and
+  as PRIMARY for origin-less tasks — and on a non-VPS machine MUST push the bus after writing
+  the ping or the card never delivers.
 - MUST auto-resume an `error_max_turns` death exactly ONCE (doubled budget, same worktree,
   no restart-from-scratch); a second cap death parks with an owner card.
 - MUST branch on `stop_reason` from the worker's JSON — refusal ≠ success; reroute to opus.
