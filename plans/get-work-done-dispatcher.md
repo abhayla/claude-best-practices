@@ -189,6 +189,36 @@ attestation without artifacts is treated as no verdict. Maker≠checker unchange
 agent, worker never writes evidence); not foolproof by nature — bounded by auditable raw
 evidence + CI re-gating code at merge + trust-score calibration.
 
+## v0.6/v0.7 owner decision record (2026-08-10)
+
+Owner-stated requirements after 2026-08-09/10 cross-session interference (two sessions stepping
+on the same task's status). Approved 02:28–02:36 IST same day; landed same-day as hub PRs #513
+(v0.6) and #515 (v0.7), both merged into `.claude/skills/get-work-done/SKILL.md`.
+
+1. **Origin-session reporting affinity (#513).** Contracts now carry `origin:` (the session that
+   took the task). Any OTHER session is read-only toward that task — it may observe but not
+   report/update it. Labeled exception: keeper rescue of a provably-dead origin session (the
+   keeper's takeover is recorded as a rescue, never a silent reassignment).
+2. **Mandatory pre-queue dedup gate (#513).** Before a new task is queued, scan ALL open
+   contracts for the target repo: duplicate → converge onto the existing T-id (no new task
+   created); overlap → link via `related:`; obsolete → rename/supersede the stale contract.
+   Same-repo file-level serialization (already in the architecture) is a separate guard — this
+   gate is about task-identity collision, not file collision.
+3. **On-screen queue ack + automatic terminal render (#515, 8a-bis/8b).** The origin session gets
+   a visible on-screen acknowledgment when its task is queued, and the terminal status (done /
+   failed / parked) renders automatically in that SAME session when the task finishes — no
+   separate lookup needed.
+4. **Terminal cards demoted to fallback-only for session-origin tasks (#515).** Notifier terminal
+   cards (WhatsApp/Telegram) fire for a session-origin task ONLY when the origin session is
+   confirmed dead at terminal time — labeled "origin session gone" so it's clear why a card
+   appeared. Origin-less tasks (filed by non-interactive producers — break-detect, Cowork, etc.)
+   keep cards as their PRIMARY channel, unchanged.
+
+Net effect: the reporting model splits by producer — a live interactive session now gets its
+answer on its own screen instead of a card, while every other producer path (headless, dead
+origin, no origin) still gets a card. This closes the 2026-08-09/10 defect class without
+weakening the fallback safety net.
+
 ## Pre-mortem (top residual risks)
 1. **Headless permission walls** in downstream repos — Phase 1 dry-run exists to hit this first; per-repo `settings.local.json` allowlists kept minimal (over-broad allowlists are their own loophole).
 2. **Dispatcher context rot** — all state on disk; any session resumes the fleet from `GetWorkDone\queue\`.
