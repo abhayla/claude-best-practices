@@ -95,8 +95,24 @@ Nothing answerable from GLOBAL.md, the repo, or the registry may be asked.
 Invoke `/goal-creator` with the task + answers; extend its contract with the dispatcher
 fields and write to `GWD\queue\T-<nnn>-<slug>.queued.md`:
 
+**PRE-QUEUE DEDUP GATE (owner requirement 2026-08-10 — MANDATORY, runs before writing the
+contract):** read EVERY open contract in `GWD\queue\` (`*.queued.md`, `*.claimed.*.md`,
+`*.parked.md`) for the same target repo and compare scope (goal, files/area the task will
+touch). Three outcomes, recorded in the new contract or intake reply:
+- **Duplicate** (same outcome already queued/claimed) → do NOT queue; tell the owner the
+  existing T-id instead. Two sessions asking for the same thing must converge on ONE task.
+- **Overlapping/related** (different outcome, shared area) → queue it with a
+  `related: [T-xxx]` line; same-repo serialization already prevents file interference, the
+  link makes the checker aware of the sibling.
+- **Supersedes** (new task makes an open one obsolete) → rename the old contract
+  `.superseded-by-T-<new>.md` with a one-line note; never leave both live.
+The queue is the SHARED cross-session truth — a session must never queue from only its own
+memory of what it dispatched.
+
 ```yaml
 repo: <registry key>            # path + remote resolved from settings.json at dispatch
+origin: <session-id>@<machine> <project-dir-name>   # WHO took this task from the owner (owner requirement 2026-08-10): in-session progress/result reporting belongs to THIS session ONLY
+related: []                      # T-ids sharing scope in the same repo (dedup gate above)
 model: haiku|sonnet|opus        # + MANDATORY one-line rationale on this line (lint-enforced)
 deliverable: code|deploy|content|claude-resource|data   # lint-enforced (fix V2 2026-07-27) — selects the checker procedure
 priority: P1|P2|P3               # dispatcher-assigned AUTONOMOUSLY (owner 2026-08-09): P1 prod-broken/blocking/owner-says-urgent, P2 normal feature/fix, P3 cleanup/nice-to-have — never ask the owner to rank
@@ -243,6 +259,17 @@ pick after evidence; a wrong expensive pick is never detected.
 
 ## STEP 7 — CHECK + REPORT: maker ≠ checker (P5)
 
+**ORIGIN-SESSION REPORTING AFFINITY (owner requirement 2026-08-10):** the contract's `origin:`
+session owns ALL in-session progress/result reporting for that task — the owner hears about a
+task in the session where they gave it, nowhere else. Every other session treats foreign-origin
+tasks as read-only context: `status` mode may LIST them, but MUST NOT check, report, retry,
+park, or otherwise act on them. Exactly two exceptions: (a) the KEEPER/SWEEP rescuing a task
+whose origin session is provably dead (reconcile rules, STEP 6.9) — the rescue is then reported
+via the owner card channel with a "rescued from <origin>" note, never as another session's own
+work; (b) an explicit owner ask in another session ("what happened to T-061?") — answer it, but
+change nothing. Cross-session meddling with a live origin's tasks is the 2026-08-09/10
+interference class — a defect, not initiative.
+
 **AUDIT-GAP FIXES 2026-07-18 (from the T-014 self-review):**
 - **Worker cwd:** launch the worker in the TARGET repo's dir (or a neutral working dir like the app's
   deploy path) — NEVER the hub repo dir. Running in the hub made a worker inherit hub governance and
@@ -317,6 +344,12 @@ Litmus test before saving: "would the target project's team want this in their r
   (calculatekaro=`calculator`; OFO shares algochanakya's remote — never dispatch into OFO).
 - MUST run every abort-capable check at INTAKE while the owner is present; runtime re-checks
   are last-line guards, never first detection.
+- MUST run the pre-queue dedup gate (scan ALL open contracts for the target repo) before
+  queueing; duplicates converge on the existing T-id, overlaps carry `related:`, supersedes
+  rename the old contract — two sessions must never independently queue the same work.
+- MUST honor origin-session reporting affinity: every contract carries `origin:`; only the
+  origin session (or a keeper rescue of a provably-dead origin, labeled as such) reports or
+  acts on a task — all other sessions are read-only toward it.
 - MUST grill at intake to >95% confidence of WHAT is asked (owner standing rule): ONE
   question per turn, `*Sync-check:*` opener, recommended answer + one-line justification on
   each, until the gate passes — no queueing/dispatch below it. MUST NOT ask anything
