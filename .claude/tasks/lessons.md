@@ -919,3 +919,15 @@ Wati sessions use a cheaper driver.
 - Third: heartbeats are MACHINE-LOCAL (gitignored) — a keeper must never death-classify a
   contract claimed by another machine (T-060 double-dispatch). Death requires a LOCAL dispatch
   artifact; foreign claims wait out wall_clock_hours (SKILL.md reconcile updated, PR #510).
+- Fourth (same 2026-08-09 incident chain, found 20:40): owner cards had TWO more dead layers past
+  the PS5.1 parse bug — (1) Hostinger relay's NOTIFIER_KEY_CLAUDEHUB was EMPTY since Jul 18
+  (every POST 401'd; key recovered from /root/notifier/config.yaml claude-hub.apiKey), and the
+  relay silently skipped non-202 files (detect-then-discard again — now logs failures); (2) the
+  Notifier severity vocabulary is P0|P1|P2|info — the fleet's P3 cards got 400. notify-owner.ps1
+  now maps unknown severities to info at the boundary. Chain lesson: a multi-hop delivery path
+  (script → outbox → bus → relay → gateway → channel) must be probed hop-by-hop at the
+  DESTINATION (Notifier delivery-log.jsonl showed ok:true message_ids = real proof); each hop
+  that "accepts" silently is a separate outage waiting.
+- Fifth: the local bus mirror is SHARED with live worker sessions on this PC — never wrestle a
+  rebase there. Land fixes via a temp clone + cherry-pick; leave the live session's untracked
+  files alone; hard-reset only after verifying local mods are upstream-superseded.
