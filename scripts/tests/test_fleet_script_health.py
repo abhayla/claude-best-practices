@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.check_fleet_script_health import run
+from scripts.check_fleet_script_health import _is_pattern_source, run
 
 CHECKER = Path(__file__).resolve().parents[1] / "check_fleet_script_health.py"
 # The dispatcher lives in the hub, outside the fleet dir, but is contract-lint.py's real caller.
@@ -464,6 +464,210 @@ def test_read_not_feeding_a_loop_is_not_flagged(tmp_path: Path):
     assert not _checks(run(tmp_path), "unchecked-read")
 
 
+# ------------------------------- ps-unchecked-call (HIGH 2026-08-10: notify-owner.ps1's callers)
+
+
+def test_ps_unchecked_script_call_is_flagged(tmp_path: Path):
+    """`& notify-owner.ps1` with no $LASTEXITCODE test reports success for a failed delivery."""
+    (tmp_path / "feature-adoption-sweep.ps1").write_text(
+        '$ErrorActionPreference = "Stop"\n'
+        "Get-Date -Format o | Set-Content -Path $marker -Encoding ascii\n"
+        '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n'
+        'Write-Output "SWEEP-OK"\n'
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    findings = _checks(run(tmp_path), "ps-unchecked-call")
+    assert findings, "gate missed the unchecked PowerShell delegate call"
+    assert "notify-owner.ps1" in findings[0].message
+
+
+def test_ps_call_with_lastexitcode_tested_is_clean(tmp_path: Path):
+    """Testing $LASTEXITCODE right after the call is the fix and must silence the finding."""
+    (tmp_path / "feature-adoption-sweep.ps1").write_text(
+        '$ErrorActionPreference = "Stop"\n'
+        '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n'
+        "if ($LASTEXITCODE -ne 0) {\n"
+        '  Write-Output "DELIVERY FAILED - retry tomorrow"; Set-RetryTomorrow; exit 1\n'
+        "}\n"
+        'Write-Output "SWEEP-OK"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "ps-unchecked-call")
+
+
+def test_unrelated_try_block_does_not_clear_an_unchecked_call(tmp_path: Path):
+    """A try/catch 30 lines away must NOT excuse the delivery call.
+
+    feature-adoption-sweep.ps1 really does wrap its Push-Location/claude -p in a try/finally far
+    above the notify-owner call; a whole-file search for `try {` reported the file clean while the
+    delivery verdict was still discarded. Prose-at-a-distance is not enforcement.
+    """
+    (tmp_path / "sweep.ps1").write_text(
+        '$ErrorActionPreference = "Stop"\n'
+        "Push-Location $HubPath\n"
+        "try {\n"
+        "  Get-Content $promptFile | claude -p --output-format json | Set-Content $resultFile\n"
+        "} finally { Pop-Location }\n"
+        "\n\n\n\n\n"
+        '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n'
+        'Write-Output "SWEEP-OK"\n',
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "ps-unchecked-call"), (
+        "a distant unrelated try/catch must not clear the unchecked-call finding"
+    )
+
+
+def test_ps_output_capturing_call_is_not_flagged(tmp_path: Path):
+    """`$x = & script.ps1` CONSUMES the output — a different, deliberate shape. Precision guard."""
+    (tmp_path / "reader.ps1").write_text(
+        '$result = & (Join-Path $StateRoot "list-things.ps1")\n'
+        'Write-Output $result\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "ps-unchecked-call")
+
+
+def test_ps_exit_code_semantics_are_real_not_theoretical(tmp_path: Path):
+    """Ground truth: $ErrorActionPreference='Stop' really does NOT trap a called script's exit.
+
+    This is the whole premise of the finding — if PowerShell DID throw here, the live scripts
+    would already be safe and the gate would be noise.
+    """
+    if sys.platform != "win32":
+        pytest.skip("PowerShell exit-code semantics probe is Windows-only")
+    child = tmp_path / "child.ps1"
+    child.write_text('Write-Output "child ran"\nexit 3\n', encoding="utf-8")
+    parent = tmp_path / "parent.ps1"
+    parent.write_text(
+        '$ErrorActionPreference = "Stop"\n'
+        f'& "{child}"\n'
+        'Write-Output "PARENT CONTINUED"\n'
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    proc = subprocess.run(
+        ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(parent)],
+        capture_output=True,
+        text=True,
+    )
+    assert "PARENT CONTINUED" in proc.stdout, (
+        "premise broken: PowerShell trapped the child's exit — re-examine the finding"
+    )
+    assert proc.returncode == 0, "the caller reports success despite the child failing"
+
+
+# ----------------------------- offset-before-write (HIGH 2026-08-10: read-answers.ps1, bus-relay)
+
+
+def test_offset_advanced_before_payload_write_is_flagged(tmp_path: Path):
+    """Committing the getUpdates cursor before writing the answers risks unrecoverable loss."""
+    (tmp_path / "read-answers.ps1").write_text(
+        '$resp = Invoke-RestMethod -Uri "https://api.telegram.org/bot$bot/getUpdates?offset=$offset"\n'
+        "foreach ($u in $resp.result) { $maxUpdate = $u.update_id + 1 }\n"
+        "Set-Content -Path $OffsetFile -Value $maxUpdate -Encoding ascii\n"
+        "if ($applied -gt 0) { Set-Content -Path $Questions -Value $q -Encoding utf8 }\n",
+        encoding="utf-8",
+    )
+    findings = _checks(run(tmp_path), "offset-before-write")
+    assert findings, "gate missed the offset-committed-before-payload ordering"
+    assert "commit point" in findings[0].message
+
+
+def test_offset_advanced_after_payload_write_is_clean(tmp_path: Path):
+    """Writing the payload first, then the offset, is the fix and must pass."""
+    (tmp_path / "read-answers.ps1").write_text(
+        '$resp = Invoke-RestMethod -Uri "https://api.telegram.org/bot$bot/getUpdates?offset=$offset"\n'
+        "foreach ($u in $resp.result) { $maxUpdate = $u.update_id + 1 }\n"
+        "if ($applied -gt 0) { Set-Content -Path $Questions -Value $q -Encoding utf8 }\n"
+        "Set-Content -Path $OffsetFile -Value $maxUpdate -Encoding ascii\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "offset-before-write")
+
+
+def test_offset_defect_in_the_python_relay_leg_is_flagged(tmp_path: Path):
+    """bus-relay.sh carries the same ordering in Python — the check must not be PowerShell-only."""
+    (tmp_path / "bus-relay.sh").write_text(
+        "#!/bin/bash\n"
+        'RESP=$(curl -s "https://api.telegram.org/bot$BOT/getUpdates?offset=$OFF")\n'
+        "python3 - \"$RESP\" << 'PYEOF'\n"
+        "for u in d.get('result',[]):\n"
+        "    mx=max(mx,u['update_id']+1)\n"
+        "if mx: open('heartbeats/.tg-offset','w').write(str(mx))\n"
+        "if applied: open(qf,'w').write(q)\n"
+        "PYEOF\n",
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "offset-before-write")
+
+
+def test_non_offset_script_is_not_flagged(tmp_path: Path):
+    """A script with ordinary writes and no update cursor is not this defect — precision guard."""
+    (tmp_path / "writer.ps1").write_text(
+        "Set-Content -Path $LogFile -Value $line\n"
+        "Set-Content -Path $Questions -Value $q\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "offset-before-write")
+
+
+# ------------------------------ unchecked-precondition (HIGH 2026-08-10: worker-wrapper.ps1)
+
+
+def test_unchecked_precondition_call_is_flagged(tmp_path: Path):
+    """A trust step whose failure cannot stop the launch is not a precondition."""
+    (tmp_path / "worker-wrapper.ps1").write_text(
+        '$trustScript = Join-Path $StateRoot "trust-workspace.py"\n'
+        "if (Test-Path $trustScript) {\n"
+        "  python $trustScript $RepoPath\n"
+        "}\n"
+        "$psi = New-Object System.Diagnostics.ProcessStartInfo\n"
+        '$psi.Arguments = "/c claude -p --model $Model --output-format json"\n'
+        "$proc = [System.Diagnostics.Process]::Start($psi)\n",
+        encoding="utf-8",
+    )
+    findings = _checks(run(tmp_path), "unchecked-precondition")
+    assert findings, "gate missed the unchecked launch precondition"
+    assert "LAUNCH PRECONDITION" in findings[0].message
+
+
+def test_checked_precondition_is_clean(tmp_path: Path):
+    """Testing the precondition's exit code and aborting the launch must pass."""
+    (tmp_path / "worker-wrapper.ps1").write_text(
+        '$trustScript = Join-Path $StateRoot "trust-workspace.py"\n'
+        "if (Test-Path $trustScript) {\n"
+        "  python $trustScript $RepoPath\n"
+        "  if ($LASTEXITCODE -ne 0) { Write-Error 'trust failed'; exit 9 }\n"
+        "}\n"
+        "$psi = New-Object System.Diagnostics.ProcessStartInfo\n"
+        "$proc = [System.Diagnostics.Process]::Start($psi)\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-precondition")
+
+
+def test_precondition_named_by_literal_is_also_flagged(tmp_path: Path):
+    """The literal spelling (`python trust-workspace.py`) is covered as well as the variable one."""
+    (tmp_path / "launcher.sh").write_text(
+        "#!/bin/bash\n"
+        "python trust-workspace.py \"$REPO\"\n"
+        "claude -p --output-format json < prompt.txt\n",
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "unchecked-precondition")
+
+
+def test_precondition_without_a_launch_is_not_flagged(tmp_path: Path):
+    """A trust helper in a script that launches nothing is not this defect — precision guard."""
+    (tmp_path / "setup.ps1").write_text(
+        "python trust-workspace.py $RepoPath\n" 'Write-Output "workspace pre-trusted"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-precondition")
+
+
 # --------------------------------------------------- precision: a noisy gate is an ignored gate
 
 
@@ -475,6 +679,27 @@ def test_worker_scratch_checkouts_are_not_scanned(tmp_path: Path):
         '#!/bin/bash\nx=$(python -c "print(1)" 2>/dev/null)\n', encoding="utf-8"
     )
     assert not run(tmp_path), "vendored/worker-scratch files must not be scanned"
+
+
+def test_the_gate_does_not_flag_its_own_pattern_source():
+    """Pointed at scripts/, the checker must not report ITSELF or its fixtures as defective.
+
+    The offset-before-write patterns necessarily contain the very strings they hunt for, and the
+    self-tests plant the defect verbatim — so a naive scan flagged both files. A gate whose first
+    output is two false positives about itself is a gate nobody reads.
+    """
+    # Assert the exclusion RESOLVES to the real files. The first version of this test compared
+    # against Path(__file__) directly, which passed while the checker's derived filename was
+    # wrong (test_check_fleet_script_health.py) — a test that cannot fail on the bug it guards.
+    assert _is_pattern_source(CHECKER), "the checker must exclude itself"
+    assert _is_pattern_source(Path(__file__)), (
+        "the checker must exclude THIS test file by its real name, not a derived guess"
+    )
+    findings = run(CHECKER.parent)
+    noise = [f for f in findings if f.path.resolve() in {CHECKER.resolve(), Path(__file__).resolve()}]
+    assert not noise, "the gate flagged its own pattern source:\n" + "\n".join(
+        f"{f.path.name}:{f.line}: [{f.check}]" for f in noise
+    )
 
 
 def test_unrelated_block_wording_is_not_a_dead_gate(tmp_path: Path):
@@ -547,8 +772,14 @@ def test_cli_missing_path_is_loud(tmp_path: Path):
 # change (out of scope for this hub PR, which delivers the gates); until then they are the known
 # ratchet floor. RULE: this set may only SHRINK. Adding to it is how a gate rots into a to-do list.
 KNOWN_OPEN_FLEET_FINDINGS = {
-    ("cost-rollup.py", "stale-receipt"),
-    ("checkpoint-pr-merge.sh", "unchecked-read"),
+    # T-071 (2026-08-10) — the three HIGHs from docs/fleet-script-audit-2026-08-10.md. Confirmed
+    # live; fixing them is a fleet-repo change, out of scope for this hub PR which delivers gates.
+    ("feature-adoption-sweep.ps1", "ps-unchecked-call"),
+    ("parked-digest.ps1", "ps-unchecked-call"),
+    ("gate-audit.ps1", "ps-unchecked-call"),
+    ("read-answers.ps1", "offset-before-write"),
+    ("bus-relay.sh", "offset-before-write"),
+    ("worker-wrapper.ps1", "unchecked-precondition"),
 }
 
 
@@ -562,8 +793,10 @@ def test_real_fleet_has_no_unknown_silent_failure_findings():
     red the moment they were fixed. Direction matters — a regression test must fail on the
     DEFECT, never on the FIX. T-027 (2026-07-27) added the next two: keeper-tick.cmd's result
     guard now asserts `is_error:false` (not just the JSON shape), and its bus push now tests its
-    own exit code. T-039 (2026-08-03) added stale-receipt + unchecked-read; both are confirmed
-    live and listed above until the fleet repo lands their fixes.
+    own exit code. T-039 (2026-08-03) added stale-receipt + unchecked-read; the fleet repo has
+    since landed BOTH fixes (cost-rollup.py keys on receipt mtime and rewrites superseded rows;
+    checkpoint-pr-merge.sh captures repos_rc and aborts loudly on an empty registry), so T-071
+    removed them from the floor. T-071 (2026-08-10) added the three HIGHs it found.
     """
     fleet = Path("C:/Abhay/GetWorkDone")
     if not fleet.exists():
