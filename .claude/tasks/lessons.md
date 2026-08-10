@@ -925,3 +925,8 @@ Wati sessions use a cheaper driver.
 - Third: heartbeats are MACHINE-LOCAL (gitignored) — a keeper must never death-classify a
   contract claimed by another machine (T-060 double-dispatch). Death requires a LOCAL dispatch
   artifact; foreign claims wait out wall_clock_hours (SKILL.md reconcile updated, PR #510).
+- Sixth (overnight run 2026-08-10): PC suspend froze the session ~03:00-07:40 — background
+  commands, monitors, and pushes silently paused and executed at wake with misleading fresh
+  timestamps. For overnight autonomous work on this PC, treat wall-clock gaps as suspend
+  (check `stat` mtimes vs claimed times) and never assume a monitor was actually watching
+  through the night.
