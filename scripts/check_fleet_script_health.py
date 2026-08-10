@@ -45,6 +45,28 @@ than "read the wrong property", and both were live-reproduced against the runnin
                  still live in checkpoint-pr-merge.sh (which also lacks its siblings' Python PATH
                  hardening, so Task Scheduler's bare PATH is the exact trigger).
 
+The 2026-08-10 audit (docs/fleet-script-audit-2026-08-10.md) added three more. All three are the
+"the verdict was produced and nobody looked" shape, in surfaces the earlier checks did not cover:
+
+  ps-unchecked-call — a PowerShell script invokes ANOTHER script with `&` and never reads
+                 $LASTEXITCODE. `$ErrorActionPreference = "Stop"` does NOT trap a called script's
+                 non-zero exit (verified on-host), so the caller prints its own success line and
+                 exits 0. Live instance: all three notify-owner.ps1 callers — and because the two
+                 weekly ones write their interval marker BEFORE delivering, a failed owner card
+                 costs a whole interval with no retry and no log line.
+  offset-before-write — a cursor/offset that CONSUMES remote state is persisted BEFORE the payload
+                 it consumed is durably written. Telegram's getUpdates permanently discards updates
+                 below a confirmed offset, so if the payload write then fails (Windows file locking
+                 is live on this box — cost-rollup.py carries a retry helper for exactly that) the
+                 owner's answers are unrecoverable, while the script exits 0 reporting "APPLIED n".
+                 Live instances: read-answers.ps1 and bus-relay.sh's relay leg.
+  unchecked-precondition — a script runs a documented LAUNCH PRECONDITION and ignores its exit
+                 code, then launches anyway. Live instance: worker-wrapper.ps1 runs
+                 trust-workspace.py (whose own comment says an untrusted workspace makes headless
+                 `claude -p` hard-block instead of running) without testing it — and is the one
+                 fleet script with no PATH-hardening preamble, so the missing-interpreter trigger
+                 its siblings already fixed twice applies here in full.
+
 Exit 0 = clean; 1 = findings (printed to stdout). Read-only; changes nothing.
 """
 from __future__ import annotations
@@ -156,6 +178,74 @@ UNCHECKED_REGISTRY_READ = re.compile(
 READ_VERDICT_TESTED = r"(\b{var}_rc\b|\brc=\$\?|;\s*\w*rc=\$\?|\[\s*-z\s*\"?\$\{{?{var}\b[^]]*\]\s*(&&|\|\|)?[^\n]*(exit|fail|FATAL|>&2))"
 
 
+# --- ps-unchecked-call: `& script.ps1 ...` whose exit code is never read --------------------------
+# PowerShell's call operator on a .ps1/.py/.sh does NOT throw on a non-zero exit, and
+# $ErrorActionPreference="Stop" does not change that (it governs error RECORDS, not exit codes).
+# Matches `& (Join-Path ...) -Arg` and `& "C:\path\x.ps1"` alike; the invoked name is captured for
+# the message. A `$(...)`/`@(...)` capture is excluded — that form consumes the OUTPUT, a different
+# (and usually deliberate) shape than fire-and-forget delegation.
+# `.\notify-owner.ps1 -Body $b` (no `&`) is the most common PowerShell spelling of this call and has
+# identical exit-code semantics, so both the `&` and the dot-slash forms are matched. A leading
+# `$x =` capture is excluded by requiring the invocation to START the statement.
+PS_AMP_CALL = re.compile(
+    r"^\s*(?:&\s*(?P<target>\(\s*Join-Path[^)]*\)|\"[^\"]+\"|'[^']+'|\$\w+|[A-Za-z]:[\\/][^\s|]+)"
+    r"|(?P<dotslash>\.[\\/][^\s|]+\.ps1))"
+)
+# `.exe` deliberately EXCLUDED: invoking an external binary with `&` and not testing $LASTEXITCODE
+# is ordinary, ubiquitous PowerShell, not the detect-then-discard class. Only a delegate SCRIPT
+# (whose exit code is its verdict) is in scope.
+PS_SCRIPT_TARGET = re.compile(r"[\w.-]+\.(ps1|py|sh|cmd)", re.I)
+# Evidence the verdict IS consumed anywhere in the file: an explicit exit-code test, a try/catch
+# around the invocation, or the caller propagating it.
+PS_EXIT_TESTED = re.compile(r"\$LASTEXITCODE|\btry\s*\{|\$\?", re.I)
+
+# --- offset-before-write: a consuming cursor persisted before its payload -------------------------
+# An offset/cursor whose persistence CONSUMES remote state (Telegram getUpdates discards anything
+# below a confirmed offset). Writing it before the payload write makes a failed payload write an
+# unrecoverable loss rather than a retry.
+OFFSET_WRITE = re.compile(
+    r"(Set-Content[^\n]*\$?\w*[Oo]ffset\w*|open\(\s*['\"][^'\"]*\.?tg-offset['\"]\s*,\s*['\"]w)",
+    re.I,
+)
+# The payload whose durability the offset is claiming: the questions/answers file.
+PAYLOAD_WRITE = re.compile(
+    r"(Set-Content[^\n]*\$?\w*(Questions|Answers)\w*|open\(\s*\w*qf\w*\s*,\s*['\"]w|"
+    r"open\(\s*['\"][^'\"]*OWNER-QUESTIONS[^'\"]*['\"]\s*,\s*['\"]w)",
+    re.I,
+)
+# Only a script that actually consumes a Telegram update cursor can carry this defect.
+OFFSET_CONSUMER = re.compile(r"getUpdates|tg-offset|update_id", re.I)
+
+# --- unchecked-precondition: a launch precondition whose failure does not stop the launch ---------
+# A script that documents a precondition (trust/auth/provision) then runs it with no exit test, and
+# goes on to LAUNCH the thing the precondition exists to protect.
+# The script may be named by a LITERAL (`python trust-workspace.py`) or, as worker-wrapper.ps1
+# does, via a VARIABLE assigned the path just above (`$trustScript = Join-Path ... ;
+# python $trustScript`). Matching only literals missed the live instance entirely, so both the
+# variable name and its assignment are treated as naming evidence.
+# A trailing-letter boundary keeps bare `auth` from matching `authors-list.py`. It must NOT reject
+# camelCase, though: the live instance is the VARIABLE `$trustScript`, so a following capital is
+# ordinary spelling, not a different word. These regexes compile with re.I, under which `[a-z]`
+# also matches uppercase — so a naive `(?![a-z])` silently killed the very finding this check
+# exists for. `[a-rt-z]` omits `s`, admitting `trustScript`/`authScript` while still blocking
+# `authors`. Verified against all four shapes before landing.
+PRECONDITION_WORDS = r"(?:trust|auth|provision|precheck|preflight)(?![a-rt-z])"
+# Names that describe REPORTING, not gating — `provision-report.py` is not a precondition.
+PRECONDITION_NOT_A_GATE = re.compile(r"report|list|summary|digest", re.I)
+# `set -e` already aborts the script when the precondition fails, so the launch below cannot run —
+# the failure is loud, not silent. This is the same reasoning that clears bus-relay.sh in the
+# audit; the gate must not contradict its own exculpatory logic.
+SHELL_ABORTS_ON_ERROR = re.compile(r"^\s*set\s+-[a-z]*e", re.M)
+PRECONDITION_INVOKE = re.compile(
+    r"^\s*(?:&\s*)?(?:python3?|powershell|bash)\b[^\n]*?(?P<script>"
+    rf"[\w.-]*{PRECONDITION_WORDS}[\w.-]*\.(?:py|ps1|sh)"
+    rf"|\$\w*{PRECONDITION_WORDS}\w*)",
+    re.I,
+)
+# Evidence the launch it guards actually happens in the same file.
+LAUNCH_AFTER = re.compile(r"claude\s+-p\b|ProcessStartInfo|Process\]::Start", re.I)
+
+
 @dataclass(frozen=True)
 class Finding:
     check: str
@@ -173,6 +263,23 @@ class Finding:
 
 def _lines(path: Path) -> list[str]:
     return path.read_text(encoding="utf-8", errors="replace").splitlines()
+
+
+def _is_pattern_source(path: Path) -> bool:
+    """True for THIS checker and its tests — files whose 'code' is defect patterns, not behaviour.
+
+    Pointed at its own tree, a checker matching source text will match the regexes that DEFINE the
+    defect and the fixtures that PLANT it, reporting the gate itself as defective. That noise is
+    the failure mode this gate exists to prevent, so exclude the two files by identity (not by a
+    generic "skip tests" rule, which would blind the gate to real defects in other test helpers).
+    """
+    here = Path(__file__).resolve()
+    # The test file drops the `check_` prefix (test_fleet_script_health.py), so derive both
+    # spellings rather than guessing one — an exclusion that silently misses its target is the
+    # same "looks handled, isn't" shape this whole gate hunts.
+    tests = here.parent / "tests"
+    stems = {here.stem, here.stem.removeprefix("check_")}
+    return path.resolve() in {here} | {tests / f"test_{s}.py" for s in stems}
 
 
 def check_grep_count_fallback(path: Path) -> list[Finding]:
@@ -435,6 +542,140 @@ def check_unchecked_registry_read(path: Path) -> list[Finding]:
     return out
 
 
+def check_ps_unchecked_call(path: Path) -> list[Finding]:
+    """A PowerShell `& other-script.ps1` whose non-zero exit nobody reads.
+
+    `$ErrorActionPreference = "Stop"` does NOT trap a called script's exit code — it governs
+    PowerShell error records. So the caller sails past a failed delegate, prints its own success
+    line and exits 0, and the keeper's `if errorlevel 1` never fires. When the caller has already
+    advanced a self-gating interval marker (the fleet's weekly sweeps do), the failure additionally
+    costs the whole interval: no retry, no log line, no card.
+    """
+    if path.suffix != ".ps1":
+        return []
+    lines = _lines(path)
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith("#"):
+            continue
+        m = PS_AMP_CALL.match(line)
+        if not m:
+            continue
+        # It must be a SCRIPT invocation; `& $someScriptBlock` is a different construct. Match ONLY
+        # the callee target — a whole-line fallback matched a script name appearing in an ARGUMENT
+        # (`& $block -Config "notify-owner.ps1"`), flagging a call that never ran a delegate.
+        target = m.group("target") or m.group("dotslash") or ""
+        named = PS_SCRIPT_TARGET.search(target)
+        if not named:
+            continue
+        # The verdict test must be NEAR the invocation. A whole-file search let an unrelated
+        # try/catch elsewhere in the script (feature-adoption-sweep.ps1 wraps its Push-Location
+        # 30 lines above) excuse a genuinely unchecked delivery call — the same "prose counted as
+        # enforcement" mistake the dead-gate and shape-only checks each had to be narrowed against.
+        window = "\n".join(lines[max(0, i - 3) : i + 3])
+        if PS_EXIT_TESTED.search(window):
+            continue
+        out.append(
+            Finding(
+                "ps-unchecked-call",
+                path,
+                i,
+                f"`{named.group(0)}` is invoked with `&` and its exit code is never read "
+                "($LASTEXITCODE / try-catch). $ErrorActionPreference='Stop' does NOT trap a called "
+                "script's non-zero exit, so this caller reports success for a delegate that "
+                "failed — and any interval marker written above is burned with no retry. Test "
+                "$LASTEXITCODE and fail loudly (and write the marker only after delivery succeeds).",
+            )
+        )
+    return out
+
+
+def check_offset_before_write(path: Path) -> list[Finding]:
+    """A consuming cursor persisted BEFORE the payload it consumed is durably written.
+
+    Telegram's getUpdates permanently discards updates below a confirmed offset, so the offset
+    write is a COMMIT POINT. Persisting it first turns any failure of the payload write (Windows
+    file locking is live on this box) into unrecoverable loss of the owner's answers, while the
+    script still exits 0 reporting how many it "applied".
+    """
+    if path.suffix not in {".ps1", ".sh", ".py"}:
+        return []
+    if _is_pattern_source(path):
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    if not OFFSET_CONSUMER.search(text):
+        return []
+    offset_line = payload_line = None
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("#", "rem ", "REM ")):
+            continue
+        if offset_line is None and OFFSET_WRITE.search(line):
+            offset_line = i
+        if payload_line is None and PAYLOAD_WRITE.search(line):
+            payload_line = i
+    # Only an ORDERING defect: both writes must exist, with the offset committing first.
+    if offset_line is None or payload_line is None or offset_line >= payload_line:
+        return []
+    return [
+        Finding(
+            "offset-before-write",
+            path,
+            offset_line,
+            f"the update cursor is persisted at line {offset_line}, BEFORE the payload it consumed "
+            f"is written at line {payload_line}. The offset is a commit point — getUpdates never "
+            "returns a consumed update again — so a failed payload write loses the owner's answers "
+            "permanently while the script exits 0. Write the payload first, advance the offset only "
+            "after that write is confirmed.",
+        )
+    ]
+
+
+def check_unchecked_precondition(path: Path) -> list[Finding]:
+    """A documented launch precondition runs, fails, and the launch proceeds anyway.
+
+    Distinct from ps-unchecked-call: this fires regardless of language whenever a trust/auth/
+    provision step guards a launch that happens in the SAME file. If the precondition cannot fail
+    the launch, it is not a precondition — it is a hopeful side effect.
+    """
+    if path.suffix not in {".ps1", ".sh", ".cmd"}:
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    if not LAUNCH_AFTER.search(text):
+        return []
+    if path.suffix == ".sh" and SHELL_ABORTS_ON_ERROR.search(text):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("#", "rem ", "REM ")):
+            continue
+        m = PRECONDITION_INVOKE.match(line)
+        if not m:
+            continue
+        # A report/list/digest helper is named like a precondition but gates nothing.
+        if PRECONDITION_NOT_A_GATE.search(m.group("script")):
+            continue
+        # A verdict test in the following 3 lines (or an `if`/`try` wrapping it) clears it.
+        window = "\n".join(lines[i - 1 : i + 3])
+        if re.search(r"\$LASTEXITCODE|errorlevel|\$\?|\btry\s*\{|\|\|", window, re.I):
+            continue
+        out.append(
+            Finding(
+                "unchecked-precondition",
+                path,
+                i,
+                f"`{m.group('script')}` is a LAUNCH PRECONDITION but its exit code is discarded, and "
+                "the launch below proceeds regardless — a failed precondition (missing interpreter "
+                "on Task Scheduler's bare PATH, unset env var, locked state file) is "
+                "indistinguishable from a satisfied one, and the worker then burns its dispatch on "
+                "the wall the precondition existed to remove. Test the exit code and abort the "
+                "launch on failure.",
+            )
+        )
+    return out
+
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -458,6 +699,9 @@ def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
         findings.extend(check_silent_push(path))
         findings.extend(check_stale_receipt_ledger(path))
         findings.extend(check_unchecked_registry_read(path))
+        findings.extend(check_ps_unchecked_call(path))
+        findings.extend(check_offset_before_write(path))
+        findings.extend(check_unchecked_precondition(path))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 
