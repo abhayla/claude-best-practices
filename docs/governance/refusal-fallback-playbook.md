@@ -14,7 +14,7 @@ Fable/Mythos safety classifiers can DECLINE a request as a SUCCESS: HTTP 200 wit
   refusal has empty content and is unbilled; a mid-stream refusal bills the partial —
   discard it, don't treat it as a complete answer.
 - New `claude-fable-5` API code opts into server-side fallbacks BY DEFAULT:
-  `betas:["server-side-fallback-2026-06-01"]` + `fallbacks:[{"model":"claude-opus-4-8"}]`
+  `betas:["server-side-fallback-2026-06-01"]` + `fallbacks:[{"model":"claude-opus-5"}]`
   (on Bedrock/Vertex/Foundry use the SDK's client-side `BetaRefusalFallbackMiddleware`).
 - Claude Code sessions: a flagged request auto-re-runs on default Opus with a transcript
   notice; HEADLESS/autonomous runs instead END THE TURN with a refusal — pipelines must
