@@ -95,6 +95,14 @@ Nothing answerable from GLOBAL.md, the repo, or the registry may be asked.
 Invoke `/goal-creator` with the task + answers; extend its contract with the dispatcher
 fields and write to `GWD\queue\T-<nnn>-<slug>.queued.md`:
 
+**T-ID ALLOCATION (MANDATORY, live triple-collision 2026-08-10 — T-063/T-064/T-068 each
+allocated to TWO different tasks by independent sessions, and the T-068 pair's shared
+`T-068.hb` heartbeat filename cross-contaminated both tasks' death-detection):** never invent
+the next id. (1) `git pull` the bus, (2) run `python GWD\next-task-id.py <GWD>` and use its
+answer, (3) if the bus push of the contract is rejected non-fast-forward, pull and RE-RUN the
+allocator before retrying — another session may have taken the id in the race window. An id
+seen ANYWHERE historically (queue, archive, LEDGER) is never reused.
+
 **PRE-QUEUE DEDUP GATE (owner requirement 2026-08-10 — MANDATORY, runs before writing the
 contract):** read EVERY open contract in `GWD\queue\` (`*.queued.md`, `*.claimed.*.md`,
 `*.parked.md`) for the same target repo and compare scope (goal, files/area the task will
@@ -233,7 +241,10 @@ pick after evidence; a wrong expensive pick is never detected.
    the expected run) that breaks on **every terminal state, not just success**: result JSON
    written, `.hb` reading `EXITED`, or heartbeat older than
    `settings.heartbeat_stale_after_seconds`. Silence is not success — a filter that only matches
-   the happy path is indistinguishable from a crash.
+   the happy path is indistinguishable from a crash. The terminal test MUST require a
+   **NON-EMPTY** result JSON (the wrapper pre-creates the file at 0 bytes — a live-fire watcher
+   false-positived on the empty placeholder 2026-08-10 and declared a running worker finished;
+   `EXITED` heartbeat and true staleness are the other two valid terminal signals).
    **Live incident:** 2026-08-08 T-056 — relaunched detached to survive shell reaping (the known
    background-Bash trap), hit its turn cap 9 minutes later, and the failure sat **unnoticed for
    35 minutes** until the owner asked "everything done?". Recovery must never wait on the owner.
