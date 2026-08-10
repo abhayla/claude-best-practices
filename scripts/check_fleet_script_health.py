@@ -184,10 +184,17 @@ READ_VERDICT_TESTED = r"(\b{var}_rc\b|\brc=\$\?|;\s*\w*rc=\$\?|\[\s*-z\s*\"?\$\{
 # Matches `& (Join-Path ...) -Arg` and `& "C:\path\x.ps1"` alike; the invoked name is captured for
 # the message. A `$(...)`/`@(...)` capture is excluded — that form consumes the OUTPUT, a different
 # (and usually deliberate) shape than fire-and-forget delegation.
+# `.\notify-owner.ps1 -Body $b` (no `&`) is the most common PowerShell spelling of this call and has
+# identical exit-code semantics, so both the `&` and the dot-slash forms are matched. A leading
+# `$x =` capture is excluded by requiring the invocation to START the statement.
 PS_AMP_CALL = re.compile(
-    r"^\s*&\s*(?P<target>\(\s*Join-Path[^)]*\)|\"[^\"]+\"|'[^']+'|\$\w+)"
+    r"^\s*(?:&\s*(?P<target>\(\s*Join-Path[^)]*\)|\"[^\"]+\"|'[^']+'|\$\w+|[A-Za-z]:[\\/][^\s|]+)"
+    r"|(?P<dotslash>\.[\\/][^\s|]+\.ps1))"
 )
-PS_SCRIPT_TARGET = re.compile(r"[\w.-]+\.(ps1|py|sh|cmd|exe)", re.I)
+# `.exe` deliberately EXCLUDED: invoking an external binary with `&` and not testing $LASTEXITCODE
+# is ordinary, ubiquitous PowerShell, not the detect-then-discard class. Only a delegate SCRIPT
+# (whose exit code is its verdict) is in scope.
+PS_SCRIPT_TARGET = re.compile(r"[\w.-]+\.(ps1|py|sh|cmd)", re.I)
 # Evidence the verdict IS consumed anywhere in the file: an explicit exit-code test, a try/catch
 # around the invocation, or the caller propagating it.
 PS_EXIT_TESTED = re.compile(r"\$LASTEXITCODE|\btry\s*\{|\$\?", re.I)
@@ -216,7 +223,19 @@ OFFSET_CONSUMER = re.compile(r"getUpdates|tg-offset|update_id", re.I)
 # does, via a VARIABLE assigned the path just above (`$trustScript = Join-Path ... ;
 # python $trustScript`). Matching only literals missed the live instance entirely, so both the
 # variable name and its assignment are treated as naming evidence.
-PRECONDITION_WORDS = r"(?:trust|auth|provision|precheck|preflight)"
+# A trailing-letter boundary keeps bare `auth` from matching `authors-list.py`. It must NOT reject
+# camelCase, though: the live instance is the VARIABLE `$trustScript`, so a following capital is
+# ordinary spelling, not a different word. These regexes compile with re.I, under which `[a-z]`
+# also matches uppercase — so a naive `(?![a-z])` silently killed the very finding this check
+# exists for. `[a-rt-z]` omits `s`, admitting `trustScript`/`authScript` while still blocking
+# `authors`. Verified against all four shapes before landing.
+PRECONDITION_WORDS = r"(?:trust|auth|provision|precheck|preflight)(?![a-rt-z])"
+# Names that describe REPORTING, not gating — `provision-report.py` is not a precondition.
+PRECONDITION_NOT_A_GATE = re.compile(r"report|list|summary|digest", re.I)
+# `set -e` already aborts the script when the precondition fails, so the launch below cannot run —
+# the failure is loud, not silent. This is the same reasoning that clears bus-relay.sh in the
+# audit; the gate must not contradict its own exculpatory logic.
+SHELL_ABORTS_ON_ERROR = re.compile(r"^\s*set\s+-[a-z]*e", re.M)
 PRECONDITION_INVOKE = re.compile(
     r"^\s*(?:&\s*)?(?:python3?|powershell|bash)\b[^\n]*?(?P<script>"
     rf"[\w.-]*{PRECONDITION_WORDS}[\w.-]*\.(?:py|ps1|sh)"
@@ -542,9 +561,11 @@ def check_ps_unchecked_call(path: Path) -> list[Finding]:
         m = PS_AMP_CALL.match(line)
         if not m:
             continue
-        # It must be a SCRIPT invocation; `& $someScriptBlock` is a different construct.
-        target = m.group("target")
-        named = PS_SCRIPT_TARGET.search(target) or PS_SCRIPT_TARGET.search(line)
+        # It must be a SCRIPT invocation; `& $someScriptBlock` is a different construct. Match ONLY
+        # the callee target — a whole-line fallback matched a script name appearing in an ARGUMENT
+        # (`& $block -Config "notify-owner.ps1"`), flagging a call that never ran a delegate.
+        target = m.group("target") or m.group("dotslash") or ""
+        named = PS_SCRIPT_TARGET.search(target)
         if not named:
             continue
         # The verdict test must be NEAR the invocation. A whole-file search let an unrelated
@@ -623,12 +644,17 @@ def check_unchecked_precondition(path: Path) -> list[Finding]:
     text = "\n".join(lines)
     if not LAUNCH_AFTER.search(text):
         return []
+    if path.suffix == ".sh" and SHELL_ABORTS_ON_ERROR.search(text):
+        return []
     out: list[Finding] = []
     for i, line in enumerate(lines, start=1):
         if line.lstrip().startswith(("#", "rem ", "REM ")):
             continue
         m = PRECONDITION_INVOKE.match(line)
         if not m:
+            continue
+        # A report/list/digest helper is named like a precondition but gates nothing.
+        if PRECONDITION_NOT_A_GATE.search(m.group("script")):
             continue
         # A verdict test in the following 3 lines (or an `if`/`try` wrapping it) clears it.
         window = "\n".join(lines[i - 1 : i + 3])

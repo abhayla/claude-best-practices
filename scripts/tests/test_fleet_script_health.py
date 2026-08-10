@@ -25,6 +25,40 @@ def _checks(findings, name):
     return [f for f in findings if f.check == name]
 
 
+# Each check gates on file suffix, so the two fixtures must carry the right extension.
+_FIXTURE_SUFFIX = {
+    "ps-unchecked-call": "sweep.ps1",
+    "offset-before-write": "read-answers.ps1",
+    "unchecked-precondition": "worker-wrapper.ps1",
+}
+
+
+def defective_name(check: str) -> str:
+    return _FIXTURE_SUFFIX[check]
+
+
+def _only_the_defect(tmp_path: Path, check: str, defective: str, fixed: str):
+    """Assert the check fires on `defective` and NOT on `fixed` — in ONE run, as a positive control.
+
+    A bare `assert not _checks(...)` on a fixed-form fixture is VACUOUS: it passes against a
+    deleted/neutered check, so it proves nothing about the fix. (Verified during T-071 review: all
+    six clean-side tests passed with the three new checks stubbed to `return []`.) Planting both
+    forms and asserting EXACTLY ONE finding, anchored to the defective file, makes the negative
+    half meaningful — a no-op implementation now fails the same assertion.
+    """
+    (tmp_path / f"bad_{defective_name(check)}").write_text(defective, encoding="utf-8")
+    (tmp_path / f"good_{defective_name(check)}").write_text(fixed, encoding="utf-8")
+    found = _checks(run(tmp_path), check)
+    assert len(found) == 1, (
+        f"expected exactly 1 {check} finding (the defective form only), got "
+        f"{[(f.path.name, f.line) for f in found]} — a no-op check yields 0, an over-firing one >1"
+    )
+    assert found[0].path.name.startswith("bad_"), (
+        f"{check} fired on the FIXED form ({found[0].path.name}) — the check cannot tell them apart"
+    )
+    return found[0]
+
+
 # ---------------------------------------------------------------- grep-count (HIGH: break-detect)
 
 
@@ -483,17 +517,28 @@ def test_ps_unchecked_script_call_is_flagged(tmp_path: Path):
 
 
 def test_ps_call_with_lastexitcode_tested_is_clean(tmp_path: Path):
-    """Testing $LASTEXITCODE right after the call is the fix and must silence the finding."""
-    (tmp_path / "feature-adoption-sweep.ps1").write_text(
-        '$ErrorActionPreference = "Stop"\n'
-        '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n'
-        "if ($LASTEXITCODE -ne 0) {\n"
-        '  Write-Output "DELIVERY FAILED - retry tomorrow"; Set-RetryTomorrow; exit 1\n'
-        "}\n"
-        'Write-Output "SWEEP-OK"\n',
-        encoding="utf-8",
+    """Testing $LASTEXITCODE right after the call is the fix — POSITIVE CONTROL.
+
+    Both forms are planted in one run and exactly one finding must come back, from the defective
+    file. A neutered check returns 0 findings and fails here, so this negative assertion is real.
+    """
+    _only_the_defect(
+        tmp_path,
+        "ps-unchecked-call",
+        defective=(
+            '$ErrorActionPreference = "Stop"\n'
+            '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n'
+            'Write-Output "SWEEP-OK"\n'
+        ),
+        fixed=(
+            '$ErrorActionPreference = "Stop"\n'
+            '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n'
+            "if ($LASTEXITCODE -ne 0) {\n"
+            '  Write-Output "DELIVERY FAILED - retry tomorrow"; Set-RetryTomorrow; exit 1\n'
+            "}\n"
+            'Write-Output "SWEEP-OK"\n'
+        ),
     )
-    assert not _checks(run(tmp_path), "ps-unchecked-call")
 
 
 def test_unrelated_try_block_does_not_clear_an_unchecked_call(tmp_path: Path):
@@ -520,13 +565,16 @@ def test_unrelated_try_block_does_not_clear_an_unchecked_call(tmp_path: Path):
 
 
 def test_ps_output_capturing_call_is_not_flagged(tmp_path: Path):
-    """`$x = & script.ps1` CONSUMES the output — a different, deliberate shape. Precision guard."""
-    (tmp_path / "reader.ps1").write_text(
-        '$result = & (Join-Path $StateRoot "list-things.ps1")\n'
-        'Write-Output $result\n',
-        encoding="utf-8",
+    """`$x = & script.ps1` CONSUMES the output — a deliberate shape. POSITIVE-CONTROL precision guard."""
+    _only_the_defect(
+        tmp_path,
+        "ps-unchecked-call",
+        defective='& (Join-Path $StateRoot "notify-owner.ps1") -Body $body\n',
+        fixed=(
+            '$result = & (Join-Path $StateRoot "list-things.ps1")\n'
+            "Write-Output $result\n"
+        ),
     )
-    assert not _checks(run(tmp_path), "ps-unchecked-call")
 
 
 def test_ps_exit_code_semantics_are_real_not_theoretical(tmp_path: Path):
@@ -576,15 +624,19 @@ def test_offset_advanced_before_payload_write_is_flagged(tmp_path: Path):
 
 
 def test_offset_advanced_after_payload_write_is_clean(tmp_path: Path):
-    """Writing the payload first, then the offset, is the fix and must pass."""
-    (tmp_path / "read-answers.ps1").write_text(
+    """Payload first, offset second, is the fix — POSITIVE CONTROL (see _only_the_defect)."""
+    header = (
         '$resp = Invoke-RestMethod -Uri "https://api.telegram.org/bot$bot/getUpdates?offset=$offset"\n'
         "foreach ($u in $resp.result) { $maxUpdate = $u.update_id + 1 }\n"
-        "if ($applied -gt 0) { Set-Content -Path $Questions -Value $q -Encoding utf8 }\n"
-        "Set-Content -Path $OffsetFile -Value $maxUpdate -Encoding ascii\n",
-        encoding="utf-8",
     )
-    assert not _checks(run(tmp_path), "offset-before-write")
+    offset_write = "Set-Content -Path $OffsetFile -Value $maxUpdate -Encoding ascii\n"
+    payload_write = "if ($applied -gt 0) { Set-Content -Path $Questions -Value $q -Encoding utf8 }\n"
+    _only_the_defect(
+        tmp_path,
+        "offset-before-write",
+        defective=header + offset_write + payload_write,
+        fixed=header + payload_write + offset_write,
+    )
 
 
 def test_offset_defect_in_the_python_relay_leg_is_flagged(tmp_path: Path):
@@ -604,13 +656,17 @@ def test_offset_defect_in_the_python_relay_leg_is_flagged(tmp_path: Path):
 
 
 def test_non_offset_script_is_not_flagged(tmp_path: Path):
-    """A script with ordinary writes and no update cursor is not this defect — precision guard."""
-    (tmp_path / "writer.ps1").write_text(
-        "Set-Content -Path $LogFile -Value $line\n"
-        "Set-Content -Path $Questions -Value $q\n",
-        encoding="utf-8",
+    """Ordinary writes with no update cursor are not this defect — POSITIVE-CONTROL precision guard."""
+    _only_the_defect(
+        tmp_path,
+        "offset-before-write",
+        defective=(
+            '$resp = Invoke-RestMethod -Uri "https://api.telegram.org/bot$b/getUpdates?offset=$o"\n'
+            "Set-Content -Path $OffsetFile -Value $maxUpdate\n"
+            "Set-Content -Path $Questions -Value $q\n"
+        ),
+        fixed="Set-Content -Path $LogFile -Value $line\nSet-Content -Path $Questions -Value $q\n",
     )
-    assert not _checks(run(tmp_path), "offset-before-write")
 
 
 # ------------------------------ unchecked-precondition (HIGH 2026-08-10: worker-wrapper.ps1)
@@ -634,18 +690,21 @@ def test_unchecked_precondition_call_is_flagged(tmp_path: Path):
 
 
 def test_checked_precondition_is_clean(tmp_path: Path):
-    """Testing the precondition's exit code and aborting the launch must pass."""
-    (tmp_path / "worker-wrapper.ps1").write_text(
-        '$trustScript = Join-Path $StateRoot "trust-workspace.py"\n'
-        "if (Test-Path $trustScript) {\n"
-        "  python $trustScript $RepoPath\n"
-        "  if ($LASTEXITCODE -ne 0) { Write-Error 'trust failed'; exit 9 }\n"
+    """Testing the precondition's exit code aborts the launch — POSITIVE CONTROL."""
+    head = '$trustScript = Join-Path $StateRoot "trust-workspace.py"\nif (Test-Path $trustScript) {\n'
+    call = "  python $trustScript $RepoPath\n"
+    guard = "  if ($LASTEXITCODE -ne 0) { Write-Error 'trust failed'; exit 9 }\n"
+    tail = (
         "}\n"
         "$psi = New-Object System.Diagnostics.ProcessStartInfo\n"
-        "$proc = [System.Diagnostics.Process]::Start($psi)\n",
-        encoding="utf-8",
+        "$proc = [System.Diagnostics.Process]::Start($psi)\n"
     )
-    assert not _checks(run(tmp_path), "unchecked-precondition")
+    _only_the_defect(
+        tmp_path,
+        "unchecked-precondition",
+        defective=head + call + tail,
+        fixed=head + call + guard + tail,
+    )
 
 
 def test_precondition_named_by_literal_is_also_flagged(tmp_path: Path):
@@ -660,12 +719,16 @@ def test_precondition_named_by_literal_is_also_flagged(tmp_path: Path):
 
 
 def test_precondition_without_a_launch_is_not_flagged(tmp_path: Path):
-    """A trust helper in a script that launches nothing is not this defect — precision guard."""
-    (tmp_path / "setup.ps1").write_text(
-        "python trust-workspace.py $RepoPath\n" 'Write-Output "workspace pre-trusted"\n',
-        encoding="utf-8",
+    """A trust helper that launches nothing is not this defect — POSITIVE-CONTROL precision guard."""
+    _only_the_defect(
+        tmp_path,
+        "unchecked-precondition",
+        defective=(
+            "python trust-workspace.py $RepoPath\n"
+            "$proc = [System.Diagnostics.Process]::Start($psi)\n"
+        ),
+        fixed='python trust-workspace.py $RepoPath\nWrite-Output "workspace pre-trusted"\n',
     )
-    assert not _checks(run(tmp_path), "unchecked-precondition")
 
 
 # --------------------------------------------------- precision: a noisy gate is an ignored gate
