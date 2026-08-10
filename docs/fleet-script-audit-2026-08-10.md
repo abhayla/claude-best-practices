@@ -222,3 +222,14 @@ fires-on-the-defect / quiet-on-the-fix self-test pair, plus a live-fleet regress
 All three are confirmed to fire against the live fleet and are recorded in
 `KNOWN_OPEN_FLEET_FINDINGS` as the ratchet floor — that set may only shrink as the fleet repo
 lands the fixes (fleet-repo edits are out of scope for this hub PR, which delivers the gates).
+
+The ratchet is bidirectional: `test_real_fleet_has_no_unknown_silent_failure_findings` blocks a
+NEW defect, and `test_known_open_fleet_findings_still_reproduce` forces a stale entry OUT once the
+fleet fixes it — so the floor cannot rot in either direction.
+
+**Reproducing the 6-finding floor:** pass the dispatcher skill as an extra caller, as the test
+does — `run(fleet, extra_callers=[Path(".claude/skills/get-work-done/SKILL.md")])`. The bare CLI
+(`python scripts/check_fleet_script_health.py C:/Abhay/GetWorkDone`) cannot see call sites that
+live in the hub repo, so it additionally reports `contract-lint.py` and `preflight-guard.ps1` as
+`dead-gate`. Those two are invocation artifacts, **not** defects — both are wired into
+`/get-work-done`. Expect 6 findings with the caller, 8 without.
