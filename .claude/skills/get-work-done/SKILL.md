@@ -29,6 +29,14 @@ the target repo against `GWD\settings.json → repo_registry` — the ONLY sourc
 registry, or an ambiguous reference ("the calculator app"?) → that's an intake question, not
 a guess.
 
+**PORTFOLIO REGISTRATION GATE (migration Phase 4b, 2026-08-12):** also check the task's target
+repo against the 5wealths PORTFOLIO registry — `PORTFOLIO.yml` on 5wealths `main` once it
+exists; until then the `PORTFOLIO-ALIGNMENT-NOTES.md` candidate-registry-rows table is the
+interim registry. A task targeting a repo absent from that registry, or a task that would
+create a NEW project folder, cannot be queued until a registration row (name, pillar,
+machines) exists for it — carry this as an open item into STEP 4, it is never silently
+skipped.
+
 ## STEP 2 — SCOUT (~1 min per task)
 
 In the target repo: `git remote get-url origin` (must equal the registry's `remote` — mismatch
@@ -78,6 +86,14 @@ present, only the question FORMAT changed (serialized, not batched):
 | Re-deploy of a live app, same domain/infra | AUTO (Tier 1) — no question |
 | New app onto a `sandbox_domains` subdomain | AUTO (Tier 1) — pre-authorized by the grant |
 | First deploy / DNS / new domain / auth or payment surface | HOLD (Tier 2) — collect the yes/no NOW |
+
+**Portfolio registration (migration Phase 4b, 2026-08-12):** if STEP 1's PORTFOLIO REGISTRATION
+GATE flagged the target repo as unregistered (or the task creates a new project folder), that
+IS a material unknown — resolve it here, same `*Sync-check:*` format, before queueing. If the
+pillar is knowable from context/GLOBAL.md, determine it and write the registration row
+yourself (name, pillar, machines) into the interim registry; only ask when the pillar is
+genuinely ambiguous (one question, recommended pillar + one-line justification). Never queue
+the task un-registered.
 
 **Deploy execution (Phase 4, P12/P13):** when a task's tier resolves to AUTO, the deploy runs via
 `GWD\deploy-site.sh` ON the Hostinger VPS (where nginx/certbot/webroots live; bus-driven like the
@@ -397,6 +413,11 @@ Litmus test before saving: "would the target project's team want this in their r
 - MUST resolve every repo through `GWD\settings.json repo_registry` and assert
   `git remote get-url origin` matches BEFORE any edit — the registry encodes real traps
   (calculatekaro=`calculator`; OFO shares algochanakya's remote — never dispatch into OFO).
+- MUST pass the PORTFOLIO REGISTRATION GATE before queueing (STEP 1/STEP 4, migration Phase
+  4b): a repo absent from the 5wealths PORTFOLIO registry, or a task creating a new project
+  folder, is registered (name, pillar, machines) FIRST. Workers may only create project
+  folders under the Ventures/VibeCoding work root (`…\Abhay\VibeCoding\<project>`, or
+  `Ventures\<project>` post-rename) — never at the estate root, never nested inside 5Wealths.
 - MUST run every abort-capable check at INTAKE while the owner is present; runtime re-checks
   are last-line guards, never first detection.
 - MUST run the pre-queue dedup gate (scan ALL open contracts for the target repo) before
