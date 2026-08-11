@@ -138,6 +138,15 @@ bar ("contract doc documents the per-partner pattern INCLUDING the two fallbacks
 "update the doc") — an autonomous worker satisfies the weakest literal reading, and the
 CHECKER can only verify what is written as a predicate.
 
+**WORKER-MERGE GUARD (mandatory standing line, live double-breach 2026-08-11 — T-099's worker
+merged a foreign PR to resolve references, T-101's worker merged its own gate-2 PR mid-run
+against an explicit contract prohibition):** every worker prompt MUST carry this standing
+mandate line verbatim, regardless of `deliverable:` or model tier: "You NEVER merge or close
+ANY pull request — yours, a foreign one, or anyone else's — and you NEVER push to `main`.
+Landing (merge-on-green, closing, deleting a branch) is dispatcher/checker-owned, not yours."
+Prose-only prohibition proved insufficient twice; STEP 6 and STEP 7 below back it with a
+deterministic post-run PR-state check so a breach is CAUGHT, not just discouraged.
+
 **Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
 global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
 `D:\Abhay\VibeCoding\claude-best-practices\.claude\rules\model-routing.md`):**
@@ -208,6 +217,14 @@ pick after evidence; a wrong expensive pick is never detected.
      haiku→sonnet→opus on one task.
    - Keeper DEATHS stay un-escalated (STEP 6.9): a dead PID is environmental by
      definition — re-queue once at the same tier, park on the second death.
+6a. **WORKER-MERGE GUARD — post-exit PR-state check (mandatory, live double-breach
+   2026-08-11):** after parsing the result JSON (item 6 above), check the state of EVERY PR
+   the contract references — its own gate PR plus any PR the worker's JSON reports touching —
+   via `gh pr view <PR> --json state,mergedBy,mergedAt`. A PR that shows `state: MERGED` with
+   `mergedAt` inside the worker's run window (dispatch timestamp → result JSON timestamp) is a
+   task FAILURE line in `status_log` + `GWD\LEDGER.md` + an owner card — regardless of how good
+   the work is. This runs for EVERY task, not just ones that look suspicious; a worker that
+   merged nothing produces a clean, fast check.
 7. **Parallel lanes (Phase 2, P6/P12):** dispatch up to `settings.soft_concurrency_cap`
    workers concurrently — SAME-repo tasks always serialize; different repos run in parallel.
    Priority P1 > P2 > P3; a P1 is ALWAYS admitted even at the cap. Exceeding the soft cap is
@@ -315,7 +332,12 @@ The worker's "done" claim is input, not truth. Dispatch a CHECKER (separate `Age
 weaker than the maker) against the worker's output. FIRST run the deterministic tier receipt
 `python GWD\verify-model-tier.py <contract> GWD\heartbeats\<id>.result.json` (fix #1 — asserts
 tier-as-run == tier-as-contracted from `modelUsage`; non-zero = a task FAILURE line in
-status_log + LEDGER, never a silent pass). Then verify **every `dod:` predicate** via the
+status_log + LEDGER, never a silent pass). **Then run the WORKER-MERGE GUARD check (mandatory
+predicate, same as STEP 6a — the checker re-derives it independently rather than trusting the
+dispatcher's pass):** `gh pr view` on every PR the contract/result JSON references; any PR
+merged inside the worker's run window is a task FAILURE regardless of `deliverable:` type —
+record it in the checker verdict before scoring any other dod predicate. Then verify **every
+`dod:` predicate** via the
 procedure for the contract's `deliverable:` type (fixes V1/V3/V4, 2026-07-27 — before this
 table only code/deploy had a defined procedure; content and skills could pass on checker
 opinion):
@@ -418,3 +440,7 @@ Litmus test before saving: "would the target project's team want this in their r
   of intake classification.
 - MUST stop a trivial-gated task that turns deep and re-enter intake — never limp on.
 - MUST write an evidence-folder failure as a task FAILURE (G20), never skip it.
+- MUST verify PR-state post-run for every task (STEP 6a + STEP 7): `gh pr view` on every PR
+  the contract or result JSON references; a PR merged by the worker during its own run window
+  is a task FAILURE, independent of work quality — checked by both the dispatcher and the
+  checker, never trusted from the worker's self-report.
