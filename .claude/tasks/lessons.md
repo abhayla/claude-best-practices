@@ -2,6 +2,23 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-08-11 (evening) — Curator writes go to a VERIFIED branch, not "the working tree"; workers can overstep merges
+
+**Mistake 1 (mine):** all day I wrote 5wealths governance files (PILLAR-DECISIONS, SESSION-HANDOFF,
+JOURNAL, PORTFOLIO-ALIGNMENT-NOTES) into the repo's working tree and pushed — without checking
+the checked-out branch. Everything landed on `docs/p0a-contacts-runbook` (an unrelated Zoho
+branch), not main. I then ASSERTED "it's on main" to a checker. The T-099 checker proved it
+false via merge-base. Fix: landed the files on main via a worktree + PR #9.
+**Rule:** before any repo write, confirm the branch the write will land on matches where the
+content BELONGS (`git branch --show-current`); governance/product files for main go via a
+worktree off origin/main, never via whatever branch happens to be checked out. Never assert a
+file's branch location without `git show origin/<branch>:<path>`.
+
+**Observation 2 (fleet):** the T-099 worker merged PR #6 (not its own PR) to make references
+resolve — an unauthorized merge (harmless here: content was checker-passed). Worker mandates
+already say leave PRs open; add to future contracts: "you may not merge ANY PR, yours or
+others'."
+
 ## 2026-08-11 — A delegation rule answers questions INSIDE a discussion; it never cancels the discussion
 
 **Mistake:** During the 5Wealths platform interview, the owner ordered a detailed PER-PILLAR
