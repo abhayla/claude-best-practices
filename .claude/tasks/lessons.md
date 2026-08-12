@@ -967,3 +967,7 @@ Wati sessions use a cheaper driver.
   timestamps. For overnight autonomous work on this PC, treat wall-clock gaps as suspend
   (check `stat` mtimes vs claimed times) and never assume a monitor was actually watching
   through the night.
+
+
+## 2026-08-12: cmd move nests instead of renaming when destination exists
+Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Ventures) already existed, so move silently NESTED src inside dst and returned exit 0, defeating the errorlevel guard. Root cause: cmd move only renames when dst is absent; exit code cannot distinguish the two. Rule: any rename script MUST pre-check the destination does not exist (if exist dst -> abort) before move, and post-verify the expected child layout — never trust move exit code alone.
