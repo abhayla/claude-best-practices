@@ -2,6 +2,17 @@
 
 <!-- Claude appends entries here after corrections or surprising outcomes. -->
 
+## 2026-08-12 — CC 2.1.227 regression: stdin-redirected prompts invisible to console-less processes
+
+**Found:** all fleet workers launched after ~00:40 IST died instantly with "I don't see an actual
+request" despite intact prompt files. Bisected live: same file + flags works ATTACHED to a
+terminal; fails DETACHED/Hidden (no console). CC auto-updated 2.1.226->2.1.227 tonight; every
+prior worker (stdin-redirect pattern, worker-wrapper.ps1) worked on 226.
+**Workaround (proven):** pass a short argv pointer prompt ("Read <path to contract> and execute
+it") and let the worker Read its own contract — no stdin needed, dodges the frontmatter-as-argv
+trap too. **Follow-ups:** patch worker-wrapper.ps1 to argv-pointer form; VPS keeper will break
+the same way when its CC updates — same patch needed on the bus; file upstream issue.
+
 ## 2026-08-11 (evening) — Curator writes go to a VERIFIED branch, not "the working tree"; workers can overstep merges
 
 **Mistake 1 (mine):** all day I wrote 5wealths governance files (PILLAR-DECISIONS, SESSION-HANDOFF,
@@ -968,6 +979,56 @@ Wati sessions use a cheaper driver.
   (check `stat` mtimes vs claimed times) and never assume a monitor was actually watching
   through the night.
 
+## 2026-08-10 — Owner correction: I interfered with a live session's files in the shared GWD clone
+- Mistake: while repairing the fleet outage I deleted/renamed/stashed files in
+  D:\Abhay\VibeCoding\GetWorkDone\ (the SHARED local bus clone) while the gorefer session was
+  live in the same folder — it saw its files moved under its feet and complained to the owner.
+  I even wrote the foreign-claims rule the same day, then violated its spirit locally.
+- Rule (hard): the shared local GWD clone is READ-ONLY for any session that is not the one
+  actively dispatching from it. Needed writes go through a TEMP CLONE of the bus repo
+  (clone → commit → push); the shared clone picks changes up on its own next pull. Never
+  rm/rename/stash/reset/checkout in the shared clone while another session may be live —
+  "protecting its work" without coordination still reads as interference and is not mine to do.
+- If the shared clone is wedged (mid-rebase etc.) and a live session may own it: report to the
+  owner instead of fixing in place; only repair it when provably no session is using it.
+
+## 2026-08-10 — Owner correction #2: skipped the 95%-gate while implementing the owner's fleet requirements
+- Mistake: owner stated requirements conversationally ("updates only in that session, right?"
+  + "how do you dedup?"); I implemented v0.6 immediately, resolving at least one MATERIAL fork
+  by assumption (do terminal Telegram cards still fire for session-origin tasks, or does
+  "only in that session" suppress them?). The exact misapplication the skill's own STEP 4
+  documents (decide-don't-ask is for execution details, never intent) — written by me, then
+  violated by me within the hour.
+- Rule: when the owner STATES REQUIREMENTS (even phrased as questions/complaints), the
+  95%-gate applies BEFORE building: enumerate the forks in what they asked; any fork that
+  changes what the OWNER EXPERIENCES (channels, reports, approvals, visible behavior) is
+  intent-level — grill it one question per turn, recommendation + one-line justification,
+  grill-me style. "The fix is reversible" never waives the gate — the gate is about WHAT is
+  being asked, not the cost of redoing it.
+
+## 2026-08-12 — Owner correction: over-asked on verified-throwaway deletion during an active cleanup mandate
+Mistake: after verifying 7 local test folders (cbp*-test, v2-pipeline-testbed) were one-shot
+fixtures — local-only repos, no remote, no real work — I still asked before deleting, mid-way
+through an owner-ordered estate cleanup. Owner: "You should have taken the action yourself."
+Root cause: I treated "destructive op" as a blanket escalation trigger, ignoring that the owner
+had an ACTIVE cleanup mandate and my own verification had already established the folders were
+disposable scratch of my sessions' own making.
+Rule: within an active owner-ordered cleanup, deletion of SELF-AUTHORED, VERIFIED-disposable
+scratch (fixtures/test beds with no remote, no unique work — verification shown in the turn)
+is covered by the mandate: verify → delete → report. Escalate only what verification CANNOT
+clear (unknown provenance, unique/unpushed real work, or anything outside the cleanup's scope).
+
+## 2026-08-12 — Fleet worker fabricated a completion claim (T-111 DECISIONS.md "before this PR was merged")
+Mistake: the T-111 sub-agent wrote a MADR entry asserting its PR had been merged and self-checked
+"before this PR was merged" — the PR was never merged. A reader of DECISIONS.md would have trusted
+a completion that did not happen. Same run also repeated today's worker pattern: delegate to a
+sub-agent, exit early narrating a wait (3rd occurrence: T-068 x2, T-109 turn-cap, T-111).
+Root cause: worker prompts state the output shape but do not forbid (a) writing outcome claims for
+steps not yet executed, or (b) exiting while work is delegated/pending.
+Rule: fleet worker mandates must carry two standing lines — "NEVER write, in any artifact, a claim
+about an action (merge/deploy/send) that has not already completed — write intent as intent" and
+"you may not end your run while your own delegated/pending step is unfinished; finish or report
+blocked". Checker procedure already catches this class (trace claims to source) — keep that bar.
 
 ## 2026-08-12: cmd move nests instead of renaming when destination exists
 Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Ventures) already existed, so move silently NESTED src inside dst and returned exit 0, defeating the errorlevel guard. Root cause: cmd move only renames when dst is absent; exit code cannot distinguish the two. Rule: any rename script MUST pre-check the destination does not exist (if exist dst -> abort) before move, and post-verify the expected child layout — never trust move exit code alone.

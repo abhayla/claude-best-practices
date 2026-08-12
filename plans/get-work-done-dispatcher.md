@@ -26,14 +26,14 @@ Break-detection feeds (wired progressively): Gatus health checks (VPS portfolio)
 
 ## On-disk state — ALL outside every git repo (G19)
 
-Root: `D:\Abhay\VibeCoding\GetWorkDone\` (sibling of the repos, like GLOBAL.md — durable, un-committable, single-writer-friendly):
+Root: `D:\Abhay\GetWorkDone\` (sibling of the repos, like GLOBAL.md — durable, un-committable, single-writer-friendly):
 - `inbox/` — incoming items (`source`, `repo`, `type`, `evidence` frontmatter)
 - `queue/` — one contract file per task; **atomic claim by rename** `<id>.queued.md → <id>.claimed.<session>.md` before any dispatch (G2)
 - `OWNER-QUESTIONS.md` — parked blockers: `[task-id] question · recommended answer · what unblocks`
 - `PATTERNS-SEEN.md` — repetition tally (3× → skill-factory proposal)
 - `heartbeats/` — per-worker PID + last-tick file (G3)
 
-Evidence store: `D:\Abhay\VibeCoding\GetWorkDone\evidence\<YYYY-MM-DD>-<task-id>\` + append-only `LEDGER.md`. Retention: prune >90 days; an evidence-write failure is a HARD task failure, never a skip (G20).
+Evidence store: `D:\Abhay\GetWorkDone\evidence\<YYYY-MM-DD>-<task-id>\` + append-only `LEDGER.md`. Retention: prune >90 days; an evidence-write failure is a HARD task failure, never a skip (G20).
 
 ## Cross-cutting principle — FAIL AT INTAKE, NOT AT MIDNIGHT (owner directive 2026-07-15)
 
@@ -77,7 +77,7 @@ Every precondition verifiable early is verified DURING INTAKE while the owner is
 **Phase 1 — MVP front door (~1 session)** — BUILD STARTED 2026-07-15 (owner GO "document and go").
 Build log: scaffold ✅ (`GetWorkDone\` + settings.json with VERIFIED repo registry — caught a new trap: folder `OFO` shares algochanakya's remote; registry pins canonical paths). Skill v0.1 ✅ (commit cd098a8). Guard-rail audit ✅ — findings: KKB + AlgoChanakya had NO protection (minimal shells now set via API); NO downstream repo has a universally-requirable PR check (KKB/AC path-filtered, IPODhan/RFP push-only, calculatekaro NO CI AT ALL) → required-check config deferred until each repo lands an always-runs "gate" workflow; 4 gate tasks filed as the inbox's first real items; calculatekaro's gate = exit-test T-002. Dispatch lesson #1: prompt via STDIN, never argument (frontmatter `---` parses as CLI flag).
 - [ ] `/get-work-done` SKILL.md v1: sequential single-worker flow end-to-end (intake→gate→clarify→contract→dispatch→check→report), atomic claim, repo-identity assert, refusal branch.
-- [ ] `D:\Abhay\VibeCoding\GetWorkDone\` + contract template + inbox convention; `GetWorkDone\evidence\` + LEDGER.
+- [ ] `D:\Abhay\GetWorkDone\` + contract template + inbox convention; `GetWorkDone\evidence\` + LEDGER.
 - [ ] Downstream prerequisite audit: branch protection (up-to-date-branch requirement) + secret-scan gate per repo.
 - [ ] Eval per check_eval_coverage ratchet (new skill ⇒ evals day one).
 - Verify: dry-run a synthetic 2-task brief (one hub, one calculatekaro); worker lands a real PR; checker (not worker) writes the LEDGER entry. **Biggest unknown retired first: headless permission walls in downstream repos.**
@@ -135,7 +135,7 @@ Mitigations are baked into the architecture above, keyed G1–G21: G1 answer ret
 
 ## Point-by-point lock ledger (owner walkthrough, 22 steps — 2026-07-15) — **COMPLETE: ALL 22 LOCKED**
 - **P22 LOCKED:** graduation gate — after final exam + real volume, an evidence-based owner decision (one-at-a-time G6 rule) on packaging /get-work-done as an installable plugin; interfaces never frozen before dogfood; "stays hub infrastructure" is a valid outcome.
-- **P1 RE-LOCKED (owner amendment 2026-07-15 evening):** fleet home = **Windows VPS `103.118.16.189`** (`C:\GetWorkDone\`), NOT the local PC — owner reason: family shut the PC down mid-run TODAY (killed worker T-002 mid-flight); an always-on box is now a requirement, not an upgrade. The **private-git state mirror is PROMOTED from earmark to REQUIRED** (repo `abhayla/getworkdone-state`, private): the queue/inbox/questions/ledger bus every machine syncs through — this is how intake from the local PC / any session reaches the VPS keeper, and it gives backup+history for free. Local `D:\Abhay\VibeCoding\GetWorkDone\` becomes a sync replica + intake surface, never the brain. Structure/format/rules of P1 otherwise unchanged. Migration = **Phase 1b** below.
+- **P1 RE-LOCKED (owner amendment 2026-07-15 evening):** fleet home = **Windows VPS `103.118.16.189`** (`C:\GetWorkDone\`), NOT the local PC — owner reason: family shut the PC down mid-run TODAY (killed worker T-002 mid-flight); an always-on box is now a requirement, not an upgrade. The **private-git state mirror is PROMOTED from earmark to REQUIRED** (repo `abhayla/getworkdone-state`, private): the queue/inbox/questions/ledger bus every machine syncs through — this is how intake from the local PC / any session reaches the VPS keeper, and it gives backup+history for free. Local `D:\Abhay\GetWorkDone\` becomes a sync replica + intake surface, never the brain. Structure/format/rules of P1 otherwise unchanged. Migration = **Phase 1b** below.
 - **P2 LOCKED:** /get-work-done front-door flow (scout → blast-radius gate → ONE upfront question batch incl. approvals → contract → dispatch → report); trivial-turned-deep re-enters intake; contracts authored via the EXISTING `/goal-creator` skill (loop-engineering plugin) extended with dispatcher fields — one contract format hub-wide (owner-confirmed).
 - **P3 LOCKED (amended):** day-one guards — repo-identity check, refusal≠success, atomic claim — PLUS the fail-at-intake principle: all abort-capable verifications run at INTAKE while the owner is present (questions asked immediately); dispatch-time re-checks are last-line guards only, never first detection.
 - **P4 LOCKED:** downstream guard-rail verification (branch protection + required CI check + up-to-date-branch + secret-scan gate) — one-time Phase-1 audit across all 5 repos, then a cheap re-check at every intake; reversible config gaps fixed autonomously, capability gaps become intake questions.
