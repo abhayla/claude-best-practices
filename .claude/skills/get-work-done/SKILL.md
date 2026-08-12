@@ -5,7 +5,7 @@ description: Central work dispatcher (the "mother hub" front door). Hand it one 
 
 # /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.7 — origin-session affinity + dedup gate + on-screen status, cards fallback-only 2026-08-10)
 
-State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\VibeCoding\GetWorkDone\`,
+State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\GetWorkDone\`,
 fleet home `C:\Abhay\GetWorkDone` on the Windows VPS (**GWD** below = whichever this machine uses).
 Contract format = `/goal-creator`'s, extended with dispatcher fields. Phase 2 scope: PARALLEL
 dispatch with priority lanes, worker heartbeats via `GWD\worker-wrapper.ps1`, keeper
