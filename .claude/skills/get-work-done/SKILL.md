@@ -449,8 +449,13 @@ Litmus test before saving: "would the target project's team want this in their r
 - MUST land ALL work via PR gated on the repo's CI. PUBLIC repos: arm auto-merge (protection
   enforces the check). PRIVATE repos (free plan — NO branch protection possible; live finding
   2026-07-15: IPODhan, RealFuelPrices, calculatekaro): NEVER arm auto-merge (it merges
-  instantly regardless of CI) — the worker `gh pr checks --watch`es until the gate is SUCCESS
-  and only then merges; red = never merged, no exceptions.
+  instantly regardless of CI) — **and the worker never merges either, on any repo, public or
+  private (WORKER-MERGE GUARD, STEP 5 — live double-breach 2026-08-11, T-098 breach
+  2026-08-12).** The worker's job on a private repo ends at `gh pr checks --watch`ing until the
+  gate is SUCCESS and reporting that state; the dispatcher or checker then merges. Any contract
+  dod boilerplate that tells the worker to merge (e.g. "merge only on SUCCESS/green") is a
+  DEFECT — it contradicts this guard and must be rewritten to end at "report gate state," never
+  "merge." Red = never merged, no exceptions, by either party.
 - MUST route models cheapest-correct (sonnet default, haiku mechanical, opus deep AND
   preemptively for security-category); Fable is NEVER dispatched as a worker. The `model:`
   line carries its rationale (lint-blocked otherwise); every reroute/escalation EDITS the
