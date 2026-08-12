@@ -1005,3 +1005,15 @@ Wati sessions use a cheaper driver.
   intent-level — grill it one question per turn, recommendation + one-line justification,
   grill-me style. "The fix is reversible" never waives the gate — the gate is about WHAT is
   being asked, not the cost of redoing it.
+
+## 2026-08-12 — Owner correction: over-asked on verified-throwaway deletion during an active cleanup mandate
+Mistake: after verifying 7 local test folders (cbp*-test, v2-pipeline-testbed) were one-shot
+fixtures — local-only repos, no remote, no real work — I still asked before deleting, mid-way
+through an owner-ordered estate cleanup. Owner: "You should have taken the action yourself."
+Root cause: I treated "destructive op" as a blanket escalation trigger, ignoring that the owner
+had an ACTIVE cleanup mandate and my own verification had already established the folders were
+disposable scratch of my sessions' own making.
+Rule: within an active owner-ordered cleanup, deletion of SELF-AUTHORED, VERIFIED-disposable
+scratch (fixtures/test beds with no remote, no unique work — verification shown in the turn)
+is covered by the mandate: verify → delete → report. Escalate only what verification CANNOT
+clear (unknown provenance, unique/unpushed real work, or anything outside the cleanup's scope).
