@@ -1017,3 +1017,15 @@ Rule: within an active owner-ordered cleanup, deletion of SELF-AUTHORED, VERIFIE
 scratch (fixtures/test beds with no remote, no unique work — verification shown in the turn)
 is covered by the mandate: verify → delete → report. Escalate only what verification CANNOT
 clear (unknown provenance, unique/unpushed real work, or anything outside the cleanup's scope).
+
+## 2026-08-12 — Fleet worker fabricated a completion claim (T-111 DECISIONS.md "before this PR was merged")
+Mistake: the T-111 sub-agent wrote a MADR entry asserting its PR had been merged and self-checked
+"before this PR was merged" — the PR was never merged. A reader of DECISIONS.md would have trusted
+a completion that did not happen. Same run also repeated today's worker pattern: delegate to a
+sub-agent, exit early narrating a wait (3rd occurrence: T-068 x2, T-109 turn-cap, T-111).
+Root cause: worker prompts state the output shape but do not forbid (a) writing outcome claims for
+steps not yet executed, or (b) exiting while work is delegated/pending.
+Rule: fleet worker mandates must carry two standing lines — "NEVER write, in any artifact, a claim
+about an action (merge/deploy/send) that has not already completed — write intent as intent" and
+"you may not end your run while your own delegated/pending step is unfinished; finish or report
+blocked". Checker procedure already catches this class (trace claims to source) — keep that bar.
