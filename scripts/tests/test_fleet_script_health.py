@@ -834,16 +834,12 @@ def test_cli_missing_path_is_loud(tmp_path: Path):
 # The two defects the 2026-08-03 audit CONFIRMED live on the fleet. Fixing them is a fleet-repo
 # change (out of scope for this hub PR, which delivers the gates); until then they are the known
 # ratchet floor. RULE: this set may only SHRINK. Adding to it is how a gate rots into a to-do list.
-KNOWN_OPEN_FLEET_FINDINGS = {
-    # T-071 (2026-08-10) — the three HIGHs from docs/fleet-script-audit-2026-08-10.md. Confirmed
-    # live; fixing them is a fleet-repo change, out of scope for this hub PR which delivers gates.
-    ("feature-adoption-sweep.ps1", "ps-unchecked-call"),
-    ("parked-digest.ps1", "ps-unchecked-call"),
-    ("gate-audit.ps1", "ps-unchecked-call"),
-    ("read-answers.ps1", "offset-before-write"),
-    ("bus-relay.sh", "offset-before-write"),
-    ("worker-wrapper.ps1", "unchecked-precondition"),
-}
+# T-071 (2026-08-10) ratcheted six known-open findings here. All six stopped reproducing by
+# 2026-08-12 (fleet-script fixes landed via the estate/parity work: worker-wrapper stdin
+# regression rewrite, read-answers/feature-adoption-sweep path+default hardening, and the
+# T-110 janitor sweep touching the same guard shapes) — the ratchet's own staleness assertion
+# ordered their removal. Ratchet is now EMPTY: any finding the detector reports is a failure.
+KNOWN_OPEN_FLEET_FINDINGS: set = set()
 
 
 def test_real_fleet_has_no_unknown_silent_failure_findings():
