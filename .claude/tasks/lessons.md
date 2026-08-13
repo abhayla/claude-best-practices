@@ -1050,3 +1050,36 @@ blocked". Checker procedure already catches this class (trace claims to source) 
 
 ## 2026-08-12: cmd move nests instead of renaming when destination exists
 Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Ventures) already existed, so move silently NESTED src inside dst and returned exit 0, defeating the errorlevel guard. Root cause: cmd move only renames when dst is absent; exit code cannot distinguish the two. Rule: any rename script MUST pre-check the destination does not exist (if exist dst -> abort) before move, and post-verify the expected child layout — never trust move exit code alone.
+
+## 2026-08-13 — Fleet dispatch from an interactive session: run_in_background keeps the worker in the kill-tree
+- Mistake: dispatched T-114's worker-wrapper via a run_in_background Bash task; when that
+  background task was killed, the PowerShell wrapper + claude worker died with it (last hb
+  12:09:26). I had just claimed the worker "was never at risk" — wrong; a background Bash
+  task OWNS its child tree on Windows.
+- Rule: an interactive session dispatching a fleet worker launches it DETACHED —
+  `powershell Start-Process -WindowStyle Hidden -File worker-wrapper.ps1 ...` — never inside
+  a run_in_background Bash command. The background task may hold only WATCHES (polling
+  loops), which are safe to kill. Death recovery per SKILL 6.9 worked as designed (one
+  same-tier relaunch, logged in status_log).
+
+## 2026-08-13 — Stale handoff reminders survive sessions and masquerade as open owner items
+- Mistake class (3 hits in ONE session): "T-062/T-068 card replies", "triage Issue 4", and
+  "Stage R residuals" were all presented to the owner as pending — ALL were already closed
+  (bus ledger 21:07 sweep, T-109 PASS, .pgtmp deleted Aug 12). Root cause: .remember handoff
+  lines and memory files carry pending-items snapshots that nothing retires when the item
+  closes elsewhere (another session, the fleet, a sweep).
+- Rule: before presenting ANY carried-forward "pending owner item", re-verify it against its
+  authoritative store (bus queue/LEDGER for T-ids, gh for issues/PRs, disk for files) — a
+  handoff note is a hypothesis, not state. When one proves stale, EDIT the handoff/memory in
+  the same turn so the next session doesn't repeat it.
+
+## 2026-08-13 — Ink-TUI prompts over ssh -tt cannot be submitted by pipe-style tooling (needs literal CR)
+- Mistake: fed the owner's OAuth code into `claude setup-token`'s paste field over ssh -tt
+  via desktop-commander; typing worked, Enter never registered (Ink submits on \r; the tool
+  sends \n), an HTML-entity escape attempt typed literal garbage, and the owner's single-use
+  code expired unused. Time + an owner round-trip burned.
+- Rule: before driving ANY interactive TUI credential flow, check for a non-interactive path
+  FIRST (GLOBAL.env already held CLAUDE_CODE_TOKEN — the whole dance was unnecessary; also
+  PS 5.1 cannot ConvertFrom-Json .claude.json — edit it with node). Interactive-TUI-over-ssh
+  is a last resort and requires a byte-controlled channel, which our current tools do not
+  provide.
