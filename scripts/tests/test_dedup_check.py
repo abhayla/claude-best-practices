@@ -209,3 +209,28 @@ class TestResolvePatternFile:
 
     def test_returns_none_when_file_absent(self, tmp_path):
         assert resolve_pattern_file("ghost", "agent", tmp_path) is None
+
+
+class TestIterScannableFiles:
+    def _touch(self, path):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("clean content\n", encoding="utf-8")
+
+    def test_excludes_venv_and_node_modules(self, tmp_path):
+        from scripts.dedup_check import iter_scannable_files
+        self._touch(tmp_path / ".venv" / "lib" / "pkg.py")
+        self._touch(tmp_path / "venv" / "lib" / "pkg.py")
+        self._touch(tmp_path / "node_modules" / "pkg" / "index.json")
+        self._touch(tmp_path / "__pycache__" / "mod.py")
+        self._touch(tmp_path / "src" / "real.py")
+        found = {f.relative_to(tmp_path).as_posix() for f in iter_scannable_files(tmp_path)}
+        assert found == {"src/real.py"}
+
+    def test_github_dir_is_scanned(self, tmp_path):
+        # regression: the old substring check (".git" in str(f)) silently
+        # skipped .github/, leaving CI workflow files unscanned
+        from scripts.dedup_check import iter_scannable_files
+        self._touch(tmp_path / ".github" / "workflows" / "ci.yml")
+        self._touch(tmp_path / ".git" / "config.json")
+        found = {f.relative_to(tmp_path).as_posix() for f in iter_scannable_files(tmp_path)}
+        assert found == {".github/workflows/ci.yml"}

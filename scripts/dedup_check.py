@@ -167,6 +167,20 @@ def scan_for_secrets(file_path: Path) -> list[str]:
     return findings
 
 
+SCAN_EXTENSIONS = ["*.md", "*.sh", "*.py", "*.yml", "*.yaml", "*.json"]
+# Excluded as exact path COMPONENTS (not substrings — a substring ".git" would
+# silently skip .github/, leaving CI workflow files unscanned).
+EXCLUDED_DIRS = {".git", "node_modules", ".venv", "venv", "__pycache__"}
+
+
+def iter_scannable_files(root: Path):
+    """Yield files under root eligible for the secret scan."""
+    for ext in SCAN_EXTENSIONS:
+        for f in root.rglob(ext):
+            if EXCLUDED_DIRS.isdisjoint(f.relative_to(root).parts):
+                yield f
+
+
 def check_file(file_path: Path) -> list[str]:
     """Validate a single pattern file for integrity, secrets, and duplicates.
 
@@ -211,11 +225,8 @@ if __name__ == "__main__":
     elif "--secret-scan" in sys.argv:
         root = Path(__file__).parent.parent
         all_findings = []
-        for ext in ["*.md", "*.sh", "*.py", "*.yml", "*.yaml", "*.json"]:
-            for f in root.rglob(ext):
-                if ".git" in str(f) or "node_modules" in str(f):
-                    continue
-                all_findings.extend(scan_for_secrets(f))
+        for f in iter_scannable_files(root):
+            all_findings.extend(scan_for_secrets(f))
         if all_findings:
             print("Secret scan findings:")
             for finding in all_findings:
