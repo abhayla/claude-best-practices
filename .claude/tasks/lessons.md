@@ -710,6 +710,24 @@ occurred AND the prior turns already landed the work — i.e. a pure confirmatio
 **Why it resolved safely (luck, not design):** the maker's commit was atomic (`git add -A` + commit), so the final HEAD had its complete work; my working-tree `checkout` became a no-op against the committed state.
 **Rule:** Do NOT run mutating git ops (checkout/add/commit/reset) on a worktree while its background maker may still be running. Wait for the completion notification (or `TaskStop` the agent first). READ-ONLY inspection (git log/status/diff, running tests) is fine; mutation is not. If you must take over a genuinely-hung maker, TaskStop it first to eliminate the race.
 
+
+## 2026-07-10 — Parallel-batch result-saving silently misfiles outputs; the checker layer is what catches it
+
+**Surfaced during:** the fable-operating-manual parity exam. An arm conductor running 4-concurrent
+worker batches saved 24 of 33 answer files under case IDs shifted +3 (a clean rotation) — every
+answer existed, every filename lied. The blind-judge layer caught it (off-topic CATCH=0 pattern),
+NOT the conductor's own 33/33 "success" report. A second conductor discarded 5 VALID answers
+because workers echoed `P02` instead of the literal `CASE-TAG: P02`. A placeholder file
+(`DISPATCH-FAILED`) then passed my content-fingerprint gate because an all-zero match tie-broke
+toward the claimed ID.
+
+**Rules:** (a) When a conductor fans out N dispatches and writes results to N names, require
+save-immediately-per-return + a content echo (tag/ID) verified on ID MATCH (not format match) —
+never buffer a batch then write filenames. (b) A "33/33 written, 0 failures" self-report from the
+producer is not integrity — verify pairing with an independent content fingerprint whose gate
+treats near-zero matches and undersized files as MISSING. (c) Maker≠checker paid for itself twice
+in one run: budget for the checker layer, it is not overhead.
+
 ## 2026-07-10 — Hook `additionalContext` without `hookEventName` is silently dropped; only an installed-context test catches it
 
 **Surfaced during:** fable-operating-manual v0.1.0. The injection hook emitted
