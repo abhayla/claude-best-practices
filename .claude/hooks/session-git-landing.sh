@@ -20,6 +20,33 @@ set -u
 
 _guard() { command -v gh >/dev/null 2>&1; }   # gh present (AUTO_MERGE gates only the *arm*, below)
 
+_hold_check() {
+  # HOLD GATE (2026-08-13 incident, T-118): a PR contracted "held for owner review" self-landed
+  # because no arming path here ever checked for a hold marker — every owner-gated PR was one
+  # SessionStart away from merging itself. Call before EVERY `gh pr merge` in this file. Echoes
+  # one observable line and returns 0 (SKIP) when the PR carries the 'hold' label or its body
+  # matches "owner review required" (case-insensitive); returns 1 (proceed) otherwise.
+  # FAIL-SAFE: unlike the rest of this file (which fails OPEN on a gh hiccup), this check fails
+  # CLOSED — a gh error here means SKIP, never land un-reviewed content on an API blip.
+  local pr="$1"
+  local labels labels_rc body body_rc
+  labels="$(gh pr view "$pr" --json labels --jq '.labels[].name' 2>/dev/null)"; labels_rc=$?
+  body="$(gh pr view "$pr" --json body --jq '.body // ""' 2>/dev/null)"; body_rc=$?
+  if [ "$labels_rc" -ne 0 ] || [ "$body_rc" -ne 0 ]; then
+    echo "  (hold-check failed for '$pr' — failing safe, skipping)"
+    return 0
+  fi
+  if printf '%s\n' "$labels" | grep -qix 'hold'; then
+    echo "  (skipped '$pr' — held: label 'hold')"
+    return 0
+  fi
+  if printf '%s' "$body" | grep -qi 'owner review required'; then
+    echo "  (skipped '$pr' — held: body matches \"owner review required\")"
+    return 0
+  fi
+  return 1
+}
+
 _sync_local_after_merge() {
   # ROOT-CAUSE fix for "the branch looks unmerged locally after /end-session": land --wait merged
   # the PR REMOTELY but never reconciled the LOCAL clone, leaving the caller ON the now-dead branch
@@ -50,6 +77,7 @@ land() {
   gh pr view "$branch" >/dev/null 2>&1 || gh pr create --base main --head "$branch" --fill >/dev/null 2>&1
   # AUTO_MERGE=0 -> open/refresh the PR but do NOT arm (you click merge yourself).
   if [ "${AUTO_MERGE:-1}" = "0" ]; then echo "AUTO_MERGE=0 — PR opened for '$branch', not armed"; return 0; fi
+  if _hold_check "$branch"; then echo "land: '$branch' held — not armed"; return 0; fi
   # Arm native auto-merge (gated on the REQUIRED checks only).
   gh pr merge "$branch" --auto --squash --delete-branch >/dev/null 2>&1
   if [ "$wait_mode" != "--wait" ]; then
@@ -81,6 +109,7 @@ merge_one() {
   case "$br" in main|master) echo "merge-one: refusing to merge '$br' into itself"; return 0;; esac
   [ "${AUTO_MERGE:-1}" = "0" ] && { echo "merge-one: skipped (AUTO_MERGE=0)"; return 0; }
   gh pr view "$br" >/dev/null 2>&1 || { echo "merge-one: no PR for '$br' (push/open it first)"; return 0; }
+  if _hold_check "$br"; then echo "merge-one: '$br' held — not armed"; return 0; fi
   if gh pr merge "$br" --auto --squash --delete-branch >/dev/null 2>&1; then
     echo "armed auto-merge on '$br' (lands when its REQUIRED CI passes; red/stale never merges)"
   else
@@ -106,6 +135,7 @@ reconcile() {
         echo "skipped #$num ($br — bot/scan-authored; add 'approved-for-merge' label to auto-land)"; continue
       fi
     fi
+    if _hold_check "$num"; then continue; fi
     gh pr merge "$num" --auto --squash --delete-branch >/dev/null 2>&1 && { echo "armed #$num ($br — lands when required CI passes)"; any=1; }
   done < <(gh pr list --state open --json number,headRefName,isDraft,autoMergeRequest,author,labels \
             --jq '.[] | select(.isDraft==false) | select(.autoMergeRequest==null) | "\(.number)|\(.headRefName)|\(.author.is_bot)|\([.labels[].name] | join(","))"' 2>/dev/null)
@@ -132,8 +162,12 @@ reconcile() {
       gh pr close "$newest" >/dev/null 2>&1 && gh pr reopen "$newest" >/dev/null 2>&1 \
         && echo "kicked CI on docs PR #$newest (no checks ran — GITHUB_TOKEN gap; close+reopen re-triggers)"
     fi
-    gh pr merge "$newest" --auto --squash --delete-branch >/dev/null 2>&1 \
-      && { echo "armed docs PR #$newest (lands when validate passes)"; any=1; }
+    if _hold_check "$newest"; then
+      : # held: logged by _hold_check, skip arming
+    else
+      gh pr merge "$newest" --auto --squash --delete-branch >/dev/null 2>&1 \
+        && { echo "armed docs PR #$newest (lands when validate passes)"; any=1; }
+    fi
   fi
   [ "$any" = 0 ] && echo "reconcile: no leftover PRs to land"
   return 0
