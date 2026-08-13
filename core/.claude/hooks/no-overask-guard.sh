@@ -101,6 +101,16 @@ full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
+# ── Banner-present short-circuit (T-116, owner-approved 2026-08-13 evidence-based curation) ──
+# WHY: 9 blocks in one session were turns that DID render the *Enhanced:* banner as their first
+# line but lacked the full card, or ended on a genuine external blocker — the attest-marker
+# workaround (touch .claude/.enhance-card-rendered) was costing a full extra round-trip on
+# ordinary tool-heavy turns. A banner-first turn is now its own evidence: it exempts the card
+# (G7) and diagnosis-substance ceremony blocks below WITHOUT needing the marker. Does NOT touch
+# the #290 WEAK-prompt sampling rule (gradea path unchanged) or the machine/slash exemptions.
+banner_present=""
+printf '%s' "$full" | head -1 | grep -qE '^\*enhanced' && banner_present="1"
+
 # ── MACHINE-origin turn: exempt the ENHANCE enforcement exactly like a slash command (owner
 # 2026-07-10, fire-where-it-pays). A task-notification / scheduled-wakeup / skill-execution /
 # system-reminder-only turn is not a human-typed prompt, so its full-process card + banner + role
@@ -175,7 +185,10 @@ fi
 # shape — AND not-grade-a-declared (#290: an explicitly-declared Grade-A/no-strengthening
 # turn is sampled OUT of this gate; the base substantive/not-trivial/no-card condition below
 # is preserved byte-for-byte so it stays a pure ADDITIVE exemption, never a rewrite).
-if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && { [ -z "$card" ] || [ -z "$overall" ]; } && [ -z "$gradea" ]; then
+# T-116: AND not-banner-present — a turn whose FIRST visible line IS the *Enhanced:* banner is
+# its own evidence the process ran; it is never blocked here for a missing card (see the
+# banner_present short-circuit above). Pure ADDITIVE exemption on top of the #290 gate.
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && { [ -z "$card" ] || [ -z "$overall" ]; } && [ -z "$gradea" ] && [ -z "$banner_present" ]; then
   rc="$root/.claude/.reviewcard-count"
   rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
   printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
@@ -204,7 +217,8 @@ fi
 substance=""
 printf '%s' "$full" | grep -qE "diagnosis:|changes applied|missing_role|missing_context|missing_output|vague_intent|under_constrained|missing_structure|missing_example|missing_constraint|grade: a|grade a[^a-z]|0 fix|no fix|zero fix" && substance="1"
 [ -n "$card_marker" ] && substance="1"
-if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ]; then
+# T-116: banner-present is its own evidence — see G7 above for the same reasoning.
+if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ] && [ -z "$banner_present" ]; then
   dc="$root/.claude/.diagnosis-count"
   dn=$(cat "$dc" 2>/dev/null || echo 0); case "$dn" in ''|*[!0-9]*) dn=0 ;; esac
   printf '%s\tdiagnosis-substance-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((dn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
@@ -242,7 +256,10 @@ fi
 # when already in sync — those carry no marker and still match the over-ask patterns below.)
 # Honest use is governed by decision-authority.md "Confidence gate"; abuse is visible (the
 # banner renders to the user).
-if printf '%s' "$full" | grep -qE "push to prod|deploy|dns|cutover|force[- ]push|--force|spend|publish|destructive|drop (table|column)|delete (the )?(branch|remote)|escalat|blocked on|gated on (you|your)|yours to (do|run|paste)|need (your|you to)|your (credential|password|approval|login|call)|waiting on (you|the user)|log in yourself|run .* yourself|requires? your|sync-check"; then
+# T-116: extended with the NAMED-EXTERNAL-BLOCKER class (background/dispatched worker in
+# flight, a scheduled wakeup, an awaited async result) — evidence: the 9-block session had
+# turns ending on exactly this kind of blocker, unrecognized by the prior pattern set.
+if printf '%s' "$full" | grep -qE "push to prod|deploy|dns|cutover|force[- ]push|--force|spend|publish|destructive|drop (table|column)|delete (the )?(branch|remote)|escalat|blocked on|gated on (you|your)|yours to (do|run|paste)|need (your|you to)|your (credential|password|approval|login|call)|waiting on (you|the user)|log in yourself|run .* yourself|requires? your|sync-check|in flight|background (worker|task|agent)|scheduled wakeup|dispatched worker|worker (is )?(running|in progress)|await(ing)? (the )?(worker|agent|result)|will (be )?notif(y|ied)|notification (will|when) arrive"; then
   exit 0
 fi
 

@@ -56,10 +56,16 @@ context-blind reviewer dispatch (it produces the card's Reviewer-after column). 
 sequence: (1) dispatch blind reviewer; (2) render banner + transcript + card + Original→Final
 + Role; (3) only then execute (research, edits, worker dispatches). Research needed to ANSWER
 the prompt never precedes the card — the card grades the prompt, not the answer.
-**Marker attestation:** the harness drops assistant text that shares an API response with
-tool_use, so a pre-execution card may never reach the transcript. After rendering the card,
-`touch .claude/.enhance-card-rendered` in the FIRST execution tool batch — that marker is the
-Stop guard's evidence the process ran (reset per user prompt by prompt-enhance-reminder.sh).
+**Marker attestation (only when the banner itself didn't persist):** the harness drops assistant
+text that shares an API response with tool_use, so on rare turns even a correctly-rendered
+pre-execution card — banner included — may never reach the transcript. A turn whose FIRST
+visible line IS the `*Enhanced:*` banner is its own evidence to the Stop guard (T-116,
+owner-approved 2026-08-13 evidence-based curation) — it is never blocked for a missing card or
+missing diagnose→fix substance, and the marker is NOT needed. Reserve the marker for the actual
+dropped-transcript case: if you rendered the card earlier this turn but the banner does not show
+up as the transcript's first line (mid-turn text beside tool_use), `touch
+.claude/.enhance-card-rendered` in the FIRST execution tool batch instead (reset per user prompt
+by prompt-enhance-reminder.sh).
 
 ## The unified per-prompt pipeline (0 → 6)
 

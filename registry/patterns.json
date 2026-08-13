@@ -6281,13 +6281,13 @@
     }
   },
   "no-overask-guard": {
-    "hash": "c08616ff1e8e8885178161171e09edc3b36b183338a5c33b6584eb426882c350",
+    "hash": "2f4ab79834242de3b66a2bce5d7bebea8403729310ad66bb1f86aba1e5ca9237",
     "type": "hook",
     "category": "core",
-    "version": "1.2.3",
+    "version": "1.3.0",
     "source": "project:firekaro-planner",
     "discovered": "2026-06-12",
-    "last_updated": "2026-07-23",
+    "last_updated": "2026-08-13",
     "dependencies": [],
     "visibility": "public",
     "description": "Stop hook enforcing stop-discipline deterministically: BLOCKS over-ask (trailing offer / multiple-choice / recommendation+question) and narrate-and-stop endings on reversible work and re-injects the decision-authority rule; exempts genuine blockers and *Sync-check:* intent grills; logs enhance-banner/block/role misses as non-blocking telemetry; per-turn auto-continue cap of 12 via .claude/.keepgoing-count.",
@@ -6297,7 +6297,7 @@
       "stop-discipline",
       "telemetry"
     ],
-    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses | v1.2.0 (2026-07-10): fire-where-it-pays — machine-origin turns (task-notification/scheduled-wakeup/skill-exec/system-reminder-only, via shared turn-origin.sh) are exempt from enhance-card/banner/role enforcement like slash commands; over-ask + narrate-and-stop guards stay active. | v1.2.2: propagate the #290 gradea (sampled-ceremony) exemption to the enhance-block-miss telemetry detector — it was wired into both BLOCKING detectors but not the telemetry one, logging every legitimate Grade-A one-liner turn as a miss (36/36 of the 7d misses; closes the #331 follow-up class)",
+    "changelog": "v1.0.0: Promoted from firekaro-planner (generalized) — includes the per-turn text aggregation fix that eliminated 58/59 false-positive banner misses | v1.2.0 (2026-07-10): fire-where-it-pays — machine-origin turns (task-notification/scheduled-wakeup/skill-exec/system-reminder-only, via shared turn-origin.sh) are exempt from enhance-card/banner/role enforcement like slash commands; over-ask + narrate-and-stop guards stay active. | v1.2.2: propagate the #290 gradea (sampled-ceremony) exemption to the enhance-block-miss telemetry detector — it was wired into both BLOCKING detectors but not the telemetry one, logging every legitimate Grade-A one-liner turn as a miss (36/36 of the 7d misses; closes the #331 follow-up class) | v1.3.0 (2026-08-13, T-116 evidence-based curation): a turn whose FIRST visible line is the *Enhanced:* banner is no longer blocked by the reviewer-card (G7) or diagnosis-substance gates — the marker-attestation workaround is no longer required on banner-present turns; extended the genuine-blocker exemption with a NAMED-EXTERNAL-BLOCKER class (dispatched/background worker in flight, scheduled wakeup, awaited async result) so a turn correctly naming one is not misclassified as narrate-and-stop. Evidence: scripts/lint_rule_compliance.py report + 9 same-session blocks 2026-08-13; owner-approved curation, WEAK-prompt full-ceremony sampling (#290) unchanged.",
     "tier": "must-have"
   },
   "turn-origin": {
