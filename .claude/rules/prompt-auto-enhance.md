@@ -4,68 +4,63 @@
 
 Every response starts with `*Enhanced: <what was checked>*` (under 15 words).
 
-The hook (`prompt-enhance-reminder.sh`) gates triggering: slash-command prompts, ≤15-char prompts,
-and known continuation phrases skip injection deterministically — the pipeline runs only on substantive free-text prompts.
+## Prompt-side gate (input) — `prompt-enhance-reminder.sh`
 
-**Slash commands are NEVER enhanced.** A `/command` — user-made OR Anthropic-provided
-(`/init`, `/end-session`, …) — runs EXACTLY as-is, any size: canonical plugin default
-`enhance_slash_commands: false` (SSOT: `plugins/prompt-auto-enhance/enhance-settings.default.json`);
-`prompt-enhance-reminder.sh` skips `/*`-prompts and `no-overask-guard.sh` exempts those turns from
-the enhance-card / diagnosis enforcement. The **governance tail** (plan-before-coding,
-decide-don't-ask, grill-when-unsure, narrate-and-stop, git) still applies to slash-command turns.
+Skips injecting the reminder (deterministic, UserPromptSubmit): a `/command` prompt, any
+size (`enhance_slash_commands: false` is the canonical plugin default — SSOT
+`plugins/prompt-auto-enhance/enhance-settings.default.json`); a machine-origin turn
+(`turn-origin.sh` `classify_turn()` = `machine` — task-notification, scheduled-wakeup,
+skill-execution, system-reminder-only); a ≤15-char prompt; or a known continuation phrase.
+The **governance tail** (plan-before-coding, decide-don't-ask, grill-when-unsure,
+narrate-and-stop, git) is emitted on every turn regardless, including slash/machine ones —
+it is not part of the pipeline this rule governs.
 
-**For free-text prompts, the indicator fires on substantive OUTPUT — even when the hook stayed
-silent** (the hook gates on PROMPT shape; the discipline fires on the output's blast radius):
-self-apply the banner + full process + `Role:` line + governance tail. The Stop hook
-`no-overask-guard.sh` logs banner misses to `.claude/.enhance-misses.log` (telemetry,
-non-blocking). Genuinely trivial turns (`yes`/`go ahead`), slash-command turns, AND **machine-origin turns**
-are exempt. **Machine-origin (owner decision 2026-07-10, LOCKED — fire-where-it-pays):** the full
-visible process fires ONLY on HUMAN-typed prompts. A task-notification, scheduled-wakeup,
-skill-execution, or system-reminder-only turn is NOT human-typed — it gets at most a one-line banner,
-never the transcript/grade-card/reviewer ceremony (autonomous work still owes the governance tail).
-The classification is deterministic and shared: `.claude/hooks/turn-origin.sh` `classify_turn()` is
-the SSOT, sourced by both `prompt-enhance-reminder.sh` and `no-overask-guard.sh` so they cannot drift.
+## Output-side gate (what's actually checked) — `no-overask-guard.sh`
 
-## MANDATORY OUTPUT — sampled: full process on WEAK prompts, one-liner on strong ones (#290)
+The hook gates on PROMPT shape; this gate fires on OUTPUT blast radius instead, so it also
+covers turns the prompt-side gate stayed silent on. Below is every check it runs — a duty
+with no line here is **guidance only**, not machine-verified; the skill (`/prompt-auto-enhance`
+STEP 4–4.7) owns the "how", this rule owns the "what's checked".
 
-SAMPLED, not blanket-mandatory, and **HUMAN-SCOPED** (owner 2026-07-10): the full pipeline
-(transcript + grade card + independent reviewer) is REQUIRED only on a HUMAN-typed **WEAK prompt**
-(a dimension scored < 7, or a fix was applied). Machine-origin turns (see turn-origin.sh) are exempt
-from the whole ceremony — banner included.
-A **STRONG / Grade-A / zero-fix** prompt just needs the banner + a one-line Grade-A declaration — no full table forced.
+**BLOCKING** (turn re-opened, capped at 4 auto-continues/turn) — applies only to a
+substantive (≥300-char), non-exempt turn:
+- **Card gate**: needs a markdown row combining `before|after|self` with `reviewer`, OR one
+  of `reviewer-after` / `reviewer col` / `blind re-grade` / `independent-reviewer`, PLUS a
+  closing `overall` row (`overall`, a letter transition like `b → a`, or `weighted total`).
+  Either missing → blocked.
+- **Substance gate** (only once a card matched): needs `diagnosis:`, `changes applied`, a
+  `MISSING_*`/`VAGUE_INTENT`/`UNDER_CONSTRAINED` taxonomy tag, or a grade-a/zero-fix token.
+  Missing → blocked.
+- **Banner short-circuit** (T-116): a turn whose first line matches `^\*enhanced` skips both
+  gates above outright — no card or marker required.
+- **Marker attestation**: when the harness drops a same-response pre-execution card (shares
+  an API response with tool_use) so it never reaches the transcript, touching
+  `.claude/.enhance-card-rendered.<session_id>` satisfies both gates in its place — real hook
+  state, not prose.
 
-- **Weak prompt:** after the banner render, in order: (1) **pipeline transcript** (skill STEP
-  4.5); (2) **before→after card + independent reviewer** — a context-blind `Agent()` reviewer
-  (fresh instance, sees only the two prompts + rubric) re-grades both; card shows PER-DIMENSION
-  scores (Reviewer-after column) + a **mandatory `Overall` row** (weighted total, e.g. `F → B`;
-  a card without it is incomplete); the blind Overall WINS the lift; print the `Independent
-  reviewer (ran this turn …)` provenance line + self-vs-blind divergence (flag if > 1.0);
-  (3) **Original → Final Strengthened Prompt** fenced blocks (STEP 4.6; Final opens with the R1
-  `Act as …` persona when Role & Framing < 7); (4) **`Role: <name> — <why>`** line (R2, 4.7).
-- **Strong / Grade-A / zero-fix prompt:** banner + one-line declaration in the FIRST 3 lines —
-  `*Enhanced: <what was checked> — Grade A, no strengthening needed*`. Full table optional.
-- **Trivial / continuation prompt:** the one-liner `*Enhanced: no change — ran your input as-is*`.
+**EXEMPTIONS** (checked before the gates above; a hit skips all output-side enforcement):
+`is_slash` (last submission opens `<command-name>`, `Base directory for this skill:`, or a
+literal leading `/`) and `machine` (`classify_turn()`) exempt everything below. `trivial`
+(first line matches `ran (your )?input as-is|ran as-is|no change —|no enhancement`, turn
+<600 chars) and `gradea` (first 3 lines match `grade a[^a-z]|grade: a|no strengthening
+needed|no change —|ran (your )?input as-is|ran as-is|0 fix|no fix|prompt already strong
+\(grade [0-9]`) exempt only the two BLOCKING gates.
 
-Skipping BOTH the full process AND the Grade-A declaration on a substantive turn is a defect
-(`no-overask-guard.sh`'s `gradea` detector still blocks it). SSOT for FORMAT when the card
-renders; skill stages 4–4.7 produce content. Compact format-A only on explicit user request.
+**TELEMETRY-ONLY** (logged to `.claude/.enhance-misses.log`, never blocks — escalate a class
+to BLOCKING only if it stays the dominant miss after this rewrite; recheck via
+`scripts/lint_rule_compliance.py`):
+- `enhance-banner-miss`: substantive, non-`is_slash`/non-`machine` turn whose first line does
+  NOT match `^\*enhanced` (not gated by `trivial`/`gradea`).
+- `enhance-block-miss`: banner present, not `gradea`, but none of `final prompt|what
+  changed|ran (your )?input as-is|ran as-is|no change — ran|no enhancement` appear anywhere
+  — the banner ran but nothing marks what got strengthened. Was the dominant class (71/92
+  misses, 30d) driving this rewrite.
+- `role-miss`: a `final (strengthened )?prompt` block exists with no `act as`.
 
-**Ordering (owner defect report 2026-07-15):** the full process renders BEFORE any execution
-tool call — never after the work. The ONLY tool call permitted before the render is the
-context-blind reviewer dispatch (it produces the card's Reviewer-after column). Per-turn
-sequence: (1) dispatch blind reviewer; (2) render banner + transcript + card + Original→Final
-+ Role; (3) only then execute (research, edits, worker dispatches). Research needed to ANSWER
-the prompt never precedes the card — the card grades the prompt, not the answer.
-**Marker attestation (only when the banner itself didn't persist):** the harness drops assistant
-text that shares an API response with tool_use, so on rare turns even a correctly-rendered
-pre-execution card — banner included — may never reach the transcript. A turn whose FIRST
-visible line IS the `*Enhanced:*` banner is its own evidence to the Stop guard (T-116,
-owner-approved 2026-08-13 evidence-based curation) — it is never blocked for a missing card or
-missing diagnose→fix substance, and the marker is NOT needed. Reserve the marker for the actual
-dropped-transcript case: if you rendered the card earlier this turn but the banner does not show
-up as the transcript's first line (mid-turn text beside tool_use), `touch
-.claude/.enhance-card-rendered` in the FIRST execution tool batch instead (reset per user prompt
-by prompt-enhance-reminder.sh).
+Everything else previously described here — transcript formatting, the reviewer provenance
+line, the >1.0 self-vs-blind divergence flag, exact tool-call ordering — is skill-owned
+procedure (`/prompt-auto-enhance` STEP 4–4.7), not a hook-checked rule obligation. No new
+always-on prose duty is added beyond the checks above.
 
 ## The unified per-prompt pipeline (0 → 6)
 
