@@ -72,7 +72,7 @@ this step. A non-trivial task ALWAYS resolves its material unknowns before dispa
 (a) DETERMINE, don't ask, anything you can scout — e.g. "compare IPODhan's data" → the authoritative
 source is the app's OWN DB/API, NOT scraping its public site; scout the data layer and use it. Asking
 what you can determine is itself a defect. (b) For a GENUINE material unknown (2+ valid answers that
-change the OUTCOME, unscoutable) → ask it in the upfront batch. Applying "decide-don't-ask" to a
+change the OUTCOME, unscoutable) → ask it via the 95%-gate below, one question per turn. Applying "decide-don't-ask" to a
 material outcome-changing unknown (as happened on T-013: assumed public-scrape, hit a WAF, asked after)
 is a MISAPPLICATION — that rule is for reversible EXECUTION details only, never for what-to-build /
 which-source intent. If in doubt whether an unknown is material: it is → resolve at intake.
