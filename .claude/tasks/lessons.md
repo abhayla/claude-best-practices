@@ -1083,3 +1083,14 @@ Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Vent
   PS 5.1 cannot ConvertFrom-Json .claude.json — edit it with node). Interactive-TUI-over-ssh
   is a last resort and requires a byte-controlled channel, which our current tools do not
   provide.
+
+## 2026-08-15 — inline foreign-repo execution (GoRefer/Wati incident)
+- **Mistake:** get-work-done's trivial-inline path let a project session execute another
+  project's tasks by hand — wrong directory, wrong context, no T-id, no checker.
+- **Root cause:** the rule lived only inside a skill body the failing session never read;
+  the inline gate had no repo-identity check; enforcement was prose-only (3rd prose-only
+  breach in this skill's history).
+- **Rule:** a fix for a cross-project behavior defect must land where EVERY session loads it
+  (user-global CLAUDE.md + thin pointer + a deterministic hook), not only in the hub SSOT
+  body — and must ship with a recurrence detector (INVOCATIONS.log grep), or "fixed" is
+  unverifiable.

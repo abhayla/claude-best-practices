@@ -3,7 +3,7 @@ name: get-work-done
 description: Central work dispatcher (the "mother hub" front door). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session only grills/contracts/queues/dispatches and NEVER executes work inline, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
 ---
 
-# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.7 — origin-session affinity + dedup gate + on-screen status, cards fallback-only 2026-08-10)
+# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.8 — inline path DELETED + registry-key identity + context_docs + batching + invocation log 2026-08-15; origin-session affinity + dedup gate + on-screen status, cards fallback-only 2026-08-10)
 
 State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\GetWorkDone\`,
 fleet home `C:\Abhay\GetWorkDone` on the Windows VPS (**GWD** below = whichever this machine uses).
@@ -44,18 +44,26 @@ aborts intake with a question), current branch state, does the named area exist,
 exist, which paths the task will plausibly touch. Ground the gate in looked-at reality, never
 in the prompt alone.
 
-## STEP 3 — GATE: blast radius, not file count (P2/P16-gate)
+## STEP 3 — GATE: every task gets a contract + T-id, NO exceptions (inline path DELETED 2026-08-15)
 
-**Trivial** = touches NO sensitive path (auth, payments, config, DB migration, deploy surface)
-AND zero unknowns after the scout → do it NOW in this session (normal branch + PR discipline),
-skip to STEP 7 report. **Fable-session exception (fix #4, 2026-07-27):** if THIS dispatching
-session runs on Fable/Mythos, do NOT execute the task inline — the cheapest work must not burn
-the priciest model (plan risk #4). Dispatch it as a normal contract on haiku/sonnet instead
-(the contract ceremony costs less than Fable executing the edit). Everything else → full
-contract. A "trivial" task that turns deep mid-flight STOPS and re-enters here as a full
-contract — it never limps on. **Intake-mode exception (2026-08-09):** in `/get-work-done intake`
-mode NOTHING executes inline — even a trivial task is contracted + dispatched (haiku), because
-the intake session's one job is staying free for the owner's next task.
+**The inline-execution path is DELETED (owner-approved 2026-08-15; live defect: a GoRefer
+session did Wati/Zoho work itself, inline, in the wrong directory with the wrong context — no
+T-id, no contract, no checker).** Every task handed to /get-work-done — however trivial — is
+contracted (STEP 5) and dispatched (STEP 6). The old carve-outs (trivial-inline, the Fable
+exception, the intake-mode exception) are all subsumed: there is ONE behavior now. The binary
+invariant any audit can check: **a get-work-done task with no T-id is a defect.**
+
+Blast radius (sensitive paths: auth, payments, config, DB migration, deploy surface) still gets
+assessed here — but it now informs ONLY model tier, budget, and deploy_tier, never
+inline-vs-dispatch. Trivial tasks are made cheap by BATCHING (STEP 5), not by inline execution.
+
+**Repo identity is compared by REGISTRY KEY, never by path or folder name:** resolve the
+session's own cwd via `git remote get-url origin` → registry key, and the task's target the
+same way (the registry encodes the traps: calculatekaro lives in a folder named `calculator`;
+OFO shares algochanakya's remote; PC and VPS paths differ). A cwd that resolves to no registry
+key is treated as foreign. Same-key tasks STILL dispatch — the worker goes into its own git
+worktree (two sessions never share a checkout); "same repo, so I'll just do it here" is the
+2026-08-15 defect class, not a shortcut.
 
 ## STEP 4 — CLARIFY: one batch, everything, while the owner is present
 
@@ -133,10 +141,28 @@ touch). Three outcomes, recorded in the new contract or intake reply:
 The queue is the SHARED cross-session truth — a session must never queue from only its own
 memory of what it dispatched.
 
+**TRIVIAL-TASK BATCHING (2026-08-15 — what keeps the no-inline rule usable):** multiple small
+tasks from ONE intake targeting the SAME repo are written as **ONE contract** with one `dod:`
+item per task — one T-id, one worker, one PR — never N serialized contracts each paying
+clone + lint + preflight + checker + PR. (Without this, 5 small Wati edits = hours of
+serialized ceremony, and the owner routes around the fleet — reintroducing the inline defect.)
+The dedup gate's "overlapping/related" branch MERGES same-intake trivia into one contract
+instead of linking siblings.
+
+**CONTEXT DOCS (2026-08-15 — the "details already provided earlier" fix):** copy the
+registry's `context_docs` list for the target repo (`GWD\settings.json →
+repo_registry.<key>.context_docs`, **repo-relative paths only**) into the contract, and the
+worker prompt MUST open with: "Before ANY work, read these files at the repo root: <list>.
+If any is missing, STOP and report it — do not proceed without it." CLAUDE.md is never
+listed (it auto-loads from the worker's cwd). If a listed doc contradicts the code, the
+repo wins. `preflight-guard.ps1` BLOCKS dispatch (exit 7) when a listed doc is missing from
+the workspace — a missing context doc is never a shrug-and-continue.
+
 ```yaml
 repo: <registry key>            # path + remote resolved from settings.json at dispatch
 origin: <session-id>@<machine> <project-dir-name>   # WHO took this task from the owner (owner requirement 2026-08-10): in-session progress/result reporting belongs to THIS session ONLY
 related: []                      # T-ids sharing scope in the same repo (dedup gate above)
+context_docs: []                 # copied VERBATIM from repo_registry.<key>.context_docs (repo-relative; preflight exit 7 if missing in workspace)
 model: haiku|sonnet|opus        # + MANDATORY one-line rationale on this line (lint-enforced)
 deliverable: code|deploy|content|claude-resource|data   # lint-enforced (fix V2 2026-07-27) — selects the checker procedure
 priority: P1|P2|P3               # dispatcher-assigned AUTONOMOUSLY (owner 2026-08-09): P1 prod-broken/blocking/owner-says-urgent, P2 normal feature/fix, P3 cleanup/nice-to-have — never ask the owner to rank
@@ -193,8 +219,10 @@ pick after evidence; a wrong expensive pick is never detected.
 3. **Deterministic preflight gate (Phase 2, P3/G18 + owner Q2):** run
    `powershell -NoProfile -ExecutionPolicy Bypass -File GWD\preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <registry remote>` —
    exit 0 = OK; non-zero BLOCKS (model not haiku|sonnet|opus incl. Fable-as-worker → exit 4; repo
-   identity mismatch → exit 6). This makes cheapest-correct routing + wrong-repo protection
-   machine-enforced, not prose-dependent. Blocked → park with the reason, never dispatch.
+   identity mismatch → exit 6; a contract `context_docs:` entry missing from the workspace →
+   exit 7, 2026-08-15). This makes cheapest-correct routing + wrong-repo protection +
+   context-doc presence machine-enforced, not prose-dependent. Blocked → park with the reason,
+   never dispatch.
 4. **Workspace (owner design 2026-07-16, clone-on-demand):** on the fleet-home box, the target
    repo is cloned FRESH at dispatch (`git clone --filter=blob:none`, per-machine path from
    settings.json) unless a workspace from the retention window already exists AND is clean. The
@@ -318,6 +346,13 @@ pick after evidence; a wrong expensive pick is never detected.
    ONE auto-resume per task, ever — a second cap death parks with an owner card. (T-056
    would have self-healed instead of sitting dead 35 min.)
 
+**INVOCATION LOG — the recurrence detector (2026-08-15; the only evidence the no-inline fix
+holds):** at the end of EVERY intake turn (any mode), append ONE line to `GWD\INVOCATIONS.log`:
+`<UTC ISO timestamp> | <session-id>@<machine> | cwd-repo=<registry key or none> |
+tasks_parsed=<n> | tids=<comma-separated T-ids or none>`. A line with `tasks_parsed>=1` and
+`tids=none` IS the inline-execution defect, findable with one grep. The weekly fleet audit
+greps this log; a defect line becomes a `LESSON(OPEN):` entry in PATTERNS-SEEN.md.
+
 ## STEP 7 — CHECK + REPORT: maker ≠ checker (P5)
 
 **ORIGIN-SESSION REPORTING AFFINITY (owner requirement 2026-08-10):** the contract's `origin:`
@@ -378,6 +413,16 @@ or the owner can re-examine, and CI re-gates anything code-shaped at merge. Then
 outcome, PR link, evidence path, cost tier used; plus anything parked and why. Append the
 task's shape signature to `GWD\PATTERNS-SEEN.md` (3rd occurrence → file a PROPOSED codify
 card, P20).
+
+**LESSONS LIVE IN PATTERNS-SEEN.MD (owner 2026-08-15 — deliberately NOT a separate
+LESSONS.md; the bus already has enough logs):** every failure, park, reroute, or
+checker-refutation appends a `LESSON(OPEN): <mistake> → <root cause> → <rule>` line to
+`GWD\PATTERNS-SEEN.md`. Lifecycle: `LESSON(OPEN)` → `LESSON(CODIFIED → <where>)` when it
+becomes a rule/gate → `LESSON(ARCHIVED)`. Intake sessions read ONLY the `LESSON(OPEN):`
+lines, newest 20 max — never the whole file. A lesson recurring 3× MUST be codified into a
+deterministic gate (`contract-lint.py` / `preflight-guard.ps1` / this skill), never left as
+a 4th prose reminder. Scope boundary: fleet-mechanics lessons only — hub-repo lessons stay
+in the hub's `.claude/tasks/lessons.md`.
 
 **TERMINAL-STATE CARDS — FALLBACK-ONLY for session-origin tasks (owner pick 2026-08-10,
 supersedes the 2026-08-09 always-card rule):** for a task with a session `origin:`, the
@@ -464,7 +509,17 @@ Litmus test before saving: "would the target project's team want this in their r
 - MUST honor the deploy-tier table computed from the ACTUAL diff at check time (G9) — a task
   whose merged diff touches auth/payment/DNS/migration paths force-upgrades to HOLD regardless
   of intake classification.
-- MUST stop a trivial-gated task that turns deep and re-enter intake — never limp on.
+- MUST give EVERY task a contract + T-id — the inline-execution path is DELETED (2026-08-15).
+  A get-work-done task with no T-id is a defect. Foreign-OR-same-repo makes no difference:
+  same-repo tasks dispatch into their own worktree. Repo identity is compared by REGISTRY KEY
+  resolved via `git remote get-url origin`, never by path or folder name.
+- MUST batch multiple same-repo trivia from one intake into ONE contract (one T-id, one PR) —
+  the no-inline rule must never make the fleet too slow to use.
+- MUST copy the registry's `context_docs` into every contract and open the worker prompt with
+  the read-these-first mandate; preflight exit 7 blocks dispatch on a missing doc — a worker
+  that proceeds past a missing context doc is a defect (detect-then-discard class).
+- MUST append the INVOCATIONS.log line at the end of every intake turn — `tasks_parsed>=1`
+  with `tids=none` is the inline defect; silence in this log is how the defect hides.
 - MUST write an evidence-folder failure as a task FAILURE (G20), never skip it.
 - MUST verify PR-state post-run for every task (STEP 6a + STEP 7): `gh pr view` on every PR
   the contract or result JSON references; a PR merged by the worker during its own run window
