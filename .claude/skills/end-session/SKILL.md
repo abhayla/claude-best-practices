@@ -192,6 +192,10 @@ confirm the new goal passes. A goal verified once is an assumption with a timest
 what keeps it verified. Skip only when the session shipped nothing with a standing runtime/wiring
 surface (pure docs/analysis).
 
+Before closing, every decision made this session that alters a SHARED artifact (conversation map,
+template inventory, queue config, cross-project policy) must be persisted to the owning repo's
+docs in THIS session — leaving it as "sync pending"/"outlined" in a handoff buffer is a defect.
+
 ---
 
 ## STEP 6: Post-Save Summary
