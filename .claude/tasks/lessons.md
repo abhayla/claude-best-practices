@@ -1094,3 +1094,13 @@ Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Vent
   (user-global CLAUDE.md + thin pointer + a deterministic hook), not only in the hub SSOT
   body — and must ship with a recurrence detector (INVOCATIONS.log grep), or "fixed" is
   unverifiable.
+
+## 2026-08-15 — deferred VPS work I could do myself (owner catch: "why leaving vps part?")
+- **Mistake:** filed the VPS hook wiring as a fleet inbox item instead of doing it over SSH
+  in the same turn; framed a cross-machine config edit as "fleet work" with no real blocker.
+- **Root cause:** treated machine boundary as a hand-off boundary; verify-before-suggest
+  Part B requires a NAMED blocker (credential/spend/irreversible/tool-absent) — "it's on
+  another machine I have SSH keys for" is none of these.
+- **Rule:** before deferring any step to the fleet/owner, run the "could I do this with my
+  current tools?" check against the ACTUAL access inventory (SSH keys, APIs, bus) — an
+  available mechanism means do it now, in-turn.
