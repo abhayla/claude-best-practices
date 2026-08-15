@@ -1104,3 +1104,14 @@ Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Vent
 - **Rule:** before deferring any step to the fleet/owner, run the "could I do this with my
   current tools?" check against the ACTUAL access inventory (SSH keys, APIs, bus) — an
   available mechanism means do it now, in-turn.
+
+## 2026-08-15 — asked the 95%-gate questions only when challenged (owner catch)
+- **Mistake:** a well-drafted incoming fleet prompt had two open owner-facing forks
+  (lint block-vs-warn; RULE B machine coverage); I classified both as "execution details,"
+  started intake, and surfaced questions only after the owner asked "are you >95%?".
+- **Root cause:** ran the confidence gate on "do I understand the words" instead of "are all
+  owner-facing forks closed"; prompt polish masqueraded as fork resolution; decide-don't-ask
+  over-generalized onto owner-outcome choices.
+- **Rule:** codified into the global CLAUDE.md 95%-gate (both machines): enforcement
+  strictness, protection coverage, spend, and interruption frequency are OWNER-facing forks —
+  ask proactively at intake; questions-only-when-challenged is itself a gate failure.
