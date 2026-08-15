@@ -60,7 +60,19 @@ classify_turn() {
     *'Base directory for this skill:'*|*'<command-name>'*) echo machine; return 0 ;;
   esac
 
-  # 4. Hook-generated system-reminder-only turn: the WHOLE payload is a <system-reminder> block with
+  # 4. Headless fleet-worker run (T-134, 2026-08-15 live defect): a `claude -p` worker launched by
+  #    the GetWorkDone dispatcher gets its contract piped via stdin as the initial "prompt" — there
+  #    is no documented UserPromptSubmit field distinguishing print-mode from an interactive session,
+  #    so this is a prompt-SHAPE marker instead. Every dispatcher worker prompt carries the
+  #    WORKER-MERGE GUARD standing mandate line VERBATIM (get-work-done SKILL.md STEP 5) — a human
+  #    never types this sentence, and unlike the notification/skill markers above it can legitimately
+  #    appear anywhere in the payload (after YAML frontmatter, after a resume briefing, etc.), so the
+  #    check is "contains", not anchored.
+  case "$prompt" in
+    *'You NEVER merge or close ANY pull request'*) echo machine; return 0 ;;
+  esac
+
+  # 5. Hook-generated system-reminder-only turn: the WHOLE payload is a <system-reminder> block with
   #    no human request outside it. Detect: trimmed opens with <system-reminder AND (after trimming
   #    trailing whitespace) closes with </system-reminder>. A human who pastes a reminder then writes
   #    a request ends with THEIR text, not the closing tag -> stays human.
