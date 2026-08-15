@@ -63,7 +63,11 @@ same way (the registry encodes the traps: calculatekaro lives in a folder named 
 OFO shares algochanakya's remote; PC and VPS paths differ). A cwd that resolves to no registry
 key is treated as foreign. Same-key tasks STILL dispatch — the worker goes into its own git
 worktree (two sessions never share a checkout); "same repo, so I'll just do it here" is the
-2026-08-15 defect class, not a shortcut.
+2026-08-15 defect class, not a shortcut. An artifact whose source of truth lives in another
+project (WhatsApp template copy, conversation-map cards, Deluge function specs) resolves its
+target repo by SSOT OWNERSHIP — the registry's `ssot_artifacts` field (landing in a follow-up
+bus task) — regardless of where the discussion happens; the dispatching session may relay owner
+approvals but NEVER authors the artifact text.
 
 ## STEP 4 — CLARIFY: resolve everything at intake, one question per turn, while the owner is present
 
@@ -523,7 +527,9 @@ Litmus test before saving: "would the target project's team want this in their r
 - MUST give EVERY task a contract + T-id — the inline-execution path is DELETED (2026-08-15).
   A get-work-done task with no T-id is a defect. Foreign-OR-same-repo makes no difference:
   same-repo tasks dispatch into their own worktree. Repo identity is compared by REGISTRY KEY
-  resolved via `git remote get-url origin`, never by path or folder name.
+  resolved via `git remote get-url origin`, never by path or folder name. Authoring SSOT-owned
+  artifact text inline (template copy / map cards / Deluge specs, even as a "draft" in chat) is
+  the same defect.
 - MUST batch multiple same-repo trivia from one intake into ONE contract (one T-id, one PR) —
   the no-inline rule must never make the fleet too slow to use.
 - MUST copy the registry's `context_docs` into every contract and open the worker prompt with

@@ -224,3 +224,26 @@ weakening the fallback safety net.
 2. **Dispatcher context rot** — all state on disk; any session resumes the fleet from `GetWorkDone\queue\`.
 3. **Machine-awake dependency** — largely retired by Phase 5b VPS pools; residual: the fleet-keeper's own host. Mitigation: run a second fleet-keeper on a VPS pool once 5b lands (dispatcher redundancy via atomic claims — G2 already makes double-keepers safe).
 4. **Fable burning tokens on routine work** — hard-coded dispatch tiers + weekly `cost_ledger.py --report` audit.
+
+## Addendum 2026-08-15 — RULE A/B: SSOT-owned artifacts + same-session persistence
+
+Born from two incidents: (1) a GoRefer session authored Wati WhatsApp template specs 3 times in
+chat from stale context (dead `{{token}}` variable, wrong compliance-line policy), each catch
+owner-only; (2) a 2026-08-13 "token-auth removal" decision outline died as "sync pending" in a
+handoff buffer and a later session designed against the already-removed mechanism.
+
+**RULE A — SSOT-artifact classification.** An artifact whose source of truth lives in another
+project (WhatsApp template copy, conversation-map cards, Deluge function specs) is dispatched to
+that project's own repo regardless of where the request surfaces, per the registry's
+`ssot_artifacts` field (landing in a follow-up bus task, NOT this task). Enforcement today is
+**prompt-layer advisory only** — the SKILL.md prose above, surfaced to the model at read time —
+because no deterministic block exists yet for prose typed inline in a session; the
+`contract-lint.py` keyword check is a **WARN-only** secondary signal, not a gate. Deterministic
+enforcement (guard hook + registry field) is scoped to the separate bus task.
+
+**RULE B — same-session persistence duty.** Any decision that alters a SHARED artifact must be
+written to the owning repo's docs in the SAME session it was decided — see the `end-session`
+SKILL.md checklist line added alongside STEP 5b. The keeper `.remember`-grep detector (an
+automated sweep for "sync pending"/"outlined" language left in handoff buffers) is explicitly
+**DEFERRED** until the `PATTERNS-SEEN.md` recurrence counter's `LESSON(OPEN)` line dated
+2026-08-15 reaches a 2nd instance — build the detector on repeated evidence, not on one incident.
