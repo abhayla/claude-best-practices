@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-08-15 06:52 UTC (auto-generated)
+> Last updated: 2026-08-15 12:35 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -212,7 +212,7 @@
 | tester-agent | agent | 3.0.0 | hub:abhayla/claude-best-practices | — |
 | testing | rule | 2.2.0 | hub:abhayla/claude-best-practices | — |
 | to-prd | skill | 1.1.0 | upstream:mattpocock/skills@engineering/to-prd | improve-codebase-architecture, plan-to-issues |
-| turn-origin | hook | 1.0.0 | hub:abhayla/claude-best-practices | — |
+| turn-origin | hook | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | ui-ux-pro-max | skill | 2.1.0 | hub:abhayla/claude-best-practices | — |
 | untrusted-content-handling | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | update-practices | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
