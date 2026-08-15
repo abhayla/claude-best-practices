@@ -189,7 +189,10 @@ mandate line verbatim, regardless of `deliverable:` or model tier: "You NEVER me
 ANY pull request — yours, a foreign one, or anyone else's — and you NEVER push to `main`.
 Landing (merge-on-green, closing, deleting a branch) is dispatcher/checker-owned, not yours."
 Prose-only prohibition proved insufficient twice; STEP 6 and STEP 7 below back it with a
-deterministic post-run PR-state check so a breach is CAUGHT, not just discouraged.
+deterministic post-run PR-state check so a breach is CAUGHT, not just discouraged. This exact
+line also doubles as the machine-origin marker `plugins/prompt-auto-enhance`'s `turn-origin.sh`
+classifier keys on to skip the enhance ceremony on headless `claude -p` workers (T-134, live
+defect: the ceremony leaked into a worker's machine-parsed JSON result) — never reword or drop it.
 
 **Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
 global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains

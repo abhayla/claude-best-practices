@@ -30,12 +30,24 @@ PLUGIN_GUARD = ROOT / "plugins" / "prompt-auto-enhance" / "hooks" / "enhance-pro
 
 BASH = shutil.which("bash") or "bash"
 
-# ── The permanent 8-case trap-test corpus ──
+# ── The permanent trap-test corpus ──
 MACHINE_CASES = {
     "task_notification_xml": "<task-notification>Agent finished item 4; 12 files changed.</task-notification>",
     "scheduled_wakeup": "[SCHEDULED WAKEUP] time to check the deploy status and report back",
     "skill_execution": "Base directory for this skill: /repo/.claude/skills/foo\nRun the pipeline now.",
     "system_reminder_only": "<system-reminder>PreToolUse hook: branch not chosen yet this session.</system-reminder>",
+    # T-134 (2026-08-15): a headless `claude -p` fleet worker's stdin-piped contract. Every
+    # GetWorkDone dispatcher worker prompt carries this WORKER-MERGE GUARD line verbatim
+    # (get-work-done SKILL.md STEP 5) regardless of whether the prompt opens with prose or raw
+    # YAML frontmatter — mirrors the live T-133 sample (worker ended its JSON result with an
+    # "*Enhanced:" banner because this turn was misclassified as human).
+    "headless_fleet_worker": (
+        "---\nrepo: gorefer\norigin: abc@itsab-PC gorefer\nmodel: sonnet  # mechanical fix\n---\n\n"
+        "STANDING MANDATE (verbatim, non-negotiable): You NEVER merge or close ANY pull request — "
+        "yours, a foreign one, or anyone else's — and you NEVER push to `main`. Landing "
+        "(merge-on-green, closing, deleting a branch) is dispatcher/checker-owned, not yours.\n\n"
+        "Fix the stale path in scripts/x.py and open a PR."
+    ),
 }
 HUMAN_CASES = {
     "short_human": "fix the typo in the readme header",
@@ -83,11 +95,29 @@ def test_judgment_call_documented_direction():
 
 
 def test_full_trap_bar():
-    """Aggregate bar: 4/4 machine correct AND >=3/4 human correct."""
+    """Aggregate bar: all machine cases correct AND >=3/4 human correct."""
     m = sum(1 for p in MACHINE_CASES.values() if _classify(p) == "machine")
     h = sum(1 for p in HUMAN_CASES.values() if _classify(p) == "human")
-    assert m == 4, f"machine bar 4/4 not met: {m}/4"
+    assert m == len(MACHINE_CASES), f"machine bar {len(MACHINE_CASES)}/{len(MACHINE_CASES)} not met: {m}/{len(MACHINE_CASES)}"
     assert h >= 3, f"human bar >=3/4 not met: {h}/4"
+
+
+# ── T-134: headless fleet-worker skip (completion probe #1) ──
+def test_headless_fleet_worker_reminder_stays_silent():
+    """The plugin's own hook, invoked exactly as the harness would (fabricated stdin payload),
+    must skip the full-enhance reminder for a headless worker prompt — the DoD-mandated probe
+    for when the live install-cache path can't be exercised without a post-merge /plugin update."""
+    out = _run_reminder(MACHINE_CASES["headless_fleet_worker"])
+    assert "RENDER THE FULL ENHANCE PROCESS" not in out, "headless worker turn must NOT get the full-enhance reminder"
+    assert "*Enhanced" not in out, "headless worker turn must not be told to emit an *Enhanced banner"
+
+
+def test_interactive_human_prompt_still_triggers_enhance_unchanged():
+    """DoD #2: prove interactive typed-prompt behavior is UNCHANGED by this fix — a normal user
+    prompt (no dispatcher marker) still triggers the full enhance pipeline via the same gate
+    logic/fixtures used above."""
+    out = _run_reminder(HUMAN_CASES["long_human"])
+    assert "RENDER THE FULL ENHANCE PROCESS" in out, "a normal human prompt must still get the full-enhance reminder"
 
 
 # ── Hub reminder-hook integration ──
@@ -114,6 +144,24 @@ def test_reminder_suppresses_full_process_on_machine_turn():
 def test_reminder_renders_full_process_on_human_turn():
     out = _run_reminder(HUMAN_CASES["long_human"])
     assert "RENDER THE FULL ENHANCE PROCESS" in out, "human turn must get the full-enhance reminder"
+
+
+# ── T-134: plugin copy, exercised directly (the actual reported defect: plugin installed at
+# USER level fires in ANY project, including one with no local reminder copy) ──
+def test_plugin_reminder_stays_silent_for_headless_worker_in_any_project(tmp_path):
+    """Reproduces the T-133 live-fire shape: a fleet worker's stdin-piped contract, run from a
+    neutral project dir (no local hook override) — the exact conditions under which the plugin's
+    UserPromptSubmit gate fired and leaked the ceremony into the worker's JSON result."""
+    import json
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    out = subprocess.run(
+        [BASH, str(PLUGIN_REMINDER)],
+        input=json.dumps({"prompt": MACHINE_CASES["headless_fleet_worker"]}),
+        capture_output=True, text=True, cwd=str(neutral), env=_os_environ(),
+    ).stdout
+    assert "REMINDER" not in out, "headless fleet-worker turn must get NO reminder output at all"
+    assert "*Enhanced" not in out
 
 
 # ── Cross-copy + wiring guards ──

@@ -6301,17 +6301,17 @@
     "tier": "must-have"
   },
   "turn-origin": {
-    "hash": "f6634a2c1a3e01de3ff3cfbad52367c5f7a911db73dbd5bf6ecf9981b365f430",
+    "hash": "5ad5b2d53ccdb313003bb1b2b8914d8fbac1a8574ac66e6c47b3034619ec97a7",
     "type": "hook",
     "category": "core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-07-10",
-    "last_updated": "2026-07-10",
+    "last_updated": "2026-08-15",
     "dependencies": [],
     "visibility": "public",
     "tier": "must-have",
-    "description": "Shared turn-origin classifier (sourced lib, not event-wired): classify_turn(prompt) -> human|machine. SSOT for the fire-where-it-pays predicate — the full prompt-auto-enhance ceremony fires only on human-typed prompts; task-notification / scheduled-wakeup / skill-execution / system-reminder-only turns classify as machine. Sourced by prompt-enhance-reminder.sh and no-overask-guard.sh so the two hooks cannot drift.",
+    "description": "Shared turn-origin classifier (sourced lib, not event-wired): classify_turn(prompt) -> human|machine. SSOT for the fire-where-it-pays predicate — the full prompt-auto-enhance ceremony fires only on human-typed prompts; task-notification / scheduled-wakeup / skill-execution / system-reminder-only / headless-fleet-worker turns classify as machine. Sourced by prompt-enhance-reminder.sh and no-overask-guard.sh so the two hooks cannot drift.",
     "tags": [
       "governance",
       "hook",
@@ -6319,7 +6319,7 @@
       "classifier",
       "dry"
     ],
-    "changelog": "v1.0.0 (2026-07-10): extracted the machine-vs-human turn predicate into one SSOT (fable-window item 5)."
+    "changelog": "v1.0.0 (2026-07-10): extracted the machine-vs-human turn predicate into one SSOT (fable-window item 5). | v1.1.0 (2026-08-15, T-134): added a headless-GetWorkDone-fleet-worker detection case (WORKER-MERGE GUARD standing mandate line, prompt-shape marker) — a `claude -p` fleet worker's stdin-piped contract was being misclassified as human, leaking the full enhance ceremony into the worker's machine-parsed JSON result."
   },
   "session-governance-status": {
     "hash": "3cf87f5cf60ed7f7e58dcc21d523c11ca81675687c187c860cb16869ebf9aaf3",
