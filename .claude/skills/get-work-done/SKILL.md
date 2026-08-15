@@ -1,6 +1,6 @@
 ---
 name: get-work-done
-description: Central work dispatcher (the "mother hub" front door). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session only grills/contracts/queues/dispatches and NEVER executes work inline, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
+description: Central work dispatcher (the "mother hub" front door). EVERY task gets a contract + T-id and a dispatched background worker — inline execution is deleted in ALL modes, not just intake (v0.8). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session only grills/contracts/queues/dispatches and NEVER executes work inline, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
 ---
 
 # /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.8 — inline path DELETED + registry-key identity + context_docs + batching + invocation log 2026-08-15; origin-session affinity + dedup gate + on-screen status, cards fallback-only 2026-08-10)
@@ -65,7 +65,7 @@ key is treated as foreign. Same-key tasks STILL dispatch — the worker goes int
 worktree (two sessions never share a checkout); "same repo, so I'll just do it here" is the
 2026-08-15 defect class, not a shortcut.
 
-## STEP 4 — CLARIFY: one batch, everything, while the owner is present
+## STEP 4 — CLARIFY: resolve everything at intake, one question per turn, while the owner is present
 
 **NON-SKIPPABLE (defect fix 2026-07-18):** "run it" / "go ahead" means PROCEED — it does NOT mean skip
 this step. A non-trivial task ALWAYS resolves its material unknowns before dispatch. TWO layers:
@@ -147,7 +147,9 @@ item per task — one T-id, one worker, one PR — never N serialized contracts 
 clone + lint + preflight + checker + PR. (Without this, 5 small Wati edits = hours of
 serialized ceremony, and the owner routes around the fleet — reintroducing the inline defect.)
 The dedup gate's "overlapping/related" branch MERGES same-intake trivia into one contract
-instead of linking siblings.
+instead of linking siblings. Batches are SAME-`deliverable:` only — a code fix and a doc
+update need different checker procedures, so a mixed batch is split into one contract per
+deliverable type (verifier finding LOW-8).
 
 **CONTEXT DOCS (2026-08-15 — the "details already provided earlier" fix):** copy the
 registry's `context_docs` list for the target repo (`GWD\settings.json →
@@ -346,12 +348,18 @@ pick after evidence; a wrong expensive pick is never detected.
    ONE auto-resume per task, ever — a second cap death parks with an owner card. (T-056
    would have self-healed instead of sitting dead 35 min.)
 
-**INVOCATION LOG — the recurrence detector (2026-08-15; the only evidence the no-inline fix
-holds):** at the end of EVERY intake turn (any mode), append ONE line to `GWD\INVOCATIONS.log`:
-`<UTC ISO timestamp> | <session-id>@<machine> | cwd-repo=<registry key or none> |
-tasks_parsed=<n> | tids=<comma-separated T-ids or none>`. A line with `tasks_parsed>=1` and
-`tids=none` IS the inline-execution defect, findable with one grep. The weekly fleet audit
-greps this log; a defect line becomes a `LESSON(OPEN):` entry in PATTERNS-SEEN.md.
+**INVOCATION LOG — a recurrence detector, not the only evidence (semantics fixed v0.8.1,
+verifier finding MEDIUM-6):** at the end of EVERY intake turn (any mode), append ONE line to
+`GWD\INVOCATIONS.log`: `<UTC ISO timestamp> | <session-id>@<machine> | cwd-repo=<registry key
+or none> | tasks_parsed=<n> | tids=<value>`. The `tids=` field distinguishes legitimate
+no-new-T-id outcomes from the defect: comma-separated T-ids (dispatched) · `dup:T-xxx`
+(dedup gate converged on an existing task) · `gate-pending` (still inside the 95% grill,
+one line per turn) · `none` (parsed a task, produced no T-id and no legitimate reason —
+THIS alone is the inline-execution defect, findable with one grep). Known limit: a session
+that never invokes the skill writes no line at all — the CLAUDE.md rule + guard hook are
+the backstop for that path, this log only proves what invoked sessions did. The weekly
+fleet audit greps for `tids=none`; a hit becomes a `LESSON(OPEN):` entry in
+PATTERNS-SEEN.md.
 
 ## STEP 7 — CHECK + REPORT: maker ≠ checker (P5)
 
@@ -371,7 +379,7 @@ interference class — a defect, not initiative.
   deploy path) — NEVER the hub repo dir. Running in the hub made a worker inherit hub governance and
   emit the `*Enhanced:*` ceremony in its report (leak). The dispatch cwd is the target, not `claude-best-practices`.
 - **Checker is MANDATORY and AUTO-CHAINED, never manual.** STEP 7 is not optional and not owner-triggered:
-  every task with `evidence: required` (all non-trivial) automatically spawns a SEPARATE checker agent (in a
+  every task automatically spawns a SEPARATE checker agent (`evidence: required` is the ONLY accepted value since v0.8.1 — lint blocks anything else; a task too small to verify is batched, never unverified) (in a
   neutral dir) that re-verifies a sample from SOURCE before the task is reported done. On T-014 the checker
   CONFIRMED a real bug (a duplicate DB row) AND REFUTED a false one (worker claimed "price data missing" —
   it was present under a differently-named column). A worker report without a checker verdict is INCOMPLETE.
@@ -475,9 +483,9 @@ Litmus test before saving: "would the target project's team want this in their r
   question per turn, `*Sync-check:*` opener, recommended answer + one-line justification on
   each, until the gate passes — no queueing/dispatch below it. MUST NOT ask anything
   answerable from GLOBAL.md / the repo / the registry.
-- MUST keep the intake surface always available: in `intake` mode nothing executes inline
-  (contract + dispatch everything, return to ready immediately); SWEEP claims + dispatches
-  any unclaimed `*.queued.md` so queued work never sits.
+- MUST keep the intake surface always available: nothing executes inline in ANY mode (v0.8 —
+  `intake` mode's only remaining distinction is returning to "ready" immediately between
+  intakes); SWEEP claims + dispatches any unclaimed `*.queued.md` so queued work never sits.
 - MUST reprioritize by REORDERING the queue only — a running worker is never preempted for
   priority.
 - MUST show the owner on-screen, in the origin session: a queue ack at dispatch AND the
@@ -518,8 +526,11 @@ Litmus test before saving: "would the target project's team want this in their r
 - MUST copy the registry's `context_docs` into every contract and open the worker prompt with
   the read-these-first mandate; preflight exit 7 blocks dispatch on a missing doc — a worker
   that proceeds past a missing context doc is a defect (detect-then-discard class).
-- MUST append the INVOCATIONS.log line at the end of every intake turn — `tasks_parsed>=1`
-  with `tids=none` is the inline defect; silence in this log is how the defect hides.
+- MUST append the INVOCATIONS.log line at the end of every intake turn, using the defined
+  `tids=` tokens (`dup:T-xxx` / `gate-pending` for legitimate no-new-T-id turns) — only
+  `tids=none` is the inline defect; silence in this log is how the defect hides.
+- MUST set `evidence: required` on every contract (the only lint-accepted value, v0.8.1) —
+  every task gets a checker; a task too small to verify is batched, never unverified.
 - MUST write an evidence-folder failure as a task FAILURE (G20), never skip it.
 - MUST verify PR-state post-run for every task (STEP 6a + STEP 7): `gh pr view` on every PR
   the contract or result JSON references; a PR merged by the worker during its own run window
