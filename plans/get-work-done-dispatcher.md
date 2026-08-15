@@ -235,11 +235,11 @@ handoff buffer and a later session designed against the already-removed mechanis
 **RULE A — SSOT-artifact classification.** An artifact whose source of truth lives in another
 project (WhatsApp template copy, conversation-map cards, Deluge function specs) is dispatched to
 that project's own repo regardless of where the request surfaces, per the registry's
-`ssot_artifacts` field (landing in a follow-up bus task, NOT this task). Enforcement today is
+`ssot_artifacts` field (live since bus commit 88b4e13). Enforcement today is
 **prompt-layer advisory only** — the SKILL.md prose above, surfaced to the model at read time —
 because no deterministic block exists yet for prose typed inline in a session; the
 `contract-lint.py` keyword check is a **WARN-only** secondary signal, not a gate. Deterministic
-enforcement (guard hook + registry field) is scoped to the separate bus task.
+enforcement (guard hook + registry field) is already live (bus commit 88b4e13).
 
 **RULE B — same-session persistence duty.** Any decision that alters a SHARED artifact must be
 written to the owning repo's docs in the SAME session it was decided — see the `end-session`
@@ -247,3 +247,4 @@ SKILL.md checklist line added alongside STEP 5b. The keeper `.remember`-grep det
 automated sweep for "sync pending"/"outlined" language left in handoff buffers) is explicitly
 **DEFERRED** until the `PATTERNS-SEEN.md` recurrence counter's `LESSON(OPEN)` line dated
 2026-08-15 reaches a 2nd instance — build the detector on repeated evidence, not on one incident.
+The recurrence counter is SELF-REPORTED — it increments only if a session notices the recurrence and logs it to PATTERNS-SEEN.md, so "deferred" means "waiting on human/agent-observed evidence", not "covered later automatically".

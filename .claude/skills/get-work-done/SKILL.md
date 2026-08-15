@@ -65,8 +65,7 @@ key is treated as foreign. Same-key tasks STILL dispatch — the worker goes int
 worktree (two sessions never share a checkout); "same repo, so I'll just do it here" is the
 2026-08-15 defect class, not a shortcut. An artifact whose source of truth lives in another
 project (WhatsApp template copy, conversation-map cards, Deluge function specs) resolves its
-target repo by SSOT OWNERSHIP — the registry's `ssot_artifacts` field (landing in a follow-up
-bus task) — regardless of where the discussion happens; the dispatching session may relay owner
+target repo by SSOT OWNERSHIP — the registry's `ssot_artifacts` field (live since bus commit 88b4e13) — regardless of where the discussion happens; the dispatching session may relay owner
 approvals but NEVER authors the artifact text.
 
 ## STEP 4 — CLARIFY: resolve everything at intake, one question per turn, while the owner is present
