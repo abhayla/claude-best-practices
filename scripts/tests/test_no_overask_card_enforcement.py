@@ -1,15 +1,18 @@
-"""Regression guard for the prompt-auto-enhance ENFORCEMENT system (2026-06-18 audit).
+"""Regression guard for the prompt-auto-enhance TELEMETRY system (2026-06-18 audit;
+converted to telemetry-only 2026-08-16 by T-143, owner-approved review Fix 3).
 
-Pins the fixes for the loopholes that let the full enhance process silently not render:
-- G6: the UserPromptSubmit reminder demands the FULL process UP FRONT (not the weaker
-  "format A — MANDATORY" compact block that contradicted the rule).
-- G7/G3: the Stop-hook card block fires INDEPENDENT of banner shape (a disguised/missing
-  banner can't let the strongest omission escape).
-- G4: the trivial "ran as-is" escape is verifiable (first line + short turn), so a long
-  working turn can't exempt itself by mentioning the phrase in prose.
-- G11: the card is detected by a token SET, not one literal.
-- G9: cap-exhaustion logs a distinct escalation line.
-Hub and core copies stay byte-identical; registry hashes stay in sync.
+T-143 CONTRACT: no-overask-guard.sh and the plugin's enhance-process-guard.sh (the
+"enhance-card Stop gate") must NEVER emit {"decision":"block"} or re-open a turn — every
+miss class is logged instead, to the SAME log files with the SAME line formats as before, so
+scripts/lint_rule_compliance.py keeps working off them. This file pins:
+- Every guard exit is non-blocking, on every transcript shape this suite exercises (including
+  the shapes that USED to legitimately block: card-miss, substance-miss, over-ask,
+  narrate-and-stop, loose-strong-prose, no-card-anywhere, reviewer-table-without-a-card).
+- Each of those miss shapes still produces its corresponding log line.
+- The detection logic itself (card token set, trivial escape, gradea exemption, marker
+  attestation, skill-turn exemption, coexistence stand-down) is UNCHANGED — only the
+  block/no-block consequence changed, so those static regressions stay pinned as before.
+- Hub and core copies stay byte-identical; registry hashes stay in sync.
 """
 
 import hashlib
@@ -31,9 +34,17 @@ PLUGIN_GUARD = ROOT / "plugins" / "prompt-auto-enhance" / "hooks" / "enhance-pro
 GUARD = "no-overask-guard.sh"
 REMINDER = "prompt-enhance-reminder.sh"
 
+BASH = shutil.which("bash")
+JQ = shutil.which("jq")
+requires_bash_jq = pytest.mark.skipif(not (BASH and JQ), reason="requires bash+jq")
+
 
 def _guard() -> str:
     return (CORE / GUARD).read_text(encoding="utf-8")
+
+
+def _hub_guard() -> str:
+    return (HUB / GUARD).read_text(encoding="utf-8")
 
 
 def _reminder() -> str:
@@ -55,57 +66,50 @@ def test_guard_present_and_hub_matches_core():
     )
 
 
-def test_card_block_is_decoupled_from_banner_shape():
-    body = _guard()
-    # the old block-present gate must be gone...
-    assert "enh_block" not in body, "the enh_block gate must be gone (G7)"
-    # ...and the card block fires on substantive + not-trivial + (no-card OR no-overall-row),
-    # not on banner shape (H2/issue #279 ported the hub's overall-row check).
-    assert (
-        '[ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && { [ -z "$card" ] || [ -z "$overall" ]; }'
-        in body
-    ), (
-        "card block must gate on (substantive AND not-trivial AND (no-card OR no-overall)), "
-        "banner-independent (G7/H2)"
-    )
+def test_guards_never_emit_a_block_decision():
+    """T-143 core contract: no code path in either guard may emit {"decision":"block"}."""
+    for name, fp in [("hub", HUB / GUARD), ("core", CORE / GUARD), ("plugin", PLUGIN_GUARD)]:
+        body = fp.read_text(encoding="utf-8")
+        assert 'decision:"block"' not in re.sub(r"\s+", "", body), (
+            f"{name} guard still contains a live {{decision:\"block\"}} emission — "
+            f"must be telemetry-only (T-143)"
+        )
 
 
-def test_card_detection_uses_a_token_set():
+def test_card_detection_still_uses_a_token_set():
     body = _guard()
     assert "reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer" in body, (
-        "the card must be detected by a token set, not one literal (G11)"
+        "the card must be detected by a token set, not one literal (G11) — detection logic unchanged"
     )
 
 
-def test_trivial_escape_is_verifiable():
+def test_trivial_escape_is_still_verifiable():
     body = _guard()
     # trivial only when declared on the FIRST line AND the turn is short (<600).
     assert 'head -1 | grep -qE "ran (your )?input as-is' in body, "trivial must be first-line only (G4)"
     assert '[ "${#last_text}" -lt 600 ]' in body, "trivial must require a short turn (G4)"
 
 
-def test_cap_exhaustion_is_logged():
+def test_card_miss_is_still_logged_not_blocked():
     body = _guard()
-    assert "card-block-EXHAUSTED" in body, "cap exhaustion must log a distinct escalation (G9)"
+    assert "reviewer-card-miss" in body, "card miss must still be logged (G9 lineage, now telemetry-only)"
 
 
-def test_substance_block_enforces_diagnose_to_fix_linkage():
+def test_substance_gate_still_enforces_diagnose_to_fix_linkage():
     body = _guard()
     # the substance guard must detect the diagnose→fix tokens by a SET (not one literal)...
     assert (
         "diagnosis:|changes applied|missing_role" in body
     ), "substance must be detected by the diagnosis/fix token set"
-    # ...and block on substantive + not-trivial + card-present + NO substance.
+    # ...and log on substantive + not-trivial + card-present + NO substance.
     assert (
         '[ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ]'
         in body
-    ), "substance block must gate on (substantive AND not-trivial AND card-present AND no-substance)"
-    assert "diagnosis-block-EXHAUSTED" in body, (
-        "substance cap exhaustion must log a distinct escalation line"
-    )
+    ), "substance check must gate on (substantive AND not-trivial AND card-present AND no-substance)"
+    assert "diagnosis-substance-miss" in body, "substance miss must be logged"
 
 
-def test_substance_block_exempts_grade_a_zero_fix_turns():
+def test_substance_gate_exempts_grade_a_zero_fix_turns():
     body = _guard()
     # a legitimate Grade-A / zero-fix turn has no diagnosis — it must be substance-accounted.
     assert "grade: a|grade a[^a-z]|0 fix|no fix|zero fix" in body, (
@@ -164,6 +168,16 @@ def _is_block(out: str) -> bool:
         return False
 
 
+def _violations_log(scratch: Path) -> str:
+    p = scratch / ".claude" / ".overask-violations.log"
+    return p.read_text(encoding="utf-8") if p.exists() else ""
+
+
+def _misses_log(scratch: Path) -> str:
+    p = scratch / ".claude" / ".enhance-misses.log"
+    return p.read_text(encoding="utf-8") if p.exists() else ""
+
+
 _CARD_TEXT = (
     "*Enhanced: checked stuff*\n\n"
     "Before-after grade card:\n"
@@ -189,7 +203,7 @@ assert len(_LONG_CARDLESS_FINAL_BLOCK) >= 300
 # turn makes tool calls, then ends with a long final summary block that itself contains
 # no card — all within ONE real user turn (no intervening real user message). A
 # last-block-only guard would see only the final block: long enough to trigger its
-# substantiveness check, and card-less, so it would incorrectly block.
+# substantiveness check, and card-less, so it would incorrectly false-block.
 _MID_TURN_CARD_TRANSCRIPT = [
     {"type": "user", "message": {"role": "user", "content": "do the thing"}},
     {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _CARD_TEXT}]}},
@@ -204,8 +218,8 @@ _MID_TURN_CARD_TRANSCRIPT = [
     {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": _LONG_CARDLESS_FINAL_BLOCK}]}},
 ]
 
-# Negative control: no card anywhere in the turn — the guard MUST still block a long,
-# non-trivial turn with no reviewer card, or the guard is doing nothing at all.
+# No-card-anywhere: the strongest miss shape — must be non-blocking but MUST still log,
+# or the guard would be doing nothing at all.
 _NO_CARD_ANYWHERE_TRANSCRIPT = [
     {"type": "user", "message": {"role": "user", "content": "do the thing"}},
     {"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Some early text with no card. " * 10}]}},
@@ -221,11 +235,6 @@ _NO_CARD_ANYWHERE_TRANSCRIPT = [
 ]
 
 
-# Issue #290 (owner-approved ceremony downgrade): a turn whose FIRST line explicitly declares
-# Grade-A/no-strengthening is exempt from the full-card enforcement — it only owes the banner +
-# a one-line declaration. Deliberately >600 chars (and NOT matching the `trivial` detector's
-# "ran as-is"/"no enhancement" first-line phrasing) so this exercises the NEW `gradea` path, not
-# the pre-existing `trivial` escape (which is length-capped at <600 and phrased differently).
 _GRADE_A_DECLARED_TEXT = (
     "*Enhanced: checked git state and recent commits — Grade A, no strengthening needed*\n\n"
     + ("This turn's prompt was already clear, well-scoped, and needed no rewriting. " * 8)
@@ -241,33 +250,20 @@ _GRADE_A_DECLARED_TRANSCRIPT = [
 ]
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_hub_guard_gradea_declared_turn_is_not_blocked(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _GRADE_A_DECLARED_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"hub {GUARD} wrongly blocked a turn that explicitly declared Grade-A/no-strengthening "
-        f"in its first 3 lines with no full card (issue #290 sampled ceremony): {out}"
-    )
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_plugin_guard_gradea_declared_turn_is_not_blocked(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _GRADE_A_DECLARED_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} wrongly blocked a turn that explicitly declared "
-        f"Grade-A/no-strengthening in its first 3 lines with no full card (issue #290): {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
-# ── Anchored strong-banner exemption (fix/enhance-gradea-strong-banner) ──
-# The UserPromptSubmit reminder tells a STRONG prompt to emit exactly
-# "*Enhanced: prompt already strong (grade N) — ran as-is*", but the gradea regex did not
-# recognise that wording ("already strong"/"grade 8" are not "grade a"; "ran as-is" != "ran
-# input as-is"), so a turn that FOLLOWED the sanctioned strong format was blocked anyway. Fix:
-# exempt ONLY the anchored literal `prompt already strong (grade <digit>` — tight enough that
-# loose "strong" prose cannot dodge the full-card enforcement (the no-hole control below).
 _STRONG_BANNER_TEXT = (
     "*Enhanced: prompt already strong (grade 8) — ran as-is*\n\n"
     + ("The prompt was clear and well scoped, so I proceeded directly with the work. " * 9)
@@ -281,8 +277,8 @@ _STRONG_BANNER_TRANSCRIPT = [
 
 # No-hole control: a turn that only CLAIMS strength in loose prose ("was already strong") but does
 # NOT emit the anchored "prompt already strong (grade <digit>" banner — and has no card, no
-# grade-a, no "no strengthening needed" — must STILL block. The exemption is the exact banner,
-# not any mention of strength.
+# grade-a, no "no strengthening needed" — used to still BLOCK. It must now still LOG (the
+# exemption is the exact banner, not any mention of strength) but never block.
 _LOOSE_STRONG_PROSE_TEXT = (
     "I judged the request and the prompt was already strong enough to run, so I did. "
     + ("Proceeding with the change and reporting the outcome below. " * 9)
@@ -299,66 +295,57 @@ _LOOSE_STRONG_PROSE_TRANSCRIPT = [
 ]
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_hub_guard_exempts_sanctioned_strong_banner(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _STRONG_BANNER_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"hub {GUARD} wrongly blocked a turn opening with the sanctioned strong banner "
-        f"'prompt already strong (grade N)' (reminder/guard wording mismatch): {out}"
-    )
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_plugin_guard_exempts_sanctioned_strong_banner(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _STRONG_BANNER_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} wrongly blocked the sanctioned strong banner: {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_hub_guard_still_blocks_loose_strong_prose(tmp_path_factory):
-    """No-hole: mentioning 'strong' in prose must NOT exempt — only the anchored banner does."""
+@requires_bash_jq
+def test_hub_guard_never_blocks_loose_strong_prose_but_still_logs(tmp_path_factory):
+    """No-hole control, updated for T-143: mentioning 'strong' in prose does not exempt the
+    card-miss telemetry (only the anchored banner does) — but the miss must be LOGGED, not
+    used to block the turn."""
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _LOOSE_STRONG_PROSE_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"hub {GUARD} failed to block a turn that only claims strength in loose prose — the "
-        f"anchored exemption must not open a hole: {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" in _violations_log(scratch), (
+        "the no-hole control must still be logged as a card miss, or the anchored exemption "
+        "opened a telemetry hole too"
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_plugin_guard_still_blocks_loose_strong_prose(tmp_path_factory):
+@requires_bash_jq
+def test_plugin_guard_never_blocks_loose_strong_prose(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _LOOSE_STRONG_PROSE_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} failed to block loose 'strong' prose (no-hole control): {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_hub_guard_still_blocks_when_neither_card_nor_gradea_declared(tmp_path_factory):
-    """Companion negative for #290: a substantive turn with NEITHER a card NOR a Grade-A
-    declaration must stay blocked — the downgrade is an ADDITIVE exemption, not a general
-    loosening. Reuses the existing #253/#279 negative-control transcript."""
+@requires_bash_jq
+def test_hub_guard_never_blocks_when_neither_card_nor_gradea_declared(tmp_path_factory):
+    """Companion negative for #290, updated for T-143: a substantive turn with NEITHER a card
+    NOR a Grade-A declaration must never block — but must still log the miss (the downgrade
+    stays an ADDITIVE exemption on the LOG side, not a telemetry blackout)."""
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"hub {GUARD} failed to block a substantive turn with no card and no Grade-A "
-        f"declaration (weak-prompt path must stay enforced, issue #290): {out}"
-    )
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" in _violations_log(scratch)
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_plugin_guard_still_blocks_when_neither_card_nor_gradea_declared(tmp_path_factory):
+@requires_bash_jq
+def test_plugin_guard_never_blocks_when_neither_card_nor_gradea_declared(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} failed to block a substantive turn with no card and no "
-        f"Grade-A declaration (weak-prompt path must stay enforced, issue #290): {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
 # Regression lock for issue #279: a fully-rendered card whose reviewer COLUMN is worded
@@ -399,8 +386,8 @@ _DIFF_WORDED_CARD_TRANSCRIPT = [
 # Negative control for the H1 tightening (issue #279 review): an UNRELATED markdown table
 # that merely contains the word "reviewer" (e.g. "| File | Reviewer |") plus the common word
 # "overall" somewhere — but NO before/after/self card header row and NONE of the enhance
-# prose tokens — must NOT be credited as a card. The guard MUST still block, or the widened
-# regex would have opened a genuine-miss escape hatch.
+# prose tokens — must NOT be credited as a card. The guard must still LOG it as a miss (never
+# block), or the widened regex would have opened a genuine-miss telemetry hole.
 _REVIEWER_TABLE_NO_CARD_TEXT = (
     "Here is the assignment table for the sprint:\n"
     "| File | Reviewer |\n"
@@ -433,8 +420,8 @@ def test_discriminating_transcript_would_trip_a_last_block_only_bug():
     """Meta-check: prove the transcript above actually discriminates. If a guard only
     looked at the LAST assistant text block (the literal bug #253 describes), that
     block alone already clears the length gate and contains no card token — so a
-    last-block-only implementation would find "substantive, no card" and block. This
-    is what makes test_*_credits_a_card_rendered_before_tool_calls below meaningful:
+    last-block-only implementation would find "substantive, no card" and misclassify it.
+    This is what makes test_*_credits_a_card_rendered_before_tool_calls below meaningful:
     the real hooks passing it proves they look past the last block, not that the
     scenario was too small to trigger the guard at all (2026-07-03 review finding)."""
     assert len(_LONG_CARDLESS_FINAL_BLOCK) >= 300
@@ -442,85 +429,79 @@ def test_discriminating_transcript_would_trip_a_last_block_only_bug():
     assert not re.search(r"reviewer-after|reviewer col|blind re-?grade|independent[ -]reviewer", lowered)
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_hub_guard_credits_a_card_rendered_before_tool_calls(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _MID_TURN_CARD_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"hub {GUARD} wrongly blocked a turn whose card rendered before tool calls (issue #253): {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" not in _violations_log(scratch), (
+        "issue #253: a card rendered before tool calls must be credited, not logged as a miss"
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_plugin_guard_credits_a_card_rendered_before_tool_calls(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _MID_TURN_CARD_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} wrongly blocked a turn whose card rendered before tool calls (issue #253): {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_hub_guard_still_blocks_when_no_card_anywhere(tmp_path_factory):
+@requires_bash_jq
+def test_hub_guard_never_blocks_when_no_card_anywhere_but_still_logs(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"hub {GUARD} failed to block a substantive turn with no reviewer card anywhere: {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" in _violations_log(scratch), (
+        f"hub {GUARD} must still log a substantive turn with no reviewer card anywhere"
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_plugin_guard_still_blocks_when_no_card_anywhere(tmp_path_factory):
+@requires_bash_jq
+def test_plugin_guard_never_blocks_when_no_card_anywhere(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} failed to block a substantive turn with no reviewer card anywhere: {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_hub_guard_credits_differently_worded_reviewer_column(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _DIFF_WORDED_CARD_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"hub {GUARD} wrongly blocked a card whose reviewer column is worded differently "
-        f"(issue #279): {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" not in _violations_log(scratch), (
+        "issue #279: a differently-worded reviewer column must be credited, not logged as a miss"
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_plugin_guard_credits_differently_worded_reviewer_column(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _DIFF_WORDED_CARD_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} wrongly blocked a card whose reviewer column is worded "
-        f"differently (issue #279): {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_hub_guard_still_blocks_reviewer_table_without_a_real_card(tmp_path_factory):
+@requires_bash_jq
+def test_hub_guard_never_blocks_reviewer_table_without_a_real_card_but_still_logs(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _REVIEWER_TABLE_NO_CARD_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"hub {GUARD} failed to block a turn whose only 'reviewer' content is an unrelated "
-        f"table (no before/after/self card header) (issue #279 review): {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" in _violations_log(scratch), (
+        f"hub {GUARD} must still log a turn whose only 'reviewer' content is an unrelated "
+        f"table (no before/after/self card header) (issue #279 review)"
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_plugin_guard_still_blocks_reviewer_table_without_a_real_card(tmp_path_factory):
+@requires_bash_jq
+def test_plugin_guard_never_blocks_reviewer_table_without_a_real_card(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _REVIEWER_TABLE_NO_CARD_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} failed to block a turn whose only 'reviewer' content is an "
-        f"unrelated table (no before/after/self card header) (issue #279 review): {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
 def test_card_regex_consistent_across_guards():
     """H6: the card-detection regex AND the overall-row regex must be byte-identical across
-    the hub, core, and plugin guards so they cannot drift out of sync again (issue #279)."""
+    the hub, core, and plugin guards so they cannot drift out of sync again (issue #279).
+    Detection logic is unchanged by T-143 — only the block/no-block consequence changed."""
     hub_body = (HUB / GUARD).read_text(encoding="utf-8")
     core_body = (CORE / GUARD).read_text(encoding="utf-8")
     plugin_body = PLUGIN_GUARD.read_text(encoding="utf-8")
@@ -536,7 +517,7 @@ def test_card_regex_consistent_across_guards():
 # as a plain (non-tool_result) user message that SPLITS the turn — it becomes the guard's
 # $last_user and carries the stable marker "Base directory for this skill:". The enhance banner
 # lands in the pre-split segment, so the post-split final text ($last_text) has no card → the guard
-# would false-block. Skills are enhance-exempt, so a $last_user carrying that marker exempts the turn.
+# used to false-block. Skills are enhance-exempt, so a $last_user carrying that marker exempts the turn.
 _SKILL_BODY = (
     "Base directory for this skill: /repo/.claude/skills/end-session\n\n"
     "# End Session — Round Up & Close\n\nClose out a work session cleanly..."
@@ -555,23 +536,21 @@ _SKILL_TURN_TRANSCRIPT = [
 ]
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_hub_guard_exempts_skill_execution_turn(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _SKILL_TURN_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"hub {GUARD} wrongly blocked a skill-execution turn whose card-less final segment follows "
-        f"a harness-injected skill body — skills are enhance-exempt (turn-split false-block): {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" not in _violations_log(scratch), (
+        "skill-execution turns are enhance-exempt — must not even be logged as a miss"
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_plugin_guard_exempts_skill_execution_turn(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _SKILL_TURN_TRANSCRIPT, scratch)
-    assert not _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} wrongly blocked a skill-execution turn (turn-split false-block): {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
 def test_guards_carry_skill_body_marker_exemption():
@@ -584,9 +563,9 @@ def test_guards_carry_skill_body_marker_exemption():
 
 # ── Coexistence dedup (fix/dedup-enhance-stop-hooks): the plugin guard must STAND DOWN where
 # the hub-operational superset Stop hook (no-overask-guard.sh) is present AND wired, so a single
-# card-miss cannot double-fire (two blocks + two log lines — the enhance-block-miss double-count).
-# Downstream projects without that hook keep full plugin enforcement (no regression — already
-# pinned by test_plugin_guard_still_blocks_when_no_card_anywhere, which uses a bare scratch repo).
+# card-miss cannot double-log. Downstream projects without that hook keep full plugin telemetry
+# (no regression — already pinned by test_plugin_guard_never_blocks_when_no_card_anywhere, which
+# uses a bare scratch repo).
 
 
 def _scratch_repo_with_superset(tmp_path_factory) -> Path:
@@ -613,33 +592,34 @@ def test_plugin_guard_source_has_coexistence_standdown():
         "plugin guard must stand down when the hub superset hook is present AND wired"
     )
     # the hub guard is the superset ENFORCER — it must NOT carry a stand-down (it can't defer to
-    # itself), or the hub would lose all card enforcement.
+    # itself); it also must never block on its own account (T-143).
     hub_body = (HUB / GUARD).read_text(encoding="utf-8")
     assert "Coexistence guard" not in hub_body, "the hub superset guard must NOT stand itself down"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_plugin_guard_stands_down_when_superset_hook_present(tmp_path_factory):
-    """The dedup: a substantive card-less turn that the plugin guard WOULD block is left alone
-    once the hub-operational no-overask-guard.sh is present + wired (it enforces the same card)."""
+    """The dedup: a substantive card-less turn is left alone by the plugin guard once the
+    hub-operational no-overask-guard.sh is present + wired (it logs the same miss)."""
     scratch = _scratch_repo_with_superset(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
     assert not _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} double-fired: it must stand down where the superset "
-        f"no-overask-guard.sh is present + wired (dedup), leaving one enforcer, not two: {out}"
+        f"plugin {PLUGIN_GUARD.name} must never block (T-143), and must stand down where the "
+        f"superset no-overask-guard.sh is present + wired (dedup): {out}"
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_hub_guard_still_blocks_even_with_its_own_hook_present(tmp_path_factory):
+@requires_bash_jq
+def test_hub_guard_still_logs_even_with_its_own_hook_present(tmp_path_factory):
     """No-regression companion: the SUPERSET (hub) guard is the sole remaining enforcer where it
-    is wired, so it must still block the same card-less turn — the dedup removes the DUPLICATE,
-    never the enforcement."""
+    is wired, so it must still LOG the same card-less turn (never block — T-143) — the dedup
+    removes the DUPLICATE, never the telemetry."""
     scratch = _scratch_repo_with_superset(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _NO_CARD_ANYWHERE_TRANSCRIPT, scratch)
-    assert _is_block(out), (
-        f"hub {GUARD} must remain the active enforcer where it is wired (dedup keeps exactly "
-        f"one enforcer, not zero): {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" in _violations_log(scratch), (
+        "hub guard must remain the active LOGGER where it is wired (dedup keeps exactly one "
+        "logger, not zero)"
     )
 
 
@@ -662,10 +642,10 @@ def test_registry_hashes_in_sync():
 # (live repro: a correctly-rendered pre-execution enhance card never persisted to the
 # transcript — only thinking/tool_use entries and the final text did). The ordering rule
 # (prompt-auto-enhance.md) requires the card BEFORE execution tool calls, so on tool-using
-# turns the transcript is NOT evidence of card absence, and the guard false-blocked 5x in one
-# session. Fix: the model touches .claude/.enhance-card-rendered in the same turn as the
-# render; the guard credits marker OR persisted card text; prompt-enhance-reminder.sh resets
-# the marker on every real user prompt so it cannot carry over.
+# turns the transcript is NOT evidence of card absence, and the guard used to false-block. Fix:
+# the model touches .claude/.enhance-card-rendered in the same turn as the render; the guard
+# credits marker OR persisted card text; prompt-enhance-reminder.sh resets the marker on every
+# real user prompt so it cannot carry over.
 _DROPPED_CARD_TOOL_TURN = [
     {"type": "user", "message": {"role": "user", "content": "do the thing"}},
     # No early text entry AT ALL — the harness dropped it (text + tool_use in one response).
@@ -681,26 +661,29 @@ _DROPPED_CARD_TOOL_TURN = [
 ]
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_hub_guard_credits_marker_when_card_text_was_dropped(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     (scratch / ".claude").mkdir(exist_ok=True)
     (scratch / ".claude" / ".enhance-card-rendered").write_text("attested", encoding="utf-8")
     out = _run_guard(HUB / GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
-    assert not _is_block(out), (
-        f"hub {GUARD} must credit the .enhance-card-rendered marker on a tool-using turn whose "
-        f"card text the harness dropped (mid-turn text does not persist beside tool_use): {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" not in _violations_log(scratch), (
+        "hub guard must credit the .enhance-card-rendered marker on a tool-using turn whose "
+        "card text the harness dropped (mid-turn text does not persist beside tool_use)"
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_hub_guard_still_blocks_dropped_card_shape_without_marker(tmp_path_factory):
-    # No-hole control: same tool-using cardless shape, NO marker → the block must stand,
-    # or the marker fix would have silently disabled enforcement on all tool-using turns.
+@requires_bash_jq
+def test_hub_guard_still_logs_dropped_card_shape_without_marker(tmp_path_factory):
+    # No-hole control: same tool-using cardless shape, NO marker → must still be logged as a
+    # miss (never blocked — T-143), or the marker fix would have silently disabled telemetry
+    # on all tool-using turns.
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(HUB / GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
-    assert _is_block(out), (
-        f"hub {GUARD} must STILL block a cardless tool-using turn when no marker exists: {out}"
+    assert not _is_block(out), f"hub {GUARD} must never block (T-143): {out}"
+    assert "reviewer-card-miss" in _violations_log(scratch), (
+        f"hub {GUARD} must still log a cardless tool-using turn when no marker exists"
     )
 
 
@@ -712,25 +695,20 @@ def test_reminder_resets_card_marker():
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
+@requires_bash_jq
 def test_plugin_guard_credits_marker_when_card_text_was_dropped(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     (scratch / ".claude").mkdir(exist_ok=True)
     (scratch / ".claude" / ".enhance-card-rendered").write_text("attested", encoding="utf-8")
     out = _run_guard(PLUGIN_GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
-    assert not _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} must credit the .enhance-card-rendered marker on a "
-        f"tool-using turn whose card text the harness dropped: {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
-@pytest.mark.skipif(shutil.which("bash") is None or shutil.which("jq") is None, reason="requires bash+jq")
-def test_plugin_guard_still_blocks_dropped_card_shape_without_marker(tmp_path_factory):
+@requires_bash_jq
+def test_plugin_guard_never_blocks_dropped_card_shape_without_marker(tmp_path_factory):
     scratch = _scratch_repo(tmp_path_factory)
     out = _run_guard(PLUGIN_GUARD, _DROPPED_CARD_TOOL_TURN, scratch)
-    assert _is_block(out), (
-        f"plugin {PLUGIN_GUARD.name} must STILL block a cardless tool-using turn with no marker: {out}"
-    )
+    assert not _is_block(out), f"plugin {PLUGIN_GUARD.name} must never block (T-143): {out}"
 
 
 def test_plugin_reminder_resets_card_marker():

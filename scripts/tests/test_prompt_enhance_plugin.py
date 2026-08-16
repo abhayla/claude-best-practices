@@ -248,9 +248,18 @@ def _run_stop(assistant_text: str, tmp_path: Path, settings_file: Path | None = 
                           capture_output=True, text=True, cwd=str(tmp_path), env=env).stdout
 
 
+def _plugin_misses_log(tmp_path: Path) -> str:
+    p = tmp_path / ".claude" / ".enhance-plugin-misses.log"
+    return p.read_text(encoding="utf-8") if p.exists() else ""
+
+
 @pytestmark_fn
-def test_stop_blocks_when_table_missing(tmp_path):
-    assert '"block"' in _run_stop(_LONG + " no table here at all.", tmp_path)
+def test_stop_never_blocks_when_table_missing_but_logs(tmp_path):
+    # T-143 (owner-approved 2026-08-16, review Fix 3): this guard is telemetry-only — a
+    # missing table must never block, but must still be logged, or telemetry went dark.
+    out = _run_stop(_LONG + " no table here at all.", tmp_path)
+    assert '"block"' not in out, f"guard must never block (T-143): {out}"
+    assert "full-process-not-shown" in _plugin_misses_log(tmp_path)
 
 
 @pytestmark_fn
@@ -261,11 +270,13 @@ def test_stop_passes_with_full_process(tmp_path):
 
 
 @pytestmark_fn
-def test_stop_blocks_when_overall_row_missing(tmp_path):
-    # Reviewer-after column present but NO Overall/total row -> incomplete card -> block.
-    # Regression guard for the dropped grade-card total row.
+def test_stop_never_blocks_when_overall_row_missing_but_logs(tmp_path):
+    # Reviewer-after column present but NO Overall/total row -> incomplete card -> logged,
+    # never blocked (T-143). Regression guard for the dropped grade-card total row.
     text = _LONG + " Diagnosis: VAGUE_INTENT. Reviewer-after column present. Changes Applied: [1] fix."
-    assert '"block"' in _run_stop(text, tmp_path)
+    out = _run_stop(text, tmp_path)
+    assert '"block"' not in out, f"guard must never block (T-143): {out}"
+    assert "full-process-not-shown" in _plugin_misses_log(tmp_path)
 
 
 @pytestmark_fn
@@ -290,12 +301,14 @@ def test_stop_no_block_in_scale_to_prompt_quality_mode(tmp_path):
 
 
 @pytestmark_fn
-def test_stop_still_blocks_in_only_for_weak_prompts_mode_without_gradea(tmp_path):
-    # #290: only_for_weak_prompts is now the DEFAULT sampled mode — it stays enforced (a weak
-    # prompt still owes the full card); only an explicitly-declared Grade-A turn is exempt
-    # (covered by test_stop_no_block_when_gradea_declared below).
+def test_stop_still_logs_in_only_for_weak_prompts_mode_without_gradea(tmp_path):
+    # #290: only_for_weak_prompts is now the DEFAULT sampled mode — a weak prompt still owes
+    # the full card, so it is still LOGGED (never blocked — T-143); only an
+    # explicitly-declared Grade-A turn is exempt (test_stop_no_block_when_gradea_declared).
     sf = _write_settings(tmp_path, **{"display.how_much_to_show": "only_for_weak_prompts"})
-    assert '"block"' in _run_stop(_LONG + " one-liner, no table.", tmp_path, settings_file=sf)
+    out = _run_stop(_LONG + " one-liner, no table.", tmp_path, settings_file=sf)
+    assert '"block"' not in out, f"guard must never block (T-143): {out}"
+    assert "full-process-not-shown" in _plugin_misses_log(tmp_path)
 
 
 @pytestmark_fn

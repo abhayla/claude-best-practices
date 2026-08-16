@@ -26,3 +26,5 @@ jobs:
         run: PYTHONPATH=. python scripts/check_eval_coverage.py --enforce --base "origin/${{ github.base_ref }}"
       - name: Plugin version-bump gate (blocking)
         run: PYTHONPATH=. python scripts/check_plugin_version_bump.py --base "origin/${{ github.base_ref }}"
+      - name: Root marketplace mirror in sync (blocking)
+        run: PYTHONPATH=. python scripts/generate_root_marketplace.py --check

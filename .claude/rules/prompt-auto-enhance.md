@@ -22,39 +22,43 @@ covers turns the prompt-side gate stayed silent on. Below is every check it runs
 with no line here is **guidance only**, not machine-verified; the skill (`/prompt-auto-enhance`
 STEP 4–4.7) owns the "how", this rule owns the "what's checked".
 
-**BLOCKING** (turn re-opened, capped at 4 auto-continues/turn) — applies only to a
-substantive (≥300-char), non-exempt turn:
-- **Card gate**: needs a markdown row combining `before|after|self` with `reviewer`, OR one
+**TELEMETRY-ONLY, never blocking** (T-143, owner-approved 2026-08-16, review Fix 3: 840
+stop-violation auto-continues + 534 enhance-misses over 3 months of rule-tightening never
+converged compliance, and each block cost a paid extra model turn — the logs stay as the
+instrument, the whip is gone). Every check below LOGS a miss to `.claude/.overask-violations.log`
+or `.claude/.enhance-misses.log` (unchanged files/line formats — `scripts/lint_rule_compliance.py`
+still works off them) and lets the turn end; none of them re-open a turn or emit
+`{"decision":"block"}`. Applies only to a substantive (≥300-char), non-exempt turn unless noted:
+- **Card check**: needs a markdown row combining `before|after|self` with `reviewer`, OR one
   of `reviewer-after` / `reviewer col` / `blind re-grade` / `independent-reviewer`, PLUS a
   closing `overall` row (`overall`, a letter transition like `b → a`, or `weighted total`).
-  Either missing → blocked.
-- **Substance gate** (only once a card matched): needs `diagnosis:`, `changes applied`, a
+  Either missing → logged as `reviewer-card-miss`.
+- **Substance check** (only once a card matched): needs `diagnosis:`, `changes applied`, a
   `MISSING_*`/`VAGUE_INTENT`/`UNDER_CONSTRAINED` taxonomy tag, or a grade-a/zero-fix token.
-  Missing → blocked.
+  Missing → logged as `diagnosis-substance-miss`.
 - **Banner short-circuit** (T-116): a turn whose first line matches `^\*enhanced` skips both
-  gates above outright — no card or marker required.
+  checks above outright — no card or marker required.
 - **Marker attestation**: when the harness drops a same-response pre-execution card (shares
   an API response with tool_use) so it never reaches the transcript, touching
-  `.claude/.enhance-card-rendered.<session_id>` satisfies both gates in its place — real hook
+  `.claude/.enhance-card-rendered.<session_id>` satisfies both checks in its place — real hook
   state, not prose.
+- **Over-ask / narrate-and-stop**: a trailing offer, multiple-choice, recommendation+question,
+  or deferred-next-step ending on reversible work → logged as `stop-violation (<class>)`.
 
-**EXEMPTIONS** (checked before the gates above; a hit skips all output-side enforcement):
+**EXEMPTIONS** (checked before the checks above; a hit skips all output-side telemetry):
 `is_slash` (last submission opens `<command-name>`, `Base directory for this skill:`, or a
 literal leading `/`) and `machine` (`classify_turn()`) exempt everything below. `trivial`
 (first line matches `ran (your )?input as-is|ran as-is|no change —|no enhancement`, turn
 <600 chars) and `gradea` (first 3 lines match `grade a[^a-z]|grade: a|no strengthening
 needed|no change —|ran (your )?input as-is|ran as-is|0 fix|no fix|prompt already strong
-\(grade [0-9]`) exempt only the two BLOCKING gates.
+\(grade [0-9]`) exempt only the card/substance checks.
 
-**TELEMETRY-ONLY** (logged to `.claude/.enhance-misses.log`, never blocks — escalate a class
-to BLOCKING only if it stays the dominant miss after this rewrite; recheck via
-`scripts/lint_rule_compliance.py`):
+**Also telemetry-only** (logged to `.claude/.enhance-misses.log`):
 - `enhance-banner-miss`: substantive, non-`is_slash`/non-`machine` turn whose first line does
   NOT match `^\*enhanced` (not gated by `trivial`/`gradea`).
 - `enhance-block-miss`: banner present, not `gradea`, but none of `final prompt|what
   changed|ran (your )?input as-is|ran as-is|no change — ran|no enhancement` appear anywhere
-  — the banner ran but nothing marks what got strengthened. Was the dominant class (71/92
-  misses, 30d) driving this rewrite.
+  — the banner ran but nothing marks what got strengthened.
 - `role-miss`: a `final (strengthened )?prompt` block exists with no `act as`.
 
 Everything else previously described here — transcript formatting, the reviewer provenance

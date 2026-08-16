@@ -298,20 +298,103 @@ def write_effectiveness_to_registry(
 
 
 def load_telemetry_aggregates(path: Path) -> dict:
-    """Load telemetry aggregates from config/telemetry-aggregates.json."""
+    """Load per-pattern telemetry aggregates from config/telemetry-aggregates.json.
+
+    Reads BOTH schemas: the T-144 form ({"patterns": {...}, "_outcomes": {...}}) and the
+    older flat form ({"<pattern>": {...}}), always returning just the per-pattern map so
+    existing callers keep working across the transition. A file already on disk from a
+    previous run must not become unreadable because the writer gained a section.
+    """
     if not path.exists():
         return {}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, UnicodeDecodeError):
         return {}
+    if isinstance(data, dict) and isinstance(data.get("patterns"), dict):
+        return data["patterns"]
+    return data
 
 
-def save_telemetry_aggregates(path: Path, aggregates: dict) -> None:
-    """Save telemetry aggregates to config/telemetry-aggregates.json."""
+def collect_outcomes(days: int = 30) -> dict:
+    """Run the outcome scorecard as this workflow's metrics source (T-144).
+
+    Degrades to an explicit `unavailable` marker rather than failing the aggregation: a
+    telemetry run must still publish pattern data when `gh` is unreachable, and a silent
+    empty dict would read as "measured, and everything is zero".
+    """
+    try:
+        from scripts.measure_outcomes import (
+            FetchError,
+            _strip_detail,
+            fetch_merged_prs,
+            load_cost_records,
+            measure_all,
+        )
+
+        try:
+            prs = fetch_merged_prs()
+        except FetchError as exc:
+            # "Could not measure" is recorded as such — never as a measured zero.
+            return {"unavailable": f"could not read PR history: {exc}"}
+        if not prs:
+            return {"unavailable": "no merged PRs found in history"}
+        # Summary only — the per-PR classification lists belong in `--explain` output,
+        # not committed into a tracked config file on every weekly run.
+        return _strip_detail(measure_all(prs, load_cost_records(), days, None))
+    except Exception as exc:  # never let the scorecard break telemetry aggregation
+        return {"unavailable": f"outcome measurement failed: {type(exc).__name__}: {exc}"}
+
+
+MIN_HONEST_SAMPLE = 2
+
+
+def retire_tautological_adoption(aggregates: dict, min_sample: int = MIN_HONEST_SAMPLE) -> dict:
+    """Drop file-exists adoption figures that carry no information (T-144).
+
+    `adoption_rate` here means "the provisioned file is still on disk". At sample_size 1
+    that is a TAUTOLOGY: provisioning put the file there, so the rate is 1.0 by
+    construction and moves for no reason anyone cares about. Reporting it next to real
+    measurements taught readers to trust a number that could never say anything else.
+
+    Below `min_sample` projects, adoption_rate/retention_days_p50 are dropped and a
+    `adoption_note` explains the omission — the honest "no data" answer. The count is
+    kept as `adoption_sample_size` so a reader can see WHY it was withheld.
+    error_prevention_rate survives at any sample: it comes from recorded learnings, which
+    is real evidence rather than a file-existence check.
+    """
+    cleaned: dict = {}
+    for name, eff in aggregates.items():
+        if not isinstance(eff, dict):
+            cleaned[name] = eff
+            continue
+        entry = dict(eff)
+        if entry.get("sample_size", 0) < min_sample:
+            had_adoption = entry.pop("adoption_rate", None) is not None
+            entry.pop("retention_days_p50", None)
+            if had_adoption:
+                entry["adoption_note"] = (
+                    f"withheld — file-exists adoption at sample_size "
+                    f"{entry.get('sample_size', 0)} is a tautology, not a measurement; "
+                    f"see scripts/measure_outcomes.py for invocation-based adoption"
+                )
+        cleaned[name] = entry
+    return cleaned
+
+
+def save_telemetry_aggregates(path: Path, aggregates: dict, outcomes: dict | None = None) -> None:
+    """Save telemetry aggregates to config/telemetry-aggregates.json.
+
+    Tautological file-exists adoption is retired on write (see
+    retire_tautological_adoption), and the outcome scorecard — the metrics that actually
+    say whether the work turned out well — is written alongside under `_outcomes`.
+    """
+    payload: dict = {"patterns": retire_tautological_adoption(aggregates)}
+    if outcomes is not None:
+        payload["_outcomes"] = outcomes
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        json.dumps(aggregates, indent=2, ensure_ascii=False) + "\n",
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
 
@@ -479,8 +562,9 @@ def aggregate_remote(
     print(f"\nWriting effectiveness data for {len(effectiveness)} patterns...")
     write_effectiveness_to_registry(registry_path, effectiveness)
 
-    # Save aggregates for historical tracking
-    save_telemetry_aggregates(output_path, effectiveness)
+    # Save aggregates for historical tracking, with the outcome scorecard alongside —
+    # per-pattern adoption says what was PROVISIONED, the outcomes say what came of it.
+    save_telemetry_aggregates(output_path, effectiveness, outcomes=collect_outcomes())
     print(f"Aggregates saved to {output_path}")
 
     # Summary
@@ -518,7 +602,7 @@ if __name__ == "__main__":
         effectiveness = aggregate_project_telemetry(project_dirs)
         if effectiveness:
             write_effectiveness_to_registry(Path(args.registry), effectiveness)
-            save_telemetry_aggregates(Path(args.output), effectiveness)
+            save_telemetry_aggregates(Path(args.output), effectiveness, outcomes=collect_outcomes())
             print(f"\nWrote effectiveness for {len(effectiveness)} patterns")
         else:
             print("No adoption data found.")

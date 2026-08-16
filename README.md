@@ -59,6 +59,12 @@ rm -rf .claude/skills/android-*
 rm -f .claude/agents/android-*
 ```
 
+> **⚠️ Some copied skills are pointer stubs, not working code.** A capability that has
+> "graduated" to a plugin (G6) is represented in `core/.claude/skills/` by a thin pointer file
+> telling you to `/plugin install` the real thing — copying it gives you the pointer's text, not
+> the workflow. See [`docs/installing-plugins-in-downstream-projects.md`](docs/installing-plugins-in-downstream-projects.md)
+> for the full plugin table (what's graduated, what each plugin bundles) and the install steps.
+
 ---
 
 #### Option B: Smart provisioning (recommended for most users)
@@ -150,6 +156,10 @@ Once your project has a `.claude/` directory, you can use all the skills directl
 | **Rules** | 58 | Scoped coding rules for workflow, testing, FastAPI, Android, Compose, Firebase, etc. |
 | **Hooks** | 22 | Auto-format, secret scanning, dangerous command blocking, context monitoring, governance |
 <!-- COUNTS:END -->
+
+> A subset of the Skills count above are plugin-pointer stubs (see the warning box under
+> Option A) — install the matching plugin from [`docs/installing-plugins-in-downstream-projects.md`](docs/installing-plugins-in-downstream-projects.md)
+> to get the working skill, not just the pointer.
 
 See [`core/.claude/README.md`](core/.claude/README.md) for the full catalog with descriptions.
 
