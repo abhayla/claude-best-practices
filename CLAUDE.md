@@ -117,7 +117,7 @@ The hub manages its own git branches end-to-end so the user never touches git. T
 
 ### Stack Detection
 
-Two mechanisms: (1) **Stack prefixes** in `STACK_PREFIXES` (`bootstrap.py`) — `fastapi-*`, `android-*`, `react-*`, `firebase-*`, `ai-gemini-*`. (2) **Dependency detection** via `DEP_PATTERN_MAP` (`recommend.py`) — matches `flutter-*`, `vue-*`, `bun-elysia-*`, etc. from project dependencies. Universal patterns have no prefix. Adding a new stack requires changes in `STACK_PREFIXES` (bootstrap.py), `STACK_DETECTORS` (recommend.py), and optionally `DEP_PATTERN_MAP` (recommend.py).
+Two mechanisms: (1) **Stack prefixes** in `STACK_PREFIXES` (`bootstrap.py`) — `fastapi-*`, `android-*`, `react-*`, `firebase-*`, `ai-gemini-*`. (2) **Dependency detection** via `DEP_PATTERN_MAP` (`scripts/dependency_detection.py`) — matches `flutter-*`, `vue-*`, `bun-elysia-*`, etc. from project dependencies. Universal patterns have no prefix. Adding a new stack requires changes in `STACK_PREFIXES` (bootstrap.py), `STACK_DETECTORS` (scripts/dependency_detection.py), and optionally `DEP_PATTERN_MAP` (scripts/dependency_detection.py).
 
 Available stacks and their prefixes (full per-stack pattern listing: `docs/STACK-CATALOG.md`):
 
@@ -169,7 +169,7 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 
 ### Key Scripts
 
-- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Defines `STACK_DETECTORS` and `DEP_PATTERN_MAP`. Calls `third_party_skills.py` during provisioning for third-party agent skill detection
+- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Calls `third_party_skills.py` during provisioning for third-party agent skill detection. (`STACK_DETECTORS` and `DEP_PATTERN_MAP` defined in `scripts/dependency_detection.py`)
 - **`bootstrap.py`** — Core copy logic. CLI: `python scripts/bootstrap.py --stacks <stack1,stack2> --target <dir>`. Defines `STACK_PREFIXES`
 - **`workflow_quality_gate_validate_patterns.py`** — CI validator for frontmatter, cross-references, registry sync
 - **`dedup_check.py`** — Dedup validator (`--validate-all`) and secret scanner (`--secret-scan`)
