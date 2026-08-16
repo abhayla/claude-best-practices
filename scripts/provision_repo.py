@@ -1,0 +1,495 @@
+import copy
+import subprocess
+import tempfile
+from pathlib import Path
+from typing import Optional
+
+from scripts.hub_resources import get_project_resource_names
+from scripts.overlap_analysis import analyze_overlaps_local, format_divergence_table
+from scripts.provision_local import _copy_resources_for_tier, apply_to_local, provision_claude_md, provision_settings_json, provision_to_local
+
+
+def apply_to_repo(
+    hub_root: Path,
+    repo: str,
+    gaps: dict[str, list[dict]],
+    tier: str = "must-have",
+) -> Optional[str]:
+    """Clone a repo, apply recommendations on a branch, and create a PR.
+
+    Returns the PR URL if successful.
+    """
+    from scripts.sync_to_projects import check_existing_pr
+
+    branch = "claude-recommendations"
+
+    if check_existing_pr(repo, branch):
+        print(f"PR already exists for branch '{branch}' on {repo}. Skipping.")
+        return None
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Full clone (need to push back)
+        try:
+            subprocess.run(
+                ["git", "clone", f"https://github.com/{repo}.git", tmpdir],
+                capture_output=True, text=True, check=True, timeout=120,
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            print(f"Failed to clone {repo}: {e}")
+            return None
+
+        # Create branch
+        subprocess.run(
+            ["git", "-C", tmpdir, "checkout", "-b", branch],
+            capture_output=True, text=True, check=True,
+        )
+
+        # Copy resources
+        copied = apply_to_local(hub_root, Path(tmpdir), gaps, tier)
+        if not copied:
+            print("No resources to copy.")
+            return None
+
+        # Commit (.gitignore may have gained the runtime-artifact ignore block)
+        subprocess.run(
+            ["git", "-C", tmpdir, "add", ".claude/", ".gitignore"],
+            capture_output=True, text=True, check=True,
+        )
+
+        must_count = len(gaps.get("must-have", []))
+        nice_count = len(gaps.get("nice-to-have", []))
+        commit_msg = (
+            f"feat: add {len(copied)} recommended Claude resources\n\n"
+            f"Added {must_count} must-have and "
+            f"{nice_count if tier == 'nice-to-have' else 0} nice-to-have resources "
+            f"from claude-best-practices hub.\n\n"
+            f"Files:\n" + "\n".join(f"  - {f}" for f in copied[:20])
+        )
+        if len(copied) > 20:
+            commit_msg += f"\n  ... and {len(copied) - 20} more"
+
+        subprocess.run(
+            ["git", "-C", tmpdir, "commit", "-m", commit_msg],
+            capture_output=True, text=True, check=True,
+        )
+
+        # Push
+        subprocess.run(
+            ["git", "-C", tmpdir, "push", "-u", "origin", branch],
+            capture_output=True, text=True, check=True,
+        )
+
+        # Create PR
+        pr_body = (
+            "## Summary\n\n"
+            f"Auto-generated recommendations from [claude-best-practices]"
+            f"(https://github.com/abhayla/claude-best-practices) hub.\n\n"
+            f"- **{must_count}** must-have resources\n"
+            f"- **{nice_count if tier == 'nice-to-have' else 0}** nice-to-have resources\n\n"
+            "## Files added\n\n"
+            + "\n".join(f"- `{f}`" for f in copied[:30])
+        )
+        if len(copied) > 30:
+            pr_body += f"\n- ... and {len(copied) - 30} more"
+
+        result = subprocess.run(
+            ["gh", "pr", "create",
+             "--repo", repo,
+             "--head", branch,
+             "--title", f"feat: add {len(copied)} recommended Claude resources",
+             "--body", pr_body],
+            capture_output=True, text=True, timeout=30,
+        )
+
+        if result.returncode == 0:
+            return result.stdout.strip()
+        else:
+            print(f"PR creation failed: {result.stderr}")
+            return None
+
+
+def _format_nice_to_have_pr_body(items: list[dict]) -> str:
+    """Format a PR body with checkboxes for nice-to-have patterns."""
+    lines = [
+        "## Optional Patterns\n",
+        "Check the patterns you want, then comment `/apply` to finalize.",
+        "Unchecked patterns will be removed from this PR.\n",
+    ]
+
+    # Group by type
+    by_type: dict[str, list[dict]] = {}
+    for item in items:
+        by_type.setdefault(item["type"], []).append(item)
+
+    type_headers = {"skill": "Skills", "rule": "Rules", "agent": "Agents", "hook": "Hooks", "config": "Config"}
+    for rtype in ("skill", "rule", "agent", "hook", "config"):
+        type_items = by_type.get(rtype, [])
+        if not type_items:
+            continue
+        lines.append(f"### {type_headers.get(rtype, rtype.title())}")
+        for item in sorted(type_items, key=lambda x: x["name"]):
+            lines.append(f"- [ ] `{item['name']}`")
+        lines.append("")
+
+    lines.append("---")
+    lines.append(
+        "Generated by [claude-best-practices]"
+        "(https://github.com/abhayla/claude-best-practices) hub."
+    )
+    return "\n".join(lines)
+
+
+def _create_tier_branch_and_pr(
+    tmpdir: str,
+    repo: str,
+    branch: str,
+    default_branch: str,
+    hub_root: Path,
+    items: list[dict],
+    title: str,
+    body: str,
+) -> Optional[str]:
+    """Create a branch, copy resources, commit, push, and create PR.
+
+    Returns PR URL if successful, None otherwise.
+    """
+    # Create branch from default
+    subprocess.run(
+        ["git", "-C", tmpdir, "checkout", default_branch],
+        capture_output=True, text=True, check=True,
+    )
+    subprocess.run(
+        ["git", "-C", tmpdir, "checkout", "-b", branch],
+        capture_output=True, text=True, check=True,
+    )
+
+    # Copy resources
+    copied = _copy_resources_for_tier(hub_root, Path(tmpdir), items)
+    if not copied:
+        return None
+
+    # Stage
+    subprocess.run(
+        ["git", "-C", tmpdir, "add", ".claude/"],
+        capture_output=True, text=True,
+    )
+
+    # Check if anything staged
+    status = subprocess.run(
+        ["git", "-C", tmpdir, "diff", "--cached", "--quiet"],
+        capture_output=True, text=True,
+    )
+    if status.returncode == 0:
+        return None  # Nothing to commit
+
+    # Commit
+    commit_msg = f"feat: {title}\n\nFiles:\n" + "\n".join(f"  - {f}" for f in copied[:20])
+    if len(copied) > 20:
+        commit_msg += f"\n  ... and {len(copied) - 20} more"
+    subprocess.run(
+        ["git", "-C", tmpdir, "commit", "-m", commit_msg],
+        capture_output=True, text=True, check=True,
+    )
+
+    # Push
+    push_result = subprocess.run(
+        ["git", "-C", tmpdir, "push", "-u", "origin", branch],
+        capture_output=True, text=True,
+    )
+    if push_result.returncode != 0:
+        print(f"Push failed for {branch}: {push_result.stderr}")
+        return None
+
+    # Create PR
+    pr_result = subprocess.run(
+        ["gh", "pr", "create",
+         "--repo", repo,
+         "--head", branch,
+         "--title", title,
+         "--body", body],
+        capture_output=True, text=True, timeout=30,
+    )
+    if pr_result.returncode == 0:
+        return pr_result.stdout.strip()
+    else:
+        print(f"PR creation failed for {branch}: {pr_result.stderr}")
+        return None
+
+
+def provision_to_repo_multi_pr(
+    hub_root: Path,
+    repo: str,
+    gaps: dict[str, list[dict]],
+    stacks: list[str],
+    hub_resources: dict[str, list[dict]],
+    project_names: dict[str, set[str]],
+) -> dict[str, Optional[str]]:
+    """Clone a repo and create up to 3 PRs for different tiers.
+
+    Creates:
+    - claude-provision/must-have: New must-have patterns (merge confidently)
+    - claude-provision/improved: Hub upgrades to existing patterns (review diffs)
+    - claude-provision/nice-to-have: Optional patterns with checkboxes
+
+    Returns dict mapping tier name to PR URL (or None if tier was empty/skipped).
+    """
+    from scripts.sync_to_projects import check_existing_pr
+
+    result = {"must-have": None, "improved": None, "nice-to-have": None}
+
+    # Check for existing PRs on any of the branches
+    branches = {
+        "must-have": "claude-provision/must-have",
+        "improved": "claude-provision/improved",
+        "nice-to-have": "claude-provision/nice-to-have",
+    }
+    for tier_name, branch in branches.items():
+        if check_existing_pr(repo, branch):
+            print(f"PR already exists for '{branch}' on {repo}. Skipping {tier_name}.")
+            # Still allow other tiers to proceed
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Clone once
+        try:
+            subprocess.run(
+                ["git", "clone", f"https://github.com/{repo}.git", tmpdir],
+                capture_output=True, text=True, check=True, timeout=120,
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            print(f"Failed to clone {repo}: {e}")
+            return result
+
+        # Detect default branch
+        db_result = subprocess.run(
+            ["git", "-C", tmpdir, "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True, text=True,
+        )
+        default_branch = db_result.stdout.strip() or "main"
+
+        # Also provision CLAUDE.md + settings.json on the must-have branch
+        must_have_items = gaps.get("must-have", [])
+        improved_items = gaps.get("improved", [])
+        nice_items = gaps.get("nice-to-have", [])
+
+        # --- Must-have PR ---
+        if must_have_items and not check_existing_pr(repo, branches["must-have"]):
+            must_count = len(must_have_items)
+            must_body = (
+                "## Must-Have Patterns\n\n"
+                f"**{must_count}** essential patterns for this project.\n"
+                "These are safe to merge — they add new files only.\n\n"
+                "Auto-provisioned from [claude-best-practices]"
+                "(https://github.com/abhayla/claude-best-practices) hub.\n\n"
+                "## Patterns\n\n"
+                + "\n".join(
+                    f"- `{i['name']}` ({i['type']})"
+                    for i in sorted(must_have_items, key=lambda x: x["name"])
+                )
+            )
+            pr_url = _create_tier_branch_and_pr(
+                tmpdir, repo, branches["must-have"], default_branch,
+                hub_root, must_have_items,
+                f"feat: add {must_count} must-have Claude patterns",
+                must_body,
+            )
+            result["must-have"] = pr_url
+            if pr_url:
+                # Also provision CLAUDE.md and settings.json on this branch
+                project_names_updated = get_project_resource_names(Path(tmpdir) / ".claude")
+                rules_present = sorted(project_names_updated.get("rule", set()))
+                provision_claude_md(hub_root, Path(tmpdir), stacks, rules_present)
+                provision_settings_json(hub_root, Path(tmpdir))
+                # Amend to include config files
+                add_paths = []
+                if (Path(tmpdir) / "CLAUDE.md").exists():
+                    add_paths.append("CLAUDE.md")
+                if (Path(tmpdir) / ".claude" / "settings.json").exists():
+                    add_paths.append(".claude/settings.json")
+                if add_paths:
+                    subprocess.run(
+                        ["git", "-C", tmpdir, "add"] + add_paths,
+                        capture_output=True, text=True,
+                    )
+                    status = subprocess.run(
+                        ["git", "-C", tmpdir, "diff", "--cached", "--quiet"],
+                        capture_output=True, text=True,
+                    )
+                    if status.returncode != 0:
+                        subprocess.run(
+                            ["git", "-C", tmpdir, "commit", "-m",
+                             "feat: provision CLAUDE.md and settings.json"],
+                            capture_output=True, text=True,
+                        )
+                        subprocess.run(
+                            ["git", "-C", tmpdir, "push"],
+                            capture_output=True, text=True,
+                        )
+
+        # --- Improved PR ---
+        if improved_items and not check_existing_pr(repo, branches["improved"]):
+            imp_count = len(improved_items)
+            imp_body = (
+                "## Improved Patterns\n\n"
+                f"**{imp_count}** patterns where the hub has newer versions.\n"
+                "Review the diffs carefully — these overwrite existing files.\n\n"
+                "Auto-provisioned from [claude-best-practices]"
+                "(https://github.com/abhayla/claude-best-practices) hub.\n\n"
+                "## Patterns\n\n"
+                + "\n".join(
+                    f"- `{i['name']}` ({i['type']}) — {i.get('reason', '')}"
+                    for i in sorted(improved_items, key=lambda x: x["name"])
+                )
+            )
+            pr_url = _create_tier_branch_and_pr(
+                tmpdir, repo, branches["improved"], default_branch,
+                hub_root, improved_items,
+                f"feat: upgrade {imp_count} Claude patterns to latest hub versions",
+                imp_body,
+            )
+            result["improved"] = pr_url
+
+        # --- Nice-to-have PR ---
+        if nice_items and not check_existing_pr(repo, branches["nice-to-have"]):
+            nice_body = _format_nice_to_have_pr_body(nice_items)
+            pr_url = _create_tier_branch_and_pr(
+                tmpdir, repo, branches["nice-to-have"], default_branch,
+                hub_root, nice_items,
+                f"feat: {len(nice_items)} optional Claude patterns (check to keep)",
+                nice_body,
+            )
+            result["nice-to-have"] = pr_url
+
+    return result
+
+
+def provision_to_repo(
+    hub_root: Path,
+    repo: str,
+    gaps: dict[str, list[dict]],
+    stacks: list[str],
+    hub_resources: dict[str, list[dict]],
+    project_names: dict[str, set[str]],
+    tier: str = "must-have",
+) -> Optional[str]:
+    """Clone a repo, provision resources + config files, and create a PR.
+
+    Returns the PR URL if successful.
+    """
+    from scripts.sync_to_projects import check_existing_pr
+
+    branch = "claude-provision"
+
+    if check_existing_pr(repo, branch):
+        print(f"PR already exists for branch '{branch}' on {repo}. Skipping.")
+        return None
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            subprocess.run(
+                ["git", "clone", f"https://github.com/{repo}.git", tmpdir],
+                capture_output=True, text=True, check=True, timeout=120,
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            print(f"Failed to clone {repo}: {e}")
+            return None
+
+        subprocess.run(
+            ["git", "-C", tmpdir, "checkout", "-b", branch],
+            capture_output=True, text=True, check=True,
+        )
+
+        # Full provision
+        summary = provision_to_local(hub_root, Path(tmpdir), gaps, stacks, tier)
+        copied = summary["copied_files"]
+
+        # Analyze overlaps for PR body
+        updated_project_names = get_project_resource_names(Path(tmpdir) / ".claude")
+        overlaps = analyze_overlaps_local(
+            hub_root, Path(tmpdir), hub_resources, updated_project_names
+        )
+        divergence_table = format_divergence_table(overlaps)
+
+        # Git add — only include tracked/trackable files
+        # Note: CLAUDE.local.md is typically gitignored (personal prefs), so skip it
+        add_paths = []
+        if (Path(tmpdir) / ".claude").exists():
+            add_paths.append(".claude/")
+        if (Path(tmpdir) / "CLAUDE.md").exists():
+            add_paths.append("CLAUDE.md")
+        if not add_paths:
+            print("Nothing to provision — no files to stage.")
+            return None
+        result = subprocess.run(
+            ["git", "-C", tmpdir, "add"] + add_paths,
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            print(f"git add failed: {result.stderr}")
+            return None
+
+        # Check if there are staged changes — skip PR if nothing changed
+        status_result = subprocess.run(
+            ["git", "-C", tmpdir, "diff", "--cached", "--quiet"],
+            capture_output=True, text=True,
+        )
+        if status_result.returncode == 0:
+            # No staged changes
+            print("Nothing to provision — project is already up to date.")
+            return None
+
+        must_count = len(gaps.get("must-have", []))
+        nice_count = len(gaps.get("nice-to-have", []))
+        commit_msg = (
+            f"feat: provision {len(copied)} Claude resources + config\n\n"
+            f"Added {must_count} must-have and "
+            f"{nice_count if tier == 'nice-to-have' else 0} nice-to-have resources.\n"
+            f"CLAUDE.md: {summary['claude_md']}\n"
+            f"CLAUDE.local.md: {summary['claude_local_md']}\n"
+            f"settings.json: {summary['settings_json']}\n\n"
+            f"Files:\n" + "\n".join(f"  - {f}" for f in copied[:20])
+        )
+        if len(copied) > 20:
+            commit_msg += f"\n  ... and {len(copied) - 20} more"
+
+        subprocess.run(
+            ["git", "-C", tmpdir, "commit", "-m", commit_msg],
+            capture_output=True, text=True, check=True,
+        )
+
+        subprocess.run(
+            ["git", "-C", tmpdir, "push", "-u", "origin", branch],
+            capture_output=True, text=True, check=True,
+        )
+
+        pr_body = (
+            "## Summary\n\n"
+            f"Auto-provisioned from [claude-best-practices]"
+            f"(https://github.com/abhayla/claude-best-practices) hub.\n\n"
+            f"- **{must_count}** must-have resources\n"
+            f"- **{nice_count if tier == 'nice-to-have' else 0}** nice-to-have resources\n"
+            f"- CLAUDE.md: {summary['claude_md']}\n"
+            f"- CLAUDE.local.md: {summary['claude_local_md']}\n"
+            f"- settings.json: {summary['settings_json']}\n\n"
+            "## Files added\n\n"
+            + "\n".join(f"- `{f}`" for f in copied[:30])
+        )
+        if len(copied) > 30:
+            pr_body += f"\n- ... and {len(copied) - 30} more"
+
+        if divergence_table:
+            pr_body += f"\n\n{divergence_table}"
+
+        result = subprocess.run(
+            ["gh", "pr", "create",
+             "--repo", repo,
+             "--head", branch,
+             "--title", f"feat: provision {len(copied)} Claude resources + config",
+             "--body", pr_body],
+            capture_output=True, text=True, timeout=30,
+        )
+
+        if result.returncode == 0:
+            return result.stdout.strip()
+        else:
+            print(f"PR creation failed: {result.stderr}")
+            return None
