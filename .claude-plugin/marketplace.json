@@ -1,0 +1,63 @@
+{
+  "name": "claude-best-practices",
+  "owner": {
+    "name": "Abhay Kumar"
+  },
+  "metadata": {
+    "description": "Claude Best Practices Hub — capabilities packaged as installable Claude Code plugins (Goal 6). Install a plugin into any project and update it centrally from this marketplace.",
+    "version": "0.1.0",
+    "_generated": "GENERATED FILE — do not hand-edit. Derived from plugins/.claude-plugin/marketplace.json by scripts/generate_root_marketplace.py so the GitHub-URL marketplace-add form (`claude plugin marketplace add <owner>/<repo>`) resolves plugin sources correctly. Edit the source file and re-run the generator."
+  },
+  "plugins": [
+    {
+      "name": "prompt-auto-enhance",
+      "source": "./plugins/prompt-auto-enhance",
+      "description": "Diagnose-and-strengthen the user's prompt before it runs, with a fully toggleable enhancement pipeline (triggers, verbosity, grade card, independent reviewer, clarification gate) plus the workflow's own self-enforcement. Every criterion is an on/off switch, all default ON; edit enhance-settings.json and behavior auto-adjusts next turn."
+    },
+    {
+      "name": "branch-lifecycle",
+      "source": "./plugins/branch-lifecycle",
+      "description": "Hands-off git branch lifecycle for any repo: pick a branch once per session, auto-commit + push off main each turn, open a PR, arm CI-gated auto-merge on session close, prune merged branches, and warn when a second session shares the working tree. Bundles the branch-choice + git-branch-lifecycle control skills and the session save/restore skills (start-session/end-session/continue). Fully self-contained — every hook and skill works with no other hub files present; all behavior toggleable via branch-lifecycle-settings.json."
+    },
+    {
+      "name": "auto-google-analytics",
+      "source": "./plugins/auto-google-analytics",
+      "description": "Autonomous Google Analytics 4 for any project: /auto-google-analytics detects the stack, provisions the GA4 property + web stream via a service-account key (no browser login), injects the gtag + Consent Mode v2 + blanket ui_click snippet into source, verifies a real hit browser-free, and records the Measurement ID in a project-local inventory. Bundles the analytics-setup engine so it works standalone. One-time service-account key is the only human step; falls back to guided manual without it."
+    },
+    {
+      "name": "fable-operating-manual",
+      "source": "./plugins/fable-operating-manual",
+      "description": "Make any model operate with Claude Fable 5's working discipline: ships the Fable 5 Operating Manual (reasoning procedures extracted from Fable at peak capability), auto-delivers its distilled core into every session and every dispatched sub-agent via hooks, and includes /model-parity-test — a blind 3-arm trap-test exam (plain model vs model+manual vs Fable baseline) that measures exactly how much discipline transferred."
+    },
+    {
+      "name": "loop-engineering",
+      "source": "./plugins/loop-engineering",
+      "description": "Autonomous DISCOVER → PLAN → EXECUTE → VERIFY → SHIP meta-loop with independent maker≠checker verification, self-healing (fix-loop/debugging-loop), and self-learning (learn-n-improve) — ships the full worker/skill dependency closure so a downstream project gets a working loop from one /plugin install."
+    },
+    {
+      "name": "cbp-workflows",
+      "source": "./plugins/cbp-workflows",
+      "description": "Quality-trio workflows (code-review, documentation, skill-authoring) + their dispatch closure — the #187 install-not-copy distribution pilot"
+    },
+    {
+      "name": "cbp-build-test-workflows",
+      "source": "./plugins/cbp-build-test-workflows",
+      "description": "Build-and-test workflows (development-loop + three-lane test-pipeline) with their universal dispatch closure — #187 install-not-copy pilot, cluster 2"
+    },
+    {
+      "name": "cbp-learning-workflow",
+      "source": "./plugins/cbp-learning-workflow",
+      "description": "Learning/self-improvement workflow (capture error→fix→lesson, distill into skill proposals, prune) with its dispatch closure — #187 install-not-copy pilot, cluster 3"
+    },
+    {
+      "name": "cbp-react-stack",
+      "source": "./plugins/cbp-react-stack",
+      "description": "React-family stack toolbox (vitest/jest runners, Next.js + React/RN test patterns) — first Tier-2 stack pack; pairs with cbp-build-test-workflows"
+    },
+    {
+      "name": "cbp-python-stack",
+      "source": "./plugins/cbp-python-stack",
+      "description": "Python/FastAPI stack toolbox (pytest-dev, FastAPI test/migrate/deploy helpers + 2 agents) — second Tier-2 stack pack; pairs with cbp-build-test-workflows"
+    }
+  ]
+}
