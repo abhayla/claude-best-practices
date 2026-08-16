@@ -46,9 +46,13 @@ because the repo carries a root-level `.claude-plugin/marketplace.json` (generat
 kept in sync by a blocking CI check — see "Keeping this table honest" below). Its plugin
 entries use `./plugins/<name>` sources, which resolve correctly against the full repo clone
 Claude Code makes for a GitHub-URL/shorthand marketplace add — so install works immediately,
-with no separate local-clone step. **Verified 2026-08-16** end-to-end: marketplace add via
-shorthand, then `/plugin install prompt-auto-enhance@claude-best-practices`, against a clean
-config dir.
+with no separate local-clone step. **Verified 2026-08-16** against a clean config dir: the
+same root-lookup + relative-source-resolution code path (`claude plugin marketplace add
+<path>` against a local clone with this PR's branch renamed to `main`, simulating the
+post-merge repository state) followed by `/plugin install prompt-auto-enhance@claude-best-practices`
+— confirmed the plugin's real files land in the install cache. The literal `owner/repo`
+shorthand against the live GitHub default branch can only be re-run once this change is
+merged to `main`, since that form always clones the repo's default branch.
 
 ## 2. Install the plugin(s)
 
