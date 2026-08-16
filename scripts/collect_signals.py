@@ -49,16 +49,24 @@ def run_secret_scan() -> float:
 def assemble_signals(
     tests_passed: int,
     tests_total: int,
-    coverage: float,
+    coverage: float | None,
     independent_verification: float,
     regression_clean: float,
     production_health: float,
     secret_scan_clean: float,
 ) -> dict:
-    """Build the signals dict from measured evidence. Each value is clamped to [0,1]."""
+    """Build the signals dict from measured evidence. Each value is clamped to [0,1].
+
+    A signal passed as None is UNMEASURABLE for this run and is carried through as None
+    (not clamped to 0.0) so compute_trust_score() can exclude it and renormalize. Callers
+    with no evidence for a signal MUST pass None rather than 0.0 — see the None-handling
+    note in trust_score.compute_trust_score().
+    """
     tests_pass = (tests_passed / tests_total) if tests_total else 0.0
 
-    def clamp(x: float) -> float:
+    def clamp(x: float | None) -> float | None:
+        if x is None:
+            return None
         return max(0.0, min(1.0, x))
 
     return {
@@ -99,7 +107,13 @@ def _main() -> int:
     p = argparse.ArgumentParser(description="Assemble real signals, score, and record a run.")
     p.add_argument("--tests-passed", type=int, default=0)
     p.add_argument("--tests-total", type=int, default=0)
-    p.add_argument("--coverage", type=float, default=0.0)
+    p.add_argument(
+        "--coverage",
+        type=float,
+        default=None,
+        help="measured coverage fraction; OMIT when no coverage evidence exists — the "
+        "signal is then recorded as unmeasurable and renormalized out, never scored 0.0",
+    )
     p.add_argument("--independent-verification", type=float, default=0.0)
     p.add_argument("--regression-clean", type=float, default=1.0)
     p.add_argument("--production-health", type=float, default=1.0)

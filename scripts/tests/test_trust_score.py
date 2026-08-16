@@ -208,3 +208,92 @@ class TestStatsBy:
 
     def test_empty_runs_is_safe(self):
         assert stats_by([], "skill") == {}
+
+
+class TestUnmeasurableSignals:
+    """None means "no evidence", which is NOT the same claim as 0.0 (T-144).
+
+    Conflating them is what killed the gauge: record_merged_prs.py had no coverage
+    evidence for a merged PR and passed a literal 0.0, subtracting a fixed 15 from every
+    run and pinning all 133 recorded ATLAS runs at exactly 60.
+    """
+
+    def test_none_signal_is_excluded_and_weights_renormalized(self):
+        signals = {
+            "tests_pass": 1.0,
+            "independent_verification": 1.0,
+            "coverage": None,
+            "regression_clean": 1.0,
+            "secret_scan_clean": 1.0,
+            "production_health": 1.0,
+        }
+        result = compute_trust_score(signals, DEFAULT_CONFIG)
+        # Every measurable signal is perfect, so renormalization must yield exactly 100 —
+        # not 85 (the old fixed deduction for evidence that never existed).
+        assert result["score"] == 100
+        assert result["excluded_signals"] == ["coverage"]
+
+    def test_none_differs_from_zero(self):
+        base = {
+            "tests_pass": 1.0,
+            "independent_verification": 1.0,
+            "regression_clean": 1.0,
+            "secret_scan_clean": 1.0,
+            "production_health": 1.0,
+        }
+        as_none = compute_trust_score({**base, "coverage": None}, DEFAULT_CONFIG)
+        as_zero = compute_trust_score({**base, "coverage": 0.0}, DEFAULT_CONFIG)
+        assert as_none["score"] == 100
+        assert as_zero["score"] == 85
+        assert as_zero["excluded_signals"] == []
+
+    def test_score_still_responds_to_real_signals_when_one_is_excluded(self):
+        """The regression guard: excluding a signal must not flatten the score."""
+        base = {
+            "tests_pass": 1.0,
+            "coverage": None,
+            "regression_clean": 1.0,
+            "secret_scan_clean": 1.0,
+            "production_health": 1.0,
+        }
+        verified = compute_trust_score({**base, "independent_verification": 1.0}, DEFAULT_CONFIG)
+        unverified = compute_trust_score({**base, "independent_verification": 0.0}, DEFAULT_CONFIG)
+        assert verified["score"] != unverified["score"]
+
+    def test_absent_signal_still_scores_zero_not_excluded(self):
+        """Only an EXPLICIT None is excluded; a key that is simply missing stays 0.0."""
+        signals = {
+            "tests_pass": 1.0,
+            "independent_verification": 1.0,
+            "regression_clean": 1.0,
+            "secret_scan_clean": 1.0,
+            "production_health": 1.0,
+        }
+        result = compute_trust_score(signals, DEFAULT_CONFIG)
+        assert result["excluded_signals"] == []
+        assert result["score"] == 85
+
+    def test_hard_gate_fails_closed_on_unmeasured_safety_signal(self):
+        """Safety gates must NOT be waived by absence of evidence."""
+        signals = {
+            "tests_pass": 1.0,
+            "independent_verification": 1.0,
+            "coverage": 1.0,
+            "regression_clean": 1.0,
+            "secret_scan_clean": None,
+            "production_health": 1.0,
+        }
+        result = compute_trust_score(signals, DEFAULT_CONFIG)
+        assert result["hard_gate_triggered"] is True
+        assert result["recommended"] == "ESCALATE"
+        assert any("fails closed" in r for r in result["reasons"])
+
+    def test_all_signals_unmeasurable_scores_zero_without_crashing(self):
+        signals = {name: None for name in DEFAULT_CONFIG["weights"]}
+        result = compute_trust_score(signals, DEFAULT_CONFIG)
+        assert result["score"] == 0
+        assert result["recommended"] == "ESCALATE"
+
+    def test_none_is_not_range_validated(self):
+        """None must pass the [0,1] range check rather than raising."""
+        compute_trust_score({"coverage": None, "tests_pass": 1.0}, DEFAULT_CONFIG)

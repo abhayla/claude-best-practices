@@ -18,22 +18,87 @@ STATE_PATH = ROOT / "trust-score" / "build-state.json"
 OUTPUT_PATH = ROOT / "trust-score" / "dashboard.html"
 CONFIG_PATH = ROOT / "config" / "trust-score.yml"
 ATLAS_LEDGER = ROOT / "trust-score" / "ledgers" / "atlas.jsonl"
+AGGREGATES_PATH = ROOT / "config" / "telemetry-aggregates.json"
 
 
 def _read_calibration(ledger_path: Path) -> dict:
     """Read REAL calibration runs from a per-project ledger (gitignored runtime).
 
     Sourced live so the dashboard never hand-drifts as runs accrue. A false-confidence
-    event = the engine recommended AUTO but a human still had to fix the work."""
+    event = the engine recommended AUTO but a human still had to fix the work.
+
+    Tolerant of ledger-schema growth (T-144 added `excluded_signals`): unknown fields are
+    ignored and an unparseable line is skipped rather than crashing the whole dashboard.
+    The score SPREAD is reported too — a healthy gauge varies, and 133/133 runs sharing
+    one score is exactly the dead-gauge symptom this dashboard should have surfaced.
+    """
     runs = []
     if ledger_path.exists():
         for line in ledger_path.read_text(encoding="utf-8").splitlines():
-            if line.strip():
+            if not line.strip():
+                continue
+            try:
                 runs.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
     false_conf = sum(
         1 for r in runs if r.get("human_had_to_fix") and r.get("recommended") == "AUTO"
     )
-    return {"runs": len(runs), "false_confidence": false_conf}
+    scores = [r.get("score") for r in runs if isinstance(r.get("score"), (int, float))]
+    return {
+        "runs": len(runs),
+        "false_confidence": false_conf,
+        "distinct_scores": len(set(scores)),
+        "score_range": (min(scores), max(scores)) if scores else None,
+    }
+
+
+def _read_outcomes(path: Path) -> dict:
+    """Read the `_outcomes` section written by aggregate_telemetry.py, if present."""
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return {}
+    outcomes = data.get("_outcomes") if isinstance(data, dict) else None
+    return outcomes if isinstance(outcomes, dict) else {}
+
+
+OUTCOME_KID = {
+    "change_failure_rate": "How often did finished work need fixing later?",
+    "rework_rate": "How often did we go back and change the same files?",
+    "first_pass_rate": "How often did work land right the first time?",
+    "guardrail_catches": "How many real problems did the safety gates catch?",
+    "invocation_adoption": "Which tools did we actually USE (not just install)?",
+    "cost_per_task": "What did each finished job cost?",
+}
+
+
+def _outcome_cards(outcomes: dict) -> str:
+    """Render the six outcome metrics. 'No data' is shown as such — never as a zero."""
+    if not outcomes or outcomes.get("unavailable"):
+        reason = outcomes.get("unavailable", "not measured yet") if outcomes else "not measured yet"
+        return (
+            '<p class="explain">No outcome scorecard yet — '
+            f"<em>{reason}</em>. Run <code>python scripts/measure_outcomes.py</code>.</p>"
+        )
+
+    rows = []
+    for name, metric in (outcomes.get("metrics") or {}).items():
+        value = metric.get("value")
+        if value is None:
+            shown = "<em>no data yet (that is an honest answer)</em>"
+        elif isinstance(value, dict):
+            shown = ", ".join(f"{k}: {v}" for k, v in list(value.items())[:4]) or "—"
+        else:
+            shown = f"<b>{value}</b> {metric.get('unit', '')}".strip()
+        rows.append(f"""
+        <div class="sig">
+          <div class="sig-label">{OUTCOME_KID.get(name, name)}</div>
+          <div class="sig-val" style="width:auto;">{shown} <em style="color:#888;">(from {metric.get('sample_size', 0)})</em></div>
+        </div>""")
+    return "".join(rows)
 
 STATUS_STYLE = {
     "done": ("#1b7f4b", "#e3f6ec", "✅", "DONE"),
@@ -95,7 +160,7 @@ def _signal_bars(signals: dict, weights: dict) -> str:
     return "".join(bars)
 
 
-def render(state: dict, config: dict, cal: dict) -> str:
+def render(state: dict, config: dict, cal: dict, outcomes: dict | None = None) -> str:
     sections = state["sections"]
     progress = _progress(sections)
     result = compute_trust_score(SAMPLE_SIGNALS, config)
@@ -109,6 +174,23 @@ def render(state: dict, config: dict, cal: dict) -> str:
         if honest
         else f"and the card owned up to {cal['false_confidence']} time(s) it was wrong (that is the card being honest!)"
     )
+
+    # Gauge-health line: a score that never moves is broken even when it looks fine. This
+    # is the symptom the dashboard silently rendered for 133 identical runs pre-T-144.
+    distinct = cal.get("distinct_scores", 0)
+    if cal_runs == 0:
+        gauge_health = "No real jobs recorded yet, so there is nothing to check."
+    elif distinct <= 1:
+        gauge_health = (
+            f"⚠️ Every one of the {cal_runs} recorded jobs scored the SAME. A score that never "
+            f"moves is not measuring anything — that is a broken gauge, not a perfect record."
+        )
+    else:
+        low, high = cal["score_range"]
+        gauge_health = (
+            f"✅ The scores actually MOVE ({distinct} different values, from {low} to {high}), "
+            f"which means the card is responding to real evidence."
+        )
 
     score = result["score"]
     gauge_color = "#1b7f4b" if score >= config["threshold"] else "#b26a00"
@@ -177,6 +259,15 @@ def render(state: dict, config: dict, cal: dict) -> str:
     ever work alone. So far <b>{cal_runs} of {min_runs}</b> real jobs are done {honest_line}</p>
     <div class="progress-track"><div class="progress-fill" style="width:{cal_pct}%;"></div></div>
     <div class="progress-num">{cal_runs} / {min_runs} honest real jobs</div>
+    <p class="explain" style="margin-top:12px;">{gauge_health}</p>
+  </div>
+
+  <div class="panel">
+    <h2>Did the work actually turn out well?</h2>
+    <p class="explain">The score above says the robot followed the rules. These six say what
+    really HAPPENED afterwards — measured from work already finished, not from a checklist.
+    Where we have no honest data yet, it says so instead of making a number up.</p>
+    {_outcome_cards(outcomes or {})}
   </div>
 
   <div class="panel gauge">
@@ -207,7 +298,8 @@ def main() -> int:
     state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
     config = load_config(CONFIG_PATH) if CONFIG_PATH.exists() else DEFAULT_CONFIG
     cal = _read_calibration(ATLAS_LEDGER)
-    OUTPUT_PATH.write_text(render(state, config, cal), encoding="utf-8")
+    outcomes = _read_outcomes(AGGREGATES_PATH)
+    OUTPUT_PATH.write_text(render(state, config, cal, outcomes), encoding="utf-8")
     print(f"wrote {OUTPUT_PATH} ({_progress(state['sections'])}% complete, "
           f"{cal['runs']}/{config.get('calibration', {}).get('min_runs', 30)} real runs)")
     return 0

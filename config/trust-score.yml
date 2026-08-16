@@ -7,7 +7,24 @@
 #
 # Motto: don't build for autonomy — prove the trust score first.
 
-# Each signal is 0.0 (bad) .. 1.0 (perfect). Weights must sum to 1.0.
+# UNMEASURABLE SIGNALS (T-144, 2026-08-16) — why a signal may be null.
+#
+# A signal recorded as null is EXCLUDED from the weighted sum and the surviving weights
+# are RENORMALIZED to sum 1.0. Recording "we have no evidence" as 0.0 is a lie that
+# breaks the gauge: it subtracts a fixed penalty from every run, so the score stops
+# responding to the signals that ARE real. That is exactly what happened — every one of
+# the 133 recorded ATLAS runs scored an identical 60, because record_merged_prs.py had
+# no coverage evidence for a merged PR and passed a literal 0.0.
+#
+# Chosen over the alternative (measure coverage by re-running the suite for every swept
+# PR) because the merged-PR sweep is deliberately cheap: it trusts each PR's own CI
+# rollup rather than re-executing tests. Renormalization keeps that cheapness honest.
+#
+# EXCEPTION — hard_gates below FAIL CLOSED on null: a missing SAFETY signal trips the
+# gate exactly as 0.0 would. Absence of evidence is not evidence of safety.
+#
+# Each signal is 0.0 (bad) .. 1.0 (perfect), or null (unmeasurable — see above).
+# Weights must sum to 1.0.
 weights:
   tests_pass: 0.30              # fraction of tests passing
   independent_verification: 0.25  # an independent verifier (NOT the doer) confirmed it — the keystone
