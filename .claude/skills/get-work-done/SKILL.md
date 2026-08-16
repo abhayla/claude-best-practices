@@ -202,6 +202,16 @@ line also doubles as the machine-origin marker `plugins/prompt-auto-enhance`'s `
 classifier keys on to skip the enhance ceremony on headless `claude -p` workers (T-134, live
 defect: the ceremony leaked into a worker's machine-parsed JSON result) — never reword or drop it.
 
+**FOREGROUND-ONLY EXECUTION (mandatory standing line, SECOND line of the WORKER-MERGE GUARD
+mandate — live defect 2026-08-16, T-152: a headless worker backgrounded its pytest run then
+ended its turn; in `claude -p` ending a turn KILLS the process, so the task died silently
+mid-run with a `success` subtype and no result JSON):** every worker prompt MUST ALSO carry
+this standing mandate line verbatim, in addition to (never in place of) the merge-guard line
+above: "Run EVERY command in the FOREGROUND and wait for it; NEVER run anything in the
+background - in headless claude -p, ending your turn kills your process and orphans the task."
+Both lines are mandatory and verbatim; the merge-guard line above is never reworded, reordered,
+or dropped to make room for this one.
+
 **Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
 global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
 `D:\Abhay\VibeCoding\claude-best-practices\.claude\rules\model-routing.md`):**
@@ -217,6 +227,20 @@ When torn, pick the cheaper tier — the escalation rule (STEP 6.6) recovers a w
 pick after evidence; a wrong expensive pick is never detected.
 
 ## STEP 6 — DISPATCH: one background worker, guarded
+
+**CROSS-MACHINE SAME-REPO GATE (mandatory, live incident 2026-08-16 — T-141/T-142 ran on
+itsab-PC while the VPS sweep concurrently ran T-143/T-144/T-145 against the same hub repo; no
+bus-level repo lock existed, and the run survived only by luck of disjoint file-sets, not by
+design):** before claiming or dispatching ANY task, `git pull` the bus and scan the GWD queue
+for ANY `*.claimed.*.md` contract targeting the SAME registry repo key, from ANY machine. If
+one exists, do NOT dispatch the new task unless (a) it is `related:`-linked to that claimed
+contract AND (b) the two contracts' file-scopes are declared disjoint. Same-repo serialization
+is a whole-fleet invariant, not a same-machine one — a machine-local queue view is not proof no
+other machine is working the repo. This prose gate is backed by a deterministic preflight
+backstop, `preflight-guard.ps1` exit 8 (SAME-REPO ALREADY-CLAIMED GATE, landed via the related
+bus task T-155): it blocks dispatch outright when a same-repo sibling `*.claimed.*.md` contract
+exists and this contract's `related:` list doesn't name it — keep this paragraph and that gate
+in sync.
 
 1. **Atomic claim**: rename `…queued.md → …claimed.<session-id>.md`. Rename failed → another
    session owns it; skip.
