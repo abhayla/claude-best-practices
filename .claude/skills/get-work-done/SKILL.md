@@ -197,6 +197,18 @@ line also doubles as the machine-origin marker `plugins/prompt-auto-enhance`'s `
 classifier keys on to skip the enhance ceremony on headless `claude -p` workers (T-134, live
 defect: the ceremony leaked into a worker's machine-parsed JSON result) — never reword or drop it.
 
+**HOLD-LABEL INSTRUCTION (mandatory second line, live double-breach 2026-08-16 — T-144's PR #558
+auto-merged 84s post-creation, T-143's PR #560 auto-merged ~7min post-creation, neither worker ran
+`gh pr merge`):** the WORKER-MERGE GUARD line above only constrains the WORKER's own actions — it
+says nothing about this repo's OWN `auto-pr-reconcile.sh`/`session-git-landing.sh` automation,
+which auto-lands any open, green, non-`hold`-labeled PR regardless of who opened it or whether they
+ever ran a merge command. For ANY contract whose `dod:` requires the PR to stay open (e.g. "leaves
+the PR OPEN"), the dispatcher MUST include a SECOND, separate worker-prompt line — never merged
+into or replacing the verbatim WORKER-MERGE GUARD line above — instructing the worker to apply the
+`hold` label immediately after opening the PR: `gh pr edit <n> --add-label hold`. This is the actual
+mechanism that stops the repo's ambient automation from landing it; refraining from merging is not
+sufficient on its own.
+
 **Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
 global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
 `D:\Abhay\VibeCoding\claude-best-practices\.claude\rules\model-routing.md`):**
@@ -469,6 +481,12 @@ Litmus test before saving: "would the target project's team want this in their r
 
 ## CRITICAL RULES
 
+- MUST include the HOLD-LABEL INSTRUCTION (STEP 5, above) as a second worker-prompt line
+  whenever a contract's `dod:` requires the PR to stay open — machine-checkable in principle
+  for a future `contract-lint.py` rule (a dod containing "leaves the PR OPEN" should co-occur
+  with a hold-label instruction in the worker prompt); not built in this task, documented here
+  as the follow-up, matching the pattern of other NOT-YET-CODIFIED items surfaced via
+  `PATTERNS-SEEN.md`.
 - MUST resolve every repo through `GWD\settings.json repo_registry` and assert
   `git remote get-url origin` matches BEFORE any edit — the registry encodes real traps
   (calculatekaro=`calculator`; OFO shares algochanakya's remote — never dispatch into OFO).
