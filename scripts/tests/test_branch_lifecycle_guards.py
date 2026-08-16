@@ -321,7 +321,11 @@ def test_autopr_does_not_fast_exit_on_a_task_branch(tmp_path):
     branch the hook MUST fall through to the landing path (session-git-landing.sh -> gh)."""
     bash, git = shutil.which("bash"), shutil.which("git")
     repo = tmp_path / "r"; repo.mkdir(); (repo / ".claude" / "hooks").mkdir(parents=True)
-    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull)
+    # AUTO_PR_DISABLE=1 is a documented off-switch (auto-pr.sh) some dev machines set globally so
+    # interactive sessions never accidentally open real PRs. Inheriting it here would fast-exit the
+    # hook on line 1 — before it ever reaches the branch-guard logic under test — and this test's
+    # own assertions (the log body, the gh call) would fail for a completely unrelated reason.
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull, AUTO_PR_DISABLE="0")
 
     def g(*a):
         return subprocess.run([git, *a], cwd=repo, capture_output=True, text=True, env=env)
