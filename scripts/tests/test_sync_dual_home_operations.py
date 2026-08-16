@@ -1,13 +1,15 @@
 """Behavior tests for the CORE mechanics of scripts/sync_dual_home.py against isolated
 tmp-path "hub"/"core" fixture trees.
 
-test_dual_home_sync.py (the existing CI gate) exercises this module's pure text-diff
+test_dual_home_sync.py (the existing CI gate) ALSO exercises this module's pure text-diff
 helpers (in_sync, shared_in_sync, fence_problems, intermingle_problems, extra_file_problems)
 directly, and runs check()/discover() ONLY against the real repo's live .claude/ +
 core/.claude/ trees via a module-scoped fixture — it never proves discover(), classify(),
 sync_one()'s COPY path, or the CLI (main()) work correctly against isolated fixtures, so a
 bug in any of those (e.g. discover() missing a one-sided resource, sync_one() copying the
-wrong direction) would ship silently. This file closes that gap.
+wrong direction) would ship silently. This file closes that gap, AND (TestStraySideMarkers)
+carries its own direct, isolated coverage of stray_side_markers/intermingle_problems so this
+file's suite alone (not just the sibling file) catches a forbidden-side regression.
 """
 
 import json
@@ -71,6 +73,60 @@ class TestDiscover:
         entry = found[0]
         assert entry["hub"].name == "SKILL.md"
         assert "hub_dir" in entry and "core_dir" in entry
+
+
+# ── stray_side_markers() / intermingle_problems(): forbidden-fence detection ─
+
+class TestStraySideMarkers:
+    """Direct, isolated coverage of the intermingle-fence drift detector — deliberately
+    NOT relying on test_dual_home_sync.py's coverage of the same functions, so this file's
+    suite alone catches a forbidden-side regression (e.g. the HUB<->DOWNSTREAM ternary
+    swapped in stray_side_markers)."""
+
+    def test_correct_side_markers_pass_clean(self):
+        hub_text = "shared\n# DUAL-SYNC:HUB-ONLY\nhub bit\n# DUAL-SYNC:END\n"
+        core_text = "shared\n# DUAL-SYNC:DOWNSTREAM-ONLY\ncore bit\n# DUAL-SYNC:END\n"
+        assert s.stray_side_markers(hub_text, "hub") == []
+        assert s.stray_side_markers(core_text, "core") == []
+
+    def test_hub_only_marker_in_downstream_copy_is_flagged(self):
+        """A HUB-ONLY fenced line appearing in the downstream (core) copy must be flagged —
+        core files must never carry hub-specific fenced content."""
+        core_text = "shared\n# DUAL-SYNC:HUB-ONLY\nleaked hub bit\n# DUAL-SYNC:END\n"
+        found = s.stray_side_markers(core_text, "core")
+        assert found == ["# DUAL-SYNC:HUB-ONLY"]
+
+    def test_downstream_only_marker_in_hub_copy_is_flagged(self):
+        """A DOWNSTREAM-ONLY fenced line appearing in the hub copy must be flagged — hub
+        files must never carry downstream-specific fenced content."""
+        hub_text = "shared\n# DUAL-SYNC:DOWNSTREAM-ONLY\nleaked core bit\n# DUAL-SYNC:END\n"
+        found = s.stray_side_markers(hub_text, "hub")
+        assert found == ["# DUAL-SYNC:DOWNSTREAM-ONLY"]
+
+    def test_intermingle_problems_reports_both_directions(self):
+        res = {
+            "hub": None,
+            "core": None,
+        }
+
+        class _FakePath:
+            def __init__(self, text):
+                self._text = text
+
+            def read_text(self, encoding="utf-8"):
+                return self._text
+
+        res["hub"] = _FakePath("clean\n")
+        res["core"] = _FakePath("shared\n# DUAL-SYNC:HUB-ONLY\noops\n# DUAL-SYNC:END\n")
+        assert s.intermingle_problems(res) == ["# DUAL-SYNC:HUB-ONLY"]
+
+        res["hub"] = _FakePath("shared\n# DUAL-SYNC:DOWNSTREAM-ONLY\noops\n# DUAL-SYNC:END\n")
+        res["core"] = _FakePath("clean\n")
+        assert s.intermingle_problems(res) == ["# DUAL-SYNC:DOWNSTREAM-ONLY"]
+
+        res["hub"] = _FakePath("clean\n")
+        res["core"] = _FakePath("clean\n")
+        assert s.intermingle_problems(res) == []
 
 
 # ── classify(): manifest lookup ──────────────────────────────────────────────
