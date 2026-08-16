@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # enhance-process-guard.sh — Stop hook (PLUGIN version)
 #
-# Enforces ONLY that the prompt-improver's full process was shown on a substantive turn —
-# its own self-check, governed by `make_sure_steps_were_shown` (strict|relaxed|off):
-#   * strict  -> block (stop and redo) when the score-table/review or fix-details are missing
-#   * relaxed -> don't block; just keep a quiet log
+# TELEMETRY-ONLY (T-143, owner-approved 2026-08-16, review Fix 3): this hook NEVER emits
+# {"decision":"block"} or re-opens a turn. `make_sure_steps_were_shown` (strict|relaxed|off)
+# now only decides whether a missing score-table/review or fix-details is worth LOGGING:
+#   * strict  -> log the miss (previously: block and force a redo)
+#   * relaxed -> don't log the strict-only misses; the quiet log (section C) still runs
 #   * off     -> no check
 # DELIBERATELY NOT PORTED (hub-wide governance, excluded by design): decide-don't-ask,
 # narrate-and-stop, plan-before-coding, role routing.
@@ -16,6 +17,9 @@ command -v jq >/dev/null || exit 0
 
 plugin_root="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+# T-143: this guard is telemetry-only — make sure .claude/ exists so the log writes below
+# aren't silently swallowed on a fresh repo/worktree (mirrors the hub guard's fix).
+mkdir -p "$root/.claude" 2>/dev/null
 
 # ── Coexistence guard: stand down where a SUPERSET enforcer already runs (hub dedup) ──
 # Some hosts (the hub itself) wire an operational Stop hook, .claude/hooks/no-overask-guard.sh,
@@ -142,38 +146,32 @@ if { [ -n "$sid" ] && [ -f "$root/.claude/.enhance-card-rendered.$sid" ]; } || [
   card="1"; overall="1"; substance="1"
 fi
 
-block() { jq -nc --arg r "$1" '{decision:"block", reason:$r}'; exit 0; }
-
-# Self-check strictness. strict -> block; relaxed/off -> don't block.
+# T-143 (owner-approved 2026-08-16, review Fix 3): this guard is TELEMETRY-ONLY — it must
+# never emit {"decision":"block"} or re-open a turn, regardless of `make_sure_steps_were_shown`
+# settings. The `strict` setting used to force a block; it and `enforce` below now only decide
+# whether a miss is worth LOGGING, never whether to block. Log file/line formats unchanged.
 strictness="$(getj '.make_sure_steps_were_shown')"; [ -z "$strictness" ] && strictness="strict"
-enforce="off"; [ "$strictness" = "strict" ] && enforce="block"
-# Issue #290: "only_for_weak_prompts" is now the DEFAULT sampled mode — it stays enforced
-# (weak prompts still owe the full card), and the per-turn `gradea` gate below is what exempts
-# an explicitly-declared Grade-A/no-strengthening turn, not a blanket disable. Only
-# "scale_to_prompt_quality" (a free-form adaptive scale with no fixed declaration format the
-# guard can verify) still disables enforcement wholesale.
+enforce="off"; [ "$strictness" = "strict" ] && enforce="log"
 case "$(getj '.display.how_much_to_show')" in scale_to_prompt_quality) enforce="off" ;; esac
 
-# A. require the score-table + second-opinion review (unless that component is off).
+log="$root/.claude/.enhance-plugin-misses.log"
+
+# A. score-table + second-opinion review miss (unless that component is off).
 mode_card="$enforce"
 [ "$(jq -r '.display.show.second_opinion_review' "$settings" 2>/dev/null)" = "false" ] && mode_card="off"
-if [ "$mode_card" = "block" ] && { [ -z "$card" ] || [ -z "$overall" ]; } && [ -z "$gradea" ]; then
-  block "STOP BLOCKED (prompt-auto-enhance: full process not shown). This substantive turn is missing the second-opinion 'Reviewer-after' score table and/or its closing 'Overall' total row. Render the FULL process UP FRONT: *Enhanced summary + step log + score table WITH the Reviewer-after column AND an Overall row (weighted total per column + letter-grade transition, e.g. F -> B) + Original->Improved prompt + Role line. If the prompt was trivial, make the first line '*Enhanced: no change — ran your input as-is*'. If this was a STRONG/Grade-A prompt needing no strengthening (#290 sampled ceremony), the full table is OPTIONAL — but declare it in the first 3 lines, e.g. '*Enhanced: … — Grade A, no strengthening needed*'. If you ALREADY rendered the table earlier this turn before tool calls (mid-turn text beside tool_use does not persist to the transcript), attest it instead: touch .claude/.enhance-card-rendered.<your-session-id> and re-state only a one-line banner."
+if [ "$mode_card" = "log" ] && { [ -z "$card" ] || [ -z "$overall" ]; } && [ -z "$gradea" ]; then
+  printf '%s\tfull-process-not-shown (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$log" 2>/dev/null
 fi
 
-# B. require fix-details (gated on the diagnosis/score-table being expected).
-# A declared Grade-A / strong-banner turn ($gradea) owes NO diagnosis (nothing was strengthened),
-# so it is exempt from this fix-details block too — mirrors section A above (which already skips on
-# $gradea) and the hub guard, whose substance block only fires when a card is actually present.
+# B. fix-details miss (gated on the diagnosis/score-table being expected).
 want_sub=""
 { [ "$(getj '.display.show.score_table')" = "true" ] || [ "$(getj '.display.show.whats_wrong')" = "true" ]; } && want_sub="1"
-if [ -n "$want_sub" ] && [ -z "$substance" ] && [ -z "$gradea" ] && [ "$enforce" = "block" ]; then
-  block "STOP BLOCKED (prompt-auto-enhance: fix-details missing). The score table shows numbers but not the diagnose->fix detail — add a 'Diagnosis:' block, a per-dimension Fix column, and a 'Changes Applied' list (taxonomy: VAGUE_INTENT, MISSING_CONTEXT, UNDER_CONSTRAINED, MISSING_OUTPUT_SPEC, MISSING_ROLE...)."
+if [ -n "$want_sub" ] && [ -z "$substance" ] && [ -z "$gradea" ] && [ "$enforce" = "log" ]; then
+  printf '%s\tfix-details-missing (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$log" 2>/dev/null
 fi
 
-# C. Quiet log (non-blocking)
+# C. Quiet log (non-blocking; unchanged from before)
 if [ "$(getj '.keep_a_quiet_log')" = "true" ]; then
-  log="$root/.claude/.enhance-plugin-misses.log"
   [ -z "$card" ] && printf '%s\treview-table-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$log" 2>/dev/null
   [ -n "$card" ] && [ -z "$overall" ] && printf '%s\toverall-total-row-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$log" 2>/dev/null
 fi
