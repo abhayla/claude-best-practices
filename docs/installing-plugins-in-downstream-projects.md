@@ -5,13 +5,27 @@
 > relying on a plugin surface or shipping a plugin change.
 
 The hub ships an in-tree plugin marketplace at `plugins/.claude-plugin/marketplace.json`
-(marketplace name: **`claude-best-practices`**). It currently distributes three plugins:
+(marketplace name: **`claude-best-practices`**). That file is the **only source of truth** for
+which plugins exist — the table below is generated from it (verified by a scripted cross-check
+run in CI for this doc; see "Keeping this table honest" below), never hand-typed:
 
-| Plugin | Install where |
-|--------|---------------|
-| `prompt-auto-enhance` | any project (prompt diagnose-and-strengthen pipeline) |
-| `branch-lifecycle` | any git repo (auto branch/commit/push/PR/merge lifecycle + session save/restore) |
-| `auto-google-analytics` | only web/frontend projects that need GA4 |
+| Plugin | Install where | What it bundles |
+|--------|---------------|------------------|
+| `prompt-auto-enhance` | any project (prompt diagnose-and-strengthen pipeline) | 1 skill — the enhance pipeline itself |
+| `branch-lifecycle` | any git repo (auto branch/commit/push/PR/merge lifecycle + session save/restore) | 5 skills (branch-choice, git-branch-lifecycle, start/end-session, continue) |
+| `auto-google-analytics` | only web/frontend projects that need GA4 | 2 skills (setup + the GA4 provisioning engine) |
+| `fable-operating-manual` | any project wanting Fable 5's reasoning discipline on any model | 1 skill (`/model-parity-test`) + hook-injected Operating Manual |
+| `loop-engineering` | any project wanting the autonomous DISCOVER→PLAN→EXECUTE→VERIFY→SHIP meta-loop | 13 skills + 5 agents (fix-loop, debugging-loop, learn-n-improve, writing-plans, …) |
+| `cbp-workflows` | any project wanting the quality-trio (code-review, documentation, skill-authoring) | 16 skills + 4 agents |
+| `cbp-build-test-workflows` | any project wanting development-loop + the three-lane test-pipeline | 17 skills + 7 agents |
+| `cbp-learning-workflow` | any project wanting the learning/self-improvement workflow | 5 skills + 2 agents |
+| `cbp-react-stack` | React/Next.js/RN projects (pairs with `cbp-build-test-workflows`) | 6 skills (vitest/jest runners, React/RN test patterns) |
+| `cbp-python-stack` | FastAPI/Python projects (pairs with `cbp-build-test-workflows`) | 4 skills + 2 agents (pytest-dev, FastAPI test/migrate/deploy) |
+
+Every project should install `prompt-auto-enhance` + `branch-lifecycle` (universal), plus
+whichever workflow/stack plugins match what it's building. `plugins/.claude-plugin/marketplace.json`
+carries the authoritative one-line `description` for each — read there for anything this table
+compresses.
 
 > **Plugin commands are session-bound to the target project.** All `/plugin …` steps below
 > MUST run inside the *downstream project's own* Claude Code session — they cannot be driven
@@ -19,15 +33,32 @@ The hub ships an in-tree plugin marketplace at `plugins/.claude-plugin/marketpla
 
 ## 1. Register the marketplace (once per project)
 
-Point at the directory that *contains* `.claude-plugin/` — that is `plugins/`, **not** the repo root:
+**Primary path — GitHub URL, works from any machine and survives any local folder move/rename:**
 
 ```
-/plugin marketplace add D:\Abhay\VibeCoding\claude-best-practices\plugins
+/plugin marketplace add https://raw.githubusercontent.com/abhayla/claude-best-practices/main/plugins/.claude-plugin/marketplace.json
 ```
 
-## 2. Install the plugin(s)
+This registers the marketplace and lets you browse it (`/plugin`, **Discover** tab) from any
+machine with no local clone. **Known current limitation (verified 2026-08-16):** every plugin
+entry in `marketplace.json` uses a relative `source` (e.g. `"./prompt-auto-enhance"`), and
+Claude Code only resolves relative sources against a *local* copy of the marketplace — a
+GitHub-URL-registered marketplace has no local copy, so `/plugin install <name>@claude-best-practices`
+fails with `Source path does not exist`. Confirmed by running
+`claude plugin marketplace add abhayla/claude-best-practices` (owner/repo shorthand — same
+failure mode) and `claude plugin install prompt-auto-enhance@claude-best-practices` against a
+clean config dir. **Until the hub adds a root-level `.claude-plugin/marketplace.json` pointer
+(tracked as a follow-up — not yet done), installing a plugin still requires the local-clone path
+below**, even though registering/browsing works fine over the GitHub URL.
 
-Syntax is `<plugin>@<marketplace-name>`:
+## 2. Install the plugin(s) — today's working method (local clone)
+
+```
+git clone https://github.com/abhayla/claude-best-practices.git <path-to-your-local-clone>
+/plugin marketplace add <path-to-your-local-clone>/claude-best-practices/plugins
+```
+
+Then install by name — syntax is `<plugin>@<marketplace-name>`:
 
 ```
 /plugin install prompt-auto-enhance@claude-best-practices
@@ -35,7 +66,10 @@ Syntax is `<plugin>@<marketplace-name>`:
 /plugin install auto-google-analytics@claude-best-practices
 ```
 
-Or run `/plugin` and browse the `claude-best-practices` marketplace interactively.
+(swap in any plugin name from the table above). Or run `/plugin` and browse the
+`claude-best-practices` marketplace interactively. `<path-to-your-local-clone>` is **any**
+directory you choose — it is not tied to a specific machine or user account, and moving the
+clone afterward just means re-running `marketplace add` with the new path.
 
 ## 3. Verify
 
@@ -62,25 +96,40 @@ git commit SHA is used and every new commit counts as an update.
 For a setup script (no interactive session):
 
 ```
-claude plugin marketplace add D:\Abhay\VibeCoding\claude-best-practices\plugins
+claude plugin marketplace add <path-to-your-local-clone>/claude-best-practices/plugins
 claude plugin install prompt-auto-enhance@claude-best-practices
 ```
 
-## Dev/test shortcut (no marketplace)
+## Footnote — developing the hub itself (no marketplace)
 
-Loads a single plugin directly, bypassing the marketplace — useful while developing:
+Loads a single plugin directly from a hub checkout, bypassing the marketplace entirely —
+useful only while developing/debugging a plugin *in this repo*, not for downstream installs:
 
 ```
-claude --plugin-dir D:\Abhay\VibeCoding\claude-best-practices\plugins\prompt-auto-enhance
+claude --plugin-dir <path-to-your-hub-checkout>/claude-best-practices/plugins/prompt-auto-enhance
 ```
 
-## Caveat — installing from another machine
+## Caveat — the GitHub-URL path registers but can't yet install (verified 2026-08-16)
 
-The hub's `marketplace.json` lives under `plugins/`, not the repo root, so the GitHub shorthand
-`/plugin marketplace add abhayla/claude-best-practices` will **not** find it (that form expects
-`.claude-plugin/marketplace.json` at the repository root). On a different machine, clone the hub
-and add the local `plugins/` path, or add a root-level marketplace pointer (a separate hub
-enhancement, not yet done).
+The hub's `marketplace.json` lives under `plugins/`, not the repo root, so:
+
+- `/plugin marketplace add abhayla/claude-best-practices` (GitHub `owner/repo` shorthand) and
+- `/plugin marketplace add https://github.com/abhayla/claude-best-practices.git` (full git URL)
+
+both fail outright with `Marketplace file not found` — Claude Code only looks for
+`.claude-plugin/marketplace.json` at the repository root for these two source types. The direct
+raw-file URL (`.../plugins/.claude-plugin/marketplace.json`, shown in step 1 above) *does*
+register successfully, but every plugin entry's `source` is a relative path
+(`"./prompt-auto-enhance"`, etc.), and Claude Code can't resolve a relative path against a
+marketplace that was fetched as a single remote file with no local copy — so
+`/plugin install <name>@claude-best-practices` then fails with `Source path does not exist`.
+All three failure modes were reproduced directly against the live GitHub repo with a clean
+`CLAUDE_CONFIG_DIR` before writing this section — this is not a theoretical gap.
+
+**Net effect:** today, on any machine (not just the hub owner's), installing a plugin requires
+the local-clone method in step 2 above. The fix is a root-level `.claude-plugin/marketplace.json`
+pointing into `./plugins/<name>` for each entry — a repo-structure change, not a docs change, so
+it's tracked as separate hub follow-up work rather than done here.
 
 ## Updating a plugin — why a source edit may not take effect (the install cache)
 
