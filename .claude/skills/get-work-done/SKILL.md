@@ -159,6 +159,21 @@ instead of linking siblings. Batches are SAME-`deliverable:` only — a code fix
 update need different checker procedures, so a mixed batch is split into one contract per
 deliverable type (verifier finding LOW-8).
 
+**WAVE-CHAINING FOR SEQUENTIAL SAME-REPO WAVES (2026-08-17 — 3rd-occurrence codification;
+see `GWD\PATTERNS-SEEN.md` ~L72-73, gorefer eight-lens-review waves backed up the same-repo
+gate 3x on 2026-08-16 17:07/19:08 and 2026-08-17 01:34 with `related: []` on every contract):**
+when queueing a WAVE of same-repo contracts at intake that are sequential/dependent by design
+(e.g. a later contract's own body states it "runs LAST" or depends on an earlier one in the
+wave), the LATER contract's `related:` field MUST list the immediately-prior wave T-id(s) it
+depends on — chaining the dependency at queue time — instead of leaving `related: []` and
+relying on the CROSS-MACHINE SAME-REPO GATE (STEP 6) to silently re-block it every sweep tick.
+This does not change STEP 6's gate logic: a same-repo block on a non-related contract still
+produces a fresh non-actionable diagnosis every sweep; with wave-chaining, the same block
+becomes an EXPECTED/silent hold instead, because the gate's own `related:`-check already treats
+a named relation as informative, not blocking-different. Same mechanism as the dedup gate's
+"overlapping/related" outcome above — this is that same `related:[T-xxx]` convention applied at
+wave-queueing time specifically for designed sequential dependency, not incidental scope overlap.
+
 **CONTEXT DOCS (2026-08-15 — the "details already provided earlier" fix):** copy the
 registry's `context_docs` list for the target repo (`GWD\settings.json →
 repo_registry.<key>.context_docs`, **repo-relative paths only**) into the contract, and the
