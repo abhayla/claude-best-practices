@@ -17,12 +17,24 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r scripts/requirements.txt
+      - name: Measure delivery outcomes (metrics source)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The honest scorecard: change-failure rate, rework, first-pass rate,
+          # guardrail catches, invocation adoption, cost per task — all from data that
+          # already exists. Report-only (no pass/fail), so it must never fail the run.
+          PYTHONPATH=. python scripts/measure_outcomes.py --days 30 --explain || true
+
       - name: Aggregate telemetry from enrolled repos
         env:
           # Prefer a cross-repo PAT (HUB_SYNC_TOKEN) so telemetry can read
           # PRIVATE enrolled repos; falls back to the default token for public repos.
           GITHUB_TOKEN: ${{ secrets.HUB_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
+          # Writes {"patterns": ..., "_outcomes": ...}: measure_outcomes.py is the
+          # metrics source for the _outcomes section, and tautological file-exists
+          # adoption (sample_size < 2) is retired on write.
           PYTHONPATH=. python scripts/aggregate_telemetry.py \
             --registry registry/patterns.json \
             --config config/repos.yml \

@@ -57,7 +57,12 @@ class TestGreenVerifiedPR:
 
         assert outcome["recorded"] == [317]
         assert outcome["skipped"] == 0
-        assert outcome["results"][317] == {"score": 85, "recommended": "AUTO"}
+        # 100, not the pre-T-144 85: coverage is unmeasurable for a merged PR, so it is
+        # excluded and the surviving weights renormalize. Every OTHER signal here is a
+        # genuine 1.0 (green CI, Verified-by marker, single clean commit), so a perfect
+        # score is the honest reading — the old 85 was a fixed 15-point deduction for
+        # evidence that was never going to exist on this path.
+        assert outcome["results"][317] == {"score": 100, "recommended": "AUTO"}
 
         runs = load_ledger(ledger)
         assert len(runs) == 1
@@ -66,7 +71,7 @@ class TestGreenVerifiedPR:
         assert entry["branch"] == "auto/work-317"
         assert entry["skill"] == "branch:auto"
         assert "recorded_at" in entry
-        assert entry["score"] == 85
+        assert entry["score"] == 100
         assert entry["recommended"] == "AUTO"
 
 
@@ -79,9 +84,34 @@ class TestGreenUnverifiedPR:
 
         outcome = rmp.record_merged_prs(limit=15, marker_path=marker, ledger_path=ledger, gh=gh)
 
-        assert outcome["results"][318] == {"score": 60, "recommended": "ESCALATE"}
+        # 71: coverage excluded/renormalized, and the missing independent_verification is
+        # a REAL honest zero (nobody verified this PR) rather than a phantom deduction.
+        assert outcome["results"][318] == {"score": 71, "recommended": "ESCALATE"}
         runs = load_ledger(ledger)
         assert runs[0]["skill"] == "branch:fix"
+
+    def test_correction_rounds_score_lower_than_first_pass(self, tmp_path):
+        """The gauge must MOVE with real evidence — the whole point of T-144.
+
+        Two otherwise-identical green PRs: one landed first-pass, the other needed a
+        correction round. Before T-144 both scored an identical 60 (133/133 ATLAS runs
+        did), which is what made the score a dead gauge.
+        """
+        gh = _fake_gh(
+            [401, 402],
+            {
+                401: _pr(401, branch="fix/clean", commits=[{"messageHeadline": "add feature"}]),
+                402: _pr(402, branch="fix/messy", commits=[
+                    {"messageHeadline": "add feature"},
+                    {"messageHeadline": "fix: correct the feature"},
+                ]),
+            },
+        )
+        outcome = rmp.record_merged_prs(
+            limit=15, marker_path=tmp_path / ".recorded-prs",
+            ledger_path=tmp_path / "atlas.jsonl", gh=gh,
+        )
+        assert outcome["results"][401]["score"] > outcome["results"][402]["score"]
 
 
 class TestPlantedFalseDoneTrap:

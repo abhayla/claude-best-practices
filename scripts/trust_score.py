@@ -48,30 +48,67 @@ def compute_trust_score(signals: dict, config: dict, stage: str | None = None) -
     """Score one pipeline run and decide AUTO vs ESCALATE.
 
     Args:
-        signals: mapping of signal name -> value in [0.0, 1.0]. A signal absent from
-            the mapping is treated as 0.0 (unknown == unproven), never skipped.
+        signals: mapping of signal name -> value in [0.0, 1.0], or None. A signal ABSENT
+            from the mapping is treated as 0.0 (unknown == unproven), never skipped. A
+            signal explicitly set to None is UNMEASURABLE for this run: it is excluded
+            from the weighted sum and the surviving weights are renormalized to sum 1.0.
         config: the rulebook (see DEFAULT_CONFIG / config/trust-score.yml).
         stage: optional pipeline stage name; irreversible stages always escalate.
 
+    The None case exists because 0.0 and "no evidence" are different claims, and
+    conflating them silently kills the gauge. Recording an unmeasurable signal as 0.0
+    subtracts a FIXED penalty from every run, so the score stops responding to the
+    signals that ARE real — the exact defect that made 133/133 ATLAS runs score 60
+    (record_merged_prs.py had no coverage evidence for a merged PR and passed a literal
+    0.0). Excluding it instead keeps the score honest in both directions: an
+    unmeasurable signal neither fabricates failure (0.0) nor fabricates success (1.0).
+
     Returns a dict with: score (0-100 int), recommended (AUTO|ESCALATE — what the score
     alone says, after gates), effective (what actually happens — always ESCALATE while
-    shadow_mode is on), shadow_mode (bool), hard_gate_triggered (bool), reasons (list).
+    shadow_mode is on), shadow_mode (bool), hard_gate_triggered (bool), excluded_signals
+    (list of renormalized-away names), reasons (list).
     """
     weights = config["weights"]
     threshold = config["threshold"]
 
     for name, value in signals.items():
+        if value is None:
+            continue
         if not 0.0 <= value <= 1.0:
             raise ValueError(f"signal {name!r}={value} out of range [0.0, 1.0]")
 
-    score_fraction = sum(weight * signals.get(name, 0.0) for name, weight in weights.items())
-    score = int(round(score_fraction * 100))
+    excluded = sorted(name for name in weights if signals.get(name, 0.0) is None)
+    scored_weights = {n: w for n, w in weights.items() if n not in excluded}
+    total_weight = sum(scored_weights.values())
+
+    if total_weight <= 0:
+        # Every weighted signal was unmeasurable — there is nothing to score. Report 0
+        # rather than dividing by zero; the hard gates below still force ESCALATE.
+        score = 0
+    else:
+        score_fraction = sum(
+            (weight / total_weight) * signals.get(name, 0.0)
+            for name, weight in scored_weights.items()
+        )
+        score = int(round(score_fraction * 100))
 
     reasons: list[str] = []
+    if excluded:
+        reasons.append(
+            f"unmeasurable signal(s) excluded and weights renormalized: {', '.join(excluded)}"
+        )
 
+    # Hard gates FAIL CLOSED on an unmeasurable signal — the deliberate opposite of the
+    # scoring rule above. Renormalizing away a missing SAFETY signal would let "we never
+    # checked for secrets" silently pass the zero-tolerance gate. Absence of evidence is
+    # not evidence of safety, so None trips the gate exactly as 0.0 would.
     hard_gate_triggered = False
     for name, floor in config.get("hard_gates", {}).items():
-        if signals.get(name, 0.0) < floor:
+        value = signals.get(name, 0.0)
+        if value is None:
+            hard_gate_triggered = True
+            reasons.append(f"hard gate: {name} unmeasured — fails closed")
+        elif value < floor:
             hard_gate_triggered = True
             reasons.append(f"hard gate: {name} below safety floor {floor}")
 
@@ -96,6 +133,7 @@ def compute_trust_score(signals: dict, config: dict, stage: str | None = None) -
         "effective": effective,
         "shadow_mode": shadow_mode,
         "hard_gate_triggered": hard_gate_triggered,
+        "excluded_signals": excluded,
         "reasons": reasons,
     }
 

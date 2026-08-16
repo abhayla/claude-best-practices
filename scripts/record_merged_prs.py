@@ -107,6 +107,26 @@ def independent_verification(pr: dict) -> float:
     return 0.0
 
 
+def regression_clean(pr: dict) -> float | None:
+    """Did this PR land FIRST-PASS clean, without correction rounds?
+
+    Deliberately NOT `1.0 if ci_green` — every merged PR is green (that is what let it
+    merge), so keying this signal off CI restated tests_pass and contributed no
+    information. Correction rounds are the honest regression evidence available from a
+    merged PR's own metadata: a single clean commit landed first-pass (1.0); extra
+    commits, or a lone commit whose headline matches the correction-round pattern, mean
+    something had to be put right on the way in (0.0). A PR reporting no commits at all
+    is unmeasurable (None) rather than silently scored.
+
+    Shares its evidence with derive_human_had_to_fix() by design: that field is the
+    calibration ground truth, this is the scored signal, and they must not disagree.
+    """
+    fix = derive_human_had_to_fix(pr)
+    if fix is None:
+        return None
+    return 0.0 if fix else 1.0
+
+
 def derive_skill(pr: dict) -> str | None:
     """Per-skill ledger attribution: an explicit `Skill: <name>` body line wins; else the
     branch's leading prefix (e.g. `auto/work-...` -> `branch:auto`); else None."""
@@ -205,9 +225,20 @@ def record_merged_prs(
             signals = assemble_signals(
                 tests_passed=1 if ci_green else 0,
                 tests_total=1,
-                coverage=0.0,
+                # UNMEASURABLE, not zero. A merged PR's CI rollup proves tests passed but
+                # publishes no coverage fraction, and this sweep deliberately does not
+                # re-run the suite locally. Recording 0.0 here was the dead-gauge bug: it
+                # subtracted a constant 15 weight from every run, pinning 133/133 ATLAS
+                # runs at exactly 60. None excludes it and renormalizes the rest.
+                coverage=None,
                 independent_verification=independent_verification(pr),
-                regression_clean=1.0 if ci_green else 0.0,
+                # First-pass cleanliness, NOT a restatement of ci_green. Every merged PR
+                # is green by definition (that is what let it merge), so `1.0 if ci_green`
+                # carried zero information and was the SECOND constant pinning the gauge.
+                # A PR that needed correction rounds before landing did regress against
+                # its own baseline — that is what this signal is for, and it is the same
+                # evidence derive_human_had_to_fix() reads.
+                regression_clean=regression_clean(pr),
                 production_health=1.0,
                 secret_scan_clean=1.0 if ci_green else 0.0,
             )
