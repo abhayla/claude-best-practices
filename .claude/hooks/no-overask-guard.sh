@@ -1,34 +1,32 @@
 #!/usr/bin/env bash
-# Stop hook — deterministic STOP-DISCIPLINE guard (over-ask + narrate-and-stop).
+# Stop hook — TELEMETRY-ONLY stop-discipline logger (over-ask + narrate-and-stop).
 #
-# WHY: advisory rules ("decide reversible work, don't ask" + "build, don't
-# narrate-and-stop") lose under long context — turns end either asking a
-# question the assistant should have decided (decision-authority.md), OR
-# DESCRIBING the next step ("next step is edit/delete") and stopping instead of
-# doing it. Per rule-writing-meta.md, zero-exception behaviour needs a HOOK,
-# not prose. This hook BLOCKS the stop and RE-INJECTS the rule so the model
-# keeps going.
+# T-143 (owner-approved 2026-08-16, review Fix 3): this hook used to BLOCK the stop and
+# RE-INJECT a rule to force continuation. Evidence across 3 months of rule-tightening (840
+# stop-violation auto-continues, 534 enhance-misses) showed compliance never converged and
+# each block cost a paid extra model turn. Owner decision: the logs stay (they are the
+# instrument), the whip goes. This hook now ONLY LOGS every miss class below — it NEVER
+# emits {"decision":"block"} and NEVER re-opens a turn. Log file paths and line formats are
+# UNCHANGED so lint_rule_compliance.py keeps working off the same telemetry.
 #
-# Two BLOCKING stop-violation classes detected:
+# Logged stop-violation classes (never blocking):
 #   A. OVER-ASK — trailing offer / multiple-choice / recommendation+question.
 #   B. NARRATE-AND-STOP — ending by describing the NEXT reversible step
 #      ("next step is…", "next I'll…", "continuation…", "remaining … tracked",
 #      "from here…") instead of executing it.
-# On either (and NOT a genuine blocker), it emits {"decision":"block","reason":…}
-# to force continuation. A per-user-turn counter (.claude/.keepgoing-count, reset
-# by prompt-enhance-reminder.sh) caps auto-continues at 12 to prevent any loop.
+#   Plus the enhance reviewer-card / diagnosis-substance miss classes (G7/substance, below) —
+#   all now single log writes, no cap/loop-guard needed since nothing blocks.
 #
-# Plus one NON-BLOCKING telemetry class (the output-side backstop):
+# Plus the pre-existing NON-BLOCKING telemetry class (the output-side backstop):
 #   C. ENHANCE-BANNER MISS — a substantive assistant turn (>=300 chars) that does
 #      NOT open with the *Enhanced:* governance banner. WHY: prompt-enhance-reminder.sh
 #      gates on PROMPT shape, so it stays silent on short/continuation prompts that
 #      still spawn real work. The banner should fire on OUTPUT blast-radius, not prompt
 #      shape — the prompt hook can't see output, this Stop hook can. We LOG the miss to
-#      .claude/.enhance-misses.log (telemetry first — escalate to a block only if the log
-#      shows it's frequent). The behavioral fix is the rule wording in prompt-auto-enhance-rule.md.
+#      .claude/.enhance-misses.log. The behavioral fix is the rule wording in prompt-auto-enhance.md.
 #      EXCEPTION: a slash-command turn ($is_slash) is exempt from ALL of class C and the
-#      enhance-card/diagnosis blocks — a /command (user- or Anthropic-made) is run as-is and
-#      never enhanced (enhance_slash_commands=false, the canonical plugin default).
+#      enhance-card/diagnosis telemetry — a /command (user- or Anthropic-made) is run as-is
+#      and never enhanced (enhance_slash_commands=false, the canonical plugin default).
 exec 2>/dev/null
 input=$(cat)
 command -v jq >/dev/null || exit 0
@@ -100,6 +98,11 @@ fi
 full=$(printf '%s' "$last_text" | tr '[:upper:]' '[:lower:]' | sed -e '/./,$!d')
 tail_part=$(printf '%s' "$full" | tail -c 900)
 root="$(git rev-parse --show-toplevel 2>/dev/null)"
+# T-143: now that this hook is telemetry-only, the log writes below are the SOLE signal (there
+# is no block message as a fallback) — make sure the directory exists so a fresh repo/worktree
+# with no .claude/ yet doesn't silently swallow every log line (latent pre-existing gap,
+# harmless while blocking carried the signal; now load-bearing).
+[ -n "$root" ] && mkdir -p "$root/.claude" 2>/dev/null
 
 # ── Banner-present short-circuit (T-116, owner-approved 2026-08-13 evidence-based curation) ──
 # WHY: 9 blocks in one session were turns that DID render the *Enhanced:* banner as their first
@@ -188,18 +191,12 @@ fi
 # T-116: AND not-banner-present — a turn whose FIRST visible line IS the *Enhanced:* banner is
 # its own evidence the process ran; it is never blocked here for a missing card (see the
 # banner_present short-circuit above). Pure ADDITIVE exemption on top of the #290 gate.
+# T-143 (owner-approved 2026-08-16, Fix 3): this guard is TELEMETRY-ONLY — it must never
+# emit {"decision":"block"} or re-open a turn. Every miss still gets logged (same log file,
+# same line formats, so lint_rule_compliance.py keeps working) — only the block+exit+loop-cap
+# mechanics are gone; a single log write replaces the old "block, then cap-exhausted log" pair.
 if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && { [ -z "$card" ] || [ -z "$overall" ]; } && [ -z "$gradea" ] && [ -z "$banner_present" ]; then
-  rc="$root/.claude/.reviewcard-count"
-  rn=$(cat "$rc" 2>/dev/null || echo 0); case "$rn" in ''|*[!0-9]*) rn=0 ;; esac
-  printf '%s\treviewer-card-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((rn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
-  if [ "$rn" -lt 4 ]; then
-    printf '%s' "$((rn+1))" > "$rc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: full process not rendered). This substantive turn did NOT render the full prompt-auto-enhance process — the tell is the missing independent-reviewer 'Reviewer-after' per-dimension card column and/or its closing 'Overall' total row (weighted total + letter-grade transition) (skill STEP 3.6/4). Render the FULL process now, UP FRONT: *Enhanced banner + pipeline transcript + before→after grade card WITH the Reviewer-after column (Before · Self-after · Reviewer-after · Weight) + an Overall row + Original→Final prompt + Role line. If the user's prompt was genuinely trivial/continuation, make the FIRST line '*Enhanced: no change — ran your input as-is*' instead. If this was a STRONG/Grade-A prompt needing no strengthening (#290 sampled ceremony), the full card is OPTIONAL — but you must then declare it in the FIRST 3 LINES, e.g. '*Enhanced: … — Grade A, no strengthening needed*'. If you ALREADY rendered the card earlier this turn before tool calls (mid-turn text beside tool_use does not persist to the transcript), attest it instead: touch .claude/.enhance-card-rendered.<your-session-id> and re-state only a one-line banner." '{decision:"block", reason:$r}'
-    exit 0
-  else
-    # G9: cap exhausted — the turn escaped without the card; log a distinct escalation line.
-    printf '%s\tcard-block-EXHAUSTED (cap 4) — full process still unrendered, turn released\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" >> "$root/.claude/.overask-violations.log" 2>/dev/null
-  fi
+  printf '%s\treviewer-card-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.overask-violations.log" 2>/dev/null
 fi
 
 # ── Substance enforcement: the diagnose→fix linkage, not just the score card (2026-06-19) ──
@@ -219,17 +216,7 @@ printf '%s' "$full" | grep -qE "diagnosis:|changes applied|missing_role|missing_
 [ -n "$card_marker" ] && substance="1"
 # T-116: banner-present is its own evidence — see G7 above for the same reasoning.
 if [ "$emode" = "auto" ] && [ -z "$is_slash" ] && [ "${#last_text}" -ge 300 ] && [ -z "$trivial" ] && [ -n "$card" ] && [ -z "$substance" ] && [ -z "$banner_present" ]; then
-  dc="$root/.claude/.diagnosis-count"
-  dn=$(cat "$dc" 2>/dev/null || echo 0); case "$dn" in ''|*[!0-9]*) dn=0 ;; esac
-  printf '%s\tdiagnosis-substance-miss — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$((dn+1))" >> "$root/.claude/.overask-violations.log" 2>/dev/null
-  if [ "$dn" -lt 4 ]; then
-    printf '%s' "$((dn+1))" > "$dc" 2>/dev/null
-    jq -nc --arg r "STOP BLOCKED (enhance: per-step improvements not shown). The grade card rendered scores but NOT the diagnose→fix substance — the tell is a missing STEP 1 'Diagnosis:' block, no 'Fix' column linking each lifted dimension to a numbered fix, and no canonical 'Changes Applied' list (format: [n] CATEGORY (severity) → specific fix, using the failure taxonomy VAGUE_INTENT, MISSING_CONTEXT, UNDER_CONSTRAINED, MISSING_OUTPUT_SPEC, MISSING_ROLE…). Re-render the card WITH a Fix column and add the Diagnosis + Changes Applied blocks so every raised score is earned by a listed fix (skill STEP 1/2/4)." '{decision:"block", reason:$r}'
-    exit 0
-  else
-    # cap exhausted — substance still absent; log a distinct escalation line (mirrors G9).
-    printf '%s\tdiagnosis-block-EXHAUSTED (cap 4) — per-step substance still unrendered, turn released\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" >> "$root/.claude/.overask-violations.log" 2>/dev/null
-  fi
+  printf '%s\tdiagnosis-substance-miss (len=%s)\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "${#last_text}" >> "$root/.claude/.overask-violations.log" 2>/dev/null
 fi
 
 # ── Exemption: *Session-boundary:* — a completed-tested-chunk stop is legitimate. ──
@@ -299,18 +286,13 @@ ends_q=$(printf '%s' "$tail_part" | grep -qE '\?[[:space:]]*$' && echo 1 || echo
 
 [ -z "$flag" ] && exit 0
 
-# ── Loop-guard: cap auto-continues per user turn ──
+# ── T-143 (owner-approved 2026-08-16, Fix 3): TELEMETRY-ONLY — log the stop-violation and
+# release the turn. Never emit {"decision":"block"}; the loop-guard/cap machinery that used to
+# gate re-opening the turn is gone (there is nothing left to cap). Log line format unchanged
+# so lint_rule_compliance.py keeps working.
 cf="$root/.claude/.keepgoing-count"
 n=$(cat "$cf" 2>/dev/null || echo 0); case "$n" in ''|*[!0-9]*) n=0 ;; esac
 log="$root/.claude/.overask-violations.log"
 printf '%s\tstop-violation (%s) — autocontinue #%s\n' "$(jq -rn 'now|todate' 2>/dev/null || echo now)" "$flag" "$((n+1))" >> "$log" 2>/dev/null
-
-if [ "$n" -ge 12 ]; then
-  echo "STOP-DISCIPLINE: auto-continue cap (12) hit this turn — yielding. If real reversible work remains, you are over-stopping; if you're blocked, state the blocker explicitly."
-  exit 0
-fi
 printf '%s' "$((n+1))" > "$cf" 2>/dev/null
-
-reason="STOP BLOCKED ($flag). decision-authority.md + build-don't-narrate: you ended your turn with a stop-violation on REVERSIBLE work. DO NOT ask, and DO NOT narrate-and-stop (describe the next step then stop). EXECUTE the next item NOW in this same turn — if it's reversible/internal (edit/delete coverage, the next tracked #issue item, the next fix, a commit, the next queued task) just DO it; chain through the WHOLE queue until ONLY a genuine blocker remains (your credentials, a destructive/irreversible op, spend, deploy, a true product fork — then state it in one line). Keep going."
-jq -nc --arg r "$reason" '{decision:"block", reason:$r}'
 exit 0
