@@ -17,7 +17,7 @@ reconciliation, full `cancel`, and a daily dispatch ceiling. Pings + VPS pools =
 |---|---|
 | `/get-work-done <task text …>` | INTAKE (steps 1–7) |
 | `/get-work-done intake` | INTAKE-ONLY standing mode (owner directive 2026-08-09): loop — take the owner's next task, run steps 1–6 (grill → contract → queue → dispatch), then return to "ready for your next task" IMMEDIATELY. NEVER executes a task inline (trivial included — dispatch on haiku instead); STEP 7 check/report arrives via the armed watcher, between intakes. The owner is never blocked from handing over work |
-| `/get-work-done status` | STATUS: render fleet state from `GWD\queue\` + `GWD\heartbeats\` + LEDGER tail |
+| `/get-work-done status` | STATUS: render fleet state from `GWD\queue\` + `GWD\heartbeats\` + LEDGER tail. While ANY session-origin task is live (claimed/running, incl. checker/fix rounds), the origin session also renders this same scoreboard (T-id, task, state, PR, round) every 15 minutes on a ticker armed at first dispatch (STEP 6.8b) — a silent gap over 15 min while work is running is a defect (owner order 2026-08-16 13:53) |
 | `/get-work-done cancel <T-id>` | CANCEL (Phase 2, full): read `GWD\heartbeats\<id>.hb` → kill that PID tree; rename contract to `<id>.cancelled.md` with reason; `gh pr close --delete-branch` any PR it opened; ledger a cancelled line. `cancel all` = every claimed task |
 | `/get-work-done sweep` | SWEEP: promote/reject `GWD\inbox\` items per the P17 authorization table, then run INTAKE steps 4–7 on promoted items; then claim + dispatch (steps 6.1–6.8) any unclaimed `*.queued.md` a dead/interrupted session left behind — queued work must never sit undispatched (always-available guarantee, 2026-08-09). DISPATCH-FIRST (live defect 2026-08-10: a sweep tick spent itself "waiting on a watcher" while 4 dispatchable contracts sat queued): claiming+dispatching unclaimed queued work is the FIRST duty of every sweep tick and is never satisfied by watching/waiting on already-claimed tasks; a tick that dispatches nothing MUST state per queued contract why it was not claimable (ceiling / same-repo serialization / lint-block) |
 
@@ -83,7 +83,12 @@ which-source intent. If in doubt whether an unknown is material: it is → resol
 FAIL AT INTAKE, NOT AT MIDNIGHT (locked principle): run every abort-capable check NOW —
 registry/remote identity (done in scout), branch protection + secret-scan gate on the target
 (P4 audit re-check via `gh api`), needed credentials/tools present, deploy tier per the table
-below. Then resolve the genuine unknowns via the owner's **95%-confidence gate** (global
+below. **Tool-permission surface (2026-08-16, T-141 stall):** any actor — worker OR checker —
+that will run unattended MUST be on a no-prompt path (`bypassPermissions` or pre-allowlisted
+tools only); verify this NOW, at intake, never discovered mid-run when the owner is away. An
+unattended dispatch whose permission mode is unverified is itself an abort-capable finding —
+park it rather than launch and hope no tool call trips a dialog. Then resolve the genuine
+unknowns via the owner's **95%-confidence gate** (global
 CLAUDE.md standing rule 2026-08-07; re-ratified for fleet intake 2026-08-09 — supersedes the
 old one-batch format): do NOT queue or dispatch a task below >95% confidence of WHAT is being
 asked. Ask **ONE question per turn**, opening with `*Sync-check:*` (grill-me style), each with
@@ -197,6 +202,16 @@ line also doubles as the machine-origin marker `plugins/prompt-auto-enhance`'s `
 classifier keys on to skip the enhance ceremony on headless `claude -p` workers (T-134, live
 defect: the ceremony leaked into a worker's machine-parsed JSON result) — never reword or drop it.
 
+**FOREGROUND-ONLY EXECUTION (mandatory standing line, SECOND line of the WORKER-MERGE GUARD
+mandate — live defect 2026-08-16, T-152: a headless worker backgrounded its pytest run then
+ended its turn; in `claude -p` ending a turn KILLS the process, so the task died silently
+mid-run with a `success` subtype and no result JSON):** every worker prompt MUST ALSO carry
+this standing mandate line verbatim, in addition to (never in place of) the merge-guard line
+above: "Run EVERY command in the FOREGROUND and wait for it; NEVER run anything in the
+background - in headless claude -p, ending your turn kills your process and orphans the task."
+Both lines are mandatory and verbatim; the merge-guard line above is never reworded, reordered,
+or dropped to make room for this one.
+
 **HOLD-LABEL INSTRUCTION (mandatory second line, live double-breach 2026-08-16 — T-144's PR #558
 auto-merged 84s post-creation, T-143's PR #560 auto-merged ~7min post-creation, neither worker ran
 `gh pr merge`):** the WORKER-MERGE GUARD line above only constrains the WORKER's own actions — it
@@ -224,6 +239,20 @@ When torn, pick the cheaper tier — the escalation rule (STEP 6.6) recovers a w
 pick after evidence; a wrong expensive pick is never detected.
 
 ## STEP 6 — DISPATCH: one background worker, guarded
+
+**CROSS-MACHINE SAME-REPO GATE (mandatory, live incident 2026-08-16 — T-141/T-142 ran on
+itsab-PC while the VPS sweep concurrently ran T-143/T-144/T-145 against the same hub repo; no
+bus-level repo lock existed, and the run survived only by luck of disjoint file-sets, not by
+design):** before claiming or dispatching ANY task, `git pull` the bus and scan the GWD queue
+for ANY `*.claimed.*.md` contract targeting the SAME registry repo key, from ANY machine. If
+one exists, do NOT dispatch the new task unless (a) it is `related:`-linked to that claimed
+contract AND (b) the two contracts' file-scopes are declared disjoint. Same-repo serialization
+is a whole-fleet invariant, not a same-machine one — a machine-local queue view is not proof no
+other machine is working the repo. This prose gate is backed by a deterministic preflight
+backstop, `preflight-guard.ps1` exit 8 (SAME-REPO ALREADY-CLAIMED GATE, landed via the related
+bus task T-155): it blocks dispatch outright when a same-repo sibling `*.claimed.*.md` contract
+exists and this contract's `related:` list doesn't name it — keep this paragraph and that gate
+in sync.
 
 1. **Atomic claim**: rename `…queued.md → …claimed.<session-id>.md`. Rename failed → another
    session owns it; skip.
@@ -336,6 +365,12 @@ pick after evidence; a wrong expensive pick is never detected.
    that session's chat — outcome (DONE/PARKED/FAILED), PR link, checker verdict, evidence path,
    tier — without the owner having to ask. Queue ack (8a-bis) + this completion render are the
    PRIMARY owner-facing reporting for session-origin tasks.
+   **15-MINUTE SCOREBOARD CADENCE (owner order 2026-08-16 13:53):** while ANY task from a
+   session-origin intake is live (claimed/running, including checker and fix rounds), the origin
+   session renders the full task scoreboard table (T-id, task, state, PR, round) on screen every
+   15 minutes — armed as a ticker in the SAME turn as the first dispatch (piggyback the existing
+   `Monitor`/`ScheduleWakeup` watcher above, or a second tick at the same cadence), stopped only
+   when the queue drains. A silent gap longer than 15 minutes while work is running is a defect.
 
 8c. **BUDGET FROM TASK SHAPE, NOT TIER DEFAULT (fix #14, same incident).** `max_turns` is set at
    intake from what the task must actually DO, not from `worker_defaults`. Any contract whose DoD
@@ -404,9 +439,33 @@ interference class — a defect, not initiative.
 - **Evidence = raw pulls + report + checker verdict**, all saved to `GWD\evidence\<date>-<id>\` — not just the
   final prose. The raw data is what lets the checker (and owner) independently re-examine claims later.
 
-The worker's "done" claim is input, not truth. Dispatch a CHECKER (separate `Agent()`; tier =
-**opus when the contract's model is opus, sonnet otherwise** — fix #11: the checker is never
-weaker than the maker) against the worker's output. FIRST run the deterministic tier receipt
+The worker's "done" claim is input, not truth. Dispatch a CHECKER against the worker's output;
+tier = **opus when the contract's model is opus, sonnet otherwise** — fix #11: the checker is
+never weaker than the maker.
+
+**CHECKERS MUST BE HEADLESS (owner-reported live defect 2026-08-16 — the T-141 stall):** the
+unattended checker path is the SAME headless wrapper mechanics as a worker, never an in-session
+`Agent()` — an in-session Agent renders a permission dialog on any tool call outside its
+allowlist, and with the owner away that dialog blocks silently with no heartbeat and no timeout.
+**Incident: on 2026-08-16, T-141's checker (dispatched as an in-session `Agent()`) stalled ~90
+minutes on a permission dialog while the owner was away** — the fleet's fail-at-intake principle
+(collect approvals while the owner is present, STEP 4) was silently violated because the checker
+path was never covered by it; workers were already immune via headless `bypassPermissions`, but
+checkers were not. Dispatch every unattended checker exactly like a worker:
+- Launch via `claude -p --model <tier> --permission-mode bypassPermissions --output-format json`
+  through `GWD\worker-wrapper.ps1` (same wrapper as STEP 6 item 8), writing a heartbeat file
+  `T-<id>C.hb` (the `C` suffix distinguishes it from the worker's own `T-<id>.hb` so the two
+  death-detection tracks never cross-contaminate, per the T-068 heartbeat-collision lesson).
+- Arm a terminal-state watcher in the SAME turn as the checker launch (identical rule to STEP
+  6.8b — non-empty result JSON, `EXITED` heartbeat, or staleness past
+  `settings.heartbeat_stale_after_seconds`; silence is not success).
+- The checker prompt carries the WORKER-MERGE GUARD standing line verbatim (STEP 5) — a checker
+  re-deriving the WORKER-MERGE GUARD predicate (below) never merges or closes a PR itself either.
+- **In-session `Agent()` is allowed ONLY when the owner is present and the dispatcher explicitly
+  states so** (e.g. "running the checker in-session — owner online") — never as the silent
+  default for an unattended run.
+
+FIRST run the deterministic tier receipt
 `python GWD\verify-model-tier.py <contract> GWD\heartbeats\<id>.result.json` (fix #1 — asserts
 tier-as-run == tier-as-contracted from `modelUsage`; non-zero = a task FAILURE line in
 status_log + LEDGER, never a silent pass). **Then run the WORKER-MERGE GUARD check (mandatory
@@ -522,7 +581,10 @@ Litmus test before saving: "would the target project's team want this in their r
   no restart-from-scratch); a second cap death parks with an owner card.
 - MUST branch on `stop_reason` from the worker's JSON — refusal ≠ success; reroute to opus.
 - MUST keep maker ≠ checker: evidence + LEDGER are checker-written only; a worker's
-  self-reported pass is never recorded as proof.
+  self-reported pass is never recorded as proof. MUST run no fleet actor — worker OR checker —
+  unattended under interactive permissions (T-141 stall, 2026-08-16): the unattended path is
+  always `bypassPermissions`/pre-allowlisted, verified at intake; in-session `Agent()` only
+  when the owner is present and the dispatcher states so.
 - MUST land ALL work via PR gated on the repo's CI. PUBLIC repos: arm auto-merge (protection
   enforces the check). PRIVATE repos (free plan — NO branch protection possible; live finding
   2026-07-15: IPODhan, RealFuelPrices, calculatekaro): NEVER arm auto-merge (it merges

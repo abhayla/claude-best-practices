@@ -117,7 +117,7 @@ The hub manages its own git branches end-to-end so the user never touches git. T
 
 ### Stack Detection
 
-Two mechanisms: (1) **Stack prefixes** in `STACK_PREFIXES` (`bootstrap.py`) — `fastapi-*`, `android-*`, `react-*`, `firebase-*`, `ai-gemini-*`. (2) **Dependency detection** via `DEP_PATTERN_MAP` (`recommend.py`) — matches `flutter-*`, `vue-*`, `bun-elysia-*`, etc. from project dependencies. Universal patterns have no prefix. Adding a new stack requires changes in `STACK_PREFIXES` (bootstrap.py), `STACK_DETECTORS` (recommend.py), and optionally `DEP_PATTERN_MAP` (recommend.py).
+Two mechanisms: (1) **Stack prefixes** in `STACK_PREFIXES` (`bootstrap.py`) — `fastapi-*`, `android-*`, `react-*`, `firebase-*`, `ai-gemini-*`. (2) **Dependency detection** via `DEP_PATTERN_MAP` (`scripts/dependency_detection.py`) — matches `flutter-*`, `vue-*`, `bun-elysia-*`, etc. from project dependencies. Universal patterns have no prefix. Adding a new stack requires changes in `STACK_PREFIXES` (bootstrap.py), `STACK_DETECTORS` (scripts/dependency_detection.py), and optionally `DEP_PATTERN_MAP` (scripts/dependency_detection.py).
 
 Available stacks and their prefixes (full per-stack pattern listing: `docs/STACK-CATALOG.md`):
 
@@ -169,7 +169,7 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 
 ### Key Scripts
 
-- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Defines `STACK_DETECTORS` and `DEP_PATTERN_MAP`. Calls `third_party_skills.py` during provisioning for third-party agent skill detection
+- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Calls `third_party_skills.py` during provisioning for third-party agent skill detection. (`STACK_DETECTORS` and `DEP_PATTERN_MAP` defined in `scripts/dependency_detection.py`)
 - **`bootstrap.py`** — Core copy logic. CLI: `python scripts/bootstrap.py --stacks <stack1,stack2> --target <dir>`. Defines `STACK_PREFIXES`
 - **`workflow_quality_gate_validate_patterns.py`** — CI validator for frontmatter, cross-references, registry sync
 - **`dedup_check.py`** — Dedup validator (`--validate-all`) and secret scanner (`--secret-scan`)
@@ -188,6 +188,7 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 - **`pipeline_aggregator.py`** — Standalone aggregator for testing-pipeline results: reads `test-results/*.json` and applies the union-of-failures rule
 - **`check_eval_coverage.py`** — Eval-coverage touch-trigger gate. CI (`validate-pr.yml`) runs it with `--enforce` (the RATCHET, owner-approved 2026-07-13): a changed `SKILL.md` lacking an `evals/*.md` report FAILS the PR unless the skill is grandfathered in `config/eval-coverage-grandfather.yml`; without `--enforce` it only warns via `::warning::` and exits 0
 - **`check_plugin_version_bump.py`** — BLOCKING CI gate (`validate-pr.yml`): any `plugins/<name>/` source change must bump that plugin's `plugin.json` version, because Claude Code serves installed plugins from a version-pinned cache — an un-bumped edit merges green but never reaches installed copies. New plugins pass; README/evals-only changes are exempt
+- **`generate_root_marketplace.py`** — Derives the root-level `.claude-plugin/marketplace.json` (T-145) from the canonical `plugins/.claude-plugin/marketplace.json`, rewriting each `source` to `./plugins/<name>` so a GitHub-URL/shorthand `claude plugin marketplace add abhayla/claude-best-practices` resolves plugin sources against the full clone. `--check` is a BLOCKING CI gate (`validate-pr.yml`) that fails the PR if the root mirror drifts from the canonical file. See `docs/installing-plugins-in-downstream-projects.md`
 - **`bootstrap.sh`** (repo root, not in `scripts/`) — Curl-pipe-bash installer for downstream users: `curl -sL .../bootstrap.sh | bash -s -- --stacks <list> [--target <dir>]`. Calls `bootstrap.py` after fetching the repo
 - **`trust_score.py`** / **`collect_signals.py`** / **`simulate_walk_phase.py`** / **`generate_trust_dashboard.py`** — the trust-score / walk-phase MVP toolchain (engine, real-signal adapter, sandbox simulator, dashboard generator). See "Trust Score & Walk-Phase (autonomous-factory MVP)" under Architecture before touching scoring, gates, or ledgers
 - **`record_task_run.py`** (#196) — honest per-task trust-score accrual: auto-derives real signals + an honest git-history `human_had_to_fix` proxy (never silently `False`) and appends ONE shadow-mode run per branch to the ATLAS ledger; idempotent via `trust-score/.recorded-branches`. Wired into `/git-branch-lifecycle finish` STEP 3
