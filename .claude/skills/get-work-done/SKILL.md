@@ -408,13 +408,27 @@ in sync.
    `budget.wall_clock_hours` has elapsed since the claim rename (bus git log dates it), and
    even then re-queue only with a status_log note naming the foreign session id. Also run the JANITOR
    here (workspaces idle past retention, clean-only delete, dirty → escalate).
-   **Turn-cap AUTO-RESUME (owner-approved 2026-08-09):** a result JSON with subtype
-   `error_max_turns` is NOT routed to CHECK and NOT treated as a death — AUTO-RESUME once:
+   **Turn-cap AUTO-RESUME (owner-approved 2026-08-09; widened 2026-08-17 — see STANDING
+   BUDGET PRE-APPROVAL below):** a result JSON with subtype `error_max_turns` is NOT routed
+   to CHECK and NOT treated as a death — AUTO-RESUME, no owner interaction:
    (a) edit the contract's `budget.max_turns` to min(2x current, 200) with a one-line note,
    (b) append the resume to `status_log`, (c) relaunch INTO THE SAME WORKTREE with a prompt
    that names the branch + the uncommitted files and FORBIDS restarting from scratch (8c).
-   ONE auto-resume per task, ever — a second cap death parks with an owner card. (T-056
-   would have self-healed instead of sitting dead 35 min.)
+   Auto-resume up to a LIFETIME TOTAL OF THREE runs per task (the original dispatch plus two
+   auto-resumes). A THIRD cap-death parks the task labeled QUALITY/SCOPE-SUSPECT — at that
+   point the task itself is the problem (mis-scoped or genuinely too large for the tier), not
+   the budget, so this park is a broken-task signal, never a budget question. (T-056 would
+   have self-healed instead of sitting dead 35 min; T-179 sat PARKED ~2h on a budget approval
+   for work that was ~90% done — this rule exists so that never recurs.)
+
+   **STANDING BUDGET PRE-APPROVAL (owner 2026-08-17):** retries, cap-resumes, budget raises,
+   and tier-escalations are pre-approved and never owner-gated — proceed without pausing for
+   permission. The only limits are (a) the Anthropic plan's own weekly/monthly usage limits,
+   which are not session-readable and are enforced by the platform itself, not by this skill,
+   and (b) the existing daily ceilings (item 7 above), which already pause dispatches and ping
+   the owner automatically rather than asking. This pre-approval does NOT extend to NEW
+   recurring third-party spend or owner-set product budget ceilings (e.g. a per-product
+   monthly watchdog cap) — those stay owner-gated as before.
 
 **INVOCATION LOG — a recurrence detector, not the only evidence (semantics fixed v0.8.1,
 verifier finding MEDIUM-6):** at the end of EVERY intake turn (any mode), append ONE line to
@@ -592,8 +606,12 @@ Litmus test before saving: "would the target project's team want this in their r
   (only when the origin session is dead at terminal time, labeled "origin session gone") and
   as PRIMARY for origin-less tasks — and on a non-VPS machine MUST push the bus after writing
   the ping or the card never delivers.
-- MUST auto-resume an `error_max_turns` death exactly ONCE (doubled budget, same worktree,
-  no restart-from-scratch); a second cap death parks with an owner card.
+- MUST auto-resume an `error_max_turns` death (doubled budget, same worktree, no
+  restart-from-scratch) up to a lifetime total of THREE runs per task, without owner
+  interaction; a third cap-death parks the task QUALITY/SCOPE-SUSPECT. Retries, cap-resumes,
+  budget raises, and tier-escalations are standing pre-approved (owner 2026-08-17) — bounded
+  only by Anthropic's own weekly/monthly plan limits and the existing daily ceilings, never by
+  an owner ask.
 - MUST branch on `stop_reason` from the worker's JSON — refusal ≠ success; reroute to opus.
 - MUST keep maker ≠ checker: evidence + LEDGER are checker-written only; a worker's
   self-reported pass is never recorded as proof. MUST run no fleet actor — worker OR checker —

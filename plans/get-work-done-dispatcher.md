@@ -248,3 +248,21 @@ automated sweep for "sync pending"/"outlined" language left in handoff buffers) 
 **DEFERRED** until the `PATTERNS-SEEN.md` recurrence counter's `LESSON(OPEN)` line dated
 2026-08-15 reaches a 2nd instance — build the detector on repeated evidence, not on one incident.
 The recurrence counter is SELF-REPORTED — it increments only if a session notices the recurrence and logs it to PATTERNS-SEEN.md, so "deferred" means "waiting on human/agent-observed evidence", not "covered later automatically".
+
+## Amendment 2026-08-17 — Standing budget pre-approval (T-182)
+
+Owner directive (2026-08-17 22:37 IST, verbatim): "Next time, do not stop for any budget
+approval. have all the approvals for budget related things. As long as we are within the
+weekly limit and monthly limit of anthropic models." Live incident this fixes: T-179 sat
+PARKED ~2h waiting for a resume-budget approval on work that was ~90% done.
+
+The turn-cap AUTO-RESUME rule ("ONE auto-resume per task, ever — a second cap death parks
+with an owner card") is superseded: cap-deaths now auto-resume with a doubled budget
+(unchanged min(2x, 200) formula) without owner interaction, up to a lifetime total of THREE
+runs per task; a third cap-death parks the task QUALITY/SCOPE-SUSPECT — a broken-task signal,
+never a budget question. Retries, cap-resumes, budget raises, and tier-escalations are
+standing pre-approved, bounded only by the Anthropic plan's own weekly/monthly limits (not
+session-readable — platform-enforced) and the existing daily ceilings (which already pause +
+ping automatically). NEW recurring third-party spend and owner-set product budget ceilings
+remain owner-gated. Landed in `.claude/skills/get-work-done/SKILL.md` STEP 6.9 — the skill
+body is the SSOT; this is a pointer, not a restatement.
