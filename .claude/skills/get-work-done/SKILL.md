@@ -408,13 +408,29 @@ in sync.
    `budget.wall_clock_hours` has elapsed since the claim rename (bus git log dates it), and
    even then re-queue only with a status_log note naming the foreign session id. Also run the JANITOR
    here (workspaces idle past retention, clean-only delete, dirty → escalate).
-   **Turn-cap AUTO-RESUME (owner-approved 2026-08-09):** a result JSON with subtype
-   `error_max_turns` is NOT routed to CHECK and NOT treated as a death — AUTO-RESUME once:
-   (a) edit the contract's `budget.max_turns` to min(2x current, 200) with a one-line note,
-   (b) append the resume to `status_log`, (c) relaunch INTO THE SAME WORKTREE with a prompt
-   that names the branch + the uncommitted files and FORBIDS restarting from scratch (8c).
-   ONE auto-resume per task, ever — a second cap death parks with an owner card. (T-056
-   would have self-healed instead of sitting dead 35 min.)
+   **Turn-cap AUTO-RESUME (owner-approved 2026-08-09; extended 2026-08-17):** a result JSON
+   with subtype `error_max_turns` is NOT routed to CHECK and NOT treated as a death —
+   AUTO-RESUME, no owner interaction: (a) edit the contract's `budget.max_turns` to
+   min(2x current, 200) with a one-line note, (b) append the resume to `status_log`,
+   (c) relaunch INTO THE SAME WORKTREE with a prompt that names the branch + the uncommitted
+   files and FORBIDS restarting from scratch (8c). Auto-resume up to a **lifetime total of
+   THREE runs per task** (initial run + two auto-resumes) — a THIRD cap-death parks the task
+   labeled `QUALITY/SCOPE-SUSPECT` with an owner card: at that point the task is oversized or
+   ill-scoped for its budget, not merely under-funded, so it stops for a scope rethink, never
+   for a budget approval. (T-056 would have self-healed instead of sitting dead 35 min; T-179
+   sat PARKED ~2h on 2026-08-17 waiting for a resume-budget approval on work that was ~90%
+   done — this is the fix.)
+
+**STANDING BUDGET PRE-APPROVAL (owner 2026-08-17):** retries, cap-resumes, budget raises, and
+tier-escalation costs are pre-approved and never owner-gated — bounded only by (a) the
+Anthropic plan's own weekly/monthly limits, which are not session-readable so the platform
+itself enforces them, and (b) the existing daily spend ceilings, which pause + notify
+automatically rather than ask. Never stop a task to ask "can I spend more?" — the only budget
+question that still reaches the owner is the third-cap-death `QUALITY/SCOPE-SUSPECT` park
+above, and that is a scope question, not a budget one. NEW recurring third-party spend (a new
+paid API, a new subscription) and owner-set product budget ceilings (e.g. a $30/mo watchdog
+cap) remain owner-gated — this grant covers running Anthropic-model work harder, not opening
+new spend categories.
 
 **INVOCATION LOG — a recurrence detector, not the only evidence (semantics fixed v0.8.1,
 verifier finding MEDIUM-6):** at the end of EVERY intake turn (any mode), append ONE line to
@@ -592,8 +608,12 @@ Litmus test before saving: "would the target project's team want this in their r
   (only when the origin session is dead at terminal time, labeled "origin session gone") and
   as PRIMARY for origin-less tasks — and on a non-VPS machine MUST push the bus after writing
   the ping or the card never delivers.
-- MUST auto-resume an `error_max_turns` death exactly ONCE (doubled budget, same worktree,
-  no restart-from-scratch); a second cap death parks with an owner card.
+- MUST auto-resume an `error_max_turns` death (doubled budget, same worktree, no
+  restart-from-scratch) up to a lifetime total of THREE runs per task, no owner interaction;
+  a THIRD cap-death parks the task `QUALITY/SCOPE-SUSPECT` (a scope signal, never a budget
+  question). Budget itself — retries, resumes, raises, tier escalation — is standing
+  pre-approved (owner 2026-08-17), bounded only by Anthropic plan limits and existing daily
+  ceilings.
 - MUST branch on `stop_reason` from the worker's JSON — refusal ≠ success; reroute to opus.
 - MUST keep maker ≠ checker: evidence + LEDGER are checker-written only; a worker's
   self-reported pass is never recorded as proof. MUST run no fleet actor — worker OR checker —
