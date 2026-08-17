@@ -67,6 +67,36 @@ The 2026-08-10 audit (docs/fleet-script-audit-2026-08-10.md) added three more. A
                  fleet script with no PATH-hardening preamble, so the missing-interpreter trigger
                  its siblings already fixed twice applies here in full.
 
+The 2026-08-17 audit (docs/fleet-script-audit-2026-08-17.md) added three more, all reproduced
+end-to-end on the host before being written down:
+
+  silent-staging — a git STATE-MUTATING command (`add`/`commit`/`checkout`) whose exit code is
+                 never read, in a script that pushes below. silent-push already covers the push
+                 itself; these are the commands that BUILD what gets pushed, and pushing an
+                 unchanged or wrong ref SUCCEEDS — so the tick's `if errorlevel 1` never fires.
+                 Live instances at keeper-tick.cmd:14,29,160,161,162. Reproduced: a concurrent
+                 `.git/index.lock` makes `git add -A` exit 128 into its sink and the tick prints
+                 healthy while the bus item stays untracked; and a checkout aborted by a dirty
+                 tracked file leaves the clone on the sweep's branch, where the tick's commit
+                 lands, while `git push origin main` exits 0 — verbatim the stranded-clone
+                 incident keeper-tick.cmd:5-6 designates a HARD INVARIANT.
+  unmeasured-safe-delete — `git status --porcelain` used as the SAFETY PREDICATE for a
+                 `git worktree remove`, where "I could not measure" scores as "measured safe".
+                 Two independent legs at janitor-worktrees.ps1:144: it omits `--ignored`, so a
+                 worker's gitignored output (build/, .env, *.log) is invisible and is deleted with
+                 the worktree; and it never tests the status command's own exit code, so a FAILED
+                 status (exit 128 on an unreadable gitdir under a concurrent prune/repair) prints
+                 nothing and its EMPTY output reads as clean, deleting a DIRTY worktree.
+  unlocked-global-rewrite — a whole-file rewrite of SHARED state with neither an atomic replace
+                 nor an inter-process lock. `open(path, "w")` truncates before the first byte, so
+                 two of the 16+ concurrent workers interleave into a LOST UPDATE (both exit 0) and
+                 any failure mid-dump leaves the file corrupt. Live instances: trust-workspace.py
+                 rewriting ~/.claude.json (the GLOBAL config — oauth plus every project's trust and
+                 permissions, 113 KB on this host) and cost-rollup.py rewriting the bus-synced
+                 costs.jsonl the daily token ceiling gates on. Note cost-rollup.py's
+                 `open_with_retry` is NOT a lock: it retries past a sharing violation, which
+                 orders nothing.
+
 Exit 0 = clean; 1 = findings (printed to stdout). Read-only; changes nothing.
 """
 from __future__ import annotations
@@ -85,6 +115,14 @@ SHELL_SUFFIXES = {".sh", ".cmd", ".ps1", ".py"}
 EXCLUDED_DIRS = {
     ".git",
     "workspaces",  # per-task worker checkouts (their own repos have their own CI)
+    # Per-task git worktrees of the HUB, created by /get-work-done under the fleet root. Their
+    # contents are copies of hub files that the hub's own CI already gates, so scanning them
+    # reports the same hub file once per live worktree. Measured 2026-08-17 (T-167): 40 of 48
+    # findings — 83% — were worktree copies, INCLUDING this checker and its tests matching their
+    # own defect-defining regexes (`_is_pattern_source` only excludes the ONE resolved path it
+    # runs from, so every copy defeats it). Burying 8 real fleet findings under 40 duplicates is
+    # the same "signal thrown away" failure this gate exists to catch, one level up.
+    "worktrees",
     "work",
     "node_modules",
     "venv",
@@ -246,6 +284,103 @@ PRECONDITION_INVOKE = re.compile(
 LAUNCH_AFTER = re.compile(r"claude\s+-p\b|ProcessStartInfo|Process\]::Start", re.I)
 
 
+# --- unlocked-global-rewrite: read-modify-write of SHARED state, truncating, with no lock ---------
+# The fleet runs 16+ concurrent claude.exe on one box plus a keeper tick every few minutes, so two
+# processes routinely hold the same shared file. `open(path, "w")` TRUNCATES before the first byte
+# is written, which makes the whole-file rewrite BOTH lossy and destructive:
+#   - lost update: A reads, B reads, B writes, A writes its stale snapshot -> B's change is erased
+#     and both processes exit 0, so the fleet records a healthy launch that silently did nothing.
+#   - corruption: any failure mid-dump (kill, disk-full, AV lock) leaves the file truncated. The
+#     targets here are not scratch files — ~/.claude.json is the GLOBAL Claude Code config (113 KB
+#     on this host: oauth account plus every project's trust + permissions) and costs.jsonl is the
+#     bus-synced spend ledger the daily token ceiling gates on.
+# Both were reproduced deterministically for T-167 (evidence/2026-08-17-T-167/repro_trust_race.py,
+# repro_trust_truncate.py). Distinct from stale-receipt (which is about the ledger's dedup KEY);
+# this is about the WRITE being non-atomic and unserialised.
+#
+# Only whole-file REWRITES qualify. An append (`"a"`) cannot lose a prior writer's bytes, and a
+# write to a fresh temp path is the FIX being matched below, not the defect.
+GLOBAL_REWRITE = re.compile(
+    r"\bopen(?:_with_retry)?\s*\(\s*(?P<target>[^,)]+?)\s*,\s*(?P<mode>['\"]w[bt+]?['\"])", re.I
+)
+# The write must land on state SHARED across processes: the global CC config, or a bus-level
+# ledger/registry/queue. A module-level CONSTANT (LEDGER, STATE_PATH) counts — that is exactly how
+# cost-rollup.py names it. A local `tmp`/`out`/`dst` variable does not.
+SHARED_STATE_TARGET = re.compile(
+    r"\.claude\.json|claude_json|costs\.jsonl|"
+    r"\b(LEDGER|REGISTRY|QUEUE|SETTINGS|STATE|COSTS|BUS)(_[A-Z]+)*\b",
+)
+# A temp-then-replace is the CORRECT shape and must never be flagged: the truncation happens on a
+# throwaway path and `os.replace` swaps it in atomically, so a concurrent reader sees either the
+# old file or the new one, never a half-written one.
+ATOMIC_REPLACE = re.compile(r"\bos\.replace\b|\bos\.rename\b|\bshutil\.move\b|\bPath\.replace\b")
+# Evidence the writer SERIALISES against other processes: a real lock. `open_with_retry` is NOT a
+# lock — it retries past a sharing violation, which orders nothing and is precisely what
+# cost-rollup.py already has while still losing updates.
+PROCESS_LOCK = re.compile(
+    r"\bmsvcrt\.locking\b|\bfcntl\.(flock|lockf)\b|\bportalocker\b|\bfilelock\b|"
+    r"\bFileLock\b|\bO_EXCL\b|\bx['\"]\s*\)|\bLockFileEx\b",
+    re.I,
+)
+
+
+# --- unmeasured-safe-delete: a destructive op gated on a predicate that cannot see / can fail -----
+# The narrowest, highest-stakes shape in the fleet: `git status --porcelain` used as the SAFETY
+# PREDICATE for deleting a worktree. Two independent ways it says "safe" without having measured
+# anything (both reproduced on this host for T-167 against janitor-worktrees.ps1:144):
+#   1. gitignored-blind — `--untracked-files=all` does NOT include ignored paths (`--ignored`
+#      does). A worker's build/, dist/, *.log, .env output is invisible, so the veto passes and
+#      `git worktree remove` (no --force needed, it shares the blindness) deletes it. Verified:
+#      porcelain reported 0 lines with real files present; `--ignored` reported them.
+#   2. failure-scores-clean — the capture discards stderr and never reads $LASTEXITCODE, so a
+#      FAILED status (exit 128: unreadable gitdir link — a concurrent `worktree prune`/`repair`
+#      from another of the 16+ workers, an AV lock, a half-finished move) prints nothing, the
+#      emptiness of stdout reads as "clean", and a DIRTY worktree is deleted. Verified: exit 128,
+#      0 lines, falls through to REMOVED.
+# Deliberately scoped to files that actually DELETE a worktree — this must never fire on ordinary
+# `git status` usage, only where emptiness authorises destruction.
+DESTRUCTIVE_WORKTREE_OP = re.compile(r"worktree\s+remove\b", re.I)
+
+
+# --- silent-staging: a git STATE-MUTATING command whose verdict is discarded, before a push -------
+# The existing silent-push check covers `git push`. But the commands that BUILD what gets pushed —
+# `git add`, `git commit`, `git checkout` — sit above it in keeper-tick.cmd sending their exit
+# codes to `>nul 2>&1`, and a push of an unchanged/wrong ref SUCCEEDS. So the tick's `if errorlevel
+# 1` never fires and the bus silently stops receiving work while every tick reports healthy.
+# Both live instances were reproduced end-to-end for T-167 (keeper-tick.cmd:160,161,162):
+#   * `git add -A` blocked by a concurrent `.git/index.lock` (the sweep at line 129 commits to this
+#     same clone — bus history shows a sweep commit and a `keeper: tick` in the same minute) exits
+#     128 into the sink; the push then succeeds on the unchanged ref and the tick prints healthy
+#     while the bus item stays untracked on disk.
+#   * `git checkout main --quiet` aborted by a dirty tracked file (line 158's own comment concedes
+#     "the sweep may have switched branches") leaves the clone on the stray branch; the tick's
+#     commit lands THERE, `git push origin main` pushes the untouched main ref and exits 0. This
+#     is verbatim the stranded-clone incident lines 5-6 designate a HARD INVARIANT.
+# Scoped to files that actually push, so the discarded verdict is what makes a healthy report a lie.
+# The verdict is lost whether it is redirected into a sink OR simply never tested: `git checkout
+# main --quiet` (keeper-tick.cmd:160) has no redirect at all, yet its failure is equally invisible
+# because nothing reads errorlevel. So the match is the MUTATION itself; the sink is not required.
+GIT_STATE_MUTATION = re.compile(
+    r"\bgit\s+(?:-C\s+\S+\s+)?(?P<verb>add|commit|checkout|switch|reset)\b", re.I
+)
+GIT_PUSHES_SOMEWHERE = re.compile(r"\bgit\s+(?:-C\s+\S+\s+)?push\b", re.I)
+# Evidence the mutation's verdict IS consumed: an exit test near it, or an `if git ...` wrapper.
+GIT_VERDICT_TESTED = re.compile(
+    r"\berrorlevel\b|%ERRORLEVEL%|\$LASTEXITCODE|\$\?|\bif\s+git\b|\|\|\s*(?!true\b)\S|&&", re.I
+)
+# A retry loop whose push IS tested (`if git push ...; then return 0; fi` inside `for`/`while`)
+# consumes the whole iteration's verdict: a failed mutation makes that iteration's push fail, and
+# exhaustion returns non-zero loudly. This is bus-sync.sh's bus_push() — the reference-correct shape.
+PUSH_RETRY_LOOP = re.compile(
+    r"^\s*(for|while)\b[^\n]*\n(?:[^\n]*\n){0,6}?[^\n]*\bif\s+git\s+push\b", re.M | re.I
+)
+STATUS_PREDICATE = re.compile(r"git\b[^\n]*\bstatus\b[^\n]*--porcelain", re.I)
+STATUS_SEES_IGNORED = re.compile(r"--ignored\b", re.I)
+# Evidence the capture's own failure is distinguished from "nothing to report": the exit code is
+# read, or stderr is kept and inspected. `2>$null` + no $LASTEXITCODE is the defect.
+STATUS_FAILURE_TESTED = re.compile(r"\$LASTEXITCODE|\berrorlevel\b|\$\?", re.I)
+
+
 @dataclass(frozen=True)
 class Finding:
     check: str
@@ -277,9 +412,14 @@ def _is_pattern_source(path: Path) -> bool:
     # The test file drops the `check_` prefix (test_fleet_script_health.py), so derive both
     # spellings rather than guessing one — an exclusion that silently misses its target is the
     # same "looks handled, isn't" shape this whole gate hunts.
-    tests = here.parent / "tests"
     stems = {here.stem, here.stem.removeprefix("check_")}
-    return path.resolve() in {here} | {tests / f"test_{s}.py" for s in stems}
+    # Match by FILENAME, not resolved path. Identity-by-path only excused the single copy this
+    # process happens to run from, so every per-task worktree/checkout of the hub carried a
+    # second copy that flagged itself (T-167: `check_fleet_script_health.py` and
+    # `test_fleet_script_health.py` reported as offset-before-write from six worktrees at once).
+    # These two filenames are pattern SOURCE wherever they live — their "code" is the defect
+    # regexes and the fixtures that plant them, never fleet behaviour.
+    return path.name in {here.name} | {f"test_{s}.py" for s in stems}
 
 
 def check_grep_count_fallback(path: Path) -> list[Finding]:
@@ -676,6 +816,162 @@ def check_unchecked_precondition(path: Path) -> list[Finding]:
     return out
 
 
+def check_unlocked_global_rewrite(path: Path) -> list[Finding]:
+    """A whole-file rewrite of SHARED state, truncating, with neither a lock nor an atomic replace.
+
+    `open(shared, "w")` truncates before writing a byte, so two concurrent fleet processes produce
+    a LOST UPDATE (the later writer's stale snapshot erases the earlier one's change, both exit 0)
+    and any failure mid-dump leaves the file CORRUPT. Unlike stale-receipt — which is about the
+    dedup KEY being wrong — this is about the write itself being neither serialised nor atomic.
+
+    The fix is temp-file + `os.replace` (atomic swap) and, where two writers can genuinely
+    interleave, a real inter-process lock. A retry-on-sharing-violation helper is NOT a lock: it
+    orders nothing, and cost-rollup.py already has one while still losing updates.
+    """
+    if path.suffix != ".py":
+        return []
+    if _is_pattern_source(path):
+        return []
+    lines = _lines(path)
+    code = "\n".join(l for l in lines if not l.lstrip().startswith("#"))
+    # A correct writer anywhere in the file clears it: these scripts have ONE shared-state writer,
+    # so an atomic replace or a real lock present means the shape has been fixed.
+    if ATOMIC_REPLACE.search(code) or PROCESS_LOCK.search(code):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith("#"):
+            continue
+        m = GLOBAL_REWRITE.search(line)
+        if not m:
+            continue
+        if not SHARED_STATE_TARGET.search(m.group("target")):
+            continue
+        out.append(
+            Finding(
+                "unlocked-global-rewrite",
+                path,
+                i,
+                f"`{m.group('target').strip()}` is SHARED fleet/global state rewritten with mode "
+                f"{m.group('mode')} — the open TRUNCATES it, and there is no atomic replace and no "
+                "inter-process lock. With 16+ concurrent workers on this box, an interleaved "
+                "read-modify-write silently ERASES the other writer's change (both exit 0, so the "
+                "fleet records a healthy run), and a failure mid-write leaves the file corrupt. "
+                "Write a temp file and os.replace() it in; add a real lock if writers interleave.",
+            )
+        )
+    return out
+
+
+def check_silent_staging(path: Path) -> list[Finding]:
+    """A git state-mutating command whose verdict nobody reads, in a script that then pushes.
+
+    `git push` already has its own check. This one covers the commands that BUILD what gets
+    pushed — a failed `add`/`commit`/`checkout` leaves the push with nothing (or the wrong ref) to
+    send, and pushing an unchanged ref SUCCEEDS. So the tick's `if errorlevel 1` never fires: the
+    bus silently stops receiving work while every tick reports healthy.
+    """
+    if path.suffix not in {".cmd", ".sh", ".ps1"}:
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    if not GIT_PUSHES_SOMEWHERE.search(text):
+        return []
+    # `set -e` aborts the script on the failed mutation, so the push below never runs — loud.
+    if path.suffix == ".sh" and SHELL_ABORTS_ON_ERROR.search(text):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("#", "rem ", "REM ")):
+            continue
+        m = GIT_STATE_MUTATION.search(line)
+        if not m:
+            continue
+        # The verdict test must be on THIS line or the very next one. A wider window let an
+        # `if errorlevel 1` belonging to an unrelated command five lines below excuse an unchecked
+        # `git checkout` (keeper-tick.cmd:14 was cleared that way during development) — the same
+        # "someone else's enforcement counted as mine" trap the dead-gate and ps-unchecked-call
+        # checks each had to be narrowed against. errorlevel reflects the LAST command, so a test
+        # after any intervening command is not this mutation's verdict.
+        window = "\n".join(lines[i - 1 : i + 1])
+        if GIT_VERDICT_TESTED.search(window):
+            continue
+        # A mutation inside a RETRY LOOP whose push is tested is already safe: if the mutation
+        # fails, the guarded push in the same iteration fails too and the loop exhausts loudly.
+        # bus_push() in bus-sync.sh is the fleet's reference-correct implementation and must never
+        # flag — a gate that fires on the known-good shape is one readers learn to ignore.
+        if PUSH_RETRY_LOOP.search("\n".join(lines[max(0, i - 4) : i + 4])):
+            continue
+        out.append(
+            Finding(
+                "silent-staging",
+                path,
+                i,
+                f"`git {m.group('verb')}` mutates git state here and its exit code is never tested, "
+                "in a script that pushes below. A failed add/commit (a concurrent .git/index.lock) "
+                "leaves the work uncommitted, and a failed checkout leaves the clone on the wrong "
+                "branch — either way the following `git push` SUCCEEDS on an unchanged or wrong "
+                "ref, so the run reports healthy while the bus never received the work. Test the "
+                "exit code and abort loudly before pushing.",
+            )
+        )
+    return out
+
+
+def check_unmeasured_safe_delete(path: Path) -> list[Finding]:
+    """A worktree deletion gated on a `git status` predicate that can't see, or can silently fail.
+
+    Fires only in a file that actually removes a worktree, so the emptiness of `git status` output
+    is literally the authorisation to destroy someone's work. Two defects, same root cause —
+    "I could not measure" scoring as "measured safe":
+
+      * the predicate omits `--ignored`, so every gitignored worker artifact (build/, .env, *.log)
+        is invisible and the veto passes over real uncommitted work;
+      * the predicate's own exit code is never tested, so a FAILED status (unreadable gitdir under
+        a concurrent prune/repair, an AV lock) yields empty stdout that reads as "clean".
+    """
+    if path.suffix not in {".ps1", ".sh", ".cmd"}:
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    if not DESTRUCTIVE_WORKTREE_OP.search(text):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("#", "rem ", "REM ")):
+            continue
+        if not STATUS_PREDICATE.search(line):
+            continue
+        problems = []
+        if not STATUS_SEES_IGNORED.search(line):
+            problems.append(
+                "omits `--ignored`, so gitignored worker output (build/, dist/, .env, *.log) is "
+                "invisible to the veto and is deleted with it"
+            )
+        # The exit code must be tested at the capture, not somewhere far below.
+        window = "\n".join(lines[i - 1 : i + 3])
+        if not STATUS_FAILURE_TESTED.search(window):
+            problems.append(
+                "never tests the status command's own exit code, so a FAILED status (exit 128 on "
+                "an unreadable gitdir — a concurrent worktree prune/repair, an AV lock) prints "
+                "nothing and its EMPTY output is read as 'clean'"
+            )
+        if not problems:
+            continue
+        out.append(
+            Finding(
+                "unmeasured-safe-delete",
+                path,
+                i,
+                "this `git status --porcelain` is the SAFETY PREDICATE for a `git worktree remove` "
+                "in the same file, but it " + "; and it ".join(problems) + ". Unmeasured is being "
+                "treated as safe: add `--ignored` and test the exit code, and treat any failure to "
+                "measure as DIRTY (refuse to delete), never as clean.",
+            )
+        )
+    return out
+
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -702,6 +998,9 @@ def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
         findings.extend(check_ps_unchecked_call(path))
         findings.extend(check_offset_before_write(path))
         findings.extend(check_unchecked_precondition(path))
+        findings.extend(check_unlocked_global_rewrite(path))
+        findings.extend(check_silent_staging(path))
+        findings.extend(check_unmeasured_safe_delete(path))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 

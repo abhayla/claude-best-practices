@@ -6,6 +6,8 @@ that cannot be shown to fire on the defect it targets is not a gate (learning-to
 """
 from __future__ import annotations
 
+import datetime as dt
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -30,6 +32,9 @@ _FIXTURE_SUFFIX = {
     "ps-unchecked-call": "sweep.ps1",
     "offset-before-write": "read-answers.ps1",
     "unchecked-precondition": "worker-wrapper.ps1",
+    "unlocked-global-rewrite": "rollup.py",
+    "unmeasured-safe-delete": "janitor.ps1",
+    "silent-staging": "tick.cmd",
 }
 
 
@@ -765,6 +770,257 @@ def test_the_gate_does_not_flag_its_own_pattern_source():
     )
 
 
+# --------------------------------------------------- unlocked-global-rewrite (T-167, 2026-08-17)
+
+
+def test_unlocked_global_rewrite_is_flagged(tmp_path: Path):
+    """The live trust-workspace.py shape: read whole shared JSON, mutate, truncate-write it back.
+
+    The fixed form writes a temp file and os.replace()s it in — atomic, so a concurrent reader
+    sees the old file or the new one, never a half-written one.
+    """
+    finding = _only_the_defect(
+        tmp_path,
+        "unlocked-global-rewrite",
+        defective=(
+            "import io, json, os\n"
+            'claude_json_path = os.path.join(os.environ["USERPROFILE"], ".claude.json")\n'
+            "with io.open(claude_json_path, encoding='utf-8') as f:\n"
+            "    data = json.load(f)\n"
+            'data["projects"][sys.argv[1]] = {"hasTrustDialogAccepted": True}\n'
+            'with io.open(claude_json_path, "w", encoding="utf-8") as f:\n'
+            "    json.dump(data, f, indent=2)\n"
+        ),
+        fixed=(
+            "import io, json, os\n"
+            'claude_json_path = os.path.join(os.environ["USERPROFILE"], ".claude.json")\n'
+            "with io.open(claude_json_path, encoding='utf-8') as f:\n"
+            "    data = json.load(f)\n"
+            'data["projects"][sys.argv[1]] = {"hasTrustDialogAccepted": True}\n'
+            'tmp = claude_json_path + ".tmp"\n'
+            'with io.open(tmp, "w", encoding="utf-8") as f:\n'
+            "    json.dump(data, f, indent=2)\n"
+            "os.replace(tmp, claude_json_path)\n"
+        ),
+    )
+    assert "no atomic replace" in finding.message
+
+
+def test_append_to_shared_ledger_is_not_flagged(tmp_path: Path):
+    """Mode "a" cannot erase another writer's bytes — only a truncating rewrite is the defect.
+
+    cost-rollup.py's normal path appends; only its supersede path rewrites. Flagging the append
+    would make the check fire on every ledger writer in the fleet and train the reader to ignore it.
+    """
+    (tmp_path / "appender.py").write_text(
+        "import json, os\n"
+        'LEDGER = os.path.join(os.path.dirname(__file__), "costs.jsonl")\n'
+        'with open(LEDGER, "a", encoding="utf-8") as f:\n'
+        '    f.write(json.dumps({"task": "T-1"}) + "\\n")\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unlocked-global-rewrite")
+
+
+def test_retry_helper_alone_does_not_clear_the_finding(tmp_path: Path):
+    """A retry-on-sharing-violation is NOT a lock — it orders nothing.
+
+    This is the exact trap cost-rollup.py falls into: `open_with_retry` reads as concurrency-aware
+    but only retries past a transient lock, so two writers still interleave and lose an update. If
+    the presence of that helper cleared the finding, the check would excuse the live defect.
+    """
+    (tmp_path / "rollup.py").write_text(
+        "import json, os, time\n"
+        'LEDGER = os.path.join(os.path.dirname(__file__), "costs.jsonl")\n'
+        "def open_with_retry(path, mode, encoding='utf-8'):\n"
+        "    for attempt in range(5):\n"
+        "        try:\n"
+        "            return open(path, mode, encoding=encoding)\n"
+        "        except OSError:\n"
+        "            time.sleep(1)\n"
+        'with open_with_retry(LEDGER, "w") as f:\n'
+        '    f.write("rewritten\\n")\n',
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path), "unlocked-global-rewrite")
+    assert len(found) == 1, "a retry helper must not be mistaken for serialisation"
+
+
+def test_locked_rewrite_is_not_flagged(tmp_path: Path):
+    """A real inter-process lock serialises the writers, so the rewrite cannot interleave."""
+    (tmp_path / "locked.py").write_text(
+        "import json, os, msvcrt\n"
+        'LEDGER = os.path.join(os.path.dirname(__file__), "costs.jsonl")\n'
+        'with open(LEDGER, "w", encoding="utf-8") as f:\n'
+        "    msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 1)\n"
+        '    f.write("safe\\n")\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unlocked-global-rewrite")
+
+
+def test_local_temp_file_rewrite_is_not_flagged(tmp_path: Path):
+    """A truncating write to a script-local scratch path is ordinary, not shared-state corruption."""
+    (tmp_path / "scratch.py").write_text(
+        "import json\n"
+        'out = "/tmp/my-scratch-output.json"\n'
+        'with open(out, "w", encoding="utf-8") as f:\n'
+        '    json.dump({"ok": True}, f)\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unlocked-global-rewrite")
+
+
+# ------------------------------------------------------------ silent-staging (T-167, 2026-08-17)
+
+
+def test_silent_staging_is_flagged(tmp_path: Path):
+    """The live keeper-tick.cmd:161 shape: `git add` into a sink, then a push that reports healthy."""
+    finding = _only_the_defect(
+        tmp_path,
+        "silent-staging",
+        defective=(
+            # ONE unchecked mutation only: the helper asserts exactly one finding, and `git add`
+            # plus `git commit` would (correctly) yield two.
+            "git add -A >nul 2>&1\n"
+            "git push --quiet origin main >nul 2>&1\n"
+            "if errorlevel 1 ( echo PUSH_FAILED )\n"
+        ),
+        fixed=(
+            "git add -A >nul 2>&1\n"
+            "if errorlevel 1 ( echo ADD_FAILED & exit /b 1 )\n"
+            "git push --quiet origin main >nul 2>&1\n"
+            "if errorlevel 1 ( echo PUSH_FAILED )\n"
+        ),
+    )
+    assert "git add" in finding.message
+
+
+def test_unchecked_checkout_before_push_is_flagged(tmp_path: Path):
+    """keeper-tick.cmd:160 — an unredirected `git checkout main` is just as silent when untested.
+
+    A failed checkout leaves the clone on the sweep's stray branch; the tick then commits THERE and
+    `git push origin main` pushes the untouched main ref and exits 0. Reproduced end-to-end for
+    T-167. The verdict is lost by not being read, not by being redirected — so the check must not
+    require a sink.
+    """
+    (tmp_path / "tick.cmd").write_text(
+        "git checkout main --quiet\n"
+        "git commit -m tick --quiet >nul 2>&1\n"
+        "git push --quiet origin main >nul 2>&1\n",
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path), "silent-staging")
+    assert any("checkout" in f.message for f in found), (
+        "an unredirected but untested `git checkout` before a push must flag"
+    )
+
+
+def test_mutation_in_a_script_that_never_pushes_is_not_flagged(tmp_path: Path):
+    """No push means no false 'healthy' report — the defect needs the push to launder the failure."""
+    (tmp_path / "local.cmd").write_text(
+        "git add -A >nul 2>&1\ngit commit -m local --quiet >nul 2>&1\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "silent-staging")
+
+
+def test_bus_push_retry_loop_is_not_flagged(tmp_path: Path):
+    """bus-sync.sh's bus_push() is the fleet's reference-correct shape and must stay clean.
+
+    Its `git checkout main -q` is untested on its own line, but it sits in a retry loop whose push
+    IS tested: a failed checkout fails that iteration's push, and exhaustion returns non-zero
+    loudly. Flagging the known-good implementation is how a gate trains its readers to ignore it.
+    """
+    (tmp_path / "bus-sync.sh").write_text(
+        "#!/bin/bash\n"
+        "bus_push() {\n"
+        "  local i\n"
+        "  for i in 1 2 3; do\n"
+        "    git checkout main -q 2>/dev/null\n"
+        "    git pull -q --rebase origin main 2>/dev/null\n"
+        "    if git push -q origin main 2>/dev/null; then return 0; fi\n"
+        "    sleep 2\n"
+        "  done\n"
+        '  echo "BUS-SYNC: push failed after 3 rebase-retries" >&2\n'
+        "  return 1\n"
+        "}\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "silent-staging")
+
+
+def test_set_e_shell_does_not_flag_silent_staging(tmp_path: Path):
+    """`set -e` aborts on the failed mutation, so the push below never runs — loud, not silent."""
+    (tmp_path / "strict.sh").write_text(
+        "#!/bin/bash\nset -euo pipefail\ngit add -A\ngit commit -m x\ngit push origin main\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "silent-staging")
+
+
+# ----------------------------------------------------- unmeasured-safe-delete (T-167, 2026-08-17)
+
+
+def test_unmeasured_safe_delete_is_flagged(tmp_path: Path):
+    """The live janitor-worktrees.ps1:144 shape: a blind, untested status gating a deletion."""
+    finding = _only_the_defect(
+        tmp_path,
+        "unmeasured-safe-delete",
+        defective=(
+            "$status = git -C $wtPath status --porcelain --untracked-files=all 2>$null\n"
+            '$statusLines = @($status | Where-Object { $_ -ne "" })\n'
+            'if ($statusLines.Count -gt 0) { return @{ Verdict = "KEPT-dirty" } }\n'
+            "git -C $RepoPath worktree remove $e.Path *> $null\n"
+        ),
+        fixed=(
+            "$status = git -C $wtPath status --porcelain --untracked-files=all --ignored 2>$null\n"
+            'if ($LASTEXITCODE -ne 0) { return @{ Verdict = "KEPT-unmeasurable" } }\n'
+            '$statusLines = @($status | Where-Object { $_ -ne "" })\n'
+            'if ($statusLines.Count -gt 0) { return @{ Verdict = "KEPT-dirty" } }\n'
+            "git -C $RepoPath worktree remove $e.Path *> $null\n"
+        ),
+    )
+    assert "--ignored" in finding.message and "exit code" in finding.message
+
+
+def test_status_without_a_deletion_is_not_flagged(tmp_path: Path):
+    """Ordinary `git status --porcelain` is ubiquitous — only a DELETE predicate is in scope.
+
+    Without this scoping the check would fire on every script that reports repo cleanliness, and a
+    gate that cries wolf on normal code is one nobody reads.
+    """
+    (tmp_path / "reporter.ps1").write_text(
+        "$status = git -C $repo status --porcelain --untracked-files=all 2>$null\n"
+        '$lines = @($status | Where-Object { $_ -ne "" })\n'
+        'Write-Output "dirty lines: $($lines.Count)"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unmeasured-safe-delete")
+
+
+def test_ignored_flag_alone_does_not_clear_the_untested_exit_code(tmp_path: Path):
+    """Half a fix is still a defect: seeing ignored files does not make a FAILED status safe.
+
+    Both legs are independent — a status that can see everything still reports nothing when it
+    exits 128, and empty output still authorises the delete.
+    """
+    (tmp_path / "half.ps1").write_text(
+        "$status = git -C $wtPath status --porcelain --untracked-files=all --ignored 2>$null\n"
+        '$statusLines = @($status | Where-Object { $_ -ne "" })\n'
+        'if ($statusLines.Count -gt 0) { return @{ Verdict = "KEPT-dirty" } }\n'
+        "git -C $RepoPath worktree remove $e.Path *> $null\n",
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path), "unmeasured-safe-delete")
+    assert len(found) == 1, "an untested exit code must still flag even with --ignored present"
+    # Only the UNSATISFIED leg may be diagnosed. (The remediation sentence names `--ignored`
+    # regardless, so assert on the diagnosis clause, not on the whole message.)
+    diagnosis = found[0].message.split("Unmeasured is being treated as safe")[0]
+    assert "omits `--ignored`" not in diagnosis, "the satisfied leg must not be reported"
+    assert "exit code" in diagnosis
+
+
 def test_unrelated_block_wording_is_not_a_dead_gate(tmp_path: Path):
     """`cryptography`'s block-padding docs must not read as a dispatch gate claim."""
     (tmp_path / "padding.py").write_text(
@@ -834,12 +1090,119 @@ def test_cli_missing_path_is_loud(tmp_path: Path):
 # The two defects the 2026-08-03 audit CONFIRMED live on the fleet. Fixing them is a fleet-repo
 # change (out of scope for this hub PR, which delivers the gates); until then they are the known
 # ratchet floor. RULE: this set may only SHRINK. Adding to it is how a gate rots into a to-do list.
-# T-071 (2026-08-10) ratcheted six known-open findings here. All six stopped reproducing by
-# 2026-08-12 (fleet-script fixes landed via the estate/parity work: worker-wrapper stdin
-# regression rewrite, read-answers/feature-adoption-sweep path+default hardening, and the
-# T-110 janitor sweep touching the same guard shapes) — the ratchet's own staleness assertion
-# ordered their removal. Ratchet is now EMPTY: any finding the detector reports is a failure.
-KNOWN_OPEN_FLEET_FINDINGS: set = set()
+# T-167 (2026-08-17) moved the floor OUT of this file into fleet-ratchet-floor.json. It used to
+# be a Python literal, which meant editing it was invisible to CI: the assertions below skip when
+# the fleet checkout is absent, so a PR emptying the floor was "validated" by a run that could not
+# see the fleet. Commit a5cde31 did exactly that on 2026-08-12 — emptied the floor claiming all
+# six T-071 findings were fixed; on 2026-08-17 all six still reproduced, and a NEW keeper-tick.cmd
+# defect had been hidden behind the empty floor for five days. The JSON carries the observation
+# date so test_ratchet_floor_is_evidenced (which runs EVERYWHERE, fleet or not) can block an
+# unevidenced shrink.
+_FLOOR_FILE = Path(__file__).resolve().parent / "fleet-ratchet-floor.json"
+_FLOOR_DOC = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
+KNOWN_OPEN_FLEET_FINDINGS: set = {(name, check) for name, check in _FLOOR_DOC["findings"]}
+
+
+def test_ratchet_floor_is_evidenced():
+    """The floor artifact must carry re-derivable evidence — and this runs WITHOUT the fleet.
+
+    This is the gate for T-167's HIGH-1. Every other fleet assertion in this file skips when
+    C:/Abhay/GetWorkDone is absent, which is always true on CI — so before this test, a PR could
+    delete the entire floor and merge green, because "green" only ever meant "the assertions did
+    not run". That is how six live defects plus one new one went unreported for five days.
+
+    This assertion is host-independent by construction: it validates the ARTIFACT, not the fleet.
+    A shrink now has to update `observed_on`, which makes the claim "I re-ran this on the host"
+    explicit and reviewable rather than implicit and unverifiable.
+    """
+    assert _FLOOR_DOC["findings"], (
+        "the ratchet floor is EMPTY. That is a strong claim — it says the live fleet carries zero "
+        "known silent-failure defects. If you just fixed the last one, say so by re-running the "
+        f"checker on the fleet host and refreshing observed_on in {_FLOOR_FILE.name}. If you are "
+        "emptying it because CI was green, STOP: CI cannot see the fleet and skips every "
+        "fleet-dependent assertion in this file (T-167 HIGH-1)."
+    )
+    # Entries must be well-formed (name, check) pairs — a malformed floor silently matches nothing
+    # and would excuse every finding, the same "looks handled, isn't" shape this gate hunts.
+    for entry in _FLOOR_DOC["findings"]:
+        assert isinstance(entry, list) and len(entry) == 2 and all(entry), (
+            f"malformed floor entry {entry!r}: expected [script_name, check_name]"
+        )
+    known_checks = {
+        "grep-count", "interpreter", "dead-gate", "discarded", "shape-only", "silent-push",
+        "stale-receipt", "unchecked-read", "ps-unchecked-call", "offset-before-write",
+        "unchecked-precondition", "unlocked-global-rewrite", "unmeasured-safe-delete",
+        "silent-staging",
+    }
+    unknown = {c for _, c in _FLOOR_DOC["findings"]} - known_checks
+    assert not unknown, (
+        f"floor references check(s) this checker does not implement: {sorted(unknown)} — a typo "
+        "here silently excuses nothing and hides a real finding"
+    )
+    # A date that never moves is the tell for an unevidenced edit.
+    dt.date.fromisoformat(_FLOOR_DOC["observed_on"])
+    assert _FLOOR_DOC.get("reproduce_with"), (
+        "the floor must record the exact command that reproduces it, so a reviewer can re-derive "
+        "the claim instead of trusting it"
+    )
+
+
+def _floor_guard(doc: dict) -> str | None:
+    """Run test_ratchet_floor_is_evidenced's logic against an arbitrary doc; return the failure.
+
+    Extracted so the negative controls below can prove the guard REJECTS bad floors. Without them
+    the guard is vacuous — it would pass just as happily if it checked nothing at all, which is
+    precisely the failure mode (a check that never fires) this whole file exists to prevent.
+    """
+    try:
+        if not doc.get("findings"):
+            return "empty floor"
+        for entry in doc["findings"]:
+            if not (isinstance(entry, list) and len(entry) == 2 and all(entry)):
+                return f"malformed entry {entry!r}"
+        known = {
+            "grep-count", "interpreter", "dead-gate", "discarded", "shape-only", "silent-push",
+            "stale-receipt", "unchecked-read", "ps-unchecked-call", "offset-before-write",
+            "unchecked-precondition", "unlocked-global-rewrite", "unmeasured-safe-delete",
+            "silent-staging",
+        }
+        unknown = {c for _, c in doc["findings"]} - known
+        if unknown:
+            return f"unknown check {sorted(unknown)}"
+        dt.date.fromisoformat(doc["observed_on"])
+        if not doc.get("reproduce_with"):
+            return "no reproduce_with"
+    except (KeyError, ValueError, TypeError) as e:
+        return f"{type(e).__name__}: {e}"
+    return None
+
+
+def test_floor_guard_rejects_the_shipped_defect():
+    """The negative control: the guard must REJECT an emptied floor, not merely accept a good one.
+
+    This replays commit a5cde31 — the real 2026-08-12 change that emptied the floor and merged
+    green because CI cannot see the fleet. If this test ever passes with the guard removed, the
+    guard is decoration.
+    """
+    good = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
+    assert _floor_guard(good) is None, "the committed floor must itself be valid"
+
+    emptied = dict(good, findings=[])
+    assert _floor_guard(emptied) == "empty floor", (
+        "emptying the floor must be REJECTED — that is the defect that shipped in a5cde31"
+    )
+
+
+def test_floor_guard_rejects_malformed_and_typoed_entries():
+    """A malformed or misspelled entry matches nothing, silently excusing a real live defect."""
+    good = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
+    assert _floor_guard(dict(good, findings=[["keeper-tick.cmd"]])) is not None
+    assert _floor_guard(dict(good, findings=[["keeper-tick.cmd", ""]])) is not None
+    typo = dict(good, findings=[["keeper-tick.cmd", "silent-stagin"]])
+    assert "unknown check" in (_floor_guard(typo) or ""), (
+        "a typo'd check name excuses nothing and hides the finding it was meant to record"
+    )
+    assert _floor_guard(dict(good, observed_on="not-a-date")) is not None
 
 
 def test_real_fleet_has_no_unknown_silent_failure_findings():

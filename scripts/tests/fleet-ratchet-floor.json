@@ -1,0 +1,43 @@
+{
+  "_comment": [
+    "The known-open fleet defect floor, as a COMMITTED artifact rather than a Python literal.",
+    "",
+    "WHY THIS FILE EXISTS (T-167, 2026-08-17). The ratchet assertions in",
+    "test_fleet_script_health.py can only run where C:/Abhay/GetWorkDone exists — on CI they",
+    "pytest.skip(). So a PR that empties the floor is validated by a CI run that CANNOT SEE the",
+    "fleet, and 'all green' means only 'the assertions did not run'. That is exactly what",
+    "happened: commit a5cde31 (2026-08-12) emptied the floor claiming 'all six T-071 findings",
+    "fixed', CI passed, and on 2026-08-17 all six still reproduced verbatim — plus a NEW",
+    "keeper-tick.cmd finding that had been invisible for five days. The gate detected the",
+    "defects and its own bookkeeping threw the signal away: the detect-then-discard class this",
+    "checker exists to catch, one level up, inside the checker.",
+    "",
+    "THE CONTRACT. Every entry records the run that OBSERVED it. Shrinking the floor is a",
+    "claim about the live fleet, so it must carry evidence a reviewer can re-derive:",
+    "  1. run the checker on the fleet host (see reproduce_with below),",
+    "  2. remove only entries that genuinely stopped reproducing,",
+    "  3. update observed_on to that run's date.",
+    "test_ratchet_floor_matches_live_fleet enforces both directions ON THE HOST. On CI, where",
+    "the fleet is absent, test_ratchet_floor_is_evidenced still runs and blocks a floor edit",
+    "whose observed_on was not refreshed — so an unevidenced shrink can no longer merge green.",
+    "",
+    "RULE: entries may only be REMOVED (as the fleet lands fixes), never added to excuse a new",
+    "defect. A new defect is a red test, not a new line here."
+  ],
+  "observed_on": "2026-08-17",
+  "observed_by": "T-167 fleet-script audit (wave 2)",
+  "reproduce_with": "PYTHONPATH=. python scripts/check_fleet_script_health.py C:/Abhay/GetWorkDone --caller .claude/skills/get-work-done/SKILL.md",
+  "findings": [
+    ["bus-relay.sh", "offset-before-write"],
+    ["cost-rollup.py", "unlocked-global-rewrite"],
+    ["feature-adoption-sweep.ps1", "ps-unchecked-call"],
+    ["gate-audit.ps1", "ps-unchecked-call"],
+    ["janitor-worktrees.ps1", "unmeasured-safe-delete"],
+    ["keeper-tick.cmd", "discarded"],
+    ["keeper-tick.cmd", "silent-staging"],
+    ["parked-digest.ps1", "ps-unchecked-call"],
+    ["read-answers.ps1", "offset-before-write"],
+    ["trust-workspace.py", "unlocked-global-rewrite"],
+    ["worker-wrapper.ps1", "unchecked-precondition"]
+  ]
+}
