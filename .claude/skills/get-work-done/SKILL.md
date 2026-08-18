@@ -346,7 +346,11 @@ in sync.
    OR (b) the keeper's failures log (`GWD\heartbeats\keeper-tick-failures.log`) shows a
    CEILING-EXCEEDED line dated today (written by `cost-rollup.py --check-ceiling` against the
    numeric `settings.daily_token_ceiling`) → pause new dispatches, ping the owner once
-   (fleet-paused), never retry-storm.
+   (fleet-paused), never retry-storm. **ACTIONS-MINUTES HOLD (budget plan part c, owner Decision
+   2 2026-08-18):** before dispatching a task whose landing will trigger private-repo CI, check
+   `GWD\state\ci-hold.flag` — present means only P1 tasks proceed, others queue with a status
+   note (prose rule; a preflight-guard exit code is the codify-later follow-up in
+   PATTERNS-SEEN.md).
 8. **Heartbeat dispatch (P7):** on Windows machines launch via the wrapper —
    `powershell -File GWD\worker-wrapper.ps1 -TaskId <id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap> -StateRoot <GWD>`
    — `-StateRoot` is MANDATORY off the VPS: its default is the VPS fleet home
