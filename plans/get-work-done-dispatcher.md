@@ -247,4 +247,14 @@ SKILL.md checklist line added alongside STEP 5b. The keeper `.remember`-grep det
 automated sweep for "sync pending"/"outlined" language left in handoff buffers) is explicitly
 **DEFERRED** until the `PATTERNS-SEEN.md` recurrence counter's `LESSON(OPEN)` line dated
 2026-08-15 reaches a 2nd instance — build the detector on repeated evidence, not on one incident.
+
+## Addendum 2026-08-18 — owner Decision 2: CI-minutes discipline (budget plan part b)
+
+The fleet's per-task CI cost was every push (WIP, fix-round, final) triggering its own full
+`validate-pr.yml` run — 2-4 runs per task in a normal fix-loop. Owner Decision 2 splits the fix
+in two: T-190 (repo-side, `validate-pr.yml` itself) and this task, T-191 (fleet-side, the
+dispatcher's own worker/checker/fix-round prompts). See SKILL.md's **CI-MINUTES DISCIPLINE**
+section for the codified rule: a third standing worker-prompt line requiring `[skip ci]` on
+every non-final push, plus same-repo same-calendar-day landing batching extending the existing
+TRIVIAL-TASK BATCHING and WAVE-CHAINING conventions.
 The recurrence counter is SELF-REPORTED — it increments only if a session notices the recurrence and logs it to PATTERNS-SEEN.md, so "deferred" means "waiting on human/agent-observed evidence", not "covered later automatically".

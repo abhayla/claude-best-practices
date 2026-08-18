@@ -227,6 +227,29 @@ background - in headless claude -p, ending your turn kills your process and orph
 Both lines are mandatory and verbatim; the merge-guard line above is never reworded, reordered,
 or dropped to make room for this one.
 
+**CI-MINUTES DISCIPLINE (owner Decision 2, 2026-08-18 — budget plan part (b); T-190 is the
+repo-side half of the same quota fix):**
+
+1. **WORKER PUSH RULE.** Every worker/checker/fix-round prompt's standing mandates gain a
+   THIRD verbatim line, alongside (never in place of) the WORKER-MERGE GUARD and
+   FOREGROUND-ONLY EXECUTION lines above: "Push every intermediate commit — WIP, docs-only,
+   fix-round iterations — with `[skip ci]` in the commit message; only your FINAL,
+   ready-for-verification push omits it, so this task costs at most one PR CI run (plus the
+   merge)." Dispatchers copy this line verbatim into every worker, checker, and fix-round
+   prompt exactly as they already do for the two lines above it — never reworded, reordered,
+   or dropped.
+2. **SAME-REPO LANDING BATCHING.** Same-repo tasks whose contracts are written within the same
+   calendar day default to ONE shared branch/PR/CI-run — extending TRIVIAL-TASK BATCHING and
+   WAVE-CHAINING FOR SEQUENTIAL SAME-REPO WAVES above (the dedup gate's overlapping/related
+   branch already merges same-intake, same-repo contracts into one). Named exceptions: a P1
+   break-fix lands solo, never batched behind slower P2/P3 work; tasks with conflicting
+   file-scopes split into separate contracts instead of batching; a checker FAIL on one task
+   inside a batch holds only that task's hunks if the diff is separable, otherwise the whole
+   batch re-rounds together.
+3. **Projected effect, stated honestly:** a fix-loop that used to cost 2-4 CI runs (one per
+   push) now costs 1 — the `[skip ci]` discipline collapses every intermediate push into the
+   same CI run as the final, ready-for-verification one.
+
 **HOLD-LABEL INSTRUCTION (mandatory second line, live double-breach 2026-08-16 — T-144's PR #558
 auto-merged 84s post-creation, T-143's PR #560 auto-merged ~7min post-creation, neither worker ran
 `gh pr merge`):** the WORKER-MERGE GUARD line above only constrains the WORKER's own actions — it
