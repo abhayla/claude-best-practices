@@ -239,6 +239,28 @@ into or replacing the verbatim WORKER-MERGE GUARD line above — instructing the
 mechanism that stops the repo's ambient automation from landing it; refraining from merging is not
 sufficient on its own.
 
+**CI-MINUTES DISCIPLINE (owner Decision 2, 2026-08-18):** the fleet-side half of the CI-quota
+fix (T-190 is the repo-side half) — two codified rules:
+
+1. **WORKER PUSH RULE.** Every worker, checker, and fix-round prompt's standing mandates gain a
+   THIRD verbatim line, additive to (never replacing) the WORKER-MERGE GUARD and FOREGROUND-ONLY
+   EXECUTION lines above: "Intermediate commits (WIP, docs-only, fix-round iterations) are pushed
+   with `[skip ci]` in the commit message; ONLY the final ready-for-verification push omits it."
+   Copy this line VERBATIM into every dispatch — dispatchers do not paraphrase it. Without this,
+   each fix-round push burns a full PR CI run on top of the eventual real one; with it, a task
+   costs at most ONE CI run (plus the merge's own check).
+2. **SAME-REPO LANDING BATCHING.** Same-repo tasks whose contracts are written within the same
+   calendar day default to ONE shared branch/PR/CI-run — extending the existing TRIVIAL-TASK
+   BATCHING (STEP 5 above) and WAVE-CHAINING (STEP 5 above) conventions; the PRE-QUEUE DEDUP
+   GATE's "overlapping/related" outcome is the mechanism that merges them. Named exceptions:
+   P1 break-fixes land solo (urgency beats batching economics); tasks with conflicting
+   file-scopes split into separate contracts (a shared PR can't safely hold two workers editing
+   the same files); a checker FAIL on one batched task holds only that task's hunks if they are
+   separable from the rest of the batch's diff, otherwise the whole batch re-rounds together.
+   **Projected effect (stated honestly, not guaranteed):** fix-loops drop from 2-4 CI runs to 1
+   per task; same-repo same-day batching further reduces the PR count itself, not just the
+   per-PR run count.
+
 **Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
 global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
 `D:\Abhay\VibeCoding\claude-best-practices\.claude\rules\model-routing.md`):**

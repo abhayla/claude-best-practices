@@ -248,3 +248,16 @@ automated sweep for "sync pending"/"outlined" language left in handoff buffers) 
 **DEFERRED** until the `PATTERNS-SEEN.md` recurrence counter's `LESSON(OPEN)` line dated
 2026-08-15 reaches a 2nd instance — build the detector on repeated evidence, not on one incident.
 The recurrence counter is SELF-REPORTED — it increments only if a session notices the recurrence and logs it to PATTERNS-SEEN.md, so "deferred" means "waiting on human/agent-observed evidence", not "covered later automatically".
+
+## Addendum 2026-08-18 — Owner Decision 2, part (b): CI-minutes discipline
+
+Fleet-level half of the CI-quota fix (part (c), the actions-minutes dispatch hold, landed under
+T-192; part (a) is the repo-side half under T-190). Two rules codified into SKILL.md STEP 5,
+immediately after the HOLD-LABEL INSTRUCTION mandate block: (1) a third standing worker-prompt
+mandate line — intermediate commits push with `[skip ci]`, only the final ready-for-verification
+push omits it, capping a task at one CI run instead of the 2-4 a fix-loop used to burn; (2)
+same-repo, same-calendar-day contracts default to one shared branch/PR/CI-run, extending the
+existing trivial-task-batching and wave-chaining conventions via the dedup gate's
+overlapping/related merge path, with named exceptions for solo P1s, conflicting file-scopes, and
+partial-batch checker FAILs. This is a prose/discipline fix, not a new gate — no deterministic
+enforcement added here.
