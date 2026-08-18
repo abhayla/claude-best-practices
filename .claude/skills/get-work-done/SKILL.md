@@ -421,6 +421,24 @@ in sync.
    sat PARKED ~2h on 2026-08-17 waiting for a resume-budget approval on work that was ~90%
    done — this is the fix.)
 
+**SWEEP RECONCILIATION RULES (2026-08-18, 3-incident codification):** the fleet's lesson
+lifecycle mandates a lesson recurring 3x becomes a deterministic rule, never a 4th prose
+reminder — this class (a sweep flipping a task's queue state against the origin session's
+newer, truer state) hit that bar in 24h. MUST rules for every sweep, before flipping ANY
+contract's state (rename park/claim/done):
+1. **Newest signal wins.** A sweep MUST read the contract's NEWEST timestamped `status_log`
+   entry AND the bus git log for that file before acting — a stale body note never overrides
+   a newer rename. Incident: T-179 was re-parked from a stale body note that overrode a newer
+   claim rename.
+2. **A live origin's activity blocks reclaim.** A sweep MUST NOT reclaim/re-state a contract
+   whose origin session pushed bus activity within the last 2 hours, except the
+   provably-dead-origin rescue path (STEP 7 exception (a) above). Incident: T-178 — a sweep
+   claimed a live origin's deliberately-held task.
+3. **Unmerged PR blocks `.done`.** A contract whose dod/status references an unmerged PR is
+   NEVER renamed `.done` — work-complete-awaiting-land stays `.claimed` (or `.parked` with an
+   external-blocker reason); `.done` REQUIRES the PR merged. Incident: T-179 was renamed done
+   while its PR was still OPEN.
+
 **STANDING BUDGET PRE-APPROVAL (owner 2026-08-17):** retries, cap-resumes, budget raises, and
 tier-escalation costs are pre-approved and never owner-gated — bounded only by (a) the
 Anthropic plan's own weekly/monthly limits, which are not session-readable so the platform
