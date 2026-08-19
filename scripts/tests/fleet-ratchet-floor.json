@@ -3,7 +3,7 @@
     "The known-open fleet defect floor, as a COMMITTED artifact rather than a Python literal.",
     "",
     "WHY THIS FILE EXISTS (T-167, 2026-08-17). The ratchet assertions in",
-    "test_fleet_script_health.py can only run where C:/Abhay/GetWorkDone exists — on CI they",
+    "test_fleet_script_health.py can only run where the real fleet bus exists — on CI they",
     "pytest.skip(). So a PR that empties the floor is validated by a CI run that CANNOT SEE the",
     "fleet, and 'all green' means only 'the assertions did not run'. That is exactly what",
     "happened: commit a5cde31 (2026-08-12) emptied the floor claiming 'all six T-071 findings",
@@ -17,18 +17,43 @@
     "  1. run the checker on the fleet host (see reproduce_with below),",
     "  2. remove only entries that genuinely stopped reproducing,",
     "  3. update observed_on to that run's date.",
-    "test_ratchet_floor_matches_live_fleet enforces both directions ON THE HOST. On CI, where",
-    "the fleet is absent, test_ratchet_floor_is_evidenced still runs and blocks a floor edit",
-    "whose observed_on was not refreshed — so an unevidenced shrink can no longer merge green.",
+    "test_known_open_fleet_findings_still_reproduce enforces the floor is real ON THE HOST. On",
+    "CI, where the fleet is absent, test_ratchet_floor_is_evidenced still runs and blocks a",
+    "floor edit whose observed_on was not refreshed — so an unevidenced shrink can no longer",
+    "merge green.",
     "",
     "RULE: entries may only be REMOVED (as the fleet lands fixes), never added to excuse a new",
-    "defect. A new defect is a red test, not a new line here."
+    "defect. A new defect is a red test, not a new line here.",
+    "",
+    "ZERO-FLOOR CONTRACT (T-212, 2026-08-19). findings CAN be empty — that is the success",
+    "condition the whole sweep exists to reach — but ONLY together with a zero_evidence block.",
+    "A prose claim ('all fixed, trust me') costs nothing to write, so it is explicitly REJECTED",
+    "(test_floor_guard_rejects_empty_floor_without_evidence replays a5cde31 exactly). What",
+    "zero_evidence carries instead is manifest_sha256: a sha256 over every scanned fleet",
+    "script's (relative path, content sha256), sorted — computed by",
+    "check_fleet_script_health.manifest_digest() / `--print-zero-evidence`. Producing a digest",
+    "that matches the live fleet requires actually reading the live fleet's real files; nobody",
+    "can hand-type a sha256 that happens to match dozens of real files' real content. On any",
+    "host that DOES have the fleet, test_zero_floor_evidence_matches_live_fleet recomputes this",
+    "digest and fails loudly the moment it drifts from what is committed here — whether the",
+    "drift is honest (the fleet changed) or fabricated (the evidence was never actually run).",
+    "That is the same host-gated-truth pattern that already governs a non-empty floor",
+    "(test_known_open_fleet_findings_still_reproduce), extended to cover the zero case, which",
+    "the pre-T-212 shape of this file could not express at all."
   ],
   "observed_on": "2026-08-19",
-  "observed_by": "T-208 (fixed the detector's stub-vs-real-bus blindness, then re-ran the ratchet against the real bus for the first time since the floor stopped being scanned)",
-  "reproduce_with": "PYTHONPATH=. python scripts/check_fleet_script_health.py <fleet-dir> --caller .claude/skills/get-work-done/SKILL.md   (fleet-dir = D:/Abhay/GetWorkDone on the dev PC, C:/Abhay/GetWorkDone on the Windows VPS; scripts/tests/test_fleet_script_health.py's _resolve_fleet_dir() resolves this automatically)",
-  "findings": [
-    ["keeper-tick.cmd", "silent-staging"],
-    ["worker-wrapper.ps1", "unchecked-precondition"]
-  ]
+  "observed_by": "T-212 (re-ran the checker against the live bus after T-210's linter accuracy fix; both remaining floor entries — keeper-tick.cmd/silent-staging and worker-wrapper.ps1/unchecked-precondition — no longer reproduce, per the removal evidence below)",
+  "reproduce_with": "PYTHONPATH=. python scripts/check_fleet_script_health.py <fleet-dir> --caller .claude/skills/get-work-done/SKILL.md   (fleet-dir = D:/Abhay/GetWorkDone on the dev PC, C:/Abhay/GetWorkDone on the Windows VPS; scripts/tests/test_fleet_script_health.py's _resolve_fleet_dir() resolves this automatically). Add --print-zero-evidence to regenerate the zero_evidence block below.",
+  "removal_evidence": {
+    "keeper-tick.cmd/silent-staging": "Never a genuine defect at this site: T-207 guards every git mutation before the push by asserting on OUTPUT CONTENT captured into a per-tick temp file (findstr/for-of into a flag variable, then an `if` on that flag), then KT_ABORT and a goto before the push — that file is forbidden from using `if errorlevel` there because its own header records six failed fixes proving errorlevel is unreliable after a redirect into a shared log. T-210 taught check_silent_staging (CONTENT_ASSERTION_READ/CONTENT_ASSERTION_GATE) to recognise this content-assertion shape as an equally valid verdict read, so it no longer false-positives on it.",
+    "worker-wrapper.ps1/unchecked-precondition": "Genuinely fixed by T-211 commit 16e1316: worker-wrapper.ps1 now tests $LASTEXITCODE right after invoking trust-workspace.py and aborts the launch (exit 9, no result.json written) on a non-zero exit. Re-proved by the supervisor: a stub trust-workspace.py exiting 3 gives the wrapper exit 9 and no worker is ever started."
+  },
+  "findings": [],
+  "zero_evidence": {
+    "claim": "the live fleet bus carries zero known silent-failure defects as of observed_on",
+    "checker_output": "fleet-health: clean",
+    "scanned_script_count": 34,
+    "manifest_sha256": "27cbb23ed1a16168e6a05acf9b5c5eb58cc50a668294eb12959190f6b95bdbd0",
+    "manifest_command": "PYTHONPATH=. python scripts/check_fleet_script_health.py D:/Abhay/GetWorkDone --caller \".claude/skills/get-work-done/SKILL.md\" --print-zero-evidence"
+  }
 }
