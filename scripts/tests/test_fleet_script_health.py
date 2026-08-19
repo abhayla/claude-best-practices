@@ -9,6 +9,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import os
+import re
 import subprocess
 import sys
 import warnings
@@ -16,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.check_fleet_script_health import _is_pattern_source, run
+from scripts.check_fleet_script_health import _is_pattern_source, manifest_digest, run
 
 CHECKER = Path(__file__).resolve().parents[1] / "check_fleet_script_health.py"
 # The dispatcher lives in the hub, outside the fleet dir, but is contract-lint.py's real caller.
@@ -1444,47 +1445,61 @@ _FLOOR_DOC = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
 KNOWN_OPEN_FLEET_FINDINGS: set = {(name, check) for name, check in _FLOOR_DOC["findings"]}
 
 
+_KNOWN_RATCHET_CHECKS = {
+    "grep-count", "interpreter", "dead-gate", "discarded", "shape-only", "silent-push",
+    "stale-receipt", "unchecked-read", "ps-unchecked-call", "offset-before-write",
+    "unchecked-precondition", "unlocked-global-rewrite", "unmeasured-safe-delete",
+    "silent-staging",
+}
+
+_CLEAN_OUTPUT = "fleet-health: clean"
+
+
+def _validate_zero_evidence(zero) -> str | None:
+    """Shape-validate a zero_evidence block; return the failure reason or None if well-formed.
+
+    Deliberately does NOT (cannot, host-independently) verify the digest is TRUE — only that it
+    has the shape a genuine run would produce. Truth is checked separately, on a host that has the
+    fleet, by test_zero_floor_evidence_matches_live_fleet.
+    """
+    if not isinstance(zero, dict):
+        return "zero_evidence must be an object"
+    if not zero.get("claim"):
+        return "zero_evidence missing claim"
+    if zero.get("checker_output") != _CLEAN_OUTPUT:
+        return f"zero_evidence.checker_output must be the literal {_CLEAN_OUTPUT!r} the CLI prints"
+    count = zero.get("scanned_script_count")
+    if not isinstance(count, int) or isinstance(count, bool) or count <= 0:
+        return "zero_evidence.scanned_script_count must be a positive integer"
+    digest = zero.get("manifest_sha256")
+    if not (isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest)):
+        return "zero_evidence.manifest_sha256 must be a 64-char lowercase hex sha256, not a placeholder"
+    if not zero.get("manifest_command"):
+        return "zero_evidence missing manifest_command"
+    return None
+
+
 def test_ratchet_floor_is_evidenced():
     """The floor artifact must carry re-derivable evidence — and this runs WITHOUT the fleet.
 
-    This is the gate for T-167's HIGH-1. Every other fleet assertion in this file skips when
-    C:/Abhay/GetWorkDone is absent, which is always true on CI — so before this test, a PR could
-    delete the entire floor and merge green, because "green" only ever meant "the assertions did
-    not run". That is how six live defects plus one new one went unreported for five days.
+    This is the gate for T-167's HIGH-1. Every other fleet assertion in this file skips when the
+    fleet bus is absent, which is always true on CI — so before this test, a PR could delete the
+    entire floor and merge green, because "green" only ever meant "the assertions did not run".
+    That is how six live defects plus one new one went unreported for five days.
 
     This assertion is host-independent by construction: it validates the ARTIFACT, not the fleet.
-    A shrink now has to update `observed_on`, which makes the claim "I re-ran this on the host"
-    explicit and reviewable rather than implicit and unverifiable.
+    T-212 extended it to the zero-findings case: findings CAN be empty (that is the sweep's
+    success condition), but only paired with a well-formed zero_evidence block whose
+    manifest_sha256 is later cross-checked against the live fleet by
+    test_zero_floor_evidence_matches_live_fleet — a prose claim alone is still rejected.
     """
-    assert _FLOOR_DOC["findings"], (
-        "the ratchet floor is EMPTY. That is a strong claim — it says the live fleet carries zero "
-        "known silent-failure defects. If you just fixed the last one, say so by re-running the "
-        f"checker on the fleet host and refreshing observed_on in {_FLOOR_FILE.name}. If you are "
-        "emptying it because CI was green, STOP: CI cannot see the fleet and skips every "
-        "fleet-dependent assertion in this file (T-167 HIGH-1)."
-    )
-    # Entries must be well-formed (name, check) pairs — a malformed floor silently matches nothing
-    # and would excuse every finding, the same "looks handled, isn't" shape this gate hunts.
-    for entry in _FLOOR_DOC["findings"]:
-        assert isinstance(entry, list) and len(entry) == 2 and all(entry), (
-            f"malformed floor entry {entry!r}: expected [script_name, check_name]"
-        )
-    known_checks = {
-        "grep-count", "interpreter", "dead-gate", "discarded", "shape-only", "silent-push",
-        "stale-receipt", "unchecked-read", "ps-unchecked-call", "offset-before-write",
-        "unchecked-precondition", "unlocked-global-rewrite", "unmeasured-safe-delete",
-        "silent-staging",
-    }
-    unknown = {c for _, c in _FLOOR_DOC["findings"]} - known_checks
-    assert not unknown, (
-        f"floor references check(s) this checker does not implement: {sorted(unknown)} — a typo "
-        "here silently excuses nothing and hides a real finding"
-    )
-    # A date that never moves is the tell for an unevidenced edit.
-    dt.date.fromisoformat(_FLOOR_DOC["observed_on"])
-    assert _FLOOR_DOC.get("reproduce_with"), (
-        "the floor must record the exact command that reproduces it, so a reviewer can re-derive "
-        "the claim instead of trusting it"
+    reason = _floor_guard(_FLOOR_DOC)
+    assert reason is None, (
+        f"the committed ratchet floor failed its own evidence guard: {reason}. If you just fixed "
+        f"the last known-open finding, re-run the checker on the fleet host with "
+        f"--print-zero-evidence and paste its output into a zero_evidence block in "
+        f"{_FLOOR_FILE.name}. If you are emptying it because CI was green, STOP: CI cannot see "
+        "the fleet and skips every fleet-dependent assertion in this file (T-167 HIGH-1)."
     )
 
 
@@ -1496,20 +1511,25 @@ def _floor_guard(doc: dict) -> str | None:
     precisely the failure mode (a check that never fires) this whole file exists to prevent.
     """
     try:
-        if not doc.get("findings"):
-            return "empty floor"
-        for entry in doc["findings"]:
-            if not (isinstance(entry, list) and len(entry) == 2 and all(entry)):
-                return f"malformed entry {entry!r}"
-        known = {
-            "grep-count", "interpreter", "dead-gate", "discarded", "shape-only", "silent-push",
-            "stale-receipt", "unchecked-read", "ps-unchecked-call", "offset-before-write",
-            "unchecked-precondition", "unlocked-global-rewrite", "unmeasured-safe-delete",
-            "silent-staging",
-        }
-        unknown = {c for _, c in doc["findings"]} - known
-        if unknown:
-            return f"unknown check {sorted(unknown)}"
+        findings = doc.get("findings")
+        if not findings:
+            zero = doc.get("zero_evidence")
+            if not zero:
+                return "empty floor without zero_evidence"
+            reason = _validate_zero_evidence(zero)
+            if reason:
+                return reason
+        else:
+            # Entries must be well-formed (name, check) pairs — a malformed floor silently
+            # matches nothing and would excuse every finding, the same "looks handled, isn't"
+            # shape this gate hunts.
+            for entry in findings:
+                if not (isinstance(entry, list) and len(entry) == 2 and all(entry)):
+                    return f"malformed entry {entry!r}"
+            unknown = {c for _, c in findings} - _KNOWN_RATCHET_CHECKS
+            if unknown:
+                return f"unknown check {sorted(unknown)}"
+        # A date that never moves is the tell for an unevidenced edit. Required in both states.
         dt.date.fromisoformat(doc["observed_on"])
         if not doc.get("reproduce_with"):
             return "no reproduce_with"
@@ -1518,20 +1538,75 @@ def _floor_guard(doc: dict) -> str | None:
     return None
 
 
-def test_floor_guard_rejects_the_shipped_defect():
-    """The negative control: the guard must REJECT an emptied floor, not merely accept a good one.
+def test_floor_guard_rejects_empty_floor_without_evidence():
+    """The negative control: the guard must REJECT an emptied floor with no attestation.
 
-    This replays commit a5cde31 — the real 2026-08-12 change that emptied the floor and merged
-    green because CI cannot see the fleet. If this test ever passes with the guard removed, the
-    guard is decoration.
+    This replays commit a5cde31 — the real 2026-08-12 change that emptied the floor on a bare
+    claim and merged green because CI cannot see the fleet. If this test ever passes with the
+    guard removed (or neutered to accept anything), the guard is decoration.
     """
     good = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
     assert _floor_guard(good) is None, "the committed floor must itself be valid"
 
-    emptied = dict(good, findings=[])
-    assert _floor_guard(emptied) == "empty floor", (
-        "emptying the floor must be REJECTED — that is the defect that shipped in a5cde31"
+    emptied = {k: v for k, v in good.items() if k != "zero_evidence"}
+    emptied["findings"] = []
+    assert _floor_guard(emptied) == "empty floor without zero_evidence", (
+        "emptying the floor with no attestation must be REJECTED — that is the defect that "
+        "shipped in a5cde31"
     )
+
+
+def test_floor_guard_accepts_empty_floor_with_valid_evidence():
+    """The positive control: a well-formed zero_evidence block on an empty floor IS accepted.
+
+    Without this, test_floor_guard_rejects_empty_floor_without_evidence alone would let a guard
+    that rejects EVERY empty floor (evidenced or not) pass unnoticed — which would make T-212's
+    whole point moot, since the sweep's actual success condition (genuinely zero, evidenced) could
+    never be expressed. Uses a synthetic digest, not the committed one, so this proves the ACCEPT
+    path is real rather than piggy-backing on the repo's own floor happening to be valid.
+    """
+    good = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
+    synthetic = dict(
+        good,
+        findings=[],
+        zero_evidence={
+            "claim": "the live fleet bus carries zero known silent-failure defects as of observed_on",
+            "checker_output": _CLEAN_OUTPUT,
+            "scanned_script_count": 7,
+            "manifest_sha256": "0" * 64,
+            "manifest_command": "PYTHONPATH=. python scripts/check_fleet_script_health.py X --print-zero-evidence",
+        },
+    )
+    assert _floor_guard(synthetic) is None, "a well-formed zero_evidence attestation must be accepted"
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda z: {k: v for k, v in z.items() if k != "claim"},
+        lambda z: dict(z, claim=""),
+        lambda z: dict(z, checker_output="all clean, trust me"),
+        lambda z: {k: v for k, v in z.items() if k != "checker_output"},
+        lambda z: dict(z, scanned_script_count=0),
+        lambda z: dict(z, scanned_script_count="34"),
+        lambda z: {k: v for k, v in z.items() if k != "scanned_script_count"},
+        lambda z: dict(z, manifest_sha256="not-a-real-digest"),
+        lambda z: dict(z, manifest_sha256="ZZ" * 32),
+        lambda z: {k: v for k, v in z.items() if k != "manifest_sha256"},
+        lambda z: {k: v for k, v in z.items() if k != "manifest_command"},
+    ],
+)
+def test_floor_guard_rejects_malformed_zero_evidence(mutate):
+    """Each required zero_evidence field is load-bearing — dropping or faking any one must fail.
+
+    This is what makes the attestation harder to fake than a comment: a bare claim ('checker_output
+    ="all clean, trust me"') or a placeholder digest is caught by SHAPE alone, before the deeper
+    live-fleet cross-check even runs.
+    """
+    good = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
+    base_zero = good["zero_evidence"]
+    bad = dict(good, findings=[], zero_evidence=mutate(base_zero))
+    assert _floor_guard(bad) is not None, f"malformed zero_evidence must be rejected: {bad['zero_evidence']!r}"
 
 
 def test_floor_guard_rejects_malformed_and_typoed_entries():
@@ -1585,6 +1660,36 @@ def test_known_open_fleet_findings_still_reproduce():
     stale = KNOWN_OPEN_FLEET_FINDINGS - seen
     assert not stale, (
         f"these known-open findings no longer reproduce — remove them from the ratchet: {stale}"
+    )
+
+
+def test_zero_floor_evidence_matches_live_fleet():
+    """When the floor claims zero findings, its manifest digest must match the LIVE fleet content.
+
+    This is the host-gated truth check that makes the zero_evidence attestation harder to fake
+    than a comment. manifest_sha256 is a sha256 over every scanned script's (relative path,
+    content sha256), sorted — nobody can produce a digest that matches the live fleet without
+    actually reading the live fleet's real files. On any host that has the fleet, this test
+    recomputes the digest fresh and fails loudly the instant it diverges from what is committed,
+    whether the divergence is honest drift (the fleet changed since the evidence was taken) or a
+    fabricated value that was never actually run. Mirrors test_known_open_fleet_findings_still_
+    reproduce's pattern (host-gated ground truth) for the OPPOSITE state of the same floor.
+    """
+    if _FLOOR_DOC.get("findings"):
+        pytest.skip("floor is not in the zero-findings state")
+    fleet = _resolve_fleet_dir()
+    if fleet is None:
+        pytest.skip("fleet bus not present on this host")
+    zero = _FLOOR_DOC.get("zero_evidence") or {}
+    live_digest, live_count = manifest_digest(fleet)
+    assert live_digest == zero.get("manifest_sha256"), (
+        f"zero_evidence.manifest_sha256 ({zero.get('manifest_sha256')}) does not match the live "
+        f"fleet's current manifest ({live_digest}) — the floor is stale or was never actually "
+        "run; re-run `check_fleet_script_health.py <fleet> --print-zero-evidence` and refresh it"
+    )
+    assert live_count == zero.get("scanned_script_count"), (
+        f"zero_evidence.scanned_script_count ({zero.get('scanned_script_count')}) does not match "
+        f"the live fleet's current script count ({live_count})"
     )
 
 
