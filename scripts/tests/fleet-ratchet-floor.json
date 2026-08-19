@@ -24,20 +24,11 @@
     "RULE: entries may only be REMOVED (as the fleet lands fixes), never added to excuse a new",
     "defect. A new defect is a red test, not a new line here."
   ],
-  "observed_on": "2026-08-17",
-  "observed_by": "T-167 fleet-script audit (wave 2)",
-  "reproduce_with": "PYTHONPATH=. python scripts/check_fleet_script_health.py C:/Abhay/GetWorkDone --caller .claude/skills/get-work-done/SKILL.md",
+  "observed_on": "2026-08-19",
+  "observed_by": "T-208 (fixed the detector's stub-vs-real-bus blindness, then re-ran the ratchet against the real bus for the first time since the floor stopped being scanned)",
+  "reproduce_with": "PYTHONPATH=. python scripts/check_fleet_script_health.py <fleet-dir> --caller .claude/skills/get-work-done/SKILL.md   (fleet-dir = D:/Abhay/GetWorkDone on the dev PC, C:/Abhay/GetWorkDone on the Windows VPS; scripts/tests/test_fleet_script_health.py's _resolve_fleet_dir() resolves this automatically)",
   "findings": [
-    ["bus-relay.sh", "offset-before-write"],
-    ["cost-rollup.py", "unlocked-global-rewrite"],
-    ["feature-adoption-sweep.ps1", "ps-unchecked-call"],
-    ["gate-audit.ps1", "ps-unchecked-call"],
-    ["janitor-worktrees.ps1", "unmeasured-safe-delete"],
-    ["keeper-tick.cmd", "discarded"],
     ["keeper-tick.cmd", "silent-staging"],
-    ["parked-digest.ps1", "ps-unchecked-call"],
-    ["read-answers.ps1", "offset-before-write"],
-    ["trust-workspace.py", "unlocked-global-rewrite"],
     ["worker-wrapper.ps1", "unchecked-precondition"]
   ]
 }

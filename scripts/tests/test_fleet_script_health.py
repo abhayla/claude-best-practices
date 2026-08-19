@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import os
 import subprocess
 import sys
+import warnings
 from pathlib import Path
 
 import pytest
@@ -21,6 +23,59 @@ CHECKER = Path(__file__).resolve().parents[1] / "check_fleet_script_health.py"
 _DISPATCHER_SKILL = (
     Path(__file__).resolve().parents[2] / ".claude" / "skills" / "get-work-done" / "SKILL.md"
 )
+
+# ------------------------------------------------------- T-208: locate the real fleet bus, not a stub
+#
+# Both fleet-gated ratchet tests used to hard-code `Path("C:/Abhay/GetWorkDone").exists()`. On the
+# dev PC that path EXISTS but is a stray stub left over from 2026-07-30 (one empty heartbeats/
+# dir, no settings.json, no queue/) — the real bus on that machine is D:\Abhay\GetWorkDone. A bare
+# existence check cannot tell "I could not look" from "there is nothing to find", so every
+# fleet-gated assertion silently scanned the stub, found zero findings, and reported all 11
+# known-open ratchet entries as fixed (2026-08-19). `_resolve_fleet_dir` requires the marker only
+# the real bus carries — settings.json with a `repo_registry` key, plus a queue/ directory — and
+# tries known per-machine locations (an explicit env override first) instead of one hard-coded
+# path. A candidate that exists but fails the marker check is rejected LOUDLY via a pytest
+# warning, never silently folded into "absent".
+_FLEET_ENV_VAR = "GETWORKDONE_FLEET_DIR"
+_FLEET_MARKER_FILE = "settings.json"
+_FLEET_MARKER_KEY = "repo_registry"
+_FLEET_CANDIDATE_DIRS = (Path("D:/Abhay/GetWorkDone"), Path("C:/Abhay/GetWorkDone"))
+
+
+def _is_real_fleet_dir(path: Path) -> bool:
+    """True only for a directory carrying the bus markers — never for a merely-existing path."""
+    settings = path / _FLEET_MARKER_FILE
+    if not settings.is_file() or not (path / "queue").is_dir():
+        return False
+    try:
+        doc = json.loads(settings.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    return isinstance(doc, dict) and _FLEET_MARKER_KEY in doc
+
+
+def _resolve_fleet_dir() -> Path | None:
+    """Return the live fleet bus directory, or None if genuinely absent on this host.
+
+    Order: `GETWORKDONE_FLEET_DIR` env override (if set, it is the ONLY candidate — an explicit
+    override that fails the marker check is a misconfiguration, not a fallthrough), then the
+    known per-machine locations, first match wins. A candidate that exists but is not the real
+    bus is reported via `warnings.warn` so pytest surfaces it instead of a silent skip.
+    """
+    override = os.environ.get(_FLEET_ENV_VAR)
+    candidates = [Path(override)] if override else list(_FLEET_CANDIDATE_DIRS)
+    for candidate in candidates:
+        if not candidate.exists():
+            continue
+        if _is_real_fleet_dir(candidate):
+            return candidate
+        warnings.warn(
+            f"T-208: rejected fleet candidate {candidate} — it exists but carries none of the "
+            f"real bus's markers ({_FLEET_MARKER_FILE} with a '{_FLEET_MARKER_KEY}' key, plus a "
+            "queue/ dir); treating it as ABSENT rather than silently scanning a stub",
+            stacklevel=2,
+        )
+    return None
 
 
 def _checks(findings, name):
@@ -1349,9 +1404,9 @@ def test_real_fleet_has_no_unknown_silent_failure_findings():
     checkpoint-pr-merge.sh captures repos_rc and aborts loudly on an empty registry), so T-071
     removed them from the floor. T-071 (2026-08-10) added the three HIGHs it found.
     """
-    fleet = Path("C:/Abhay/GetWorkDone")
-    if not fleet.exists():
-        pytest.skip("fleet checkout not present on this host")
+    fleet = _resolve_fleet_dir()
+    if fleet is None:
+        pytest.skip("fleet bus not present on this host")
     findings = run(fleet, extra_callers=[_DISPATCHER_SKILL])
     unexpected = [
         f for f in findings if (f.path.name, f.check) not in KNOWN_OPEN_FLEET_FINDINGS
@@ -1366,9 +1421,9 @@ def test_known_open_fleet_findings_still_reproduce():
 
     Guards the opposite rot — a stale allowlist that silently excuses defects already fixed.
     """
-    fleet = Path("C:/Abhay/GetWorkDone")
-    if not fleet.exists():
-        pytest.skip("fleet checkout not present on this host")
+    fleet = _resolve_fleet_dir()
+    if fleet is None:
+        pytest.skip("fleet bus not present on this host")
     seen = {(f.path.name, f.check) for f in run(fleet, extra_callers=[_DISPATCHER_SKILL])}
     stale = KNOWN_OPEN_FLEET_FINDINGS - seen
     assert not stale, (
@@ -1378,9 +1433,12 @@ def test_known_open_fleet_findings_still_reproduce():
 
 def test_keeper_tick_checks_both_guard_exit_codes():
     """Regression: every guard invocation in keeper-tick.cmd is followed by an errorlevel test."""
-    tick = Path("C:/Abhay/GetWorkDone/keeper-tick.cmd")
+    fleet = _resolve_fleet_dir()
+    if fleet is None:
+        pytest.skip("fleet bus not present on this host")
+    tick = fleet / "keeper-tick.cmd"
     if not tick.exists():
-        pytest.skip("fleet checkout not present on this host")
+        pytest.skip("keeper-tick.cmd not present in the fleet bus")
     lines = tick.read_text(encoding="utf-8", errors="replace").splitlines()
     for i, line in enumerate(lines):
         if ".sh" not in line or "bash.exe" not in line:
@@ -1393,9 +1451,12 @@ def test_keeper_tick_checks_both_guard_exit_codes():
 
 def test_keeper_tick_asserts_sweep_outcome_not_just_shape():
     """Regression (T-027): the tick guard must assert is_error:false, not only the JSON shape."""
-    tick = Path("C:/Abhay/GetWorkDone/keeper-tick.cmd")
+    fleet = _resolve_fleet_dir()
+    if fleet is None:
+        pytest.skip("fleet bus not present on this host")
+    tick = fleet / "keeper-tick.cmd"
     if not tick.exists():
-        pytest.skip("fleet checkout not present on this host")
+        pytest.skip("keeper-tick.cmd not present in the fleet bus")
     code = "\n".join(
         l
         for l in tick.read_text(encoding="utf-8", errors="replace").splitlines()
@@ -1409,9 +1470,12 @@ def test_keeper_tick_asserts_sweep_outcome_not_just_shape():
 
 def test_keeper_tick_push_verdict_is_tested():
     """Regression (T-027): every git push in the tick must have its exit code tested."""
-    tick = Path("C:/Abhay/GetWorkDone/keeper-tick.cmd")
+    fleet = _resolve_fleet_dir()
+    if fleet is None:
+        pytest.skip("fleet bus not present on this host")
+    tick = fleet / "keeper-tick.cmd"
     if not tick.exists():
-        pytest.skip("fleet checkout not present on this host")
+        pytest.skip("keeper-tick.cmd not present in the fleet bus")
     lines = tick.read_text(encoding="utf-8", errors="replace").splitlines()
     for i, line in enumerate(lines):
         # An actual invocation starts the statement; `echo ... git push FAILED ...` is a log
@@ -1433,3 +1497,74 @@ def test_contract_lint_is_wired_into_the_dispatch_path():
     )
     step6 = body.split("## STEP 6")[1].split("## STEP 7")[0]
     assert "contract-lint.py" in step6, "contract-lint must be invoked in STEP 6 (the dispatch path)"
+
+
+# --------------------------- T-208: prove _resolve_fleet_dir's three states by execution ---------
+
+
+def test_resolve_fleet_dir_returns_none_when_absent(tmp_path: Path, monkeypatch):
+    """(a) No candidate exists at all -> None, no warning (there was nothing to reject)."""
+    monkeypatch.setenv(_FLEET_ENV_VAR, str(tmp_path / "does-not-exist"))
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = _resolve_fleet_dir()
+    assert result is None
+    assert not caught, f"unexpected warning for a genuinely absent path: {[str(w.message) for w in caught]}"
+
+
+def test_resolve_fleet_dir_rejects_a_stub_with_only_heartbeats(tmp_path: Path, monkeypatch):
+    """(b) A directory exists but carries only an empty heartbeats/ dir (the live 2026-07-30 stub
+    shape at C:\\Abhay\\GetWorkDone) -> None, WITH a loud warning naming the path and the reason.
+
+    This is the exact defect T-208 fixes: the stub EXISTS, so a bare `.exists()` check treated it
+    as the fleet and silently scanned nothing. The marker check must reject it, and the rejection
+    must be visible, not another silent skip.
+    """
+    stub = tmp_path / "stub"
+    (stub / "heartbeats").mkdir(parents=True)
+    monkeypatch.setenv(_FLEET_ENV_VAR, str(stub))
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = _resolve_fleet_dir()
+    assert result is None, "a stub with no settings.json/queue/ must never resolve as the fleet"
+    assert caught, "rejecting an existing-but-invalid candidate must emit a warning, not skip silently"
+    msg = str(caught[0].message)
+    assert str(stub) in msg and "queue" in msg.lower(), (
+        f"warning must name the rejected path and the missing marker: {msg!r}"
+    )
+
+
+def test_resolve_fleet_dir_accepts_a_real_bus(tmp_path: Path, monkeypatch):
+    """(c) A directory carrying both markers (settings.json#repo_registry + queue/) resolves."""
+    real = tmp_path / "real-bus"
+    (real / "queue").mkdir(parents=True)
+    (real / _FLEET_MARKER_FILE).write_text(
+        json.dumps({_FLEET_MARKER_KEY: {"claude-best-practices": "abhayla/claude-best-practices"}}),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(_FLEET_ENV_VAR, str(real))
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = _resolve_fleet_dir()
+    assert result == real, "a directory with both bus markers must resolve"
+    assert not caught, f"a valid bus must never be warned about: {[str(w.message) for w in caught]}"
+
+    # And the ratchet actually RUNS against it (rather than skipping) once resolved: plant one
+    # known-bad construct and confirm `run()` sees it through the resolved path.
+    (real / "bad.sh").write_text(
+        "#!/bin/bash\n"
+        'seen=$(grep -c "^k$" state 2>/dev/null || echo 0)\n'
+        'if [ "$seen" -lt 1 ]; then echo k >> state; fi\n',
+        encoding="utf-8",
+    )
+    findings = run(result)
+    assert _checks(findings, "grep-count"), "the ratchet must actually scan the resolved real bus"
+
+
+def test_resolve_fleet_dir_honours_env_override_even_off_known_locations(tmp_path: Path, monkeypatch):
+    """An explicit override is authoritative — it must not silently fall back to D:/C: guesses."""
+    real = tmp_path / "custom-bus"
+    (real / "queue").mkdir(parents=True)
+    (real / _FLEET_MARKER_FILE).write_text(json.dumps({_FLEET_MARKER_KEY: {}}), encoding="utf-8")
+    monkeypatch.setenv(_FLEET_ENV_VAR, str(real))
+    assert _resolve_fleet_dir() == real
