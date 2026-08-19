@@ -67,6 +67,23 @@ The 2026-08-10 audit (docs/fleet-script-audit-2026-08-10.md) added three more. A
                  fleet script with no PATH-hardening preamble, so the missing-interpreter trigger
                  its siblings already fixed twice applies here in full.
 
+The 2026-08-19 sweep found the silent-staging and dead-gate checks over-firing on the live fleet
+(11 of the sweep's 12 findings, hand-verified false positives):
+
+  - keeper-tick.cmd's T-207 fix (2026-08-18) replaced errorlevel testing with asserting each
+    mutation's OUTCOME from CAPTURED OUTPUT CONTENT (`findstr`/`for /f` into a flag variable, then
+    an `if` on that flag) — a DIFFERENT but equally valid way of reading the same verdict, which
+    the check did not recognise because it only looked for errorlevel-shaped tokens in a 1-line
+    window. See CONTENT_ASSERTION_READ/CONTENT_ASSERTION_GATE below.
+  - janitor-worktrees.ps1's -SelfTest harness `git init --bare`s its OWN throwaway repo under
+    $env:TEMP and only ever mutates/pushes to that — never the real bus — so the mutations inside
+    it cannot cause the silent data loss this check exists to catch. See
+    _selftest_harness_ranges below.
+  - preflight-guard.ps1's dead-gate finding was correct in isolation (no shell call site exists)
+    but wrong in context: it is invoked by the get-work-done dispatcher SKILL.md, which the CLI
+    now includes as a default `--caller` unless the file is missing or `--no-default-caller` is
+    passed.
+
 The 2026-08-17 audit (docs/fleet-script-audit-2026-08-17.md) added three more, all reproduced
 end-to-end on the host before being written down:
 
@@ -108,6 +125,18 @@ from dataclasses import dataclass
 from pathlib import Path
 
 SHELL_SUFFIXES = {".sh", ".cmd", ".ps1", ".py"}
+
+# The dispatcher SSOT lives in THIS hub repo, outside the fleet dir being scanned — the hub's own
+# get-work-done SKILL.md is preflight-guard.ps1's real caller (STEP 6.2). A CLI run against the
+# live fleet with no --caller therefore flagged it dead-gate even though it IS wired in (verified
+# 2026-08-19: 11 of 12 findings on that sweep were exactly this class of false positive). Auto-
+# including it by default — resolved relative to this checker's OWN file, never the fleet root —
+# means the common case (a human or the dispatcher itself running the checker) sees the honest
+# answer without having to know to pass --caller; --no-default-caller opts back out for isolation
+# (the test suite passes its own extra_callers explicitly and does not need this default).
+DEFAULT_DISPATCHER_SKILL = (
+    Path(__file__).resolve().parent.parent / ".claude" / "skills" / "get-work-done" / "SKILL.md"
+)
 
 # Directories that are NOT fleet machinery: per-task worker scratch checkouts, vendored deps, and
 # runtime state. Scanning them buries the real findings in third-party noise — a gate nobody reads
@@ -390,6 +419,13 @@ DESTRUCTIVE_WORKTREE_OP = re.compile(r"worktree\s+remove\b", re.I)
 GIT_STATE_MUTATION = re.compile(
     r"\bgit\s+(?:-C\s+\S+\s+)?(?P<verb>add|commit|checkout|switch|reset)\b", re.I
 )
+# A narration line (`echo ... git commit FAILED ...`) can contain the same verb text as a real
+# invocation without running one — keeper-tick.cmd:258/272 log exactly this sentence about the
+# real mutations at :251/:265, and the bare regex above cannot tell a git command from a git
+# WORD inside a logged string. `echo`/`Write-Output`/`Write-Host` never execute anything they
+# print, in any of the three shells this check scans, so a line that starts with one of them is
+# narration, not a command, regardless of what verb-shaped text it contains.
+NARRATION_LINE = re.compile(r"^\s*(echo\b|Write-Output\b|Write-Host\b)", re.I)
 GIT_PUSHES_SOMEWHERE = re.compile(r"\bgit\s+(?:-C\s+\S+\s+)?push\b", re.I)
 # Evidence the mutation's verdict IS consumed: an exit test near it, or an `if git ...` wrapper.
 GIT_VERDICT_TESTED = re.compile(
@@ -401,11 +437,78 @@ GIT_VERDICT_TESTED = re.compile(
 PUSH_RETRY_LOOP = re.compile(
     r"^\s*(for|while)\b[^\n]*\n(?:[^\n]*\n){0,6}?[^\n]*\bif\s+git\s+push\b", re.M | re.I
 )
+
+# --- content-assertion guard: T-207's errorlevel-free way of reading the same verdict -------------
+# keeper-tick.cmd's own header (this file, not this checker) records SIX failed fixes proving
+# errorlevel is unreliable after any call whose output is redirected into a log 12+ concurrent
+# fleet processes also write to — so T-207 (2026-08-18) replaced errorlevel testing with asserting
+# the mutation's OUTCOME from its CAPTURED OUTPUT CONTENT instead. Two shapes, both observed live:
+#   (a) the mutation's own captured output is grepped for an error marker (`findstr /c:"fatal"`),
+#   (b) a follow-up state-query command (`git rev-parse --abbrev-ref HEAD` after `git checkout`) is
+#       captured and compared against the expected value.
+# Either way the read feeds a flag variable, and that flag is GATED by a plain `if "<flag>"=="..."`
+# — functionally identical to `if errorlevel 1`, just spelled in content instead of exit code. A
+# mutation whose output is genuinely discarded to nul/dev-null can never have this shape (nobody
+# could read what was thrown away), so that case is untouched and still requires the errorlevel
+# shape above.
+MUTATION_OUTPUT_DISCARDED = re.compile(r">\s*(nul|/dev/null)\b", re.I)
+CONTENT_ASSERTION_READ = re.compile(r"\bfindstr\b|\bfor\s*/f\b", re.I)
+CONTENT_ASSERTION_GATE = re.compile(r'if\s+(not\s+)?"?!?%?\w+%?!?"?\s*==\s*"', re.I)
+
 STATUS_PREDICATE = re.compile(r"git\b[^\n]*\bstatus\b[^\n]*--porcelain", re.I)
 STATUS_SEES_IGNORED = re.compile(r"--ignored\b", re.I)
 # Evidence the capture's own failure is distinguished from "nothing to report": the exit code is
 # read, or stderr is kept and inspected. `2>$null` + no $LASTEXITCODE is the defect.
 STATUS_FAILURE_TESTED = re.compile(r"\$LASTEXITCODE|\berrorlevel\b|\$\?", re.I)
+
+
+# --- self-test/fixture harness exclusion -----------------------------------------------------------
+# janitor-worktrees.ps1's -SelfTest function `git init --bare`s its OWN throwaway repo under
+# $env:TEMP, then mutates and pushes ONLY inside that scope — it never touches the real bus or any
+# registered fleet repo, so none of the "reports healthy while real work is lost" checks can apply
+# to it: there is no real work in scope to lose. Deliberately narrower than "skip anything named
+# *test*" (which would blind the gate to a genuine defect a dev merely labelled a test): a function
+# only qualifies when it BOTH (a) is named as a self-test/fixture harness AND (b) itself originates
+# a bare repo under a temp path before mutating. Production fleet code has no reason to `git init
+# --bare` a fresh throwaway remote moments before "pushing" to it — doing so cannot reach the real
+# shared bus this checker exists to protect, so a script cannot game this exclusion by merely
+# naming a real-work function SelfTest without also making that real work provably unreachable.
+SELFTEST_FUNCTION = re.compile(r"^\s*function\s+[\w-]*(?:SelfTest|Self-Test)[\w-]*\b", re.I)
+TEMP_REPO_INIT = re.compile(
+    r"git\s+init\b[^\n]*(\$env:TEMP|\$tmp\w*|TemporaryDirectory|tempfile|mktemp)|"
+    r"\$\w*[Tt]emp\w*\s*=\s*(Join-Path\s+\$env:TEMP|New-TemporaryFile|mktemp)",
+    re.I,
+)
+
+
+def _selftest_harness_ranges(lines: list[str]) -> list[tuple[int, int]]:
+    """1-based inclusive (start, end) line ranges of self-test functions that own a throwaway repo.
+
+    A function only counts once BOTH its name matches the self-test/fixture convention and its body
+    contains a `git init` targeting a temp-derived path — see SELFTEST_FUNCTION/TEMP_REPO_INIT.
+    """
+    ranges: list[tuple[int, int]] = []
+    for i, line in enumerate(lines, start=1):
+        if not SELFTEST_FUNCTION.search(line):
+            continue
+        depth = 0
+        started = False
+        end = i
+        for j in range(i, len(lines) + 1):
+            text = lines[j - 1]
+            depth += text.count("{") - text.count("}")
+            if "{" in text:
+                started = True
+            end = j
+            if started and depth <= 0:
+                break
+        if TEMP_REPO_INIT.search("\n".join(lines[i - 1 : end])):
+            ranges.append((i, end))
+    return ranges
+
+
+def _in_ranges(line: int, ranges: list[tuple[int, int]]) -> bool:
+    return any(start <= line <= end for start, end in ranges)
 
 
 @dataclass(frozen=True)
@@ -912,12 +1015,17 @@ def check_silent_staging(path: Path) -> list[Finding]:
     # `set -e` aborts the script on the failed mutation, so the push below never runs — loud.
     if path.suffix == ".sh" and SHELL_ABORTS_ON_ERROR.search(text):
         return []
+    selftest_ranges = _selftest_harness_ranges(lines) if path.suffix == ".ps1" else []
     out: list[Finding] = []
     for i, line in enumerate(lines, start=1):
-        if line.lstrip().startswith(("#", "rem ", "REM ")):
+        if line.lstrip().startswith(("#", "rem ", "REM ")) or NARRATION_LINE.match(line):
             continue
         m = GIT_STATE_MUTATION.search(line)
         if not m:
+            continue
+        # A mutation inside a throwaway self-test harness (its own `git init --bare` repo under
+        # $env:TEMP) never touches the real bus — see _selftest_harness_ranges.
+        if _in_ranges(i, selftest_ranges):
             continue
         # The verdict test must be on THIS line or the very next one. A wider window let an
         # `if errorlevel 1` belonging to an unrelated command five lines below excuse an unchecked
@@ -928,6 +1036,31 @@ def check_silent_staging(path: Path) -> list[Finding]:
         window = "\n".join(lines[i - 1 : i + 1])
         if GIT_VERDICT_TESTED.search(window):
             continue
+        # T-207's content-assertion shape (no errorlevel token anywhere): the mutation's output
+        # must be CAPTURED (not discarded to nul/dev-null) — nobody can read what was thrown away —
+        # then a findstr/for-f READ of that capture, followed within a few lines by an `if` GATE on
+        # the resulting flag, is the same verdict-testing this check already accepts, just spelled
+        # in content instead of exit code. Both windows are kept tight (10 lines mutation->read, 5
+        # read->gate — the widest observed real gap is 7 and 4 respectively) so an unrelated
+        # findstr/if pair elsewhere in the file cannot falsely clear a genuinely unguarded mutation.
+        if not MUTATION_OUTPUT_DISCARDED.search(line):
+            read_at = None
+            for j in range(i, min(i + 10, len(lines))):
+                candidate = lines[j]
+                if candidate.lstrip().startswith(("#", "rem ", "REM ")):
+                    continue
+                if CONTENT_ASSERTION_READ.search(candidate):
+                    read_at = j
+                    break
+            if read_at is not None:
+                gate_lines = [
+                    l
+                    for l in lines[read_at : min(read_at + 5, len(lines))]
+                    if not l.lstrip().startswith(("#", "rem ", "REM "))
+                ]
+                gate_window = "\n".join(gate_lines)
+                if CONTENT_ASSERTION_GATE.search(gate_window):
+                    continue
         # A mutation inside a RETRY LOOP whose push is tested is already safe: if the mutation
         # fails, the guarded push in the same iteration fails too and the loop exhausts loudly.
         # bus_push() in bus-sync.sh is the fleet's reference-correct implementation and must never
@@ -1047,12 +1180,20 @@ def main() -> int:
         metavar="FILE",
         help="extra file that may invoke a gate (e.g. the dispatcher SKILL.md); repeatable",
     )
+    ap.add_argument(
+        "--no-default-caller",
+        action="store_true",
+        help="do not auto-include this hub's get-work-done SKILL.md as a dead-gate caller",
+    )
     args = ap.parse_args()
     root = Path(args.path)
     if not root.exists():
         sys.stderr.write(f"fleet-health: path not found: {root}\n")
         return 2
-    findings = run(root, [Path(c) for c in args.caller])
+    extra_callers = [Path(c) for c in args.caller]
+    if not args.no_default_caller and DEFAULT_DISPATCHER_SKILL.is_file():
+        extra_callers.append(DEFAULT_DISPATCHER_SKILL)
+    findings = run(root, extra_callers)
     for f in sorted(findings, key=lambda f: (str(f.path), f.line)):
         print(f.render(root if root.is_dir() else root.parent))
     if findings:

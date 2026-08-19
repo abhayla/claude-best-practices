@@ -1143,6 +1143,126 @@ def test_set_e_shell_does_not_flag_silent_staging(tmp_path: Path):
     assert not _checks(run(tmp_path), "silent-staging")
 
 
+# ------------------------------------------------ content-assertion guard (T-207, 2026-08-19 audit)
+
+
+def test_content_assertion_guard_clears_silent_staging(tmp_path: Path):
+    """keeper-tick.cmd's T-207 shape: no errorlevel token anywhere, verdict read from CAPTURED
+    output content instead — `for /f` lifts a follow-up query into a flag, an `if` on that flag
+    gates the push. This is a DIFFERENT but equally valid way of reading the same verdict and must
+    clear exactly like the errorlevel shape does.
+    """
+    finding = _only_the_defect(
+        tmp_path,
+        "silent-staging",
+        # Captured (not `>nul`) but genuinely never read — the negative control that proves the
+        # widened content-assertion window does not blindly clear every non-nul mutation.
+        defective=(
+            'git checkout main --quiet > "!KT_OUT!" 2>&1\n'
+            "git push --quiet origin main >nul 2>&1\n"
+            "if errorlevel 1 ( echo PUSH_FAILED )\n"
+        ),
+        fixed=(
+            'git checkout main --quiet > "!KT_OUT!" 2>&1\n'
+            'git rev-parse --abbrev-ref HEAD > "!KT_OUT!" 2>nul\n'
+            "set KT_HEAD=\n"
+            'for /f "usebackq delims=" %%b in ("!KT_OUT!") do set KT_HEAD=%%b\n'
+            "set KT_ON_MAIN=0\n"
+            'if "!KT_HEAD!"=="main" set KT_ON_MAIN=1\n'
+            'if "!KT_ON_MAIN!"=="0" ( echo NOT ON MAIN )\n'
+            "git push --quiet origin main >nul 2>&1\n"
+            "if errorlevel 1 ( echo PUSH_FAILED )\n"
+        ),
+    )
+    assert "checkout" in finding.message
+
+
+def test_narration_echo_line_is_not_a_mutation(tmp_path: Path):
+    """keeper-tick.cmd:258/272: an `echo ... git commit FAILED ...` narration line contains verb
+    text but never executes anything — it must not be counted as a second, unguarded mutation
+    alongside the real (and separately guarded) one it is narrating about.
+    """
+    (tmp_path / "tick.cmd").write_text(
+        'git commit -m "keeper: tick" > "!KT_OUT!" 2>&1\n'
+        'set KT_COMMIT_OK=0\n'
+        'findstr /c:"keeper: tick" "!KT_OUT!" >nul && set KT_COMMIT_OK=1\n'
+        'if "!KT_COMMIT_OK!"=="0" (\n'
+        "  set KT_ABORT=1\n"
+        "  echo %date% %time% keeper-tick: git commit FAILED - tick work NOT committed >> fail.log\n"
+        ")\n"
+        'if "!KT_ABORT!"=="1" goto skip\n'
+        "git push --quiet origin main >nul 2>&1\n"
+        "if errorlevel 1 ( echo PUSH_FAILED )\n"
+        ":skip\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "silent-staging")
+
+
+def test_echo_line_with_real_unguarded_mutation_still_flags(tmp_path: Path):
+    """The narration exclusion is scoped to lines STARTING with echo — a real, unguarded mutation
+    on its own line, elsewhere in the same file, must still fire.
+    """
+    (tmp_path / "tick.cmd").write_text(
+        'git commit -m "keeper: tick" >nul 2>&1\n'
+        "echo some unrelated narration\n"
+        "git push --quiet origin main >nul 2>&1\n"
+        "if errorlevel 1 ( echo PUSH_FAILED )\n",
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path), "silent-staging")
+    assert any("commit" in f.message for f in found)
+
+
+# ------------------------------------------- self-test/fixture harness exclusion (2026-08-19 audit)
+
+
+def test_selftest_harness_with_temp_bare_repo_is_not_flagged(tmp_path: Path):
+    """janitor-worktrees.ps1's -SelfTest shape: a throwaway `git init --bare` repo under $env:TEMP,
+    mutated and pushed to ONLY inside a SelfTest-named function, can never lose real fleet work —
+    there is no real work in its scope to lose.
+    """
+    (tmp_path / "janitor.ps1").write_text(
+        "function Invoke-SelfTest {\n"
+        '  $tempRoot = Join-Path $env:TEMP "janitor-selftest-x"\n'
+        '  $originPath = Join-Path $tempRoot "origin.git"\n'
+        '  $mainPath = Join-Path $tempRoot "main"\n'
+        "  git init --bare -q $originPath *> $null\n"
+        "  git init -q $mainPath *> $null\n"
+        "  git -C $mainPath add -A *> $null\n"
+        "  git -C $mainPath commit -q -m seed *> $null\n"
+        "  git -C $mainPath push -q origin main *> $null\n"
+        "}\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "silent-staging")
+
+
+def test_selftest_named_function_without_temp_repo_still_flags(tmp_path: Path):
+    """Naming a function SelfTest alone cannot game the exclusion — it must ALSO originate its own
+    throwaway repo. A function that claims to be a self-test but mutates/pushes with no `git init`
+    under a temp path anywhere is indistinguishable from real work and must still fire.
+    """
+    (tmp_path / "fake.ps1").write_text(
+        "function Invoke-SelfTest {\n"
+        "  git add -A *> $null\n"
+        "  git commit -q -m x *> $null\n"
+        "  git push -q origin main *> $null\n"
+        "}\n",
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "silent-staging")
+
+
+def test_non_selftest_ps1_mutation_still_flags(tmp_path: Path):
+    """The exclusion is scoped to the self-test-harness shape, not to .ps1 files in general."""
+    (tmp_path / "deploy.ps1").write_text(
+        "git add -A *> $null\ngit commit -q -m x *> $null\ngit push -q origin main *> $null\n",
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "silent-staging")
+
+
 # ----------------------------------------------------- unmeasured-safe-delete (T-167, 2026-08-17)
 
 
@@ -1266,6 +1386,43 @@ def test_cli_missing_path_is_loud(tmp_path: Path):
     )
     assert proc.returncode == 2
     assert "not found" in proc.stderr
+
+
+def test_dead_gate_default_caller_wires_the_dispatcher_skill(tmp_path: Path):
+    """preflight-guard.ps1's real shape (2026-08-19 audit): no shell call site anywhere, but it IS
+    invoked by the hub's get-work-done dispatcher SKILL.md. The CLI with no --caller must not flag
+    it dead-gate — the dispatcher SKILL.md is now wired in by default.
+    """
+    fleet = tmp_path / "fleet"
+    fleet.mkdir()
+    (fleet / "preflight-guard.ps1").write_text(
+        "# Called before every worker launch; exit 0 = clean to dispatch, non-zero = BLOCK\n"
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    proc = subprocess.run(
+        [sys.executable, str(CHECKER), str(fleet)], capture_output=True, text=True
+    )
+    assert proc.returncode == 0, proc.stdout
+    assert "dead-gate" not in proc.stdout
+
+
+def test_dead_gate_no_default_caller_flag_still_flags(tmp_path: Path):
+    """--no-default-caller opts back out — the same unwired gate must still flag."""
+    fleet = tmp_path / "fleet"
+    fleet.mkdir()
+    (fleet / "preflight-guard.ps1").write_text(
+        "# Called before every worker launch; exit 0 = clean to dispatch, non-zero = BLOCK\n"
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    proc = subprocess.run(
+        [sys.executable, str(CHECKER), str(fleet), "--no-default-caller"],
+        capture_output=True,
+        text=True,
+    )
+    assert proc.returncode == 1
+    assert "dead-gate" in proc.stdout
 
 
 # ------------------------------------------------- regression: the gate must fire on the REAL fleet
