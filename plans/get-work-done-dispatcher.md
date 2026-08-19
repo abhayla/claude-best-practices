@@ -250,14 +250,24 @@ automated sweep for "sync pending"/"outlined" language left in handoff buffers) 
 The recurrence counter is SELF-REPORTED — it increments only if a session notices the recurrence and logs it to PATTERNS-SEEN.md, so "deferred" means "waiting on human/agent-observed evidence", not "covered later automatically".
 
 ## Addendum 2026-08-18 — Owner Decision 2, part (b): CI-minutes discipline
+## Corrected 2026-08-19 (T-209, evidence PR #580) — see SKILL.md for the full wording
 
 Fleet-level half of the CI-quota fix (part (c), the actions-minutes dispatch hold, landed under
 T-192; part (a) is the repo-side half under T-190). Two rules codified into SKILL.md STEP 5,
 immediately after the HOLD-LABEL INSTRUCTION mandate block: (1) a third standing worker-prompt
-mandate line — intermediate commits push with `[skip ci]`, only the final ready-for-verification
-push omits it, capping a task at one CI run instead of the 2-4 a fix-loop used to burn; (2)
-same-repo, same-calendar-day contracts default to one shared branch/PR/CI-run, extending the
-existing trivial-task-batching and wave-chaining conventions via the dedup gate's
-overlapping/related merge path, with named exceptions for solo P1s, conflicting file-scopes, and
-partial-batch checker FAILs. This is a prose/discipline fix, not a new gate — no deterministic
-enforcement added here.
+mandate line — intermediate commits carry `[skip ci]` ANYWHERE in the commit message (GitHub
+matches the whole message, headline or body — there is no safe placement for a push that still
+needs CI); only the final ready-for-verification push carries the marker NOWHERE at all, not
+just absent from the headline. Applied correctly this caps a task at one CI run instead of the
+2-4 a fix-loop used to burn. **Measured on PR #580 (2026-08-19):** a push with the marker as the
+last line of the commit BODY (headline clean) still produced ZERO workflow runs and left the PR
+BLOCKED with no checks to wait for — the earlier belief that body placement was safe (the
+T-191-era fix) is FALSE, and every commit that followed it had been suppressing the CI it was
+meant to preserve. On this repo's REQUIRED `validate` check, that leaves a validated push
+permanently unmergeable with nothing to wait for — exactly what stalled PRs #577/#579. (2) the
+second rule, unaffected by this correction: same-repo, same-calendar-day contracts default to
+one shared branch/PR/CI-run, extending the existing trivial-task-batching and wave-chaining
+conventions via the dedup gate's overlapping/related merge path, with named exceptions for solo
+P1s, conflicting file-scopes, and partial-batch checker FAILs. This is a prose/discipline fix,
+guarded by a regression test (`scripts/tests/test_skip_ci_guidance.py`) — no deterministic
+dispatch-time enforcement added here.
