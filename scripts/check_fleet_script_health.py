@@ -119,6 +119,8 @@ Exit 0 = clean; 1 = findings (printed to stdout). Read-only; changes nothing.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import re
 import sys
 from dataclasses import dataclass
@@ -1149,6 +1151,24 @@ def collect(root: Path) -> list[Path]:
     )
 
 
+def manifest_digest(root: Path) -> tuple[str, int]:
+    """sha256 over every scanned script's (relative path, content sha256), sorted, plus the count.
+
+    This is the "zero floor" evidence primitive (T-212): producing a matching digest requires
+    reading the ACTUAL bytes of every file `collect()` would scan on THIS host, in the same order
+    the checker itself uses. A comment claiming "all fixed" costs nothing to write; a matching
+    manifest_sha256 costs an actual run against the actual fleet checkout — nobody can hand-type a
+    sha256 that happens to match dozens of real files' real content. The next run on a host that
+    DOES have the fleet (scripts/tests/test_fleet_script_health.py's
+    test_zero_floor_evidence_matches_live_fleet) recomputes this and fails loudly on any mismatch,
+    whether the mismatch is honest drift or a fabricated digest.
+    """
+    corpus = collect(root)
+    parts = [f"{p.relative_to(root).as_posix()}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in corpus]
+    manifest = "\n".join(sorted(parts))
+    return hashlib.sha256(manifest.encode("utf-8")).hexdigest(), len(corpus)
+
+
 def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
     corpus = collect(root)
     findings: list[Finding] = []
@@ -1185,6 +1205,14 @@ def main() -> int:
         action="store_true",
         help="do not auto-include this hub's get-work-done SKILL.md as a dead-gate caller",
     )
+    ap.add_argument(
+        "--print-zero-evidence",
+        action="store_true",
+        help=(
+            "when the sweep is clean, print a ready-to-paste zero_evidence JSON block for "
+            "scripts/tests/fleet-ratchet-floor.json's findings:[] state (refuses if not clean)"
+        ),
+    )
     args = ap.parse_args()
     root = Path(args.path)
     if not root.exists():
@@ -1200,6 +1228,26 @@ def main() -> int:
         print(f"\nfleet-health: {len(findings)} finding(s) — silent-failure class present")
         return 1
     print("fleet-health: clean")
+    if args.print_zero_evidence:
+        digest, count = manifest_digest(root)
+        caller_args = " ".join(f'--caller "{c}"' for c in args.caller)
+        command = (
+            f"PYTHONPATH=. python scripts/check_fleet_script_health.py {args.path} "
+            f"{caller_args}".rstrip() + " --print-zero-evidence"
+        )
+        print(json.dumps(
+            {
+                "claim": (
+                    "the live fleet bus carries zero known silent-failure defects as of "
+                    "observed_on"
+                ),
+                "checker_output": "fleet-health: clean",
+                "scanned_script_count": count,
+                "manifest_sha256": digest,
+                "manifest_command": command,
+            },
+            indent=2,
+        ))
     return 0
 
 
