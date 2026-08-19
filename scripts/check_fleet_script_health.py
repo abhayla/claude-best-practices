@@ -236,6 +236,33 @@ PS_SCRIPT_TARGET = re.compile(r"[\w.-]+\.(ps1|py|sh|cmd)", re.I)
 # Evidence the verdict IS consumed anywhere in the file: an explicit exit-code test, a try/catch
 # around the invocation, or the caller propagating it.
 PS_EXIT_TESTED = re.compile(r"\$LASTEXITCODE|\btry\s*\{|\$\?", re.I)
+# A trailing backtick continues a PowerShell statement onto the next line. Real invocations are
+# routinely spread over several lines this way (named args each on their own line); the window
+# must be measured from where the statement ENDS, not where it begins, or a guard placed right
+# after a multi-line call falls outside a window anchored to the first line.
+PS_LINE_CONTINUES = re.compile(r"`\s*$")
+
+
+def _ps_statement_end(lines: list[str], start: int) -> int:
+    """Return the 1-based line where the statement beginning at `start` actually ends.
+
+    Two independent PowerShell continuation mechanisms both spread one call across several
+    lines: an explicit trailing backtick, and an UNCLOSED parenthesis (a multi-line `-Body
+    ("..." + "...")` concatenation continues with no backtick at all until its parens balance —
+    the live nginx-drift-check-alert.ps1 CANNOT_CHECK call uses exactly this shape). Naive
+    per-line paren counting is not a real PowerShell parser, but it is the same class of
+    heuristic PS_AMP_CALL already uses for `Join-Path`, and it is enough to find the statement's
+    real last line so the guard-lookahead window is anchored there instead of at the first line.
+    """
+    depth = 0
+    idx = start
+    while True:
+        line = lines[idx - 1]
+        depth += line.count("(") - line.count(")")
+        if (depth > 0 or PS_LINE_CONTINUES.search(line)) and idx < len(lines):
+            idx += 1
+            continue
+        return idx
 
 # --- offset-before-write: a consuming cursor persisted before its payload -------------------------
 # An offset/cursor whose persistence CONSUMES remote state (Telegram getUpdates discards anything
@@ -712,7 +739,12 @@ def check_ps_unchecked_call(path: Path) -> list[Finding]:
         # try/catch elsewhere in the script (feature-adoption-sweep.ps1 wraps its Push-Location
         # 30 lines above) excuse a genuinely unchecked delivery call — the same "prose counted as
         # enforcement" mistake the dead-gate and shape-only checks each had to be narrowed against.
-        window = "\n".join(lines[max(0, i - 3) : i + 3])
+        # The call itself may be continued over several lines (backtick-continued named args, or
+        # an unclosed-paren concatenation like `-Body ("..." + "...")`); measure the forward edge
+        # of the window from the statement's LAST line, not its first, or a guard placed right
+        # after a multi-line call falls outside a window anchored to where the call began.
+        end = _ps_statement_end(lines, i)
+        window = "\n".join(lines[max(0, i - 3) : end + 3])
         if PS_EXIT_TESTED.search(window):
             continue
         out.append(
