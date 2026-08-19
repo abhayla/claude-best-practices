@@ -582,6 +582,135 @@ def test_ps_output_capturing_call_is_not_flagged(tmp_path: Path):
     )
 
 
+# ------------------- ps-unchecked-call window (T-204: backtick-continued multi-line calls) -------
+#
+# The window used to look for a $LASTEXITCODE/try-catch guard was measured from the line the call
+# STARTS on. A PowerShell call spread over several backtick-continued lines (named args one per
+# line is routine style) can put its guard outside that window even though the guard is right
+# after the call — flagging correct code. The four cases below are the full combination matrix:
+# single-line/continued x guarded/unguarded. Each must produce the RIGHT verdict on its own, and
+# a broken window would either flag test_continued_call_guarded_is_not_flagged (false positive,
+# the live T-204 bug) or miss test_continued_call_unguarded_is_flagged (false negative — the check
+# going blind is the "must not become blind in the process" DoD line).
+
+
+def test_single_line_call_guarded_is_not_flagged(tmp_path: Path):
+    """Baseline: a single-line call immediately followed by a $LASTEXITCODE test is clean."""
+    _only_the_defect(
+        tmp_path,
+        "ps-unchecked-call",
+        defective='& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n',
+        fixed=(
+            '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n'
+            "if ($LASTEXITCODE -ne 0) { exit 1 }\n"
+        ),
+    )
+
+
+def test_single_line_call_unguarded_is_flagged(tmp_path: Path):
+    """Baseline: a single-line call with no guard anywhere nearby is flagged."""
+    (tmp_path / "sweep.ps1").write_text(
+        '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId $taskId -Body $body\n'
+        'Write-Output "SWEEP-OK"\n',
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "ps-unchecked-call"), "unguarded single-line call must be flagged"
+
+
+def test_continued_call_guarded_is_not_flagged(tmp_path: Path):
+    """THE BUG BEING FIXED: a backtick-continued call guarded right after must NOT be flagged.
+
+    This is the exact live shape from nginx-drift-check-alert.ps1 lines 88-93: the call spans
+    5 lines via trailing backticks and $LASTEXITCODE is tested on the line right after the call
+    ends. With the window anchored to the call's FIRST line, the guard fell outside it.
+    """
+    _only_the_defect(
+        tmp_path,
+        "ps-unchecked-call",
+        defective=(
+            '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId "x" -Severity "P2" `\n'
+            '  -Title "some title" `\n'
+            '  -Body ("a very long body string built across " + "several lines") `\n'
+            '  -Settings $Settings\n'
+        ),
+        fixed=(
+            '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId "x" -Severity "P2" `\n'
+            '  -Title "some title" `\n'
+            '  -Body ("a very long body string built across " + "several lines") `\n'
+            '  -Settings $Settings\n'
+            "if ($LASTEXITCODE -ne 0) {\n"
+            '  Write-Output "NOTIFY-FAIL: notify-owner.ps1 exited $LASTEXITCODE"\n'
+            "}\n"
+        ),
+    )
+
+
+def test_continued_call_unguarded_is_flagged(tmp_path: Path):
+    """The fix must NOT go blind: a genuinely unguarded multi-line call still fires."""
+    (tmp_path / "sweep.ps1").write_text(
+        '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId "x" -Severity "P2" `\n'
+        '  -Title "some title" `\n'
+        '  -Body ("a very long body string built across " + "several lines") `\n'
+        '  -Settings $Settings\n'
+        'Write-Output "SWEEP-OK"\n',
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "ps-unchecked-call"), (
+        "an unguarded backtick-continued call must still be flagged — the fix must not blind the "
+        "check to the defect class it exists to catch"
+    )
+
+
+def test_unclosed_paren_continuation_guarded_is_not_flagged(tmp_path: Path):
+    """The OTHER live false positive: continuation via an unclosed paren, no backtick at all.
+
+    nginx-drift-check-alert.ps1 line 104's CANNOT_CHECK call continues its `-Body (... + ...)`
+    concatenation across lines 106-109 with no trailing backtick on line 106 — the parens stay
+    open, which is itself a PowerShell continuation. A backtick-only fix still anchors the
+    window to line 106 (the first non-backtick-terminated line) and misses the guard at 111.
+    """
+    _only_the_defect(
+        tmp_path,
+        "ps-unchecked-call",
+        defective=(
+            '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId "x" -Severity "P3" `\n'
+            '  -Title "check is failing" `\n'
+            '  -Body ("has failed for $streak " +\n'
+            '         "consecutive runs. This does " +\n'
+            '         "NOT mean the dependency is broken.") `\n'
+            '  -Settings $Settings\n'
+        ),
+        fixed=(
+            '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId "x" -Severity "P3" `\n'
+            '  -Title "check is failing" `\n'
+            '  -Body ("has failed for $streak " +\n'
+            '         "consecutive runs. This does " +\n'
+            '         "NOT mean the dependency is broken.") `\n'
+            '  -Settings $Settings\n'
+            "if ($LASTEXITCODE -ne 0) {\n"
+            '  Write-Output "NOTIFY-FAIL"\n'
+            "}\n"
+        ),
+    )
+
+
+def test_unclosed_paren_continuation_unguarded_is_flagged(tmp_path: Path):
+    """The fix must not go blind on the unclosed-paren continuation shape either."""
+    (tmp_path / "sweep.ps1").write_text(
+        '& (Join-Path $StateRoot "notify-owner.ps1") -TaskId "x" -Severity "P3" `\n'
+        '  -Title "check is failing" `\n'
+        '  -Body ("has failed for $streak " +\n'
+        '         "consecutive runs. This does " +\n'
+        '         "NOT mean the dependency is broken.") `\n'
+        '  -Settings $Settings\n'
+        'Write-Output "SWEEP-OK"\n',
+        encoding="utf-8",
+    )
+    assert _checks(run(tmp_path), "ps-unchecked-call"), (
+        "an unguarded unclosed-paren-continued call must still be flagged"
+    )
+
+
 def test_ps_exit_code_semantics_are_real_not_theoretical(tmp_path: Path):
     """Ground truth: $ErrorActionPreference='Stop' really does NOT trap a called script's exit.
 
