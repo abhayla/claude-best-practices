@@ -68,6 +68,36 @@ project (WhatsApp template copy, conversation-map cards, Deluge function specs) 
 target repo by SSOT OWNERSHIP — the registry's `ssot_artifacts` field (live since bus commit 88b4e13) — regardless of where the discussion happens; the dispatching session may relay owner
 approvals but NEVER authors the artifact text.
 
+## STEP 3.5 — ROOT-CAUSE GATE: the SECOND occurrence must fix the MECHANISM
+
+Owner rule 2026-08-20, his words: fix things so "the issues do not happen again", because
+re-fixing instances "will take a lot of time". The evidence it exists: eight workers (T-204,
+T-205, T-210, T-218, T-223, T-225, T-227, T-228) finished correct engineering, then died at
+their turn cap with everything UNCOMMITTED — each rescued by hand at ~20 min, ~2.5 hours in
+one day. The response every single time was a firmer prose mandate; it failed all eight times.
+The mechanism fix (worker-wrapper autosaves a dirty tree on exit, T-231) was filed only after
+the owner challenged it.
+
+- **First occurrence** of a failure may be fixed as an instance.
+- **From the SECOND occurrence of the same failure SHAPE** (same symptom class — not the same
+  file, task or repo), the instance fix is NOT acceptable on its own: fix the MECHANISM that
+  permits the shape, or record in the contract's `status_log`, explicitly and with the reason,
+  why a mechanism fix is impossible. Silence is not an exemption.
+- **PROSE IS NOT A MECHANISM.** A stronger instruction — in a worker prompt, a mandate block,
+  a contract, or this skill — does NOT count as a class fix: one "COMMIT EARLY AND OFTEN"
+  mandate line failed eight consecutive times. A mechanism is CODE, a GUARD, a HOOK, a SCHEMA
+  CONSTRAINT, or a TEST THAT FAILS when the defect returns. If the fix you are about to ship
+  is words, it is an instance fix wearing a class fix's clothes.
+- **SWEEP before a task is called done.** A fixed defect is searched for across the repo (and
+  the estate, where the shape travels) BEFORE completion, and the search result is REPORTED:
+  "fixed 1 of N found" or "swept, no other instances". Done right on 2026-08-20: the em-dash
+  fix swept 14 lines AND added a pre-commit guard; the Windows path guard fixed all 11 files
+  AND added a regression test; the stopwatch-test sweep found a SECOND instance.
+- **SELF-IMPROVEMENT.** Every recurrence-triggered class fix appends its lesson to
+  `GWD\PATTERNS-SEEN.md` in mechanism-fix form — `LESSON(CODIFIED → <where>): <symptom> →
+  <shape> → <mechanism installed>` — so the next dispatcher inherits the guard instead of
+  re-deriving the story (same lesson lifecycle as STEP 7; no new store).
+
 ## STEP 4 — CLARIFY: resolve everything at intake, one question per turn, while the owner is present
 
 **NON-SKIPPABLE (defect fix 2026-07-18):** "run it" / "go ahead" means PROCEED — it does NOT mean skip
@@ -592,6 +622,12 @@ outcome, PR link, evidence path, cost tier used; plus anything parked and why. A
 task's shape signature to `GWD\PATTERNS-SEEN.md` (3rd occurrence → file a PROPOSED codify
 card, P20).
 
+**ROOT-CAUSE CLOSE-OUT (STEP 3.5, enforced here):** no task is reported done until the
+checker verdict carries the SWEEP result for every defect fixed ("fixed 1 of N found" /
+"swept, no other instances") and, on a second-occurrence shape, names the MECHANISM installed
+plus its `PATTERNS-SEEN.md` lesson line. A close-out claiming a class fix whose only artifact
+is new prose is INCOMPLETE.
+
 **LESSONS LIVE IN PATTERNS-SEEN.MD (owner 2026-08-15 — deliberately NOT a separate
 LESSONS.md; the bus already has enough logs):** every failure, park, reroute, or
 checker-refutation appends a `LESSON(OPEN): <mistake> → <root cause> → <rule>` line to
@@ -717,6 +753,10 @@ Litmus test before saving: "would the target project's team want this in their r
 - MUST set `evidence: required` on every contract (the only lint-accepted value, v0.8.1) —
   every task gets a checker; a task too small to verify is batched, never unverified.
 - MUST write an evidence-folder failure as a task FAILURE (G20), never skip it.
+- MUST apply the ROOT-CAUSE GATE (STEP 3.5): a SECOND occurrence of a failure shape is fixed
+  at the MECHANISM (code/guard/hook/schema/failing test) or the impossibility is recorded —
+  prose is never a mechanism; every fix is SWEPT repo-wide with the count reported, and every
+  class fix appends its `LESSON(CODIFIED → <where>)` line to `GWD\PATTERNS-SEEN.md`.
 - MUST verify PR-state post-run for every task (STEP 6a + STEP 7): `gh pr view` on every PR
   the contract or result JSON references; a PR merged by the worker during its own run window
   is a task FAILURE, independent of work quality — checked by both the dispatcher and the
