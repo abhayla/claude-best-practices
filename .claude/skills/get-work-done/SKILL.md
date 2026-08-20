@@ -460,6 +460,18 @@ in sync.
    15 minutes — armed as a ticker in the SAME turn as the first dispatch (piggyback the existing
    `Monitor`/`ScheduleWakeup` watcher above, or a second tick at the same cadence), stopped only
    when the queue drains. A silent gap longer than 15 minutes while work is running is a defect.
+   **OWNER STATUS CADENCE (owner directive 2026-08-20 23:53 IST):** this is a SKILL obligation,
+   not a per-plan promise — a plan-level cadence evaporates with the plan; a skill rule inherits
+   into every future dispatching session. Every tick OPENS WITH THE CURRENT TIME IN IST (e.g.
+   `[21:46 IST]`) so the owner always knows when the last update was dropped — a tick with no
+   timestamp does not satisfy the cadence. CONTENT FLOOR, one line: what changed since the last
+   tick (landed/failed/dispatched), what is running now, and the current estimate if one was
+   given; if NOTHING changed, say so explicitly with the time rather than skipping the tick.
+   MECHANISM: the ticker MUST be PERSISTENT for the session, never a fixed timeout that silently
+   expires — the 2026-08-20 20:30 lapse was exactly this failure shape, a ticker armed with a
+   timeout instead of as persistent, going dark for an hour inside the same session that spent
+   two days fixing that failure shape elsewhere. It reports real state, never fabricated
+   progress. When no fleet work is active, no ticker is required.
 
 8c. **BUDGET FROM TASK SHAPE, NOT TIER DEFAULT (fix #14, same incident).** `max_turns` is set at
    intake from what the task must actually DO, not from `worker_defaults`. Any contract whose DoD
@@ -702,6 +714,8 @@ Litmus test before saving: "would the target project's team want this in their r
   priority.
 - MUST show the owner on-screen, in the origin session: a queue ack at dispatch AND the
   terminal status card when the watcher fires (8a-bis/8b) — the owner never has to ask.
+- MUST apply the OWNER STATUS CADENCE (8b) while fleet work is active: every 15-minute tick
+  opens with the current IST time and a persistent (never timeout-expired) ticker.
 - MUST send a terminal-state card (DONE/PARKED/FAILED) as FALLBACK for session-origin tasks
   (only when the origin session is dead at terminal time, labeled "origin session gone") and
   as PRIMARY for origin-less tasks — and on a non-VPS machine MUST push the bus after writing
