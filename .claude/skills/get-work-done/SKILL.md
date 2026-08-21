@@ -351,12 +351,17 @@ in sync.
    this call site existed (`check_fleet_script_health.py` dead-gate finding); `SKILL.md` is the
    canonical caller — keep this step and the script in sync or the health gate re-fires.
 3. **Deterministic preflight gate (Phase 2, P3/G18 + owner Q2):** run
-   `powershell -NoProfile -ExecutionPolicy Bypass -File GWD\preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <registry remote>` —
+   `powershell -NoProfile -ExecutionPolicy Bypass -File GWD\preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <registry remote> -PromptPath <prompt file>` —
    exit 0 = OK; non-zero BLOCKS (model not haiku|sonnet|opus incl. Fable-as-worker → exit 4; repo
    identity mismatch → exit 6; a contract `context_docs:` entry missing from the workspace →
-   exit 7, 2026-08-15). This makes cheapest-correct routing + wrong-repo protection +
-   context-doc presence machine-enforced, not prose-dependent. Blocked → park with the reason,
-   never dispatch.
+   exit 7, 2026-08-15; a generated prompt referencing a sibling machine's absolute fleet-home
+   path (e.g. a PC-authored checker prompt hardcoding `D:\Abhay\GetWorkDone` and running on the
+   VPS, where that drive doesn't exist and the process dies silently with no result) → exit 9,
+   2026-08-21, T-235C incident — 2nd occurrence of the 2026-07-25 hardcoded-local-path shape).
+   **`-PromptPath` is MANDATORY for every dispatch that writes a prompt file** (worker STEP 6
+   item 5 AND checker STEP 7) — omitting it silently skips the exit-9 check. This makes
+   cheapest-correct routing + wrong-repo protection + context-doc presence + machine-relative
+   paths machine-enforced, not prose-dependent. Blocked → park with the reason, never dispatch.
 4. **Workspace (owner design 2026-07-16, clone-on-demand):** on the fleet-home box, the target
    repo is cloned FRESH at dispatch (`git clone --filter=blob:none`, per-machine path from
    settings.json) unless a workspace from the retention window already exists AND is clean. The
