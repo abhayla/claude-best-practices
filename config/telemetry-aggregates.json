@@ -1,919 +1,1737 @@
 {
-  "a11y-audit": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "adr": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "adversarial-review": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "agent-orchestration": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "ai-gemini-api": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "android": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "android-arch": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "android-gradle": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "android-kotlin": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "android-mvi-scaffold": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "anthropic-agent-orchestration-guide": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "api-docs-generator": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "apply-selections": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "architecture-fitness": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "auto-verify": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "batch": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "brainstorm": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "branching": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "change-risk-scoring": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "changelog-contributing": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "chaos-resilience": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "ci-cd-setup": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "claude-behavior": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "claude-guardian": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "code-quality-gate": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "code-reviewer-agent": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "compose-ui": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "configuration-ssot": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "context-management": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "continue": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "contract-test": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "coverage-analysis": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "cross-platform-visual": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "dast-scan": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "db-migrate": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "db-migrate-verify": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "debugger-agent": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "deploy-strategy": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "diataxis-docs": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "disaster-recovery": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "doc-staleness": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "doc-structure-enforcer": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "docker-optimize": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "executing-plans": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "fastapi-api-tester-agent": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "fastapi-database-admin-agent": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "fastapi-db-migrate": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "fastapi-deploy": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "fastapi-run-backend-tests": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "feature-flag": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "firebase": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "firebase-ai": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "firebase-data-connect": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "firebase-dev": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "firebase-test": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "fix-issue": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "fix-loop": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "flutter-dart-agent": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "git-worktrees": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "handover": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "html-prototype": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "iac-deploy": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "implement": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "incident-response": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "integration-test": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "k8s-deploy": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "learn-n-improve": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "merge-strategy": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "middleware-test": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "mobile-a11y-test": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "mock-server": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "monitoring-setup": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "parallel-worktree-orchestrator-agent": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "perf-test": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "pg-query": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "pipeline-orchestrator": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "plan-to-issues": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "planner-researcher-agent": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "playwright": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "post-fix-pipeline": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "pr-standards": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "prd-parser": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "project-manager-agent": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "project-scaffold": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "prompt-auto-enhance": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "prompt-auto-enhance-rule": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "pytest-dev": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "quality-gate-evaluator-agent": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "receive-code-review": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "redis-patterns": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "regression-test": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "request-code-review": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "review-gate": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "rule-writing-meta": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "save-session": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "scan-discovery-report": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "schema-designer": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "security-audit": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "security-auditor-agent": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "semgrep-rules": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "session-summarizer-agent": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "skill-author-agent": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "skill-factory": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "skill-master": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "ssot-audit": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "start-session": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "status": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "strategic-architect": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "subagent-driven-dev": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "supply-chain-audit": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "synthesize-project": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "systematic-debugging": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "tdd": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "tdd-rule": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "test-data-management": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "test-generator": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "test-knowledge": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "test-maintenance": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "test-pipeline": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "test-pipeline-agent": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "tester-agent": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "testing": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "trace-test": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "ui-ux-pro-max": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "verify-screenshots": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "web-quality": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "web-research-specialist-agent": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "websocket-patterns": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "workflow": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "writing-plans": {
-    "adoption_rate": 0.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
-  },
-  "xml-to-compose": {
-    "adoption_rate": 1.0,
-    "retention_days_p50": 0,
-    "error_prevention_rate": null,
-    "sample_size": 1,
-    "last_updated": "2026-08-14"
+  "patterns": {
+    "a11y-audit": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "adr": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "adversarial-review": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "agent-evaluator": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "agent-orchestration": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "agent-team-selection": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "ai-gemini-api": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "android": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "android-adb-test": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "android-arch": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "android-build-fixer-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "android-compose-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "android-compose-ui": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "android-gradle": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "android-kotlin": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "android-kotlin-reviewer-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "android-mvi-scaffold": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "android-run-e2e": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "android-run-tests": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "android-test-patterns": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "anthropic-agent-orchestration-guide": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "anthropic-multi-agent-research-system-skill": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "anthropic-multi-agent-reviewer-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "api-docs-generator": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "apply-selections": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "architecture-fitness": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "auto-verify": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "autonomous-contract": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "batch": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "brainstorm": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "branching": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "bug-triage-discipline": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "bun-elysia": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "bun-elysia-test": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "change-risk-scoring": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "changelog-contributing": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "chaos-resilience": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "ci-cd-setup": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "claude-behavior": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "claude-guardian": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "code-quality-gate": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "code-readability": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "code-review-master-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "code-review-workflow": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "code-reviewer-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "compose-ui": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "configuration-ssot": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "context-management": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "context-reducer-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "continue": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "continuous-improvement": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "contract-test": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "contribute-practice": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "coverage-analysis": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "create-github-issue": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "cross-platform-visual": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "cross-project-context-capture": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "d3-viz": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "dast-scan": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "db-migrate": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "db-migrate-verify": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "debugger-agent": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "debugging-loop": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "debugging-loop-master-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "decision-authority": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "deploy-strategy": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "design-principles": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "design-ssot": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "development-loop": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "development-loop-master-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "diataxis-docs": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "disaster-recovery": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "doc-staleness": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "doc-structure-enforcer": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "docker-optimize": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "docs-manager-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "documentation-master-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "documentation-workflow": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "dod-verbs": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "drizzle-orm": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "e2e-best-practices": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "e2e-conductor-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "e2e-persistence-verification": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "e2e-readiness-signal": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "e2e-test-writing": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "e2e-visual-run": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "end-session": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "engineering-roles": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "environment-validation": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "error-handling": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "escalation-report": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "executing-plans": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "expo-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "failure-triage-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "fastapi-api-tester-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "fastapi-backend": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "fastapi-database": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "fastapi-database-admin-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "fastapi-db-migrate": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "fastapi-deploy": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "fastapi-run-backend-tests": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "feature-flag": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "firebase": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "firebase-ai": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "firebase-data-connect": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "firebase-dev": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "firebase-test": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "five-advisors": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "fix-github-issue": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "fix-issue": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "fix-loop": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "flutter": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "flutter-dart-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "flutter-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "flutter-e2e-test": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "git-collaboration": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "git-manager-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "git-worktrees": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "github": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "github-issue-manager-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "goal-anchored-decisions": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "goal-creator": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "grill-me": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "grill-with-docs": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "handover": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "hono-backend": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "hono-conventions": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "html-prototype": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "human-approval-gates": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "iac-deploy": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "implement": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "improve-codebase-architecture": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "incident-response": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "independent-test-verification": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "integration-test": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "jest-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "k8s-deploy": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "learn-n-improve": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "learning-self-improvement": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "learning-self-improvement-master-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "learnings-routing": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "loop-engineering": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "mcp-server-builder": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "merge-strategy": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "middleware-test": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "mobile-a11y-test": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "mock-server": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "monitoring-setup": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "monorepo": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "nextjs-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "node-backend-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "notifier-integration": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "nuxt-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "obsidian": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "output-plausibility-verification": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "parallel-worktree-orchestrator-agent": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "pattern-portability": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "pattern-self-containment": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "pattern-structure": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "perf-test": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "pg-query": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "pipeline-fix-pr": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "pipeline-orchestrator": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "plan-before-coding": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "plan-executor-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "plan-to-issues": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "planner-researcher-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "playwright": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "pm2-deploy": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "post-fix-pipeline": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "pr-standards": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "prd-parser": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "prisma-conventions": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "prisma-orm": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "project-manager-agent": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "project-scaffold": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "prompt-auto-enhance": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "prompt-auto-enhance-rule": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "pytest-dev": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "quality-gate-evaluator-agent": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "react-native-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "react-native-e2e": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "react-nextjs": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "react-test-patterns": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "receive-code-review": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "reddit": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "redis-patterns": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "regression-test": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "remotion-video": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "request-code-review": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "research-mode": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "review-gate": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "rule-curation": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "rule-writing-meta": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "save-session": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "scan-discovery-report": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "schema-designer": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "security-audit": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "security-auditor-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "security-baseline": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "semgrep-rules": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "serialize-fixes": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "session-continuity": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "session-continuity-master-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "session-summarizer-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "skill-author-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "skill-authoring-master-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "skill-authoring-workflow": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "skill-evaluator": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "skill-factory": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "skill-master": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "solidity-audit": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "ssot-audit": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "start-session": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "status": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "strategic-architect": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "subagent-driven-dev": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "supervisor-verification": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "supply-chain-audit": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "synthesize-project": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "systematic-debugging": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "tailwind-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "tdd": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "tdd-failing-test-generator": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "tdd-rule": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "test-data-management": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "test-failure-analyzer-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "test-generator": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "test-healer-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "test-knowledge": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "test-maintenance": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "test-pipeline": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "test-pipeline-agent": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "test-scout-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "tester-agent": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "testing": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "testing-pipeline-master-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "testing-pipeline-workflow": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "to-prd": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "trace-test": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "twitter-x": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "ui-ux-pro-max": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "update-practices": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "verify-screenshots": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "visual-inspector-agent": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "vitest-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "vue": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "vue-dev": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "vue-e2e": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "vue-test": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "web-deploy-readiness": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "web-quality": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "web-research-specialist-agent": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "web-scraper": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "websocket-patterns": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "workflow": {
+      "adoption_rate": 1.0,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "workflow-master-template": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "writing-plans": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "writing-skills": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    },
+    "xml-to-compose": {
+      "adoption_rate": 0.5,
+      "retention_days_p50": 0.0,
+      "error_prevention_rate": null,
+      "sample_size": 2,
+      "last_updated": "2026-08-21"
+    },
+    "zoom-out": {
+      "error_prevention_rate": null,
+      "sample_size": 1,
+      "last_updated": "2026-08-21",
+      "adoption_note": "withheld — file-exists adoption at sample_size 1 is a tautology, not a measurement; see scripts/measure_outcomes.py for invocation-based adoption"
+    }
+  },
+  "_outcomes": {
+    "window_days": 30,
+    "generated": "2026-08-21",
+    "pr_count": 75,
+    "metrics": {
+      "change_failure_rate": {
+        "value": null,
+        "sample_size": 0,
+        "failed": 0,
+        "note": "no PRs old enough for a full 30-day window"
+      },
+      "rework_rate": {
+        "value": null,
+        "sample_size": 0,
+        "reworked": 0,
+        "note": "no PRs with file data old enough for a full 30-day window"
+      },
+      "first_pass_rate": {
+        "value": 0.5067,
+        "sample_size": 75,
+        "first_pass": 38
+      },
+      "guardrail_catches": {
+        "value": 0,
+        "sample_size": 75,
+        "unit": "confirmed true positives"
+      },
+      "invocation_adoption": {
+        "value": null,
+        "sample_size": 0,
+        "source": "none",
+        "note": "no invocation log and no PR skill attribution — NO DATA (not a rate of 0)"
+      },
+      "cost_per_task": {
+        "value": null,
+        "sample_size": 0,
+        "note": "cost ledger empty or absent (costs/ledger.jsonl is gitignored runtime state)"
+      }
+    }
   }
 }
