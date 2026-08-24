@@ -1115,3 +1115,12 @@ Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Vent
 - **Rule:** codified into the global CLAUDE.md 95%-gate (both machines): enforcement
   strictness, protection coverage, spend, and interruption frequency are OWNER-facing forks —
   ask proactively at intake; questions-only-when-challenged is itself a gate failure.
+
+- **Fleet host OOM kills the dispatcher session (2026-08-24, 3 deaths in one night).** Mistake: dispatching 5-6
+  parallel workers on a 16GB PC while worker-wrapper never killed workers' child processes, so node.exe from tasks
+  closed days earlier held 2-4GB each; commit hit 45.9/50.1GB and Windows Terminal (host of the interactive session)
+  crashed with E_OUTOFMEMORY. Root cause: no process-tree containment + no host-resource gate at dispatch. Rule:
+  a dispatch wave is gated on host commit % and a live-worker cap (mechanism: T-312 in getworkdone-bus - job
+  object kill-on-close, preflight exit code, janitor orphan sweep); until it lands, max 3 heavy workers and kill
+  orphan node.exe from closed worktrees before each wave. A watcher/session that "just dies" is a symptom - check
+  the Windows Application log (Id 1000/1001) for 8007000e before blaming the harness.
