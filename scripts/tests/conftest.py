@@ -9,6 +9,12 @@ import yaml
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
+# Fixture demo apps (e.g. fixtures/playwright-demo/tests/) are scenario material for the
+# three-lane test pipeline's test-scout-agent, not hub tests — their test_*.py files use
+# runtime deps (e.g. httpx) the hub's own scripts/requirements.txt does not install, so
+# pytest must never import/collect them here.
+collect_ignore_glob = ["fixtures/*/tests/**"]
+
 
 def pytest_configure(config):
     """Register custom marks used by fixture files for the three-lane test pipeline.
