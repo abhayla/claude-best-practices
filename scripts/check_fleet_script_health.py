@@ -400,6 +400,124 @@ PROCESS_LOCK = re.compile(
 DESTRUCTIVE_WORKTREE_OP = re.compile(r"worktree\s+remove\b", re.I)
 
 
+# --- unmeasured-reset: `reset --hard` gated on an unpushed-commit probe that can itself fail ------
+# T-320 HIGH-1 (bus-sync.sh:8-11). The sibling of unmeasured-safe-delete, on git HISTORY rather
+# than the working tree, and the existing check cannot see it: there is no `worktree remove` here,
+# the destructive verb is `reset --hard`.
+#
+#   if [ -n "$(git log '@{u}..HEAD' --oneline 2>/dev/null)" ]; then   <- the probe
+#     ... rebase (protects unpushed commits)
+#   else
+#     git pull --rebase ... || { git fetch ... && git reset -q --hard origin/main; }  # "safe"
+#
+# `git log '@{u}..HEAD'` exits 128 with EMPTY stdout whenever the upstream cannot be resolved (no
+# tracking ref after `git branch -M`, a renamed/deleted remote branch, a detached HEAD). Empty
+# stdout is then read as "no unpushed commits to lose" and the code takes the branch whose own
+# comment calls it safe -- destroying real unpushed commits. Reproduced end-to-end in
+# evidence/2026-08-26-T-320/repro-bus-sync-dataloss.sh: the commit is destroyed and the function
+# still returns 0, so the fleet records a healthy tick.
+UNPUSHED_COMMIT_PROBE = re.compile(
+    r"git\b[^\n]*\b(log|rev-list)\b[^\n]*@\{u(pstream)?\}|"
+    r"git\b[^\n]*\bcherry\b",
+    re.I,
+)
+# The probe's own failure must be distinguished from "nothing to report" BEFORE its emptiness is
+# allowed to authorise a reset: test its exit code, or resolve the upstream first and fail closed.
+PROBE_FAILURE_TESTED = re.compile(
+    r"\$LASTEXITCODE|\berrorlevel\b|\$\?|"
+    r"rev-parse\b[^\n]*@\{u|"
+    r"\|\|\s*(return|exit)\b",
+    re.I,
+)
+HISTORY_DESTRUCTIVE_OP = re.compile(r"\breset\b[^\n]*--hard\b", re.I)
+# The one honest way to make the probe's emptiness trustworthy without testing it inline: resolve
+# the upstream FIRST and bail when it cannot be resolved, so an unresolvable upstream can never
+# reach the reset branch. Must appear BEFORE the probe (a later check is too late to matter).
+UPSTREAM_RESOLVED_FAIL_CLOSED = re.compile(
+    r"rev-parse\b[^\n]*@\{u[^\n]*(\|\||\bexit\b|\breturn\b|-ne\s*0|errorlevel)",
+    re.I,
+)
+
+
+# --- dead-convention-guard: a naming-convention literal that matches NOTHING on the live fleet ----
+# T-320 HIGH-2 (janitor-worktrees.ps1:137). A THIRD shape of "detect-then-discard", and the most
+# invisible one yet: the guard is not skipped, not swallowed, not unchecked -- it is never ARMED.
+#
+#   $leaf = Split-Path $wtPath -Leaf
+#   if ($leaf -match '-wt-t(\d+)$') {          <- 39 of 40 live worktrees fail this
+#       ... consult heartbeat, return KEPT-live
+#   }
+#   ... fall through to the clean/landed predicate -> `git worktree remove`
+#
+# The fleet's real directories are `T-320-claude-best-practices`, `gorefer-T149`, `T-215-IPODhan`.
+# None end in `-wt-t<digits>`, so the live-worker heartbeat is never consulted and a RUNNING
+# worker's worktree is judged solely on clean+landed -- which a worker that has just pushed
+# satisfies while still writing STATUS.md. Nothing errors; the guard silently protects nobody.
+#
+# Detectable WITHOUT running the fleet: the convention literal is checked against the directory
+# names the script's OWN sibling paths show, so a literal that cannot match the corpus it guards
+# is a static contradiction. This check deliberately fires only when a live directory listing is
+# available (a --workspace-dir), so CI without the fleet on disk never guesses.
+CONVENTION_MATCH_LITERAL = re.compile(
+    r"-match\s+'([^']*)'|-match\s+\"([^\"]*)\"",
+    re.I,
+)
+# Only convention literals that gate a DESTRUCTIVE outcome matter; `-match '^!!'` on status output
+# is not a naming convention and guards nothing destructive.
+PATH_LEAF_SOURCE = re.compile(r"Split-Path\b[^\n]*-Leaf|\bbasename\b|\.Name\b", re.I)
+
+
+# --- clobbered-exit: a native call whose $LASTEXITCODE is overwritten before anyone reads it ------
+# T-320 HIGH-3 (worker-wrapper.ps1:755-757). Every existing PowerShell check asks "is there a
+# $LASTEXITCODE test near this call?" -- a PRESENCE question. This asks a REACHABILITY question:
+# does the value the test reads still belong to the call we care about?
+#
+#   git add -A *> $null                       <- exit code lands in $LASTEXITCODE
+#   git commit -m "autosave: ..." *> $null    <- and is DESTROYED here, unread
+#   if ($LASTEXITCODE -eq 0) { ...success... } <- reads the COMMIT's code, never the add's
+#
+# `git add -A` can fail while partially staging (a file still locked by a dying descendant --
+# likely, since this block runs right after a process-tree kill; a MAX_PATH overrun in
+# node_modules). `git commit` then succeeds on the partial staging and returns 0, so the wrapper
+# writes a confident "dirty tree committed to rescue branch" line to the heartbeat. The dispatcher
+# is told the rescue branch holds the worker's work; it holds only part of it, and nobody rechecks
+# because the wrapper reported success.
+#
+# Deliberately narrow: consecutive native calls at the SAME indent with no intervening test, then
+# a test. Anything else (a test between them, a pipeline, an assignment) is out of scope.
+PS_NATIVE_CALL_LINE = re.compile(
+    r"^\s*(?:&\s*)?(git|gh|claude|python|py|node|npm|npx|dotnet|cargo|go|pwsh|powershell)\b",
+    re.I,
+)
+PS_EXITCODE_READ = re.compile(r"\$LASTEXITCODE", re.I)
+# An assignment CAPTURES the code, so a later read is reading the capture, not the live variable.
+PS_EXITCODE_CAPTURED = re.compile(r"\$\w+\s*=\s*\$LASTEXITCODE", re.I)
+
+
+# --- unchecked-chdir: a batch `cd /d` whose failure leaves git mutating the PREVIOUS repo --------
+# T-320 HIGH-4 (keeper-tick.cmd:212 and :256). Verified on this host: a failed `cd /d` sets
+# errorlevel 1, does NOT abort the script, and leaves the working directory UNCHANGED --
+#     BEFORE cwd=C:\Abhay\GetWorkDone
+#     The system cannot find the path specified.
+#     AFTER  cwd=C:\Abhay\GetWorkDone  errorlevel=1
+#     SCRIPT CONTINUED
+# so every subsequent `git add -A` / `git commit` / `git push` runs against whatever repo the
+# script was in before. keeper-tick.cmd:212 is a HARDCODED absolute path (the one path in the file
+# never migrated to %~dp0) and its failure would commit+push the bus checkout's whole working tree
+# under a "keeper: tick" message -- or, if :256 fails, push the hub clone to the hub's main.
+#
+# The tick's own guards cannot see it: the HEAD-is-main assertion is true in the wrong repo too,
+# and the commit guard matches on the message text, which the wrong repo also produces. Every
+# guard passes and the tick is logged healthy.
+BATCH_CHDIR = re.compile(r"^\s*cd\s+/d\s+\S", re.I)
+BATCH_CHDIR_TESTED = re.compile(r"\berrorlevel\b|\bif\s+not\s+exist\b|\|\|", re.I)
+# `git push` is the irreversible end of the chain, but staging/committing in the wrong repo is
+# already damage -- any state-mutating git verb downstream makes an unchecked chdir load-bearing.
+BATCH_GIT_MUTATION = re.compile(
+    r"^\s*git\s+(add|commit|push|checkout|reset|rm|mv|tag|branch)\b", re.I
+)
+
+
 # --- silent-staging: a git STATE-MUTATING command whose verdict is discarded, before a push -------
 # The existing silent-push check covers `git push`. But the commands that BUILD what gets pushed —
 # `git add`, `git commit`, `git checkout` — sit above it in keeper-tick.cmd sending their exit
@@ -1139,6 +1257,266 @@ def check_unmeasured_safe_delete(path: Path) -> list[Finding]:
     return out
 
 
+
+
+def check_unmeasured_reset(path: Path) -> list[Finding]:
+    """A `reset --hard` authorised by an unpushed-commit probe whose OWN failure reads as "none".
+
+    T-320 HIGH-1, live in bus-sync.sh's `bus_pull`. The unmeasured-safe-delete sibling, one level
+    up: there the emptiness of `git status` authorised deleting a working tree; here the emptiness
+    of `git log '@{u}..HEAD'` authorises discarding COMMITTED history.
+
+    `git log '@{u}..HEAD'` exits 128 and prints NOTHING when the upstream cannot be resolved -- a
+    branch with no tracking ref (routine after `git branch -M main`), a deleted/renamed remote
+    branch, a detached HEAD. With stderr sent to /dev/null and the exit code untested, that empty
+    stdout is indistinguishable from the genuine "zero unpushed commits" answer, so the code takes
+    the branch it documents as `safe: no unpushed commits to lose` and hard-resets over real work.
+
+    The failure is doubly silent: the destroyed commit is only in the reflog, and the function
+    RETURNS 0, so the caller records a healthy tick. Fail closed instead -- a probe that could not
+    measure must be treated as "unpushed commits present" (refuse to reset), never as "none".
+    """
+    if path.suffix not in {".sh", ".ps1", ".cmd"}:
+        return []
+    if _is_pattern_source(path):
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    # Only where a hard reset actually exists: elsewhere the probe's emptiness authorises nothing.
+    if not HISTORY_DESTRUCTIVE_OP.search(text):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("#", "rem ", "REM ")):
+            continue
+        if not UNPUSHED_COMMIT_PROBE.search(line):
+            continue
+        # Two ways the emptiness can be made trustworthy, and only two:
+        #   (a) the probe line tests its OWN exit code, or
+        #   (b) the upstream was resolved fail-closed BEFORE the probe, so an unresolvable
+        #       upstream can never reach the reset branch at all.
+        # A test on a FOLLOWING line does not count: it guards that line, not the probe. In the
+        # live bus-sync.sh the `|| { ...; return 2; }` one line below belongs to the rebase, so a
+        # symmetric window would read the shipped defect as handled.
+        if PROBE_FAILURE_TESTED.search(line):
+            continue
+        preceding = "\n".join(lines[max(0, i - 6) : i - 1])
+        if UPSTREAM_RESOLVED_FAIL_CLOSED.search(preceding):
+            continue
+        out.append(
+            Finding(
+                "unmeasured-reset",
+                path,
+                i,
+                "this unpushed-commit probe is the SAFETY PREDICATE for a `reset --hard` in the "
+                "same file, but its own exit code is never tested: `git log '@{u}..HEAD'` exits "
+                "128 with EMPTY output when the upstream cannot be resolved (no tracking ref, a "
+                "renamed/deleted remote branch, detached HEAD), and that emptiness is then read as "
+                "'no unpushed commits to lose' -- hard-resetting over real committed work while "
+                "returning success. Fail closed: treat a probe that could not measure as UNPUSHED "
+                "COMMITS PRESENT and refuse to reset.",
+            )
+        )
+    return out
+
+
+
+def check_dead_convention_guard(path: Path, workspace_dirs: list[Path] | None) -> list[Finding]:
+    """A live-worker guard armed by a naming convention that matches NOTHING on the live fleet.
+
+    T-320 HIGH-2, live in janitor-worktrees.ps1:137. The third face of detect-then-discard, and the
+    quietest: the guard is not swallowed, redirected or unchecked -- it is never ARMED. Its regex
+    encodes a directory convention (`<repo>-wt-t<id>`) that the fleet stopped using; the real names
+    are `T-320-claude-best-practices`, `gorefer-T149`, `T-215-IPODhan`. `-match` simply returns
+    false, the heartbeat is never consulted, and a RUNNING worker's worktree falls through to the
+    clean+landed predicate -- which a worker that has already pushed satisfies while it is still
+    writing STATUS.md. The directory is then deleted out from under the live process.
+
+    Nothing about this is visible at runtime: no error, no exit code, no log line. It is only
+    visible by comparing the literal against the names it is supposed to match. So this check needs
+    GROUND TRUTH and refuses to guess: it fires only when real directory names were supplied
+    (--workspace-dir). On a CI box with no fleet on disk it returns nothing rather than inventing a
+    verdict -- an unmeasurable claim must never be scored as a finding (the same fail-closed
+    discipline the checks themselves demand of the fleet).
+    """
+    if path.suffix != ".ps1":
+        return []
+    if _is_pattern_source(path):
+        return []
+    if not workspace_dirs:
+        return []
+    names = [d.name for d in workspace_dirs]
+    if not names:
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    # Only where the verdict can authorise destruction.
+    if not DESTRUCTIVE_WORKTREE_OP.search(text):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith("#"):
+            continue
+        m = CONVENTION_MATCH_LITERAL.search(line)
+        if not m:
+            continue
+        pattern = m.group(1) or m.group(2) or ""
+        # Must be a guard over a path LEAF -- `-match '^!!'` over git status output is not a
+        # naming convention and gates nothing destructive.
+        context = "\n".join(lines[max(0, i - 4) : i])
+        if not PATH_LEAF_SOURCE.search(context) and not PATH_LEAF_SOURCE.search(line):
+            continue
+        try:
+            rx = re.compile(pattern, re.I if "(?i)" not in pattern else 0)
+        except re.error:
+            continue
+        matched = [n for n in names if rx.search(n)]
+        # A COVERAGE test, not a zero test. The live janitor literal still matches one legacy
+        # directory (`gorefer-wt-t060`) out of 40, so "matches nothing" would let a guard that
+        # protects 2.5% of the fleet pass as healthy. What makes a guard dead is that the
+        # convention it encodes is no longer the one in use -- so require it to cover a MAJORITY
+        # of the corpus it guards. A convention genuinely in use matches nearly everything; a
+        # superseded one matches only the stragglers that predate the rename.
+        if len(matched) * 2 > len(names):
+            continue
+        unmatched = sorted(n for n in names if not rx.search(n))
+        out.append(
+            Finding(
+                "dead-convention-guard",
+                path,
+                i,
+                f"this naming-convention guard matches only {len(matched)} of {len(names)} live "
+                f"worktree directories, so it is effectively never armed (unmatched e.g. "
+                f"{', '.join(unmatched[:3])}): the protection it gates is silently skipped for "
+                "those worktrees and the code falls through to the destructive path. A guard that "
+                "does not match the corpus it guards protects nobody -- derive the convention from "
+                "the same SSOT that NAMES the directories, or fail closed when the leaf is "
+                "unrecognised.",
+            )
+        )
+    return out
+
+
+
+def check_clobbered_exit(path: Path) -> list[Finding]:
+    """A native call whose `$LASTEXITCODE` is destroyed by the NEXT native call before any read.
+
+    T-320 HIGH-3, live at worker-wrapper.ps1:755-757. The existing PowerShell checks ask a
+    PRESENCE question -- "is a `$LASTEXITCODE` test near this call?" -- and this defect answers it
+    truthfully: there IS a test, two lines down. The test just reads a different command's exit
+    code, because `$LASTEXITCODE` holds only the most recent one.
+
+        git add -A *> $null                        <- code lands here
+        git commit -m "autosave: ..." *> $null     <- and is overwritten here, unread
+        if ($LASTEXITCODE -eq 0) { ...success... } <- reads the commit's code
+
+    `git add -A` can fail while partially staging (a file still locked by a descendant the wrapper
+    force-killed moments earlier; a MAX_PATH overrun under node_modules). The commit then succeeds
+    on the partial staging, returns 0, and the wrapper writes "dirty tree committed to rescue
+    branch" to the heartbeat -- so the dispatcher is told a rescue branch holds the worker's work
+    when it holds a fragment of it, and nothing rechecks because the run reported success.
+
+    Scoped tightly to keep the signal honest: only CONSECUTIVE native calls at the same indent,
+    with no test and no capture between them, followed by a read. A capture
+    (`$rc = $LASTEXITCODE`) between the calls is the correct fix and clears the finding.
+    """
+    if path.suffix != ".ps1":
+        return []
+    if _is_pattern_source(path):
+        return []
+    lines = _lines(path)
+    out: list[Finding] = []
+    for i in range(len(lines) - 2):
+        first, second = lines[i], lines[i + 1]
+        if first.lstrip().startswith("#") or second.lstrip().startswith("#"):
+            continue
+        if not PS_NATIVE_CALL_LINE.match(first) or not PS_NATIVE_CALL_LINE.match(second):
+            continue
+        # Same block: a differently-indented neighbour is not a straight-line sequence.
+        if len(first) - len(first.lstrip()) != len(second) - len(second.lstrip()):
+            continue
+        # The first call's code must not already be read or captured on its own line.
+        if PS_EXITCODE_READ.search(first):
+            continue
+        # Somebody must actually READ $LASTEXITCODE after the second call -- otherwise this is the
+        # plain unchecked-call shape the existing checks already own, not the clobber shape.
+        window = "\n".join(lines[i + 2 : i + 5])
+        if not PS_EXITCODE_READ.search(window):
+            continue
+        if PS_EXITCODE_CAPTURED.search(second):
+            continue
+        out.append(
+            Finding(
+                "clobbered-exit",
+                path,
+                i + 1,
+                "this native call's `$LASTEXITCODE` is overwritten by the native call on the next "
+                "line before anything reads it, so the `$LASTEXITCODE` test below reports on the "
+                "SECOND command only -- this one's failure is structurally unobservable. A partial "
+                "failure here followed by a successful second call is reported as full success. "
+                "Capture it immediately (`$rc = $LASTEXITCODE`) and test that, or test it before "
+                "the next native call runs.",
+            )
+        )
+    return out
+
+
+
+def check_unchecked_chdir(path: Path) -> list[Finding]:
+    """A batch `cd /d` whose failure is unchecked, with git mutations downstream.
+
+    T-320 HIGH-4, live at keeper-tick.cmd:212 and :256. Reproduced on this host: a failed `cd /d`
+    sets errorlevel 1, does NOT abort the script, and leaves the working directory UNCHANGED. So
+    every `git add -A` / `git commit` / `git push` after it runs against whatever repository the
+    script happened to be in before -- committing one repo's working tree into another and pushing
+    it, under the caller's own commit message.
+
+    keeper-tick.cmd:212 is the single hardcoded absolute path in a file whose header records that
+    exactly this class of hardcoding was 'dead on the PC and only working by coincidence on the
+    VPS'. Nothing downstream can catch it: a HEAD-is-main assertion is true in the wrong repo too,
+    and a commit-message guard matches text the wrong repo also produces. Every guard passes and
+    the tick is logged healthy -- the fleet's definition of a silent failure.
+
+    Scoped to files that actually mutate git state after the chdir, so navigation-only scripts and
+    read-only reporting ticks are never flagged.
+    """
+    if path.suffix != ".cmd":
+        return []
+    if _is_pattern_source(path):
+        return []
+    lines = _lines(path)
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("rem ", "REM ", "::")):
+            continue
+        if not BATCH_CHDIR.match(line):
+            continue
+        if BATCH_CHDIR_TESTED.search(line):
+            continue
+        # The verdict must be taken before anything else runs: batch `cd` failure is silent, so a
+        # test more than a couple of lines later has already let git run in the wrong place.
+        following = lines[i : i + 2]
+        if any(BATCH_CHDIR_TESTED.search(f) for f in following):
+            continue
+        # Only load-bearing when git actually mutates state downstream of this line.
+        downstream = lines[i:]
+        if not any(BATCH_GIT_MUTATION.match(d) for d in downstream):
+            continue
+        out.append(
+            Finding(
+                "unchecked-chdir",
+                path,
+                i,
+                "this `cd /d` never tests its own failure, and a failed `cd /d` in batch does NOT "
+                "abort the script -- it sets errorlevel 1 and leaves the working directory "
+                "UNCHANGED. The state-mutating git commands below then run against whichever "
+                "repository the script was already in, committing and pushing one repo's tree "
+                "from another while every downstream guard (HEAD-is-main, commit-message match) "
+                "still passes. Test it immediately: `if errorlevel 1 ( ...alert...; exit /b 1 )`.",
+            )
+        )
+    return out
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -1169,7 +1547,11 @@ def manifest_digest(root: Path) -> tuple[str, int]:
     return hashlib.sha256(manifest.encode("utf-8")).hexdigest(), len(corpus)
 
 
-def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
+def run(
+    root: Path,
+    extra_callers: list[Path] | None = None,
+    workspace_dirs: list[Path] | None = None,
+) -> list[Finding]:
     corpus = collect(root)
     findings: list[Finding] = []
     for path in corpus:
@@ -1186,6 +1568,10 @@ def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
         findings.extend(check_unlocked_global_rewrite(path))
         findings.extend(check_silent_staging(path))
         findings.extend(check_unmeasured_safe_delete(path))
+        findings.extend(check_unmeasured_reset(path))
+        findings.extend(check_dead_convention_guard(path, workspace_dirs))
+        findings.extend(check_clobbered_exit(path))
+        findings.extend(check_unchecked_chdir(path))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 
@@ -1199,6 +1585,17 @@ def main() -> int:
         default=[],
         metavar="FILE",
         help="extra file that may invoke a gate (e.g. the dispatcher SKILL.md); repeatable",
+    )
+    ap.add_argument(
+        "--workspace-dir",
+        action="append",
+        default=[],
+        metavar="DIR",
+        help=(
+            "directory whose SUBDIRECTORIES are live worktree names (e.g. GetWorkDone/workspaces); "
+            "repeatable. Supplies the ground truth for dead-convention-guard, which stays silent "
+            "when it is not given rather than guessing"
+        ),
     )
     ap.add_argument(
         "--no-default-caller",
@@ -1221,7 +1618,12 @@ def main() -> int:
     extra_callers = [Path(c) for c in args.caller]
     if not args.no_default_caller and DEFAULT_DISPATCHER_SKILL.is_file():
         extra_callers.append(DEFAULT_DISPATCHER_SKILL)
-    findings = run(root, extra_callers)
+    workspace_dirs: list[Path] = []
+    for w in args.workspace_dir:
+        wp = Path(w)
+        if wp.is_dir():
+            workspace_dirs.extend(d for d in wp.iterdir() if d.is_dir())
+    findings = run(root, extra_callers, workspace_dirs)
     for f in sorted(findings, key=lambda f: (str(f.path), f.line)):
         print(f.render(root if root.is_dir() else root.parent))
     if findings:

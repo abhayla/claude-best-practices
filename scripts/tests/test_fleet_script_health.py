@@ -91,6 +91,9 @@ _FIXTURE_SUFFIX = {
     "unlocked-global-rewrite": "rollup.py",
     "unmeasured-safe-delete": "janitor.ps1",
     "silent-staging": "tick.cmd",
+    "unmeasured-reset": "bus-sync.sh",
+    "clobbered-exit": "worker-wrapper-autosave.ps1",
+    "unchecked-chdir": "keeper-tick.cmd",
 }
 
 
@@ -1450,6 +1453,8 @@ _KNOWN_RATCHET_CHECKS = {
     "stale-receipt", "unchecked-read", "ps-unchecked-call", "offset-before-write",
     "unchecked-precondition", "unlocked-global-rewrite", "unmeasured-safe-delete",
     "silent-staging",
+    # T-320 (2026-08-26)
+    "unmeasured-reset", "dead-convention-guard", "clobbered-exit", "unchecked-chdir",
 }
 
 _CLEAN_OUTPUT = "fleet-health: clean"
@@ -1604,7 +1609,23 @@ def test_floor_guard_rejects_malformed_zero_evidence(mutate):
     live-fleet cross-check even runs.
     """
     good = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
-    base_zero = good["zero_evidence"]
+    # SYNTHETIC base, not the committed block. The committed floor legitimately has no
+    # zero_evidence whenever findings are open (T-320 repopulated it), and a negative control that
+    # only runs while the fleet happens to be clean is a control that stops controlling exactly
+    # when defects exist — the same "the assertion did not run" hole T-167 HIGH-1 closed.
+    base_zero = {
+        "claim": "the live fleet bus carries zero known silent-failure defects as of observed_on",
+        "checker_output": _CLEAN_OUTPUT,
+        "scanned_script_count": 7,
+        "manifest_sha256": "0" * 64,
+        "manifest_command": (
+            "PYTHONPATH=. python scripts/check_fleet_script_health.py X --print-zero-evidence"
+        ),
+    }
+    assert _floor_guard(dict(good, findings=[], zero_evidence=base_zero)) is None, (
+        "the synthetic base must itself be VALID, or every mutation below would 'pass' for the "
+        "wrong reason and the control would be vacuous"
+    )
     bad = dict(good, findings=[], zero_evidence=mutate(base_zero))
     assert _floor_guard(bad) is not None, f"malformed zero_evidence must be rejected: {bad['zero_evidence']!r}"
 
@@ -1830,3 +1851,314 @@ def test_resolve_fleet_dir_honours_env_override_even_off_known_locations(tmp_pat
     (real / _FLEET_MARKER_FILE).write_text(json.dumps({_FLEET_MARKER_KEY: {}}), encoding="utf-8")
     monkeypatch.setenv(_FLEET_ENV_VAR, str(real))
     assert _resolve_fleet_dir() == real
+
+
+# ------------------------------------------------------- unmeasured-reset (HIGH: bus-sync.sh, T-320)
+
+
+def test_unmeasured_reset_is_flagged(tmp_path: Path):
+    """The live bus-sync.sh:8 shape: `git log '@{u}..HEAD'` emptiness authorising a hard reset.
+
+    The probe exits 128 with EMPTY stdout when the upstream cannot be resolved, so "I could not
+    measure" is read as "there is nothing to lose" and the reset destroys committed work.
+    """
+    finding = _only_the_defect(
+        tmp_path,
+        "unmeasured-reset",
+        defective=(
+            "#!/bin/bash\n"
+            'bus_pull() {\n'
+            '  git checkout main -q 2>/dev/null || return 1\n'
+            "  if [ -n \"$(git log '@{u}..HEAD' --oneline 2>/dev/null)\" ]; then\n"
+            "    git pull -q --rebase origin main 2>/dev/null || return 2\n"
+            "  else\n"
+            "    git pull -q --rebase origin main 2>/dev/null || "
+            "{ git fetch -q origin main && git reset -q --hard origin/main; }\n"
+            "  fi\n"
+            "}\n"
+        ),
+        fixed=(
+            "#!/bin/bash\n"
+            'bus_pull() {\n'
+            '  git checkout main -q 2>/dev/null || return 1\n'
+            # Fail closed: if the upstream cannot even be resolved, we CANNOT know whether there
+            # are unpushed commits, so we must never take the reset branch.
+            '  git rev-parse --abbrev-ref "@{u}" >/dev/null 2>&1 || {\n'
+            '    echo "BUS-SYNC: upstream unresolvable — refusing to reset" >&2; return 3; }\n'
+            "  if [ -n \"$(git log '@{u}..HEAD' --oneline 2>/dev/null)\" ]; then\n"
+            "    git pull -q --rebase origin main 2>/dev/null || return 2\n"
+            "  else\n"
+            "    git pull -q --rebase origin main 2>/dev/null || "
+            "{ git fetch -q origin main && git reset -q --hard origin/main; }\n"
+            "  fi\n"
+            "}\n"
+        ),
+    )
+    assert "reset --hard" in finding.message and "exit code is never tested" in finding.message
+
+
+def test_unpushed_probe_without_a_hard_reset_is_not_flagged(tmp_path: Path):
+    """Reporting unpushed commits is ubiquitous and harmless — only a RESET puts work at risk.
+
+    Without this scoping the check would fire on every status/report script, and a gate that cries
+    wolf on normal code is one nobody reads.
+    """
+    (tmp_path / "report.sh").write_text(
+        "#!/bin/bash\n"
+        "ahead=$(git log '@{u}..HEAD' --oneline 2>/dev/null)\n"
+        'if [ -n "$ahead" ]; then echo "unpushed commits present"; fi\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unmeasured-reset")
+
+
+def test_neighbouring_exit_test_does_not_clear_the_probe(tmp_path: Path):
+    """A `|| return` on the NEXT line guards that line, not the probe — the live bus-sync.sh trap.
+
+    bus-sync.sh's rebase carries `|| { ...; return 2; }` one line below the probe. A windowed
+    failure-tested search reads that as "the probe is checked" and the real defect walks through.
+    """
+    (tmp_path / "windowed.sh").write_text(
+        "#!/bin/bash\n"
+        "if [ -n \"$(git log '@{u}..HEAD' --oneline 2>/dev/null)\" ]; then\n"
+        "  git pull -q --rebase origin main 2>/dev/null || { git rebase --abort; return 2; }\n"
+        "else\n"
+        "  git reset -q --hard origin/main\n"
+        "fi\n",
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path), "unmeasured-reset")
+    assert len(found) == 1 and found[0].line == 2, (
+        "the probe on line 2 must still be flagged despite the `|| return 2` on line 3, which "
+        f"belongs to the rebase — got {[(f.path.name, f.line) for f in found]}"
+    )
+
+
+# ------------------------------------------- dead-convention-guard (HIGH: janitor-worktrees, T-320)
+
+
+def _janitor(body: str) -> str:
+    """A janitor-shaped script: a leaf-convention guard whose fall-through DELETES a worktree."""
+    return (
+        "function Test-WorktreeSafety {\n"
+        "  $leaf = Split-Path $wtPath -Leaf\n"
+        f"{body}"
+        '  git -C $RepoPath worktree remove $e.Path *> $null\n'
+        "}\n"
+    )
+
+
+def test_dead_convention_guard_is_flagged(tmp_path: Path):
+    """The live janitor-worktrees.ps1:137 shape: `-wt-t<id>` vs real `T-320-repo` / `repo-T149`."""
+    ws = tmp_path / "workspaces"
+    ws.mkdir()
+    for n in ("T-320-claude-best-practices", "gorefer-T149", "T-215-IPODhan", "gorefer-wt-t060"):
+        (ws / n).mkdir()
+    (tmp_path / "janitor.ps1").write_text(
+        _janitor(
+            "  if ($leaf -match '-wt-t(\\d+)$') {\n"
+            '    if (Test-Path $hbPath) { return @{ Verdict = "KEPT-live" } }\n'
+            "  }\n"
+        ),
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path, None, [d for d in ws.iterdir() if d.is_dir()]), "dead-convention-guard")
+    assert len(found) == 1, f"expected the dead guard to be flagged, got {found}"
+    assert found[0].line == 3
+    assert "1 of 4" in found[0].message
+
+
+def test_live_convention_guard_is_not_flagged(tmp_path: Path):
+    """The FIXED form: a convention that actually matches the fleet's names must stay silent.
+
+    This is the half that proves the check discriminates — without it, a check that flagged every
+    `-match` in a destructive script would pass the positive test above and be useless.
+    """
+    ws = tmp_path / "workspaces"
+    ws.mkdir()
+    for n in ("T-320-claude-best-practices", "gorefer-T149", "T-215-IPODhan", "gorefer-wt-t060"):
+        (ws / n).mkdir()
+    (tmp_path / "janitor.ps1").write_text(
+        _janitor(
+            "  if ($leaf -match '[-]?T-?(\\d+)') {\n"
+            '    if (Test-Path $hbPath) { return @{ Verdict = "KEPT-live" } }\n'
+            "  }\n"
+        ),
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path, None, [d for d in ws.iterdir() if d.is_dir()]), "dead-convention-guard")
+    assert not found, f"a convention matching the live names must not be flagged, got {found}"
+
+
+def test_dead_convention_guard_stays_silent_without_ground_truth(tmp_path: Path):
+    """No live directory listing => no verdict. The check must never GUESS.
+
+    On a CI box the fleet is not on disk. Scoring "matches nothing" there would flag every healthy
+    convention, which is the same unmeasurable-claim defect these gates exist to stamp out — so
+    absent ground truth the check returns nothing rather than inventing a finding.
+    """
+    (tmp_path / "janitor.ps1").write_text(
+        _janitor(
+            "  if ($leaf -match '-wt-t(\\d+)$') {\n"
+            '    if (Test-Path $hbPath) { return @{ Verdict = "KEPT-live" } }\n'
+            "  }\n"
+        ),
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "dead-convention-guard")
+
+
+def test_non_leaf_match_is_not_a_convention_guard(tmp_path: Path):
+    """`-match '^!!'` over git status output is not a naming convention — must not be flagged."""
+    ws = tmp_path / "workspaces"
+    ws.mkdir()
+    (ws / "T-320-repo").mkdir()
+    (tmp_path / "janitor.ps1").write_text(
+        "function Test-WorktreeSafety {\n"
+        "  $status = git -C $wtPath status --porcelain --ignored 2>$null\n"
+        "  $ignoredLines = @($statusLines | Where-Object { $_ -match '^!!' })\n"
+        "  git -C $RepoPath worktree remove $e.Path *> $null\n"
+        "}\n",
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path, None, [d for d in ws.iterdir() if d.is_dir()]), "dead-convention-guard")
+    assert not found, f"a status-output match is not a leaf convention, got {found}"
+
+
+# --------------------------------------------------- clobbered-exit (HIGH: worker-wrapper, T-320)
+
+
+def test_clobbered_exit_is_flagged(tmp_path: Path):
+    """The live worker-wrapper.ps1:755-757 shape: `git add` clobbered by `git commit`.
+
+    The FIXED form keeps the same two calls and the same test -- it only captures the first code
+    before the second call runs. A check that cannot tell these apart is worthless, so this asserts
+    exactly one finding, on the defective file.
+    """
+    finding = _only_the_defect(
+        tmp_path,
+        "clobbered-exit",
+        defective=(
+            "git checkout -b $branch *> $null\n"
+            "if ($LASTEXITCODE -eq 0) {\n"
+            "  git add -A *> $null\n"
+            '  git commit -m "autosave" *> $null\n'
+            "  if ($LASTEXITCODE -eq 0) {\n"
+            '    Add-Content -Path $hb -Value "committed to rescue branch"\n'
+            "  }\n"
+            "}\n"
+        ),
+        fixed=(
+            "git checkout -b $branch *> $null\n"
+            "if ($LASTEXITCODE -eq 0) {\n"
+            "  git add -A *> $null\n"
+            "  $addRc = $LASTEXITCODE\n"
+            '  git commit -m "autosave" *> $null\n'
+            "  if ($addRc -eq 0 -and $LASTEXITCODE -eq 0) {\n"
+            '    Add-Content -Path $hb -Value "committed to rescue branch"\n'
+            "  }\n"
+            "}\n"
+        ),
+    )
+    assert "overwritten by the native call on the next line" in finding.message
+
+
+def test_native_call_pair_with_no_exitcode_read_is_not_flagged(tmp_path: Path):
+    """Two native calls nobody checks at all is the EXISTING unchecked-call shape, not this one.
+
+    Without this scoping the check would double-report every unchecked pair the other gates
+    already own, and duplicated findings train people to skim the report.
+    """
+    (tmp_path / "plain.ps1").write_text(
+        "git add -A *> $null\n"
+        'git commit -m "x" *> $null\n'
+        'Write-Output "done"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "clobbered-exit")
+
+
+def test_exitcode_tested_between_the_two_calls_is_not_flagged(tmp_path: Path):
+    """A test BETWEEN the calls reads the first code while it is still live — correct code."""
+    (tmp_path / "guarded.ps1").write_text(
+        "git add -A *> $null\n"
+        "if ($LASTEXITCODE -ne 0) { throw 'staging failed' }\n"
+        'git commit -m "x" *> $null\n'
+        "if ($LASTEXITCODE -eq 0) { Write-Output 'ok' }\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "clobbered-exit")
+
+
+def test_differently_indented_calls_are_not_a_straight_line_sequence(tmp_path: Path):
+    """Calls in different blocks do not necessarily execute back-to-back — do not guess."""
+    (tmp_path / "branched.ps1").write_text(
+        "git add -A *> $null\n"
+        "  git commit -m 'x' *> $null\n"
+        "if ($LASTEXITCODE -eq 0) { Write-Output 'ok' }\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "clobbered-exit")
+
+
+# ------------------------------------------------------ unchecked-chdir (HIGH: keeper-tick, T-320)
+
+
+def test_unchecked_chdir_is_flagged(tmp_path: Path):
+    """The live keeper-tick.cmd:212 shape: an untested `cd /d` with git mutations downstream.
+
+    Verified on a real cmd.exe: a failed `cd /d` sets errorlevel 1, does NOT abort, and leaves the
+    cwd unchanged -- so the git commands below commit and push the PREVIOUS repository.
+    """
+    finding = _only_the_defect(
+        tmp_path,
+        "unchecked-chdir",
+        defective=(
+            "@echo off\n"
+            "cd /d C:\\Abhay\\Ventures\\claude-best-practices\n"
+            "git add -A\n"
+            'git commit -m "keeper: tick"\n'
+            "git push --quiet origin main\n"
+        ),
+        fixed=(
+            "@echo off\n"
+            "cd /d C:\\Abhay\\Ventures\\claude-best-practices\n"
+            "if errorlevel 1 (\n"
+            "  echo keeper-tick: chdir FAILED - refusing to run git in the wrong repo >> failures.log\n"
+            "  exit /b 1\n"
+            ")\n"
+            "git add -A\n"
+            'git commit -m "keeper: tick"\n'
+            "git push --quiet origin main\n"
+        ),
+    )
+    assert "leaves the working directory" in finding.message
+
+
+def test_chdir_without_git_mutation_is_not_flagged(tmp_path: Path):
+    """Navigation in a read-only tick risks nothing — only a downstream MUTATION makes it matter.
+
+    Without this scoping the check would fire on every `cd /d` in every batch file, and a gate that
+    cries wolf on ordinary navigation is one nobody reads.
+    """
+    (tmp_path / "report.cmd").write_text(
+        "@echo off\n"
+        "cd /d C:\\Abhay\\GetWorkDone\n"
+        "git status --porcelain\n"
+        "git log --oneline -1\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-chdir")
+
+
+def test_chdir_guarded_by_a_later_line_is_not_flagged(tmp_path: Path):
+    """`if errorlevel 1` on the following line is the correct fix and must clear the finding."""
+    (tmp_path / "guarded.cmd").write_text(
+        "@echo off\n"
+        "cd /d C:\\Abhay\\GetWorkDone\n"
+        "if errorlevel 1 exit /b 1\n"
+        "git add -A\n"
+        'git commit -m "tick"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-chdir")

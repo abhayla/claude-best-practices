@@ -1,0 +1,32 @@
+T-320 HIGH-2 evidence — janitor-worktrees.ps1:137 live-worker guard coverage.
+
+The guard arms only when a worktree directory leaf matches: -wt-t(\d+)$
+Measured against every live worktree/workspace directory on the fleet host:
+
+GUARD-DISARMED algochanakya-T030          GUARD-DISARMED T-166-claude-best-practices
+GUARD-DISARMED bus-checker-T231C          GUARD-DISARMED T-182-claude-best-practices
+GUARD-DISARMED claude-best-practices-T071 GUARD-DISARMED T-215-IPODhan
+GUARD-DISARMED claude-best-practices-T147 GUARD-DISARMED T-216-IPODhan
+GUARD-DISARMED claude-best-practices-T191 GUARD-DISARMED T-224-IPODhan
+GUARD-DISARMED gorefer-T028               GUARD-DISARMED T-224-IPODhan-check
+GUARD-DISARMED gorefer-T037               GUARD-DISARMED T-228-IPODhan
+GUARD-DISARMED gorefer-T038               GUARD-DISARMED T-234-IPODhan
+GUARD-DISARMED gorefer-T060               GUARD-DISARMED T-235-IPODhan
+GUARD-DISARMED gorefer-T060-checker       GUARD-DISARMED T-266-IPODhan
+GUARD-DISARMED gorefer-T061               GUARD-DISARMED T-267-IPODhan
+GUARD-DISARMED gorefer-T070               GUARD-DISARMED T-268-IPODhan
+GUARD-DISARMED gorefer-T149               GUARD-DISARMED T-310C-IPODhan
+GUARD-DISARMED gorefer-T156               GUARD-DISARMED T-318-IPODhan
+GUARD-DISARMED gorefer-T193               GUARD-DISARMED T-320-claude-best-practices
+GUARD-ARMED    gorefer-wt-t060            GUARD-DISARMED T-167
+GUARD-DISARMED IPODhan-T179               GUARD-DISARMED T-320
+GUARD-DISARMED RealFuelPricesinIndia      GUARD-DISARMED RealFuelPrices-T032
+GUARD-DISARMED RealFuelPrices-T035        GUARD-DISARMED RealFuelPrices-T036-checker
+GUARD-DISARMED RealFuelPrices-T072        GUARD-DISARMED SiteWatchdog
+
+TOTAL: 1 armed / 40 directories.
+
+For the 39 disarmed, Test-WorktreeSafety never opens a heartbeat, never returns KEPT-live, and
+falls through to the clean+landed predicate -- which a worker that has already pushed satisfies
+while it is still running. The production log already records a removal decided with zero
+heartbeat consultation: "SiteWatchdog-T227 | REMOVED | fleet/T-227 | gh PR MERGED".
