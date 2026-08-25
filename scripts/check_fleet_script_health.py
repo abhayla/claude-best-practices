@@ -494,6 +494,30 @@ PS_EXITCODE_READ = re.compile(r"\$LASTEXITCODE", re.I)
 PS_EXITCODE_CAPTURED = re.compile(r"\$\w+\s*=\s*\$LASTEXITCODE", re.I)
 
 
+# --- unchecked-chdir: a batch `cd /d` whose failure leaves git mutating the PREVIOUS repo --------
+# T-320 HIGH-4 (keeper-tick.cmd:212 and :256). Verified on this host: a failed `cd /d` sets
+# errorlevel 1, does NOT abort the script, and leaves the working directory UNCHANGED --
+#     BEFORE cwd=C:\Abhay\GetWorkDone
+#     The system cannot find the path specified.
+#     AFTER  cwd=C:\Abhay\GetWorkDone  errorlevel=1
+#     SCRIPT CONTINUED
+# so every subsequent `git add -A` / `git commit` / `git push` runs against whatever repo the
+# script was in before. keeper-tick.cmd:212 is a HARDCODED absolute path (the one path in the file
+# never migrated to %~dp0) and its failure would commit+push the bus checkout's whole working tree
+# under a "keeper: tick" message -- or, if :256 fails, push the hub clone to the hub's main.
+#
+# The tick's own guards cannot see it: the HEAD-is-main assertion is true in the wrong repo too,
+# and the commit guard matches on the message text, which the wrong repo also produces. Every
+# guard passes and the tick is logged healthy.
+BATCH_CHDIR = re.compile(r"^\s*cd\s+/d\s+\S", re.I)
+BATCH_CHDIR_TESTED = re.compile(r"\berrorlevel\b|\bif\s+not\s+exist\b|\|\|", re.I)
+# `git push` is the irreversible end of the chain, but staging/committing in the wrong repo is
+# already damage -- any state-mutating git verb downstream makes an unchecked chdir load-bearing.
+BATCH_GIT_MUTATION = re.compile(
+    r"^\s*git\s+(add|commit|push|checkout|reset|rm|mv|tag|branch)\b", re.I
+)
+
+
 # --- silent-staging: a git STATE-MUTATING command whose verdict is discarded, before a push -------
 # The existing silent-push check covers `git push`. But the commands that BUILD what gets pushed —
 # `git add`, `git commit`, `git checkout` — sit above it in keeper-tick.cmd sending their exit
@@ -1436,6 +1460,63 @@ def check_clobbered_exit(path: Path) -> list[Finding]:
         )
     return out
 
+
+
+def check_unchecked_chdir(path: Path) -> list[Finding]:
+    """A batch `cd /d` whose failure is unchecked, with git mutations downstream.
+
+    T-320 HIGH-4, live at keeper-tick.cmd:212 and :256. Reproduced on this host: a failed `cd /d`
+    sets errorlevel 1, does NOT abort the script, and leaves the working directory UNCHANGED. So
+    every `git add -A` / `git commit` / `git push` after it runs against whatever repository the
+    script happened to be in before -- committing one repo's working tree into another and pushing
+    it, under the caller's own commit message.
+
+    keeper-tick.cmd:212 is the single hardcoded absolute path in a file whose header records that
+    exactly this class of hardcoding was 'dead on the PC and only working by coincidence on the
+    VPS'. Nothing downstream can catch it: a HEAD-is-main assertion is true in the wrong repo too,
+    and a commit-message guard matches text the wrong repo also produces. Every guard passes and
+    the tick is logged healthy -- the fleet's definition of a silent failure.
+
+    Scoped to files that actually mutate git state after the chdir, so navigation-only scripts and
+    read-only reporting ticks are never flagged.
+    """
+    if path.suffix != ".cmd":
+        return []
+    if _is_pattern_source(path):
+        return []
+    lines = _lines(path)
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("rem ", "REM ", "::")):
+            continue
+        if not BATCH_CHDIR.match(line):
+            continue
+        if BATCH_CHDIR_TESTED.search(line):
+            continue
+        # The verdict must be taken before anything else runs: batch `cd` failure is silent, so a
+        # test more than a couple of lines later has already let git run in the wrong place.
+        following = lines[i : i + 2]
+        if any(BATCH_CHDIR_TESTED.search(f) for f in following):
+            continue
+        # Only load-bearing when git actually mutates state downstream of this line.
+        downstream = lines[i:]
+        if not any(BATCH_GIT_MUTATION.match(d) for d in downstream):
+            continue
+        out.append(
+            Finding(
+                "unchecked-chdir",
+                path,
+                i,
+                "this `cd /d` never tests its own failure, and a failed `cd /d` in batch does NOT "
+                "abort the script -- it sets errorlevel 1 and leaves the working directory "
+                "UNCHANGED. The state-mutating git commands below then run against whichever "
+                "repository the script was already in, committing and pushing one repo's tree "
+                "from another while every downstream guard (HEAD-is-main, commit-message match) "
+                "still passes. Test it immediately: `if errorlevel 1 ( ...alert...; exit /b 1 )`.",
+            )
+        )
+    return out
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -1490,6 +1571,7 @@ def run(
         findings.extend(check_unmeasured_reset(path))
         findings.extend(check_dead_convention_guard(path, workspace_dirs))
         findings.extend(check_clobbered_exit(path))
+        findings.extend(check_unchecked_chdir(path))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 

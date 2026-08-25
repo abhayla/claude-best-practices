@@ -93,6 +93,7 @@ _FIXTURE_SUFFIX = {
     "silent-staging": "tick.cmd",
     "unmeasured-reset": "bus-sync.sh",
     "clobbered-exit": "worker-wrapper-autosave.ps1",
+    "unchecked-chdir": "keeper-tick.cmd",
 }
 
 
@@ -2080,3 +2081,66 @@ def test_differently_indented_calls_are_not_a_straight_line_sequence(tmp_path: P
         encoding="utf-8",
     )
     assert not _checks(run(tmp_path), "clobbered-exit")
+
+
+# ------------------------------------------------------ unchecked-chdir (HIGH: keeper-tick, T-320)
+
+
+def test_unchecked_chdir_is_flagged(tmp_path: Path):
+    """The live keeper-tick.cmd:212 shape: an untested `cd /d` with git mutations downstream.
+
+    Verified on a real cmd.exe: a failed `cd /d` sets errorlevel 1, does NOT abort, and leaves the
+    cwd unchanged -- so the git commands below commit and push the PREVIOUS repository.
+    """
+    finding = _only_the_defect(
+        tmp_path,
+        "unchecked-chdir",
+        defective=(
+            "@echo off\n"
+            "cd /d C:\\Abhay\\Ventures\\claude-best-practices\n"
+            "git add -A\n"
+            'git commit -m "keeper: tick"\n'
+            "git push --quiet origin main\n"
+        ),
+        fixed=(
+            "@echo off\n"
+            "cd /d C:\\Abhay\\Ventures\\claude-best-practices\n"
+            "if errorlevel 1 (\n"
+            "  echo keeper-tick: chdir FAILED - refusing to run git in the wrong repo >> failures.log\n"
+            "  exit /b 1\n"
+            ")\n"
+            "git add -A\n"
+            'git commit -m "keeper: tick"\n'
+            "git push --quiet origin main\n"
+        ),
+    )
+    assert "leaves the working directory" in finding.message
+
+
+def test_chdir_without_git_mutation_is_not_flagged(tmp_path: Path):
+    """Navigation in a read-only tick risks nothing — only a downstream MUTATION makes it matter.
+
+    Without this scoping the check would fire on every `cd /d` in every batch file, and a gate that
+    cries wolf on ordinary navigation is one nobody reads.
+    """
+    (tmp_path / "report.cmd").write_text(
+        "@echo off\n"
+        "cd /d C:\\Abhay\\GetWorkDone\n"
+        "git status --porcelain\n"
+        "git log --oneline -1\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-chdir")
+
+
+def test_chdir_guarded_by_a_later_line_is_not_flagged(tmp_path: Path):
+    """`if errorlevel 1` on the following line is the correct fix and must clear the finding."""
+    (tmp_path / "guarded.cmd").write_text(
+        "@echo off\n"
+        "cd /d C:\\Abhay\\GetWorkDone\n"
+        "if errorlevel 1 exit /b 1\n"
+        "git add -A\n"
+        'git commit -m "tick"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unchecked-chdir")
