@@ -3,11 +3,11 @@
     "The known-open fleet defect floor, as a COMMITTED artifact rather than a Python literal.",
     "",
     "WHY THIS FILE EXISTS (T-167, 2026-08-17). The ratchet assertions in",
-    "test_fleet_script_health.py can only run where the real fleet bus exists — on CI they",
+    "test_fleet_script_health.py can only run where the real fleet bus exists \u2014 on CI they",
     "pytest.skip(). So a PR that empties the floor is validated by a CI run that CANNOT SEE the",
     "fleet, and 'all green' means only 'the assertions did not run'. That is exactly what",
     "happened: commit a5cde31 (2026-08-12) emptied the floor claiming 'all six T-071 findings",
-    "fixed', CI passed, and on 2026-08-17 all six still reproduced verbatim — plus a NEW",
+    "fixed', CI passed, and on 2026-08-17 all six still reproduced verbatim \u2014 plus a NEW",
     "keeper-tick.cmd finding that had been invisible for five days. The gate detected the",
     "defects and its own bookkeeping threw the signal away: the detect-then-discard class this",
     "checker exists to catch, one level up, inside the checker.",
@@ -19,41 +19,54 @@
     "  3. update observed_on to that run's date.",
     "test_known_open_fleet_findings_still_reproduce enforces the floor is real ON THE HOST. On",
     "CI, where the fleet is absent, test_ratchet_floor_is_evidenced still runs and blocks a",
-    "floor edit whose observed_on was not refreshed — so an unevidenced shrink can no longer",
+    "floor edit whose observed_on was not refreshed \u2014 so an unevidenced shrink can no longer",
     "merge green.",
     "",
     "RULE: entries may only be REMOVED (as the fleet lands fixes), never added to excuse a new",
     "defect. A new defect is a red test, not a new line here.",
     "",
-    "ZERO-FLOOR CONTRACT (T-212, 2026-08-19). findings CAN be empty — that is the success",
-    "condition the whole sweep exists to reach — but ONLY together with a zero_evidence block.",
+    "ZERO-FLOOR CONTRACT (T-212, 2026-08-19). findings CAN be empty \u2014 that is the success",
+    "condition the whole sweep exists to reach \u2014 but ONLY together with a zero_evidence block.",
     "A prose claim ('all fixed, trust me') costs nothing to write, so it is explicitly REJECTED",
     "(test_floor_guard_rejects_empty_floor_without_evidence replays a5cde31 exactly). What",
     "zero_evidence carries instead is manifest_sha256: a sha256 over every scanned fleet",
-    "script's (relative path, content sha256), sorted — computed by",
+    "script's (relative path, content sha256), sorted \u2014 computed by",
     "check_fleet_script_health.manifest_digest() / `--print-zero-evidence`. Producing a digest",
     "that matches the live fleet requires actually reading the live fleet's real files; nobody",
     "can hand-type a sha256 that happens to match dozens of real files' real content. On any",
     "host that DOES have the fleet, test_zero_floor_evidence_matches_live_fleet recomputes this",
-    "digest and fails loudly the moment it drifts from what is committed here — whether the",
+    "digest and fails loudly the moment it drifts from what is committed here \u2014 whether the",
     "drift is honest (the fleet changed) or fabricated (the evidence was never actually run).",
     "That is the same host-gated-truth pattern that already governs a non-empty floor",
     "(test_known_open_fleet_findings_still_reproduce), extended to cover the zero case, which",
-    "the pre-T-212 shape of this file could not express at all."
+    "the pre-T-212 shape of this file could not express at all.",
+    "",
+    "T-320 (2026-08-26) REPOPULATED a floor that had legitimately reached zero. This is NOT the forbidden \"add a line to excuse a new defect\": the four entries below were INVISIBLE to the checker on 2026-08-19 because no check for their classes existed yet. T-320 built four new gates (unmeasured-reset, dead-convention-guard, clobbered-exit, unchecked-chdir), each with self-tests that fail when the check is stubbed to return [], and each then fired on the LIVE fleet. The defects are in the GetWorkDone fleet repo, not in this hub repo, so this hub PR cannot fix them - it can only make them visible and hold the line. The zero_evidence block from 2026-08-19 was REMOVED because it is now factually false: the fleet does carry known silent-failure defects. Shrinking this floor still requires the same evidence contract as before."
   ],
-  "observed_on": "2026-08-19",
-  "observed_by": "T-212 (re-ran the checker against the live bus after T-210's linter accuracy fix; both remaining floor entries — keeper-tick.cmd/silent-staging and worker-wrapper.ps1/unchecked-precondition — no longer reproduce, per the removal evidence below)",
+  "observed_on": "2026-08-26",
+  "observed_by": "T-320 (fleet-script adversarial audit, week 3). Ran the checker against the live bus at C:/Abhay/GetWorkDone with the four new T-320 gates wired in; all four entries below reproduced. Each was independently verified at source before being gated - bus-sync.sh data loss was reproduced end-to-end (evidence/2026-08-26-T-320/repro-bus-sync-dataloss.sh), and the cd /d semantics were reproduced on a real cmd.exe.",
   "reproduce_with": "PYTHONPATH=. python scripts/check_fleet_script_health.py <fleet-dir> --caller .claude/skills/get-work-done/SKILL.md   (fleet-dir = D:/Abhay/GetWorkDone on the dev PC, C:/Abhay/GetWorkDone on the Windows VPS; scripts/tests/test_fleet_script_health.py's _resolve_fleet_dir() resolves this automatically). Add --print-zero-evidence to regenerate the zero_evidence block below.",
   "removal_evidence": {
-    "keeper-tick.cmd/silent-staging": "Never a genuine defect at this site: T-207 guards every git mutation before the push by asserting on OUTPUT CONTENT captured into a per-tick temp file (findstr/for-of into a flag variable, then an `if` on that flag), then KT_ABORT and a goto before the push — that file is forbidden from using `if errorlevel` there because its own header records six failed fixes proving errorlevel is unreliable after a redirect into a shared log. T-210 taught check_silent_staging (CONTENT_ASSERTION_READ/CONTENT_ASSERTION_GATE) to recognise this content-assertion shape as an equally valid verdict read, so it no longer false-positives on it.",
+    "keeper-tick.cmd/silent-staging": "Never a genuine defect at this site: T-207 guards every git mutation before the push by asserting on OUTPUT CONTENT captured into a per-tick temp file (findstr/for-of into a flag variable, then an `if` on that flag), then KT_ABORT and a goto before the push \u2014 that file is forbidden from using `if errorlevel` there because its own header records six failed fixes proving errorlevel is unreliable after a redirect into a shared log. T-210 taught check_silent_staging (CONTENT_ASSERTION_READ/CONTENT_ASSERTION_GATE) to recognise this content-assertion shape as an equally valid verdict read, so it no longer false-positives on it.",
     "worker-wrapper.ps1/unchecked-precondition": "Genuinely fixed by T-211 commit 16e1316: worker-wrapper.ps1 now tests $LASTEXITCODE right after invoking trust-workspace.py and aborts the launch (exit 9, no result.json written) on a non-zero exit. Re-proved by the supervisor: a stub trust-workspace.py exiting 3 gives the wrapper exit 9 and no worker is ever started."
   },
-  "findings": [],
-  "zero_evidence": {
-    "claim": "the live fleet bus carries zero known silent-failure defects as of observed_on",
-    "checker_output": "fleet-health: clean",
-    "scanned_script_count": 34,
-    "manifest_sha256": "27cbb23ed1a16168e6a05acf9b5c5eb58cc50a668294eb12959190f6b95bdbd0",
-    "manifest_command": "PYTHONPATH=. python scripts/check_fleet_script_health.py D:/Abhay/GetWorkDone --caller \".claude/skills/get-work-done/SKILL.md\" --print-zero-evidence"
+  "findings": [
+    [
+      "bus-sync.sh",
+      "unmeasured-reset"
+    ],
+    [
+      "keeper-tick.cmd",
+      "unchecked-chdir"
+    ],
+    [
+      "worker-wrapper.ps1",
+      "clobbered-exit"
+    ]
+  ],
+  "open_finding_notes": {
+    "bus-sync.sh/unmeasured-reset": "bus-sync.sh:8 - bus_pull() reads the EMPTY output of a failed `git log @{u}..HEAD` (exit 128, unresolvable upstream) as \"no unpushed commits to lose\" and hard-resets over them, returning 0. Reproduced end-to-end; the commit is destroyed and the fleet records a healthy tick. Fix belongs in the GetWorkDone repo: resolve the upstream fail-closed before the probe.",
+    "keeper-tick.cmd/unchecked-chdir": "keeper-tick.cmd:26, :212, :256 - a failed `cd /d` sets errorlevel 1, does NOT abort, and leaves cwd UNCHANGED, so the git add/commit/push below run against the previous repository. :212 is the one hardcoded absolute path never migrated to %~dp0. Fix: `if errorlevel 1 ( alert & exit /b 1 )` immediately after each chdir.",
+    "worker-wrapper.ps1/clobbered-exit": "worker-wrapper.ps1:755 - `git add -A`'s exit code is overwritten by `git commit` before the $LASTEXITCODE test reads it, so a partial staging failure is reported to the dispatcher as a successful autosave to a rescue branch. Fix: capture `$addRc = $LASTEXITCODE` before the commit runs."
   }
 }

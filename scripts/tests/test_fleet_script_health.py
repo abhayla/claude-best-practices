@@ -1453,6 +1453,8 @@ _KNOWN_RATCHET_CHECKS = {
     "stale-receipt", "unchecked-read", "ps-unchecked-call", "offset-before-write",
     "unchecked-precondition", "unlocked-global-rewrite", "unmeasured-safe-delete",
     "silent-staging",
+    # T-320 (2026-08-26)
+    "unmeasured-reset", "dead-convention-guard", "clobbered-exit", "unchecked-chdir",
 }
 
 _CLEAN_OUTPUT = "fleet-health: clean"
@@ -1607,7 +1609,23 @@ def test_floor_guard_rejects_malformed_zero_evidence(mutate):
     live-fleet cross-check even runs.
     """
     good = json.loads(_FLOOR_FILE.read_text(encoding="utf-8"))
-    base_zero = good["zero_evidence"]
+    # SYNTHETIC base, not the committed block. The committed floor legitimately has no
+    # zero_evidence whenever findings are open (T-320 repopulated it), and a negative control that
+    # only runs while the fleet happens to be clean is a control that stops controlling exactly
+    # when defects exist — the same "the assertion did not run" hole T-167 HIGH-1 closed.
+    base_zero = {
+        "claim": "the live fleet bus carries zero known silent-failure defects as of observed_on",
+        "checker_output": _CLEAN_OUTPUT,
+        "scanned_script_count": 7,
+        "manifest_sha256": "0" * 64,
+        "manifest_command": (
+            "PYTHONPATH=. python scripts/check_fleet_script_health.py X --print-zero-evidence"
+        ),
+    }
+    assert _floor_guard(dict(good, findings=[], zero_evidence=base_zero)) is None, (
+        "the synthetic base must itself be VALID, or every mutation below would 'pass' for the "
+        "wrong reason and the control would be vacuous"
+    )
     bad = dict(good, findings=[], zero_evidence=mutate(base_zero))
     assert _floor_guard(bad) is not None, f"malformed zero_evidence must be rejected: {bad['zero_evidence']!r}"
 
