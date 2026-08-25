@@ -1115,3 +1115,8 @@ Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Vent
 - **Rule:** codified into the global CLAUDE.md 95%-gate (both machines): enforcement
   strictness, protection coverage, spend, and interruption frequency are OWNER-facing forks —
   ask proactively at intake; questions-only-when-challenged is itself a gate failure.
+
+## 2026-08-26 — Learn-or-block (owner directive after repeated same-day recurrences)
+- **Mistake:** four failure classes recurred within 24h AFTER being "codified" (related-list block x4, cap-death with uncommitted work x2, worker fabrication x2, silent exit-1 in IPODhan deploy-linux.sh after the same class was fixed in fleet scripts by T-320).
+- **Root cause:** lessons stored as prose in 3 places; mechanisms "queued for backlog" with no T-id/owner; no gate stopped new dispatch while learning debt accrued; nobody verifies the dispatcher.
+- **Rule/mechanism:** global CLAUDE.md "Learn-or-block" section; machine-read `D:\Abhay\GetWorkDone\MECHANISM-DUE.md`; fleet preflight exit-11 learning-debt gate (T-323); class sweeps across all registered repos. Instance fix for the deploy defect: T-321.
