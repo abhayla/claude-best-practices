@@ -439,6 +439,33 @@ UPSTREAM_RESOLVED_FAIL_CLOSED = re.compile(
 )
 
 
+# --- dead-convention-guard: a naming-convention literal that matches NOTHING on the live fleet ----
+# T-320 HIGH-2 (janitor-worktrees.ps1:137). A THIRD shape of "detect-then-discard", and the most
+# invisible one yet: the guard is not skipped, not swallowed, not unchecked -- it is never ARMED.
+#
+#   $leaf = Split-Path $wtPath -Leaf
+#   if ($leaf -match '-wt-t(\d+)$') {          <- 39 of 40 live worktrees fail this
+#       ... consult heartbeat, return KEPT-live
+#   }
+#   ... fall through to the clean/landed predicate -> `git worktree remove`
+#
+# The fleet's real directories are `T-320-claude-best-practices`, `gorefer-T149`, `T-215-IPODhan`.
+# None end in `-wt-t<digits>`, so the live-worker heartbeat is never consulted and a RUNNING
+# worker's worktree is judged solely on clean+landed -- which a worker that has just pushed
+# satisfies while still writing STATUS.md. Nothing errors; the guard silently protects nobody.
+#
+# Detectable WITHOUT running the fleet: the convention literal is checked against the directory
+# names the script's OWN sibling paths show, so a literal that cannot match the corpus it guards
+# is a static contradiction. This check deliberately fires only when a live directory listing is
+# available (a --workspace-dir), so CI without the fleet on disk never guesses.
+CONVENTION_MATCH_LITERAL = re.compile(
+    r"-match\s+'([^']*)'|-match\s+\"([^\"]*)\"",
+    re.I,
+)
+# Only convention literals that gate a DESTRUCTIVE outcome matter; `-match '^!!'` on status output
+# is not a naming convention and guards nothing destructive.
+PATH_LEAF_SOURCE = re.compile(r"Split-Path\b[^\n]*-Leaf|\bbasename\b|\.Name\b", re.I)
+
 
 # --- silent-staging: a git STATE-MUTATING command whose verdict is discarded, before a push -------
 # The existing silent-push check covers `git push`. But the commands that BUILD what gets pushed —
@@ -1243,6 +1270,81 @@ def check_unmeasured_reset(path: Path) -> list[Finding]:
 
 
 
+def check_dead_convention_guard(path: Path, workspace_dirs: list[Path] | None) -> list[Finding]:
+    """A live-worker guard armed by a naming convention that matches NOTHING on the live fleet.
+
+    T-320 HIGH-2, live in janitor-worktrees.ps1:137. The third face of detect-then-discard, and the
+    quietest: the guard is not swallowed, redirected or unchecked -- it is never ARMED. Its regex
+    encodes a directory convention (`<repo>-wt-t<id>`) that the fleet stopped using; the real names
+    are `T-320-claude-best-practices`, `gorefer-T149`, `T-215-IPODhan`. `-match` simply returns
+    false, the heartbeat is never consulted, and a RUNNING worker's worktree falls through to the
+    clean+landed predicate -- which a worker that has already pushed satisfies while it is still
+    writing STATUS.md. The directory is then deleted out from under the live process.
+
+    Nothing about this is visible at runtime: no error, no exit code, no log line. It is only
+    visible by comparing the literal against the names it is supposed to match. So this check needs
+    GROUND TRUTH and refuses to guess: it fires only when real directory names were supplied
+    (--workspace-dir). On a CI box with no fleet on disk it returns nothing rather than inventing a
+    verdict -- an unmeasurable claim must never be scored as a finding (the same fail-closed
+    discipline the checks themselves demand of the fleet).
+    """
+    if path.suffix != ".ps1":
+        return []
+    if _is_pattern_source(path):
+        return []
+    if not workspace_dirs:
+        return []
+    names = [d.name for d in workspace_dirs]
+    if not names:
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    # Only where the verdict can authorise destruction.
+    if not DESTRUCTIVE_WORKTREE_OP.search(text):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith("#"):
+            continue
+        m = CONVENTION_MATCH_LITERAL.search(line)
+        if not m:
+            continue
+        pattern = m.group(1) or m.group(2) or ""
+        # Must be a guard over a path LEAF -- `-match '^!!'` over git status output is not a
+        # naming convention and gates nothing destructive.
+        context = "\n".join(lines[max(0, i - 4) : i])
+        if not PATH_LEAF_SOURCE.search(context) and not PATH_LEAF_SOURCE.search(line):
+            continue
+        try:
+            rx = re.compile(pattern, re.I if "(?i)" not in pattern else 0)
+        except re.error:
+            continue
+        matched = [n for n in names if rx.search(n)]
+        # A COVERAGE test, not a zero test. The live janitor literal still matches one legacy
+        # directory (`gorefer-wt-t060`) out of 40, so "matches nothing" would let a guard that
+        # protects 2.5% of the fleet pass as healthy. What makes a guard dead is that the
+        # convention it encodes is no longer the one in use -- so require it to cover a MAJORITY
+        # of the corpus it guards. A convention genuinely in use matches nearly everything; a
+        # superseded one matches only the stragglers that predate the rename.
+        if len(matched) * 2 > len(names):
+            continue
+        unmatched = sorted(n for n in names if not rx.search(n))
+        out.append(
+            Finding(
+                "dead-convention-guard",
+                path,
+                i,
+                f"this naming-convention guard matches only {len(matched)} of {len(names)} live "
+                f"worktree directories, so it is effectively never armed (unmatched e.g. "
+                f"{', '.join(unmatched[:3])}): the protection it gates is silently skipped for "
+                "those worktrees and the code falls through to the destructive path. A guard that "
+                "does not match the corpus it guards protects nobody -- derive the convention from "
+                "the same SSOT that NAMES the directories, or fail closed when the leaf is "
+                "unrecognised.",
+            )
+        )
+    return out
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -1273,7 +1375,11 @@ def manifest_digest(root: Path) -> tuple[str, int]:
     return hashlib.sha256(manifest.encode("utf-8")).hexdigest(), len(corpus)
 
 
-def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
+def run(
+    root: Path,
+    extra_callers: list[Path] | None = None,
+    workspace_dirs: list[Path] | None = None,
+) -> list[Finding]:
     corpus = collect(root)
     findings: list[Finding] = []
     for path in corpus:
@@ -1291,6 +1397,7 @@ def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
         findings.extend(check_silent_staging(path))
         findings.extend(check_unmeasured_safe_delete(path))
         findings.extend(check_unmeasured_reset(path))
+        findings.extend(check_dead_convention_guard(path, workspace_dirs))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 
@@ -1304,6 +1411,17 @@ def main() -> int:
         default=[],
         metavar="FILE",
         help="extra file that may invoke a gate (e.g. the dispatcher SKILL.md); repeatable",
+    )
+    ap.add_argument(
+        "--workspace-dir",
+        action="append",
+        default=[],
+        metavar="DIR",
+        help=(
+            "directory whose SUBDIRECTORIES are live worktree names (e.g. GetWorkDone/workspaces); "
+            "repeatable. Supplies the ground truth for dead-convention-guard, which stays silent "
+            "when it is not given rather than guessing"
+        ),
     )
     ap.add_argument(
         "--no-default-caller",
@@ -1326,7 +1444,12 @@ def main() -> int:
     extra_callers = [Path(c) for c in args.caller]
     if not args.no_default_caller and DEFAULT_DISPATCHER_SKILL.is_file():
         extra_callers.append(DEFAULT_DISPATCHER_SKILL)
-    findings = run(root, extra_callers)
+    workspace_dirs: list[Path] = []
+    for w in args.workspace_dir:
+        wp = Path(w)
+        if wp.is_dir():
+            workspace_dirs.extend(d for d in wp.iterdir() if d.is_dir())
+    findings = run(root, extra_callers, workspace_dirs)
     for f in sorted(findings, key=lambda f: (str(f.path), f.line)):
         print(f.render(root if root.is_dir() else root.parent))
     if findings:

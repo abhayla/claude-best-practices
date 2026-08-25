@@ -1912,3 +1912,94 @@ def test_neighbouring_exit_test_does_not_clear_the_probe(tmp_path: Path):
         "the probe on line 2 must still be flagged despite the `|| return 2` on line 3, which "
         f"belongs to the rebase — got {[(f.path.name, f.line) for f in found]}"
     )
+
+
+# ------------------------------------------- dead-convention-guard (HIGH: janitor-worktrees, T-320)
+
+
+def _janitor(body: str) -> str:
+    """A janitor-shaped script: a leaf-convention guard whose fall-through DELETES a worktree."""
+    return (
+        "function Test-WorktreeSafety {\n"
+        "  $leaf = Split-Path $wtPath -Leaf\n"
+        f"{body}"
+        '  git -C $RepoPath worktree remove $e.Path *> $null\n'
+        "}\n"
+    )
+
+
+def test_dead_convention_guard_is_flagged(tmp_path: Path):
+    """The live janitor-worktrees.ps1:137 shape: `-wt-t<id>` vs real `T-320-repo` / `repo-T149`."""
+    ws = tmp_path / "workspaces"
+    ws.mkdir()
+    for n in ("T-320-claude-best-practices", "gorefer-T149", "T-215-IPODhan", "gorefer-wt-t060"):
+        (ws / n).mkdir()
+    (tmp_path / "janitor.ps1").write_text(
+        _janitor(
+            "  if ($leaf -match '-wt-t(\\d+)$') {\n"
+            '    if (Test-Path $hbPath) { return @{ Verdict = "KEPT-live" } }\n'
+            "  }\n"
+        ),
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path, None, [d for d in ws.iterdir() if d.is_dir()]), "dead-convention-guard")
+    assert len(found) == 1, f"expected the dead guard to be flagged, got {found}"
+    assert found[0].line == 3
+    assert "1 of 4" in found[0].message
+
+
+def test_live_convention_guard_is_not_flagged(tmp_path: Path):
+    """The FIXED form: a convention that actually matches the fleet's names must stay silent.
+
+    This is the half that proves the check discriminates — without it, a check that flagged every
+    `-match` in a destructive script would pass the positive test above and be useless.
+    """
+    ws = tmp_path / "workspaces"
+    ws.mkdir()
+    for n in ("T-320-claude-best-practices", "gorefer-T149", "T-215-IPODhan", "gorefer-wt-t060"):
+        (ws / n).mkdir()
+    (tmp_path / "janitor.ps1").write_text(
+        _janitor(
+            "  if ($leaf -match '[-]?T-?(\\d+)') {\n"
+            '    if (Test-Path $hbPath) { return @{ Verdict = "KEPT-live" } }\n'
+            "  }\n"
+        ),
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path, None, [d for d in ws.iterdir() if d.is_dir()]), "dead-convention-guard")
+    assert not found, f"a convention matching the live names must not be flagged, got {found}"
+
+
+def test_dead_convention_guard_stays_silent_without_ground_truth(tmp_path: Path):
+    """No live directory listing => no verdict. The check must never GUESS.
+
+    On a CI box the fleet is not on disk. Scoring "matches nothing" there would flag every healthy
+    convention, which is the same unmeasurable-claim defect these gates exist to stamp out — so
+    absent ground truth the check returns nothing rather than inventing a finding.
+    """
+    (tmp_path / "janitor.ps1").write_text(
+        _janitor(
+            "  if ($leaf -match '-wt-t(\\d+)$') {\n"
+            '    if (Test-Path $hbPath) { return @{ Verdict = "KEPT-live" } }\n'
+            "  }\n"
+        ),
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "dead-convention-guard")
+
+
+def test_non_leaf_match_is_not_a_convention_guard(tmp_path: Path):
+    """`-match '^!!'` over git status output is not a naming convention — must not be flagged."""
+    ws = tmp_path / "workspaces"
+    ws.mkdir()
+    (ws / "T-320-repo").mkdir()
+    (tmp_path / "janitor.ps1").write_text(
+        "function Test-WorktreeSafety {\n"
+        "  $status = git -C $wtPath status --porcelain --ignored 2>$null\n"
+        "  $ignoredLines = @($statusLines | Where-Object { $_ -match '^!!' })\n"
+        "  git -C $RepoPath worktree remove $e.Path *> $null\n"
+        "}\n",
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path, None, [d for d in ws.iterdir() if d.is_dir()]), "dead-convention-guard")
+    assert not found, f"a status-output match is not a leaf convention, got {found}"
