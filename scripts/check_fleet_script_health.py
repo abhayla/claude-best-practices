@@ -467,6 +467,33 @@ CONVENTION_MATCH_LITERAL = re.compile(
 PATH_LEAF_SOURCE = re.compile(r"Split-Path\b[^\n]*-Leaf|\bbasename\b|\.Name\b", re.I)
 
 
+# --- clobbered-exit: a native call whose $LASTEXITCODE is overwritten before anyone reads it ------
+# T-320 HIGH-3 (worker-wrapper.ps1:755-757). Every existing PowerShell check asks "is there a
+# $LASTEXITCODE test near this call?" -- a PRESENCE question. This asks a REACHABILITY question:
+# does the value the test reads still belong to the call we care about?
+#
+#   git add -A *> $null                       <- exit code lands in $LASTEXITCODE
+#   git commit -m "autosave: ..." *> $null    <- and is DESTROYED here, unread
+#   if ($LASTEXITCODE -eq 0) { ...success... } <- reads the COMMIT's code, never the add's
+#
+# `git add -A` can fail while partially staging (a file still locked by a dying descendant --
+# likely, since this block runs right after a process-tree kill; a MAX_PATH overrun in
+# node_modules). `git commit` then succeeds on the partial staging and returns 0, so the wrapper
+# writes a confident "dirty tree committed to rescue branch" line to the heartbeat. The dispatcher
+# is told the rescue branch holds the worker's work; it holds only part of it, and nobody rechecks
+# because the wrapper reported success.
+#
+# Deliberately narrow: consecutive native calls at the SAME indent with no intervening test, then
+# a test. Anything else (a test between them, a pipeline, an assignment) is out of scope.
+PS_NATIVE_CALL_LINE = re.compile(
+    r"^\s*(?:&\s*)?(git|gh|claude|python|py|node|npm|npx|dotnet|cargo|go|pwsh|powershell)\b",
+    re.I,
+)
+PS_EXITCODE_READ = re.compile(r"\$LASTEXITCODE", re.I)
+# An assignment CAPTURES the code, so a later read is reading the capture, not the live variable.
+PS_EXITCODE_CAPTURED = re.compile(r"\$\w+\s*=\s*\$LASTEXITCODE", re.I)
+
+
 # --- silent-staging: a git STATE-MUTATING command whose verdict is discarded, before a push -------
 # The existing silent-push check covers `git push`. But the commands that BUILD what gets pushed —
 # `git add`, `git commit`, `git checkout` — sit above it in keeper-tick.cmd sending their exit
@@ -1345,6 +1372,70 @@ def check_dead_convention_guard(path: Path, workspace_dirs: list[Path] | None) -
         )
     return out
 
+
+
+def check_clobbered_exit(path: Path) -> list[Finding]:
+    """A native call whose `$LASTEXITCODE` is destroyed by the NEXT native call before any read.
+
+    T-320 HIGH-3, live at worker-wrapper.ps1:755-757. The existing PowerShell checks ask a
+    PRESENCE question -- "is a `$LASTEXITCODE` test near this call?" -- and this defect answers it
+    truthfully: there IS a test, two lines down. The test just reads a different command's exit
+    code, because `$LASTEXITCODE` holds only the most recent one.
+
+        git add -A *> $null                        <- code lands here
+        git commit -m "autosave: ..." *> $null     <- and is overwritten here, unread
+        if ($LASTEXITCODE -eq 0) { ...success... } <- reads the commit's code
+
+    `git add -A` can fail while partially staging (a file still locked by a descendant the wrapper
+    force-killed moments earlier; a MAX_PATH overrun under node_modules). The commit then succeeds
+    on the partial staging, returns 0, and the wrapper writes "dirty tree committed to rescue
+    branch" to the heartbeat -- so the dispatcher is told a rescue branch holds the worker's work
+    when it holds a fragment of it, and nothing rechecks because the run reported success.
+
+    Scoped tightly to keep the signal honest: only CONSECUTIVE native calls at the same indent,
+    with no test and no capture between them, followed by a read. A capture
+    (`$rc = $LASTEXITCODE`) between the calls is the correct fix and clears the finding.
+    """
+    if path.suffix != ".ps1":
+        return []
+    if _is_pattern_source(path):
+        return []
+    lines = _lines(path)
+    out: list[Finding] = []
+    for i in range(len(lines) - 2):
+        first, second = lines[i], lines[i + 1]
+        if first.lstrip().startswith("#") or second.lstrip().startswith("#"):
+            continue
+        if not PS_NATIVE_CALL_LINE.match(first) or not PS_NATIVE_CALL_LINE.match(second):
+            continue
+        # Same block: a differently-indented neighbour is not a straight-line sequence.
+        if len(first) - len(first.lstrip()) != len(second) - len(second.lstrip()):
+            continue
+        # The first call's code must not already be read or captured on its own line.
+        if PS_EXITCODE_READ.search(first):
+            continue
+        # Somebody must actually READ $LASTEXITCODE after the second call -- otherwise this is the
+        # plain unchecked-call shape the existing checks already own, not the clobber shape.
+        window = "\n".join(lines[i + 2 : i + 5])
+        if not PS_EXITCODE_READ.search(window):
+            continue
+        if PS_EXITCODE_CAPTURED.search(second):
+            continue
+        out.append(
+            Finding(
+                "clobbered-exit",
+                path,
+                i + 1,
+                "this native call's `$LASTEXITCODE` is overwritten by the native call on the next "
+                "line before anything reads it, so the `$LASTEXITCODE` test below reports on the "
+                "SECOND command only -- this one's failure is structurally unobservable. A partial "
+                "failure here followed by a successful second call is reported as full success. "
+                "Capture it immediately (`$rc = $LASTEXITCODE`) and test that, or test it before "
+                "the next native call runs.",
+            )
+        )
+    return out
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -1398,6 +1489,7 @@ def run(
         findings.extend(check_unmeasured_safe_delete(path))
         findings.extend(check_unmeasured_reset(path))
         findings.extend(check_dead_convention_guard(path, workspace_dirs))
+        findings.extend(check_clobbered_exit(path))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 

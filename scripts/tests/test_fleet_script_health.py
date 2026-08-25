@@ -92,6 +92,7 @@ _FIXTURE_SUFFIX = {
     "unmeasured-safe-delete": "janitor.ps1",
     "silent-staging": "tick.cmd",
     "unmeasured-reset": "bus-sync.sh",
+    "clobbered-exit": "worker-wrapper-autosave.ps1",
 }
 
 
@@ -2003,3 +2004,79 @@ def test_non_leaf_match_is_not_a_convention_guard(tmp_path: Path):
     )
     found = _checks(run(tmp_path, None, [d for d in ws.iterdir() if d.is_dir()]), "dead-convention-guard")
     assert not found, f"a status-output match is not a leaf convention, got {found}"
+
+
+# --------------------------------------------------- clobbered-exit (HIGH: worker-wrapper, T-320)
+
+
+def test_clobbered_exit_is_flagged(tmp_path: Path):
+    """The live worker-wrapper.ps1:755-757 shape: `git add` clobbered by `git commit`.
+
+    The FIXED form keeps the same two calls and the same test -- it only captures the first code
+    before the second call runs. A check that cannot tell these apart is worthless, so this asserts
+    exactly one finding, on the defective file.
+    """
+    finding = _only_the_defect(
+        tmp_path,
+        "clobbered-exit",
+        defective=(
+            "git checkout -b $branch *> $null\n"
+            "if ($LASTEXITCODE -eq 0) {\n"
+            "  git add -A *> $null\n"
+            '  git commit -m "autosave" *> $null\n'
+            "  if ($LASTEXITCODE -eq 0) {\n"
+            '    Add-Content -Path $hb -Value "committed to rescue branch"\n'
+            "  }\n"
+            "}\n"
+        ),
+        fixed=(
+            "git checkout -b $branch *> $null\n"
+            "if ($LASTEXITCODE -eq 0) {\n"
+            "  git add -A *> $null\n"
+            "  $addRc = $LASTEXITCODE\n"
+            '  git commit -m "autosave" *> $null\n'
+            "  if ($addRc -eq 0 -and $LASTEXITCODE -eq 0) {\n"
+            '    Add-Content -Path $hb -Value "committed to rescue branch"\n'
+            "  }\n"
+            "}\n"
+        ),
+    )
+    assert "overwritten by the native call on the next line" in finding.message
+
+
+def test_native_call_pair_with_no_exitcode_read_is_not_flagged(tmp_path: Path):
+    """Two native calls nobody checks at all is the EXISTING unchecked-call shape, not this one.
+
+    Without this scoping the check would double-report every unchecked pair the other gates
+    already own, and duplicated findings train people to skim the report.
+    """
+    (tmp_path / "plain.ps1").write_text(
+        "git add -A *> $null\n"
+        'git commit -m "x" *> $null\n'
+        'Write-Output "done"\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "clobbered-exit")
+
+
+def test_exitcode_tested_between_the_two_calls_is_not_flagged(tmp_path: Path):
+    """A test BETWEEN the calls reads the first code while it is still live — correct code."""
+    (tmp_path / "guarded.ps1").write_text(
+        "git add -A *> $null\n"
+        "if ($LASTEXITCODE -ne 0) { throw 'staging failed' }\n"
+        'git commit -m "x" *> $null\n'
+        "if ($LASTEXITCODE -eq 0) { Write-Output 'ok' }\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "clobbered-exit")
+
+
+def test_differently_indented_calls_are_not_a_straight_line_sequence(tmp_path: Path):
+    """Calls in different blocks do not necessarily execute back-to-back — do not guess."""
+    (tmp_path / "branched.ps1").write_text(
+        "git add -A *> $null\n"
+        "  git commit -m 'x' *> $null\n"
+        "if ($LASTEXITCODE -eq 0) { Write-Output 'ok' }\n",
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "clobbered-exit")
