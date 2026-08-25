@@ -91,6 +91,7 @@ _FIXTURE_SUFFIX = {
     "unlocked-global-rewrite": "rollup.py",
     "unmeasured-safe-delete": "janitor.ps1",
     "silent-staging": "tick.cmd",
+    "unmeasured-reset": "bus-sync.sh",
 }
 
 
@@ -1830,3 +1831,84 @@ def test_resolve_fleet_dir_honours_env_override_even_off_known_locations(tmp_pat
     (real / _FLEET_MARKER_FILE).write_text(json.dumps({_FLEET_MARKER_KEY: {}}), encoding="utf-8")
     monkeypatch.setenv(_FLEET_ENV_VAR, str(real))
     assert _resolve_fleet_dir() == real
+
+
+# ------------------------------------------------------- unmeasured-reset (HIGH: bus-sync.sh, T-320)
+
+
+def test_unmeasured_reset_is_flagged(tmp_path: Path):
+    """The live bus-sync.sh:8 shape: `git log '@{u}..HEAD'` emptiness authorising a hard reset.
+
+    The probe exits 128 with EMPTY stdout when the upstream cannot be resolved, so "I could not
+    measure" is read as "there is nothing to lose" and the reset destroys committed work.
+    """
+    finding = _only_the_defect(
+        tmp_path,
+        "unmeasured-reset",
+        defective=(
+            "#!/bin/bash\n"
+            'bus_pull() {\n'
+            '  git checkout main -q 2>/dev/null || return 1\n'
+            "  if [ -n \"$(git log '@{u}..HEAD' --oneline 2>/dev/null)\" ]; then\n"
+            "    git pull -q --rebase origin main 2>/dev/null || return 2\n"
+            "  else\n"
+            "    git pull -q --rebase origin main 2>/dev/null || "
+            "{ git fetch -q origin main && git reset -q --hard origin/main; }\n"
+            "  fi\n"
+            "}\n"
+        ),
+        fixed=(
+            "#!/bin/bash\n"
+            'bus_pull() {\n'
+            '  git checkout main -q 2>/dev/null || return 1\n'
+            # Fail closed: if the upstream cannot even be resolved, we CANNOT know whether there
+            # are unpushed commits, so we must never take the reset branch.
+            '  git rev-parse --abbrev-ref "@{u}" >/dev/null 2>&1 || {\n'
+            '    echo "BUS-SYNC: upstream unresolvable — refusing to reset" >&2; return 3; }\n'
+            "  if [ -n \"$(git log '@{u}..HEAD' --oneline 2>/dev/null)\" ]; then\n"
+            "    git pull -q --rebase origin main 2>/dev/null || return 2\n"
+            "  else\n"
+            "    git pull -q --rebase origin main 2>/dev/null || "
+            "{ git fetch -q origin main && git reset -q --hard origin/main; }\n"
+            "  fi\n"
+            "}\n"
+        ),
+    )
+    assert "reset --hard" in finding.message and "exit code is never tested" in finding.message
+
+
+def test_unpushed_probe_without_a_hard_reset_is_not_flagged(tmp_path: Path):
+    """Reporting unpushed commits is ubiquitous and harmless — only a RESET puts work at risk.
+
+    Without this scoping the check would fire on every status/report script, and a gate that cries
+    wolf on normal code is one nobody reads.
+    """
+    (tmp_path / "report.sh").write_text(
+        "#!/bin/bash\n"
+        "ahead=$(git log '@{u}..HEAD' --oneline 2>/dev/null)\n"
+        'if [ -n "$ahead" ]; then echo "unpushed commits present"; fi\n',
+        encoding="utf-8",
+    )
+    assert not _checks(run(tmp_path), "unmeasured-reset")
+
+
+def test_neighbouring_exit_test_does_not_clear_the_probe(tmp_path: Path):
+    """A `|| return` on the NEXT line guards that line, not the probe — the live bus-sync.sh trap.
+
+    bus-sync.sh's rebase carries `|| { ...; return 2; }` one line below the probe. A windowed
+    failure-tested search reads that as "the probe is checked" and the real defect walks through.
+    """
+    (tmp_path / "windowed.sh").write_text(
+        "#!/bin/bash\n"
+        "if [ -n \"$(git log '@{u}..HEAD' --oneline 2>/dev/null)\" ]; then\n"
+        "  git pull -q --rebase origin main 2>/dev/null || { git rebase --abort; return 2; }\n"
+        "else\n"
+        "  git reset -q --hard origin/main\n"
+        "fi\n",
+        encoding="utf-8",
+    )
+    found = _checks(run(tmp_path), "unmeasured-reset")
+    assert len(found) == 1 and found[0].line == 2, (
+        "the probe on line 2 must still be flagged despite the `|| return 2` on line 3, which "
+        f"belongs to the rebase — got {[(f.path.name, f.line) for f in found]}"
+    )

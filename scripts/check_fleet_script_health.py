@@ -400,6 +400,46 @@ PROCESS_LOCK = re.compile(
 DESTRUCTIVE_WORKTREE_OP = re.compile(r"worktree\s+remove\b", re.I)
 
 
+# --- unmeasured-reset: `reset --hard` gated on an unpushed-commit probe that can itself fail ------
+# T-320 HIGH-1 (bus-sync.sh:8-11). The sibling of unmeasured-safe-delete, on git HISTORY rather
+# than the working tree, and the existing check cannot see it: there is no `worktree remove` here,
+# the destructive verb is `reset --hard`.
+#
+#   if [ -n "$(git log '@{u}..HEAD' --oneline 2>/dev/null)" ]; then   <- the probe
+#     ... rebase (protects unpushed commits)
+#   else
+#     git pull --rebase ... || { git fetch ... && git reset -q --hard origin/main; }  # "safe"
+#
+# `git log '@{u}..HEAD'` exits 128 with EMPTY stdout whenever the upstream cannot be resolved (no
+# tracking ref after `git branch -M`, a renamed/deleted remote branch, a detached HEAD). Empty
+# stdout is then read as "no unpushed commits to lose" and the code takes the branch whose own
+# comment calls it safe -- destroying real unpushed commits. Reproduced end-to-end in
+# evidence/2026-08-26-T-320/repro-bus-sync-dataloss.sh: the commit is destroyed and the function
+# still returns 0, so the fleet records a healthy tick.
+UNPUSHED_COMMIT_PROBE = re.compile(
+    r"git\b[^\n]*\b(log|rev-list)\b[^\n]*@\{u(pstream)?\}|"
+    r"git\b[^\n]*\bcherry\b",
+    re.I,
+)
+# The probe's own failure must be distinguished from "nothing to report" BEFORE its emptiness is
+# allowed to authorise a reset: test its exit code, or resolve the upstream first and fail closed.
+PROBE_FAILURE_TESTED = re.compile(
+    r"\$LASTEXITCODE|\berrorlevel\b|\$\?|"
+    r"rev-parse\b[^\n]*@\{u|"
+    r"\|\|\s*(return|exit)\b",
+    re.I,
+)
+HISTORY_DESTRUCTIVE_OP = re.compile(r"\breset\b[^\n]*--hard\b", re.I)
+# The one honest way to make the probe's emptiness trustworthy without testing it inline: resolve
+# the upstream FIRST and bail when it cannot be resolved, so an unresolvable upstream can never
+# reach the reset branch. Must appear BEFORE the probe (a later check is too late to matter).
+UPSTREAM_RESOLVED_FAIL_CLOSED = re.compile(
+    r"rev-parse\b[^\n]*@\{u[^\n]*(\|\||\bexit\b|\breturn\b|-ne\s*0|errorlevel)",
+    re.I,
+)
+
+
+
 # --- silent-staging: a git STATE-MUTATING command whose verdict is discarded, before a push -------
 # The existing silent-push check covers `git push`. But the commands that BUILD what gets pushed —
 # `git add`, `git commit`, `git checkout` — sit above it in keeper-tick.cmd sending their exit
@@ -1139,6 +1179,70 @@ def check_unmeasured_safe_delete(path: Path) -> list[Finding]:
     return out
 
 
+
+
+def check_unmeasured_reset(path: Path) -> list[Finding]:
+    """A `reset --hard` authorised by an unpushed-commit probe whose OWN failure reads as "none".
+
+    T-320 HIGH-1, live in bus-sync.sh's `bus_pull`. The unmeasured-safe-delete sibling, one level
+    up: there the emptiness of `git status` authorised deleting a working tree; here the emptiness
+    of `git log '@{u}..HEAD'` authorises discarding COMMITTED history.
+
+    `git log '@{u}..HEAD'` exits 128 and prints NOTHING when the upstream cannot be resolved -- a
+    branch with no tracking ref (routine after `git branch -M main`), a deleted/renamed remote
+    branch, a detached HEAD. With stderr sent to /dev/null and the exit code untested, that empty
+    stdout is indistinguishable from the genuine "zero unpushed commits" answer, so the code takes
+    the branch it documents as `safe: no unpushed commits to lose` and hard-resets over real work.
+
+    The failure is doubly silent: the destroyed commit is only in the reflog, and the function
+    RETURNS 0, so the caller records a healthy tick. Fail closed instead -- a probe that could not
+    measure must be treated as "unpushed commits present" (refuse to reset), never as "none".
+    """
+    if path.suffix not in {".sh", ".ps1", ".cmd"}:
+        return []
+    if _is_pattern_source(path):
+        return []
+    lines = _lines(path)
+    text = "\n".join(lines)
+    # Only where a hard reset actually exists: elsewhere the probe's emptiness authorises nothing.
+    if not HISTORY_DESTRUCTIVE_OP.search(text):
+        return []
+    out: list[Finding] = []
+    for i, line in enumerate(lines, start=1):
+        if line.lstrip().startswith(("#", "rem ", "REM ")):
+            continue
+        if not UNPUSHED_COMMIT_PROBE.search(line):
+            continue
+        # Two ways the emptiness can be made trustworthy, and only two:
+        #   (a) the probe line tests its OWN exit code, or
+        #   (b) the upstream was resolved fail-closed BEFORE the probe, so an unresolvable
+        #       upstream can never reach the reset branch at all.
+        # A test on a FOLLOWING line does not count: it guards that line, not the probe. In the
+        # live bus-sync.sh the `|| { ...; return 2; }` one line below belongs to the rebase, so a
+        # symmetric window would read the shipped defect as handled.
+        if PROBE_FAILURE_TESTED.search(line):
+            continue
+        preceding = "\n".join(lines[max(0, i - 6) : i - 1])
+        if UPSTREAM_RESOLVED_FAIL_CLOSED.search(preceding):
+            continue
+        out.append(
+            Finding(
+                "unmeasured-reset",
+                path,
+                i,
+                "this unpushed-commit probe is the SAFETY PREDICATE for a `reset --hard` in the "
+                "same file, but its own exit code is never tested: `git log '@{u}..HEAD'` exits "
+                "128 with EMPTY output when the upstream cannot be resolved (no tracking ref, a "
+                "renamed/deleted remote branch, detached HEAD), and that emptiness is then read as "
+                "'no unpushed commits to lose' -- hard-resetting over real committed work while "
+                "returning success. Fail closed: treat a probe that could not measure as UNPUSHED "
+                "COMMITS PRESENT and refuse to reset.",
+            )
+        )
+    return out
+
+
+
 def collect(root: Path) -> list[Path]:
     if root.is_file():
         return [root]
@@ -1186,6 +1290,7 @@ def run(root: Path, extra_callers: list[Path] | None = None) -> list[Finding]:
         findings.extend(check_unlocked_global_rewrite(path))
         findings.extend(check_silent_staging(path))
         findings.extend(check_unmeasured_safe_delete(path))
+        findings.extend(check_unmeasured_reset(path))
         findings.extend(check_dead_gate(path, corpus, extra_callers))
     return findings
 

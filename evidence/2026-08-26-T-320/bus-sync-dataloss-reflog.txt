@@ -1,0 +1,4 @@
+0000000000000000000000000000000000000000 40e90eb54bf1e0b2f8c7a64218068b81357b7fc3 abhayla <abhayinfosys@gmail.com> 1787687254 +0530	clone: from C:/Users/Administrator/AppData/Local/Temp/bustest/remote
+40e90eb54bf1e0b2f8c7a64218068b81357b7fc3 df357fc5ee3eb58e4f48c9b954289456daac24c4 t <t@t> 1787687254 +0530	commit: PRECIOUS local work (conflicting)
+df357fc5ee3eb58e4f48c9b954289456daac24c4 df357fc5ee3eb58e4f48c9b954289456daac24c4 t <t@t> 1787687271 +0530	checkout: moving from main to main
+df357fc5ee3eb58e4f48c9b954289456daac24c4 852153470d804bf1ae69ff26c4374c547472b3f5 t <t@t> 1787687271 +0530	pull -q --rebase origin main (start): checkout 852153470d804bf1ae69ff26c4374c547472b3f5
