@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- Audit trail (full-audit dates; scoped addenda in git history): 2026-06-19 full audit; 2026-06-20 trust-score addendum (PR #163); 2026-06-22 G6 refresh (PR #195); 2026-06-29 branch-choice addendum (PRs #217/#218/#227); 2026-07-14 /init audit (CI gates, config list, rule list — PR #396); 2026-07-14 owner-approved compression of the G6 + hooks narratives (history detail → changelog/graduation docs); 2026-07-24 /init audit (added missing global rule verify-before-suggest-do-before-delegate.md to rule list; then added missing Key Script check_fleet_script_health.py; plugins/config/CI/workflow-map/skills/agents/sampled-paths all verified in sync); 2026-07-26 /init audit (added 3 wired-but-undocumented hooks — atlas-session-start/atlas-post-edit/session-concurrency-guard — plus the unwired session-git-landing helper; everything else verified in sync); 2026-08-13 /init audit (added missing Key Script check_prereq_contract.py; recommend.yml prose corrected weekly-cron→workflow_dispatch-only; plugins/rules/config/CI/hooks/workflow-map/paths all verified in sync). How to audit this file: see "Maintaining This File" at the bottom. NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
+<!-- Audit trail (full-audit dates; scoped addenda in git history): 2026-06-19 full audit; 2026-06-20 trust-score addendum (PR #163); 2026-06-22 G6 refresh (PR #195); 2026-06-29 branch-choice addendum (PRs #217/#218/#227); 2026-07-14 /init audit (CI gates, config list, rule list — PR #396); 2026-07-14 owner-approved compression of the G6 + hooks narratives (history detail → changelog/graduation docs); 2026-07-24 /init audit (added missing global rule verify-before-suggest-do-before-delegate.md to rule list; then added missing Key Script check_fleet_script_health.py; plugins/config/CI/workflow-map/skills/agents/sampled-paths all verified in sync); 2026-07-26 /init audit (added 3 wired-but-undocumented hooks — atlas-session-start/atlas-post-edit/session-concurrency-guard — plus the unwired session-git-landing helper; everything else verified in sync); 2026-08-13 /init audit (added missing Key Script check_prereq_contract.py; recommend.yml prose corrected weekly-cron→workflow_dispatch-only; plugins/rules/config/CI/hooks/workflow-map/paths all verified in sync); 2026-08-26 /init audit (CI prose corrected 6→7 checks / two→three blocking gates — root-marketplace mirror gate was undocumented in both places; added `config/dual-home-resources.yml` to Key Config Files; noted recommend.py's import-only library modules so audits stop re-flagging them; plugins/rules/hooks/agents/workflow-map/paths all verified in sync). How to audit this file: see "Maintaining This File" at the bottom. NOTE: live pattern count is whatever `registry/patterns.json` holds (one top-level key per pattern, minus `_meta`) — that file is the SSOT; do not pin a number here. -->
 
 ## Critical: Two `.claude/` Directories
 
@@ -30,13 +30,14 @@ PYTHONPATH=. python -m pytest scripts/tests/test_bootstrap.py::TestCopyClaudeDir
 # Provision a project
 PYTHONPATH=. python scripts/recommend.py --local /path/to/project --provision
 
-# Full local CI replication (run before opening a PR — mirrors validate-pr.yml's 6 checks)
+# Full local CI replication (run before opening a PR — mirrors validate-pr.yml's 7 checks)
 PYTHONPATH=. python scripts/dedup_check.py --validate-all
 PYTHONPATH=. python scripts/dedup_check.py --secret-scan
 PYTHONPATH=. python scripts/workflow_quality_gate_validate_patterns.py
 PYTHONPATH=. python -m pytest scripts/tests/ -v
 PYTHONPATH=. python scripts/check_eval_coverage.py --enforce --base origin/main   # skip if no skills changed
 PYTHONPATH=. python scripts/check_plugin_version_bump.py --base origin/main      # skip if plugins/ untouched
+PYTHONPATH=. python scripts/generate_root_marketplace.py --check                  # skip if plugins/ untouched
 
 # Regenerate docs after registry changes
 python scripts/generate_docs.py
@@ -169,7 +170,7 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 
 ### Key Scripts
 
-- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Calls `third_party_skills.py` during provisioning for third-party agent skill detection. (`STACK_DETECTORS` and `DEP_PATTERN_MAP` defined in `scripts/dependency_detection.py`)
+- **`recommend.py`** — Main provisioning entry point. Modes: `--local`/`--repo`, `--provision`, `--diff`, `--apply`. Calls `third_party_skills.py` during provisioning for third-party agent skill detection. (`STACK_DETECTORS` and `DEP_PATTERN_MAP` defined in `scripts/dependency_detection.py`.) Its import-only library modules — `gap_analysis`, `hub_resources`, `overlap_analysis`, `plugin_recommendations`, `provision_local`, `provision_repo`, `provisioning_tiers`, `resource_copy`, `stack_detection`, `sync_manifest` — have no CLI and are intentionally not listed here
 - **`bootstrap.py`** — Core copy logic. CLI: `python scripts/bootstrap.py --stacks <stack1,stack2> --target <dir>`. Defines `STACK_PREFIXES`
 - **`workflow_quality_gate_validate_patterns.py`** — CI validator for frontmatter, cross-references, registry sync
 - **`dedup_check.py`** — Dedup validator (`--validate-all`) and secret scanner (`--secret-scan`)
@@ -219,12 +220,13 @@ Distributable build workflows carry self-gated `--team` modes (`code-review-work
 - **`config/trust-score.yml`** — Trust-score rulebook: signal weights (sum 1.0), RECOMMEND `threshold`, and `hard_gates` safety floors. Edit here — `scripts/trust_score.py` mirrors it as a default; never hard-code thresholds
 - **`config/telemetry-aggregates.json`** — Historical effectiveness data from `aggregate_telemetry.py` runs. Generated output — may not exist until the first telemetry run; do not treat its absence as an error. Schema (T-144): `{"patterns": {...}, "_outcomes": {...}}` — `_outcomes` holds the `measure_outcomes.py` scorecard, and file-exists `adoption_rate`/`retention_days_p50` are RETIRED below `sample_size` 2 (a 1-of-1 adoption rate is a provisioning tautology, not a measurement). `load_telemetry_aggregates()` reads both this and the older flat schema
 - **`config/model-costs.yml`** — Cost-ledger rulebook: USD-per-MTok rates by model family (opus/sonnet/haiku/fable/default), `daily_alert_usd` threshold, `ledger_retention_days`. Edit here — `scripts/cost_ledger.py` reads it at runtime; rates are estimates pending real billing (see `as_of`)
+- **`config/dual-home-resources.yml`** — Classifies every resource living in BOTH `.claude/` and `core/.claude/` as `synced`/`shared`/`divergent`; the drift gate `scripts/tests/test_dual_home_sync.py` fails on an unclassified or drifted resource. See `docs/HUB-CORE-SYNC.md`
 - **`config/eval-coverage-grandfather.yml`** — Shrink-only allowlist for the eval-coverage ratchet (`check_eval_coverage.py --enforce`): skills predating the blocking gate only WARN when changed without evals. RATCHET RULE: entries may only be REMOVED (as evals are added), never added — new skills ship with evals from day one
 - **`config/plugin-recommendations.yml`** — The install-not-copy layer of the #187 distribution model: `recommend.py` reads it to tell a project WHICH marketplace plugins to install (universal workflows + its stack's toolbox) alongside copy-provision. Edit recommendations here, never hardcode plugin sets in scripts
 
 ### CI Workflows
 
-- **`validate-pr.yml`** — Runs all 4 validation commands on PRs, plus two blocking gates: eval-coverage ratchet (`check_eval_coverage.py --enforce`) and plugin version-bump (`check_plugin_version_bump.py`)
+- **`validate-pr.yml`** — Runs all 4 validation commands on PRs, plus three blocking gates: eval-coverage ratchet (`check_eval_coverage.py --enforce`), plugin version-bump (`check_plugin_version_bump.py`), and root-marketplace mirror sync (`generate_root_marketplace.py --check`)
 - **`update-docs.yml`** — Auto-regenerates docs on main push. Avoid running `generate_docs.py` manually on main
 - **`test.yml`** — Runs pytest on `scripts/**` changes
 - **`recommend.yml`** — `workflow_dispatch`-only (weekly cron RETIRED, owner-approved 2026-07-14 — all enrolled repos are plugins-first): provisions patterns for repos in `config/repos.yml` on manual trigger; re-enable by restoring the schedule block in the workflow file
