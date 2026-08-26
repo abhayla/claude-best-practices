@@ -23,6 +23,18 @@ VPS. Contract format = the goal-creator shape
 | `/get-work-done cancel <T-id>` | Read `GWD/heartbeats/<id>.hb` -> kill that PID tree; rename the contract `<id>.cancelled.md` with a reason; `gh pr close --delete-branch` any PR it opened; ledger it. `cancel all` = all claimed |
 | `/get-work-done sweep` | Promote/reject `GWD/inbox/` per the P17 table, run INTAKE 4-7 on promoted items, then claim + dispatch any unclaimed `*.queued.md`. DISPATCH-FIRST: that claiming is every tick's first duty, never satisfied by watching claimed tasks; a tick that dispatches nothing says why per contract |
 
+## Prerequisites
+
+`git`, an authenticated `gh` (PR/label/merge-state calls), `python` and PowerShell on PATH, and a
+writable bus checkout at `GWD` (queue, heartbeats, settings.json, guard scripts). Fast-lane work
+also needs `GWD/fast-lane-gate.py` + `GWD/fast-lane-check.py`.
+
+## STEP 0: Preflight
+
+Verify every prerequisite NOW, at invocation, while the owner is present, and report ALL missing
+items in one hard stop - never discover a missing tool mid-run, never improvise an undeclared
+fallback (an unreachable bus means no T-id can be allocated: there is no safe degraded mode).
+
 ## STEP 1 - INTAKE: parse the ask
 
 Split the input into tasks (they may span repos). Resolve each target against
@@ -180,21 +192,21 @@ the cheaper tier - escalation recovers a wrong cheap pick; a wrong expensive one
    | Code | Gate |
    |---|---|
    | exit 0 | OK to dispatch |
-   | exit 1 | `-SelfTest` failure ONLY; never from a gate run |
+   | exit 1 | `-SelfTest` failure only; never from a gate run |
    | exit 2 | contract missing |
    | exit 3 | no `model:` field |
    | exit 4 | model not an allowed worker tier (Fable/Mythos) |
    | exit 5 | workspace path missing |
    | exit 6 | repo identity mismatch |
-   | exit 7 | a `context_docs:` entry absolute or missing from the workspace |
+   | exit 7 | a `context_docs:` entry is absolute or missing from the workspace |
    | exit 8 | same-repo contract already claimed, not `related:` |
    | exit 9 | prompt file references a foreign-machine path |
-   | exit 10 | HOST-MEMORY (T-312): commit charge over 75% of the limit, or live workers at `settings.fleet.max_concurrent_workers` |
-   | exit 11 | LEARNING-DEBT (T-323): a `MECHANISM-DUE.md` row at occurrences >= 2, not claimed/done, older than 48h, unless named via `lesson_class:`; a malformed registry FAILS CLOSED |
-   | exit 12 | TURN-BUDGET (T-345): `-MaxTurns` below the floor from `settings.worker_defaults.max_turns_by_deliverable` for this kind |
+   | exit 10 | HOST-MEMORY (T-312): commit charge over 75% of the limit, or workers at `settings.fleet.max_concurrent_workers` |
+   | exit 11 | LEARNING-DEBT (T-323): a `MECHANISM-DUE.md` row at occurrences >= 2, not claimed/done, older than 48h, unless named via `lesson_class:`; malformed = FAILS CLOSED |
+   | exit 12 | TURN-BUDGET (T-345): `-MaxTurns` under the `settings.worker_defaults.max_turns_by_deliverable` floor for this kind |
    | exit 13 | FIX-ROUND PROMPT-LINT (T-336): a `T-<n>F*` prompt whose first step omits honesty / PR-body / STATUS.md duties |
    | exit 14 | FAST-LANE contract at worker dispatch (T-351): set `lane: normal` and re-lint |
-   | exit 15 | KEEPER-LIVENESS (T-363): no reconciler tick on THIS host inside 2x `settings.fleet_keeper_tick_minutes`. Remedy: `GWD/reconcile-claims.ps1 -StateRoot <root>` |
+   | exit 15 | KEEPER-LIVENESS (T-363): no reconciler tick on THIS host inside 2x `settings.fleet_keeper_tick_minutes`; run `GWD/reconcile-claims.ps1 -StateRoot <root>` |
    | exit 16 | HOST-MEMORY-UNKNOWN (T-364): the commit or worker query returned nothing - fails CLOSED, never 0.0%/0 |
    | exit 17 | SETTINGS-READ-FAILURE (T-364): settings.json unreadable/malformed or a value not an integer - blocks instead of defaulting |
 
