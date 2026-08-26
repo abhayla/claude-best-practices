@@ -1,0 +1,76 @@
+# GWD MUST<->gate manifest (T-370 dod item 3).
+# Catalog of machine-checkable gates a SKILL.md CRITICAL RULES `MUST`/`MUST NOT`
+# bullet can cite via a trailing `gate:<id>` token. Seeded from
+# D:/Abhay/GetWorkDone/preflight-guard.ps1's exit-code table + contract-lint.py's
+# checks. No MUST bullet cites one of these ids yet (all 26 are grandfathered as
+# gate:PROSE-ONLY today, see config/gwd-skill-conformance-grandfather.yml
+# max_ungated_musts) — wiring MUSTs to real ids here is T-371, the rewrite.
+gates:
+  PROSE-ONLY:
+    script: none
+    note: >-
+      Placeholder for a MUST with no machine-checkable gate yet. Every
+      currently-ungated CRITICAL RULES bullet resolves to this id implicitly
+      (grandfathered, shrink-only — see max_ungated_musts).
+
+  # preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <remote>
+  # exit-code table (id -> exit code), source: preflight-guard.ps1 header comment.
+  PREFLIGHT-OK:
+    script: preflight-guard.ps1
+    exit: 0
+  PREFLIGHT-CONTRACT-MISSING:
+    script: preflight-guard.ps1
+    exit: 2
+  PREFLIGHT-NO-MODEL-FIELD:
+    script: preflight-guard.ps1
+    exit: 3
+  PREFLIGHT-MODEL-TIER-NOT-ALLOWED:
+    script: preflight-guard.ps1
+    exit: 4
+  PREFLIGHT-WORKSPACE-PATH-MISSING:
+    script: preflight-guard.ps1
+    exit: 5
+  PREFLIGHT-REPO-IDENTITY-MISMATCH:
+    script: preflight-guard.ps1
+    exit: 6
+  PREFLIGHT-CONTEXT-DOCS-MISSING:
+    script: preflight-guard.ps1
+    exit: 7
+  PREFLIGHT-SAME-REPO-ALREADY-CLAIMED:
+    script: preflight-guard.ps1
+    exit: 8
+  PREFLIGHT-FOREIGN-MACHINE-PROMPT-PATH:
+    script: preflight-guard.ps1
+    exit: 9
+  PREFLIGHT-HOST-MEMORY-GATE:
+    script: preflight-guard.ps1
+    exit: 10
+  PREFLIGHT-LEARNING-DEBT-GATE:
+    script: preflight-guard.ps1
+    exit: 11
+  PREFLIGHT-TURN-BUDGET-GATE:
+    script: preflight-guard.ps1
+    exit: 12
+  PREFLIGHT-FIX-ROUND-PROMPT-LINT:
+    script: preflight-guard.ps1
+    exit: 13
+  PREFLIGHT-FAST-LANE-AT-WORKER-DISPATCH:
+    script: preflight-guard.ps1
+    exit: 14
+
+  # contract-lint.py has one generic BLOCK exit path (non-zero, reason on stderr)
+  # covering several distinct rules — cite this id for any of them until the
+  # script grows per-rule exit codes.
+  CONTRACT-LINT-BLOCK:
+    script: contract-lint.py
+    exit: nonzero
+    note: >-
+      Missing/empty required field, unresolved assumption language, a
+      data-reading task with no data_source:, a model: line with no routing
+      rationale, or a security-category task on a non-opus tier.
+
+  # test-backed gates this contract (T-370) adds.
+  GWD-SKILL-CONFORMANCE-TEST:
+    test: scripts/tests/test_gwd_skill_conformance.py
+  GWD-SKILL-MUSTS-HAVE-GATES-TEST:
+    test: scripts/tests/test_gwd_skill_musts_have_gates.py
