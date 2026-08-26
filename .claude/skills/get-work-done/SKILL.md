@@ -303,43 +303,15 @@ sufficient on its own.
 
 **CI-MINUTES DISCIPLINE (owner Decision 2, 2026-08-18; WORKER PUSH RULE corrected 2026-08-19 —
 T-209, evidence PR #580):** the fleet-side half of the CI-quota fix (T-190 is the repo-side
-half) — two codified rules:
-
-1. **WORKER PUSH RULE.** Every worker, checker, and fix-round prompt's standing mandates gain a
-   THIRD verbatim line, additive to (never replacing) the WORKER-MERGE GUARD and FOREGROUND-ONLY
-   EXECUTION lines above: "Intermediate commits (WIP, docs-only, fix-round iterations) carry
-   `[skip ci]` ANYWHERE in the commit message — GitHub matches the whole message, headline or
-   body, there is no safe placement for a push that still needs CI. ONLY the final
-   ready-for-verification push carries the marker NOWHERE — not the headline, not the body, not
-   even quoted while describing this convention." Copy this line VERBATIM into every dispatch —
-   dispatchers do not paraphrase it. **Measured on PR #580, 2026-08-19, same branch, two
-   consecutive pushes:** push 1 carried the marker as the LAST LINE OF THE BODY (headline clean)
-   — result: ZERO workflow runs started, `gh pr checks` reported "no checks reported", PR
-   BLOCKED. Push 2 was an empty commit with the marker NOWHERE — result: `Validate PR` and
-   `Tests` both started within 45s and passed. The quota was not the cause (Validate PR runs had
-   completed successfully the day before). **A prior belief that "the marker is safe in the
-   body, only the headline suppresses CI" is FALSE** — GitHub's skip-ci match is a substring
-   search over the ENTIRE commit message, not the headline alone; a fleet convention that relied
-   on that belief has been suppressing the CI it was meant to preserve on every push that
-   followed it. **The consequence is why this matters:** this repo's `validate` check is
-   REQUIRED — a push that carries the marker anywhere, on a commit that was meant to be
-   validated, leaves the PR with NO checks to ever report; branch protection blocks the merge
-   forever and auto-merge never fires. That is exactly what stalled PRs #577/#579 under the
-   T-191 incident, whose headline-only diagnosis treated the symptom and left the substring-match
-   cause in place. Without the push-rule line at all, each fix-round push burns a full PR CI run
-   on top of the eventual real one; applied correctly (marker truly absent, not just absent from
-   the headline, on the final push), a task costs at most ONE CI run plus the merge's own check.
-2. **SAME-REPO LANDING BATCHING.** Same-repo tasks whose contracts are written within the same
-   calendar day default to ONE shared branch/PR/CI-run — extending the existing TRIVIAL-TASK
-   BATCHING (STEP 5 above) and WAVE-CHAINING (STEP 5 above) conventions; the PRE-QUEUE DEDUP
-   GATE's "overlapping/related" outcome is the mechanism that merges them. Named exceptions:
-   P1 break-fixes land solo (urgency beats batching economics); tasks with conflicting
-   file-scopes split into separate contracts (a shared PR can't safely hold two workers editing
-   the same files); a checker FAIL on one batched task holds only that task's hunks if they are
-   separable from the rest of the batch's diff, otherwise the whole batch re-rounds together.
-   **Projected effect (stated honestly, not guaranteed):** fix-loops drop from 2-4 CI runs to 1
-   per task; same-repo same-day batching further reduces the PR count itself, not just the
-   per-PR run count.
+half). Full evidence + the SAME-REPO LANDING BATCHING rule:
+`references/ci-minutes-discipline.md`. The load-bearing part stays here — copy this line
+VERBATIM into every worker/checker/fix-round prompt (dispatchers do not paraphrase it), as a
+THIRD standing mandate additive to (never replacing) the WORKER-MERGE GUARD and
+FOREGROUND-ONLY EXECUTION lines above: "Intermediate commits (WIP, docs-only, fix-round
+iterations) carry `[skip ci]` ANYWHERE in the commit message — GitHub matches the whole
+message, headline or body, there is no safe placement for a push that still needs CI. ONLY
+the final ready-for-verification push carries the marker NOWHERE — not the headline, not the
+body, not even quoted while describing this convention."
 
 **Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
 global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
@@ -539,23 +511,16 @@ in sync.
    sat PARKED ~2h on 2026-08-17 waiting for a resume-budget approval on work that was ~90%
    done — this is the fix.)
 
-**SWEEP RECONCILIATION RULES (2026-08-18, 3-incident codification):** the fleet's lesson
-lifecycle mandates a lesson recurring 3x becomes a deterministic rule, never a 4th prose
-reminder — this class (a sweep flipping a task's queue state against the origin session's
-newer, truer state) hit that bar in 24h. MUST rules for every sweep, before flipping ANY
-contract's state (rename park/claim/done):
-1. **Newest signal wins.** A sweep MUST read the contract's NEWEST timestamped `status_log`
-   entry AND the bus git log for that file before acting — a stale body note never overrides
-   a newer rename. Incident: T-179 was re-parked from a stale body note that overrode a newer
-   claim rename.
-2. **A live origin's activity blocks reclaim.** A sweep MUST NOT reclaim/re-state a contract
-   whose origin session pushed bus activity within the last 2 hours, except the
-   provably-dead-origin rescue path (STEP 7 exception (a) above). Incident: T-178 — a sweep
-   claimed a live origin's deliberately-held task.
+**SWEEP RECONCILIATION RULES (2026-08-18, 3-incident codification — T-178/T-179):** a lesson
+recurring 3x in 24h becomes a deterministic rule, never a 4th prose reminder. MUST rules for
+every sweep, before flipping ANY contract's state (rename park/claim/done):
+1. **Newest signal wins.** Read the contract's NEWEST timestamped `status_log` entry AND the
+   bus git log before acting — a stale body note never overrides a newer rename.
+2. **A live origin's activity blocks reclaim.** Never reclaim/re-state a contract whose origin
+   session pushed bus activity within the last 2 hours, except the provably-dead-origin rescue
+   path (STEP 7 exception (a)).
 3. **Unmerged PR blocks `.done`.** A contract whose dod/status references an unmerged PR is
-   NEVER renamed `.done` — work-complete-awaiting-land stays `.claimed` (or `.parked` with an
-   external-blocker reason); `.done` REQUIRES the PR merged. Incident: T-179 was renamed done
-   while its PR was still OPEN.
+   NEVER renamed `.done` — stays `.claimed` (or `.parked` with an external-blocker reason).
 
 **STANDING BUDGET PRE-APPROVAL (owner 2026-08-17):** retries, cap-resumes, budget raises, and
 tier-escalation costs are pre-approved and never owner-gated — bounded only by (a) the
