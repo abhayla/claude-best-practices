@@ -51,6 +51,15 @@ scripts/tests/test_eval_coverage_freshness.py                   5 passed
 
 Verified `config/gwd-skill-conformance-grandfather.yml` on disk lists exactly: `missing_preflight_exit_codes: [1,2,3,5,9,10,11,12,13,14]` (M1), `plugin_skill_allowlist: [goal-creator]` (M3), `stale_paths: [D:\Abhay\VibeCoding\...]` (M10), `max_claude_p_recipes: 2` (C2), `max_ungated_musts: 26` (all 26 CRITICAL RULES MUSTs are `gate:PROSE-ONLY` today). All of these are named in the PR body as the T-371 punch list — cross-checked line by line, matches.
 
+## Final push + real CI (item 5, closed out)
+
+Final commit `ca507a1c` ("ci: trigger validation for T-370") — NO `[skip ci]` marker anywhere (headline or body). `gh pr checks 597 --watch --interval 30` run in the foreground until every check reported:
+
+- `test`: SUCCESS (43s)
+- `validate`: SUCCESS (46s)
+
+Both green, no fixes needed on this push. `hold` label confirmed still present (`gh pr view 597 --json labels`), PR state OPEN — never merged/closed by this worker.
+
 ## Findings this test suite encodes (from the review, verified independently while scoping)
 
 - SKILL.md mentions only preflight exit codes {0,4,6,7,8}; the live header table defines {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14} — 10 codes undocumented (M1).
