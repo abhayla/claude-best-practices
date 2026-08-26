@@ -1,9 +1,9 @@
 ---
 name: get-work-done
-description: Central work dispatcher (the "mother hub" front door). EVERY task gets a contract + T-id and a dispatched background worker — inline execution is deleted in ALL modes, not just intake (v0.8). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session only grills/contracts/queues/dispatches and NEVER executes work inline, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
+description: Central work dispatcher (the "mother hub" front door). EVERY task gets a contract + T-id; size-eligible tasks run through the FAST LANE (session-executed under a T-id in a worktree of the target repo, deterministic checker); everything else dispatches (v0.9). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, fast-lanes or dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session grills/contracts/queues/dispatches, fast-lanes size-eligible work after the current turn's queueing, and never freelances outside a T-id, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
 ---
 
-# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.8 — inline path DELETED + registry-key identity + context_docs + batching + invocation log 2026-08-15; origin-session affinity + dedup gate + on-screen status, cards fallback-only 2026-08-10)
+# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.9 — FAST LANE reconciles G16 + v0.8 2026-08-26; v0.8 registry-key identity + context_docs + batching + invocation log 2026-08-15; origin-session affinity + dedup gate + on-screen status, cards fallback-only 2026-08-10)
 
 State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\GetWorkDone\`,
 fleet home `C:\Abhay\GetWorkDone` on the Windows VPS (**GWD** below = whichever this machine uses).
@@ -16,7 +16,7 @@ reconciliation, full `cancel`, and a daily dispatch ceiling. Pings + VPS pools =
 | Invocation | Mode |
 |---|---|
 | `/get-work-done <task text …>` | INTAKE (steps 1–7) |
-| `/get-work-done intake` | INTAKE-ONLY standing mode (owner directive 2026-08-09): loop — take the owner's next task, run steps 1–6 (grill → contract → queue → dispatch), then return to "ready for your next task" IMMEDIATELY. NEVER executes a task inline (trivial included — dispatch on haiku instead); STEP 7 check/report arrives via the armed watcher, between intakes. The owner is never blocked from handing over work |
+| `/get-work-done intake` | INTAKE-ONLY standing mode (owner directive 2026-08-09): loop — take the owner's next task, run steps 1–6 (grill → contract → queue → dispatch). A FAST-LANE-eligible task (STEP 3) is session-executed AFTER the current turn's queueing; everything else dispatches (haiku for non-fast-lane trivia) — then return to "ready for your next task" IMMEDIATELY. Never freelances outside a T-id; STEP 7 check/report arrives via the armed watcher, between intakes. The owner is never blocked from handing over work |
 | `/get-work-done status` | STATUS: render fleet state from `GWD\queue\` + `GWD\heartbeats\` + LEDGER tail, PLUS host pressure (T-312, 2026-08-24 OOM incident): host commit % (`preflight-guard.ps1 -HostMemoryStatus`, commit charge / commit limit) and live-worker count (live `claude.exe` processes matched by heartbeats prompt path in their command line) so the dispatcher sees pressure before dispatching — the same two numbers are also written to the keeper tick log every tick. While ANY session-origin task is live (claimed/running, incl. checker/fix rounds), the origin session also renders this same scoreboard (T-id, task, state, PR, round) every 15 minutes on a ticker armed at first dispatch (STEP 6.8b) — a silent gap over 15 min while work is running is a defect (owner order 2026-08-16 13:53) |
 | `/get-work-done cancel <T-id>` | CANCEL (Phase 2, full): read `GWD\heartbeats\<id>.hb` → kill that PID tree; rename contract to `<id>.cancelled.md` with reason; `gh pr close --delete-branch` any PR it opened; ledger a cancelled line. `cancel all` = every claimed task |
 | `/get-work-done sweep` | SWEEP: promote/reject `GWD\inbox\` items per the P17 authorization table, then run INTAKE steps 4–7 on promoted items; then claim + dispatch (steps 6.1–6.8) any unclaimed `*.queued.md` a dead/interrupted session left behind — queued work must never sit undispatched (always-available guarantee, 2026-08-09). DISPATCH-FIRST (live defect 2026-08-10: a sweep tick spent itself "waiting on a watcher" while 4 dispatchable contracts sat queued): claiming+dispatching unclaimed queued work is the FIRST duty of every sweep tick and is never satisfied by watching/waiting on already-claimed tasks; a tick that dispatches nothing MUST state per queued contract why it was not claimable (ceiling / same-repo serialization / lint-block) |
@@ -649,7 +649,8 @@ opinion):
 |---|---|
 | `code` | Re-run the project's OWN full test gate from scratch; CI green on the PR; diff inspected against dod predicates |
 | `deploy` | verify-effect-at-destination: probe the LIVE URL, capture the screenshot, config-validity gate |
-| `content` (docs/reports/research) | Trace EVERY factual/technical claim in the deliverable to its source (code, PR diff, captured data) — a claim with no source row is a FINDING; check placement + structure against the repo's conventions; check each dod predicate individually. Sample floor: ALL claims when ≤10, else 10 + every number |
+| `content` (docs/reports/research) | Trace EVERY factual/technical claim in the deliverable to its source (code, PR diff, captured data) — a claim with no source row is a FINDING; check placement + structure against the repo's conventions; check each dod predicate individually. Sample floor: ALL claims when ≤10, else 10 + every number. `lane: fast` → `fast-lane-check.py` replaces this claim-trace procedure |
+| `mechanical` | `fast-lane-check.py` (deterministic) or the repo's own lint — never a review-and-agree |
 | `claude-resource` (skill/agent/rule/hook) | Run the hub's `/skill-evaluator` (output mode minimum; full for new skills) from the hub checkout; if the target repo can't run it, execute the resource's own trigger + one real scenario end-to-end and capture the transcript. An unexercised skill is UNVERIFIED, never done |
 | `data` | Independently re-pull a sample from the contract's `data_source:` and re-derive the worker's headline numbers (T-014 precedent: checker CONFIRMED a real dup-row bug AND REFUTED a false "missing data" claim) |
 
@@ -739,9 +740,10 @@ Litmus test before saving: "would the target project's team want this in their r
   question per turn, `*Sync-check:*` opener, recommended answer + one-line justification on
   each, until the gate passes — no queueing/dispatch below it. MUST NOT ask anything
   answerable from GLOBAL.md / the repo / the registry.
-- MUST keep the intake surface always available: nothing executes inline in ANY mode (v0.8 —
-  `intake` mode's only remaining distinction is returning to "ready" immediately between
-  intakes); SWEEP claims + dispatches any unclaimed `*.queued.md` so queued work never sits.
+- MUST keep the intake surface always available: every task gets a contract + T-id; size-eligible
+  tasks FAST-LANE (STEP 3), everything else dispatches (v0.9 — `intake` mode's only remaining
+  distinction is returning to "ready" immediately between intakes, fast-lane work included); SWEEP
+  claims + dispatches any unclaimed `*.queued.md` so queued work never sits.
 - MUST reprioritize by REORDERING the queue only — a running worker is never preempted for
   priority.
 - MUST show the owner on-screen, in the origin session: a queue ack at dispatch AND the
@@ -782,12 +784,13 @@ Litmus test before saving: "would the target project's team want this in their r
 - MUST honor the deploy-tier table computed from the ACTUAL diff at check time (G9) — a task
   whose merged diff touches auth/payment/DNS/migration paths force-upgrades to HOLD regardless
   of intake classification.
-- MUST give EVERY task a contract + T-id — the inline-execution path is DELETED (2026-08-15).
-  A get-work-done task with no T-id is a defect. Foreign-OR-same-repo makes no difference:
-  same-repo tasks dispatch into their own worktree. Repo identity is compared by REGISTRY KEY
-  resolved via `git remote get-url origin`, never by path or folder name. Authoring SSOT-owned
-  artifact text inline (template copy / map cards / Deluge specs, even as a "draft" in chat) is
-  the same defect.
+- MUST give EVERY task a contract + T-id — a get-work-done task with no T-id is a defect (v0.9:
+  size-eligible tasks FAST-LANE under that T-id in a worktree of the target repo, STEP 3;
+  everything else dispatches). Foreign-OR-same-repo makes no difference: same-repo tasks
+  fast-lane or dispatch into their own worktree, never the cwd checkout. Repo identity is
+  compared by REGISTRY KEY resolved via `git remote get-url origin`, never by path or folder
+  name. Authoring SSOT-owned artifact text inline (template copy / map cards / Deluge specs,
+  even as a "draft" in chat, outside the fast-lane flow) is the same defect.
 - MUST batch multiple same-repo trivia from one intake into ONE contract (one T-id, one PR) —
   the no-inline rule must never make the fleet too slow to use.
 - MUST copy the registry's `context_docs` into every contract and open the worker prompt with
