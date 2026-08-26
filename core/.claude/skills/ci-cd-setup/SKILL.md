@@ -88,6 +88,7 @@ Select the CI/CD platform based on the user's request or repository host. If uns
 - **Pipeline stages & caching:** `references/pipeline-stages-and-caching.md` — standard stage order, gate enforcement, cache key design by language, cache policy rules, artifact management
 - **Secrets & deployment:** `references/secrets-and-deployment.md` — secret management principles, environment-specific secrets, secret scanning, environment progression, rollback, blue-green/canary
 - **Optimization & anti-patterns:** `references/optimization-and-anti-patterns.md` — conditional execution, concurrency control, skip patterns, parallel test splitting, common anti-patterns table
+- **Docs-only CI short-circuit:** `references/docs-only-short-circuit.md` — skip heavy jobs on a docs-only diff via a `needs:`-gated first job (never workflow-level `paths-ignore` on a required check), with a two-run verification recipe
 
 ---
 ## STEP 3: Create Pipeline Configuration
