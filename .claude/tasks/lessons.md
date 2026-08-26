@@ -1120,3 +1120,8 @@ Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Vent
 - **Mistake:** four failure classes recurred within 24h AFTER being "codified" (related-list block x4, cap-death with uncommitted work x2, worker fabrication x2, silent exit-1 in IPODhan deploy-linux.sh after the same class was fixed in fleet scripts by T-320).
 - **Root cause:** lessons stored as prose in 3 places; mechanisms "queued for backlog" with no T-id/owner; no gate stopped new dispatch while learning debt accrued; nobody verifies the dispatcher.
 - **Rule/mechanism:** global CLAUDE.md "Learn-or-block" section; machine-read `D:\Abhay\GetWorkDone\MECHANISM-DUE.md`; fleet preflight exit-11 learning-debt gate (T-323); class sweeps across all registered repos. Instance fix for the deploy defect: T-321.
+
+## 2026-08-26 — Detection-gap RCA gate (owner directive 09:43 IST)
+- **Mistake:** round-7 findings were fixed as code classes; nobody asked why round 6 / the nightly audit / monitors / tests had not caught them. The fresh review was the only process executing the coverage floor.
+- **Root cause:** no standing step upgrades the DETECTION layer; the nightly audit prints WARN with no thresholds.
+- **Rule/mechanism:** global CLAUDE.md "Detection-gap RCA gate" — Fable-authored per-finding RCA (should-have-caught / why-not / detection upgrade) + FAIL-level daily checks shipped before the next review (T-335); next review gated on it; second success metric = findings a machine check should have caught = 0. RCA doc: bus evidence/2026-08-26-T-322/DETECTION-RCA.md.
