@@ -19,7 +19,13 @@ Contract: `D:/Abhay/GetWorkDone/queue/T-353-hub-skill-fast-lane-step3-docs-ci-te
 
 ## Fix-round history
 
-- T-353F (this worker, resumed run) picked up after the predecessor died at item 6 (backgrounded pytest, which kills the process in headless `claude -p`). Verified items 1-5 complete on disk via `git diff origin/main --stat`, re-ran the full pytest suite in the foreground (9m25s, waited it out), proved the new test file RED-on-main via a temporary detached worktree of `origin/main` (`D:/Abhay/Ventures/.wt/t353-main-check`, removed after use), then ran the remaining 5 CI commands in the foreground. All 6 CI checks are green (module the one environment-only pytest failure explained above).
+- T-353F (this worker, resumed run) picked up after the predecessor died at item 6 (backgrounded pytest, which kills the process in headless `claude -p`). Verified items 1-5 complete on disk via `git diff origin/main --stat`, re-ran the full pytest suite in the foreground (9m25s, waited it out), proved the new test file RED-on-main via a temporary detached worktree of `origin/main` (`D:/Abhay/Ventures/.wt/t353-main-check`, removed after use), then ran the remaining 5 CI commands in the foreground. All 6 CI checks are green (modulo the one environment-only pytest failure explained above).
+
+## Final state
+
+All 6 contract DoD items are done and verified. This push carries no `[skip ci]` marker — real
+CI runs on it. Not merged by this worker; the `hold` label is left in place for the
+checker/dispatcher to clear.
 
 ## Notes
 
