@@ -57,6 +57,28 @@ gates:
   PREFLIGHT-FAST-LANE-AT-WORKER-DISPATCH:
     script: preflight-guard.ps1
     exit: 14
+  PREFLIGHT-KEEPER-LIVENESS:
+    script: preflight-guard.ps1
+    exit: 15
+    note: >-
+      T-363: no claim reconciler tick on THIS host inside 2x
+      settings.fleet_keeper_tick_minutes (heartbeats/reconcile-last.json missing,
+      unreadable, stale, or written by a -DryRun run). Added by T-371 when the
+      SKILL.md rewrite documented exit 15. Exit codes 16/17 are RESERVED for
+      T-364 (host-memory-unknown / settings-read-failure), added below once
+      T-364 landed on the bus (queue/T-364-....done.57be62e.md).
+  PREFLIGHT-HOST-MEMORY-UNKNOWN:
+    script: preflight-guard.ps1
+    exit: 16
+    note: >-
+      T-364: the host commit-percent or live-worker query returned nothing;
+      blocks instead of falling through to 0.0% / 0 workers.
+  PREFLIGHT-SETTINGS-READ-FAILURE:
+    script: preflight-guard.ps1
+    exit: 17
+    note: >-
+      T-364: settings.json missing/unreadable/malformed or a needed value is not
+      an integer; blocks instead of silently defaulting to 3 workers / floor 0.
 
   # contract-lint.py has one generic BLOCK exit path (non-zero, reason on stderr)
   # covering several distinct rules — cite this id for any of them until the

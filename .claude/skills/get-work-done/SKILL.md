@@ -1,777 +1,399 @@
 ---
 name: get-work-done
-description: Central work dispatcher (the "mother hub" front door). EVERY task gets a contract + T-id and a dispatched background worker — inline execution is deleted in ALL modes, not just intake (v0.8). Hand it one or many tasks — any project, code or deploy — and it sizes each honestly, grills the owner to >95% confidence at intake (ONE question per turn, each with a recommended answer + one-line justification — the owner's 95%-gate, grill-me style; supersedes the old one-batch format 2026-08-09), writes a contract per task, dispatches an autonomous background worker in the target repo's OWN directory on the cheapest-correct model, has an independent checker verify + capture evidence, and lands everything via PR + CI-gated auto-merge. `/get-work-done intake` runs the standing intake-only mode: the session only grills/contracts/queues/dispatches and NEVER executes work inline, so the owner can hand over new tasks at any time without being blocked. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan, add Y to calculatekaro"), asks for fleet state ("status"), or wants a running task stopped ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md (all 22 points owner-locked 2026-07-15) — read it before changing ANY behavior here.
+description: Central work dispatcher (the "mother hub" front door) for the GetWorkDone fleet. EVERY task gets a contract + T-id; size-eligible tasks run the FAST LANE (session-executed under that T-id in a worktree of the target repo), everything else dispatches a background worker on the cheapest-correct model, with an independent checker and a CI-gated PR (v0.10). Grills the owner to >95% confidence at intake, one question per turn. Use when the owner hands work to the fleet ("/get-work-done fix X in IPODhan"), for intake-only mode ("intake"), fleet state ("status"), or to stop a task ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md - read it before changing ANY behavior here.
 ---
 
-# /get-work-done — central work dispatcher (Phase 2: parallel fleet, v0.8 — inline path DELETED + registry-key identity + context_docs + batching + invocation log 2026-08-15; origin-session affinity + dedup gate + on-screen status, cards fallback-only 2026-08-10)
+# /get-work-done - central work dispatcher (v0.10, 2026-08-27)
 
-State root (per machine, `settings.json fleet_home`): local mirror `D:\Abhay\GetWorkDone\`,
-fleet home `C:\Abhay\GetWorkDone` on the Windows VPS (**GWD** below = whichever this machine uses).
-Contract format = `/goal-creator`'s, extended with dispatcher fields. Phase 2 scope: PARALLEL
-dispatch with priority lanes, worker heartbeats via `GWD\worker-wrapper.ps1`, keeper
-reconciliation, full `cancel`, and a daily dispatch ceiling. Pings + VPS pools = later phases.
+**v0.10 = procedure only.** Every dated incident narrative is in `references/incident-log.md`,
+VERBATIM, anchored `I-01 ... I-37`; each rule carries a `[log: I-nn]` back-reference. Read it for
+the WHY or before changing a rule, never to run a task; `references/` also holds the fast-lane
+runbook and the routing table. **GWD** = this machine's state root
+(`GWD/settings.json` -> `fleet_home`): `D:/Abhay/GetWorkDone/` here, `C:/Abhay/GetWorkDone` on the
+VPS. Contract format = the goal-creator shape
+(`plugins/loop-engineering/skills/goal-creator/SKILL.md`) plus the STEP 5 dispatcher fields.
 
 ## Mode router
 
 | Invocation | Mode |
 |---|---|
-| `/get-work-done <task text …>` | INTAKE (steps 1–7) |
-| `/get-work-done intake` | INTAKE-ONLY standing mode (owner directive 2026-08-09): loop — take the owner's next task, run steps 1–6 (grill → contract → queue → dispatch), then return to "ready for your next task" IMMEDIATELY. NEVER executes a task inline (trivial included — dispatch on haiku instead); STEP 7 check/report arrives via the armed watcher, between intakes. The owner is never blocked from handing over work |
-| `/get-work-done status` | STATUS: render fleet state from `GWD\queue\` + `GWD\heartbeats\` + LEDGER tail, PLUS host pressure (T-312, 2026-08-24 OOM incident): host commit % (`preflight-guard.ps1 -HostMemoryStatus`, commit charge / commit limit) and live-worker count (live `claude.exe` processes matched by heartbeats prompt path in their command line) so the dispatcher sees pressure before dispatching — the same two numbers are also written to the keeper tick log every tick. While ANY session-origin task is live (claimed/running, incl. checker/fix rounds), the origin session also renders this same scoreboard (T-id, task, state, PR, round) every 15 minutes on a ticker armed at first dispatch (STEP 6.8b) — a silent gap over 15 min while work is running is a defect (owner order 2026-08-16 13:53) |
-| `/get-work-done cancel <T-id>` | CANCEL (Phase 2, full): read `GWD\heartbeats\<id>.hb` → kill that PID tree; rename contract to `<id>.cancelled.md` with reason; `gh pr close --delete-branch` any PR it opened; ledger a cancelled line. `cancel all` = every claimed task |
-| `/get-work-done sweep` | SWEEP: promote/reject `GWD\inbox\` items per the P17 authorization table, then run INTAKE steps 4–7 on promoted items; then claim + dispatch (steps 6.1–6.8) any unclaimed `*.queued.md` a dead/interrupted session left behind — queued work must never sit undispatched (always-available guarantee, 2026-08-09). DISPATCH-FIRST (live defect 2026-08-10: a sweep tick spent itself "waiting on a watcher" while 4 dispatchable contracts sat queued): claiming+dispatching unclaimed queued work is the FIRST duty of every sweep tick and is never satisfied by watching/waiting on already-claimed tasks; a tick that dispatches nothing MUST state per queued contract why it was not claimable (ceiling / same-repo serialization / lint-block) |
+| `/get-work-done <task>` | INTAKE (steps 1-7) |
+| `/get-work-done intake` | Standing intake loop: take the next task, run steps 1-6, return to "ready" IMMEDIATELY. A fast-lane-eligible task (STEP 3) is session-executed after the turn's queueing; everything else dispatches. Never freelances outside a T-id |
+| `/get-work-done status` | Fleet state from `GWD/queue/` + `GWD/heartbeats/` + LEDGER tail, plus host pressure (commit % + live workers via `preflight-guard.ps1 -HostMemoryStatus`); re-rendered every 15 min while a session-origin task is live [log: I-22] |
+| `/get-work-done cancel <T-id>` | Read `GWD/heartbeats/<id>.hb` -> kill that PID tree; rename the contract `<id>.cancelled.md` with a reason; `gh pr close --delete-branch` any PR it opened; ledger it. `cancel all` = all claimed |
+| `/get-work-done sweep` | Promote/reject `GWD/inbox/` per the P17 table, run INTAKE 4-7 on promoted items, then claim + dispatch any unclaimed `*.queued.md`. DISPATCH-FIRST: that claiming is every tick's first duty, never satisfied by watching claimed tasks; a tick that dispatches nothing says why per contract |
 
-## STEP 1 — INTAKE: parse the ask
+## STEP 1 - INTAKE: parse the ask
 
-Split the input into individual tasks (they may span different repos). For each task resolve
-the target repo against `GWD\settings.json → repo_registry` — the ONLY source of repo paths
-(it encodes the calculatekaro→`calculator` and algochanakya-vs-OFO traps). A repo not in the
-registry, or an ambiguous reference ("the calculator app"?) → that's an intake question, not
-a guess.
+Split the input into tasks (they may span repos). Resolve each target against
+`GWD/settings.json` -> `repo_registry` - the ONLY source of repo paths (it encodes the
+calculatekaro->`calculator` and algochanakya-vs-OFO traps). A repo not in the registry, or an
+ambiguous reference, is an intake question, never a guess.
 
-**PORTFOLIO REGISTRATION GATE (migration Phase 4b, 2026-08-12):** also check the task's target
-repo against the 5wealths PORTFOLIO registry — `PORTFOLIO.yml` on 5wealths `main` once it
-exists; until then the `PORTFOLIO-ALIGNMENT-NOTES.md` candidate-registry-rows table is the
-interim registry. A task targeting a repo absent from that registry, or a task that would
-create a NEW project folder, cannot be queued until a registration row (name, pillar,
-machines) exists for it — carry this as an open item into STEP 4, it is never silently
-skipped.
+**PORTFOLIO REGISTRATION GATE** [log: I-04]: also check the target against `PORTFOLIO.yml` on
+5wealths `main` (it EXISTS - the `PORTFOLIO-ALIGNMENT-NOTES.md` interim table is superseded). A
+repo absent from it, or a task that creates a NEW project folder, cannot be queued until a
+registration row (name, pillar, machines) exists. Carry it into STEP 4; never skip it silently.
 
-## STEP 2 — SCOUT (~1 min per task)
+## STEP 2 - SCOUT (~1 min per task)
 
-In the target repo: `git remote get-url origin` (must equal the registry's `remote` — mismatch
-aborts intake with a question), current branch state, does the named area exist, do tests
-exist, which paths the task will plausibly touch. Ground the gate in looked-at reality, never
-in the prompt alone.
+In the target repo: `git remote get-url origin` (must equal the registry's `remote` - a mismatch
+aborts intake with a question), branch state, does the named area exist, do tests exist, which
+paths the task will plausibly touch. Ground the gate in looked-at reality, never the prompt alone.
 
-## STEP 3 — GATE: every task gets a contract + T-id, NO exceptions (inline path DELETED 2026-08-15)
+## STEP 3 - GATE: every task gets a contract + T-id; SIZE picks the lane
 
-**The inline-execution path is DELETED (owner-approved 2026-08-15; live defect: a GoRefer
-session did Wati/Zoho work itself, inline, in the wrong directory with the wrong context — no
-T-id, no contract, no checker).** Every task handed to /get-work-done — however trivial — is
-contracted (STEP 5) and dispatched (STEP 6). The old carve-outs (trivial-inline, the Fable
-exception, the intake-mode exception) are all subsumed: there is ONE behavior now. The binary
-invariant any audit can check: **a get-work-done task with no T-id is a defect.**
-
-Blast radius (sensitive paths: auth, payments, config, DB migration, deploy surface) still gets
-assessed here — but it now informs ONLY model tier, budget, and deploy_tier, never
-inline-vs-dispatch. Trivial tasks are made cheap by BATCHING (STEP 5), not by inline execution.
+**A get-work-done task with no T-id is a defect** [log: I-01]. Every task is contracted (STEP 5),
+then FAST-LANED or DISPATCHED (STEP 6); the old carve-outs (trivial-inline, Fable, intake-mode)
+are subsumed by those two paths. Blast radius (auth, payments, config, migrations, deploy)
+informs model tier, budget, `deploy_tier` AND lane eligibility.
 
 **Repo identity is compared by REGISTRY KEY, never by path or folder name:** resolve the
-session's own cwd via `git remote get-url origin` → registry key, and the task's target the
-same way (the registry encodes the traps: calculatekaro lives in a folder named `calculator`;
-OFO shares algochanakya's remote; PC and VPS paths differ). A cwd that resolves to no registry
-key is treated as foreign. Same-key tasks STILL dispatch — the worker goes into its own git
-worktree (two sessions never share a checkout); "same repo, so I'll just do it here" is the
-2026-08-15 defect class, not a shortcut. An artifact whose source of truth lives in another
-project (WhatsApp template copy, conversation-map cards, Deluge function specs) resolves its
-target repo by SSOT OWNERSHIP — the registry's `ssot_artifacts` field (live since bus commit 88b4e13) — regardless of where the discussion happens; the dispatching session may relay owner
-approvals but NEVER authors the artifact text.
+session's cwd and the target via `git remote get-url origin` -> key; a cwd resolving to no key
+is foreign, and same-key tasks still go to their own worktree. An artifact whose source of
+truth lives in another project (template copy, map cards, Deluge specs) resolves its repo by
+the registry's `ssot_artifacts` field wherever the discussion happens; the session may relay
+owner approvals, never author the text.
 
-## STEP 3.5 — ROOT-CAUSE GATE: the SECOND occurrence must fix the MECHANISM
+### FAST LANE (owner decision A, 2026-08-26 - T-349/T-351/T-353)
 
-Owner rule 2026-08-20, his words: fix things so "the issues do not happen again", because
-re-fixing instances "will take a lot of time". The evidence it exists: eight workers (T-204,
-T-205, T-210, T-218, T-223, T-225, T-227, T-228) finished correct engineering, then died at
-their turn cap with everything UNCOMMITTED — each rescued by hand at ~20 min, ~2.5 hours in
-one day. The response every single time was a firmer prose mandate; it failed all eight times.
-The mechanism fix (worker-wrapper autosaves a dirty tree on exit, T-231) was filed only after
-the owner challenged it.
+The ONE owner-approved exception to "a session never edits a target repo itself" - not an inline
+path: still a T-id, a contract, a worktree of the TARGET repo, `context_docs`, and a checker.
+Those, not a ban on session edits, are what prevent the 2026-08-15 incident [log: I-01].
 
-- **First occurrence** of a failure may be fixed as an instance.
-- **From the SECOND occurrence of the same failure SHAPE** (same symptom class — not the same
-  file, task or repo), the instance fix is NOT acceptable on its own: fix the MECHANISM that
-  permits the shape, or record in the contract's `status_log`, explicitly and with the reason,
-  why a mechanism fix is impossible. Silence is not an exemption.
-- **PROSE IS NOT A MECHANISM.** A stronger instruction — in a worker prompt, a mandate block,
-  a contract, or this skill — does NOT count as a class fix: one "COMMIT EARLY AND OFTEN"
-  mandate line failed eight consecutive times. A mechanism is CODE, a GUARD, a HOOK, a SCHEMA
-  CONSTRAINT, or a TEST THAT FAILS when the defect returns. If the fix you are about to ship
-  is words, it is an instance fix wearing a class fix's clothes.
-- **SWEEP before a task is called done.** A fixed defect is searched for across the repo (and
-  the estate, where the shape travels) BEFORE completion, and the search result is REPORTED:
-  "fixed 1 of N found" or "swept, no other instances". Done right on 2026-08-20: the em-dash
-  fix swept 14 lines AND added a pre-commit guard; the Windows path guard fixed all 11 files
-  AND added a regression test; the stopwatch-test sweep found a SECOND instance.
-- **SELF-IMPROVEMENT.** Every recurrence-triggered class fix appends its lesson to
-  `GWD\PATTERNS-SEEN.md` in mechanism-fix form — `LESSON(CODIFIED → <where>): <symptom> →
-  <shape> → <mechanism installed>` — so the next dispatcher inherits the guard instead of
-  re-deriving the story (same lesson lifecycle as STEP 7; no new store).
+**ELIGIBILITY** = ALL of: `deliverable: content|mechanical` * <=5 files in the contract's `files:`
+list * <=300 changed lines at PR time * no path matching the sensitive-path denylist in
+`GWD/fast-lane-gate.py` * no unknowns after scout. `code` is NOT eligible in v1 (it needs the
+repo's test gate); revisit after 10 clean runs.
 
-## STEP 4 — CLARIFY: resolve everything at intake, one question per turn, while the owner is present
+**FLOW:** the command sequence (gate -> stage-stamp -> worktree edit -> PR ->
+diff gate -> `fast-lane-check.py` -> merge on green -> LEDGER line) is
+`references/fast-lane-runbook.md`. SLO <=20 min launched->merged
+(`settings.fast_lane_slo_minutes`); a miss surfaces as `FAST-LANE-SLO-MISS` via
+`lesson.py status`. A `lane: fast` contract reaching WORKER dispatch is preflight exit 14.
 
-**NON-SKIPPABLE (defect fix 2026-07-18):** "run it" / "go ahead" means PROCEED — it does NOT mean skip
-this step. A non-trivial task ALWAYS resolves its material unknowns before dispatch. TWO layers:
-(a) DETERMINE, don't ask, anything you can scout — e.g. "compare IPODhan's data" → the authoritative
-source is the app's OWN DB/API, NOT scraping its public site; scout the data layer and use it. Asking
-what you can determine is itself a defect. (b) For a GENUINE material unknown (2+ valid answers that
-change the OUTCOME, unscoutable) → ask it via the 95%-gate below, one question per turn. Applying "decide-don't-ask" to a
-material outcome-changing unknown (as happened on T-013: assumed public-scrape, hit a WAF, asked after)
-is a MISAPPLICATION — that rule is for reversible EXECUTION details only, never for what-to-build /
-which-source intent. If in doubt whether an unknown is material: it is → resolve at intake.
+## STEP 3.5 - ROOT-CAUSE GATE: the SECOND occurrence fixes the MECHANISM
 
-FAIL AT INTAKE, NOT AT MIDNIGHT (locked principle): run every abort-capable check NOW —
-registry/remote identity (done in scout), branch protection + secret-scan gate on the target
-(P4 audit re-check via `gh api`), needed credentials/tools present, deploy tier per the table
-below. **Tool-permission surface (2026-08-16, T-141 stall):** any actor — worker OR checker —
-that will run unattended MUST be on a no-prompt path (`bypassPermissions` or pre-allowlisted
-tools only); verify this NOW, at intake, never discovered mid-run when the owner is away. An
-unattended dispatch whose permission mode is unverified is itself an abort-capable finding —
-park it rather than launch and hope no tool call trips a dialog. Then resolve the genuine
-unknowns via the owner's **95%-confidence gate** (global
-CLAUDE.md standing rule 2026-08-07; re-ratified for fleet intake 2026-08-09 — supersedes the
-old one-batch format): do NOT queue or dispatch a task below >95% confidence of WHAT is being
-asked. Ask **ONE question per turn**, opening with `*Sync-check:*` (grill-me style), each with
-a **recommended answer FIRST + a one-line justification**; keep going until confidence exceeds
-95%. Approval-class items (deploy tier below) are asked the same way, as their own question.
-The fail-at-intake principle is unchanged — every unknown is still resolved while the owner is
-present, only the question FORMAT changed (serialized, not batched):
+[log: I-02 - eight workers died at their turn cap with everything uncommitted; the answer every
+time was a firmer prose mandate, and it failed all eight times.]
+
+A first occurrence may be fixed as an instance. From the SECOND occurrence of the same failure
+SHAPE (same symptom class, not the same file or repo), fix the MECHANISM that permits it or record
+in `status_log`, with the reason, why a mechanism fix is impossible - silence is not an exemption.
+**PROSE IS NOT A MECHANISM**: a mechanism is CODE, a GUARD, a HOOK, a SCHEMA CONSTRAINT or a TEST
+THAT FAILS when the defect returns. Before calling it done, SWEEP the repo (and the estate, where
+the shape travels) and REPORT the count - "fixed 1 of N found" / "swept, no other instances" - and
+append a `LESSON(CODIFIED -> <where>)` line to `GWD/PATTERNS-SEEN.md` plus a row in
+`GWD/MECHANISM-DUE.md` (`python GWD/lesson.py`); the learning-debt gate (exit 11) reads it.
+
+## STEP 4 - CLARIFY: resolve everything at intake, one question per turn
+
+**NON-SKIPPABLE** - "run it" / "go ahead" means PROCEED, not skip [log: I-03]. (a) **DETERMINE,
+don't ask** anything you can scout ("compare IPODhan's data" -> the app's OWN DB/API, not its
+public site); asking what you can determine is itself a defect. (b) For a GENUINE material unknown
+(2+ valid answers that change the OUTCOME, unscoutable) -> the 95%-gate: **ONE question per turn**,
+`*Sync-check:*` opener, **recommended answer + one-line justification**, until confidence exceeds
+95%. "Decide-don't-ask" governs reversible EXECUTION detail only.
+
+**FAIL AT INTAKE, NOT AT MIDNIGHT:** run every abort-capable check now - registry/remote
+identity, branch protection + secret-scan gate on the target (`gh api`), credentials/tools
+present, deploy tier, and the permission surface (any unattended worker OR checker must be on a
+no-prompt path, verified now, never discovered mid-run with the owner away).
 
 | Deploy situation | Tier |
 |---|---|
-| Re-deploy of a live app, same domain/infra | AUTO (Tier 1) — no question |
-| New app onto a `sandbox_domains` subdomain | AUTO (Tier 1) — pre-authorized by the grant |
-| First deploy / DNS / new domain / auth or payment surface | HOLD (Tier 2) — collect the yes/no NOW |
+| Re-deploy of a live app, same domain/infra | AUTO (Tier 1) - no question |
+| New app onto a `settings.sandbox_domains` subdomain | AUTO (Tier 1) - pre-authorized |
+| First deploy / DNS / new domain / auth or payment surface | HOLD (Tier 2) - collect the yes/no NOW |
 
-**Portfolio registration (migration Phase 4b, 2026-08-12):** if STEP 1's PORTFOLIO REGISTRATION
-GATE flagged the target repo as unregistered (or the task creates a new project folder), that
-IS a material unknown — resolve it here, same `*Sync-check:*` format, before queueing. If the
-pillar is knowable from context/GLOBAL.md, determine it and write the registration row
-yourself (name, pillar, machines) into the interim registry; only ask when the pillar is
-genuinely ambiguous (one question, recommended pillar + one-line justification). Never queue
-the task un-registered.
+A portfolio-registration flag from STEP 1 IS a material unknown - resolve it here; determine the
+pillar yourself when knowable. AUTO-tier deploys run via `GWD/deploy-site.sh` on the VPS: capture
+KNOWN-GOOD -> niced build -> swap -> `nginx -t` gate -> probe the live URL -> restore known-good on any
+failure [log: I-05]. Nothing answerable from GLOBAL.md, the repo, or the registry may be asked.
 
-**Deploy execution (Phase 4, P12/P13):** when a task's tier resolves to AUTO, the deploy runs via
-`GWD\deploy-site.sh` ON the Hostinger VPS (where nginx/certbot/webroots live; bus-driven like the
-relay). It captures the current webroot as KNOWN-GOOD first, builds niced (never starves live sites),
-swaps in the new build, `nginx -t`-gates the reload, PROBES the live URL, and on any probe/​config
-failure RESTORES the known-good + reloads (revert-first, P13) — the forward-fix is a separate P1 task.
-NEW-APP subdomains (P12): the dispatcher first creates the `<app>.<sandbox>` DNS A-record via the
-GoDaddy/Cloudflare API (GLOBAL.env), then the runner adds the vhost + certbot TLS. **Requires a granted
-`settings.sandbox_domains` entry — until the owner provides one, new-app auto-deploy stays Tier-2 (HOLD).**
+## STEP 5 - CONTRACT
 
-Nothing answerable from GLOBAL.md, the repo, or the registry may be asked.
+Build the goal-creator contract from the task + answers, add the dispatcher fields, write it to
+`GWD/queue/T-<nnn>-<slug>.queued.md`. Each rule below is normative in CRITICAL RULES; its full
+v0.9 text and incident are at [log: I-06 ... I-14].
 
-## STEP 5 — CONTRACT: via /goal-creator, extended
-
-Invoke `/goal-creator` with the task + answers; extend its contract with the dispatcher
-fields and write to `GWD\queue\T-<nnn>-<slug>.queued.md`:
-
-**T-ID ALLOCATION (MANDATORY, live triple-collision 2026-08-10 — T-063/T-064/T-068 each
-allocated to TWO different tasks by independent sessions, and the T-068 pair's shared
-`T-068.hb` heartbeat filename cross-contaminated both tasks' death-detection):** never invent
-the next id. (1) `git pull` the bus, (2) run `python GWD\next-task-id.py <GWD>` and use its
-answer, (3) if the bus push of the contract is rejected non-fast-forward, pull and RE-RUN the
-allocator before retrying — another session may have taken the id in the race window. An id
-seen ANYWHERE historically (queue, archive, LEDGER) is never reused.
-
-**PRE-QUEUE DEDUP GATE (owner requirement 2026-08-10 — MANDATORY, runs before writing the
-contract):** read EVERY open contract in `GWD\queue\` (`*.queued.md`, `*.claimed.*.md`,
-`*.parked.md`) for the same target repo and compare scope (goal, files/area the task will
-touch). Three outcomes, recorded in the new contract or intake reply:
-- **Duplicate** (same outcome already queued/claimed) → do NOT queue; tell the owner the
-  existing T-id instead. Two sessions asking for the same thing must converge on ONE task.
-- **Overlapping/related** (different outcome, shared area) → queue it with a
-  `related: [T-xxx]` line; same-repo serialization already prevents file interference, the
-  link makes the checker aware of the sibling.
-- **Supersedes** (new task makes an open one obsolete) → rename the old contract
-  `.superseded-by-T-<new>.md` with a one-line note; never leave both live.
-The queue is the SHARED cross-session truth — a session must never queue from only its own
-memory of what it dispatched.
-
-**TRIVIAL-TASK BATCHING (2026-08-15 — what keeps the no-inline rule usable):** multiple small
-tasks from ONE intake targeting the SAME repo are written as **ONE contract** with one `dod:`
-item per task — one T-id, one worker, one PR — never N serialized contracts each paying
-clone + lint + preflight + checker + PR. (Without this, 5 small Wati edits = hours of
-serialized ceremony, and the owner routes around the fleet — reintroducing the inline defect.)
-The dedup gate's "overlapping/related" branch MERGES same-intake trivia into one contract
-instead of linking siblings. Batches are SAME-`deliverable:` only — a code fix and a doc
-update need different checker procedures, so a mixed batch is split into one contract per
-deliverable type (verifier finding LOW-8).
-
-**WAVE-CHAINING FOR SEQUENTIAL SAME-REPO WAVES (2026-08-17 — 3rd-occurrence codification;
-see `GWD\PATTERNS-SEEN.md` ~L72-73, gorefer eight-lens-review waves backed up the same-repo
-gate 3x on 2026-08-16 17:07/19:08 and 2026-08-17 01:34 with `related: []` on every contract):**
-when queueing a WAVE of same-repo contracts at intake that are sequential/dependent by design
-(e.g. a later contract's own body states it "runs LAST" or depends on an earlier one in the
-wave), the LATER contract's `related:` field MUST list the immediately-prior wave T-id(s) it
-depends on — chaining the dependency at queue time — instead of leaving `related: []` and
-relying on the CROSS-MACHINE SAME-REPO GATE (STEP 6) to silently re-block it every sweep tick.
-This does not change STEP 6's gate logic: a same-repo block on a non-related contract still
-produces a fresh non-actionable diagnosis every sweep; with wave-chaining, the same block
-becomes an EXPECTED/silent hold instead, because the gate's own `related:`-check already treats
-a named relation as informative, not blocking-different. Same mechanism as the dedup gate's
-"overlapping/related" outcome above — this is that same `related:[T-xxx]` convention applied at
-wave-queueing time specifically for designed sequential dependency, not incidental scope overlap.
-
-**CONTEXT DOCS (2026-08-15 — the "details already provided earlier" fix):** copy the
-registry's `context_docs` list for the target repo (`GWD\settings.json →
-repo_registry.<key>.context_docs`, **repo-relative paths only**) into the contract, and the
-worker prompt MUST open with: "Before ANY work, read these files at the repo root: <list>.
-If any is missing, STOP and report it — do not proceed without it." CLAUDE.md is never
-listed (it auto-loads from the worker's cwd). If a listed doc contradicts the code, the
-repo wins. `preflight-guard.ps1` BLOCKS dispatch (exit 7) when a listed doc is missing from
-the workspace — a missing context doc is never a shrug-and-continue.
+1. **T-ID** [log: I-06]: `git pull` the bus -> `python GWD/next-task-id.py <GWD>` -> on a
+   non-fast-forward push rejection, pull and RE-RUN the allocator. Never invent an id; never reuse
+   one seen anywhere historically.
+2. **DEDUP** [log: I-07]: read EVERY open contract in `GWD/queue/` for the same repo. Duplicate ->
+   don't queue, name the existing T-id. Overlapping -> `related: [T-xxx]`. Supersedes -> rename the
+   old one `.superseded-by-T-<new>.md`.
+3. **BATCH** [log: I-08]: same-repo trivia from one intake -> ONE contract, one `dod:` item each,
+   same `deliverable:` only. **WAVE-CHAIN** [log: I-09]: a wave contract's `related:` names the
+   earlier wave T-id it depends on.
+4. **CONTEXT DOCS** [log: I-10]: copy `repo_registry.<key>.context_docs` (repo-relative) into the
+   contract; the prompt opens "Before ANY work, read these files at the repo root: <list>. If any
+   is missing, STOP and report it." CLAUDE.md is never listed; the repo wins over a stale doc.
+5. **MANDATES**: the worker/checker/fix-round prompt gets `GWD/worker-mandates.txt` injected by
+   the wrapper - never hand-copied or paraphrased (13 of 159 prompts carried all three lines
+   verbatim before this change) [log: I-11, I-12, I-14]; T-372 owns the wrapper-side self-test. Add
+   the HOLD-LABEL line (`gh pr edit <n> --add-label hold`) whenever the `dod:` needs the PR to stay
+   open [log: I-13] - not merging is not enough to stop this repo's auto-landing hooks.
+6. **LANDING BATCH** [log: I-14]: same-repo same-day contracts default to ONE branch/PR/CI-run;
+   exceptions are P1 break-fixes, conflicting file scopes, and a checker FAIL on separable hunks.
 
 ```yaml
-repo: <registry key>            # path + remote resolved from settings.json at dispatch
-origin: <session-id>@<machine> <project-dir-name>   # WHO took this task from the owner (owner requirement 2026-08-10): in-session progress/result reporting belongs to THIS session ONLY
-related: []                      # T-ids sharing scope in the same repo (dedup gate above)
-context_docs: []                 # copied VERBATIM from repo_registry.<key>.context_docs (repo-relative; preflight exit 7 if missing in workspace)
+repo: <registry key>            # path + remote resolved from the registry
+origin: <session-id>@<machine> <project-dir>   # owns all reporting for this task
+related: []                     # T-ids sharing scope in the same repo
+context_docs: []                # copied VERBATIM from the registry
 model: haiku|sonnet|opus        # + MANDATORY one-line rationale on this line (lint-enforced)
-deliverable: code|deploy|content|claude-resource|data   # lint-enforced (fix V2 2026-07-27) — selects the checker procedure
-priority: P1|P2|P3               # dispatcher-assigned AUTONOMOUSLY (owner 2026-08-09): P1 prod-broken/blocking/owner-says-urgent, P2 normal feature/fix, P3 cleanup/nice-to-have — never ask the owner to rank
+deliverable: code|deploy|content|claude-resource|data|mechanical   # selects the checker procedure
+lane: normal|fast               # fast needs deliverable content|mechanical + files:/checks: (STEP 3)
+priority: P1|P2|P3              # dispatcher-assigned - never ask the owner to rank
 deploy_tier: none|auto|hold-approved|hold-denied
 approvals: [<granted at intake>]
-budget: {max_turns: <settings.worker_defaults.max_turns_by_tier[model], fallback max_turns>, wall_clock_hours: 4}
+budget: {max_turns: <sized floor, 6.8c>, wall_clock_hours: 4}
 evidence: required              # checker-written, never worker-written
-dod:                            # lint-enforced (fix V2): CHECKABLE completion predicates, dod-verbs discipline
-  - <ACTION + COMPLETENESS BAR, verifiable by a stranger — never "write good docs">
+dod:                            # CHECKABLE predicates, dod-verbs discipline
+  - <ACTION + COMPLETENESS BAR, verifiable by a stranger>
 status_log: []
 ```
 
-`dod:` items follow /goal-creator's dod-verbs rule: state the ACTION **and** the completeness
-bar ("contract doc documents the per-partner pattern INCLUDING the two fallbacks", not
-"update the doc") — an autonomous worker satisfies the weakest literal reading, and the
-CHECKER can only verify what is written as a predicate.
+`dod:` items state the ACTION **and** the completeness bar ("documents the per-partner pattern
+INCLUDING the two fallbacks", not "update the doc") - a worker satisfies the weakest literal
+reading, and the checker can only verify what is written as a predicate.
 
-**WORKER-MERGE GUARD (mandatory standing line, live double-breach 2026-08-11 — T-099's worker
-merged a foreign PR to resolve references, T-101's worker merged its own gate-2 PR mid-run
-against an explicit contract prohibition):** every worker prompt MUST carry this standing
-mandate line verbatim, regardless of `deliverable:` or model tier: "You NEVER merge or close
-ANY pull request — yours, a foreign one, or anyone else's — and you NEVER push to `main`.
-Landing (merge-on-green, closing, deleting a branch) is dispatcher/checker-owned, not yours."
-Prose-only prohibition proved insufficient twice; STEP 6 and STEP 7 below back it with a
-deterministic post-run PR-state check so a breach is CAUGHT, not just discouraged. This exact
-line also doubles as the machine-origin marker `plugins/prompt-auto-enhance`'s `turn-origin.sh`
-classifier keys on to skip the enhance ceremony on headless `claude -p` workers (T-134, live
-defect: the ceremony leaked into a worker's machine-parsed JSON result) — never reword or drop it.
+**Routing:** haiku = mechanical/classification, sonnet = DEFAULT for any briefed machine-checkable
+job, opus = deep design AND preemptively all security-category work, Fable/Mythos = NEVER a worker
+(preflight exit 4). Full table with examples: `references/model-routing-table.md`. When torn pick
+the cheaper tier - escalation recovers a wrong cheap pick; a wrong expensive one is never detected.
 
-**FOREGROUND-ONLY EXECUTION (mandatory standing line, SECOND line of the WORKER-MERGE GUARD
-mandate — live defect 2026-08-16, T-152: a headless worker backgrounded its pytest run then
-ended its turn; in `claude -p` ending a turn KILLS the process, so the task died silently
-mid-run with a `success` subtype and no result JSON):** every worker prompt MUST ALSO carry
-this standing mandate line verbatim, in addition to (never in place of) the merge-guard line
-above: "Run EVERY command in the FOREGROUND and wait for it; NEVER run anything in the
-background - in headless claude -p, ending your turn kills your process and orphans the task."
-Both lines are mandatory and verbatim; the merge-guard line above is never reworded, reordered,
-or dropped to make room for this one.
+## STEP 6 - DISPATCH: one background worker, guarded
 
-**HOLD-LABEL INSTRUCTION (mandatory second line, live double-breach 2026-08-16 — T-144's PR #558
-auto-merged 84s post-creation, T-143's PR #560 auto-merged ~7min post-creation, neither worker ran
-`gh pr merge`):** the WORKER-MERGE GUARD line above only constrains the WORKER's own actions — it
-says nothing about this repo's OWN `auto-pr-reconcile.sh`/`session-git-landing.sh` automation,
-which auto-lands any open, green, non-`hold`-labeled PR regardless of who opened it or whether they
-ever ran a merge command. For ANY contract whose `dod:` requires the PR to stay open (e.g. "leaves
-the PR OPEN"), the dispatcher MUST include a SECOND, separate worker-prompt line — never merged
-into or replacing the verbatim WORKER-MERGE GUARD line above — instructing the worker to apply the
-`hold` label immediately after opening the PR: `gh pr edit <n> --add-label hold`. This is the actual
-mechanism that stops the repo's ambient automation from landing it; refraining from merging is not
-sufficient on its own.
+1. **Same-repo scan** [log: I-15]: `git pull` the bus, scan for ANY `*.claimed.*.md` on the same
+   registry key from ANY machine; one exists -> do not dispatch unless `related:`-linked with
+   declared-disjoint file scopes. Preflight exit 8 is the backstop; keep them in sync.
+2. **Atomic claim**: rename `...queued.md` -> `...claimed.<session-id>.md`; failed -> skip.
+3. **Contract lint FIRST**: `python GWD/contract-lint.py <claimed contract>` - non-zero -> park
+   with its stderr as the reason. Runs before preflight so nothing is cloned for a bad contract.
+   This skill is the canonical caller - keep it in sync or the fleet-health gate re-fires.
+4. **Preflight gate**:
+   `powershell -NoProfile -ExecutionPolicy Bypass -File GWD/preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <remote> [-PromptPath <p>] [-MaxTurns <n>]`
+   - non-zero BLOCKS; park with the reason. The script header table is the SSOT:
 
-**CI-MINUTES DISCIPLINE (owner Decision 2, 2026-08-18; WORKER PUSH RULE corrected 2026-08-19 —
-T-209, evidence PR #580):** the fleet-side half of the CI-quota fix (T-190 is the repo-side
-half) — two codified rules:
+   | Code | Gate |
+   |---|---|
+   | exit 0 | OK to dispatch |
+   | exit 1 | `-SelfTest` failure ONLY; never from a gate run |
+   | exit 2 | contract missing |
+   | exit 3 | no `model:` field |
+   | exit 4 | model not an allowed worker tier (Fable/Mythos) |
+   | exit 5 | workspace path missing |
+   | exit 6 | repo identity mismatch |
+   | exit 7 | a `context_docs:` entry absolute or missing from the workspace |
+   | exit 8 | same-repo contract already claimed, not `related:` |
+   | exit 9 | prompt file references a foreign-machine path |
+   | exit 10 | HOST-MEMORY (T-312): commit charge over 75% of the limit, or live workers at `settings.fleet.max_concurrent_workers` |
+   | exit 11 | LEARNING-DEBT (T-323): a `MECHANISM-DUE.md` row at occurrences >= 2, not claimed/done, older than 48h, unless named via `lesson_class:`; a malformed registry FAILS CLOSED |
+   | exit 12 | TURN-BUDGET (T-345): `-MaxTurns` below the floor from `settings.worker_defaults.max_turns_by_deliverable` for this kind |
+   | exit 13 | FIX-ROUND PROMPT-LINT (T-336): a `T-<n>F*` prompt whose first step omits honesty / PR-body / STATUS.md duties |
+   | exit 14 | FAST-LANE contract at worker dispatch (T-351): set `lane: normal` and re-lint |
+   | exit 15 | KEEPER-LIVENESS (T-363): no reconciler tick on THIS host inside 2x `settings.fleet_keeper_tick_minutes`. Remedy: `GWD/reconcile-claims.ps1 -StateRoot <root>` |
+   | exit 16 | HOST-MEMORY-UNKNOWN (T-364): the commit or worker query returned nothing - fails CLOSED, never 0.0%/0 |
+   | exit 17 | SETTINGS-READ-FAILURE (T-364): settings.json unreadable/malformed or a value not an integer - blocks instead of defaulting |
 
-1. **WORKER PUSH RULE.** Every worker, checker, and fix-round prompt's standing mandates gain a
-   THIRD verbatim line, additive to (never replacing) the WORKER-MERGE GUARD and FOREGROUND-ONLY
-   EXECUTION lines above: "Intermediate commits (WIP, docs-only, fix-round iterations) carry
-   `[skip ci]` ANYWHERE in the commit message — GitHub matches the whole message, headline or
-   body, there is no safe placement for a push that still needs CI. ONLY the final
-   ready-for-verification push carries the marker NOWHERE — not the headline, not the body, not
-   even quoted while describing this convention." Copy this line VERBATIM into every dispatch —
-   dispatchers do not paraphrase it. **Measured on PR #580, 2026-08-19, same branch, two
-   consecutive pushes:** push 1 carried the marker as the LAST LINE OF THE BODY (headline clean)
-   — result: ZERO workflow runs started, `gh pr checks` reported "no checks reported", PR
-   BLOCKED. Push 2 was an empty commit with the marker NOWHERE — result: `Validate PR` and
-   `Tests` both started within 45s and passed. The quota was not the cause (Validate PR runs had
-   completed successfully the day before). **A prior belief that "the marker is safe in the
-   body, only the headline suppresses CI" is FALSE** — GitHub's skip-ci match is a substring
-   search over the ENTIRE commit message, not the headline alone; a fleet convention that relied
-   on that belief has been suppressing the CI it was meant to preserve on every push that
-   followed it. **The consequence is why this matters:** this repo's `validate` check is
-   REQUIRED — a push that carries the marker anywhere, on a commit that was meant to be
-   validated, leaves the PR with NO checks to ever report; branch protection blocks the merge
-   forever and auto-merge never fires. That is exactly what stalled PRs #577/#579 under the
-   T-191 incident, whose headline-only diagnosis treated the symptom and left the substring-match
-   cause in place. Without the push-rule line at all, each fix-round push burns a full PR CI run
-   on top of the eventual real one; applied correctly (marker truly absent, not just absent from
-   the headline, on the final push), a task costs at most ONE CI run plus the merge's own check.
-2. **SAME-REPO LANDING BATCHING.** Same-repo tasks whose contracts are written within the same
-   calendar day default to ONE shared branch/PR/CI-run — extending the existing TRIVIAL-TASK
-   BATCHING (STEP 5 above) and WAVE-CHAINING (STEP 5 above) conventions; the PRE-QUEUE DEDUP
-   GATE's "overlapping/related" outcome is the mechanism that merges them. Named exceptions:
-   P1 break-fixes land solo (urgency beats batching economics); tasks with conflicting
-   file-scopes split into separate contracts (a shared PR can't safely hold two workers editing
-   the same files); a checker FAIL on one batched task holds only that task's hunks if they are
-   separable from the rest of the batch's diff, otherwise the whole batch re-rounds together.
-   **Projected effect (stated honestly, not guaranteed):** fix-loops drop from 2-4 CI runs to 1
-   per task; same-repo same-day batching further reduces the PR count itself, not just the
-   per-PR run count.
-
-**Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
-global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
-`D:\Abhay\VibeCoding\claude-best-practices\.claude\rules\model-routing.md`):**
-
-| Tier | Contract it for |
-|---|---|
-| `haiku` | rubric scoring, classification, extraction, format checks, mechanical single-file edits |
-| `sonnet` (DEFAULT) | any explicit brief + machine-checkable gate: code edits per plan, tests, research, docs |
-| `opus` | deep debugging, architecture, multi-file design freedom — AND **preemptively for ALL security-category work** (security scan/audit, vulnerability analysis, exploit-adjacent, authz, prompt-injection; fix #8 — avoids the refusal round-trip; contract-lint BLOCKS security-on-cheaper-tier) |
-| Fable/Mythos | NEVER a worker (preflight-guard exit 4) |
-
-When torn, pick the cheaper tier — the escalation rule (STEP 6.6) recovers a wrong cheap
-pick after evidence; a wrong expensive pick is never detected.
-
-## STEP 6 — DISPATCH: one background worker, guarded
-
-**CROSS-MACHINE SAME-REPO GATE (mandatory, live incident 2026-08-16 — T-141/T-142 ran on
-itsab-PC while the VPS sweep concurrently ran T-143/T-144/T-145 against the same hub repo; no
-bus-level repo lock existed, and the run survived only by luck of disjoint file-sets, not by
-design):** before claiming or dispatching ANY task, `git pull` the bus and scan the GWD queue
-for ANY `*.claimed.*.md` contract targeting the SAME registry repo key, from ANY machine. If
-one exists, do NOT dispatch the new task unless (a) it is `related:`-linked to that claimed
-contract AND (b) the two contracts' file-scopes are declared disjoint. Same-repo serialization
-is a whole-fleet invariant, not a same-machine one — a machine-local queue view is not proof no
-other machine is working the repo. This prose gate is backed by a deterministic preflight
-backstop, `preflight-guard.ps1` exit 8 (SAME-REPO ALREADY-CLAIMED GATE, landed via the related
-bus task T-155): it blocks dispatch outright when a same-repo sibling `*.claimed.*.md` contract
-exists and this contract's `related:` list doesn't name it — keep this paragraph and that gate
-in sync.
-
-1. **Atomic claim**: rename `…queued.md → …claimed.<session-id>.md`. Rename failed → another
-   session owns it; skip.
-2. **Contract lint (deterministic, runs FIRST — T-020 2026-07-20):** run
-   `python GWD\contract-lint.py <claimed contract path>` — exit 0 = clean to dispatch; non-zero
-   BLOCKS (reason on stderr: missing/empty required field, unresolved assumption language, a
-   data-reading task with no declared `data_source:`, a `model:` line with no routing rationale,
-   or a security-category task on a non-opus tier — fixes #6/#8 2026-07-27). Blocked → park the contract with the
-   lint's stderr as the reason, never dispatch it. This runs BEFORE the preflight gate so a
-   malformed contract is rejected before any workspace is cloned. The gate was dead prose until
-   this call site existed (`check_fleet_script_health.py` dead-gate finding); `SKILL.md` is the
-   canonical caller — keep this step and the script in sync or the health gate re-fires.
-3. **Deterministic preflight gate (Phase 2, P3/G18 + owner Q2):** run
-   `powershell -NoProfile -ExecutionPolicy Bypass -File GWD\preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <registry remote>` —
-   exit 0 = OK; non-zero BLOCKS (model not haiku|sonnet|opus incl. Fable-as-worker → exit 4; repo
-   identity mismatch → exit 6; a contract `context_docs:` entry missing from the workspace →
-   exit 7, 2026-08-15). This makes cheapest-correct routing + wrong-repo protection +
-   context-doc presence machine-enforced, not prose-dependent. Blocked → park with the reason,
-   never dispatch.
-4. **Workspace (owner design 2026-07-16, clone-on-demand):** on the fleet-home box, the target
-   repo is cloned FRESH at dispatch (`git clone --filter=blob:none`, per-machine path from
-   settings.json) unless a workspace from the retention window already exists AND is clean. The
-   keeper's janitor deletes workspaces idle past `workspaces.retention_days` ONLY when provably
-   clean (no uncommitted changes, no unpushed branches) — dirty workspaces are escalated to the
-   owner, NEVER deleted (live save 2026-07-16: pre-existing IPODhan WIP). Permanent exceptions:
-   the bus, the hub clone (keeper engine), GLOBAL.md/GLOBAL.env scp-copies (never in git).
-5. Launch via background Bash, IN the workspace directory so the repo's own CLAUDE.md/plugins load.
-   The prompt goes via STDIN — never as an argument (a contract starting with `---` frontmatter
-   is parsed as a CLI flag; live failure 2026-07-15):
-   ```bash
-   # prompt file = contract body + worker mandate + required JSON output shape
-   cd <registry path> && claude -p --model <tier> --max-turns <cap> \
-     --permission-mode bypassPermissions --output-format json \
-     < GWD\heartbeats\T-<id>.prompt.txt > GWD\heartbeats\T-<id>.result.json
+5. **Workspace** [log: I-16]: clone FRESH (`git clone --filter=blob:none`) unless one inside
+   `settings.workspaces.retention_days` exists AND is clean. The janitor deletes idle workspaces
+   only when provably clean; dirty ones escalate, never delete.
+6. **LAUNCH - the one recipe** [log: I-21]. Write `GWD/heartbeats/T-<id>.prompt.txt` FIRST, then:
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File GWD/worker-wrapper.ps1 `
+     -TaskId T-<id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap> -StateRoot <GWD>
    ```
-   Same-repo-as-dispatcher tasks: the contract MUST order the worker into its own git worktree
-   (two sessions must never share one checkout).
-6. On exit, parse the JSON **`stop_reason` — a refusal is NOT success** (exit code lies).
-   Terminal-state rules (fixes #2/#3/#7, 2026-07-27):
-   - **Refusal on haiku/sonnet → reroute to opus via the FULL procedure**, never a bare
-     relaunch: (a) EDIT the contract's `model:` to `opus  # rerouted: refusal on <tier>`,
-     (b) append the reroute to `status_log`, (c) re-run contract-lint + preflight-guard,
-     (d) relaunch. Skipping (a) records the wrong tier in LEDGER/evidence and corrupts the
-     cost audit (P21) — the contract must always state the tier that actually runs.
-   - **Refusal on opus (original or rerouted) → PARK immediately** with an owner card
-     carrying the refusal category. There is NO second reroute, ever.
-   - **Error → one retry on the SAME tier** (most errors are environmental). A **2nd
-     failure** on the same task: classify it — environmental (missing tool/auth/network/
-     trust-dialog/OOM) → park with the error text as before; **capability/quality class
-     (worker ran fine but produced wrong/insufficient work) → escalate ONE tier**
-     (haiku→sonnet→opus) via the same edit-contract + re-lint + re-preflight procedure,
-     record the routing lesson in `status_log`, and relaunch once; already at opus → park
-     (model-routing.md: "escalate ONE tier after 2 supervised failures"). Max ONE
-     escalation per task — if the escalated relaunch also fails, PARK; never chain
-     haiku→sonnet→opus on one task.
-   - Keeper DEATHS stay un-escalated (STEP 6.9): a dead PID is environmental by
-     definition — re-queue once at the same tier, park on the second death.
-6a. **WORKER-MERGE GUARD — post-exit PR-state check (mandatory, live double-breach
-   2026-08-11):** after parsing the result JSON (item 6 above), check the state of EVERY PR
-   the contract references — its own gate PR plus any PR the worker's JSON reports touching —
-   via `gh pr view <PR> --json state,mergedBy,mergedAt`. A PR that shows `state: MERGED` with
-   `mergedAt` inside the worker's run window (dispatch timestamp → result JSON timestamp) is a
-   task FAILURE line in `status_log` + `GWD\LEDGER.md` + an owner card — regardless of how good
-   the work is. This runs for EVERY task, not just ones that look suspicious; a worker that
-   merged nothing produces a clean, fast check.
-7. **Parallel lanes (Phase 2, P6/P12):** dispatch up to `settings.soft_concurrency_cap`
-   workers concurrently — SAME-repo tasks always serialize; different repos run in parallel.
-   Priority P1 > P2 > P3; a P1 is ALWAYS admitted even at the cap. Exceeding the soft cap is
-   allowed only for mechanical, independent tasks. **Reprioritization (owner 2026-08-09):**
-   when a NEW task arrives, the dispatcher re-judges priority across the whole QUEUE on its
-   own — a more urgent task is queued ahead (edit the contracts' `priority:` fields; same-repo
-   serialization still holds). REORDER ONLY: a running worker is NEVER preempted or killed for
-   priority (cancel stays owner-only); urgency is served by P1 always-admitted, not by killing
-   in-flight work. Before each dispatch check the DAILY
-   CEILINGS (both, fix #10 2026-07-27): (a) dispatches today >= `settings.max_dispatches_per_day`,
-   OR (b) the keeper's failures log (`GWD\heartbeats\keeper-tick-failures.log`) shows a
-   CEILING-EXCEEDED line dated today (written by `cost-rollup.py --check-ceiling` against the
-   numeric `settings.daily_token_ceiling`) → pause new dispatches, ping the owner once
-   (fleet-paused), never retry-storm. **ACTIONS-MINUTES HOLD (budget plan part c, owner Decision
-   2 2026-08-18):** before dispatching a task whose landing will trigger private-repo CI, check
-   `GWD\state\ci-hold.flag` — present means only P1 tasks proceed, others queue with a status
-   note (prose rule; a preflight-guard exit code is the codify-later follow-up in
-   PATTERNS-SEEN.md).
-8. **Heartbeat dispatch (P7):** on Windows machines launch via the wrapper —
-   `powershell -File GWD\worker-wrapper.ps1 -TaskId <id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap> -StateRoot <GWD>`
-   — `-StateRoot` is MANDATORY off the VPS: its default is the VPS fleet home
-   `C:\Abhay\GetWorkDone`, so omitting it on the local PC fails with "prompt file
-   missing" (live misfire T-038, 2026-08-01). Pass THIS machine's GWD path.
-   (prompt file at `GWD\heartbeats\<id>.prompt.txt` first). The wrapper writes
-   `<id>.hb` (PID + tick, ~60s) and the result JSON.
-8a-bis. **ON-SCREEN QUEUE ACK (owner requirement 2026-08-10):** the moment a task is queued or
-   dispatched, RENDER a visible confirmation in the origin session's chat — T-id, target repo,
-   model tier, priority, budget, one-line DoD summary. The owner must SEE on screen that the
-   task entered the fleet, in the same session where they gave it — a silent queue insert is a
-   defect.
-8b. **ARM A WATCHER IN THE SAME TURN AS THE LAUNCH (fix #13, 2026-08-08 — owner-reported).**
-   A worker launched **detached** (PowerShell `Start-Process`, `nohup`, anything the harness holds
-   no handle on) emits **NO completion notification** — nothing tells the dispatcher it died. In
-   the SAME turn as the dispatch, arm a `Monitor` until-loop (or a `ScheduleWakeup` tick sized to
-   the expected run) that breaks on **every terminal state, not just success**: result JSON
-   written, `.hb` reading `EXITED`, or heartbeat older than
-   `settings.heartbeat_stale_after_seconds`. Silence is not success — a filter that only matches
-   the happy path is indistinguishable from a crash. The terminal test MUST require a
-   **NON-EMPTY** result JSON (the wrapper pre-creates the file at 0 bytes — a live-fire watcher
-   false-positived on the empty placeholder 2026-08-10 and declared a running worker finished;
-   `EXITED` heartbeat and true staleness are the other two valid terminal signals).
-   **Live incident:** 2026-08-08 T-056 — relaunched detached to survive shell reaping (the known
-   background-Bash trap), hit its turn cap 9 minutes later, and the failure sat **unnoticed for
-   35 minutes** until the owner asked "everything done?". Recovery must never wait on the owner.
-   The two traps are a pair: background Bash gets reaped and kills its child; detached survives
-   but goes dark. Use detached **AND** a watcher, never one alone.
-   **ON-SCREEN COMPLETION STATUS (owner requirement 2026-08-10):** when the watcher fires on a
-   terminal state, the origin session AUTOMATICALLY renders the task's status card on screen in
-   that session's chat — outcome (DONE/PARKED/FAILED), PR link, checker verdict, evidence path,
-   tier — without the owner having to ask. Queue ack (8a-bis) + this completion render are the
-   PRIMARY owner-facing reporting for session-origin tasks.
-   **15-MINUTE SCOREBOARD CADENCE (owner order 2026-08-16 13:53):** while ANY task from a
-   session-origin intake is live (claimed/running, including checker and fix rounds), the origin
-   session renders the full task scoreboard table (T-id, task, state, PR, round) on screen every
-   15 minutes — armed as a ticker in the SAME turn as the first dispatch (piggyback the existing
-   `Monitor`/`ScheduleWakeup` watcher above, or a second tick at the same cadence), stopped only
-   when the queue drains. A silent gap longer than 15 minutes while work is running is a defect.
-   **OWNER STATUS CADENCE (owner directive 2026-08-20 23:53 IST):** this is a SKILL obligation,
-   not a per-plan promise — a plan-level cadence evaporates with the plan; a skill rule inherits
-   into every future dispatching session. Every tick OPENS WITH THE CURRENT TIME IN IST (e.g.
-   `[21:46 IST]`) so the owner always knows when the last update was dropped — a tick with no
-   timestamp does not satisfy the cadence. CONTENT FLOOR, one line: what changed since the last
-   tick (landed/failed/dispatched), what is running now, and the current estimate if one was
-   given; if NOTHING changed, say so explicitly with the time rather than skipping the tick.
-   MECHANISM: the ticker MUST be PERSISTENT for the session, never a fixed timeout that silently
-   expires — the 2026-08-20 20:30 lapse was exactly this failure shape, a ticker armed with a
-   timeout instead of as persistent, going dark for an hour inside the same session that spent
-   two days fixing that failure shape elsewhere. It reports real state, never fabricated
-   progress. When no fleet work is active, no ticker is required.
+   The wrapper passes the prompt as an **argv pointer** (STDIN was abandoned 2026-08-12 - invisible
+   to console-less processes), appends `GWD/worker-mandates.txt`, writes `T-<id>.hb` (PID + ~60s
+   tick) and the result JSON. `-StateRoot` is MANDATORY off the VPS. The deleted STDIN recipe is
+   archived with a do-not-use banner at [log: I-17]. A same-repo-as-dispatcher contract orders the
+   worker into its own worktree.
+7. **Terminal state** [log: I-18]: parse `stop_reason` - a refusal is NOT success. Refusal on
+   haiku/sonnet -> reroute to opus by the full procedure (edit `model:`, append `status_log`,
+   re-lint, re-preflight, relaunch); on opus -> PARK, no second reroute. Error -> one retry same
+   tier; a 2nd failure: environmental -> park, capability/quality -> escalate ONE tier (max one).
+   Keeper deaths are environmental: re-queue once, park on the second.
+8. **Post-exit PR-state check** [log: I-19]: `gh pr view <PR> --json state,mergedBy,mergedAt` on
+   every PR the contract or result JSON names. Merged inside the run window (dispatch -> result JSON
+   timestamp) = a task FAILURE line in `status_log` + `GWD/LEDGER.md` + an owner card.
+9. **Lanes + ceilings** [log: I-20]: up to `settings.fleet.max_concurrent_workers` concurrently
+   (exit 10 enforces it); same-repo serializes, other repos run in parallel; P1 > P2 > P3 and a P1
+   is always admitted; re-judge priority by REORDERING only, never preempting. Check
+   `settings.max_dispatches_per_day` and a CEILING-EXCEEDED line dated today in the keeper failures
+   log (from `settings.daily_token_ceiling`) -> pause + ping once, never retry-storm.
+   `GWD/state/ci-hold.flag` present => only P1 proceeds.
+10. **Queue ack + watcher, same turn as the launch** [log: I-22]. Ack: render T-id, repo, tier,
+   priority, budget, one-line DoD on screen in the origin session. Watcher: a `Monitor`
+   until-loop (or sized `ScheduleWakeup`) breaking on **every** terminal state - a NON-EMPTY
+   result JSON (the wrapper pre-creates it at 0 bytes), an `EXITED` heartbeat, or one older than
+   `settings.heartbeat_stale_after_seconds` - after which the origin session renders the status
+   card (outcome, PR, verdict, evidence path, tier) automatically. **Cadence:** while any
+   session-origin task is live, a PERSISTENT 15-minute ticker (never a timeout), each tick
+   opening with the IST time: what changed, what is running, the estimate - explicitly so even
+   when nothing changed.
+11. **Budget from task shape** [log: I-23]: `max_turns` from
+   `settings.worker_defaults.max_turns_by_deliverable` for the kind, floored by
+   `settings.worker_defaults.max_turns_by_tier`. A DoD that runs a full suite, rebuilds assets,
+   writes docs AND drives a PR is >=70 turns however small the diff. A turn-cap death resumes into
+   the SAME worktree at a raised budget - never redo finished work from origin/main.
+12. **Reconcile (keeper duty, every tick)** [log: I-24]: per claimed contract read its `.hb` -
+   fresh tick + live PID -> leave alone; `EXITED` -> CHECK; stale or dead PID -> kill the remnant,
+   append `status_log`, re-queue ONCE, park + card on a second death. Foreign-machine claims have
+   no local `.hb` by design - require a local `.hb` or `.prompt.txt` before calling one dead, else
+   wait out `budget.wall_clock_hours` from the claim rename. Run the janitor here too.
+   `error_max_turns` is NOT a death: raise `budget.max_turns` to min(2x current, 200), log it,
+   relaunch into the SAME worktree naming the branch + uncommitted files; lifetime THREE runs, then
+   park `QUALITY/SCOPE-SUSPECT`. Reconciliation must RUN on this host or exit 15 blocks the next
+   dispatch.
 
-8c. **BUDGET FROM TASK SHAPE, NOT TIER DEFAULT (fix #14, same incident).** `max_turns` is set at
-   intake from what the task must actually DO, not from `worker_defaults`. Any contract whose DoD
-   includes running a full test suite, rebuilding assets, writing docs AND driving a PR to merge
-   is a **≥70-turn** task however small its diff — the PR/CI/merge tail alone costs 10-15 turns.
-   T-056 was a ~40-line fix budgeted at 40 turns; it wrote correct code and died one turn short of
-   running the suite. On a turn-cap death, RESUME INTO THE SAME WORKTREE with a raised budget
-   (the prompt must name the branch, the uncommitted files, and forbid restarting from scratch) —
-   never relaunch from origin/main and redo finished work.
+**SWEEP RECONCILIATION** [log: I-25] - before flipping any contract's state: newest signal wins
+(the newest timestamped `status_log` entry AND the bus git log); a live origin's activity blocks
+reclaim except the provably-dead-origin rescue; an unmerged PR blocks `.done`.
 
-9. **Reconcile (keeper duty, every tick):** for each `claimed` contract read its `.hb` —
-   fresh tick + live PID → leave alone (slow ≠ dead); `EXITED` → route to CHECK; stale (> 
-   `settings.heartbeat_stale_after_seconds`) or dead PID → kill remnant, append status_log,
-   re-queue ONCE; a SECOND death on the same task → park + owner card.
-   **FOREIGN-MACHINE CLAIMS ARE NOT DEAD (live defect 2026-08-09, T-060 double-dispatch):**
-   heartbeats are machine-local (gitignored), so a contract claimed by ANOTHER machine's
-   session has NO local `.hb` BY DESIGN. Before treating a claimed contract as dead, require
-   a local dispatch artifact (`.hb` or `.prompt.txt`) proving it was launched FROM THIS
-   machine. A claim with no local artifact is FOREIGN: leave it alone until the contract's
-   `budget.wall_clock_hours` has elapsed since the claim rename (bus git log dates it), and
-   even then re-queue only with a status_log note naming the foreign session id. Also run the JANITOR
-   here (workspaces idle past retention, clean-only delete, dirty → escalate).
-   **Turn-cap AUTO-RESUME (owner-approved 2026-08-09; extended 2026-08-17):** a result JSON
-   with subtype `error_max_turns` is NOT routed to CHECK and NOT treated as a death —
-   AUTO-RESUME, no owner interaction: (a) edit the contract's `budget.max_turns` to
-   min(2x current, 200) with a one-line note, (b) append the resume to `status_log`,
-   (c) relaunch INTO THE SAME WORKTREE with a prompt that names the branch + the uncommitted
-   files and FORBIDS restarting from scratch (8c). Auto-resume up to a **lifetime total of
-   THREE runs per task** (initial run + two auto-resumes) — a THIRD cap-death parks the task
-   labeled `QUALITY/SCOPE-SUSPECT` with an owner card: at that point the task is oversized or
-   ill-scoped for its budget, not merely under-funded, so it stops for a scope rethink, never
-   for a budget approval. (T-056 would have self-healed instead of sitting dead 35 min; T-179
-   sat PARKED ~2h on 2026-08-17 waiting for a resume-budget approval on work that was ~90%
-   done — this is the fix.)
+**BUDGET PRE-APPROVAL** [log: I-26]: retries, cap-resumes, raises and tier escalations are
+pre-approved, never owner-gated - bounded by the Anthropic plan's limits and the daily ceilings,
+which pause + notify rather than ask. New recurring third-party spend stays owner-gated.
 
-**SWEEP RECONCILIATION RULES (2026-08-18, 3-incident codification):** the fleet's lesson
-lifecycle mandates a lesson recurring 3x becomes a deterministic rule, never a 4th prose
-reminder — this class (a sweep flipping a task's queue state against the origin session's
-newer, truer state) hit that bar in 24h. MUST rules for every sweep, before flipping ANY
-contract's state (rename park/claim/done):
-1. **Newest signal wins.** A sweep MUST read the contract's NEWEST timestamped `status_log`
-   entry AND the bus git log for that file before acting — a stale body note never overrides
-   a newer rename. Incident: T-179 was re-parked from a stale body note that overrode a newer
-   claim rename.
-2. **A live origin's activity blocks reclaim.** A sweep MUST NOT reclaim/re-state a contract
-   whose origin session pushed bus activity within the last 2 hours, except the
-   provably-dead-origin rescue path (STEP 7 exception (a) above). Incident: T-178 — a sweep
-   claimed a live origin's deliberately-held task.
-3. **Unmerged PR blocks `.done`.** A contract whose dod/status references an unmerged PR is
-   NEVER renamed `.done` — work-complete-awaiting-land stays `.claimed` (or `.parked` with an
-   external-blocker reason); `.done` REQUIRES the PR merged. Incident: T-179 was renamed done
-   while its PR was still OPEN.
+**INVOCATION LOG** [log: I-27]: end EVERY intake turn with one line in `GWD/INVOCATIONS.log`:
+`<UTC ISO> | <session-id>@<machine> | cwd-repo=<key or none> | tasks_parsed=<n> | tids=<value>`;
+`tids=` is T-ids * `dup:T-xxx` * `gate-pending` * `none`. Only `tids=none` is the inline defect.
 
-**STANDING BUDGET PRE-APPROVAL (owner 2026-08-17):** retries, cap-resumes, budget raises, and
-tier-escalation costs are pre-approved and never owner-gated — bounded only by (a) the
-Anthropic plan's own weekly/monthly limits, which are not session-readable so the platform
-itself enforces them, and (b) the existing daily spend ceilings, which pause + notify
-automatically rather than ask. Never stop a task to ask "can I spend more?" — the only budget
-question that still reaches the owner is the third-cap-death `QUALITY/SCOPE-SUSPECT` park
-above, and that is a scope question, not a budget one. NEW recurring third-party spend (a new
-paid API, a new subscription) and owner-set product budget ceilings (e.g. a $30/mo watchdog
-cap) remain owner-gated — this grant covers running Anthropic-model work harder, not opening
-new spend categories.
+## STEP 7 - CHECK + REPORT: maker != checker
 
-**INVOCATION LOG — a recurrence detector, not the only evidence (semantics fixed v0.8.1,
-verifier finding MEDIUM-6):** at the end of EVERY intake turn (any mode), append ONE line to
-`GWD\INVOCATIONS.log`: `<UTC ISO timestamp> | <session-id>@<machine> | cwd-repo=<registry key
-or none> | tasks_parsed=<n> | tids=<value>`. The `tids=` field distinguishes legitimate
-no-new-T-id outcomes from the defect: comma-separated T-ids (dispatched) · `dup:T-xxx`
-(dedup gate converged on an existing task) · `gate-pending` (still inside the 95% grill,
-one line per turn) · `none` (parsed a task, produced no T-id and no legitimate reason —
-THIS alone is the inline-execution defect, findable with one grep). Known limit: a session
-that never invokes the skill writes no line at all — the CLAUDE.md rule + guard hook are
-the backstop for that path, this log only proves what invoked sessions did. The weekly
-fleet audit greps for `tids=none`; a hit becomes a `LESSON(OPEN):` entry in
-PATTERNS-SEEN.md.
-
-## STEP 7 — CHECK + REPORT: maker ≠ checker (P5)
-
-**ORIGIN-SESSION REPORTING AFFINITY (owner requirement 2026-08-10):** the contract's `origin:`
-session owns ALL in-session progress/result reporting for that task — the owner hears about a
-task in the session where they gave it, nowhere else. Every other session treats foreign-origin
-tasks as read-only context: `status` mode may LIST them, but MUST NOT check, report, retry,
-park, or otherwise act on them. Exactly two exceptions: (a) the KEEPER/SWEEP rescuing a task
-whose origin session is provably dead (reconcile rules, STEP 6.9) — the rescue is then reported
-via the owner card channel with a "rescued from <origin>" note, never as another session's own
-work; (b) an explicit owner ask in another session ("what happened to T-061?") — answer it, but
-change nothing. Cross-session meddling with a live origin's tasks is the 2026-08-09/10
-interference class — a defect, not initiative.
-
-**AUDIT-GAP FIXES 2026-07-18 (from the T-014 self-review):**
-- **Worker cwd:** launch the worker in the TARGET repo's dir (or a neutral working dir like the app's
-  deploy path) — NEVER the hub repo dir. Running in the hub made a worker inherit hub governance and
-  emit the `*Enhanced:*` ceremony in its report (leak). The dispatch cwd is the target, not `claude-best-practices`.
-- **Checker is MANDATORY and AUTO-CHAINED, never manual.** STEP 7 is not optional and not owner-triggered:
-  every task automatically spawns a SEPARATE checker agent (`evidence: required` is the ONLY accepted value since v0.8.1 — lint blocks anything else; a task too small to verify is batched, never unverified) (in a
-  neutral dir) that re-verifies a sample from SOURCE before the task is reported done. On T-014 the checker
-  CONFIRMED a real bug (a duplicate DB row) AND REFUTED a false one (worker claimed "price data missing" —
-  it was present under a differently-named column). A worker report without a checker verdict is INCOMPLETE.
-- **Evidence = raw pulls + report + checker verdict**, all saved to `GWD\evidence\<date>-<id>\` — not just the
-  final prose. The raw data is what lets the checker (and owner) independently re-examine claims later.
-
-The worker's "done" claim is input, not truth. Dispatch a CHECKER against the worker's output;
-tier = **opus when the contract's model is opus, sonnet otherwise** — fix #11: the checker is
-never weaker than the maker.
-
-**CHECKERS MUST BE HEADLESS (owner-reported live defect 2026-08-16 — the T-141 stall):** the
-unattended checker path is the SAME headless wrapper mechanics as a worker, never an in-session
-`Agent()` — an in-session Agent renders a permission dialog on any tool call outside its
-allowlist, and with the owner away that dialog blocks silently with no heartbeat and no timeout.
-**Incident: on 2026-08-16, T-141's checker (dispatched as an in-session `Agent()`) stalled ~90
-minutes on a permission dialog while the owner was away** — the fleet's fail-at-intake principle
-(collect approvals while the owner is present, STEP 4) was silently violated because the checker
-path was never covered by it; workers were already immune via headless `bypassPermissions`, but
-checkers were not. Dispatch every unattended checker exactly like a worker:
-- Launch via `claude -p --model <tier> --permission-mode bypassPermissions --output-format json`
-  through `GWD\worker-wrapper.ps1` (same wrapper as STEP 6 item 8), writing a heartbeat file
-  `T-<id>C.hb` (the `C` suffix distinguishes it from the worker's own `T-<id>.hb` so the two
-  death-detection tracks never cross-contaminate, per the T-068 heartbeat-collision lesson).
-- Arm a terminal-state watcher in the SAME turn as the checker launch (identical rule to STEP
-  6.8b — non-empty result JSON, `EXITED` heartbeat, or staleness past
-  `settings.heartbeat_stale_after_seconds`; silence is not success).
-- The checker prompt carries the WORKER-MERGE GUARD standing line verbatim (STEP 5) — a checker
-  re-deriving the WORKER-MERGE GUARD predicate (below) never merges or closes a PR itself either.
-- **In-session `Agent()` is allowed ONLY when the owner is present and the dispatcher explicitly
-  states so** (e.g. "running the checker in-session — owner online") — never as the silent
-  default for an unattended run.
-
-FIRST run the deterministic tier receipt
-`python GWD\verify-model-tier.py <contract> GWD\heartbeats\<id>.result.json` (fix #1 — asserts
-tier-as-run == tier-as-contracted from `modelUsage`; non-zero = a task FAILURE line in
-status_log + LEDGER, never a silent pass). **Then run the WORKER-MERGE GUARD check (mandatory
-predicate, same as STEP 6a — the checker re-derives it independently rather than trusting the
-dispatcher's pass):** `gh pr view` on every PR the contract/result JSON references; any PR
-merged inside the worker's run window is a task FAILURE regardless of `deliverable:` type —
-record it in the checker verdict before scoring any other dod predicate. Then verify **every
-`dod:` predicate** via the
-procedure for the contract's `deliverable:` type (fixes V1/V3/V4, 2026-07-27 — before this
-table only code/deploy had a defined procedure; content and skills could pass on checker
-opinion):
+1. **Reporting affinity** [log: I-28]: the contract's `origin:` session owns all in-session
+   reporting; another session may LIST a foreign-origin task but never check, report, retry or park
+   it. Exceptions: a keeper/sweep rescue of a provably-dead origin (labeled as such) and an
+   explicit owner ask elsewhere (answer, change nothing).
+2. **Checker launch** [log: I-29, I-30]: mandatory, auto-chained, HEADLESS - `worker-wrapper.ps1`,
+   `bypassPermissions`, heartbeat `T-<id>C.hb` (the `C` suffix keeps the death-detection tracks
+   apart), watcher armed in the same turn. Tier = opus when the contract is opus, else sonnet -
+   never weaker than the maker. In-session `Agent()` only with the owner present and said so. The
+   worker itself runs in the TARGET repo's dir, never the hub's, or hub governance leaks into its
+   machine-parsed JSON.
+3. **Tier receipt**: `python GWD/verify-model-tier.py <contract> GWD/heartbeats/<id>.result.json`
+   - tier-as-run must equal tier-as-contracted; non-zero = a task FAILURE line, never a silent pass.
+4. **Merge-guard predicate**: re-derive item 8 of STEP 6 independently, before scoring any dod.
+5. **Verify every `dod:` predicate** by the `deliverable:` procedure:
 
 | `deliverable:` | Checker procedure (re-derivation, never review-and-agree) |
 |---|---|
-| `code` | Re-run the project's OWN full test gate from scratch; CI green on the PR; diff inspected against dod predicates |
+| `code` | Re-run the project's OWN full test gate from scratch; CI green on the PR; diff inspected against the dod predicates |
 | `deploy` | verify-effect-at-destination: probe the LIVE URL, capture the screenshot, config-validity gate |
-| `content` (docs/reports/research) | Trace EVERY factual/technical claim in the deliverable to its source (code, PR diff, captured data) — a claim with no source row is a FINDING; check placement + structure against the repo's conventions; check each dod predicate individually. Sample floor: ALL claims when ≤10, else 10 + every number |
-| `claude-resource` (skill/agent/rule/hook) | Run the hub's `/skill-evaluator` (output mode minimum; full for new skills) from the hub checkout; if the target repo can't run it, execute the resource's own trigger + one real scenario end-to-end and capture the transcript. An unexercised skill is UNVERIFIED, never done |
-| `data` | Independently re-pull a sample from the contract's `data_source:` and re-derive the worker's headline numbers (T-014 precedent: checker CONFIRMED a real dup-row bug AND REFUTED a false "missing data" claim) |
+| `content` | Trace EVERY factual/technical claim to its source (code, PR diff, captured data) - a claim with no source row is a FINDING; check placement, structure and each dod predicate. Sample floor: ALL claims when <=10, else 10 + every number. `lane: fast` -> `fast-lane-check.py` instead |
+| `mechanical` | `fast-lane-check.py` (deterministic) or the repo's own lint - never review-and-agree |
+| `claude-resource` | Run the hub's `/skill-evaluator` (output mode minimum; full for a new skill) from the hub checkout; if the target repo can't, execute the resource's own trigger + one real scenario end-to-end and capture the transcript |
+| `data` | Re-pull a sample from the contract's `data_source:` independently and re-derive the headline numbers |
 
-**Evidence = re-derivation artifacts, not attestations (fix V4):** the evidence folder
-`GWD\evidence\<date>-T-<id>\` must contain the checker's raw proof (test output / probe
-screenshot / claim→source table / eval report or scenario transcript / re-pulled sample +
-recomputation) plus SHA + PR URL, AND the `GWD\LEDGER.md` line — including the tier +
-costUSD from the receipt, so the P21 cost audit reads receipts, not claims. A checker
-verdict consisting of an opinion ("reviewed, looks correct") with no re-derivation artifact
-is INCOMPLETE — treat it as no verdict. The WORKER NEVER writes evidence. Foolproof it is
-not (a checker can err) — but every verdict leaves auditable raw evidence a later session
-or the owner can re-examine, and CI re-gates anything code-shaped at merge. Then report to the owner: per task —
-outcome, PR link, evidence path, cost tier used; plus anything parked and why. Append the
-task's shape signature to `GWD\PATTERNS-SEEN.md` (3rd occurrence → file a PROPOSED codify
-card, P20).
+6. **Evidence = re-derivation artifacts, not attestations** [log: I-32]:
+   `GWD/evidence/<date>-T-<id>/` holds the raw proof (test output / probe screenshot / claim-source
+   table / eval report or transcript / re-pulled sample + recomputation) plus SHA + PR URL, AND the
+   `GWD/LEDGER.md` line with tier + costUSD from the receipt. An opinion with no artifact is no
+   verdict; the WORKER NEVER writes evidence.
+7. **Close-out** [log: I-33]: not done until the verdict carries the SWEEP result for every defect
+   fixed and, on a second-occurrence shape, names the MECHANISM installed plus its
+   `PATTERNS-SEEN.md` lesson line. New prose alone is INCOMPLETE.
+8. **Report + lessons** [log: I-34]: per task - outcome, PR link, evidence path, cost tier, plus
+   anything parked and why. Append the shape signature to `GWD/PATTERNS-SEEN.md` (3rd occurrence ->
+   a PROPOSED codify card) and every failure/park/reroute/refutation as `LESSON(OPEN): <mistake> ->
+   <root cause> -> <rule>`; lifecycle OPEN -> CODIFIED -> ARCHIVED; intake reads only the newest 20
+   OPEN lines; 3x means a deterministic gate. Fleet-mechanics lessons only - hub-repo lessons stay
+   in `.claude/tasks/lessons.md`.
+9. **Cards** [log: I-35]: the origin session's on-screen render is PRIMARY;
+   `GWD/notify-owner.ps1` fires only when that session is dead at terminal time (card opens "origin
+   session gone"). Origin-less tasks use the card as primary. Silence is never success. On a
+   non-VPS machine the ping reaches the relay only after a bus commit+push. **Parked digest** [log:
+   I-36]: `GWD/parked-digest.ps1` (weekly keeper step) cards every `*.parked.md` with age + reason;
+   the owner replies `<T-id> retry` / `<T-id> drop` and the sweep processes it - parked must never
+   mean forgotten.
 
-**ROOT-CAUSE CLOSE-OUT (STEP 3.5, enforced here):** no task is reported done until the
-checker verdict carries the SWEEP result for every defect fixed ("fixed 1 of N found" /
-"swept, no other instances") and, on a second-occurrence shape, names the MECHANISM installed
-plus its `PATTERNS-SEEN.md` lesson line. A close-out claiming a class fix whose only artifact
-is new prose is INCOMPLETE.
+## ARTIFACT PLACEMENT
 
-**LESSONS LIVE IN PATTERNS-SEEN.MD (owner 2026-08-15 — deliberately NOT a separate
-LESSONS.md; the bus already has enough logs):** every failure, park, reroute, or
-checker-refutation appends a `LESSON(OPEN): <mistake> → <root cause> → <rule>` line to
-`GWD\PATTERNS-SEEN.md`. Lifecycle: `LESSON(OPEN)` → `LESSON(CODIFIED → <where>)` when it
-becomes a rule/gate → `LESSON(ARCHIVED)`. Intake sessions read ONLY the `LESSON(OPEN):`
-lines, newest 20 max — never the whole file. A lesson recurring 3× MUST be codified into a
-deterministic gate (`contract-lint.py` / `preflight-guard.ps1` / this skill), never left as
-a 4th prose reminder. Scope boundary: fleet-mechanics lessons only — hub-repo lessons stay
-in the hub's `.claude/tasks/lessons.md`.
-
-**TERMINAL-STATE CARDS — FALLBACK-ONLY for session-origin tasks (owner pick 2026-08-10,
-supersedes the 2026-08-09 always-card rule):** for a task with a session `origin:`, the
-PRIMARY report is the origin session's on-screen render (8a-bis + 8b watcher). The
-Telegram/WhatsApp card via `GWD\notify-owner.ps1` fires ONLY when the origin session is
-dead/closed at terminal time (keeper/sweep detects no live origin — the card then opens
-with "origin session gone"). Tasks with NO session origin (inbox promotions, keeper break-fix)
-keep the card as their primary channel — DONE (P3→info: outcome + PR link + tier) / PARKED or
-FAILED (P2: reason). The invariant is unchanged: silence is never success; the owner must
-never have to ask "everything done?" (T-056 sat dead 35 min because nothing fired).
-Delivery trap on a NON-VPS machine: `notify-owner.ps1` only writes the ping file to the
-local bus `pings\` outbox — the Hostinger relay reads the BUS REPO, so after writing the
-card you MUST commit+push the bus or the card never delivers (a written-but-unpushed ping
-is the detect-then-discard defect class).
-
-**PARKED DIGEST (owner-approved 2026-08-09):** parked must never mean forgotten. The
-deterministic weekly `GWD\parked-digest.ps1` (keeper-tick step, self-gated like the
-feature sweep) cards the owner every `*.parked.md` with age + reason. The owner replies
-`<T-id> retry` (SWEEP re-queues at the same tier) or `<T-id> drop` (SWEEP renames to
-`<T-id>.dropped.md`); the sweep processes these replies like any owner answer.
-
-## ARTIFACT PLACEMENT (rule 2026-07-18 — owner question)
-Where a created artifact lives is determined by WHAT it is, not where the fleet runs:
-- **Project-SPECIFIC artifact** (a tool/script/config for ONE app — e.g. an IPODhan audit tool) → lands
-  IN that project's repo via a PR (versioned with the app, discoverable by its team, covered by its CI).
-  NEVER the bus or hub. (Defect fixed: ipo-audit.py was wrongly put in the bus → moved to IPODhan #112.)
-- **Fleet-GENERIC machinery** (dispatcher, keeper, contract-lint, bus-sync, guards) → the hub / bus scripts.
-- **Fleet runtime STATE** (queue, ledger, evidence, questions) → the GetWorkDone bus only.
-Litmus test before saving: "would the target project's team want this in their repo?" If yes → their repo.
+[log: I-37] Decided by WHAT the artifact is, not where the fleet runs: project-SPECIFIC -> that
+project's repo via a PR (never the bus or hub); fleet-GENERIC machinery -> the hub / bus scripts;
+fleet runtime STATE -> the bus only.
 
 ## CRITICAL RULES
 
-- MUST include the HOLD-LABEL INSTRUCTION (STEP 5, above) as a second worker-prompt line
-  whenever a contract's `dod:` requires the PR to stay open — machine-checkable in principle
-  for a future `contract-lint.py` rule (a dod containing "leaves the PR OPEN" should co-occur
-  with a hold-label instruction in the worker prompt); not built in this task, documented here
-  as the follow-up, matching the pattern of other NOT-YET-CODIFIED items surfaced via
-  `PATTERNS-SEEN.md`.
-- MUST resolve every repo through `GWD\settings.json repo_registry` and assert
-  `git remote get-url origin` matches BEFORE any edit — the registry encodes real traps
-  (calculatekaro=`calculator`; OFO shares algochanakya's remote — never dispatch into OFO).
-- MUST pass the PORTFOLIO REGISTRATION GATE before queueing (STEP 1/STEP 4, migration Phase
-  4b): a repo absent from the 5wealths PORTFOLIO registry, or a task creating a new project
-  folder, is registered (name, pillar, machines) FIRST. Workers may only create project
-  folders under the Ventures/VibeCoding work root (`…\Abhay\VibeCoding\<project>`, or
-  `Ventures\<project>` post-rename) — never at the estate root, never nested inside 5Wealths.
-- MUST run every abort-capable check at INTAKE while the owner is present; runtime re-checks
-  are last-line guards, never first detection.
-- MUST run the pre-queue dedup gate (scan ALL open contracts for the target repo) before
-  queueing; duplicates converge on the existing T-id, overlaps carry `related:`, supersedes
-  rename the old contract — two sessions must never independently queue the same work.
-- MUST honor origin-session reporting affinity: every contract carries `origin:`; only the
-  origin session (or a keeper rescue of a provably-dead origin, labeled as such) reports or
-  acts on a task — all other sessions are read-only toward it.
-- MUST grill at intake to >95% confidence of WHAT is asked (owner standing rule): ONE
-  question per turn, `*Sync-check:*` opener, recommended answer + one-line justification on
-  each, until the gate passes — no queueing/dispatch below it. MUST NOT ask anything
-  answerable from GLOBAL.md / the repo / the registry.
-- MUST keep the intake surface always available: nothing executes inline in ANY mode (v0.8 —
-  `intake` mode's only remaining distinction is returning to "ready" immediately between
-  intakes); SWEEP claims + dispatches any unclaimed `*.queued.md` so queued work never sits.
-- MUST reprioritize by REORDERING the queue only — a running worker is never preempted for
-  priority.
-- MUST show the owner on-screen, in the origin session: a queue ack at dispatch AND the
-  terminal status card when the watcher fires (8a-bis/8b) — the owner never has to ask.
-- MUST apply the OWNER STATUS CADENCE (8b) while fleet work is active: every 15-minute tick
-  opens with the current IST time and a persistent (never timeout-expired) ticker.
-- MUST send a terminal-state card (DONE/PARKED/FAILED) as FALLBACK for session-origin tasks
-  (only when the origin session is dead at terminal time, labeled "origin session gone") and
-  as PRIMARY for origin-less tasks — and on a non-VPS machine MUST push the bus after writing
-  the ping or the card never delivers.
-- MUST auto-resume an `error_max_turns` death (doubled budget, same worktree, no
-  restart-from-scratch) up to a lifetime total of THREE runs per task, no owner interaction;
-  a THIRD cap-death parks the task `QUALITY/SCOPE-SUSPECT` (a scope signal, never a budget
-  question). Budget itself — retries, resumes, raises, tier escalation — is standing
-  pre-approved (owner 2026-08-17), bounded only by Anthropic plan limits and existing daily
-  ceilings.
-- MUST branch on `stop_reason` from the worker's JSON — refusal ≠ success; reroute to opus.
-- MUST keep maker ≠ checker: evidence + LEDGER are checker-written only; a worker's
-  self-reported pass is never recorded as proof. MUST run no fleet actor — worker OR checker —
-  unattended under interactive permissions (T-141 stall, 2026-08-16): the unattended path is
-  always `bypassPermissions`/pre-allowlisted, verified at intake; in-session `Agent()` only
-  when the owner is present and the dispatcher states so.
-- MUST land ALL work via PR gated on the repo's CI. PUBLIC repos: arm auto-merge (protection
-  enforces the check). PRIVATE repos (free plan — NO branch protection possible; live finding
-  2026-07-15: IPODhan, RealFuelPrices, calculatekaro): NEVER arm auto-merge (it merges
-  instantly regardless of CI) — **and the worker never merges either, on any repo, public or
-  private (WORKER-MERGE GUARD, STEP 5 — live double-breach 2026-08-11, T-098 breach
-  2026-08-12).** The worker's job on a private repo ends at `gh pr checks --watch`ing until the
-  gate is SUCCESS and reporting that state; the dispatcher or checker then merges. Any contract
-  dod boilerplate that tells the worker to merge (e.g. "merge only on SUCCESS/green") is a
-  DEFECT — it contradicts this guard and must be rewritten to end at "report gate state," never
-  "merge." Red = never merged, no exceptions, by either party.
-- MUST route models cheapest-correct (sonnet default, haiku mechanical, opus deep AND
-  preemptively for security-category); Fable is NEVER dispatched as a worker. The `model:`
-  line carries its rationale (lint-blocked otherwise); every reroute/escalation EDITS the
-  contract tier before relaunch; the checker verifies the tier receipt (verify-model-tier.py)
-  — a tier the contract didn't state, or a receipt that contradicts it, is a task FAILURE.
-- MUST honor the deploy-tier table computed from the ACTUAL diff at check time (G9) — a task
-  whose merged diff touches auth/payment/DNS/migration paths force-upgrades to HOLD regardless
-  of intake classification.
-- MUST give EVERY task a contract + T-id — the inline-execution path is DELETED (2026-08-15).
-  A get-work-done task with no T-id is a defect. Foreign-OR-same-repo makes no difference:
-  same-repo tasks dispatch into their own worktree. Repo identity is compared by REGISTRY KEY
-  resolved via `git remote get-url origin`, never by path or folder name. Authoring SSOT-owned
-  artifact text inline (template copy / map cards / Deluge specs, even as a "draft" in chat) is
-  the same defect.
-- MUST batch multiple same-repo trivia from one intake into ONE contract (one T-id, one PR) —
-  the no-inline rule must never make the fleet too slow to use.
-- MUST copy the registry's `context_docs` into every contract and open the worker prompt with
-  the read-these-first mandate; preflight exit 7 blocks dispatch on a missing doc — a worker
-  that proceeds past a missing context doc is a defect (detect-then-discard class).
-- MUST append the INVOCATIONS.log line at the end of every intake turn, using the defined
-  `tids=` tokens (`dup:T-xxx` / `gate-pending` for legitimate no-new-T-id turns) — only
-  `tids=none` is the inline defect; silence in this log is how the defect hides.
-- MUST set `evidence: required` on every contract (the only lint-accepted value, v0.8.1) —
-  every task gets a checker; a task too small to verify is batched, never unverified.
-- MUST write an evidence-folder failure as a task FAILURE (G20), never skip it.
-- MUST apply the ROOT-CAUSE GATE (STEP 3.5): a SECOND occurrence of a failure shape is fixed
-  at the MECHANISM (code/guard/hook/schema/failing test) or the impossibility is recorded —
-  prose is never a mechanism; every fix is SWEPT repo-wide with the count reported, and every
-  class fix appends its `LESSON(CODIFIED → <where>)` line to `GWD\PATTERNS-SEEN.md`.
-- MUST verify PR-state post-run for every task (STEP 6a + STEP 7): `gh pr view` on every PR
-  the contract or result JSON references; a PR merged by the worker during its own run window
-  is a task FAILURE, independent of work quality — checked by both the dispatcher and the
-  checker, never trusted from the worker's self-report.
+Each bullet carries `gate:<id>` resolving in `config/gwd-gates.yml` (hub). `gate:PROSE-ONLY` means
+exactly that - no machine enforces the line yet.
+
+- MUST resolve every repo through `GWD/settings.json` `repo_registry` and assert `git remote
+  get-url origin` matches before any edit. gate:PREFLIGHT-REPO-IDENTITY-MISMATCH
+- MUST give EVERY task a contract + T-id - size-eligible tasks fast-lane under it in a worktree of
+  the target repo, everything else dispatches; never the cwd checkout, and authoring SSOT-owned
+  artifact text outside a T-id is the same defect. gate:PREFLIGHT-CONTRACT-MISSING
+- MUST keep the lanes separate: a `lane: fast` contract is session-executed and checked by
+  `fast-lane-check.py`, never handed to a worker. gate:PREFLIGHT-FAST-LANE-AT-WORKER-DISPATCH
+- MUST NOT dispatch into a host whose claim reconciler has not ticked inside 2x
+  `settings.fleet_keeper_tick_minutes`. gate:PREFLIGHT-KEEPER-LIVENESS
+- MUST NOT dispatch past host pressure (commit charge over the limit, or live workers at
+  `settings.fleet.max_concurrent_workers`), and MUST fail CLOSED when the host or settings read
+  fails rather than reading 0.0%/0. gate:PREFLIGHT-HOST-MEMORY-GATE
+- MUST serialize same-repo work fleet-wide (any machine) unless `related:`-linked with disjoint
+  file scopes. gate:PREFLIGHT-SAME-REPO-ALREADY-CLAIMED
+- MUST copy the registry's `context_docs` into every contract and open the worker prompt with the
+  read-these-first mandate. gate:PREFLIGHT-CONTEXT-DOCS-MISSING
+- MUST route models cheapest-correct (sonnet default, haiku mechanical, opus deep + security),
+  never Fable as a worker, editing the contract tier before any reroute.
+  gate:PREFLIGHT-MODEL-TIER-NOT-ALLOWED
+- MUST carry a routing rationale on `model:`, a `data_source:` on a data-reading task, `evidence:
+  required`, and a `dod:` of checkable predicates. gate:CONTRACT-LINT-BLOCK
+- MUST size `max_turns` from task shape and auto-resume an `error_max_turns` death into the SAME
+  worktree at double budget, lifetime THREE runs, then park `QUALITY/SCOPE-SUSPECT`; budget is
+  standing pre-approved, never an owner question. gate:PREFLIGHT-TURN-BUDGET-GATE
+- MUST open every fix-round prompt with its honesty / PR-body / STATUS.md duties.
+  gate:PREFLIGHT-FIX-ROUND-PROMPT-LINT
+- MUST apply the ROOT-CAUSE GATE: a SECOND occurrence is fixed at the MECHANISM or the
+  impossibility recorded; every fix swept with the count reported; every class fix appends its
+  `LESSON(CODIFIED -> ...)` line and `MECHANISM-DUE.md` row. gate:PREFLIGHT-LEARNING-DEBT-GATE
+- MUST keep this skill conformant with the live fleet - paths resolve, settings keys exist, every
+  preflight exit code documented, one launch recipe, shrink-only byte ratchet.
+  gate:GWD-SKILL-CONFORMANCE-TEST
+- MUST carry a `gate:<id>` on every rule here; an unmapped MUST is red in CI.
+  gate:GWD-SKILL-MUSTS-HAVE-GATES-TEST
+- MUST NOT write a worker prompt naming a path that belongs to another machine.
+  gate:PREFLIGHT-FOREIGN-MACHINE-PROMPT-PATH
+- MUST inject the three standing mandates from `GWD/worker-mandates.txt` - never hand-copied,
+  never paraphrased - into every worker, checker and fix-round prompt. gate:PROSE-ONLY (mechanism
+  in flight: T-372)
+- MUST add the HOLD-LABEL line whenever a `dod:` needs the PR to stay open. gate:PROSE-ONLY
+  (mechanism queued: T-372)
+- MUST land ALL work via a PR gated on the repo's CI, and the WORKER never merges or closes any
+  PR on any repo: PUBLIC repos arm auto-merge, PRIVATE ones (free plan, no branch protection)
+  never do - the worker ends at `gh pr checks --watch` reporting the gate state and the
+  dispatcher or checker merges. Dod boilerplate telling a worker to merge is a DEFECT.
+  gate:PROSE-ONLY (mechanism queued: contract-lint self-merge ban, T-372)
+- MUST verify PR-state post-run for every task - a PR merged inside the worker's run window is a
+  task FAILURE independent of work quality, checked by dispatcher AND checker. gate:PROSE-ONLY
+  (mechanism queued: post-run-pr-check.ps1, T-372)
+- MUST run the pre-queue dedup gate over ALL open contracts for the repo before queueing.
+  gate:PROSE-ONLY
+- MUST batch same-repo trivia from one intake into ONE contract (one T-id, one PR).
+  gate:PROSE-ONLY
+- MUST pass the PORTFOLIO REGISTRATION GATE before queueing, and create project folders only under
+  the work root. gate:PROSE-ONLY
+- MUST run every abort-capable check at INTAKE while the owner is present, and grill to >95%
+  confidence of WHAT is asked; MUST NOT ask what GLOBAL.md, the repo or the registry answers.
+  gate:PROSE-ONLY
+- MUST run no fleet actor (worker or checker) unattended under interactive permissions.
+  gate:PROSE-ONLY
+- MUST keep maker != checker: evidence + LEDGER are checker-written only, a self-reported pass is
+  never proof, a verdict with no re-derivation artifact is no verdict, and a missing evidence
+  folder is a task FAILURE. gate:PROSE-ONLY
+- MUST branch on `stop_reason` - a refusal is not success; reroute to opus once, then park.
+  gate:PROSE-ONLY
+- MUST honor origin-session reporting affinity: only the origin session, or a labeled keeper rescue
+  of a provably-dead origin, reports or acts on a task. gate:PROSE-ONLY
+- MUST show the owner a queue ack at dispatch AND the terminal status card when the watcher fires,
+  and keep a PERSISTENT IST-stamped 15-minute ticker while work is live. gate:PROSE-ONLY
+- MUST send a terminal-state card as FALLBACK for session-origin tasks and PRIMARY for origin-less
+  ones - and on a non-VPS machine push the bus after writing the ping. gate:PROSE-ONLY
+- MUST reprioritize by REORDERING only - a running worker is never preempted. gate:PROSE-ONLY
+- MUST honor the deploy tier computed from the ACTUAL merged diff - auth/payment/DNS/migration
+  force-upgrades to HOLD. gate:PROSE-ONLY
+- MUST append the INVOCATIONS.log line at the end of every intake turn using the defined `tids=`
+  tokens - only `tids=none` is the inline defect. gate:PROSE-ONLY
+

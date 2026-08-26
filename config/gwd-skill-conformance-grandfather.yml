@@ -1,52 +1,22 @@
-# GWD skill<->fleet conformance grandfather allowlist (T-370 ratchet).
-# Known drifts between .claude/skills/get-work-done/SKILL.md and the live fleet
-# checkout, as verified in the 2026-08-26 review
-# (D:/Abhay/GetWorkDone/docs/reviews/2026-08-26-get-work-done-skill-review.md).
-# SHRINK-ONLY (mirrors config/eval-coverage-grandfather.yml): entries here may
-# only be REMOVED or numbers DECREASED as SKILL.md/the fleet are fixed, never
-# added or increased. scripts/tests/test_gwd_skill_conformance.py asserts this.
-# The rewrite that empties this file is the separate contract T-371.
+# GWD skill<->fleet conformance grandfather allowlist (T-370 ratchet, EMPTIED by T-371).
+# SHRINK-ONLY (mirrors config/eval-coverage-grandfather.yml): entries may only be
+# REMOVED or numbers DECREASED, never added or increased —
+# scripts/tests/test_gwd_skill_conformance_grandfather_ratchet.py asserts this
+# against the origin/main copy of this file.
+#
+# T-371 (SKILL.md v0.10, procedure/incident split) fixed every drift T-370 listed:
+#   missing_preflight_exit_codes  -> SKILL.md STEP 6 now documents exits 0-15
+#   max_claude_p_recipes: 2       -> 0 `claude -p ... --model` recipes remain (the
+#                                    one launch recipe is worker-wrapper.ps1's argv form)
+#   plugin_skill_allowlist        -> the skill no longer invokes `/goal-creator`; it
+#                                    names the goal-creator SKILL.md path directly
+#   stale_paths                   -> the dead D:\Abhay\VibeCoding\... path is gone
+# Only the two ceilings the tests REQUIRE to exist are left, both lowered.
 
-# M1/M2 — SKILL.md byte-size ratchet, seeded at the current size (2026-08-27).
-max_bytes: 66296
+# M1/M2 — SKILL.md byte-size ratchet. Was 66296 (v0.9); v0.10 is 29,989 bytes.
+max_bytes: 30000
 
-# M1 — exit codes preflight-guard.ps1's header table defines that SKILL.md
-# never mentions (SKILL.md only cites exit codes 0, 4, 6, 7, 8 today).
-missing_preflight_exit_codes:
-  - 1
-  - 2
-  - 3
-  - 5
-  - 9
-  - 10
-  - 11
-  - 12
-  - 13
-  - 14
-
-# C2 — SKILL.md documents 2 full `claude -p --model ...` launch recipes: the
-# STDIN-redirect form (~L372, the launch path the fleet deleted 2026-08-12)
-# and the checker launch form (~L590). The fleet's actual worker launch is
-# worker-wrapper.ps1's argv-based form (~L425), which contradicts the STDIN
-# recipe. T-371 collapses this to one recipe.
-max_claude_p_recipes: 2
-
-# M3 — /skill references SKILL.md invokes that resolve outside .claude/skills/
-# via a documented plugin, not via the hub-repo skills dir.
-plugin_skill_allowlist:
-  - skill: goal-creator
-    path: plugins/loop-engineering/skills/goal-creator
-    note: >-
-      /goal-creator is invoked at SKILL.md STEP 5. It exists only under
-      core/.claude/skills/ (forbidden for hub work per this repo's own
-      CLAUDE.md) and under this plugin -- not under .claude/skills/.
-
-# M10 — literal absolute paths SKILL.md names that no longer exist on disk.
-stale_paths:
-  - "D:\\Abhay\\VibeCoding\\claude-best-practices\\.claude\\rules\\model-routing.md"
-
-# RC1/M9 -- CRITICAL RULES `MUST`/`MUST NOT` bullets with no trailing
-# `gate:<id>` token today (T-370 dod item 3,
-# scripts/tests/test_gwd_skill_musts_have_gates.py). Seeded at the current
-# count; only decreases as SKILL.md gains gate: tokens (T-371).
-max_ungated_musts: 26
+# RC1/M9 — CRITICAL RULES MUST/MUST NOT bullets with no `gate:<id>` token.
+# Was 26 (every MUST implicitly gate:PROSE-ONLY). v0.10 gives every bullet an
+# explicit gate id, so the floor is now zero: a new ungated MUST is RED.
+max_ungated_musts: 0
