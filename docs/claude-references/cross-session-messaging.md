@@ -38,3 +38,20 @@ crash-survival and auditability, and held-message expiry makes unattended delive
 
 **Revisit trigger:** a Claude Code changelog entry adding native-Windows support for
 cross-session messaging → re-run the intake-handoff trial (/review-new-claude-features).
+
+## Revisit (2026-08-26, /review-new-claude-features dry-run)
+
+**Trigger fired.** v2.1.239 (2026-08-21) changelog: "Windows: cross-session messaging is now
+available, so Claude Code sessions across your machines can message each other with
+`SendMessage` and find each other with `ListAgents`, as on macOS and Linux." The platform
+blocker this REJECT-for-now was keyed on is resolved.
+
+**Updated verdict: MEASURE-FIRST** (was REJECT-for-now). Per the 2026-08-09 assessment above,
+the plausible value was already scoped as a convenience layer for owner-context handoff between
+interactive sessions (project session → `/get-work-done` intake session, completion pings back)
+— never as fleet plumbing (the GetWorkDone durable-file/git bus still wins on crash-survival and
+auditability for queue/worker coordination; held-message expiry keeps unattended delivery
+fragile). Next step before flipping to ADOPT: run one live intake-handoff trial on this Windows
+VPS and confirm `SendMessage`/`ListAgents` actually reach across the two sessions this session's
+own SessionStart banner reported sharing a working tree with. Not run in this dry-run pass
+(report-only; no code/config changes beyond this doc per the skill's `--dry-run` contract).
