@@ -44,18 +44,50 @@ aborts intake with a question), current branch state, does the named area exist,
 exist, which paths the task will plausibly touch. Ground the gate in looked-at reality, never
 in the prompt alone.
 
-## STEP 3 — GATE: every task gets a contract + T-id, NO exceptions (inline path DELETED 2026-08-15)
+## STEP 3 — GATE: every task gets a contract + T-id; SIZE picks the lane (v0.9, 2026-08-26)
 
-**The inline-execution path is DELETED (owner-approved 2026-08-15; live defect: a GoRefer
-session did Wati/Zoho work itself, inline, in the wrong directory with the wrong context — no
-T-id, no contract, no checker).** Every task handed to /get-work-done — however trivial — is
-contracted (STEP 5) and dispatched (STEP 6). The old carve-outs (trivial-inline, the Fable
-exception, the intake-mode exception) are all subsumed: there is ONE behavior now. The binary
-invariant any audit can check: **a get-work-done task with no T-id is a defect.**
+**The invariant that never changed: a get-work-done task with no T-id is a defect.** (v0.8,
+2026-08-15, after a GoRefer session did Wati/Zoho work itself, inline, in the wrong directory
+with the wrong context — no T-id, no contract, no checker.) Every task handed to
+/get-work-done is contracted (STEP 5) and dispatched (STEP 6) or FAST-LANED (below) — the old
+carve-outs (trivial-inline, the Fable exception, the intake-mode exception) are all subsumed by
+either path; "inline" below names only that 2026-08-15 incident.
 
 Blast radius (sensitive paths: auth, payments, config, DB migration, deploy surface) still gets
-assessed here — but it now informs ONLY model tier, budget, and deploy_tier, never
-inline-vs-dispatch. Trivial tasks are made cheap by BATCHING (STEP 5), not by inline execution.
+assessed here — it informs model tier, budget, deploy_tier, AND lane eligibility (below).
+Trivial tasks are made cheap by the FAST LANE (this step) and by BATCHING (STEP 5) for
+anything the fast lane doesn't cover.
+
+### FAST LANE (owner decision A, 2026-08-26 — T-349)
+
+**ELIGIBILITY** = ALL of: `deliverable: content|mechanical` · ≤5 files named in the contract's
+`files:` list · ≤300 changed lines measured at PR time · no path matching the sensitive-path
+denylist in `GWD\fast-lane-gate.py` · no unknowns after scout. `code` is NOT eligible in v1 —
+it needs the repo's test gate, which is the normal lane; revisit after 10 clean fast-lane runs.
+
+**FLOW:** contract written with `lane: fast`, `files:`, `checks:` (≤2 min) → `python
+GWD\fast-lane-gate.py contract <path>` exit 0 → `python GWD\stage-stamp.py <T> edit_start` →
+the DISPATCHING SESSION edits in a FRESH git worktree of the TARGET repo (`git worktree add
+<repo-path>-wt-<tid> -b <branch> origin/main`; never the cwd checkout, never the bus, any
+session model including Fable) after reading the registry `context_docs` → commit, push, open
+the PR → `stage-stamp.py <T> edit_end` → `fast-lane-gate.py diff <worktree> --base
+origin/main` (non-zero exit ⇒ set `lane: normal` in the contract, status_log note, dispatch
+through the normal lane) → **CHECKER** = `python GWD\fast-lane-check.py <contract> <worktree>
+--base origin/main --evidence GWD\evidence\<date>-<T>\` (deterministic; no second LLM run; the
+evidence dir is the checker artifact) → merge on green (public repo: auto-merge; private
+repo: `gh pr checks --watch` then the session merges) → `stage-stamp.py <T> merged` → LEDGER
+line with `stages=... lane=fast` from `stage-stamp.py ledger-line <T>`.
+
+**SLO** = ≤20 min launched→merged; a miss is surfaced by `lesson.py status` as
+`FAST-LANE-SLO-MISS` and counts as ceremony debt.
+
+**WHY THIS IS SAFE:** the 2026-08-15 wrong-context incident is prevented by the
+worktree-of-target-repo + `context_docs` read + T-id + checker, not by banning session edits —
+G16 and v0.8 are reconciled, not overridden.
+
+**INTAKE MODE:** in `/get-work-done intake` a fast-lane-eligible task is executed by the
+session AFTER the current intake turn's queueing is done, announced on screen as `[fast lane]
+editing T-nnn now (~15 min) — say later to queue it instead`.
 
 **Repo identity is compared by REGISTRY KEY, never by path or folder name:** resolve the
 session's own cwd via `git remote get-url origin` → registry key, and the task's target the
