@@ -311,7 +311,9 @@ FOREGROUND-ONLY EXECUTION lines above: "Intermediate commits (WIP, docs-only, fi
 iterations) carry `[skip ci]` ANYWHERE in the commit message — GitHub matches the whole
 message, headline or body, there is no safe placement for a push that still needs CI. ONLY
 the final ready-for-verification push carries the marker NOWHERE — not the headline, not the
-body, not even quoted while describing this convention."
+body, not even quoted while describing this convention." A REQUIRED status check that never
+reports leaves the PR permanently blocked — this is exactly what stalled PRs #577/#579 under
+the T-191 incident (full evidence in the reference file above).
 
 **Routing table (fix #5, 2026-07-27 — inlined so NON-hub dispatch sessions, e.g. via the
 global pointer skill, don't depend on the hub-only rule being loaded; SSOT remains
