@@ -19,6 +19,19 @@ REPO = Path(__file__).resolve().parents[2]
 SKILL_MD = REPO / ".claude/skills/get-work-done/SKILL.md"
 DISPATCHER_PLAN = REPO / "plans/get-work-done-dispatcher.md"
 
+
+# T-371 (SKILL.md v0.10, 2026-08-27): the skill split into PROCEDURE (SKILL.md) + verbatim
+# INCIDENT NARRATIVES (references/incident-log.md). The corrected RULE stays in SKILL.md; the
+# PR #580 / #577 / #579 EVIDENCE lives in the log. Evidence assertions read the package, the
+# false-claim guard still reads each file on its own (a regression anywhere is a failure).
+def _package(path: Path) -> str:
+    if path != SKILL_MD:
+        return path.read_text(encoding="utf-8")
+    refs = sorted((SKILL_MD.parent / "references").glob("*.md"))
+    parts = [SKILL_MD.read_text(encoding="utf-8")]
+    parts += [r.read_text(encoding="utf-8") for r in refs]
+    return (chr(10)).join(parts)
+
 # A commit message that would only avoid the marker in the *headline*,
 # while implying the body is a safe place to put it, is the exact false
 # claim T-209 corrected.
@@ -53,14 +66,14 @@ def test_skip_ci_guidance_states_marker_matches_anywhere(path):
 
 @pytest.mark.parametrize("path", [SKILL_MD, DISPATCHER_PLAN])
 def test_skip_ci_guidance_cites_pr_580_evidence(path):
-    body = path.read_text(encoding="utf-8")
+    body = _package(path)
     assert "#580" in body, (
         f"{path} must cite the PR #580 experiment as evidence for the corrected rule"
     )
 
 
 def test_skip_ci_guidance_states_required_check_consequence():
-    body = SKILL_MD.read_text(encoding="utf-8")
+    body = _package(SKILL_MD)
     assert "REQUIRED" in body or "required" in body, (
         "SKILL.md must explain that a required status check never reporting "
         "leaves the PR permanently blocked — the consequence that makes this urgent"

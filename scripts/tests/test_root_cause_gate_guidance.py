@@ -18,6 +18,17 @@ SKILL_MD = REPO / ".claude/skills/get-work-done/SKILL.md"
 def _skill() -> str:
     return SKILL_MD.read_text(encoding="utf-8")
 
+# T-371 (SKILL.md v0.10, 2026-08-27): the skill was split into PROCEDURE (SKILL.md, <= 30 KB)
+# and its dated INCIDENT NARRATIVES (references/incident-log.md, verbatim). The guard below
+# keeps its full force but now reads the whole skill PACKAGE for the EVIDENCE tokens (the
+# stories moved, they were not dropped), while placement and CRITICAL-RULES assertions stay
+# pinned to SKILL.md itself - which is where a rule decaying would actually show up.
+def _skill_package() -> str:
+    refs = sorted((SKILL_MD.parent / "references").glob("*.md"))
+    parts = [SKILL_MD.read_text(encoding="utf-8")]
+    parts += [r.read_text(encoding="utf-8") for r in refs]
+    return (chr(10)).join(parts)
+
 
 def test_recurrence_rule_is_a_step_not_an_appendix():
     body = _skill()
@@ -26,11 +37,11 @@ def test_recurrence_rule_is_a_step_not_an_appendix():
         "not an appendix a dispatcher never reaches"
     )
     gate = body.index("## STEP 3.5")
-    assert gate < body.index("## STEP 4 —"), "STEP 3.5 must sit before STEP 4 in the flow"
+    assert gate < re.search(r"## STEP 4 [-—]", body).start(), "STEP 3.5 must sit before STEP 4 in the flow"
 
 
 def test_second_occurrence_demands_a_mechanism_fix():
-    body = _skill()
+    body = _skill_package()
     assert re.search(r"SECOND occurrence of the same failure SHAPE", body), (
         "SKILL.md must state the rule in terms of the SECOND occurrence of a failure SHAPE"
     )
@@ -48,7 +59,7 @@ def test_second_occurrence_demands_a_mechanism_fix():
 
 
 def test_prose_is_not_a_mechanism_is_stated_with_its_definition():
-    body = _skill()
+    body = _skill_package()
     assert "PROSE IS NOT A MECHANISM" in body, (
         "SKILL.md must state plainly that prose is not a mechanism"
     )
@@ -65,7 +76,7 @@ def test_prose_is_not_a_mechanism_is_stated_with_its_definition():
 
 
 def test_sweep_obligation_is_on_the_completion_path():
-    body = _skill()
+    body = _skill_package()
     assert "fixed 1 of N found" in body and "swept, no other instances" in body, (
         "SKILL.md must require the sweep RESULT be reported in one of the two "
         "explicit forms, so 'I looked' cannot pass as a sweep"
@@ -81,7 +92,7 @@ def test_sweep_obligation_is_on_the_completion_path():
 
 
 def test_self_improvement_loop_points_at_patterns_seen():
-    body = _skill()
+    body = _skill_package()
     assert "LESSON(CODIFIED" in body, (
         "class fixes must be recorded in the existing LESSON(CODIFIED -> where) form"
     )

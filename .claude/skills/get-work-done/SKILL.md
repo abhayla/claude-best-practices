@@ -93,7 +93,7 @@ A first occurrence may be fixed as an instance. From the SECOND occurrence of th
 SHAPE (same symptom class, not the same file or repo), fix the MECHANISM that permits it or record
 in `status_log`, with the reason, why a mechanism fix is impossible - silence is not an exemption.
 **PROSE IS NOT A MECHANISM**: a mechanism is CODE, a GUARD, a HOOK, a SCHEMA CONSTRAINT or a TEST
-THAT FAILS when the defect returns. Before calling it done, SWEEP the repo (and the estate, where
+THAT FAILS when the defect returns (the mandate it replaces failed eight times running). Before calling it done, SWEEP the repo (and the estate, where
 the shape travels) and REPORT the count - "fixed 1 of N found" / "swept, no other instances" - and
 append a `LESSON(CODIFIED -> <where>)` line to `GWD/PATTERNS-SEEN.md` plus a row in
 `GWD/MECHANISM-DUE.md` (`python GWD/lesson.py`); the learning-debt gate (exit 11) reads it.
@@ -242,7 +242,7 @@ the cheaper tier - escalation recovers a wrong cheap pick; a wrong expensive one
    until-loop (or sized `ScheduleWakeup`) breaking on **every** terminal state - a NON-EMPTY
    result JSON (the wrapper pre-creates it at 0 bytes), an `EXITED` heartbeat, or one older than
    `settings.heartbeat_stale_after_seconds` - after which the origin session renders the status
-   card (outcome, PR, verdict, evidence path, tier) automatically. **Cadence:** while any
+   card (outcome, PR, verdict, evidence path, tier) automatically. **OWNER STATUS CADENCE:** while any
    session-origin task is live, a PERSISTENT 15-minute ticker (never a timeout), each tick
    opening with the IST time: what changed, what is running, the estimate - explicitly so even
    when nothing changed.
@@ -400,7 +400,8 @@ exactly that - no machine enforces the line yet.
 - MUST honor origin-session reporting affinity: only the origin session, or a labeled keeper rescue
   of a provably-dead origin, reports or acts on a task. gate:PROSE-ONLY
 - MUST show the owner a queue ack at dispatch AND the terminal status card when the watcher fires,
-  and keep a PERSISTENT IST-stamped 15-minute ticker while work is live. gate:PROSE-ONLY
+  and MUST apply the OWNER STATUS CADENCE: a PERSISTENT IST-stamped 15-minute ticker while work
+  is live. gate:PROSE-ONLY
 - MUST send a terminal-state card as FALLBACK for session-origin tasks and PRIMARY for origin-less
   ones - and on a non-VPS machine push the bus after writing the ping. gate:PROSE-ONLY
 - MUST reprioritize by REORDERING only - a running worker is never preempted. gate:PROSE-ONLY
