@@ -59,6 +59,12 @@ def test_subagent_hook_emits_mandates_as_valid_json():
     assert "PLAN FIRST" in ctx
     assert "ROOT CAUSE, NOT PATCH" in ctx
     assert "STRUCTURED CONTRACT" in ctx
+    # T-393: FOREGROUND ONLY mandate — a subagent that runs tests/builds with
+    # run_in_background then ends its turn stalls forever (nothing re-invokes
+    # a subagent); this line must be injected into every worker's context.
+    assert "FOREGROUND ONLY" in ctx
+    assert "run_in_background" in ctx
+    assert "T-393" in ctx
 
 
 @needs_bash

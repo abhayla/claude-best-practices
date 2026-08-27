@@ -25,6 +25,9 @@ If your task changes code:
    blockers, summary} so the T0 supervisor can reproduce your gate, not just read
    your claim (supervisor-verification.md). A self-reported "done/clean/passing" is
    a claim, not proof.
+FOREGROUND ONLY: never run tests/builds with run_in_background - a background job
+never re-invokes you; run in the foreground with a timeout and report the result
+in the same turn (registry: sonnet-subagent-backgrounds-tests-and-stops, T-393).
 EOF
 
 # Emit the documented additionalContext envelope. If the running version instead

@@ -1,6 +1,6 @@
 ---
 name: get-work-done
-description: Central work dispatcher (the "mother hub" front door) for the GetWorkDone fleet. EVERY task gets a contract + T-id; owner-present tasks session-execute in a worktree of the target repo (the DEFAULT), else dispatches a background worker on the cheapest-correct model, checked independently, landed via CI-gated PR (v0.10). Grills to >95% confidence at intake, one question per turn. Use for "/get-work-done fix X in IPODhan", intake-only mode, status, or "cancel T-042". SSOT: plans/get-work-done-dispatcher.md.
+description: Central work dispatcher ("mother hub" front door) for the GetWorkDone fleet. EVERY task gets a contract + T-id; owner-present tasks run in-session in a worktree of the target repo (default), else a background worker on the cheapest-correct model lands via CI-gated PR (v0.10). Grills to >95% confidence at intake, one question per turn. Use for "/get-work-done fix X in IPODhan", intake mode, status, or "cancel T-042". SSOT: plans/get-work-done-dispatcher.md.
 ---
 
 # /get-work-done - central work dispatcher (v0.10, 2026-08-27)
@@ -16,7 +16,7 @@ the VPS. Contract format = the goal-creator shape (`plugins/loop-engineering/ski
 | Invocation | Mode |
 |---|---|
 | `/get-work-done <task>` | INTAKE (steps 1-7) |
-| `/get-work-done intake` | Standing intake loop: next task, steps 1-6, return to "ready" IMMEDIATELY. A fast-lane-eligible task (STEP 3) is session-executed after the turn's queueing; else dispatches. Never freelances outside a T-id |
+| `/get-work-done intake` | Standing intake loop: next task, steps 1-6, return to "ready" IMMEDIATELY. A fast-lane task (STEP 3) session-executes after queueing; else dispatches. Never freelances outside a T-id |
 | `/get-work-done status` | Fleet state from `GWD/queue/` + `GWD/heartbeats/` + LEDGER tail, plus host pressure (commit % + live workers via `preflight-guard.ps1 -HostMemoryStatus`); re-rendered every 15 min while live [log: I-22] |
 | `/get-work-done cancel <T-id>` | Read `GWD/heartbeats/<id>.hb` -> kill PID tree; rename `<id>.cancelled.md` with a reason; `gh pr close --delete-branch` any PR it opened; ledger it. `cancel all` = all claimed |
 | `/get-work-done sweep` | Promote/reject `GWD/inbox/` per the P17 table, run INTAKE 4-7 on promoted items, then claim + dispatch unclaimed `*.queued.md`. DISPATCH-FIRST: claiming is every tick's first duty, never satisfied by watching claimed tasks |
@@ -235,7 +235,7 @@ recovers a wrong cheap pick; a wrong expensive one is never detected.
    console-less processes), writes `T-<id>.hb` (PID + tick) and the result JSON; the dispatcher,
    not yet the wrapper, prepends `GWD/worker-mandates.txt` to that prompt (T-372). `-StateRoot`
    is MANDATORY off the VPS. A same-repo-as-dispatcher contract orders the worker into its own
-   worktree.
+   worktree. Workers run tests/builds in the FOREGROUND only, never `run_in_background` (T-393).
 7. **Terminal state** [log: I-18]: parse `stop_reason` - a refusal is NOT success. Refusal on
    haiku/sonnet -> reroute to opus (edit `model:`, append `status_log`, re-lint, re-preflight,
    relaunch); on opus -> PARK, no second reroute. Error -> one retry same tier; a 2nd failure:
