@@ -937,6 +937,52 @@ def test_worker_scratch_checkouts_are_not_scanned(tmp_path: Path):
     assert not run(tmp_path), "vendored/worker-scratch files must not be scanned"
 
 
+_DEFECTIVE_INTERPRETER_SHAPE = (
+    "#!/bin/bash\n"
+    'mapfile -t REPOS < <(python3 -c "import json;print(1)" 2>/dev/null | grep -v "^_")\n'
+    'echo "swept ${#REPOS[@]} repos"\n'
+)
+
+
+def test_selftest_fixture_embedding_the_bad_shape_is_not_flagged(tmp_path: Path):
+    """A file named like a self-test that PLANTS the pre-fix defect shape is a mutation control.
+
+    T-368's bus-sync-selftest.sh deliberately contains the pre-fix `git log @{u}..HEAD` shape to
+    prove the fix catches it as a regression — that is the file's whole purpose, not a live
+    defect. Any defect shape, in a *selftest*/*self-test* file, must not be flagged.
+    """
+    script = tmp_path / "bus-sync-selftest.sh"
+    script.write_text(_DEFECTIVE_INTERPRETER_SHAPE, encoding="utf-8")
+    assert not run(tmp_path), "a selftest fixture's planted defect shape must not be flagged"
+
+
+def test_same_content_as_an_ordinary_script_is_still_flagged(tmp_path: Path):
+    """The exact same defect content, under an ordinary filename, must still be a real finding."""
+    script = tmp_path / "foo.sh"
+    script.write_text(_DEFECTIVE_INTERPRETER_SHAPE, encoding="utf-8")
+    findings = _checks(run(tmp_path), "interpreter")
+    assert findings, "an ordinary script carrying the same defect shape must still be flagged"
+
+
+def test_test_prefixed_basename_is_not_flagged(tmp_path: Path):
+    """The `test_*` naming convention (this hub's own suite) is a fixture, not a live script."""
+    script = tmp_path / "test_bus_sync.sh"
+    script.write_text(_DEFECTIVE_INTERPRETER_SHAPE, encoding="utf-8")
+    assert not run(tmp_path), "a test_*-named fixture's planted defect shape must not be flagged"
+
+
+def test_captured_backup_under_state_reviews_is_not_flagged(tmp_path: Path):
+    """A backup copy filed under a review's state/reviews/**/tmp/** is forensic evidence, not a
+    live script — the false positive kt-backup.cmd was filed exactly this way."""
+    captured = tmp_path / "state" / "reviews" / "2026-08-26T1710" / "T-344" / "tmp" / "t344"
+    captured.mkdir(parents=True)
+    (captured / "kt-backup.cmd").write_text(
+        "@echo off\ncd /d C:\\Abhay\\GetWorkDone\ngit add -A\ngit commit -m x\n",
+        encoding="utf-8",
+    )
+    assert not run(tmp_path), "a state/reviews captured backup copy must not be scanned"
+
+
 def test_the_gate_does_not_flag_its_own_pattern_source():
     """Pointed at scripts/, the checker must not report ITSELF or its fixtures as defective.
 
