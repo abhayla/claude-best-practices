@@ -285,7 +285,7 @@ which pause + notify rather than ask. New recurring third-party spend stays owne
    never weaker than the maker. In-session `Agent()` only with the owner present and said so. The
    worker itself runs in the TARGET repo's dir, never the hub's, or hub governance leaks into its
    machine-parsed JSON.
-3. **Tier receipt**: `python GWD/verify-model-tier.py <contract> GWD/heartbeats/<id>.result.json`
+3. **Tier receipt** [log: I-31]: `python GWD/verify-model-tier.py <contract> GWD/heartbeats/<id>.result.json`
    - tier-as-run must equal tier-as-contracted; non-zero = a task FAILURE line, never a silent pass.
 4. **Merge-guard predicate**: re-derive item 8 of STEP 6 independently, before scoring any dod.
 5. **Verify every `dod:` predicate** by the `deliverable:` procedure:
