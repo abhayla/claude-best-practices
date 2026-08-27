@@ -37,14 +37,13 @@ means no T-id can be allocated: no safe degraded mode).
 ## STEP 1 - INTAKE: parse the ask
 
 Split the input into tasks (may span repos). Resolve each target against `GWD/settings.json` ->
-`repo_registry` - the ONLY source of repo paths (it encodes the calculatekaro->`calculator` and
-algochanakya-vs-OFO traps). A repo not in the registry, or an ambiguous reference, is an intake
-question, never a guess.
+`repo_registry` - the ONLY source of repo paths [log: I-04]. A repo not in the registry, or an
+ambiguous reference, is an intake question, never a guess.
 
 **PORTFOLIO REGISTRATION GATE** [log: I-04]: also check the target against `PORTFOLIO.yml` on
-5wealths `main` (it EXISTS - the `PORTFOLIO-ALIGNMENT-NOTES.md` interim table is superseded). A
-repo absent from it, or a task creating a NEW project folder, cannot queue until a registration
-row (name, pillar, machines) exists. Carry it into STEP 4; never skip it silently.
+5wealths `main`. A repo absent from it, or a task creating a NEW project folder, cannot queue
+until a registration row (name, pillar, machines) exists. Carry it into STEP 4; never skip it
+silently.
 
 ## STEP 2 - SCOUT (~1 min per task)
 
@@ -65,11 +64,10 @@ same-key tasks still go to their own worktree. An artifact whose source of truth
 (template copy, map cards, Deluge specs) resolves its repo by the registry's `ssot_artifacts`
 field wherever discussed; the session may relay owner approvals, never author the text.
 
-### FAST LANE (owner decision A, 2026-08-26 - T-349/T-351/T-353)
+### FAST LANE (owner decision A [log: I-01])
 
 The ONE owner-approved exception to "a session never edits a target repo itself" - not inline:
-still a T-id, a contract, a worktree of the TARGET repo, `context_docs`, and a checker. Those,
-not a ban on session edits, prevent the 2026-08-15 incident [log: I-01].
+still a T-id, a contract, a worktree of the TARGET repo, `context_docs`, and a checker.
 
 **ELIGIBILITY** = ALL of: `deliverable: content|mechanical` * <=5 files in `files:` * <=300
 changed lines at PR time * no path matching the sensitive-path denylist in
@@ -83,17 +81,16 @@ launched->merged (`settings.fast_lane_slo_minutes`), a miss = `FAST-LANE-SLO-MIS
 
 ## STEP 3.5 - ROOT-CAUSE GATE: the SECOND occurrence fixes the MECHANISM
 
-[log: I-02 - eight workers died at their turn cap with everything uncommitted; the answer every
-time was a firmer prose mandate, and it failed all eight times.]
+[log: I-02] - eight workers died at their turn cap; the fix was always a firmer prose mandate,
+and it failed every time.
 
 A first occurrence may be fixed as an instance. From the SECOND occurrence of the same failure SHAPE
 (same symptom class, not the same file or repo) an instance fix alone is NOT acceptable on its own -
 fix the MECHANISM that permits it or record in `status_log`, with the reason, why a mechanism fix is
 impossible - silence is not an exemption.
 **PROSE IS NOT A MECHANISM**: a mechanism is CODE, a GUARD, a HOOK, a SCHEMA CONSTRAINT or a TEST
-THAT FAILS when the defect returns (the mandate it replaces failed eight times running). Before
-calling it done, SWEEP the repo (and the estate, where the shape travels) and REPORT the count -
-"fixed 1 of N found" / "swept, no other instances" - and
+THAT FAILS when the defect returns. Before calling it done, SWEEP the repo (and the estate, where
+the shape travels) and REPORT the count - "fixed 1 of N found" / "swept, no other instances" - and
 append a `LESSON(CODIFIED -> <where>)` line to `GWD/PATTERNS-SEEN.md` plus a row in
 `GWD/MECHANISM-DUE.md` (`python GWD/lesson.py`); the learning-debt gate (exit 11) reads it.
 
@@ -114,7 +111,7 @@ discovered mid-run with the owner away).
 | Deploy situation | Tier |
 |---|---|
 | Re-deploy of a live app, same domain/infra | AUTO (Tier 1) - no question |
-| New app onto a `settings.sandbox_domains` subdomain | AUTO (Tier 1) - pre-authorized |
+| New app onto the owner-granted sandbox domain (`settings.json` `_sandbox_note`) | AUTO (Tier 1) - pre-authorized |
 | First deploy / DNS / new domain / auth or payment surface | HOLD (Tier 2) - collect the yes/no NOW |
 
 A portfolio-registration flag from STEP 1 IS a material unknown - resolve it here; determine the
@@ -124,9 +121,9 @@ failure [log: I-05]. Nothing answerable from GLOBAL.md, the repo, or the registr
 
 ## STEP 5 - CONTRACT
 
-Build the goal-creator contract from the task + answers, add the dispatcher fields, write it to
-`GWD/queue/T-<nnn>-<slug>.queued.md`. Each rule below is normative in CRITICAL RULES; full v0.9
-text + incident at [log: I-06 ... I-14].
+Build the goal-creator contract from the task + answers, add the dispatcher fields, write it via
+`bus-write.ps1` to `GWD/queue/T-<nnn>-<slug>.queued.md` (T-384, the one bus write path). Each rule
+below is normative in CRITICAL RULES; full v0.9 text + incident at [log: I-06 ... I-14].
 
 1. **T-ID** [log: I-06]: `git pull` the bus -> `python GWD/next-task-id.py <GWD>` -> on a
    non-fast-forward push rejection, pull and RE-RUN the allocator. Never invent an id; never
@@ -141,14 +138,13 @@ text + incident at [log: I-06 ... I-14].
    contract; prompt opens "Before ANY work, read these files at the repo root: <list>. If any is
    missing, STOP and report it." CLAUDE.md is never listed; the repo wins over a stale doc.
 5. **MANDATES**: the three standing mandates live VERBATIM in `GWD/worker-mandates.txt` - never
-   hand-copied or paraphrased (13 of 159 prompts carried all three before this change) [log: I-11,
-   I-12, I-14]. The DISPATCHER prepends that file to every prompt today; T-372 makes
-   `worker-wrapper.ps1` do it instead (not landed - `grep -c worker-mandates
-   GWD/worker-wrapper.ps1` = 0 until it does). Mandate 3 (T-209, PR #580): `[skip ci]` matches
-   ANYWHERE in a commit message, headline or body; a REQUIRED check that never reports leaves the
-   PR blocked forever, per PRs #577/#579 under T-191. Add
-   the HOLD-LABEL line (`gh pr edit <n> --add-label hold`) whenever the `dod:` needs the PR to stay
-   open [log: I-13] - not merging is not enough to stop this repo's auto-landing hooks.
+   hand-copied or paraphrased [log: I-11, I-12, I-14]. The DISPATCHER prepends that file to every
+   prompt today; T-372 makes `worker-wrapper.ps1` do it instead (not landed - `grep -c
+   worker-mandates GWD/worker-wrapper.ps1` = 0 until it does). Mandate 3 (T-209): `[skip ci]`
+   matches ANYWHERE in a commit message, headline or body; a REQUIRED check that never reports
+   leaves the PR blocked forever. Add the HOLD-LABEL line (`gh pr edit <n> --add-label hold`)
+   whenever the `dod:` needs the PR to stay open [log: I-13] - not merging is not enough to stop
+   this repo's auto-landing hooks.
 6. **LANDING BATCH** [log: I-14]: same-repo same-day contracts default to ONE branch/PR/CI-run;
    exceptions are P1 break-fixes, conflicting file scopes, and a checker FAIL on separable hunks.
 
@@ -188,8 +184,10 @@ recovers a wrong cheap pick; a wrong expensive one is never detected.
 3. **Contract lint FIRST**: `python GWD/contract-lint.py <claimed contract>` - non-zero -> park
    with its stderr as the reason. Runs before preflight so nothing is cloned for a bad contract.
 4. **Preflight gate**:
-   `powershell -NoProfile -ExecutionPolicy Bypass -File GWD/preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <remote> [-PromptPath <p>] [-MaxTurns <n>]`
-   - non-zero BLOCKS; park with the reason. The script header table is the SSOT:
+   `powershell -NoProfile -ExecutionPolicy Bypass -File GWD/preflight-guard.ps1 -ContractPath <c> -RepoPath <workspace> -ExpectedRemote <remote> -TaskId <T-NNN|T-NNNC*|T-NNNF*> -PromptPath GWD/heartbeats/<id>.prompt.txt -MaxTurns <cap>`
+   - non-zero BLOCKS; park with the reason. `-TaskId` sizes exit 12's kind (build/checker/fix_round);
+   a checker/fix round launches against its PARENT's contract, so omitting it prices as build.
+   The script header table is the SSOT:
 
    | Code | Gate |
    |---|---|
@@ -212,6 +210,7 @@ recovers a wrong cheap pick; a wrong expensive one is never detected.
    | exit 16 | HOST-MEMORY-UNKNOWN (T-364): commit/worker query returned nothing - fails CLOSED |
    | exit 17 | SETTINGS-READ-FAILURE (T-364): settings.json unreadable/malformed/non-integer - blocks |
    | exit 18 | ROUND-CAP-EXCEEDED (T-367): round suffix over `settings.max_rounds_by_kind` - park QUALITY/SCOPE-SUSPECT |
+   | exit 19 | DISPATCH-CEILING (T-369): today's `heartbeats/*.prompt.txt` count >= `settings.max_dispatches_per_day` |
 
 5. **Workspace** [log: I-16]: clone FRESH (`git clone --filter=blob:none`) unless one inside
    `settings.workspaces.retention_days` exists AND is clean. The janitor deletes idle workspaces
@@ -221,11 +220,11 @@ recovers a wrong cheap pick; a wrong expensive one is never detected.
    powershell -NoProfile -ExecutionPolicy Bypass -File GWD/worker-wrapper.ps1 `
      -TaskId T-<id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap> -StateRoot <GWD>
    ```
-   The wrapper passes the prompt as an **argv pointer** (STDIN abandoned 2026-08-12 - invisible to
+   The wrapper passes the prompt as an **argv pointer** (STDIN abandoned - invisible to
    console-less processes), writes `T-<id>.hb` (PID + ~60s tick) and the result JSON; the
    dispatcher, not yet the wrapper, prepends `GWD/worker-mandates.txt` to that prompt (T-372).
-   `-StateRoot` is MANDATORY off the VPS. The deleted STDIN recipe is archived with a do-not-use
-   banner at [log: I-17]. A same-repo-as-dispatcher contract orders the worker into its own worktree.
+   `-StateRoot` is MANDATORY off the VPS. Deleted STDIN recipe archived at [log: I-17]. A
+   same-repo-as-dispatcher contract orders the worker into its own worktree.
 7. **Terminal state** [log: I-18]: parse `stop_reason` - a refusal is NOT success. Refusal on
    haiku/sonnet -> reroute to opus (edit `model:`, append `status_log`, re-lint, re-preflight,
    relaunch); on opus -> PARK, no second reroute. Error -> one retry same tier; a 2nd failure:
@@ -245,8 +244,8 @@ recovers a wrong cheap pick; a wrong expensive one is never detected.
    result JSON (the wrapper pre-creates it at 0 bytes), an `EXITED` heartbeat, or one older than
    `settings.heartbeat_stale_after_seconds` - after which the origin session renders the status
    card (outcome, PR, verdict, evidence path, tier) automatically. **OWNER STATUS CADENCE** [log:
-   I-22]: while any session-origin task is live, run a PERSISTENT 15-minute ticker (never a fixed timeout that silently expires - the 2026-08-20 20:30 lapse: a timeout-armed ticker stopped and
-   nobody noticed until the owner asked twice). Every tick opens with the CURRENT TIME IN IST, e.g.
+   I-22]: while any session-origin task is live, run a PERSISTENT 15-minute ticker (never a fixed
+   timeout that silently expires - full incident at [log: I-22]). Every tick opens with the CURRENT TIME IN IST, e.g.
    `[20:45 IST]` - a tick with no timestamp does not satisfy the cadence. CONTENT FLOOR per tick:
    what changed since the last tick, what is running, the estimate - an explicit "NOTHING changed"
    tick, never a skipped one, and never fabricated progress.
@@ -283,10 +282,10 @@ rather than ask. New recurring third-party spend stays owner-gated.
    park it. Exceptions: a keeper/sweep rescue of a provably-dead origin and an explicit owner ask
    elsewhere (answer, change nothing).
 2. **Checker launch** [log: I-29, I-30]: mandatory, auto-chained, HEADLESS - `worker-wrapper.ps1`,
-   `bypassPermissions`, heartbeat `T-<id>C.hb` (`C` keeps death-detection tracks apart), watcher
-   armed same turn. Tier = opus when the contract is opus, else sonnet - never weaker than the
-   maker. In-session `Agent()` only with the owner present and said so. The worker itself runs in
-   the TARGET repo's dir, never the hub's, or hub governance leaks into its machine-parsed JSON.
+   `bypassPermissions`, heartbeat `T-<id>C.hb`, watcher armed same turn. Tier = opus when the
+   contract is opus, else sonnet - never weaker than the maker. In-session `Agent()` only with the
+   owner present and said so. The worker itself runs in the TARGET repo's dir, never the hub's, or
+   hub governance leaks into its machine-parsed JSON.
 3. **Tier receipt** [log: I-31]: `python GWD/verify-model-tier.py <contract> GWD/heartbeats/<id>.result.json`
    - tier-as-run must equal tier-as-contracted; non-zero = a task FAILURE line, never a silent pass.
 4. **Merge-guard predicate**: re-derive item 8 of STEP 6 independently, before scoring any dod.
@@ -400,7 +399,8 @@ exactly that - no machine enforces it yet.
   and MUST apply the OWNER STATUS CADENCE: a PERSISTENT IST-stamped 15-minute ticker while work
   is live. gate:PROSE-ONLY
 - MUST send a terminal-state card as FALLBACK for session-origin tasks and PRIMARY for origin-less
-  ones - and on a non-VPS machine push the bus after writing the ping. gate:PROSE-ONLY
+  ones - and on a non-VPS machine push the bus (via `bus-write.ps1`, T-384) after writing the
+  ping. gate:PROSE-ONLY
 - MUST reprioritize by REORDERING only - a running worker is never preempted. gate:PROSE-ONLY
 - MUST honor the deploy tier computed from the ACTUAL merged diff - auth/payment/DNS/migration
   force-upgrades to HOLD. gate:PROSE-ONLY
