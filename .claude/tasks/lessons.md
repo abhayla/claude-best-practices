@@ -1116,16 +1116,12 @@ Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Vent
   strictness, protection coverage, spend, and interruption frequency are OWNER-facing forks —
   ask proactively at intake; questions-only-when-challenged is itself a gate failure.
 
-- **Fleet host OOM kills the dispatcher session (2026-08-24, 3 deaths in one night).** Mistake: dispatching 5-6
-  parallel workers on a 16GB PC while worker-wrapper never killed workers' child processes, so node.exe from tasks
-  closed days earlier held 2-4GB each; commit hit 45.9/50.1GB and Windows Terminal (host of the interactive session)
-  crashed with E_OUTOFMEMORY. Root cause: no process-tree containment + no host-resource gate at dispatch. Rule:
-  a dispatch wave is gated on host commit % and a live-worker cap (mechanism: T-312 in getworkdone-bus - job
-  object kill-on-close, preflight exit code, janitor orphan sweep); until it lands, max 3 heavy workers and kill
-  orphan node.exe from closed worktrees before each wave. A watcher/session that "just dies" is a symptom - check
-  the Windows Application log (Id 1000/1001) for 8007000e before blaming the harness.
+## 2026-08-26 — Learn-or-block (owner directive after repeated same-day recurrences)
+- **Mistake:** four failure classes recurred within 24h AFTER being "codified" (related-list block x4, cap-death with uncommitted work x2, worker fabrication x2, silent exit-1 in IPODhan deploy-linux.sh after the same class was fixed in fleet scripts by T-320).
+- **Root cause:** lessons stored as prose in 3 places; mechanisms "queued for backlog" with no T-id/owner; no gate stopped new dispatch while learning debt accrued; nobody verifies the dispatcher.
+- **Rule/mechanism:** global CLAUDE.md "Learn-or-block" section; machine-read `D:\Abhay\GetWorkDone\MECHANISM-DUE.md`; fleet preflight exit-11 learning-debt gate (T-323); class sweeps across all registered repos. Instance fix for the deploy defect: T-321.
 
-## 2026-08-27 — the validator enforced a frontmatter key Claude Code does not have (`globs:` vs `paths:`)
-- **Mistake:** `workflow_quality_gate_validate_patterns.py` REQUIRED `globs:` for path-scoped rules and rejected `paths:`. Claude Code only honours `paths:`; a rule with `globs:` loads unconditionally. Every provisioned project loaded every rule every session (IPODhan: 81/81 files, ~117k tokens at launch; 26 global files / ~46k after the fix — InstructionsLoaded proof, 2 runs per state).
-- **Root cause:** the gate encoded an unverified field name as canonical (no live check against the docs), then propagated it via provisioning and tests that asserted the same wrong key. Nothing ever measured which instruction files actually load.
-- **Rule:** any platform field name a validator ENFORCES must cite the doc URL + fetch date in a comment next to the check; and any claim "this loads only when X" is verified with an `InstructionsLoaded` hook run, not assumed. Fixed by T-394 (hub) + T-396 (6 app repos); registry class `rules-frontmatter-globs-instead-of-paths-loads-every-rule-unconditionally`.
+## 2026-08-26 — Detection-gap RCA gate (owner directive 09:43 IST)
+- **Mistake:** round-7 findings were fixed as code classes; nobody asked why round 6 / the nightly audit / monitors / tests had not caught them. The fresh review was the only process executing the coverage floor.
+- **Root cause:** no standing step upgrades the DETECTION layer; the nightly audit prints WARN with no thresholds.
+- **Rule/mechanism:** global CLAUDE.md "Detection-gap RCA gate" — Fable-authored per-finding RCA (should-have-caught / why-not / detection upgrade) + FAIL-level daily checks shipped before the next review (T-335); next review gated on it; second success metric = findings a machine check should have caught = 0. RCA doc: bus evidence/2026-08-26-T-322/DETECTION-RCA.md.
