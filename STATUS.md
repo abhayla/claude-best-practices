@@ -115,10 +115,26 @@ the remaining items.
    | `check_plugin_version_bump.py --base origin/main` | exit 0 — `Plugin version-bump gate: OK` |
    | `generate_root_marketplace.py --check` | exit 0 — in sync |
 
-4. **DONE** — final push with no CI-skip marker anywhere in the commit message, then
-   `gh pr checks 598 --watch --interval 30` run in the foreground; per-check SUCCESS/FAILURE
-   recorded below and in the PR body once the watch completes. `hold` label unchanged (stays
-   until the dispatcher/checker lands this PR).
+4. **DONE** — final push `0d05696c` carries no CI-skip marker anywhere in the commit message.
+   `gh pr checks 598 --watch --interval 30` run in the foreground on that head:
+
+   | Check | Result | Duration |
+   |---|---|---|
+   | `test` | **SUCCESS** | 39s |
+   | `validate` | **SUCCESS** | 45s |
+
+   `gh pr view 598`: `state: OPEN`, `mergedAt: null`, `headRefOid: 0d05696c...` (matches the
+   final push), label `hold` present and unchanged — this worker never merges or closes a PR;
+   landing stays dispatcher/checker-owned.
+
+## Round 3 (T-371F3) summary — all four remaining items DONE
+
+SKILL.md 29,973 B (<=30,000 decimal), grandfather `max_bytes: 30000`, 28/28 gwd
+conformance/ratchet/eval-freshness tests green; checker's cadence mutation E re-derived RED then
+reverted on this branch (guard hole closed); full local CI green except the one pre-existing,
+contract-named `test_fleet_script_health` failure; final push `0d05696c` marker-free with both
+required GitHub checks (`test`, `validate`) SUCCESS. `hold` label in place; PR left OPEN for
+dispatcher/checker landing.
 
 ---
 
