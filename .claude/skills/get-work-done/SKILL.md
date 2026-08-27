@@ -205,12 +205,13 @@ recovers a wrong cheap pick; a wrong expensive one is never detected.
    | exit 9 | prompt file references a foreign-machine path |
    | exit 10 | HOST-MEMORY (T-312): commit charge over 75% of the limit, or at `settings.fleet.max_concurrent_workers` |
    | exit 11 | LEARNING-DEBT (T-323): a `MECHANISM-DUE.md` row at occurrences >= 2, not claimed/done, older than 48h, no `lesson_class:`; malformed = FAILS CLOSED |
-   | exit 12 | TURN-BUDGET (T-345): `-MaxTurns` under `settings.worker_defaults.max_turns_by_deliverable` for this kind |
+   | exit 12 | TURN-BUDGET (T-345): `-MaxTurns` under `settings.worker_defaults.max_turns_by_deliverable` |
    | exit 13 | FIX-ROUND PROMPT-LINT (T-336): a `T-<n>F*` prompt's first step omits honesty / PR-body / STATUS.md duties |
    | exit 14 | FAST-LANE contract at worker dispatch (T-351): set `lane: normal`, re-lint |
-   | exit 15 | KEEPER-LIVENESS (T-363): no reconciler tick on THIS host in 2x `settings.fleet_keeper_tick_minutes`; run `GWD/reconcile-claims.ps1 -StateRoot <root>` |
-   | exit 16 | HOST-MEMORY-UNKNOWN (T-364): commit/worker query returned nothing - fails CLOSED, never 0.0%/0 |
-   | exit 17 | SETTINGS-READ-FAILURE (T-364): settings.json unreadable/malformed or non-integer value - blocks, never defaults |
+   | exit 15 | KEEPER-LIVENESS (T-363): no reconciler tick on THIS host in 2x `settings.fleet_keeper_tick_minutes` |
+   | exit 16 | HOST-MEMORY-UNKNOWN (T-364): commit/worker query returned nothing - fails CLOSED |
+   | exit 17 | SETTINGS-READ-FAILURE (T-364): settings.json unreadable/malformed/non-integer - blocks |
+   | exit 18 | ROUND-CAP-EXCEEDED (T-367): round suffix over `settings.max_rounds_by_kind` - park QUALITY/SCOPE-SUSPECT |
 
 5. **Workspace** [log: I-16]: clone FRESH (`git clone --filter=blob:none`) unless one inside
    `settings.workspaces.retention_days` exists AND is clean. The janitor deletes idle workspaces
