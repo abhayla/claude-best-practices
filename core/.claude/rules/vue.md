@@ -1,5 +1,5 @@
 ---
-globs: ["**/src/**/*.vue", "**/src/**/*.ts"]
+paths: ["**/src/**/*.vue", "**/src/**/*.ts"]
 description: Vue 3 Composition API patterns and conventions.
 ---
 

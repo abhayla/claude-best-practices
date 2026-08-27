@@ -1,6 +1,6 @@
 {
   "name": "cbp-workflows",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "The hub's quality trio of orchestrated workflows \u2014 code-review, documentation, and skill-authoring \u2014 installed as one plugin instead of copied into each repo (#187 distribution pilot). Ships each workflow's level-1 dispatch closure (13 sub-skills + 4 worker agents) so a downstream project gets working /code-review-workflow, /documentation-workflow, and /skill-authoring-workflow from one /plugin install, centrally versioned and upgradable.",
   "author": {
     "name": "Abhay Kumar"

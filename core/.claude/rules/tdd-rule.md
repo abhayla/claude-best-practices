@@ -1,6 +1,6 @@
 ---
 description: Test-driven development workflow rules for red-green-refactor cycle.
-globs: ["**/test_*", "**/*_test.*", "**/tests/**", "**/*.test.*", "**/*.spec.*"]
+paths: ["**/test_*", "**/*_test.*", "**/tests/**", "**/*.test.*", "**/*.spec.*"]
 ---
 
 # TDD Rules

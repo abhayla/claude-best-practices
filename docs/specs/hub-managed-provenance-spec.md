@@ -113,7 +113,7 @@ hub_extension: ".claude/rules/project-*.md"
 | Hub file | Local extension convention |
 |---|---|
 | Rule (global) | New file `.claude/rules/project-<scope>.md` with `# Scope: global` — all global rules stack |
-| Rule (scoped) | New file `.claude/rules/project-<scope>.md` with `globs:` frontmatter — may overlap |
+| Rule (scoped) | New file `.claude/rules/project-<scope>.md` with `paths:` frontmatter — may overlap |
 | Skill | New skill directory `.claude/skills/<project-skill>/SKILL.md` — never edit hub SKILL.md |
 | Agent | New file `.claude/agents/project-<name>.md` |
 | Hook | Register additional hooks in `.claude/settings.json` — don't edit hub hook scripts |

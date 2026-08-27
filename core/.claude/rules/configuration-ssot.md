@@ -11,14 +11,14 @@ Every piece of Claude Code configuration MUST live in exactly one canonical laye
 | Layer | SSOT For | NOT For |
 |-------|----------|---------|
 | `CLAUDE.md` | Project-wide context loaded every session: build/test commands, architecture pointers, non-obvious gotchas | Multi-step workflows, path-scoped constraints, code style enforcement, tool permissions |
-| `.claude/rules/*.md` | Domain constraints scoped to file paths via `globs:` frontmatter, or global behavioral standards | Workflows/procedures, project-wide context, tool permissions |
+| `.claude/rules/*.md` | Domain constraints scoped to file paths via `paths:` frontmatter, or global behavioral standards | Workflows/procedures, project-wide context, tool permissions |
 | `.claude/skills/*/SKILL.md` | Multi-step workflows and procedures, loaded on demand via slash commands | Constraints, project context, permissions |
 | `.claude/settings.json` + hooks | Tool permissions, deterministic enforcement (linting, formatting, secret scanning) | Documentation, constraints Claude should "know", workflows |
 
 ### Choosing the Right Layer
 
 - If it is context Claude needs **every session** (commands, architecture, gotchas) --> `CLAUDE.md`
-- If it is a constraint scoped to **specific file types** --> `.claude/rules/` with `globs:`
+- If it is a constraint scoped to **specific file types** --> `.claude/rules/` with `paths:`
 - If it is a **multi-step procedure** invoked by name --> `.claude/skills/`
 - If it must be enforced with **zero exceptions** (deterministic) --> hook in `.claude/settings.json`
 
@@ -32,7 +32,7 @@ Every piece of Claude Code configuration MUST live in exactly one canonical laye
 
 4. **No permission echoing.** MUST NOT duplicate tool permissions across `.claude/settings.json` and `CLAUDE.md`. Settings control what Claude CAN do; `CLAUDE.md` controls what Claude SHOULD know. These domains MUST NOT overlap.
 
-5. **Path-scoped constraints go in rules.** When a constraint applies only to specific file types or directories, MUST use a `.claude/rules/*.md` file with `globs:` frontmatter. MUST NOT place path-specific constraints in `CLAUDE.md` where they consume tokens on every prompt regardless of relevance.
+5. **Path-scoped constraints go in rules.** When a constraint applies only to specific file types or directories, MUST use a `.claude/rules/*.md` file with `paths:` frontmatter. MUST NOT place path-specific constraints in `CLAUDE.md` where they consume tokens on every prompt regardless of relevance.
 
 ## The Pointer Pattern
 
@@ -65,7 +65,7 @@ When a `CLAUDE.md` file exceeds its budget (~80 lines for project root), extract
 
 1. **Identify multi-step procedures** (numbered steps, if/then flows). Move each to `.claude/skills/<name>/SKILL.md`. Replace with a pointer: `# Deploy workflow: run /deploy`
 
-2. **Identify path-scoped constraints** (rules that mention specific file extensions, directories, or frameworks). Move each to `.claude/rules/<name>.md` with appropriate `globs:`. Replace with a pointer.
+2. **Identify path-scoped constraints** (rules that mention specific file extensions, directories, or frameworks). Move each to `.claude/rules/<name>.md` with appropriate `paths:`. Replace with a pointer.
 
 3. **Identify deterministic enforcement** (style rules, formatting, "always run X"). Convert to hooks in `.claude/settings.json`. Remove from `CLAUDE.md` entirely -- hooks do not need pointers since they run automatically.
 
@@ -79,4 +79,4 @@ When a `CLAUDE.md` file exceeds its budget (~80 lines for project root), extract
 - MUST NOT use CLAUDE.md as a catch-all -- respect layer boundaries
 - MUST use pointers (not copies) when CLAUDE.md references another layer's content
 - MUST use hooks for deterministic enforcement; use instructions for advisory guidance
-- MUST scope path-specific constraints to rules with `globs:`, not global CLAUDE.md
+- MUST scope path-specific constraints to rules with `paths:`, not global CLAUDE.md

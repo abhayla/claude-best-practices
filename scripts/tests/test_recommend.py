@@ -921,12 +921,12 @@ class TestGenerateHubPracticesSection:
     def test_section_points_at_rules_directory_not_enumeration(self, hub_root):
         """The hub section must describe where rules live without enumerating
         them. Enumerating 50+ rule rows costs ~4k tokens per session for zero
-        enforcement benefit (path-scoped rules auto-load via `globs:`)."""
+        enforcement benefit (path-scoped rules auto-load via `paths:`)."""
         section = generate_hub_practices_section(hub_root, ["workflow", "context-management"])
         # Still mentions .claude/rules/ so users know where to look
         assert ".claude/rules/" in section or "rules/" in section
-        # Points at globs auto-loading (the actual enforcement mechanism)
-        assert "globs" in section.lower() or "auto-load" in section.lower() or "path-scoped" in section.lower()
+        # Points at paths auto-loading (the actual enforcement mechanism)
+        assert "paths" in section.lower() or "auto-load" in section.lower() or "path-scoped" in section.lower()
 
     def test_section_length_bounded_regardless_of_rule_count(self, hub_root):
         """The hub section MUST stay compact (≤25 lines) regardless of how
@@ -1045,7 +1045,7 @@ class TestProvisionClaudeMd:
     def test_create_from_template_does_not_enumerate_rules(self, hub_root, tmp_path):
         """Case 1a: the hub section MUST NOT enumerate individual rule files.
         Enumerating scales linearly with rule count and costs ~4k tokens at 50
-        rules for zero enforcement benefit (path-scoping is done via `globs:`)."""
+        rules for zero enforcement benefit (path-scoping is done via `paths:`)."""
         target = tmp_path / "myproject"
         target.mkdir()
         provision_claude_md(hub_root, target, [], ["workflow", "context-management", "testing"])

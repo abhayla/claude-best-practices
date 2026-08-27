@@ -136,7 +136,7 @@ def generate_hub_practices_section(
 
     Intentionally compact — the previous version enumerated every rule in a
     large table, which cost ~4k tokens per session at 50+ rules. Path-scoped
-    rules auto-load via `globs:` when matching files are opened; the table
+    rules auto-load via `paths:` when matching files are opened; the table
     added zero enforcement value. Discovery for planning conversations is
     served by `ls .claude/rules/` or grep, not by in-file enumeration.
 
@@ -160,7 +160,7 @@ def generate_hub_practices_section(
     )
     lines.append(
         "2. **Rules**: Path-scoped rules live in `.claude/rules/` and "
-        "auto-load via `globs:` frontmatter when matching files are opened. "
+        "auto-load via `paths:` frontmatter when matching files are opened. "
         "Browse with `ls .claude/rules/` — enumerating each rule here would "
         "cost ~4k tokens per session for zero enforcement benefit."
     )

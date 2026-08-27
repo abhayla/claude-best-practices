@@ -1,6 +1,6 @@
 ---
 description: Web analytics instrumentation standard — every site ships GA4 (one property per site) via GTM, with verified CTA/affiliate events and Search Console.
-globs: ["**/*.html", "**/*.tsx", "**/*.jsx", "**/*.vue", "**/*.astro", "**/*.svelte", "**/app/**", "**/pages/**"]
+paths: ["**/*.html", "**/*.tsx", "**/*.jsx", "**/*.vue", "**/*.astro", "**/*.svelte", "**/app/**", "**/pages/**"]
 ---
 
 # Web Analytics Instrumentation

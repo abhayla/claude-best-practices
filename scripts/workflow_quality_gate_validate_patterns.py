@@ -392,11 +392,11 @@ def score_rule(rule_path: Path) -> tuple[int, list[str]]:
     content = rule_path.read_text(encoding="utf-8")
     fm = parse_frontmatter(rule_path)
 
-    has_globs = fm and ("globs" in fm or "paths" in fm)
+    has_paths = fm and "paths" in fm
     first_lines = "\n".join(content.splitlines()[:10])
     has_scope_global = "# Scope: global" in first_lines
 
-    if not has_globs and not has_scope_global:
+    if not has_paths and not has_scope_global:
         score -= 20
         breakdown.append(f"Missing scope declaration (-20)")
 
@@ -636,26 +636,28 @@ def validate_rule(rule_path: Path) -> list[str]:
 
     fm = parse_frontmatter(rule_path)
 
-    # Check scope declaration — `globs:` is the canonical Claude Code field.
-    # `paths:` (and casing/singular variants like `Paths:`, `path:`) are
-    # invalid fields; rules using them silently load on every session instead
-    # of being path-scoped. Lowercase keys once so case-variants can't slip through.
+    # Check scope declaration — `paths:` is the ONLY frontmatter key Claude
+    # Code honours for path-scoped rules (code.claude.com/docs/en/memory).
+    # `globs:` (and casing/singular variants like `Globs:`, `glob:`) is a hub
+    # invention; a rule carrying it and nothing else loads UNCONDITIONALLY on
+    # every session instead of being path-scoped. Lowercase keys once so
+    # case-variants can't slip through.
     fm_lower = {k.lower(): v for k, v in fm.items()} if fm else {}
-    has_globs = "globs" in fm_lower
-    invalid_scope_fields = [k for k in ("paths", "path") if k in fm_lower]
+    has_paths = "paths" in fm_lower
+    invalid_scope_fields = [k for k in ("globs", "glob") if k in fm_lower]
     first_lines = "\n".join(content.splitlines()[:10])
     has_scope_global = "# Scope: global" in first_lines
 
     if invalid_scope_fields:
         field_list = ", ".join(f"`{k}:`" for k in invalid_scope_fields)
         errors.append(
-            f"{name}: Invalid `paths:` field in frontmatter (found {field_list}) — "
-            f"Claude Code uses `globs:` instead. Rename to `globs:` so the rule "
-            f"is actually path-scoped (it currently loads on every session)."
+            f"{name}: Invalid `globs:` field in frontmatter (found {field_list}) — "
+            f"Claude Code only honours `paths:` frontmatter (globs: loads the "
+            f"rule unconditionally) — rename to paths:"
         )
 
-    if not has_globs and not has_scope_global:
-        errors.append(f"{name}: Missing scope — add 'globs:' in frontmatter or '# Scope: global' in first 5 lines")
+    if not has_paths and not has_scope_global:
+        errors.append(f"{name}: Missing scope — add 'paths:' in frontmatter or '# Scope: global' in first 5 lines")
 
     # Placeholder detection (skip code blocks and inline code)
     content_stripped = re.sub(r"```[\s\S]*?```", "", content)  # fenced code blocks
@@ -1360,7 +1362,7 @@ def main():
                 elif "Missing 'type'" in e:
                     print(f"  → Add 'type: workflow' or 'type: reference' to frontmatter")
                 elif "Missing scope" in e:
-                    print(f"  → Add 'globs:' to frontmatter or '# Scope: global' to first 5 lines")
+                    print(f"  → Add 'paths:' to frontmatter or '# Scope: global' to first 5 lines")
 
         print(f"\nTotal: {len(hard_errors)} error(s), {len(warnings)} warning(s)")
         sys.exit(1)

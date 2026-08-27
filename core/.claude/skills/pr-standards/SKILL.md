@@ -151,7 +151,7 @@ Read each rule file in `.claude/rules/` and extract actionable constraints:
 
 1. Scan for RFC 2119 keywords: MUST, MUST NOT, NEVER, ALWAYS, SHOULD
 2. Extract patterns that can be checked against code (naming conventions, required patterns, forbidden patterns)
-3. Note any file-scoped rules (rules with `globs:` frontmatter that apply only to specific paths)
+3. Note any file-scoped rules (rules with `paths:` frontmatter that apply only to specific paths)
 
 ### 2.3 Custom Rule Definition Format
 

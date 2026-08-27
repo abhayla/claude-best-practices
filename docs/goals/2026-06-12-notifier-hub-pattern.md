@@ -78,7 +78,7 @@ The reference implementation to promote lives in **firekaro-planner** (read it c
 | Hub rule home | `core/.claude/rules/` | where `notifier-integration.md` goes. Study `core/.claude/rules/structured-logging.md` for the MUST/MUST-NOT + Why-this-matters house style. |
 | Hub template home | `core/.claude/templates/` | where the portable helper + CLAUDE.md block template go. |
 | Distribution registry | `registry/patterns.json` + `registry/changelog.md` | every distributed pattern is registered here (`hash`, `type`, `category`, `version`, `tier`, `description`, `tags`, `changelog`). `update-practices`/`synthesize-project` read it. |
-| Rule-authoring standards | `core/.claude/rules/rule-curation.md`, `pattern-structure.md`, `pattern-portability.md`, `pattern-self-containment.md`, `configuration-ssot.md`, `rule-writing-meta.md` | the rule MUST conform: scoped (`globs:`) or `# Scope: global`, no hardcoded paths/project names in the *template* helper, self-contained, no duplication. |
+| Rule-authoring standards | `core/.claude/rules/rule-curation.md`, `pattern-structure.md`, `pattern-portability.md`, `pattern-self-containment.md`, `configuration-ssot.md`, `rule-writing-meta.md` | the rule MUST conform: scoped (`paths:`) or `# Scope: global`, no hardcoded paths/project names in the *template* helper, self-contained, no duplication. |
 
 **Gotchas:** (1) The hub is the canonical SOURCE of `.claude/rules/*` — its own rules resolve here. (2) The
 template helper MUST be **portable/generic** (`pattern-portability.md`): no `"firekaro"` hardcoded — the

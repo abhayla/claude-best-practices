@@ -116,7 +116,7 @@ def test_only_scope_global_rules_scanned(tmp_path):
     tel = tmp_path / "tel"
     tel.mkdir()
     _write(rules / "global.md", "# Scope: global\n\n- MUST do X globally.\n")
-    _write(rules / "scoped.md", "---\nglobs: ['*.py']\n---\n\n- MUST do Y only for py.\n")
+    _write(rules / "scoped.md", "---\npaths: ['*.py']\n---\n\n- MUST do Y only for py.\n")
     report = run(rules, tel, window_days=30, min_misses=20, now=NOW)
     assert "global.md" in report["scanned_rules"]
     assert "scoped.md" not in report["scanned_rules"]

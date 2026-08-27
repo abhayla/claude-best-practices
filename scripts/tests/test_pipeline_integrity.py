@@ -438,12 +438,12 @@ class TestOrchestrationRule:
     def test_rule_file_exists(self):
         assert ORCHESTRATION_RULE.exists()
 
-    def test_rule_has_globs_scoping(self):
+    def test_rule_has_paths_scoping(self):
         content = _read_file(ORCHESTRATION_RULE)
         fm = _parse_frontmatter(content)
-        globs = fm.get("globs", [])
-        assert any("agents" in g for g in globs), "Rule must scope to agents"
-        assert any("skills" in g for g in globs), "Rule must scope to skills"
+        paths = fm.get("paths", [])
+        assert any("agents" in g for g in paths), "Rule must scope to agents"
+        assert any("skills" in g for g in paths), "Rule must scope to skills"
 
     def test_rule_mentions_key_constraints(self):
         content = _read_file(ORCHESTRATION_RULE)

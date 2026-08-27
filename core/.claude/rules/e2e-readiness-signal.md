@@ -3,7 +3,7 @@ description: >
   E2E tests MUST wait on an explicit app-emitted readiness signal after
   navigation, never a fixed wall-clock delay. Framework-agnostic: the app
   emits a ready attribute/event, the test waits on it.
-globs: ["**/e2e/**/*", "**/tests/e2e/**/*", "**/*.e2e.*", "**/*.spec.ts", "**/*.cy.*"]
+paths: ["**/e2e/**/*", "**/tests/e2e/**/*", "**/*.e2e.*", "**/*.spec.ts", "**/*.cy.*"]
 version: "1.0.0"
 ---
 

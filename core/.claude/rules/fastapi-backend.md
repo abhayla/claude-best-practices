@@ -1,5 +1,5 @@
 ---
-globs: ["backend/**/*.py"]
+paths: ["backend/**/*.py"]
 description: FastAPI backend development rules and patterns.
 ---
 

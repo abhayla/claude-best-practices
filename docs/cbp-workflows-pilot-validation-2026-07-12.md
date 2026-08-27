@@ -25,7 +25,7 @@ downstream projects instead of *copied*.
 
 1. **Rules-in-plugins: NO.** Plugin components are skills/commands/agents/hooks/MCP/LSP/
    monitors/bin/settings (cached doc `docs/claude-references/create-plugins.md`).
-   Auto-loaded `rules/*.md` with `globs:` are not a plugin component — rules stay
+   Auto-loaded `rules/*.md` with `paths:` are not a plugin component — rules stay
    copy-provisioned, or hook-injected (the fable-operating-manual pattern).
 2. **Dual-home fencing:** unaffected by this pilot (no rules shipped). The long-term
    answer is plugin-as-SSOT graduation (the prompt-auto-enhance precedent), which removes

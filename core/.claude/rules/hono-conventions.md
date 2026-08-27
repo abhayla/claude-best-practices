@@ -1,6 +1,6 @@
 ---
 description: Hono backend route conventions — instance setup, inline Zod validation, ownership checks, response envelopes, opt-in pagination, and rate limiting.
-globs: ["**/server/**/*.ts", "**/routes/**/*.ts", "**/api/**/*.ts"]
+paths: ["**/server/**/*.ts", "**/routes/**/*.ts", "**/api/**/*.ts"]
 ---
 
 # Hono Route Conventions

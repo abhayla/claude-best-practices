@@ -1,6 +1,6 @@
 ---
 description: Guidelines for curating patterns (skills, agents, rules) added to the distributed .claude/ template.
-globs: [".claude/**/*.md"]
+paths: [".claude/**/*.md"]
 ---
 
 # Pattern Curation for Distributed Template
@@ -45,7 +45,7 @@ Agents MUST declare `model` in frontmatter and include `## Core Responsibilities
 
 ## Rule Curation
 
-Every rule MUST declare its activation scope — either `globs:` in frontmatter or `# Scope: global` in the first 5 lines. Unscoped rules cause context pollution in projects where they don't apply.
+Every rule MUST declare its activation scope — either `paths:` in frontmatter or `# Scope: global` in the first 5 lines. Unscoped rules cause context pollution in projects where they don't apply.
 
 ## Hub-only vs Distributable Scoping (+ dual-home sync)
 

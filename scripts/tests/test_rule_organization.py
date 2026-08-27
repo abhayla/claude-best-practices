@@ -33,13 +33,14 @@ def _parse_frontmatter(path: Path) -> dict:
 def _get_globs(path: Path) -> list[str]:
     """Extract glob patterns from a rule's frontmatter.
 
-    `globs:` is the canonical Claude Code field. The `paths:` fallback was
-    removed because Claude Code does not recognize `paths:` — rules using
-    that field are actively rejected by the validator. Keeping a silent
+    `paths:` is the ONLY field Claude Code honours for path-scoped rules
+    (code.claude.com/docs/en/memory). The `globs:` fallback was removed
+    because Claude Code does not recognize `globs:` — rules using that field
+    are actively rejected by the validator (T-394). Keeping a silent
     fallback here would let non-canonical rules pass organization checks
     while failing the validator, which is inconsistent."""
     fm = _parse_frontmatter(path)
-    raw = fm.get("globs") or []
+    raw = fm.get("paths") or []
     if isinstance(raw, str):
         return [g.strip() for g in raw.split(",") if g.strip()]
     if isinstance(raw, list):
@@ -168,7 +169,7 @@ class TestCoreMetaRuleGlobs:
     ]
 
     def test_meta_rules_target_downstream_paths(self):
-        """Meta-rules must use .claude/**/*.md globs, not core/.claude/**/*.md."""
+        """Meta-rules must use .claude/**/*.md paths, not core/.claude/**/*.md."""
         for name in self.META_RULES:
             path = CORE_RULES_DIR / name
             if not path.exists():
@@ -222,7 +223,7 @@ class TestScopeDeclarations:
     """Rules should not have redundant dual scope declarations."""
 
     def test_no_dual_scope(self):
-        """Rules with # Scope: global should not also have globs: ['**/*']."""
+        """Rules with # Scope: global should not also have paths: ['**/*']."""
         for rule_dir in [HUB_RULES_DIR, CORE_RULES_DIR]:
             if not rule_dir.exists():
                 continue
@@ -234,8 +235,8 @@ class TestScopeDeclarations:
                 has_wildcard_glob = any(g == "**/*" for g in globs)
                 assert not (has_scope_comment and has_wildcard_glob), (
                     f"{rule.parent.parent.name}/{rule.name}: Has both "
-                    f"'# Scope: global' AND globs: ['**/*']. Use only "
-                    f"'# Scope: global' for global rules (remove globs)."
+                    f"'# Scope: global' AND paths: ['**/*']. Use only "
+                    f"'# Scope: global' for global rules (remove paths)."
                 )
 
 
@@ -265,37 +266,40 @@ class TestHubOnlyRulesNotInCore:
 
 
 class TestCanonicalScopeField:
-    """Claude Code recognizes only `globs:` as the path-scoping frontmatter
-    field. Any rule using `paths:` (a historical misuse) will silently load on
-    every session instead of being path-scoped — the opposite of intent.
+    """Claude Code recognizes only `paths:` as the path-scoping frontmatter
+    field (code.claude.com/docs/en/memory). Any rule using `globs:` (a hub
+    invention with no meaning to Claude Code) will silently load on every
+    session instead of being path-scoped — the opposite of intent.
 
-    Regression guard: we found 8 hub rules using `paths:` in April 2026; each
-    downstream provisioning run re-propagated the bug. This test asserts the
-    canonical field is used everywhere.
+    Regression guard (T-394, 2026-08-27): the hub validator itself enforced
+    `globs:` as canonical from the start, so every "path-scoped" rule in the
+    hub — and in every provisioned downstream project — loaded unconditionally
+    in every session. This test asserts the actually-canonical field is used
+    everywhere.
     """
 
-    def _rules_using_paths_field(self, rule_files: list[Path]) -> list[str]:
+    def _rules_using_globs_field(self, rule_files: list[Path]) -> list[str]:
         violations = []
         for path in rule_files:
             fm = _parse_frontmatter(path)
-            if "paths" in fm:
+            if "globs" in fm:
                 violations.append(str(path.relative_to(ROOT)))
         return violations
 
-    def test_no_core_rule_uses_paths_field(self):
-        """Hub template (core/.claude/rules/) — no rule may use `paths:`."""
-        violations = self._rules_using_paths_field(_core_rule_files())
+    def test_no_core_rule_uses_globs_field(self):
+        """Hub template (core/.claude/rules/) — no rule may use `globs:`."""
+        violations = self._rules_using_globs_field(_core_rule_files())
         assert violations == [], (
-            f"Rules using `paths:` (invalid Claude Code field — use `globs:`): "
-            f"{violations}. Claude Code does not recognize `paths:`; these rules "
-            f"silently load on every session. Rename `paths:` to `globs:` in the "
+            f"Rules using `globs:` (invalid Claude Code field — use `paths:`): "
+            f"{violations}. Claude Code does not recognize `globs:`; these rules "
+            f"silently load on every session. Rename `globs:` to `paths:` in the "
             f"YAML frontmatter."
         )
 
-    def test_no_hub_rule_uses_paths_field(self):
+    def test_no_hub_rule_uses_globs_field(self):
         """This hub's own rules (.claude/rules/) — same check."""
-        violations = self._rules_using_paths_field(_hub_rule_files())
+        violations = self._rules_using_globs_field(_hub_rule_files())
         assert violations == [], (
-            f"Hub rules using `paths:` (invalid field): {violations}. "
-            f"Rename to `globs:`."
+            f"Hub rules using `globs:` (invalid field): {violations}. "
+            f"Rename to `paths:`."
         )

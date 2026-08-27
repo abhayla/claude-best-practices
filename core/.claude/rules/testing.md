@@ -1,6 +1,6 @@
 ---
 description: Testing conventions and best practices.
-globs: ["**/test_*", "**/*_test.*", "**/tests/**", "**/*.test.*", "**/*.spec.*"]
+paths: ["**/test_*", "**/*_test.*", "**/tests/**", "**/*.test.*", "**/*.spec.*"]
 ---
 
 # Testing Rules

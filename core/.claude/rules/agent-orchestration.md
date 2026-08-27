@@ -1,6 +1,6 @@
 ---
 description: Constraints for multi-agent orchestration patterns in agents and skills.
-globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
+paths: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 ---
 
 # Agent Orchestration Constraints

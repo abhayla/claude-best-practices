@@ -1,6 +1,6 @@
 ---
 description: When to reach for an agent TEAM (peer Claude Code sessions that message + self-coordinate) vs a SUBAGENT (flat worker that reports back) vs a git WORKTREE. Complements agent-orchestration.md.
-globs: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
+paths: [".claude/agents/*.md", ".claude/skills/*/SKILL.md"]
 ---
 
 # Agent Team vs Subagent vs Worktree — selection rule

@@ -41,7 +41,7 @@ Read the pattern file and check:
 2. **Required fields** — name, description, version, type (for skills), model (for agents)
 3. **Version field** — Must be valid SemVer format (`"1.0.0"`)
 4. **Type field** (skills only) — Must be `workflow` or `reference`
-5. **Scope** (rules only) — Must have `globs:` in frontmatter or `# Scope: global` in first 5 lines
+5. **Scope** (rules only) — Must have `paths:` in frontmatter or `# Scope: global` in first 5 lines
 6. **No placeholders** — Reject patterns with `<!-- TODO: -->`, `<!-- FIXME: -->`, or body under 30 lines
 7. **Size check** — Warn if SKILL.md exceeds 500 lines, reject if over 1000 lines
 8. **Least-privilege tools** — Flag if `allowed-tools` includes `Write`/`Edit`/`Bash` but skill body never uses them

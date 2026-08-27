@@ -126,7 +126,7 @@ context + grading trigger), not just the indicator reminder.
 
 ## Rule: `prompt-auto-enhance-rule.md` (~40 lines)
 
-**Scope:** Global (`globs: ["**/*"]`) -- loaded into every conversation.
+**Scope:** Global (`paths: ["**/*"]`) -- loaded into every conversation.
 **Role:** Lean trigger + Clarification Gate (unique to rule).
 
 ### What the rule contains

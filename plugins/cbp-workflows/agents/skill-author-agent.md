@@ -47,10 +47,10 @@ You receive one of:
 1. Invoke `Skill(skill="claude-guardian")` with the rough rule text
 2. `/claude-guardian` handles:
    - Enhancing the rule into proper structure with RFC 2119 language (MUST, MUST NOT, NEVER)
-   - Adding `globs:` frontmatter for scoped rules or `# Scope: global` for global rules
+   - Adding `paths:` frontmatter for scoped rules or `# Scope: global` for global rules
    - Determining correct placement (`.claude/rules/`, CLAUDE.md, or `settings.json`)
 3. After `/claude-guardian` returns, verify:
-   - Rule has scope declaration (globs or global)
+   - Rule has scope declaration (paths or global)
    - MUST NOT rules provide alternatives ("Use Y instead of X")
    - If synthesized: `synthesized: true` in frontmatter
 4. Return the validated rule file with placement recommendation
@@ -176,7 +176,7 @@ Every pattern MUST pass ALL of these before being returned:
 | Frontmatter complete | All | All required fields present for the pattern type |
 | Prerequisites contract | Skills | `## Prerequisites` section (or explicit `Prerequisites: none`) + `## STEP 0: Preflight` when any prerequisite is declared |
 | Version present | All | SemVer format (`"1.0.0"`) |
-| Scope declared | Rules | `globs:` or `# Scope: global` |
+| Scope declared | Rules | `paths:` or `# Scope: global` |
 | Tools least-privilege | Skills, Agents | Only tools actually used in the pattern |
 | 30+ lines of content | All | No stubs — every pattern must be actionable |
 | Under 500 lines | All | Use `references/` for overflow |

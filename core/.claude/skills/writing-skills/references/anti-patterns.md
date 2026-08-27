@@ -30,7 +30,7 @@ MUST NOT delete a skill without the deprecation lifecycle. Abrupt removal breaks
 
 **Why it fails:** Rules load automatically, skills load on-demand. If the guidance should always be active, it belongs in `.claude/rules/`, not `.claude/skills/`.
 
-**Fix:** Move it to `core/.claude/rules/{name}.md` with appropriate `globs:` frontmatter.
+**Fix:** Move it to `core/.claude/rules/{name}.md` with appropriate `paths:` frontmatter.
 
 ### Anti-Pattern 2: The Vague Advisor
 

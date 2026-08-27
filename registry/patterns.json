@@ -193,7 +193,7 @@
     }
   },
   "agent-orchestration": {
-    "hash": "8cdc170ce9b1ce858fef58b64d76e60b212a34e21298450d1e669a6d063bbe2c",
+    "hash": "23379b583882366cceaae92d0a412b424d566884c2227ac052c2f889e6fdc3ba",
     "type": "rule",
     "category": "core",
     "version": "1.7.0",
@@ -241,7 +241,7 @@
     }
   },
   "android": {
-    "hash": "082f7d56ff67e5cedf84dc9bd349ea7b05ebfb326f8114089ec62957047cb389",
+    "hash": "7865bdc9f4dc675a24fe85f82310edd3ff2dafcabc90e02d8bb5284cc9227d27",
     "type": "rule",
     "category": "core",
     "version": "2.0.0",
@@ -367,7 +367,7 @@
     }
   },
   "android-compose-ui": {
-    "hash": "b099c571b1c5c12882918db61c210554b0bdac607c361a3137056b4b2b75f45d",
+    "hash": "745beb2bacade9c33fb01f7d778089990f399745e2a5f9c1cf991ef6e037aa1a",
     "type": "rule",
     "category": "core",
     "version": "2.0.0",
@@ -412,7 +412,7 @@
     }
   },
   "android-kotlin": {
-    "hash": "1c40f0bfca4faacc2b1fe20a2177773f4b0724ef193bce56e724460086e84388",
+    "hash": "58c3ce6bfbd033b60821089295366054276a884a5ec56061c252374de08a6b65",
     "type": "rule",
     "category": "android-compose",
     "version": "1.0.1",
@@ -825,7 +825,7 @@
     }
   },
   "bun-elysia": {
-    "hash": "c10026f0b1e2b98296770dde2abceb6a54e0a260459967000c92d6e3c5388f57",
+    "hash": "10d892233f9fa1e01ce14e2902420c54c5e0b27e844bc9de62d1d35533319627",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -998,7 +998,7 @@
     }
   },
   "claude-guardian": {
-    "hash": "b563e718b08644d845d2fcc24a732910cab247cb26fb106f92502d5d6212acdf",
+    "hash": "bc4742c3088dc8b1d2ec064831f05e8900e05b7f83566537c1070b83751aabb9",
     "type": "skill",
     "category": "core",
     "version": "2.0.0",
@@ -1150,7 +1150,7 @@
     }
   },
   "configuration-ssot": {
-    "hash": "2836d182e7206906a7454026dba5255d7517033d6e5dd7e6367b83b4fc372759",
+    "hash": "8b90343d5ffcc501a0840c6a0340a6b17e5db2320e41c89cc9eeece89826964a",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -1316,7 +1316,7 @@
     }
   },
   "contribute-practice": {
-    "hash": "b68b64f4dc77ed6afe03ca06c0b09555eb2e7c8085e0a6fd73aa50e189dae963",
+    "hash": "bcabf630ef44f49dde6b8a1f5f735dd480560b5f60463c751bfbce7dac2ccfe3",
     "type": "skill",
     "category": "core",
     "version": "2.1.0",
@@ -1962,7 +1962,7 @@
     "tier": "nice-to-have"
   },
   "e2e-test-writing": {
-    "hash": "1723f9489d0ba48e0f2121adb5739ea2e056802b266c8ea6b6795bfbafe176f7",
+    "hash": "a4bf56f4d36e1223c71400bc4fdd6b437740901cb2a923a53c26d11affa6d919",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -2142,7 +2142,7 @@
     }
   },
   "fastapi-backend": {
-    "hash": "6880f6de4c52914106f93d259cab26b16bcf54f92319fdd48c6e55923544989b",
+    "hash": "d133845cd084d62ae68ff00f16cd4b6ab00b84be62c8ac716f7c839d89b296b9",
     "type": "rule",
     "category": "core",
     "version": "2.0.0",
@@ -2163,7 +2163,7 @@
     }
   },
   "fastapi-database": {
-    "hash": "a6bb6500d77afdd4b3fe078da33aee3ca1a11c93dc0e07a31edc57b71b4142f3",
+    "hash": "60bcc15834e806fb4351e3c5f6b2c7a87e19a8bd09e0fcb6e5132b4ddd89bc73",
     "type": "rule",
     "category": "core",
     "version": "2.0.0",
@@ -2338,7 +2338,7 @@
     }
   },
   "firebase": {
-    "hash": "571d4b5a9de3f82a11b8771e0065c583b0395a328bd1e2a09cca52a6da110955",
+    "hash": "f74643487a85c3dcaf7741b08a4b51ce7dfb65b48859e5fbb14b5e3cb31723ca",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -2524,7 +2524,7 @@
     }
   },
   "flutter": {
-    "hash": "feb4b3812142ecbdcbe4de317a609f50c3e0d81d24d6adad44acdfe2556b6ac9",
+    "hash": "85895483cf706ebf49d50b9c9ec6718c33da159532e0a6cdea8c03d01673eb82",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -3369,7 +3369,7 @@
     }
   },
   "pattern-portability": {
-    "hash": "a6e0bef672ffe762a706be651dad6db2e7738ec3815423df482ebef15b83b3ef",
+    "hash": "ec19ddc7b96204eff5a3349be19094b6154af20eab0d9abc2c4fdd3dac98dece",
     "type": "rule",
     "category": "core",
     "version": "1.1.0",
@@ -3394,7 +3394,7 @@
     }
   },
   "pattern-self-containment": {
-    "hash": "03d4ba7aa83406623d7f53fff7561ac048544b6fbe56a8fbfe9eb020e94a9a0a",
+    "hash": "8728e5169e2c920763f9ebce199b44f364b5880650efffd83cb759db689d6e86",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -3419,7 +3419,7 @@
     }
   },
   "pattern-structure": {
-    "hash": "5f448a650f4a7657ac99dc8cdc1990ad4f962ad635f78412eb9672399a1cff9a",
+    "hash": "e602721a35d2e633cab10732ca1cdddfdd0f3539ecf1a7e4cca1e94993b840e0",
     "type": "rule",
     "category": "core",
     "version": "1.2.0",
@@ -3692,7 +3692,7 @@
     }
   },
   "pr-standards": {
-    "hash": "95a25f4518ae006202f243562d277d9de9498376965a807141536c82b8b1ea70",
+    "hash": "7ffc439eef6eca997e3a018f09aa4871cf2c9971cc3c59e5f8c4d2a983ca2133",
     "type": "skill",
     "category": "core",
     "version": "1.1.0",
@@ -3980,7 +3980,7 @@
     }
   },
   "react-nextjs": {
-    "hash": "9a44faf762afaaf91692ed078620ca2b03403e58a3ebbd55996dbfef42acc04a",
+    "hash": "ed21c97ef24d9fe110937413167920f0211b91de9fa04b379f15606e15dedef1",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -4232,7 +4232,7 @@
     }
   },
   "rule-curation": {
-    "hash": "86879bba2a7bbf9a386fa566d2ddae4d5a572c696b39e05f621372476ebee6fe",
+    "hash": "cac4e28b4d9136465da20de40d1d36de6bab80daada08640b243c4999e24ce8f",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -4261,7 +4261,7 @@
     }
   },
   "rule-writing-meta": {
-    "hash": "0b95e0286ef63c46f93e21e0e31d9ac853ba1a91f50e80df77b1a177ba0187a1",
+    "hash": "67cea1969aceb21d01dd6f01a1d43703d019ddd09e725f65ae81db58a824dd17",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -4572,7 +4572,7 @@
     }
   },
   "skill-author-agent": {
-    "hash": "c2db5d6456336d2eccf8f4274e05bda51d4492688fe02b30b2c1e8e963a1bedf",
+    "hash": "173199b937f7175022958ed14acf941196ac3105fbc9e94e25465ec478f62fb7",
     "type": "agent",
     "category": "core",
     "version": "1.1.0",
@@ -4729,7 +4729,7 @@
     }
   },
   "ssot-audit": {
-    "hash": "faacd3ebb11d969a5f52b4280ffdf68f39a6905f77b7927a770430e162cbc6ed",
+    "hash": "12af6cbe3ec167c90dea4f887f372a537367b99a00cccf2f65a2228ffc52c8e6",
     "type": "skill",
     "category": "core",
     "version": "1.3.0",
@@ -4983,7 +4983,7 @@
     }
   },
   "tdd-rule": {
-    "hash": "6f67acb5642edf356d1130f2d8d4b553d58b15116950b871742e97681814522c",
+    "hash": "6a9dd1b58e8cf8fed7d797bf6b55f6b835b39ac923591eed0536a6d12d451fd8",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -5218,7 +5218,7 @@
     }
   },
   "testing": {
-    "hash": "85d2c6d52e8214d8f4bb70232ae91f1b91e6b1a19db4bc2d9bbd217b7a7ff6b5",
+    "hash": "45d91d27ced7644bf1b11598ce56622da04c15174d642fcbbe74346bd5d9ea90",
     "type": "rule",
     "category": "core",
     "version": "2.2.0",
@@ -5411,7 +5411,7 @@
     }
   },
   "vue": {
-    "hash": "1329fcee8245d56a1dba96c5aead406160c0517a5f09add1c52c7243690755c9",
+    "hash": "8318b1ab82477ae50d72b107a2e49d06b2166bc62c650a64e5e724c36f0e94a7",
     "type": "rule",
     "category": "core",
     "version": "1.1.0",
@@ -6007,7 +6007,7 @@
     }
   },
   "e2e-readiness-signal": {
-    "hash": "307f775ba544c7bf128053c59eee6ee0f57d4cd3810ee2494410ef400ca77c33",
+    "hash": "f3af78eebad63478dcafd9e57b555583161e9ee910554fe9ba7298ec0a548913",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6034,7 +6034,7 @@
     }
   },
   "e2e-persistence-verification": {
-    "hash": "cc8dd88ac9b07136d321b5538db55699f003f9ecf7542beb98c39cdf6f1bd221",
+    "hash": "99975db53d26846f631945d2d1ec50ee9cf289d252910cef9d4b8db164f54b3b",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6114,7 +6114,7 @@
     }
   },
   "hono-conventions": {
-    "hash": "18f0333b4aed9e47d42d9df8743c977592c124b736426c9258903f88420ecd48",
+    "hash": "aec7562e6fecee10de24575fda383dd730d4231ac2c370c88541bcc7895615ea",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6141,7 +6141,7 @@
     }
   },
   "prisma-conventions": {
-    "hash": "6398af845fb99a386a700a26e3d42405e0bf46f1eec9f6be3c52b77937d6dcbe",
+    "hash": "76e88d6bdf0d8c5e2acfdf1c0f699dba95b019ca5d4ea77841f38bd3be11b33e",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6168,7 +6168,7 @@
     }
   },
   "vue-e2e": {
-    "hash": "6166c44a4bf8a26990a998d6ea07c7e7e18b06e9192f9dd089167e2f7792ce24",
+    "hash": "d35ea591908fa23351c621b8ea7c20b65424b5d4ae23f7e43afc51385002e75e",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6450,7 +6450,7 @@
     "tier": "nice-to-have"
   },
   "web-analytics-instrumentation": {
-    "hash": "d7c304d79a19080bba3542e7baf4b02cb21f23c0f34711ba3ccd68eaf538c7a8",
+    "hash": "c05996d618d046e2078f439f2d4854c9f0a92d7a825dd2ed80d8f9ec3634ba31",
     "type": "rule",
     "category": "need-basis",
     "version": "1.0.0",
@@ -6694,7 +6694,7 @@
     "tier": "nice-to-have"
   },
   "agent-team-selection": {
-    "hash": "48fc3cbdc6ae1219f0174bb6f2d9f1d07ddebd254469ec8ddf7bf3ac589938a5",
+    "hash": "0d86cc42778fd1e52028bd5332a09603fe4c46bdf71868ddc660ba435efeb1bb",
     "type": "rule",
     "category": "core",
     "version": "1.0.0",
@@ -6796,7 +6796,7 @@
     "tier": "must-have"
   },
   "web-deploy-readiness": {
-    "hash": "0672f511930082fb8040b863f3e84c8477d7ddd94859314b7dc72a452367ecd4",
+    "hash": "fbe6699761283c1217a291331066b853b5c09b0925d177caeebb03816d764078",
     "type": "rule",
     "category": "need-basis",
     "version": "1.0.0",

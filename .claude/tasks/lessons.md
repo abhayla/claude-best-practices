@@ -1124,3 +1124,8 @@ Mistake: STAGE-R-PC.cmd used move src dst expecting a rename; dst (D:\Abhay\Vent
   object kill-on-close, preflight exit code, janitor orphan sweep); until it lands, max 3 heavy workers and kill
   orphan node.exe from closed worktrees before each wave. A watcher/session that "just dies" is a symptom - check
   the Windows Application log (Id 1000/1001) for 8007000e before blaming the harness.
+
+## 2026-08-27 — the validator enforced a frontmatter key Claude Code does not have (`globs:` vs `paths:`)
+- **Mistake:** `workflow_quality_gate_validate_patterns.py` REQUIRED `globs:` for path-scoped rules and rejected `paths:`. Claude Code only honours `paths:`; a rule with `globs:` loads unconditionally. Every provisioned project loaded every rule every session (IPODhan: 81/81 files, ~117k tokens at launch; 26 global files / ~46k after the fix — InstructionsLoaded proof, 2 runs per state).
+- **Root cause:** the gate encoded an unverified field name as canonical (no live check against the docs), then propagated it via provisioning and tests that asserted the same wrong key. Nothing ever measured which instruction files actually load.
+- **Rule:** any platform field name a validator ENFORCES must cite the doc URL + fetch date in a comment next to the check; and any claim "this loads only when X" is verified with an `InstructionsLoaded` hook run, not assumed. Fixed by T-394 (hub) + T-396 (6 app repos); registry class `rules-frontmatter-globs-instead-of-paths-loads-every-rule-unconditionally`.
