@@ -521,17 +521,20 @@ def plugin_versions(cache_dir: Path, notes: list | None = None) -> dict[tuple[st
     return {slot: path for slot, (_, path) in best.items()}
 
 
-def _read_enabled_plugins(path: Path, notes: list, note_if_missing: bool) -> dict[str, bool]:
-    """`enabledPlugins` map from one settings.json — `{}` if the file is missing/unreadable.
+def _read_enabled_plugins(path: Path, notes: list) -> dict[str, bool]:
+    """`enabledPlugins` map from one settings.json scope.
 
-    `note_if_missing` is False for the optional per-repo overlay files (`settings.json` /
-    `settings.local.json` are commonly absent by design — that is not worth flagging), True
-    for the primary user settings file where absence is unusual enough to say out loud.
+    Every scope actually read gets an informational note — `"enablement scope: <path>
+    (N entries)"` when read, `"enablement scope: <path> missing"` when the file does not
+    exist — so a coverage swing between two `--repo` runs is explained by the report rather
+    than silent (T-395 review finding 1). A settings file that exists but whose
+    `enabledPlugins` value is absent or the wrong shape is ALSO noted rather than silently
+    treated as `{}` (finding 2): `"<path>: no enabledPlugins map (key absent)"` /
+    `"(wrong type: <type>)"`.
     """
     path = Path(path)
     if not path.is_file():
-        if note_if_missing:
-            notes.append(f"unverified — settings file not found: {path}")
+        notes.append(f"enablement scope: {path} missing")
         return {}
     try:
         with open(path, encoding="utf-8") as f:
@@ -539,27 +542,35 @@ def _read_enabled_plugins(path: Path, notes: list, note_if_missing: bool) -> dic
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         notes.append(f"unverified — could not read {path}: {exc}")
         return {}
-    enabled = data.get("enabledPlugins") if isinstance(data, dict) else None
-    return dict(enabled) if isinstance(enabled, dict) else {}
+    if not isinstance(data, dict) or "enabledPlugins" not in data:
+        notes.append(f"{path}: no enabledPlugins map (key absent)")
+        notes.append(f"enablement scope: {path} (0 entries)")
+        return {}
+    enabled = data["enabledPlugins"]
+    if not isinstance(enabled, dict):
+        notes.append(f"{path}: no enabledPlugins map (wrong type: {type(enabled).__name__})")
+        notes.append(f"enablement scope: {path} (0 entries)")
+        return {}
+    notes.append(f"enablement scope: {path} ({len(enabled)} entries)")
+    return dict(enabled)
 
 
 def load_enabled_plugins(user_settings_path, repo_paths, notes: list | None = None) -> dict[str, bool]:
     """Merge `enabledPlugins` (`"<plugin>@<marketplace>": true/false`) across scopes: the
     user's `~/.claude/settings.json`, then each repo's `.claude/settings.json`, then that
     repo's `.claude/settings.local.json` — later scopes win key-by-key, matching the order
-    Claude Code itself resolves plugin enablement. A key absent from every scope stays
-    absent here (the caller treats "no key" as not-enabled, distinct from an explicit
-    `false`, but both read as "don't count this plugin as installed").
+    Claude Code itself resolves plugin enablement (project settings override the user
+    default; the untracked local overlay overrides the project setting). A key absent from
+    every scope stays absent here (the caller treats "no key" as not-enabled, distinct from
+    an explicit `false`, but both read as "don't count this plugin as installed").
     """
     notes = notes if notes is not None else []
     merged: dict[str, bool] = {}
-    merged.update(_read_enabled_plugins(Path(user_settings_path), notes, note_if_missing=True))
+    merged.update(_read_enabled_plugins(Path(user_settings_path), notes))
     for repo in repo_paths or []:
         repo_claude = Path(repo) / ".claude"
-        merged.update(_read_enabled_plugins(repo_claude / "settings.json", notes, note_if_missing=False))
-        merged.update(
-            _read_enabled_plugins(repo_claude / "settings.local.json", notes, note_if_missing=False)
-        )
+        merged.update(_read_enabled_plugins(repo_claude / "settings.json", notes))
+        merged.update(_read_enabled_plugins(repo_claude / "settings.local.json", notes))
     return merged
 
 
@@ -605,12 +616,24 @@ def build_inventory(repos, home: Path | None = None, user_settings_path=None) ->
     settings_path = Path(user_settings_path) if user_settings_path else user_root / "settings.json"
     enabled_map = load_enabled_plugins(settings_path, repos, notes)
 
+    # Finding 4: a key someone enabled that has no matching cached plugin dir at all is a
+    # config drift worth saying out loud — never silently ignored.
+    for key, value in enabled_map.items():
+        if value is not True:
+            continue
+        plugin_name, sep, marketplace = key.partition("@")
+        if sep and (marketplace, plugin_name) not in plugins:
+            notes.append(f"enabled but not cached: {key}")
+
     enabled_plugins: list[str] = []
     not_enabled_plugins: list[dict] = []
+    all_plugin_skills: set[str] = set()   # enabled AND not-enabled — classification only
     for (marketplace, plugin_name), version_dir in sorted(plugins.items()):
         plugin_label = f"{marketplace}/{plugin_name}"
         plugin_skills = _names_in(version_dir, "skills", notes)
         plugin_agents = _names_in(version_dir, "agents", notes)
+        for name in plugin_skills:
+            all_plugin_skills.add(f"{plugin_name}:{name}")
         if enabled_map.get(f"{plugin_name}@{marketplace}") is True:
             enabled_plugins.append(plugin_label)
             for name in plugin_skills:
@@ -627,7 +650,13 @@ def build_inventory(repos, home: Path | None = None, user_settings_path=None) ->
         "agents": agents,
         "plugins": sorted(f"{m}/{p}" for m, p in plugins),
         "enabled_plugins": sorted(enabled_plugins),
+        # Already sorted here — this is the single source of truth for report ordering;
+        # build_report must NOT re-sort it (T-395 review finding 7).
         "not_enabled_plugins": sorted(not_enabled_plugins, key=lambda d: d["plugin"]),
+        # ALL cached plugin skills (enabled + not-enabled), for classifying a slash name as
+        # "a skill" vs "a CLI built-in" even when the plugin behind it is not enabled
+        # (T-395 review finding 3) — never used for coverage, only for classification.
+        "all_plugin_skills": all_plugin_skills,
         "notes": notes,
     }
 
@@ -770,12 +799,18 @@ def build_report(usage: dict, inventory: dict, mcp_config: dict, hooks: dict, da
     ]
 
     # --- skills: split the slash stream into real skills vs CLI built-ins ---------------
-    skill_names = set(inventory["skills"])
+    skill_names = set(inventory["skills"])          # ENABLED only — feeds coverage below
     local_skills = {n for n in skill_names if ":" not in n}
-    plugin_bare = {_bare(n) for n in skill_names if ":" in n}
+    # Classification (skill vs CLI built-in) uses the FULL cached-plugin bare-name set, not
+    # just the enabled one — a slash call to a cached-but-not-enabled plugin's skill is still
+    # a skill call, just one that can't be credited; it must land in "observed but not
+    # installed/enabled", never silently miscounted as a CLI command (T-395 review finding 3).
+    all_plugin_bare = {
+        _bare(n) for n in set(inventory.get("all_plugin_skills", ())) | skill_names if ":" in n
+    }
 
     def _is_skill(name: str) -> bool:
-        return name in skill_names or name in local_skills or _bare(name) in plugin_bare
+        return name in skill_names or name in local_skills or _bare(name) in all_plugin_bare
 
     slash_skills = Counter()
     cli_commands = Counter()
@@ -837,9 +872,9 @@ def build_report(usage: dict, inventory: dict, mcp_config: dict, hooks: dict, da
         "stats": usage["stats"],
         "notes": list(usage["notes"]) + list(inventory.get("notes", [])),
         "plugins_enabled": sorted(inventory.get("enabled_plugins", [])),
-        "plugins_not_enabled": sorted(
-            inventory.get("not_enabled_plugins", []), key=lambda d: d["plugin"]
-        ),
+        # build_inventory already returns this pre-sorted by plugin — do not re-sort here
+        # (T-395 review finding 7: two sorts of the same list is dead duplication).
+        "plugins_not_enabled": list(inventory.get("not_enabled_plugins", [])),
         "sessions": {
             "owner": len(owner_session_ids),
             "fleet_workers": len(usage["sessions"][BUCKET_FLEET]),
@@ -1082,15 +1117,28 @@ def _group_by_plugin(names):
     return sorted(groups.items())
 
 
-def collect(projects_dir: Path, days: int, repos, home: Path | None = None, now=None) -> dict:
-    """One full pass: scan usage, build the inventory, and assemble the report dict."""
+def collect(
+    projects_dir: Path,
+    days: int,
+    repos,
+    home: Path | None = None,
+    now=None,
+    user_settings_path=None,
+) -> dict:
+    """One full pass: scan usage, build the inventory, and assemble the report dict.
+
+    `user_settings_path` overrides which settings.json is read as the USER-level
+    `enabledPlugins` scope (default `home/.claude/settings.json`) — plumbed through from
+    `_main`'s `--user-settings-path` so a run can be pointed at a settings file living
+    outside `home` (a different profile, a CI fixture) without faking an entire fake home.
+    """
     home = Path(home) if home else Path.home()
     usage = scan_usage(projects_dir, days, now=now)
     usage["slug_buckets"] = {
         slug: entry_bucket(slug, False)
         for slug in sorted({p.name for p in Path(projects_dir).iterdir() if p.is_dir()})
     } if Path(projects_dir).is_dir() else {}
-    inventory = build_inventory(repos, home=home)
+    inventory = build_inventory(repos, home=home, user_settings_path=user_settings_path)
     mcp_config = configured_mcp_servers(home / ".claude.json", repos)
     hooks = hook_events(
         [home / ".claude" / "settings.json"]
@@ -1111,6 +1159,11 @@ def _main() -> int:
         help="repo whose .claude/ skills+agents count as available (repeatable; default cwd)",
     )
     parser.add_argument("--projects-dir", default=None, help="override the transcripts dir")
+    parser.add_argument(
+        "--user-settings-path",
+        default=None,
+        help="override the user-level settings.json read for enabledPlugins (default ~/.claude/settings.json)",
+    )
     parser.add_argument("--json", action="store_true", help="machine-readable output")
     args = parser.parse_args()
 
@@ -1118,7 +1171,7 @@ def _main() -> int:
     projects_dir = Path(args.projects_dir) if args.projects_dir else default_projects_dir()
 
     started = time.monotonic()
-    report = collect(projects_dir, args.days, repos)
+    report = collect(projects_dir, args.days, repos, user_settings_path=args.user_settings_path)
     elapsed = time.monotonic() - started
     report["scan_seconds"] = round(elapsed, 2)
 

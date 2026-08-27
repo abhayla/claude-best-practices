@@ -456,7 +456,155 @@ def test_missing_user_settings_file_is_a_note_not_a_crash(tmp_path):
     notes: list = []
     merged = fu.load_enabled_plugins(tmp_path / "does-not-exist.json", [], notes=notes)
     assert merged == {}
-    assert any("settings file not found" in note for note in notes)
+    assert any("enablement scope" in note and "missing" in note for note in notes)
+
+
+def test_load_enabled_plugins_settings_local_overrides_project_settings(tmp_path):
+    """Third scope: settings.local.json must win over settings.json for the SAME repo -- if
+    the merge order were reversed this would assert True instead of False (T-395 review
+    finding 6)."""
+    user_settings = tmp_path / "user-settings.json"
+    user_settings.write_text(json.dumps({"enabledPlugins": {}}), encoding="utf-8")
+    repo = tmp_path / "repo"
+    (repo / ".claude").mkdir(parents=True)
+    (repo / ".claude" / "settings.json").write_text(
+        json.dumps({"enabledPlugins": {"a@mkt": True}}), encoding="utf-8"
+    )
+    (repo / ".claude" / "settings.local.json").write_text(
+        json.dumps({"enabledPlugins": {"a@mkt": False}}), encoding="utf-8"
+    )
+
+    merged = fu.load_enabled_plugins(user_settings, [repo])
+    assert merged == {"a@mkt": False}
+
+
+def test_truthy_non_true_value_does_not_enable_a_plugin(tmp_path):
+    """1 and "true" are truthy in Python but are NOT the boolean true settings.json actually
+    writes -- only `is True` may enable a plugin (T-395 review finding 6)."""
+    home = tmp_path / "home-truthy"
+    cache = home / ".claude" / "plugins" / "cache" / "mkt"
+    skill = cache / "p" / "1.0.0" / "skills" / "s"
+    skill.mkdir(parents=True)
+    (skill / "SKILL.md").write_text("x", encoding="utf-8")
+    (home / ".claude").mkdir(parents=True, exist_ok=True)
+    (home / ".claude" / "settings.json").write_text(
+        json.dumps({"enabledPlugins": {"p@mkt": 1}}), encoding="utf-8"
+    )
+
+    inventory = fu.build_inventory(repos=[], home=home)
+    assert inventory["enabled_plugins"] == []
+    assert inventory["not_enabled_plugins"] == [{"plugin": "mkt/p", "skills": 1, "agents": 0}]
+
+
+def test_enabled_plugins_key_absent_is_noted_not_silent(tmp_path):
+    """A settings.json with no enabledPlugins key at all must say so, not silently read as
+    {} (T-395 review finding 2)."""
+    settings = tmp_path / "settings.json"
+    settings.write_text(json.dumps({"someOtherKey": True}), encoding="utf-8")
+    notes: list = []
+
+    merged = fu.load_enabled_plugins(settings, [], notes=notes)
+    assert merged == {}
+    assert any("no enabledPlugins map (key absent)" in note for note in notes)
+
+
+def test_enabled_plugins_wrong_type_is_noted_not_silent(tmp_path):
+    """enabledPlugins present but not a dict (e.g. a list) must say so, not silently read as
+    {} (T-395 review finding 2)."""
+    settings = tmp_path / "settings.json"
+    settings.write_text(json.dumps({"enabledPlugins": ["a@mkt"]}), encoding="utf-8")
+    notes: list = []
+
+    merged = fu.load_enabled_plugins(settings, [], notes=notes)
+    assert merged == {}
+    assert any("no enabledPlugins map (wrong type: list)" in note for note in notes)
+
+
+def test_enablement_scope_notes_record_path_and_entry_count(tmp_path):
+    """Every scope actually read gets an 'enablement scope: <path> (N entries)' note -- this
+    is what explains a coverage swing between two --repo runs (T-395 review finding 1)."""
+    user_settings = tmp_path / "user-settings.json"
+    user_settings.write_text(
+        json.dumps({"enabledPlugins": {"a@mkt": True, "b@mkt": False}}), encoding="utf-8"
+    )
+    notes: list = []
+
+    fu.load_enabled_plugins(user_settings, [], notes=notes)
+    assert f"enablement scope: {user_settings} (2 entries)" in notes
+
+
+def test_enabled_but_not_cached_plugin_is_noted(tmp_path):
+    """A settings.json enables a plugin@marketplace with NO matching cached dir -- config
+    drift that must be visible, not silently ignored (T-395 review finding 4)."""
+    home = tmp_path / "home-drift"
+    (home / ".claude").mkdir(parents=True, exist_ok=True)
+    (home / ".claude" / "settings.json").write_text(
+        json.dumps({"enabledPlugins": {"ghost-plugin@mkt": True}}), encoding="utf-8"
+    )
+    # No plugins/cache dir at all -- the enabled key still has no matching install.
+
+    inventory = fu.build_inventory(repos=[], home=home)
+    assert any("enabled but not cached: ghost-plugin@mkt" in note for note in inventory["notes"])
+
+
+def test_user_settings_path_override_is_used_by_build_inventory(tmp_path):
+    """The user_settings_path param on build_inventory is not dead -- a real caller
+    (collect()/--user-settings-path, tested below) uses it, and it is exercised directly
+    here (T-395 review finding 5)."""
+    home = tmp_path / "home-override"
+    cache = home / ".claude" / "plugins" / "cache" / "mkt"
+    skill = cache / "p" / "1.0.0" / "skills" / "s"
+    skill.mkdir(parents=True)
+    (skill / "SKILL.md").write_text("x", encoding="utf-8")
+    # Deliberately NO settings.json under home/.claude -- enablement comes only from the
+    # override path elsewhere on disk.
+    custom_settings = tmp_path / "elsewhere-settings.json"
+    custom_settings.write_text(json.dumps({"enabledPlugins": {"p@mkt": True}}), encoding="utf-8")
+
+    inventory = fu.build_inventory(repos=[], home=home, user_settings_path=custom_settings)
+    assert inventory["enabled_plugins"] == ["mkt/p"]
+
+
+def test_collect_threads_user_settings_path_override(tmp_path):
+    """collect() (and therefore --user-settings-path in _main) actually plumbs the override
+    down to build_inventory (T-395 review finding 5)."""
+    home = tmp_path / "home-collect"
+    cache = home / ".claude" / "plugins" / "cache" / "mkt"
+    skill = cache / "p" / "1.0.0" / "skills" / "s"
+    skill.mkdir(parents=True)
+    (skill / "SKILL.md").write_text("x", encoding="utf-8")
+    custom_settings = tmp_path / "elsewhere-settings.json"
+    custom_settings.write_text(json.dumps({"enabledPlugins": {"p@mkt": True}}), encoding="utf-8")
+    projects_dir = tmp_path / "projects-empty"
+    projects_dir.mkdir()
+
+    report = fu.collect(
+        projects_dir, days=30, repos=[], home=home, now=NOW, user_settings_path=custom_settings
+    )
+    assert report["plugins_enabled"] == ["mkt/p"]
+
+
+def test_slash_call_to_not_enabled_plugin_skill_is_not_a_cli_command(tmp_path, enablement_home):
+    """A slash call matching a cached-but-not-enabled plugin's bare skill name must be
+    classified as a SKILL (and land in used_not_installed, uncredited), never miscounted as
+    a plain CLI built-in (T-395 review finding 3)."""
+    root = tmp_path / "projects"
+    write_jsonl(root / "D--demo" / "sess.jsonl", user_slash("sess", RECENT, "off-skill"))
+
+    usage = fu.scan_usage(root, days=30, now=NOW)
+    inventory = fu.build_inventory(repos=[], home=enablement_home)
+    report = fu.build_report(usage, inventory, {"servers": [], "notes": []}, {}, days=30)
+
+    assert "off-skill" not in report["cli_commands"]
+    assert "off-skill" in report["skills"]["used_not_installed"]
+
+
+def test_not_enabled_plugins_returned_pre_sorted_no_double_sort(enablement_home):
+    """build_inventory returns not_enabled_plugins already sorted by plugin -- build_report
+    must reuse it as-is (T-395 review finding 7: no duplicate sort)."""
+    inventory = fu.build_inventory(repos=[], home=enablement_home)
+    plugins_order = [item["plugin"] for item in inventory["not_enabled_plugins"]]
+    assert plugins_order == sorted(plugins_order)
 
 
 # --------------------------------------------------------------------------------------
