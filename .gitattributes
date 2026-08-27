@@ -1,0 +1,8 @@
+# The GWD dispatcher skill carries a BYTE-SIZE ratchet
+# (config/gwd-skill-conformance-grandfather.yml max_bytes, checked by
+# scripts/tests/test_gwd_skill_conformance.py against the file's real on-disk size).
+# With core.autocrlf=true a Windows checkout would silently add ~430 bytes of CR,
+# making the same content pass on one machine and fail on another. Pin these files
+# to LF so the ratchet measures content, not line endings. (T-371)
+.claude/skills/get-work-done/SKILL.md text eol=lf
+.claude/skills/get-work-done/references/*.md text eol=lf

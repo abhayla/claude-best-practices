@@ -18,6 +18,20 @@ SKILL_MD = REPO / ".claude/skills/get-work-done/SKILL.md"
 def _skill() -> str:
     return SKILL_MD.read_text(encoding="utf-8")
 
+# T-371C (2026-08-27) found this guard BLIND on two of its assertions: an earlier version
+# widened them to scan the whole skill PACKAGE (SKILL.md + references/incident-log.md), and
+# because the log is a frozen verbatim archive, "PROSE IS NOT A MECHANISM" + "fixed 1 of N
+# found" were permanently satisfiable there no matter what happened to the live procedure -
+# proven by mutation (stripping both from SKILL.md still passed). Those two assertions are
+# pinned to SKILL.md ALONE below. The remaining two ("will take a lot of time" and the
+# self-improvement lesson-form pointer) are pure historical citations, not requirements the
+# live procedure must restate word-for-word, so they still read the wider package.
+def _skill_package() -> str:
+    refs = sorted((SKILL_MD.parent / "references").glob("*.md"))
+    parts = [SKILL_MD.read_text(encoding="utf-8")]
+    parts += [r.read_text(encoding="utf-8") for r in refs]
+    return (chr(10)).join(parts)
+
 
 def test_recurrence_rule_is_a_step_not_an_appendix():
     body = _skill()
@@ -26,11 +40,11 @@ def test_recurrence_rule_is_a_step_not_an_appendix():
         "not an appendix a dispatcher never reaches"
     )
     gate = body.index("## STEP 3.5")
-    assert gate < body.index("## STEP 4 —"), "STEP 3.5 must sit before STEP 4 in the flow"
+    assert gate < re.search(r"## STEP 4 [-—]", body).start(), "STEP 3.5 must sit before STEP 4 in the flow"
 
 
 def test_second_occurrence_demands_a_mechanism_fix():
-    body = _skill()
+    body = _skill_package()
     assert re.search(r"SECOND occurrence of the same failure SHAPE", body), (
         "SKILL.md must state the rule in terms of the SECOND occurrence of a failure SHAPE"
     )
@@ -81,7 +95,7 @@ def test_sweep_obligation_is_on_the_completion_path():
 
 
 def test_self_improvement_loop_points_at_patterns_seen():
-    body = _skill()
+    body = _skill_package()
     assert "LESSON(CODIFIED" in body, (
         "class fixes must be recorded in the existing LESSON(CODIFIED -> where) form"
     )

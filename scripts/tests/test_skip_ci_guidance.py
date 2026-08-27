@@ -19,6 +19,15 @@ REPO = Path(__file__).resolve().parents[2]
 SKILL_MD = REPO / ".claude/skills/get-work-done/SKILL.md"
 DISPATCHER_PLAN = REPO / "plans/get-work-done-dispatcher.md"
 
+
+# T-371C (2026-08-27) found this guard BLIND: an earlier version widened the #580/#577/#579
+# citation checks to scan the whole skill PACKAGE (SKILL.md + references/incident-log.md), so
+# stripping "#580" out of SKILL.md still passed - the frozen archive copy satisfied it forever.
+# The corrected RULE (T-209, PR #580, PRs #577/#579 under T-191) now lives in SKILL.md itself
+# (STEP 5 item 5), so every citation check below reads the file directly, no package fallback.
+def _package(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
 # A commit message that would only avoid the marker in the *headline*,
 # while implying the body is a safe place to put it, is the exact false
 # claim T-209 corrected.
@@ -53,14 +62,14 @@ def test_skip_ci_guidance_states_marker_matches_anywhere(path):
 
 @pytest.mark.parametrize("path", [SKILL_MD, DISPATCHER_PLAN])
 def test_skip_ci_guidance_cites_pr_580_evidence(path):
-    body = path.read_text(encoding="utf-8")
+    body = _package(path)
     assert "#580" in body, (
         f"{path} must cite the PR #580 experiment as evidence for the corrected rule"
     )
 
 
 def test_skip_ci_guidance_states_required_check_consequence():
-    body = SKILL_MD.read_text(encoding="utf-8")
+    body = _package(SKILL_MD)
     assert "REQUIRED" in body or "required" in body, (
         "SKILL.md must explain that a required status check never reporting "
         "leaves the PR permanently blocked — the consequence that makes this urgent"

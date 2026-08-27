@@ -256,3 +256,74 @@ def load_gates(hub_root: Path) -> dict:
         return {}
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     return data.get("gates", {})
+
+
+# --- T-371: compare THIS working copy against the base ref (the ratchet hole T-370C found) ---
+#
+# T-370 made the grandfather file shrink-only as a PURE FUNCTION over two dicts, but nothing
+# ever fed it the base-branch copy — so a PR that raised a ceiling (or grew the number of
+# gate:PROSE-ONLY MUSTs) was green. These helpers read the base copies with `git show
+# <ref>:<path>` so the comparison runs against what is actually on origin/main.
+
+GRANDFATHER_REL = "config/gwd-skill-conformance-grandfather.yml"
+SKILL_REL = ".claude/skills/get-work-done/SKILL.md"
+
+
+def git_show(repo_root: Path, ref: str, rel_path: str) -> Optional[str]:
+    """`git show <ref>:<rel_path>`; None when the ref or the path is absent there
+    (a brand-new file on this branch, or a clone with no origin/main fetched)."""
+    import subprocess
+
+    try:
+        out = subprocess.run(
+            ["git", "show", f"{ref}:{rel_path}"],
+            cwd=str(repo_root), capture_output=True, text=True,
+        )
+    except OSError:
+        return None
+    if out.returncode != 0:
+        return None
+    return out.stdout
+
+
+def count_prose_only_gates(skill_text: str) -> int:
+    """MUST bullets no machine enforces: an explicit `gate:PROSE-ONLY` token OR no gate token
+    at all (an ungated bullet is implicitly PROSE-ONLY — that is exactly what T-370's
+    `max_ungated_musts` grandfathered). Counting both is what makes the comparison honest
+    across the v0.9->v0.10 rewrite, where the same rules moved from implicit to explicit."""
+    return sum(1 for e in must_gate_tokens(skill_text) if e["gate"] in (None, "PROSE-ONLY"))
+
+
+def ratchet_violations_vs_ref(repo_root: Path, ref: str = "origin/main") -> list:
+    """Every shrink-only violation of THIS working copy against `ref`. Empty list = clean.
+
+    Covers both ratchets: the grandfather file (entries + ceilings) and the
+    gate:PROSE-ONLY MUST count in SKILL.md. A base copy that cannot be read is
+    reported as a skip reason, never as a silent pass — callers decide."""
+    violations = []
+
+    base_gf_text = git_show(repo_root, ref, GRANDFATHER_REL)
+    if base_gf_text is not None:
+        base = yaml.safe_load(base_gf_text) or {}
+        head = yaml.safe_load((repo_root / GRANDFATHER_REL).read_text(encoding="utf-8")) or {}
+        violations.extend(grandfather_shrink_violations(base, head))
+
+    base_skill = git_show(repo_root, ref, SKILL_REL)
+    if base_skill is not None:
+        base_n = count_prose_only_gates(base_skill)
+        head_n = count_prose_only_gates((repo_root / SKILL_REL).read_text(encoding="utf-8"))
+        if head_n > base_n:
+            violations.append(
+                f"gate:PROSE-ONLY MUST count grew from {base_n} ({ref}) to {head_n} — every new "
+                f"MUST needs a real gate id from config/gwd-gates.yml, not the placeholder"
+            )
+    return violations
+
+
+def base_refs_readable(repo_root: Path, ref: str = "origin/main") -> bool:
+    """True when both base copies can be read from `ref` (so a green result means
+    'compared and clean', not 'nothing to compare against')."""
+    return (
+        git_show(repo_root, ref, GRANDFATHER_REL) is not None
+        and git_show(repo_root, ref, SKILL_REL) is not None
+    )
