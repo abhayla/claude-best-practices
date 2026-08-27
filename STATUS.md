@@ -86,9 +86,12 @@ and **stay**:
 6. [x] Final marker-free push (no `[skip ci]` anywhere) — real CI runs on it. `gh pr checks 596
    --watch --interval 30` result recorded below once it completes.
 
-## CI result (real GitHub Actions run on the final push)
+## CI result (real GitHub Actions run on the final marker-free push, `53301cdd`)
 
-See PR #596 for the live check run; result recorded here once `gh pr checks 596 --watch`
-completes in this run.
+`gh pr checks 596 --watch --interval 30` → **both required checks PASS**:
+- `test` — PASS (41s), https://github.com/abhayla/claude-best-practices/actions/runs/33041550890/job/98416056337
+- `validate` — PASS (41s), https://github.com/abhayla/claude-best-practices/actions/runs/33041550855/job/98416056131
 
-`hold` label stays on PR #596 throughout — this worker never merges or closes.
+Re-cut complete. PR #596 now diffs from `origin/main` on exactly the 10 expected files (no
+SKILL.md hunk of its own). `hold` label stays on PR #596 throughout — this worker never merges
+or closes; landing is dispatcher/checker-owned.
