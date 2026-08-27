@@ -521,10 +521,58 @@ def plugin_versions(cache_dir: Path, notes: list | None = None) -> dict[tuple[st
     return {slot: path for slot, (_, path) in best.items()}
 
 
-def build_inventory(repos, home: Path | None = None) -> dict:
+def _read_enabled_plugins(path: Path, notes: list, note_if_missing: bool) -> dict[str, bool]:
+    """`enabledPlugins` map from one settings.json — `{}` if the file is missing/unreadable.
+
+    `note_if_missing` is False for the optional per-repo overlay files (`settings.json` /
+    `settings.local.json` are commonly absent by design — that is not worth flagging), True
+    for the primary user settings file where absence is unusual enough to say out loud.
+    """
+    path = Path(path)
+    if not path.is_file():
+        if note_if_missing:
+            notes.append(f"unverified — settings file not found: {path}")
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        notes.append(f"unverified — could not read {path}: {exc}")
+        return {}
+    enabled = data.get("enabledPlugins") if isinstance(data, dict) else None
+    return dict(enabled) if isinstance(enabled, dict) else {}
+
+
+def load_enabled_plugins(user_settings_path, repo_paths, notes: list | None = None) -> dict[str, bool]:
+    """Merge `enabledPlugins` (`"<plugin>@<marketplace>": true/false`) across scopes: the
+    user's `~/.claude/settings.json`, then each repo's `.claude/settings.json`, then that
+    repo's `.claude/settings.local.json` — later scopes win key-by-key, matching the order
+    Claude Code itself resolves plugin enablement. A key absent from every scope stays
+    absent here (the caller treats "no key" as not-enabled, distinct from an explicit
+    `false`, but both read as "don't count this plugin as installed").
+    """
+    notes = notes if notes is not None else []
+    merged: dict[str, bool] = {}
+    merged.update(_read_enabled_plugins(Path(user_settings_path), notes, note_if_missing=True))
+    for repo in repo_paths or []:
+        repo_claude = Path(repo) / ".claude"
+        merged.update(_read_enabled_plugins(repo_claude / "settings.json", notes, note_if_missing=False))
+        merged.update(
+            _read_enabled_plugins(repo_claude / "settings.local.json", notes, note_if_missing=False)
+        )
+    return merged
+
+
+def build_inventory(repos, home: Path | None = None, user_settings_path=None) -> dict:
     """Enumerate every skill and agent installed on this machine: user-level, per-repo, and
     the highest installed version of each cached plugin (plugin resources are qualified
     `plugin:name` so a plugin skill can never be confused with a local one).
+
+    A plugin sitting in the cache is not necessarily LOADED — Claude Code only loads what
+    `enabledPlugins` in settings.json lists (see `load_enabled_plugins`). Only an ENABLED
+    plugin's skills/agents feed `skills`/`agents` (and therefore the coverage math below);
+    a cached-but-not-enabled plugin is reported separately in `not_enabled_plugins` so it is
+    visible without inflating "available but never used".
 
     Returns `notes` alongside the inventory — a directory that could not be read is said out
     loud, never reported as "nothing installed here".
@@ -554,16 +602,32 @@ def build_inventory(repos, home: Path | None = None) -> dict:
             agents.setdefault(name, label)
 
     plugins = plugin_versions(home / ".claude" / "plugins" / "cache", notes)
+    settings_path = Path(user_settings_path) if user_settings_path else user_root / "settings.json"
+    enabled_map = load_enabled_plugins(settings_path, repos, notes)
+
+    enabled_plugins: list[str] = []
+    not_enabled_plugins: list[dict] = []
     for (marketplace, plugin_name), version_dir in sorted(plugins.items()):
-        for name in _names_in(version_dir, "skills", notes):
-            skills.setdefault(f"{plugin_name}:{name}", f"plugin:{marketplace}/{plugin_name}")
-        for name in _names_in(version_dir, "agents", notes):
-            agents.setdefault(f"{plugin_name}:{name}", f"plugin:{marketplace}/{plugin_name}")
+        plugin_label = f"{marketplace}/{plugin_name}"
+        plugin_skills = _names_in(version_dir, "skills", notes)
+        plugin_agents = _names_in(version_dir, "agents", notes)
+        if enabled_map.get(f"{plugin_name}@{marketplace}") is True:
+            enabled_plugins.append(plugin_label)
+            for name in plugin_skills:
+                skills.setdefault(f"{plugin_name}:{name}", f"plugin:{marketplace}/{plugin_name}")
+            for name in plugin_agents:
+                agents.setdefault(f"{plugin_name}:{name}", f"plugin:{marketplace}/{plugin_name}")
+        else:
+            not_enabled_plugins.append(
+                {"plugin": plugin_label, "skills": len(plugin_skills), "agents": len(plugin_agents)}
+            )
 
     return {
         "skills": skills,
         "agents": agents,
         "plugins": sorted(f"{m}/{p}" for m, p in plugins),
+        "enabled_plugins": sorted(enabled_plugins),
+        "not_enabled_plugins": sorted(not_enabled_plugins, key=lambda d: d["plugin"]),
         "notes": notes,
     }
 
@@ -772,6 +836,10 @@ def build_report(usage: dict, inventory: dict, mcp_config: dict, hooks: dict, da
         "generated_at": usage["now"].isoformat(),
         "stats": usage["stats"],
         "notes": list(usage["notes"]) + list(inventory.get("notes", [])),
+        "plugins_enabled": sorted(inventory.get("enabled_plugins", [])),
+        "plugins_not_enabled": sorted(
+            inventory.get("not_enabled_plugins", []), key=lambda d: d["plugin"]
+        ),
         "sessions": {
             "owner": len(owner_session_ids),
             "fleet_workers": len(usage["sessions"][BUCKET_FLEET]),
@@ -844,6 +912,10 @@ def render_report(report: dict, scan_seconds: float | None = None) -> str:
         f"{report['sessions']['fleet_workers']} fleet-worker"
     )
     add(
+        f"  plugins      : {len(report['plugins_enabled'])} enabled, "
+        f"{len(report['plugins_not_enabled'])} cached-not-enabled"
+    )
+    add(
         f"  primitives   : transcript-observable subset of {CAPABILITY_CATALOGUE} — a "
         "capability with no tool call of its own cannot be measured here"
     )
@@ -853,6 +925,15 @@ def render_report(report: dict, scan_seconds: float | None = None) -> str:
         add(f"  scan time    : {scan_seconds:.1f}s")
     for note in report.get("notes", []):
         add(f"  NOTE         : {note}")
+    add("")
+
+    not_enabled = report["plugins_not_enabled"]
+    add("Cached but NOT enabled (excluded from coverage):")
+    if not_enabled:
+        for item in not_enabled:
+            add(f"    {item['plugin']}: {item['skills']} skill(s), {item['agents']} agent(s)")
+    else:
+        add("    (none)")
     add("")
 
     add("1. PLATFORM PRIMITIVES")

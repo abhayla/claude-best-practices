@@ -189,6 +189,22 @@ def fake_home(tmp_path):
     junk = cache / "temp_git_123" / "junk" / "9.9.9" / "skills" / "junk-skill"
     junk.mkdir(parents=True)
     (junk / "SKILL.md").write_text("# junk", encoding="utf-8")
+
+    # Only these three cached plugins are actually ENABLED (Claude Code only loads what
+    # settings.json lists) — every fixture plugin above must be listed here or it silently
+    # drops out of every existing coverage/inventory assertion below.
+    (home / ".claude" / "settings.json").write_text(
+        json.dumps(
+            {
+                "enabledPlugins": {
+                    "demo-plugin@market": True,
+                    "demo-plugin@official": True,
+                    "twin-plugin@official": True,
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
     return home
 
 
@@ -357,6 +373,90 @@ def test_repo_skills_and_agents_are_inventoried(tmp_path, fake_home):
     inventory = fu.build_inventory(repos=[repo], home=fake_home)
     assert inventory["skills"]["repo-skill"] == "repo:myrepo"
     assert inventory["agents"]["repo-agent"] == "repo:myrepo"
+
+
+# --------------------------------------------------------------------------------------
+# Enabled vs cached-but-not-enabled plugins (T-395)
+# --------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def enablement_home(tmp_path):
+    """One cached plugin ENABLED in settings.json, one cached but NEVER enabled anywhere —
+    the exact shape that tripped the real report (cbp-* plugins cached, none enabled)."""
+    home = tmp_path / "home2"
+    cache = home / ".claude" / "plugins" / "cache" / "mkt"
+
+    on_skill = cache / "on-plugin" / "1.0.0" / "skills" / "on-skill"
+    on_skill.mkdir(parents=True)
+    (on_skill / "SKILL.md").write_text("# on", encoding="utf-8")
+
+    off_skill = cache / "off-plugin" / "1.0.0" / "skills" / "off-skill"
+    off_skill.mkdir(parents=True)
+    (off_skill / "SKILL.md").write_text("# off", encoding="utf-8")
+    off_agent = cache / "off-plugin" / "1.0.0" / "agents"
+    off_agent.mkdir(parents=True)
+    (off_agent / "off-agent.md").write_text("# off agent", encoding="utf-8")
+
+    (home / ".claude").mkdir(parents=True, exist_ok=True)
+    (home / ".claude" / "settings.json").write_text(
+        json.dumps({"enabledPlugins": {"on-plugin@mkt": True}}), encoding="utf-8"
+    )
+    return home
+
+
+def test_cached_but_not_enabled_plugin_excluded_from_inventory_and_coverage(enablement_home):
+    inventory = fu.build_inventory(repos=[], home=enablement_home)
+
+    # Still visible in the raw cached-plugin list...
+    assert inventory["plugins"] == ["mkt/off-plugin", "mkt/on-plugin"]
+    # ...but the disabled plugin's skill/agent must NOT be counted as installed/available.
+    assert "on-plugin:on-skill" in inventory["skills"]
+    assert "off-plugin:off-skill" not in inventory["skills"]
+    assert "off-plugin:off-agent" not in inventory["agents"]
+
+    assert inventory["enabled_plugins"] == ["mkt/on-plugin"]
+    assert inventory["not_enabled_plugins"] == [
+        {"plugin": "mkt/off-plugin", "skills": 1, "agents": 1}
+    ]
+
+    empty_usage = fu.scan_usage(enablement_home, days=30, now=NOW)  # no transcripts here
+    report = fu.build_report(
+        empty_usage, inventory, {"servers": [], "notes": []}, {}, days=30
+    )
+
+    # Coverage denominator counts ONLY the enabled plugin's skill.
+    assert report["skills"]["available_total"] == 1
+    assert report["coverage"]["skills_available"] == 1
+    # The disabled plugin's skill must not appear in "available but never used" either —
+    # it was never counted as available in the first place.
+    assert "off-plugin:off-skill" not in report["skills"]["never_used"]
+    assert report["plugins_enabled"] == ["mkt/on-plugin"]
+    assert report["plugins_not_enabled"] == [
+        {"plugin": "mkt/off-plugin", "skills": 1, "agents": 1}
+    ]
+
+
+def test_load_enabled_plugins_merges_scopes_later_wins(tmp_path):
+    user_settings = tmp_path / "user-settings.json"
+    user_settings.write_text(
+        json.dumps({"enabledPlugins": {"a@mkt": True, "b@mkt": True}}), encoding="utf-8"
+    )
+    repo = tmp_path / "repo"
+    (repo / ".claude").mkdir(parents=True)
+    (repo / ".claude" / "settings.json").write_text(
+        json.dumps({"enabledPlugins": {"b@mkt": False}}), encoding="utf-8"
+    )
+
+    merged = fu.load_enabled_plugins(user_settings, [repo])
+    assert merged == {"a@mkt": True, "b@mkt": False}
+
+
+def test_missing_user_settings_file_is_a_note_not_a_crash(tmp_path):
+    notes: list = []
+    merged = fu.load_enabled_plugins(tmp_path / "does-not-exist.json", [], notes=notes)
+    assert merged == {}
+    assert any("settings file not found" in note for note in notes)
 
 
 # --------------------------------------------------------------------------------------
