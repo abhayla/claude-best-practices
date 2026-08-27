@@ -1,5 +1,5 @@
 ---
-globs: ["android/**/*.kt", "android/**/*.kts", "**/src/main/**/*.kt", "**/src/test/**/*.kt"]
+paths: ["android/**/*.kt", "android/**/*.kts", "**/src/main/**/*.kt", "**/src/test/**/*.kt"]
 description: Kotlin language idioms, null safety, scope functions, and KMP-specific patterns for Android projects.
 ---
 

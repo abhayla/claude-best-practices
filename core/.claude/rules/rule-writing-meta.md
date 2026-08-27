@@ -1,6 +1,6 @@
 ---
 description: Meta-guidance for writing effective CLAUDE.md rules, choosing config file placement, and structuring project instructions.
-globs: [".claude/**/*.md", "CLAUDE.md", "CLAUDE.local.md"]
+paths: [".claude/**/*.md", "CLAUDE.md", "CLAUDE.local.md"]
 ---
 
 # Rule Writing Meta-Guide
@@ -23,7 +23,7 @@ All loaded CLAUDE.md files share one context window (~150 usable instruction slo
 | `./CLAUDE.local.md` | ≤20 | Personal project overrides (gitignored) |
 | Folder-level `CLAUDE.md` | ≤15 | Directory-specific safety guards |
 
-Move task-specific knowledge to `.claude/skills/` (loaded on-demand, zero cost when unused). Move path-scoped standards to `.claude/rules/` with `globs:` frontmatter (loaded only when path matches). Deletion test: "Would removing this line cause Claude to make mistakes?" If not, cut it.
+Move task-specific knowledge to `.claude/skills/` (loaded on-demand, zero cost when unused). Move path-scoped standards to `.claude/rules/` with `paths:` frontmatter (loaded only when path matches). Deletion test: "Would removing this line cause Claude to make mistakes?" If not, cut it.
 
 ## Where to Put Rules
 

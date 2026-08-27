@@ -5,9 +5,9 @@
 | Scope Type | Declaration | When to Use |
 |------------|-------------|-------------|
 | Global | `# Scope: global` in first 5 lines | Applies to all files |
-| Path-scoped | `globs:` in YAML frontmatter | Applies only to matching files |
+| Path-scoped | `paths:` in YAML frontmatter | Applies only to matching files |
 
-MUST NOT have both `# Scope: global` AND `globs: ["**/*"]` — pick one.
+MUST NOT have both `# Scope: global` AND `paths: ["**/*"]` — pick one.
 MUST NOT leave scope undefined.
 
 ## Content Quality

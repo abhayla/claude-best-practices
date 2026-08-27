@@ -46,7 +46,7 @@ Each piece of Claude Code configuration has exactly one correct home:
 | Content Type | Correct Location | Wrong Location |
 |---|---|---|
 | Multi-step workflows | `.claude/skills/*/SKILL.md` | CLAUDE.md |
-| Path-specific constraints | `.claude/rules/*.md` with `globs:` | CLAUDE.md |
+| Path-specific constraints | `.claude/rules/*.md` with `paths:` | CLAUDE.md |
 | Global behavioral rules | `.claude/rules/*.md` with `# Scope: global` | CLAUDE.md |
 | Code style (indent, semicolons) | Linter config + hooks | CLAUDE.md or rules |
 | Tool permissions | `.claude/settings.json` | CLAUDE.md |
@@ -71,7 +71,7 @@ Build a complete map of all Claude Code configuration in the project.
 
 - Glob for all `.claude/rules/*.md` files
 - For each rule file, read the first 10 lines to extract:
-  - `globs:` from YAML frontmatter (scoped rule)
+  - `paths:` from YAML frontmatter (scoped rule)
   - `# Scope: global` declaration (global rule)
   - If neither found, flag as **UNSCOPED**
 - Record: filename, scope type, line count
@@ -120,7 +120,7 @@ Scan each CLAUDE.md section for content that belongs in a different layer:
 **Path-specific constraints (should be scoped rules):**
 - Look for phrases targeting specific file patterns: "When editing `*.py` files", "In the `src/auth/` directory", "For test files"
 - Look for glob-like references: `**/*.ts`, `src/components/`
-- These belong in `.claude/rules/*.md` with `globs:` frontmatter
+- These belong in `.claude/rules/*.md` with `paths:` frontmatter
 
 **Code style enforcement (should be linter hooks):**
 - Look for: indentation rules, semicolon preferences, import ordering, bracket style, line length limits, naming conventions for variables/functions
@@ -187,7 +187,7 @@ Every rule file MUST declare its activation scope.
 
 For each rule in `.claude/rules/*.md`:
 
-| Has `globs:` | Has `# Scope: global` | Verdict |
+| Has `paths:` | Has `# Scope: global` | Verdict |
 |---|---|---|
 | Yes | No | OK -- scoped rule |
 | No | Yes | OK -- global rule |
@@ -199,7 +199,7 @@ For each rule in `.claude/rules/*.md`:
 For rules declared as `# Scope: global`, check if they contain stack-specific or path-specific content:
 
 - References to specific frameworks (React, FastAPI, Android) in a global rule = should be scoped
-- References to specific directories (`src/auth/`, `tests/`) in a global rule = should use `globs:`
+- References to specific directories (`src/auth/`, `tests/`) in a global rule = should use `paths:`
 
 ### 4c. Rule Size Check
 
@@ -258,7 +258,7 @@ Compile all findings into a structured report.
 |---|------|----------|-------|---------------|
 | 1 | DUPLICATION | CLAUDE.md:15 + rules/testing.md:8 | Same "run tests before commit" constraint | Remove from CLAUDE.md; add pointer: "See .claude/rules/testing.md" |
 | 2 | MISPLACED | CLAUDE.md:42-55 | Multi-step deployment workflow | Extract to .claude/skills/deploy/SKILL.md |
-| 3 | UNSCOPED | rules/api-patterns.md | No globs or scope declaration | Add `globs: ["**/api/**"]` frontmatter |
+| 3 | UNSCOPED | rules/api-patterns.md | No paths or scope declaration | Add `paths: ["**/api/**"]` frontmatter |
 | 4 | BLOAT | CLAUDE.md:80-120 | 40-line code block inlined | Move to skill or reference file |
 | 5 | LAYER_MISUSE | CLAUDE.md:30 | Code style rule (semicolons) | Move to linter config + hook |
 

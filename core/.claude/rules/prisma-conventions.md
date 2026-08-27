@@ -1,6 +1,6 @@
 ---
 description: Prisma model and query conventions — cuid PKs, cascade ownership, findFirst ownership checks, upsert singletons, parallel reads, and the dev-mode client singleton.
-globs: ["**/schema.prisma", "**/*.prisma", "**/prisma/**/*.ts"]
+paths: ["**/schema.prisma", "**/*.prisma", "**/prisma/**/*.ts"]
 ---
 
 # Prisma Conventions

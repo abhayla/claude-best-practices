@@ -1,5 +1,5 @@
 ---
-globs: ["**/app/**/*.tsx", "**/app/**/*.ts", "**/components/**/*.tsx"]
+paths: ["**/app/**/*.tsx", "**/app/**/*.ts", "**/components/**/*.tsx"]
 description: Next.js App Router and React Server Component patterns and conventions.
 ---
 

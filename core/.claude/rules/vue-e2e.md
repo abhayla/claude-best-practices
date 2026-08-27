@@ -1,6 +1,6 @@
 ---
 description: Vuetify + Playwright E2E conventions — component animation timing, single-worker data-dependent suites, networkidle navigation, and the vee-validate fill() gotcha.
-globs: ["**/e2e/**/*.ts", "**/*.spec.ts", "**/tests/e2e/**/*"]
+paths: ["**/e2e/**/*.ts", "**/*.spec.ts", "**/tests/e2e/**/*"]
 ---
 
 # Vue E2E (Vuetify + Playwright)

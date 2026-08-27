@@ -1,6 +1,6 @@
 ---
 description: Nudges to e2e-best-practices skill when writing or modifying E2E tests.
-globs: ["**/e2e/**", "**/tests/e2e/**", "**/*.e2e.*", "**/integration_test/**"]
+paths: ["**/e2e/**", "**/tests/e2e/**", "**/*.e2e.*", "**/integration_test/**"]
 ---
 
 # E2E Test Writing

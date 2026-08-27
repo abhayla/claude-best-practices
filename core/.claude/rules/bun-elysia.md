@@ -1,6 +1,6 @@
 ---
 description: Bun runtime and ElysiaJS framework patterns and conventions
-globs: ["**/src/**/*.ts", "**/server/**/*.ts"]
+paths: ["**/src/**/*.ts", "**/server/**/*.ts"]
 ---
 
 # Bun + ElysiaJS Development Rules

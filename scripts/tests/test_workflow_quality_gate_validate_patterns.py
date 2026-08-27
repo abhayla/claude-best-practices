@@ -137,7 +137,7 @@ def _write_rule(tmp_path, name, content=None):
     default_content = textwrap.dedent(f"""\
         ---
         description: Test rule.
-        globs: ["**/*.py"]
+        paths: ["**/*.py"]
         ---
 
         # Test Rule
@@ -466,18 +466,19 @@ class TestValidateRule:
         errors = validate_rule(rule_path)
         assert any("Missing scope" in e for e in errors)
 
-    def test_paths_field_is_rejected(self, tmp_path):
-        """`paths:` is NOT a Claude Code field — reject it so CI catches
-        regressions. Rules using `paths:` silently load on every session
-        instead of being path-scoped."""
-        rule_path = _write_rule(tmp_path, "paths-field-rule", content=textwrap.dedent("""\
+    def test_globs_field_is_rejected(self, tmp_path):
+        """`globs:` is NOT a Claude Code field — reject it so CI catches
+        regressions. Claude Code only honours `paths:`; a rule using `globs:`
+        silently loads on every session instead of being path-scoped
+        (code.claude.com/docs/en/memory)."""
+        rule_path = _write_rule(tmp_path, "globs-field-rule", content=textwrap.dedent("""\
             ---
-            description: Buggy rule using legacy paths field.
-            paths:
+            description: Buggy rule using the invented globs field.
+            globs:
               - "**/*.py"
             ---
 
-            # Paths Field Rule
+            # Globs Field Rule
 
             MUST do X when Y happens.
             Use Z instead of W.
@@ -491,18 +492,19 @@ class TestValidateRule:
             Final notes.
         """))
         errors = validate_rule(rule_path)
-        # Pin to the stable sentinel phrase so a future message refactor that
-        # drops the diagnostic surface is caught.
-        assert any("Invalid `paths:` field" in e for e in errors), (
-            f"Expected error containing literal 'Invalid `paths:` field'. "
+        # Pin to the validator's actual sentinel phrase — a bare "paths:" check
+        # is mutation-blind because the generic "Missing scope" error also
+        # contains the substring "paths:".
+        assert any("Invalid `globs:` field" in e for e in errors), (
+            f"Expected error containing literal 'Invalid `globs:` field'. "
             f"Got errors: {errors}"
         )
 
-    @pytest.mark.parametrize("bad_field", ["Paths", "PATHS", "path", "Path"])
-    def test_paths_field_variants_are_rejected(self, tmp_path, bad_field):
-        """Case variants (`Paths:`, `PATHS:`) and singular (`path:`) are also
+    @pytest.mark.parametrize("bad_field", ["Globs", "GLOBS", "glob", "Glob"])
+    def test_globs_field_variants_are_rejected(self, tmp_path, bad_field):
+        """Case variants (`Globs:`, `GLOBS:`) and singular (`glob:`) are also
         invalid and must be flagged. YAML is case-sensitive, so these would
-        otherwise slip past the lowercase `paths` check."""
+        otherwise slip past a lowercase-only `globs` check."""
         rule_path = _write_rule(tmp_path, f"bad-{bad_field.lower()}-rule",
                                 content=textwrap.dedent(f"""\
             ---
@@ -525,15 +527,65 @@ class TestValidateRule:
             Final notes.
         """))
         errors = validate_rule(rule_path)
-        assert any("Invalid `paths:` field" in e for e in errors), (
+        assert any("Invalid `globs:` field" in e for e in errors), (
             f"Expected rejection of `{bad_field}:` variant. Got errors: {errors}"
         )
+
+    def test_paths_field_passes(self, tmp_path):
+        """`paths:` is the ONLY frontmatter key Claude Code honours for
+        path-scoped rules — it must validate cleanly with no errors."""
+        rule_path = _write_rule(tmp_path, "paths-field-rule", content=textwrap.dedent("""\
+            ---
+            description: Correctly scoped rule using paths.
+            paths:
+              - "**/*.py"
+            ---
+
+            # Paths Field Rule
+
+            MUST do X when Y happens.
+            Use Z instead of W.
+            This prevents bugs.
+            Always verify outcomes.
+
+            ## Details
+
+            More content here.
+            Additional context.
+            Final notes.
+        """))
+        errors = validate_rule(rule_path)
+        assert errors == [], f"Expected no errors for a valid paths: rule. Got: {errors}"
+
+    def test_neither_globs_nor_paths_nor_scope_global_is_rejected(self, tmp_path):
+        """A rule with no `paths:`, no `globs:`, and no `# Scope: global`
+        must still error — it has no scope declaration at all."""
+        rule_path = _write_rule(tmp_path, "no-scope-declared", content=textwrap.dedent("""\
+            ---
+            description: A rule with no scope declaration whatsoever.
+            ---
+
+            # No Scope Rule
+
+            MUST do X when Y happens.
+            Use Z instead of W.
+            This prevents bugs.
+            Always verify outcomes.
+
+            ## Details
+
+            More content here.
+            Additional context.
+            Final notes.
+        """))
+        errors = validate_rule(rule_path)
+        assert any("Missing scope" in e for e in errors)
 
     def test_placeholder_in_rule(self, tmp_path):
         rule_path = _write_rule(tmp_path, "stub-rule", content=textwrap.dedent("""\
             ---
             description: Stub rule.
-            globs: ["**/*.py"]
+            paths: ["**/*.py"]
             ---
 
             # Stub Rule
@@ -678,7 +730,7 @@ class TestActualPatterns:
         reason="core/.claude/ not found"
     )
     def test_all_rules_have_scope(self):
-        """Every rule must have globs: or # Scope: global."""
+        """Every rule must have paths: or # Scope: global."""
         rules_dir = Path(__file__).parent.parent.parent / "core" / ".claude" / "rules"
         missing = []
         for rule_path in sorted(rules_dir.glob("*.md")):
@@ -686,9 +738,9 @@ class TestActualPatterns:
                 continue
             content = rule_path.read_text(encoding="utf-8")
             fm = parse_frontmatter(rule_path)
-            has_globs = fm and ("globs" in fm or "paths" in fm)
+            has_paths = fm and "paths" in fm
             has_scope = "# Scope: global" in "\n".join(content.splitlines()[:10])
-            if not has_globs and not has_scope:
+            if not has_paths and not has_scope:
                 missing.append(rule_path.stem)
         assert len(missing) == 0, f"Rules without scope: {missing}"
 

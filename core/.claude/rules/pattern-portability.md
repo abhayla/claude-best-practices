@@ -1,6 +1,6 @@
 ---
 description: Portability standards for distributed patterns. Ensures patterns work in any project without modification.
-globs: [".claude/**/*.md"]
+paths: [".claude/**/*.md"]
 ---
 
 # Pattern Portability Standards

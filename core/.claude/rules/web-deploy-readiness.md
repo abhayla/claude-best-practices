@@ -1,6 +1,6 @@
 ---
 description: Web ship-readiness DoD — a web app is not "done" until it is visually verified at mobile/tablet/laptop breakpoints, static hosting sets cache headers (HTML revalidate, hashed assets immutable), every serving host/origin is added to the auth provider's authorized domains, a shared-host deploy is gated on a config-validity check that leaves co-located sites untouched, and owner-alerting + an uptime heartbeat are wired through the Notifier gateway.
-globs: ["**/*.html", "**/*.tsx", "**/*.jsx", "**/*.vue", "**/*.svelte", "**/*.astro", "**/app/**", "**/pages/**", "**/firebase.json", "**/nginx*.conf", "**/*.nginx", "**/sites-available/**"]
+paths: ["**/*.html", "**/*.tsx", "**/*.jsx", "**/*.vue", "**/*.svelte", "**/*.astro", "**/app/**", "**/pages/**", "**/firebase.json", "**/nginx*.conf", "**/*.nginx", "**/sites-available/**"]
 version: "1.0.0"
 ---
 

@@ -1,6 +1,6 @@
 ---
 description: Self-containment and completeness standards for patterns. Prevents placeholders, oversized files, and broken dependencies.
-globs: [".claude/**/*.md"]
+paths: [".claude/**/*.md"]
 ---
 
 # Pattern Self-Containment Standards

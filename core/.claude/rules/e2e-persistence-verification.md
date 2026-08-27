@@ -3,7 +3,7 @@ description: >
   E2E tests that create records MUST verify actual persistence (per iteration
   in a loop) plus the final rendered UI — never trust a closed dialog/modal or
   an end-of-loop count as success.
-globs: ["**/e2e/**/*", "**/tests/e2e/**/*", "**/*.e2e.*", "**/*.spec.ts", "**/*.cy.*"]
+paths: ["**/e2e/**/*", "**/tests/e2e/**/*", "**/*.e2e.*", "**/*.spec.ts", "**/*.cy.*"]
 version: "1.0.0"
 ---
 

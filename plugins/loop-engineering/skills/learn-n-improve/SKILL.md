@@ -173,7 +173,7 @@ After every 10th entry in `.claude/learnings.json`, scan for systemic patterns:
 
 4. **Propose rules** — For patterns that appear 5+ times, suggest a new rule for `.claude/rules/`. Every proposed rule MUST include:
    - A `description:` field in frontmatter
-   - A `globs:` field scoping it to relevant file patterns, OR `# Scope: global` if it applies everywhere
+   - A `paths:` field scoping it to relevant file patterns, OR `# Scope: global` if it applies everywhere
    - Actionable content (not placeholder/TODO stubs)
 
    ```
@@ -181,7 +181,7 @@ After every 10th entry in `.claude/learnings.json`, scan for systemic patterns:
    Suggested rule:
    ---
    description: Enforce null-safety checks on ORM query results.
-   globs: ["**/*.py", "**/*.ts"]
+   paths: ["**/*.py", "**/*.ts"]
    ---
    # ORM Null Safety
    All ORM queries MUST check for None/null before accessing attributes.
@@ -211,7 +211,7 @@ For each learning with `reuse_count >= 2`, identify the target skill:
 |---|---|---|
 | Tags match a skill name | That skill | `tags` contains skill name (e.g., `"fix-loop"`) |
 | Error occurred during a skill run | That skill | `context` mentions `/skill-name` invocation |
-| Error file matches a skill's `globs:` | That skill | File path matches skill's operational scope |
+| Error file matches a skill's `paths:` | That skill | File path matches skill's operational scope |
 | No skill match found | Skip | Record as general learning, do not force-fit |
 
 ```bash

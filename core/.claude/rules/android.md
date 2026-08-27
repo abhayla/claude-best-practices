@@ -1,5 +1,5 @@
 ---
-globs: ["android/**/*.kt", "android/**/*.kts", "android/**/*.xml"]
+paths: ["android/**/*.kt", "android/**/*.kts", "android/**/*.xml"]
 description: Android development rules for Kotlin + Jetpack Compose projects.
 ---
 

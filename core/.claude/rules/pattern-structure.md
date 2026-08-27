@@ -1,6 +1,6 @@
 ---
 description: Structural requirements for skills, agents, and rules. Enforces frontmatter, versioning, type classification, and scope.
-globs: [".claude/**/*.md"]
+paths: [".claude/**/*.md"]
 ---
 
 # Pattern Structure Standards
@@ -182,11 +182,11 @@ Plus `## Core Responsibilities` and `## Output Format` sections in the body. The
 
 Every rule in `core/.claude/rules/*.md` MUST have either:
 
-1. **Scoped rule** — YAML frontmatter with `globs:` targeting specific file patterns:
+1. **Scoped rule** — YAML frontmatter with `paths:` targeting specific file patterns:
    ```yaml
    ---
    description: What this rule enforces.
-   globs: ["**/*.py", "**/*.ts"]
+   paths: ["**/*.py", "**/*.ts"]
    ---
    ```
 

@@ -51,7 +51,7 @@ Parse the rough rule text and classify it using this decision tree:
 | Rule Type | Signal | Target | Action |
 |-----------|--------|--------|--------|
 | Deterministic enforcement (style, linting, "always run X") | Zero-exception language, automatable | `.claude/settings.json` | Route to `/update-config` — hooks enforce this, not instructions |
-| Path-scoped constraint (applies to specific file types) | Mentions file extensions, directories, frameworks | `.claude/rules/*.md` with `globs:` | Create or append to scoped rule file |
+| Path-scoped constraint (applies to specific file types) | Mentions file extensions, directories, frameworks | `.claude/rules/*.md` with `paths:` | Create or append to scoped rule file |
 | Global behavioral standard | Applies to all files, requires judgment | `.claude/rules/*.md` with `# Scope: global` | Create or append to global rule file |
 | Project context (commands, architecture, gotchas) | Build/test commands, project-specific facts | `CLAUDE.md` (project root) | Add to appropriate section |
 | Personal preference | Subjective, not team-wide | `CLAUDE.local.md` | Add (gitignored) |
@@ -127,6 +127,6 @@ Audit Results:
 - MUST route deterministic enforcement (style, linting, "always run X") to `/update-config` for hooks — Why: CLAUDE.md instructions are advisory; hooks are guaranteed
 - MUST check for existing rules before placing new ones — Why: duplicate rules across files cause contradictions and waste context tokens
 - MUST NOT duplicate the `configuration-ssot.md` placement taxonomy inline — reference it instead — Why: inline copies drift from the authoritative source
-- MUST NOT place path-scoped constraints in CLAUDE.md — use `.claude/rules/` with `globs:` — Why: path-scoped rules in CLAUDE.md consume tokens on every prompt regardless of relevance
+- MUST NOT place path-scoped constraints in CLAUDE.md — use `.claude/rules/` with `paths:` — Why: path-scoped rules in CLAUDE.md consume tokens on every prompt regardless of relevance
 - MUST NOT modify `.claude/settings.json` directly — route to `/update-config` — Why: settings.json has specific structure requirements that update-config understands
 - MUST preserve existing content when adding rules — never overwrite or reorganize without explicit user approval — Why: accidental content loss during rule placement is the primary failure mode
