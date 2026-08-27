@@ -60,6 +60,51 @@ evidence on each).
 6. Final marker-free push; `gh pr checks 598 --watch --interval 30` in the foreground; `hold`
    label stays.
 
+## Fix round 3 (T-371F3) — progress
+
+Round 2 (T-371F2) hit `error_max_turns` at 121/120 with items 1 (partial) and 3-4 already
+committed/pushed (`4268b07f`) plus an uncommitted WIP diff the dispatcher autosaved
+(`5f3ea610`) and this round cherry-picked onto the PR branch (`7a53d6a0`). This round finishes
+the remaining items.
+
+1. **DONE** — `SKILL.md` trimmed to **29,973 bytes** (was 30,246 after the autosave cherry-pick),
+   PROSE-only edits across STEP 0/1/3/5/6/7 narrative paragraphs — no `MUST`/`NEVER` rule line
+   touched (diffed against the pre-trim commit; the one `NEVER` hit in the diff is the STEP 5
+   "Routing:" informational sentence, not a CRITICAL RULES bullet). `max_bytes` lowered
+   30720 → **30000** in `config/gwd-skill-conformance-grandfather.yml` (a valid shrink vs
+   `origin/main`'s 66296). `GWD_ROOT=D:/Abhay/GetWorkDone python -m pytest
+   scripts/tests/test_gwd_skill_conformance.py scripts/tests/test_gwd_skill_musts_have_gates.py
+   scripts/tests/test_gwd_skill_conformance_grandfather_ratchet.py
+   scripts/tests/test_eval_coverage_freshness.py -q` → **28 passed**. Commit `48137507`.
+2. **DONE** — checker T-371C's mutation E (replace the OWNER STATUS CADENCE rule body in
+   `SKILL.md` with `**OWNER STATUS CADENCE:** see the log.`, heading + CRITICAL RULES bullet kept)
+   re-applied to this branch's un-blinded guard and run:
+
+   ```
+   $ GWD_ROOT=D:/Abhay/GetWorkDone python -m pytest scripts/tests/test_owner_status_cadence_guidance.py -q
+   .FFF.                                                                    [100%]
+   FAILED scripts/tests/test_owner_status_cadence_guidance.py::test_every_tick_opens_with_ist_timestamp
+     AssertionError: one OWNER STATUS CADENCE block must require every tick to open with the
+     current IST time, give a concrete [HH:MM IST] example, and say a tick missing it does not
+     satisfy the cadence
+   FAILED scripts/tests/test_owner_status_cadence_guidance.py::test_content_floor_is_specified
+     AssertionError: one OWNER STATUS CADENCE block must name a per-tick CONTENT FLOOR covering
+     what changed since the last tick, and require an explicit no-change tick rather than a
+     skipped one
+   FAILED scripts/tests/test_owner_status_cadence_guidance.py::test_ticker_must_be_persistent_not_a_timeout
+     AssertionError: one OWNER STATUS CADENCE block must require a PERSISTENT ticker, forbid a
+     fixed timeout, cite the 2026-08-20 20:30 lapse, and forbid fabricated progress
+   3 failed, 2 passed in 0.06s
+   ```
+
+   Confirms the T-371F2 un-blinding holds: the guard is RED the moment the cadence rule's
+   REQUIREMENT tokens leave `SKILL.md`, even though the identical text still lives verbatim in
+   `references/incident-log.md` (the exact hole the checker found is now closed). Mutation
+   reverted via `git checkout -- .claude/skills/get-work-done/SKILL.md`; re-run confirms
+   **5 passed** clean.
+3. Full local CI block from `CLAUDE.md` — pending.
+4. Final marker-free push + `gh pr checks 598 --watch` — pending.
+
 ---
 
 ## Historical record — fix round 0's own (since-superseded) self-assessment
