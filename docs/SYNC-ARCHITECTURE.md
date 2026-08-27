@@ -38,6 +38,13 @@ Hub registry → compare hashes → show diff → copy files → update sync-con
 - The push-triggered auto-sync is OFF; `workflow_dispatch` remains for the residual
   copy-provisioned surface until stage 2 (owner-gated) decides its final form.
 - Script: `scripts/sync_to_projects.py --all` (unchanged, manual)
+- **Rules cannot ship as plugin content** (Claude Code has no plugin-rule mechanism), so a
+  project's `.claude/rules/*.md` stays a one-time COPY forever — nothing above re-diffs it
+  after provisioning day. `scripts/check_provisioned_rule_drift.py` (T-401) is the detector
+  for that gap: it classifies every registered repo's rule copies against the hub's own git
+  history (CURRENT / STALE / MODIFIED / PROJECT-ONLY) and flags a CONTRADICTION candidate
+  when a project is stuck on content the hub later fixed — report-only, ticked weekly by
+  `.claude/hooks/auto-pr-reconcile.sh`.
 
 ### 5. Local → Hub (contribute-practice skill)
 ```

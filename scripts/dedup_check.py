@@ -15,13 +15,22 @@ from typing import Optional
 import yaml
 
 
-def hash_pattern(file_path: str) -> str:
-    """SHA256 of file content, normalized (collapse whitespace, strip trailing)."""
-    content = Path(file_path).read_text(encoding="utf-8")
+def hash_content(content: str) -> str:
+    """SHA256 of pattern content, normalized (collapse whitespace, strip trailing, line-ending-agnostic).
+
+    Split out from hash_pattern() (T-401) so callers with in-memory content — e.g. a git blob
+    fetched via `git show <sha>:<path>` — can hash it without writing a temp file.
+    """
     lines = [line.strip() for line in content.splitlines()]
     normalized = "\n".join(lines)
     normalized = re.sub(r"  +", " ", normalized)
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
+def hash_pattern(file_path: str) -> str:
+    """SHA256 of file content, normalized (collapse whitespace, strip trailing)."""
+    content = Path(file_path).read_text(encoding="utf-8")
+    return hash_content(content)
 
 
 _PATTERN_LOCATORS = {

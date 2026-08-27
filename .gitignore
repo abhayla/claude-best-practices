@@ -78,6 +78,10 @@ trust-score/.recorded-prs
 # same treatment as the trust-score ledgers above
 costs/
 
+# Weekly-tick cache for scripts/check_provisioned_rule_drift.py (T-401) — machine-local,
+# same treatment as the trust-score/costs runtime state above
+rule-drift/
+
 # Local scratch notes (untracked working notes, e.g. ad-hoc gap-analysis prompts)
 /Notes
 

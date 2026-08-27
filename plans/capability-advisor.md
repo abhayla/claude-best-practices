@@ -85,3 +85,7 @@ v1 → v2 change log at the bottom.
 - Q6: build-missing-immediately → list-and-wait with a 3-firings auto-build trigger.
 - N1–N3: hand-edit guard, sync cold-start rows, cache hygiene.
 - Cut: Sonnet row-synthesis call in v1.
+
+## Status log
+- **2026-08-27 22:10 IST — step 0 DONE, step 1 mechanical part DONE.** #603 meter+catalogue+plan; #604 validator inverted; `globs:`→`paths:` in 5 app repos (KKB archived, local-only). Path-scoping merged: IPODhan 25→20, algochanakya 21→17, firekaro 24→16 rule files at launch (InstructionsLoaded proofs; permanent logging in IPODhan via `D:\Abhay\GetWorkDone\hooks\instructions-loaded-log.py`). `workflow.md` 5-vs-3 retry contradiction resynced from hub in 5 repos (T-402). New mechanism `scripts/check_provisioned_rule_drift.py` (T-401): first run = **86 stale hub-rule copies across 6 repos**, `prompt-auto-enhance-rule.md` RETIRED-but-enforced in all 6. Plugin cache: 188 stale `temp_*` clones removed.
+- **OPEN (owner, rule 5):** rules-diet items 1–7 (deletes/trims/merges, 2 policy contradictions, retired-rule deletion) — hub-first, then resync. Queued: T-397. Next after owner reply: 2-week meter readout (no new machinery), then step 2 marker telemetry, then Part A uninstall.
