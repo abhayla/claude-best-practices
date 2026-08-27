@@ -46,14 +46,49 @@ and **stay**:
   v0.9 wording this branch added; will be re-pointed at the v0.10 section text without weakening
   assertions.
 
-## Next steps (this run, T-353F2)
+## Steps completed (this run, T-353F2)
 
-1. [x] Rewrite STATUS.md + PR #596 body to this honest state, commit + push `[skip ci]` — DONE (this commit).
-2. [ ] `git fetch origin && git merge origin/main` — resolve SKILL.md conflict by taking
-   `origin/main`'s version entirely; keep the other 10 files.
-3. [ ] Adapt `scripts/tests/test_get_work_done_fast_lane.py` to the v0.10 section text.
-4. [ ] Run that test + the 4 gwd ratchet tests (`GWD_ROOT=D:/Abhay/GetWorkDone`) — must stay green.
-5. [ ] Full local CI block from CLAUDE.md, once.
-6. [ ] Final marker-free push, `gh pr checks 596 --watch --interval 30`, record results here + in PR body.
+1. [x] Rewrote STATUS.md + PR #596 body to the honest state, committed + pushed `[skip ci]`
+   (`ae25edd3`).
+2. [x] `git fetch origin && git merge origin/main` (`371a0bcf`) — SKILL.md conflict resolved by
+   taking `origin/main`'s version entirely (`git checkout --theirs`); the other 10 files kept.
+   Post-merge `git diff origin/main --stat` shows exactly the 10 expected files + STATUS.md, and
+   SKILL.md no longer diffs from `origin/main`.
+3. [x] Adapted `scripts/tests/test_get_work_done_fast_lane.py` to the v0.10 section text
+   (`61f57748`): v0.10 split the FAST LANE detail into `references/fast-lane-runbook.md`, so the
+   `stage-stamp.py` assertion now also checks that reference file (SKILL.md's inline FLOW line
+   abbreviates it to `stage-stamp`); the `300 changed lines` regex was loosened to tolerate the
+   line-wrapped `<=300\nchanged lines` phrasing. No assertion was weakened — every original check
+   still requires the same concrete facts to be true, just located per v0.10's split.
+4. [x] `PYTHONPATH=. python -m pytest scripts/tests/test_get_work_done_fast_lane.py -v` →
+   **4/4 passed**. `GWD_ROOT=D:/Abhay/GetWorkDone python -m pytest
+   scripts/tests/test_gwd_skill_conformance.py scripts/tests/test_gwd_skill_musts_have_gates.py
+   scripts/tests/test_gwd_skill_conformance_grandfather_ratchet.py
+   scripts/tests/test_eval_coverage_freshness.py -v` → **28/28 passed**.
+5. [x] Full local CI block from CLAUDE.md, once:
+   1. `dedup_check.py --validate-all` → `Registry validation passed`
+   2. `dedup_check.py --secret-scan` → `No secrets found`
+   3. `workflow_quality_gate_validate_patterns.py` → `PASSED: All patterns valid (46 warning(s))`
+      — all pre-existing across the registry
+   4. `pytest scripts/tests/ -q` → **2239 passed, 156 skipped, 1 failed** (332.77s). The 1
+      failure (`test_fleet_script_health.py::test_real_fleet_has_no_unknown_silent_failure_findings`)
+      is the SAME pre-existing, environment-only failure called out in the contract (line 6:
+      "the known pre-existing pytest failure test_fleet_script_health on kt-backup.cmd is not
+      yours") — it scans live fleet scripts on `D:/Abhay/GetWorkDone`, a different repo untouched
+      by this PR's diff. On GitHub CI that directory does not exist, so the test self-skips.
+   5. `check_eval_coverage.py --enforce --base origin/main` → `1 uncovered + 0 stale changed
+      skill(s) (grandfathered)`, exit 0 (`ci-cd-setup` is on the shrink-only grandfather
+      allowlist)
+   6. `check_plugin_version_bump.py --base origin/main` → `Plugin version-bump gate: OK` (no
+      plugin source touched)
+   7. `generate_root_marketplace.py --check` — SKIPPED per CLAUDE.md ("skip if plugins/
+      untouched"); `plugins/` is untouched by this PR's diff.
+6. [x] Final marker-free push (no `[skip ci]` anywhere) — real CI runs on it. `gh pr checks 596
+   --watch --interval 30` result recorded below once it completes.
+
+## CI result (real GitHub Actions run on the final push)
+
+See PR #596 for the live check run; result recorded here once `gh pr checks 596 --watch`
+completes in this run.
 
 `hold` label stays on PR #596 throughout — this worker never merges or closes.
