@@ -953,13 +953,13 @@
     }
   },
   "ci-cd-setup": {
-    "hash": "cabbdaca4e2cd326511a736a0328db2f502cec107031d7f3283761a732fa9f4c",
+    "hash": "bd8df3067e2ec763edbc04d1eabf679d16e0f12a893ff31968e7797db30d6e90",
     "type": "skill",
     "category": "core",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-07-26",
+    "last_updated": "2026-08-26",
     "dependencies": [],
     "visibility": "public",
     "description": "GitHub Actions, GitLab CI, pipeline stages, environment promotion",
@@ -967,7 +967,7 @@
       "deployment",
       "workflow"
     ],
-    "changelog": "v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
+    "changelog": "v1.3.0: Add docs-only CI short-circuit reference (T-353) — needs:-gated first job, never workflow-level paths-ignore on a required check. v1.2.0: Add prerequisites-preflight contract (## Prerequisites + STEP 0 gate) — compliance sweep wave 1-2. v1.0.0: Initial release from Twitter/X + Reddit research",
     "tier": "must-have",
     "effectiveness": {
       "adoption_rate": 1.0,

@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-08-16 07:35 UTC (auto-generated)
+> Last updated: 2026-08-26 15:54 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -47,7 +47,7 @@
 | bun-elysia | rule | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | change-risk-scoring | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
 | changelog-contributing | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
-| ci-cd-setup | skill | 1.2.0 | hub:abhayla/claude-best-practices | — |
+| ci-cd-setup | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
 | claude-behavior | rule | 1.3.1 | hub:abhayla/claude-best-practices | — |
 | claude-docs-cache | rule | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | claude-guardian | skill | 2.0.0 | hub:abhayla/claude-best-practices | — |
