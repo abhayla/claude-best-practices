@@ -102,7 +102,19 @@ the remaining items.
    `references/incident-log.md` (the exact hole the checker found is now closed). Mutation
    reverted via `git checkout -- .claude/skills/get-work-done/SKILL.md`; re-run confirms
    **5 passed** clean.
-3. Full local CI block from `CLAUDE.md` — pending.
+3. **DONE** — full local CI block from `CLAUDE.md` (`PYTHONPATH=.`, `GWD_ROOT=D:/Abhay/GetWorkDone`
+   where required), each run once:
+
+   | Check | Result |
+   |---|---|
+   | `dedup_check.py --validate-all` | exit 0 — `Registry validation passed` |
+   | `dedup_check.py --secret-scan` | exit 0 — `No secrets found` |
+   | `workflow_quality_gate_validate_patterns.py` | exit 0 — `PASSED: All patterns valid (46 warning(s))`, all pre-existing |
+   | `pytest scripts/tests/ -q` | **1 failed, 2240 passed, 151 skipped** — the one failure is `test_fleet_script_health.py::test_real_fleet_has_no_unknown_silent_failure_findings`, scanning the LIVE fleet scripts on this machine's disk (`reconcile-claims.ps1`, `kt-backup.cmd`, `ww-base.ps1`, `worker-wrapper.ps1`, `sweep-silent-exit.ps1`, `pf-backup.ps1`) — a different repo, untouched by this PR, invisible to GitHub CI, and named pre-existing by the contract |
+   | `check_eval_coverage.py --enforce --base origin/main` | FAILED once (`evals/2026-08-27-v010-rewrite.md` predated the item-1/item-2 SKILL.md commits) → fixed by appending a freshness note to the eval (commit `a08ac797`) describing exactly what changed and why the scenario coverage still holds → re-run: exit 0, `all changed skills covered and fresh` |
+   | `check_plugin_version_bump.py --base origin/main` | exit 0 — `Plugin version-bump gate: OK` |
+   | `generate_root_marketplace.py --check` | exit 0 — in sync |
+
 4. Final marker-free push + `gh pr checks 598 --watch` — pending.
 
 ---
