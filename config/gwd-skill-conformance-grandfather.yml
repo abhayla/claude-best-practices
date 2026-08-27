@@ -13,12 +13,12 @@
 #   stale_paths                   -> the dead D:\Abhay\VibeCoding\... path is gone
 # Only the two ceilings the tests REQUIRE to exist are left, both lowered.
 
-# M1/M2 — SKILL.md byte-size ratchet. Was 66296 (v0.9); v0.10 is 29,998 bytes
+# M1/M2 — SKILL.md byte-size ratchet. Was 66296 (v0.9); v0.10 is 29,973 bytes
 # with LF endings (.gitattributes pins these files to LF so a Windows checkout
-# cannot inflate the measurement by ~430 CR bytes). The ceiling is the contract's
-# 30 KB bar = 30720 bytes, which leaves the file 722 bytes of headroom and still
-# fails RED on any real re-bloat.
-max_bytes: 30720
+# cannot inflate the measurement by ~430 CR bytes). Ceiling set to the contract's
+# decimal 30,000-byte bar (T-371F3), leaving 27 bytes of headroom and still
+# failing RED on any real re-bloat.
+max_bytes: 30000
 
 # RC1/M9 — CRITICAL RULES MUST/MUST NOT bullets with no `gate:<id>` token.
 # Was 26 (every MUST implicitly gate:PROSE-ONLY). v0.10 gives every bullet an

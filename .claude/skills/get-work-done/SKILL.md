@@ -1,16 +1,16 @@
 ---
 name: get-work-done
-description: Central work dispatcher (the "mother hub" front door) for the GetWorkDone fleet. EVERY task gets a contract + T-id; size-eligible tasks fast-lane in a worktree of the target repo, everything else dispatches a background worker on the cheapest-correct model, checked independently, landed via CI-gated PR (v0.10). Grills the owner to >95% confidence at intake, one question per turn. Use for "/get-work-done fix X in IPODhan", intake-only mode, fleet state ("status"), or stopping a task ("cancel T-042"). Design SSOT: plans/get-work-done-dispatcher.md.
+description: Central work dispatcher (the "mother hub" front door) for the GetWorkDone fleet. EVERY task gets a contract + T-id; size-eligible tasks fast-lane in a worktree of the target repo, else dispatches a background worker on the cheapest-correct model, checked independently, landed via CI-gated PR (v0.10). Grills to >95% confidence at intake, one question per turn. Use for "/get-work-done fix X in IPODhan", intake-only mode, status, or "cancel T-042". SSOT: plans/get-work-done-dispatcher.md.
 ---
 
 # /get-work-done - central work dispatcher (v0.10, 2026-08-27)
 
 **v0.10 = procedure only.** Every dated incident narrative is in `references/incident-log.md`,
-VERBATIM, anchored `I-01 ... I-37`; each rule carries a `[log: I-nn]` back-reference - read it for
+VERBATIM, anchored `I-01 ... I-37`; each rule carries a `[log: I-nn]` back-reference - read for
 the WHY, never to run a task. `references/` also holds the fast-lane runbook + routing table.
-**GWD** = this machine's state root (`GWD/settings.json` -> `fleet_home`):
-`D:/Abhay/GetWorkDone/` here, `C:/Abhay/GetWorkDone` on the VPS. Contract format = the
-goal-creator shape (`plugins/loop-engineering/skills/goal-creator/SKILL.md`) + STEP 5 fields.
+**GWD** = this machine's state root (`GWD/settings.json` -> `fleet_home`): `D:/Abhay/GetWorkDone/`
+here, `C:/Abhay/GetWorkDone` on the VPS. Contract format = the goal-creator shape
+(`plugins/loop-engineering/skills/goal-creator/SKILL.md`) + STEP 5 fields.
 
 ## Mode router
 
@@ -24,63 +24,62 @@ goal-creator shape (`plugins/loop-engineering/skills/goal-creator/SKILL.md`) + S
 
 ## Prerequisites
 
-`git`, an authenticated `gh` (PR/label/merge-state calls), `python` and PowerShell on PATH, and a
+`git`, an authenticated `gh` (PR/label/merge-state calls), `python` and PowerShell on PATH, a
 writable bus checkout at `GWD` (queue, heartbeats, settings.json, guard scripts). Fast-lane also
 needs `GWD/fast-lane-gate.py` + `GWD/fast-lane-check.py`.
 
 ## STEP 0: Preflight
 
 Verify every prerequisite NOW, while the owner is present, and report ALL missing items in one
-hard stop - never discover a missing tool mid-run, never improvise an undeclared fallback (an
-unreachable bus means no T-id can be allocated: no safe degraded mode).
+hard stop - never discover a missing tool mid-run, never improvise a fallback (an unreachable bus
+means no T-id can be allocated: no safe degraded mode).
 
 ## STEP 1 - INTAKE: parse the ask
 
-Split the input into tasks (they may span repos). Resolve each target against
-`GWD/settings.json` -> `repo_registry` - the ONLY source of repo paths (it encodes the
-calculatekaro->`calculator` and algochanakya-vs-OFO traps). A repo not in the registry, or an
-ambiguous reference, is an intake question, never a guess.
+Split the input into tasks (may span repos). Resolve each target against `GWD/settings.json` ->
+`repo_registry` - the ONLY source of repo paths (it encodes the calculatekaro->`calculator` and
+algochanakya-vs-OFO traps). A repo not in the registry, or an ambiguous reference, is an intake
+question, never a guess.
 
 **PORTFOLIO REGISTRATION GATE** [log: I-04]: also check the target against `PORTFOLIO.yml` on
 5wealths `main` (it EXISTS - the `PORTFOLIO-ALIGNMENT-NOTES.md` interim table is superseded). A
-repo absent from it, or a task creating a NEW project folder, cannot be queued until a
-registration row (name, pillar, machines) exists. Carry it into STEP 4; never skip it silently.
+repo absent from it, or a task creating a NEW project folder, cannot queue until a registration
+row (name, pillar, machines) exists. Carry it into STEP 4; never skip it silently.
 
 ## STEP 2 - SCOUT (~1 min per task)
 
 In the target repo: `git remote get-url origin` (must equal the registry's `remote` - a mismatch
 aborts intake with a question), branch state, does the named area exist, do tests exist, which
-paths the task will plausibly touch. Ground the gate in looked-at reality, never the prompt alone.
+paths the task will touch. Ground the gate in looked-at reality, never the prompt alone.
 
 ## STEP 3 - GATE: every task gets a contract + T-id; SIZE picks the lane
 
 **A get-work-done task with no T-id is a defect** [log: I-01]. Every task is contracted (STEP 5),
 then FAST-LANED or DISPATCHED (STEP 6); old carve-outs (trivial-inline, Fable, intake-mode) are
 subsumed by those two paths. Blast radius (auth, payments, config, migrations, deploy) informs
-model tier, budget, `deploy_tier` AND lane eligibility.
+model tier, budget, `deploy_tier` and lane eligibility.
 
 **Repo identity is compared by REGISTRY KEY, never path or folder name:** resolve the session's
 cwd and the target via `git remote get-url origin` -> key; a cwd resolving to no key is foreign,
-same-key tasks still go to their own worktree. An artifact whose source of truth lives in another
-project (template copy, map cards, Deluge specs) resolves its repo by the registry's
-`ssot_artifacts` field wherever the discussion happens; the session may relay owner approvals,
-never author the text.
+same-key tasks still go to their own worktree. An artifact whose source of truth lives elsewhere
+(template copy, map cards, Deluge specs) resolves its repo by the registry's `ssot_artifacts`
+field wherever discussed; the session may relay owner approvals, never author the text.
 
 ### FAST LANE (owner decision A, 2026-08-26 - T-349/T-351/T-353)
 
-The ONE owner-approved exception to "a session never edits a target repo itself" - not an inline
-path: still a T-id, a contract, a worktree of the TARGET repo, `context_docs`, and a checker.
-Those, not a ban on session edits, prevent the 2026-08-15 incident [log: I-01].
+The ONE owner-approved exception to "a session never edits a target repo itself" - not inline:
+still a T-id, a contract, a worktree of the TARGET repo, `context_docs`, and a checker. Those,
+not a ban on session edits, prevent the 2026-08-15 incident [log: I-01].
 
 **ELIGIBILITY** = ALL of: `deliverable: content|mechanical` * <=5 files in `files:` * <=300
 changed lines at PR time * no path matching the sensitive-path denylist in
-`GWD/fast-lane-gate.py` * no unknowns after scout. `code` is NOT eligible in v1 (needs the
-repo's test gate); revisit after 10 clean runs.
+`GWD/fast-lane-gate.py` * no unknowns after scout. `code` is NOT eligible in v1; revisit after
+10 clean runs.
 
 **FLOW:** gate -> stage-stamp -> worktree edit -> PR -> diff gate -> `fast-lane-check.py` -> merge
 on green -> LEDGER line, detailed in `references/fast-lane-runbook.md`. SLO <=20 min
 launched->merged (`settings.fast_lane_slo_minutes`), a miss = `FAST-LANE-SLO-MISS` via
-`lesson.py status`. A `lane: fast` contract reaching WORKER dispatch is preflight exit 14.
+`lesson.py status`. A `lane: fast` contract at WORKER dispatch is preflight exit 14.
 
 ## STEP 3.5 - ROOT-CAUSE GATE: the SECOND occurrence fixes the MECHANISM
 
@@ -119,8 +118,8 @@ discovered mid-run with the owner away).
 | First deploy / DNS / new domain / auth or payment surface | HOLD (Tier 2) - collect the yes/no NOW |
 
 A portfolio-registration flag from STEP 1 IS a material unknown - resolve it here; determine the
-pillar yourself when knowable. AUTO-tier deploys run via `GWD/deploy-site.sh` on the VPS: capture
-KNOWN-GOOD -> niced build -> swap -> `nginx -t` gate -> probe the live URL -> restore known-good on
+pillar yourself when knowable. AUTO-tier deploys run via `GWD/deploy-site.sh`: capture
+KNOWN-GOOD -> niced build -> swap -> `nginx -t` gate -> probe live URL -> restore known-good on
 failure [log: I-05]. Nothing answerable from GLOBAL.md, the repo, or the registry may be asked.
 
 ## STEP 5 - CONTRACT
@@ -173,12 +172,12 @@ status_log: []
 
 `dod:` items state the ACTION **and** the completeness bar ("documents the per-partner pattern
 INCLUDING the two fallbacks", not "update the doc") - a worker satisfies the weakest literal
-reading, the checker can only verify what is written as a predicate.
+reading, the checker verifies only what is written as a predicate.
 
 **Routing:** haiku = mechanical/classification, sonnet = DEFAULT for any briefed machine-checkable
-job, opus = deep design + preemptively all security-category work, Fable/Mythos = NEVER a worker
-(exit 4). Full table: `references/model-routing-table.md`. When torn pick the cheaper tier -
-escalation recovers a wrong cheap pick; a wrong expensive one is never detected.
+job, opus = deep design + preemptively all security work, Fable/Mythos = NEVER a worker (exit 4).
+Full table: `references/model-routing-table.md`. When torn pick the cheaper tier - escalation
+recovers a wrong cheap pick; a wrong expensive one is never detected.
 
 ## STEP 6 - DISPATCH: one background worker, guarded
 
@@ -215,26 +214,25 @@ escalation recovers a wrong cheap pick; a wrong expensive one is never detected.
 
 5. **Workspace** [log: I-16]: clone FRESH (`git clone --filter=blob:none`) unless one inside
    `settings.workspaces.retention_days` exists AND is clean. The janitor deletes idle workspaces
-   only when provably clean; dirty ones escalate, never delete.
+   only when provably clean; dirty ones escalate.
 6. **LAUNCH - the one recipe** [log: I-21]. Write `GWD/heartbeats/T-<id>.prompt.txt` FIRST, then:
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File GWD/worker-wrapper.ps1 `
      -TaskId T-<id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap> -StateRoot <GWD>
    ```
-   The wrapper passes the prompt as an **argv pointer** (STDIN was abandoned 2026-08-12 - invisible
-   to console-less processes), writes `T-<id>.hb` (PID + ~60s tick) and the result JSON; the
+   The wrapper passes the prompt as an **argv pointer** (STDIN abandoned 2026-08-12 - invisible to
+   console-less processes), writes `T-<id>.hb` (PID + ~60s tick) and the result JSON; the
    dispatcher, not yet the wrapper, prepends `GWD/worker-mandates.txt` to that prompt (T-372).
-   `-StateRoot` is MANDATORY off the VPS. The deleted STDIN recipe is
-   archived with a do-not-use banner at [log: I-17]. A same-repo-as-dispatcher contract orders the
-   worker into its own worktree.
+   `-StateRoot` is MANDATORY off the VPS. The deleted STDIN recipe is archived with a do-not-use
+   banner at [log: I-17]. A same-repo-as-dispatcher contract orders the worker into its own worktree.
 7. **Terminal state** [log: I-18]: parse `stop_reason` - a refusal is NOT success. Refusal on
    haiku/sonnet -> reroute to opus (edit `model:`, append `status_log`, re-lint, re-preflight,
    relaunch); on opus -> PARK, no second reroute. Error -> one retry same tier; a 2nd failure:
    environmental -> park, capability/quality -> escalate ONE tier (max one). Keeper deaths are
    environmental: re-queue once, park on the second.
 8. **Post-exit PR-state check** [log: I-19]: `gh pr view <PR> --json state,mergedBy,mergedAt` on
-   every PR named. Merged inside the run window (dispatch -> result JSON timestamp) = a task
-   FAILURE line in `status_log` + `GWD/LEDGER.md` + an owner card.
+   every PR named. Merged inside the run window (dispatch -> result JSON) = a task FAILURE line
+   in `status_log` + `GWD/LEDGER.md` + an owner card.
 9. **Lanes + ceilings** [log: I-20]: up to `settings.fleet.max_concurrent_workers` concurrently
    (exit 10 enforces it); same-repo serializes, others parallel; P1 > P2 > P3, a P1 always admitted;
    reprioritize by REORDERING only, never preempting. `settings.max_dispatches_per_day` +
@@ -266,12 +264,12 @@ escalation recovers a wrong cheap pick; a wrong expensive one is never detected.
    must RUN on this host or exit 15 blocks the next dispatch.
 
 **SWEEP RECONCILIATION** [log: I-25] - before flipping any contract's state: newest signal wins
-(newest timestamped `status_log` entry AND the bus git log); a live origin's activity blocks
-reclaim except the provably-dead-origin rescue; an unmerged PR blocks `.done`.
+(newest `status_log` entry AND the bus git log); a live origin's activity blocks reclaim except
+the provably-dead-origin rescue; an unmerged PR blocks `.done`.
 
 **BUDGET PRE-APPROVAL** [log: I-26]: retries, cap-resumes, raises and tier escalations are
-pre-approved, never owner-gated - bounded by the plan's limits and daily ceilings, which pause +
-notify rather than ask. New recurring third-party spend stays owner-gated.
+pre-approved, never owner-gated - bounded by plan limits and daily ceilings, which pause + notify
+rather than ask. New recurring third-party spend stays owner-gated.
 
 **INVOCATION LOG** [log: I-27]: end EVERY intake turn with one `GWD/INVOCATIONS.log` line:
 `<UTC ISO> | <session-id>@<machine> | cwd-repo=<key or none> | tasks_parsed=<n> | tids=<value>`;
@@ -281,8 +279,8 @@ notify rather than ask. New recurring third-party spend stays owner-gated.
 
 1. **Reporting affinity** [log: I-28]: the contract's `origin:` session owns all in-session
    reporting; another session may LIST a foreign-origin task but never check, report, retry or
-   park it. Exceptions: a keeper/sweep rescue of a provably-dead origin (labeled as such) and an
-   explicit owner ask elsewhere (answer, change nothing).
+   park it. Exceptions: a keeper/sweep rescue of a provably-dead origin and an explicit owner ask
+   elsewhere (answer, change nothing).
 2. **Checker launch** [log: I-29, I-30]: mandatory, auto-chained, HEADLESS - `worker-wrapper.ps1`,
    `bypassPermissions`, heartbeat `T-<id>C.hb` (`C` keeps death-detection tracks apart), watcher
    armed same turn. Tier = opus when the contract is opus, else sonnet - never weaker than the
@@ -319,13 +317,13 @@ notify rather than ask. New recurring third-party spend stays owner-gated.
    fires only when that session is dead at terminal time. Origin-less tasks use the card as
    primary; silence is never success. Non-VPS: the ping reaches the relay only after a bus
    commit+push. **Parked digest** [log: I-36]: `GWD/parked-digest.ps1` (weekly) cards every
-   `*.parked.md` with age + reason; owner replies `<T-id> retry`/`drop` - parked is never forgotten.
+   `*.parked.md` with age + reason; owner replies `<T-id> retry`/`drop` - parked is never lost.
 
 ## ARTIFACT PLACEMENT
 
 [log: I-37] Decided by WHAT the artifact is, not where the fleet runs: project-SPECIFIC -> that
-project's repo via a PR (never the bus or hub); fleet-GENERIC machinery -> hub/bus scripts;
-fleet runtime STATE -> the bus only.
+repo via a PR (never the bus or hub); fleet-GENERIC machinery -> hub/bus scripts; fleet runtime
+STATE -> the bus only.
 
 ## CRITICAL RULES
 
