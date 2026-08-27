@@ -8,6 +8,13 @@ exits 0. With --enforce (the RATCHET, owner-approved 2026-07-13): a changed skil
 lacking an evals/ report FAILS CI (exit 1) unless it is grandfathered in
 config/eval-coverage-grandfather.yml — a shrink-only allowlist of the skills that
 predate the gate. New skills must ship with evals from day one.
+
+FRESHNESS (T-370 dod item 4, existence-is-not-freshness finding H7 — 31
+SKILL.md commits since the last eval passed the "blocking" gate green): a
+changed SKILL.md that HAS an evals/ report is still flagged when its own last
+commit (`git log -1 --format=%ct`) is newer than every eval file's last
+commit — the eval predates the behavior it claims to cover. Same warn/enforce/
+grandfather semantics as the existence check above.
 """
 
 import re
@@ -82,6 +89,64 @@ def uncovered_changed_skills(changed_files: list, root: Path) -> list:
     return results
 
 
+def _git_commit_time(path: Path, root: Path) -> Optional[int]:
+    """Unix timestamp of the last commit touching `path`, or None (no history / not a git repo)."""
+    try:
+        rel = path.relative_to(root).as_posix()
+    except ValueError:
+        rel = str(path)
+    try:
+        proc = subprocess.run(
+            ["git", "log", "-1", "--format=%ct", "--", rel],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+    out = proc.stdout.strip()
+    return int(out) if out.isdigit() else None
+
+
+def stale_changed_skills(changed_files: list, root: Path) -> list:
+    """Flag changed skills whose SKILL.md's last commit is newer than every eval
+    file's last commit — existence of an evals/ report is not freshness (H7).
+
+    Returns a list of {"skill", "skill_md", "reason"} dicts. Skills with no
+    evals/ report at all are the EXISTENCE gate's concern (uncovered_changed_skills),
+    not this one.
+    """
+    results = []
+    for changed_path in changed_files:
+        skill_dir = _skill_dir_for(changed_path, root)
+        if skill_dir is None or not skill_dir.exists():
+            continue
+        if _is_reference_skill(skill_dir):
+            continue
+        evals_dir = skill_dir / "evals"
+        if not evals_dir.is_dir():
+            continue
+        eval_files = sorted(evals_dir.glob("*.md"))
+        if not eval_files:
+            continue
+        skill_md_time = _git_commit_time(skill_dir / "SKILL.md", root)
+        if skill_md_time is None:
+            continue
+        newest_eval_time = max((_git_commit_time(f, root) or 0) for f in eval_files)
+        if skill_md_time > newest_eval_time:
+            results.append({
+                "skill": skill_dir.name,
+                "skill_md": changed_path,
+                "reason": (
+                    f"SKILL.md's last commit ({skill_md_time}) is newer than its newest "
+                    f"eval's last commit ({newest_eval_time}) — the eval predates the "
+                    f"current behavior"
+                ),
+            })
+    return results
+
+
 def _changed_files_from_git(base: str, root: Path) -> list:
     try:
         proc = subprocess.run(
@@ -140,6 +205,7 @@ def main(argv: list) -> int:
         return 0
 
     uncovered = uncovered_changed_skills(changed_files, root)
+    stale = stale_changed_skills(changed_files, root)
     grandfathered = _grandfathered(root) if enforce else set()
 
     blocking = []
@@ -158,13 +224,32 @@ def main(argv: list) -> int:
                 f"report ({item['reason']}) — consider running /skill-evaluator"
             )
 
+    for item in stale:
+        if enforce and item["skill"] not in grandfathered:
+            blocking.append(item)
+            print(
+                f"::error::Skill '{item['skill']}' ({item['skill_md']}) has a STALE eval "
+                f"report ({item['reason']}) — the eval-coverage freshness ratchet blocks "
+                f"changed skills whose SKILL.md outran its evals/ report (grandfather list: "
+                f"config/eval-coverage-grandfather.yml, shrink-only). Run /skill-evaluator "
+                f"and commit a fresh report."
+            )
+        else:
+            print(
+                f"::warning::Skill '{item['skill']}' ({item['skill_md']}) has a stale eval "
+                f"report ({item['reason']}) — consider running /skill-evaluator"
+            )
+
     if blocking:
-        print(f"check_eval_coverage: RATCHET FAILED — {len(blocking)} non-grandfathered changed skill(s) lack evals")
+        print(f"check_eval_coverage: RATCHET FAILED — {len(blocking)} non-grandfathered changed skill(s) lack evals or are stale")
         return 1
-    if uncovered:
-        print(f"check_eval_coverage: {len(uncovered)} changed skill(s) lack eval coverage (grandfathered)")
+    if uncovered or stale:
+        print(
+            f"check_eval_coverage: {len(uncovered)} uncovered + {len(stale)} stale "
+            f"changed skill(s) (grandfathered)"
+        )
     else:
-        print("check_eval_coverage: all changed skills covered")
+        print("check_eval_coverage: all changed skills covered and fresh")
 
     return 0
 

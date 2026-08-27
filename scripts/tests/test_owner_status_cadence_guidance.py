@@ -19,59 +19,68 @@ SKILL_MD = REPO / ".claude/skills/get-work-done/SKILL.md"
 def _skill() -> str:
     return SKILL_MD.read_text(encoding="utf-8")
 
+# T-371C (2026-08-27) found this guard BLIND: an earlier version of this file widened these
+# assertions to scan the whole skill PACKAGE (SKILL.md + references/incident-log.md). Because
+# the log is a frozen verbatim archive, every token below was permanently satisfiable there no
+# matter what happened to the live procedure - proven by mutation (stripping the cadence rule's
+# body out of SKILL.md still passed 5/5). Requirement tokens are pinned to SKILL.md ALONE below;
+# only pure historical citations (a PR/date, never a requirement) may read the wider package.
+def _cadence_windows():
+    """Every 1200-char window that opens at an OWNER STATUS CADENCE heading in SKILL.md itself -
+    where a rule decaying out of the live procedure would actually show up."""
+    body = _skill()
+    return [body[m.start():][:1200] for m in re.finditer("OWNER STATUS CADENCE", body)]
+
 
 def test_cadence_rule_lives_on_the_dispatch_monitor_path():
     body = _skill()
     assert "OWNER STATUS CADENCE" in body, (
         "SKILL.md must state the owner status cadence as a named rule"
     )
-    assert "## STEP 6" in body and "## STEP 7 —" in body
+    assert "## STEP 6" in body and re.search(r"## STEP 7 [-—]", body)
     cadence = body.index("OWNER STATUS CADENCE")
-    assert body.index("## STEP 6") < cadence < body.index("## STEP 7 —"), (
+    assert body.index("## STEP 6") < cadence < re.search(r"## STEP 7 [-—]", body).start(), (
         "the cadence rule must sit on the dispatch/monitor path (STEP 6), not an appendix"
     )
 
 
 def test_every_tick_opens_with_ist_timestamp():
-    body = _skill()
-    section = body[body.index("OWNER STATUS CADENCE"):][:1200]
-    assert re.search(r"CURRENT TIME IN IST", section), (
-        "the rule must require every tick to open with the current time in IST"
+    windows = _cadence_windows()
+    assert any(
+        re.search(r"CURRENT TIME IN IST", w)
+        and re.search(r"\[\d{1,2}:\d{2} IST\]", w)
+        and "does not satisfy the cadence" in w
+        for w in windows
+    ), (
+        "one OWNER STATUS CADENCE block must require every tick to open with the current IST "
+        "time, give a concrete [HH:MM IST] example, and say a tick missing it does not satisfy "
+        "the cadence"
     )
-    assert re.search(r"\[\d{1,2}:\d{2} IST\]", section), (
-        "the rule must give a concrete IST-timestamp example, e.g. [21:46 IST]"
-    )
-    assert "does not satisfy the cadence" in section, (
-        "a tick missing its timestamp must not count as satisfying the cadence"
-    )
-
 
 def test_content_floor_is_specified():
-    body = _skill()
-    section = body[body.index("OWNER STATUS CADENCE"):][:1200]
-    assert "CONTENT FLOOR" in section, "a per-tick content floor must be named"
-    assert re.search(r"what changed since the last\s+tick", section), (
-        "the content floor must cover what changed since the last tick"
+    windows = _cadence_windows()
+    assert any(
+        "CONTENT FLOOR" in w
+        and re.search(r"what changed since the last\s+tick", w)
+        and re.search(r"NOTHING changed", w)
+        for w in windows
+    ), (
+        "one OWNER STATUS CADENCE block must name a per-tick CONTENT FLOOR covering what changed "
+        "since the last tick, and require an explicit no-change tick rather than a skipped one"
     )
-    assert re.search(r"NOTHING changed", section), (
-        "a no-change tick must be an explicit statement, not a skipped tick"
-    )
-
 
 def test_ticker_must_be_persistent_not_a_timeout():
-    body = _skill()
-    section = body[body.index("OWNER STATUS CADENCE"):][:1200]
-    assert "PERSISTENT" in section, "the ticker must be required to be persistent"
-    assert re.search(r"never a fixed timeout", section), (
-        "the rule must forbid a fixed-timeout ticker - the exact mechanism that failed"
+    windows = _cadence_windows()
+    assert any(
+        "PERSISTENT" in w
+        and re.search(r"never a fixed timeout", w)
+        and "20:30" in w
+        and "fabricated" in w
+        for w in windows
+    ), (
+        "one OWNER STATUS CADENCE block must require a PERSISTENT ticker, forbid a fixed timeout, "
+        "cite the 2026-08-20 20:30 lapse, and forbid fabricated progress"
     )
-    assert "20:30" in section, (
-        "cite the 2026-08-20 20:30 lapse as the evidence the rule exists to prevent"
-    )
-    assert "fabricated" in section, (
-        "the ticker must report real state, never fabricated progress"
-    )
-
 
 def test_critical_rules_carry_the_cadence():
     body = _skill()
