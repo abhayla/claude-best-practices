@@ -163,6 +163,52 @@ EXCLUDED_DIRS = {
     "heartbeats",
 }
 
+# A SELF-TEST file deliberately PLANTS the pre-fix defect shape as a mutation control — proving a
+# regression is caught is its whole purpose, not a live defect (T-368: bus-sync-selftest.sh
+# contains the exact pre-T-368 `git log @{u}..HEAD` shape on purpose, to prove the fix catches it
+# as a regression). Scanning it reports the checker's own proof-of-catch as a live finding.
+# Basename-only (never content-based): `*selftest*` / `*self-test*` (either case) and the `test_*`
+# convention this hub's own suite uses, plus anything living under a `tests/` directory.
+SELFTEST_OR_TEST_BASENAME = re.compile(r"selftest|self-test|^test_", re.I)
+
+# A path is CAPTURED EVIDENCE, not a live script, when it sits under a review's `state/reviews/**`
+# forensic snapshot dir, a `tmp/` scratch dir, or is named as a `-backup.*`/`.bak` copy. These are
+# point-in-time copies filed for an audit trail — scanning them reports someone else's backup, not
+# a script the fleet actually runs. (Live instance: kt-backup.cmd, a copy of keeper-tick.cmd filed
+# under state/reviews/2026-08-26T1710/T-344/tmp/t344/.)
+BACKUP_OR_CAPTURED_BASENAME = re.compile(r"-backup\.|\.bak$", re.I)
+
+
+def _is_selftest_or_captured_copy(path: Path, root: Path) -> bool:
+    """True for self-test fixtures and captured/backup copies — never a live fleet script.
+
+    The basename checks are absolute-path-safe (a filename is a filename). The directory checks
+    (`tests/`, `tmp/`, `state/reviews/**`) are NOT: they must be scoped to the path RELATIVE TO
+    THE SCANNED ROOT, never the absolute path. `tmp_path`-based pytest fixtures live under
+    `/tmp/pytest-of-.../...` on Linux CI runners, so checking absolute `path.parts` for a bare
+    `"tmp"` segment matched the runner's OWN scratch root and silently excluded every fixture in
+    the suite (49 tests went from "flagged" to "collect() returned nothing" the moment this
+    landed on CI) — the same "detect nothing, report clean" shape this checker exists to catch,
+    one level up, inside the checker's own test suite.
+    """
+    if SELFTEST_OR_TEST_BASENAME.search(path.name):
+        return True
+    if BACKUP_OR_CAPTURED_BASENAME.search(path.name):
+        return True
+    try:
+        rel_parts = path.relative_to(root).parts
+    except ValueError:
+        rel_parts = path.parts
+    if "tests" in rel_parts:
+        return True
+    if "tmp" in rel_parts:
+        return True
+    for i in range(len(rel_parts) - 1):
+        if rel_parts[i] == "state" and rel_parts[i + 1] == "reviews":
+            return True
+    return False
+
+
 # `x=$(grep -c ...)` with a `|| echo N` fallback, later compared numerically. grep -c prints "0"
 # AND exits 1 on no-match, so the fallback appends a second line and the numeric test throws.
 GREP_COUNT_FALLBACK = re.compile(
@@ -1526,6 +1572,7 @@ def collect(root: Path) -> list[Path]:
         if p.is_file()
         and p.suffix in SHELL_SUFFIXES
         and not EXCLUDED_DIRS.intersection(p.parts)
+        and not _is_selftest_or_captured_copy(p, root)
     )
 
 
