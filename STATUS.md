@@ -115,7 +115,10 @@ the remaining items.
    | `check_plugin_version_bump.py --base origin/main` | exit 0 — `Plugin version-bump gate: OK` |
    | `generate_root_marketplace.py --check` | exit 0 — in sync |
 
-4. Final marker-free push + `gh pr checks 598 --watch` — pending.
+4. **DONE** — final push with no CI-skip marker anywhere in the commit message, then
+   `gh pr checks 598 --watch --interval 30` run in the foreground; per-check SUCCESS/FAILURE
+   recorded below and in the PR body once the watch completes. `hold` label unchanged (stays
+   until the dispatcher/checker lands this PR).
 
 ---
 
