@@ -1,7 +1,7 @@
 # Eval — /get-work-done dispatch recipe: -TaskId/-PromptPath/-MaxTurns + bus-write.ps1 pointer
 
 ```
-Skill:     .claude/skills/get-work-done/SKILL.md (v0.10, 29,842 bytes -> was 29,992)
+Skill:     .claude/skills/get-work-done/SKILL.md (v0.10, 29,989 bytes -> was 29,992)
 Mode:      output (targeted diff verification, not a full re-eval)
 Scenario:  "verify the STEP 6 preflight recipe passes every param the live preflight-guard.ps1
            accepts, and that the bus-write.ps1 pointer resolves"
@@ -78,7 +78,7 @@ python -m pytest scripts/tests/test_gwd_skill_conformance.py \
 | `test_preflight_exit_codes_bidirectional` | PASS — exit 19 now documented; no SKILL.md exit code the script doesn't define |
 | `test_at_most_one_claude_p_recipe` | PASS — unchanged (0 `claude -p --model` recipes) |
 | `test_skill_invocations_resolve` | PASS — unchanged |
-| `test_byte_size_ratchet` | PASS — 29,842 bytes <= grandfathered ceiling 30,000 (headroom trimmed from adjacent incident-narrative prose in STEP 3.5/4/6/7, never from a gate/exit-code statement) |
+| `test_byte_size_ratchet` | PASS — 29,989 bytes <= grandfathered ceiling 30,000 (first pass 29,842; +147 bytes to restore the 4 pinned-guard citations below, still never touching a gate/exit-code statement) |
 | `test_grandfather_*` (ratchet, incl. the origin/main comparison) | PASS — `config/gwd-skill-conformance-grandfather.yml` untouched, no entry added/raised; `gate:PROSE-ONLY` MUST count did NOT grow (bus-write folded into an existing bullet, per above) |
 | `test_gwd_skill_musts_have_gates` | PASS — the existing bullet's added clause carries the same `gate:PROSE-ONLY` it already had; ungated-MUST count unchanged |
 | `test_eval_coverage_freshness` | PASS — this note is the required freshness artifact for the touched SKILL.md |
@@ -89,3 +89,60 @@ python -m pytest scripts/tests/test_gwd_skill_conformance.py \
 APPROVED for merge. The change is a documentation/procedure fix only — no runtime script edited,
 no contract schema changed, no new settings key introduced. Byte ceiling honored via prose trims,
 not by cutting any gate or exit-code statement.
+
+
+## CORRECTION (same day, PR #599 CI red on first push)
+
+CI's `validate` run failed: my first prose-trim pass cut text that FOUR guard tests pin
+verbatim (I had run only the gwd_skill/* subset locally, not the full suite, so I never
+saw these). Root cause: I trimmed incident-narrative detail without first grepping
+`scripts/tests/` for the exact phrases being cut — the pinned-guard tests
+(`test_owner_status_cadence_guidance.py`, `test_root_cause_gate_guidance.py`,
+`test_skip_ci_guidance.py`) exist SPECIFICALLY to stop this class of decay (each file's
+own docstring says so), and I decayed straight into three of them.
+
+Fixed by restoring, verbatim or near-verbatim, the four pinned requirements:
+- `test_ticker_must_be_persistent_not_a_timeout`: restored the "2026-08-20 20:30 lapse"
+  citation in the OWNER STATUS CADENCE block (I had cut it to a bare `[log: I-22]`
+  pointer — the test pins the literal date+time in SKILL.md itself, not the incident log).
+- `test_prose_is_not_a_mechanism_is_stated_with_its_definition`: restored an "eight"
+  citation within 800 chars of "PROSE IS NOT A MECHANISM" (I had cut the parenthetical
+  that carried it).
+- `test_skip_ci_guidance_cites_pr_580_evidence[path0]` +
+  `test_skip_ci_guidance_states_required_check_consequence`: restored "PR #580" and
+  "PRs #577/#579" in the MANDATES bullet (I had cut both citations as "already implied").
+
+To stay under the 30,000-byte ratchet after restoring ~190 bytes of pinned text, I
+re-verified (via `grep -rn <phrase> scripts/tests/*.py`) that NONE of the other prose I
+had trimmed (calculatekaro/algochanakya-vs-OFO examples, the FAST LANE owner-decision
+date + T-349/T-351/T-353 refs, "13 of 159 prompts" stat, the STDIN-abandoned date, the
+"C keeps death-detection tracks apart" aside, the deleted-STDIN "do-not-use banner"
+phrase) is pinned by any test in `scripts/tests/` before leaving those cuts in place.
+
+**Also caught and fixed in this pass:** a `write_text()` call in my restore script ran
+under Python's default (platform) newline translation and silently reintroduced CRLF
+line endings across the whole file (412 bytes of drift, invisible in a plain byte-count
+diff until `file` was run) — normalized back to LF (`.gitattributes` pins `eol=lf` for
+this file) before re-measuring the ratchet.
+
+## Verification run #2 — FULL suite (not the targeted subset)
+
+```
+cd D:/Abhay/Ventures/claude-best-practices-wt-T-375H
+$env:PYTHONPATH="."; $env:GWD_ROOT="D:/Abhay/GetWorkDone"
+python -m pytest scripts/tests/ -q --ignore=scripts/tests/smoke-test
+```
+
+Result: **2238 passed, 151 skipped, 1 failed** in 403s.
+
+The one failure — `test_fleet_script_health.py::test_real_fleet_has_no_unknown_silent_failure_findings`
+— is a live-fleet static-analysis check over `.sh`/`.ps1`/`.cmd` scripts on the bus
+(`bus-sync-selftest.sh`, `keeper-tick.cmd`, `reconcile-claims.ps1`, `worker-wrapper.ps1`,
+etc.). It does not read `.claude/skills/get-work-done/SKILL.md` at all. **Confirmed
+pre-existing**, not caused by this change: `git stash` (removing every SKILL.md edit in
+this branch) and re-running just that one test reproduces the identical failure and the
+identical finding list against the unmodified `origin/main` copy of SKILL.md. Out of
+scope for T-375H (SKILL.md + evals/ only) and not touched by this PR.
+
+The targeted subset from the first verification pass (32 tests) all still pass inside
+this full run; the four previously-broken guard tests are green.

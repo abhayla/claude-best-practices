@@ -89,8 +89,8 @@ A first occurrence may be fixed as an instance. From the SECOND occurrence of th
 fix the MECHANISM that permits it or record in `status_log`, with the reason, why a mechanism fix is
 impossible - silence is not an exemption.
 **PROSE IS NOT A MECHANISM**: a mechanism is CODE, a GUARD, a HOOK, a SCHEMA CONSTRAINT or a TEST
-THAT FAILS when the defect returns. Before calling it done, SWEEP the repo (and the estate, where
-the shape travels) and REPORT the count - "fixed 1 of N found" / "swept, no other instances" - and
+THAT FAILS when the defect returns - the eight-times-failed prose mandate is why. Before
+calling it done, SWEEP the repo (and the estate, where the shape travels) and REPORT the count - "fixed 1 of N found" / "swept, no other instances" - and
 append a `LESSON(CODIFIED -> <where>)` line to `GWD/PATTERNS-SEEN.md` plus a row in
 `GWD/MECHANISM-DUE.md` (`python GWD/lesson.py`); the learning-debt gate (exit 11) reads it.
 
@@ -140,9 +140,10 @@ below is normative in CRITICAL RULES; full v0.9 text + incident at [log: I-06 ..
 5. **MANDATES**: the three standing mandates live VERBATIM in `GWD/worker-mandates.txt` - never
    hand-copied or paraphrased [log: I-11, I-12, I-14]. The DISPATCHER prepends that file to every
    prompt today; T-372 makes `worker-wrapper.ps1` do it instead (not landed - `grep -c
-   worker-mandates GWD/worker-wrapper.ps1` = 0 until it does). Mandate 3 (T-209): `[skip ci]`
+   worker-mandates GWD/worker-wrapper.ps1` = 0 until it does). Mandate 3 (T-209, PR #580): `[skip ci]`
    matches ANYWHERE in a commit message, headline or body; a REQUIRED check that never reports
-   leaves the PR blocked forever. Add the HOLD-LABEL line (`gh pr edit <n> --add-label hold`)
+   leaves the PR blocked forever, per PRs #577/#579 under T-191. Add the HOLD-LABEL line
+   (`gh pr edit <n> --add-label hold`)
    whenever the `dod:` needs the PR to stay open [log: I-13] - not merging is not enough to stop
    this repo's auto-landing hooks.
 6. **LANDING BATCH** [log: I-14]: same-repo same-day contracts default to ONE branch/PR/CI-run;
@@ -244,8 +245,9 @@ recovers a wrong cheap pick; a wrong expensive one is never detected.
    result JSON (the wrapper pre-creates it at 0 bytes), an `EXITED` heartbeat, or one older than
    `settings.heartbeat_stale_after_seconds` - after which the origin session renders the status
    card (outcome, PR, verdict, evidence path, tier) automatically. **OWNER STATUS CADENCE** [log:
-   I-22]: while any session-origin task is live, run a PERSISTENT 15-minute ticker (never a fixed
-   timeout that silently expires - full incident at [log: I-22]). Every tick opens with the CURRENT TIME IN IST, e.g.
+   I-22]: while any session-origin task is live, run a PERSISTENT 15-minute ticker (never a fixed timeout - the 2026-08-20 20:30 lapse: a
+   timeout-armed ticker stopped and nobody noticed until the owner asked twice). Every tick
+   opens with the CURRENT TIME IN IST, e.g.
    `[20:45 IST]` - a tick with no timestamp does not satisfy the cadence. CONTENT FLOOR per tick:
    what changed since the last tick, what is running, the estimate - an explicit "NOTHING changed"
    tick, never a skipped one, and never fabricated progress.
