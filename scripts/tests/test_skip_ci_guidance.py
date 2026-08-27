@@ -20,17 +20,13 @@ SKILL_MD = REPO / ".claude/skills/get-work-done/SKILL.md"
 DISPATCHER_PLAN = REPO / "plans/get-work-done-dispatcher.md"
 
 
-# T-371 (SKILL.md v0.10, 2026-08-27): the skill split into PROCEDURE (SKILL.md) + verbatim
-# INCIDENT NARRATIVES (references/incident-log.md). The corrected RULE stays in SKILL.md; the
-# PR #580 / #577 / #579 EVIDENCE lives in the log. Evidence assertions read the package, the
-# false-claim guard still reads each file on its own (a regression anywhere is a failure).
+# T-371C (2026-08-27) found this guard BLIND: an earlier version widened the #580/#577/#579
+# citation checks to scan the whole skill PACKAGE (SKILL.md + references/incident-log.md), so
+# stripping "#580" out of SKILL.md still passed - the frozen archive copy satisfied it forever.
+# The corrected RULE (T-209, PR #580, PRs #577/#579 under T-191) now lives in SKILL.md itself
+# (STEP 5 item 5), so every citation check below reads the file directly, no package fallback.
 def _package(path: Path) -> str:
-    if path != SKILL_MD:
-        return path.read_text(encoding="utf-8")
-    refs = sorted((SKILL_MD.parent / "references").glob("*.md"))
-    parts = [SKILL_MD.read_text(encoding="utf-8")]
-    parts += [r.read_text(encoding="utf-8") for r in refs]
-    return (chr(10)).join(parts)
+    return path.read_text(encoding="utf-8")
 
 # A commit message that would only avoid the marker in the *headline*,
 # while implying the body is a safe place to put it, is the exact false

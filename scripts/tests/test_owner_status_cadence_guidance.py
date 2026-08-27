@@ -19,24 +19,16 @@ SKILL_MD = REPO / ".claude/skills/get-work-done/SKILL.md"
 def _skill() -> str:
     return SKILL_MD.read_text(encoding="utf-8")
 
-# T-371 (SKILL.md v0.10, 2026-08-27): the skill was split into PROCEDURE (SKILL.md, <= 30 KB)
-# and its dated INCIDENT NARRATIVES (references/incident-log.md, verbatim). The guard below
-# keeps its full force but now reads the whole skill PACKAGE for the EVIDENCE tokens (the
-# stories moved, they were not dropped), while placement and CRITICAL-RULES assertions stay
-# pinned to SKILL.md itself - which is where a rule decaying would actually show up.
-def _skill_package() -> str:
-    refs = sorted((SKILL_MD.parent / "references").glob("*.md"))
-    parts = [SKILL_MD.read_text(encoding="utf-8")]
-    parts += [r.read_text(encoding="utf-8") for r in refs]
-    return (chr(10)).join(parts)
-
-
+# T-371C (2026-08-27) found this guard BLIND: an earlier version of this file widened these
+# assertions to scan the whole skill PACKAGE (SKILL.md + references/incident-log.md). Because
+# the log is a frozen verbatim archive, every token below was permanently satisfiable there no
+# matter what happened to the live procedure - proven by mutation (stripping the cadence rule's
+# body out of SKILL.md still passed 5/5). Requirement tokens are pinned to SKILL.md ALONE below;
+# only pure historical citations (a PR/date, never a requirement) may read the wider package.
 def _cadence_windows():
-    """Every 1200-char window that opens at an OWNER STATUS CADENCE heading anywhere in the
-    skill package. After the T-371 split the RULE sits in SKILL.md STEP 6 and its full
-    2026-08-20 evidence sits verbatim in references/incident-log.md (I-22); the guard is that
-    ONE window still carries the complete rule - not that both copies do."""
-    body = _skill_package()
+    """Every 1200-char window that opens at an OWNER STATUS CADENCE heading in SKILL.md itself -
+    where a rule decaying out of the live procedure would actually show up."""
+    body = _skill()
     return [body[m.start():][:1200] for m in re.finditer("OWNER STATUS CADENCE", body)]
 
 

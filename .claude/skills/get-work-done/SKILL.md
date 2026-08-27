@@ -89,12 +89,14 @@ diff gate -> `fast-lane-check.py` -> merge on green -> LEDGER line) is
 [log: I-02 - eight workers died at their turn cap with everything uncommitted; the answer every
 time was a firmer prose mandate, and it failed all eight times.]
 
-A first occurrence may be fixed as an instance. From the SECOND occurrence of the same failure
-SHAPE (same symptom class, not the same file or repo), fix the MECHANISM that permits it or record
-in `status_log`, with the reason, why a mechanism fix is impossible - silence is not an exemption.
+A first occurrence may be fixed as an instance. From the SECOND occurrence of the same failure SHAPE
+(same symptom class, not the same file or repo) an instance fix alone is NOT acceptable on its own -
+fix the MECHANISM that permits it or record in `status_log`, with the reason, why a mechanism fix is
+impossible - silence is not an exemption.
 **PROSE IS NOT A MECHANISM**: a mechanism is CODE, a GUARD, a HOOK, a SCHEMA CONSTRAINT or a TEST
-THAT FAILS when the defect returns (the mandate it replaces failed eight times running). Before calling it done, SWEEP the repo (and the estate, where
-the shape travels) and REPORT the count - "fixed 1 of N found" / "swept, no other instances" - and
+THAT FAILS when the defect returns (the mandate it replaces failed eight times running). Before
+calling it done, SWEEP the repo (and the estate, where the shape travels) and REPORT the count -
+"fixed 1 of N found" / "swept, no other instances" - and
 append a `LESSON(CODIFIED -> <where>)` line to `GWD/PATTERNS-SEEN.md` plus a row in
 `GWD/MECHANISM-DUE.md` (`python GWD/lesson.py`); the learning-debt gate (exit 11) reads it.
 
@@ -141,9 +143,14 @@ v0.9 text and incident are at [log: I-06 ... I-14].
 4. **CONTEXT DOCS** [log: I-10]: copy `repo_registry.<key>.context_docs` (repo-relative) into the
    contract; the prompt opens "Before ANY work, read these files at the repo root: <list>. If any
    is missing, STOP and report it." CLAUDE.md is never listed; the repo wins over a stale doc.
-5. **MANDATES**: the worker/checker/fix-round prompt gets `GWD/worker-mandates.txt` injected by
-   the wrapper - never hand-copied or paraphrased (13 of 159 prompts carried all three lines
-   verbatim before this change) [log: I-11, I-12, I-14]; T-372 owns the wrapper-side self-test. Add
+5. **MANDATES**: the three standing mandates live VERBATIM in `GWD/worker-mandates.txt`
+   - never hand-copied or paraphrased (13 of 159 prompts carried all three lines verbatim before
+   this change) [log: I-11, I-12, I-14]. Today the DISPATCHER prepends that file to every prompt it
+   writes; T-372 makes `worker-wrapper.ps1` do the injection instead (not yet landed - `grep -c
+   worker-mandates GWD/worker-wrapper.ps1` = 0 until it does). Mandate 3, WORKER PUSH RULE (T-209,
+   PR #580, 2026-08-19): `[skip ci]` matches ANYWHERE in a commit message, headline or body - there
+   is no safe placement for a push that still needs CI; a REQUIRED check that never reports leaves
+   the PR blocked forever, exactly what stalled PRs #577/#579 under T-191. Add
    the HOLD-LABEL line (`gh pr edit <n> --add-label hold`) whenever the `dod:` needs the PR to stay
    open [log: I-13] - not merging is not enough to stop this repo's auto-landing hooks.
 6. **LANDING BATCH** [log: I-14]: same-repo same-day contracts default to ONE branch/PR/CI-run;
@@ -219,8 +226,9 @@ the cheaper tier - escalation recovers a wrong cheap pick; a wrong expensive one
      -TaskId T-<id> -RepoPath <workspace> -Model <tier> -MaxTurns <cap> -StateRoot <GWD>
    ```
    The wrapper passes the prompt as an **argv pointer** (STDIN was abandoned 2026-08-12 - invisible
-   to console-less processes), appends `GWD/worker-mandates.txt`, writes `T-<id>.hb` (PID + ~60s
-   tick) and the result JSON. `-StateRoot` is MANDATORY off the VPS. The deleted STDIN recipe is
+   to console-less processes), writes `T-<id>.hb` (PID + ~60s tick) and the result JSON; the
+   dispatcher, not yet the wrapper, prepends `GWD/worker-mandates.txt` to that prompt (T-372).
+   `-StateRoot` is MANDATORY off the VPS. The deleted STDIN recipe is
    archived with a do-not-use banner at [log: I-17]. A same-repo-as-dispatcher contract orders the
    worker into its own worktree.
 7. **Terminal state** [log: I-18]: parse `stop_reason` - a refusal is NOT success. Refusal on
@@ -242,10 +250,12 @@ the cheaper tier - escalation recovers a wrong cheap pick; a wrong expensive one
    until-loop (or sized `ScheduleWakeup`) breaking on **every** terminal state - a NON-EMPTY
    result JSON (the wrapper pre-creates it at 0 bytes), an `EXITED` heartbeat, or one older than
    `settings.heartbeat_stale_after_seconds` - after which the origin session renders the status
-   card (outcome, PR, verdict, evidence path, tier) automatically. **OWNER STATUS CADENCE:** while any
-   session-origin task is live, a PERSISTENT 15-minute ticker (never a timeout), each tick
-   opening with the IST time: what changed, what is running, the estimate - explicitly so even
-   when nothing changed.
+   card (outcome, PR, verdict, evidence path, tier) automatically. **OWNER STATUS CADENCE** [log:
+   I-22]: while any session-origin task is live, run a PERSISTENT 15-minute ticker (never a fixed timeout that silently expires - the 2026-08-20 20:30 lapse: a timeout-armed ticker stopped and
+   nobody noticed until the owner asked twice). Every tick opens with the CURRENT TIME IN IST, e.g.
+   `[20:45 IST]` - a tick with no timestamp does not satisfy the cadence. CONTENT FLOOR per tick:
+   what changed since the last tick, what is running, the estimate - an explicit "NOTHING changed"
+   tick, never a skipped one, and never fabricated progress.
 11. **Budget from task shape** [log: I-23]: `max_turns` from
    `settings.worker_defaults.max_turns_by_deliverable` for the kind, floored by
    `settings.worker_defaults.max_turns_by_tier`. A DoD that runs a full suite, rebuilds assets,
@@ -304,8 +314,8 @@ which pause + notify rather than ask. New recurring third-party spend stays owne
    table / eval report or transcript / re-pulled sample + recomputation) plus SHA + PR URL, AND the
    `GWD/LEDGER.md` line with tier + costUSD from the receipt. An opinion with no artifact is no
    verdict; the WORKER NEVER writes evidence.
-7. **Close-out** [log: I-33]: not done until the verdict carries the SWEEP result for every defect
-   fixed and, on a second-occurrence shape, names the MECHANISM installed plus its
+7. **ROOT-CAUSE CLOSE-OUT** [log: I-33]: not done until the verdict carries the SWEEP result for
+   every defect fixed and, on a second-occurrence shape, names the MECHANISM installed plus its
    `PATTERNS-SEEN.md` lesson line. New prose alone is INCOMPLETE.
 8. **Report + lessons** [log: I-34]: per task - outcome, PR link, evidence path, cost tier, plus
    anything parked and why. Append the shape signature to `GWD/PATTERNS-SEEN.md` (3rd occurrence ->

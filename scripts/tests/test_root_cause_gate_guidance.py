@@ -18,11 +18,14 @@ SKILL_MD = REPO / ".claude/skills/get-work-done/SKILL.md"
 def _skill() -> str:
     return SKILL_MD.read_text(encoding="utf-8")
 
-# T-371 (SKILL.md v0.10, 2026-08-27): the skill was split into PROCEDURE (SKILL.md, <= 30 KB)
-# and its dated INCIDENT NARRATIVES (references/incident-log.md, verbatim). The guard below
-# keeps its full force but now reads the whole skill PACKAGE for the EVIDENCE tokens (the
-# stories moved, they were not dropped), while placement and CRITICAL-RULES assertions stay
-# pinned to SKILL.md itself - which is where a rule decaying would actually show up.
+# T-371C (2026-08-27) found this guard BLIND on two of its assertions: an earlier version
+# widened them to scan the whole skill PACKAGE (SKILL.md + references/incident-log.md), and
+# because the log is a frozen verbatim archive, "PROSE IS NOT A MECHANISM" + "fixed 1 of N
+# found" were permanently satisfiable there no matter what happened to the live procedure -
+# proven by mutation (stripping both from SKILL.md still passed). Those two assertions are
+# pinned to SKILL.md ALONE below. The remaining two ("will take a lot of time" and the
+# self-improvement lesson-form pointer) are pure historical citations, not requirements the
+# live procedure must restate word-for-word, so they still read the wider package.
 def _skill_package() -> str:
     refs = sorted((SKILL_MD.parent / "references").glob("*.md"))
     parts = [SKILL_MD.read_text(encoding="utf-8")]
@@ -59,7 +62,7 @@ def test_second_occurrence_demands_a_mechanism_fix():
 
 
 def test_prose_is_not_a_mechanism_is_stated_with_its_definition():
-    body = _skill_package()
+    body = _skill()
     assert "PROSE IS NOT A MECHANISM" in body, (
         "SKILL.md must state plainly that prose is not a mechanism"
     )
@@ -76,7 +79,7 @@ def test_prose_is_not_a_mechanism_is_stated_with_its_definition():
 
 
 def test_sweep_obligation_is_on_the_completion_path():
-    body = _skill_package()
+    body = _skill()
     assert "fixed 1 of N found" in body and "swept, no other instances" in body, (
         "SKILL.md must require the sweep RESULT be reported in one of the two "
         "explicit forms, so 'I looked' cannot pass as a sweep"
