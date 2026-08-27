@@ -17,6 +17,11 @@
 #   1c. Daily tick of the cost ledger (scripts/cost_ledger.py --daily, fable-window item 6) —
 #      appends yesterday's token/USD rollup and alerts the owner if it exceeded daily_alert_usd.
 #      Internally bounded (60s soft deadline); a transcript-scan hiccup must never block session start.
+#   1d. Weekly tick of the provisioned-rule drift report (scripts/check_provisioned_rule_drift.py
+#      --weekly, T-401) — flags downstream repos still carrying a STALE (pre-fix) copy of a hub
+#      rule; rules cannot ship in plugins, so a provisioned copy is the only delivery mechanism
+#      there is and it silently rots. Cached (rule-drift/.last-run.json, gitignored) so it only
+#      actually scans once every 7 days; report-only, exit 0 always.
 #   2. Arm native auto-merge (squash) on every OPEN, non-draft PR that doesn't already have it —
 #      EXCEPT the current HEAD branch (active work must not be merged out from under the session).
 #      GitHub still gates the actual merge on the required `validate` check, so a red/pending PR
@@ -62,6 +67,11 @@ fi
 # 1c. Daily cost-ledger tick (fable-window item 6): append yesterday's rollup + alert-if-over.
 if command -v python >/dev/null 2>&1; then
   log "cost-ledger: $(PYTHONPATH=. python scripts/cost_ledger.py --daily 2>&1 | tail -1)" || true
+fi
+
+# 1d. Weekly provisioned-rule drift tick (T-401): cached, so this only actually scans once/week.
+if command -v python >/dev/null 2>&1; then
+  log "rule-drift: $(PYTHONPATH=. python scripts/check_provisioned_rule_drift.py --weekly 2>&1 | tail -1)" || true
 fi
 
 [ "${AUTO_MERGE:-1}" = "0" ] && { log "AUTO_MERGE=0 — prune only, no arming"; exit 0; }
