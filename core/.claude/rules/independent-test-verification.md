@@ -2,7 +2,7 @@
 
 # Independent Test Verification — the blind second tester
 
-version: "1.0.0"
+version: "1.1.0"
 
 Whenever an agent OR a process performs **testing** that emits a pass/fail
 verdict (E2E, UI verification, a data-entry/persistence run, a browser-driven
@@ -57,6 +57,11 @@ Hub workers stay flat by the single-level convention (`agent-orchestration.md`
 - MUST keep the verifier **isolated** from the tester's reasoning and
   **adversarial** — prompted to find what the test missed, not to bless it. A
   rubber-stamp "looks good" is verification theater and does not satisfy this rule.
+- MUST, for every test of a cap / budget / guard / retry limit, check that the test ALSO
+  asserts the row or state the limit leaves behind — a test that only proves "the cap exists"
+  ratifies whatever the cap does (T-403 r4, owner-approved 2026-09-02). MUST ask of every
+  write described as a choke point: "is it reachable with the PRODUCTION flag value?" — a write
+  hung on one branch of a feature-flag `if/else` is a miss, not coverage.
 - MUST judge **both** axes: coverage (did it exercise every required
   screen/control/scenario) AND verdict-correctness (does the evidence actually
   support pass/fail — see `output-plausibility-verification.md`).
