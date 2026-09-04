@@ -135,6 +135,73 @@ def _json(s: str) -> str:
     return json.dumps(s)
 
 
+def _run_reminder_session(prompt: str, session_id: str) -> str:
+    import json
+    res = subprocess.run(
+        [BASH, str(HUB_REMINDER)],
+        input=json.dumps({"prompt": prompt, "session_id": session_id}),
+        capture_output=True, text=True, cwd=str(ROOT),
+    )
+    return res.stdout
+
+
+@pytest.fixture
+def reminder_marker_cleanup():
+    """T-445: the once-per-session gate writes .claude/.enhance-reminder-shown.<session_id>
+    into the real worktree (HUB_REMINDER is invoked with cwd=ROOT, not a tmp_path, throughout
+    this file). Track + delete every marker this test creates so no test run leaves runtime
+    state behind or leaks state into a later test."""
+    created = []
+
+    def _register(session_id: str) -> str:
+        path = ROOT / ".claude" / f".enhance-reminder-shown.{session_id}"
+        created.append(path)
+        return session_id
+
+    yield _register
+    for path in created:
+        path.unlink(missing_ok=True)
+
+
+# ── T-445: once-per-session gate on the full reminder + governance tail ──
+def test_reminder_full_text_on_first_turn_of_session(reminder_marker_cleanup):
+    sid = reminder_marker_cleanup("t445-first-turn")
+    out = _run_reminder_session(HUMAN_CASES["long_human"], sid)
+    assert "RENDER THE FULL ENHANCE PROCESS" in out, "turn 1 of a new session must get the full reminder"
+    assert "DECIDE, DON'T ASK" in out, "turn 1 must still get the full governance tail"
+
+
+def test_reminder_one_line_pointer_on_second_turn_same_session(reminder_marker_cleanup):
+    sid = reminder_marker_cleanup("t445-second-turn")
+    _run_reminder_session(HUMAN_CASES["long_human"], sid)  # turn 1: consumes the marker
+    out = _run_reminder_session(HUMAN_CASES["long_human"], sid)  # turn 2: same session
+    assert "RENDER THE FULL ENHANCE PROCESS" not in out, "turn 2+ of the same session must NOT re-render the full text"
+    assert "DECIDE, DON'T ASK" not in out, "turn 2+ must not re-render the full governance tail either"
+    assert out.strip() == (
+        "Reminder: enhance banner + governance tail apply (SSOT prompt-auto-enhance.md); "
+        "full text shown at turn 1."
+    )
+
+
+def test_reminder_full_text_again_on_a_different_session_id(reminder_marker_cleanup):
+    sid_a = reminder_marker_cleanup("t445-session-a")
+    sid_b = reminder_marker_cleanup("t445-session-b")
+    _run_reminder_session(HUMAN_CASES["long_human"], sid_a)  # turn 1 of session A
+    out = _run_reminder_session(HUMAN_CASES["long_human"], sid_b)  # turn 1 of a DIFFERENT session
+    assert "RENDER THE FULL ENHANCE PROCESS" in out, "a new session_id must get its own turn-1 full reminder"
+
+
+def test_reminder_gate_skipped_when_session_id_absent():
+    """No session_id in stdin (older harness, or the pre-existing tests in this file that omit
+    it) -> gating is skipped entirely and the full text renders every call, matching pre-T-445
+    behavior — this is what keeps test_reminder_renders_full_process_on_human_turn (below)
+    order-independent and non-flaky."""
+    out1 = _run_reminder(HUMAN_CASES["long_human"])
+    out2 = _run_reminder(HUMAN_CASES["long_human"])
+    assert "RENDER THE FULL ENHANCE PROCESS" in out1
+    assert "RENDER THE FULL ENHANCE PROCESS" in out2
+
+
 def test_reminder_suppresses_full_process_on_machine_turn():
     out = _run_reminder(MACHINE_CASES["task_notification_xml"])
     assert "RENDER THE FULL ENHANCE PROCESS" not in out, "machine turn must NOT get the full-enhance reminder"

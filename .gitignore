@@ -65,6 +65,10 @@ trust-score/calibration-ledger.jsonl
 # Branch-choice per-session marker (stale-branch-reaper.sh clears it each SessionStart;
 # branch-choice.md rule writes it once the owner picks a branch — enforces ask-once-per-session)
 .claude/.branch-choice-active*
+
+# Once-per-session full-reminder marker (T-445): prompt-enhance-reminder.sh touches this per
+# session_id so the full reminder + governance tail render only on turn 1 of a session.
+.claude/.enhance-reminder-shown.*
 trust-score/sim-ledger.jsonl
 trust-score/ledgers/
 
