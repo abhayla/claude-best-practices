@@ -135,6 +135,61 @@ def _json(s: str) -> str:
     return json.dumps(s)
 
 
+def _run_reminder_session(prompt: str, session_id: str, home: Path) -> str:
+    """T-445 round 3: the once-per-session gate writes its marker under $HOME/.claude/, not the
+    project's own .claude/ (so a downstream project that tracks .claude/ can never commit it).
+    `home` MUST be a throwaway tmp_path — never the real machine HOME — so a test run never
+    touches ~/.claude/.enhance-reminder-shown on this PC and pytest's tmp_path fixture handles
+    cleanup on its own."""
+    import json
+    import os
+    env = {**os.environ, "HOME": str(home)}
+    res = subprocess.run(
+        [BASH, str(HUB_REMINDER)],
+        input=json.dumps({"prompt": prompt, "session_id": session_id}),
+        capture_output=True, text=True, cwd=str(ROOT), env=env,
+    )
+    return res.stdout
+
+
+# ── T-445: once-per-session gate on the full reminder + governance tail ──
+def test_reminder_full_text_on_first_turn_of_session(tmp_path):
+    out = _run_reminder_session(HUMAN_CASES["long_human"], "t445-first-turn", tmp_path)
+    assert "RENDER THE FULL ENHANCE PROCESS" in out, "turn 1 of a new session must get the full reminder"
+    assert "DECIDE, DON'T ASK" in out, "turn 1 must still get the full governance tail"
+    assert (tmp_path / ".claude" / ".enhance-reminder-shown" / "t445-first-turn").exists(), (
+        "marker must live under $HOME/.claude/.enhance-reminder-shown/<session_id>"
+    )
+
+
+def test_reminder_one_line_pointer_on_second_turn_same_session(tmp_path):
+    _run_reminder_session(HUMAN_CASES["long_human"], "t445-second-turn", tmp_path)  # turn 1: consumes the marker
+    out = _run_reminder_session(HUMAN_CASES["long_human"], "t445-second-turn", tmp_path)  # turn 2: same session
+    assert "RENDER THE FULL ENHANCE PROCESS" not in out, "turn 2+ of the same session must NOT re-render the full text"
+    assert "DECIDE, DON'T ASK" not in out, "turn 2+ must not re-render the full governance tail either"
+    assert out.strip() == (
+        "Reminder: enhance banner + governance tail apply (SSOT prompt-auto-enhance.md); "
+        "full text shown at turn 1."
+    )
+
+
+def test_reminder_full_text_again_on_a_different_session_id(tmp_path):
+    _run_reminder_session(HUMAN_CASES["long_human"], "t445-session-a", tmp_path)  # turn 1 of session A
+    out = _run_reminder_session(HUMAN_CASES["long_human"], "t445-session-b", tmp_path)  # turn 1 of a DIFFERENT session
+    assert "RENDER THE FULL ENHANCE PROCESS" in out, "a new session_id must get its own turn-1 full reminder"
+
+
+def test_reminder_gate_skipped_when_session_id_absent():
+    """No session_id in stdin (older harness, or the pre-existing tests in this file that omit
+    it) -> gating is skipped entirely and the full text renders every call, matching pre-T-445
+    behavior — this is what keeps test_reminder_renders_full_process_on_human_turn (below)
+    order-independent and non-flaky."""
+    out1 = _run_reminder(HUMAN_CASES["long_human"])
+    out2 = _run_reminder(HUMAN_CASES["long_human"])
+    assert "RENDER THE FULL ENHANCE PROCESS" in out1
+    assert "RENDER THE FULL ENHANCE PROCESS" in out2
+
+
 def test_reminder_suppresses_full_process_on_machine_turn():
     out = _run_reminder(MACHINE_CASES["task_notification_xml"])
     assert "RENDER THE FULL ENHANCE PROCESS" not in out, "machine turn must NOT get the full-enhance reminder"
@@ -208,6 +263,100 @@ def test_plugin_reminder_honors_full_process_scope(tmp_path):
     cfg["full_process_scope"] = "everywhere"
     everywhere.write_text(json.dumps(cfg), encoding="utf-8")
     assert "REMINDER" in run_plugin(machine, everywhere)
+
+
+# ── T-445 round 2/3: plugin copy — once-per-session full-text gate ──
+def _run_plugin_reminder(prompt: str, cwd: Path, session_id: str | None = None, home: Path | None = None,
+                          settings_file: Path | None = None) -> str:
+    """Round 3: the marker lives under $HOME/.claude/.enhance-reminder-shown/<session_id>, so
+    `home` MUST be a throwaway tmp_path in any test that passes a session_id — never the real
+    machine HOME."""
+    import json
+    payload = {"prompt": prompt}
+    if session_id is not None:
+        payload["session_id"] = session_id
+    env = _os_environ()
+    if home is not None:
+        env = {**env, "HOME": str(home)}
+    if settings_file is not None:
+        env = {**env, "ENHANCE_SETTINGS_FILE": str(settings_file)}
+    return subprocess.run(
+        [BASH, str(PLUGIN_REMINDER)],
+        input=json.dumps(payload),
+        capture_output=True, text=True, cwd=str(cwd), env=env,
+    ).stdout
+
+
+def test_plugin_reminder_full_text_on_first_turn_of_session(tmp_path):
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    out = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-first-turn", home=tmp_path)
+    assert "REMINDER" in out, "turn 1 of a new session must get the full reminder"
+    assert (tmp_path / ".claude" / ".enhance-reminder-shown" / "pae-first-turn").exists(), (
+        "marker must live under $HOME/.claude/.enhance-reminder-shown/<session_id>"
+    )
+
+
+def test_plugin_reminder_one_line_pointer_on_second_turn_same_session(tmp_path):
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-second-turn", home=tmp_path)  # turn 1
+    out = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-second-turn", home=tmp_path)  # turn 2
+    assert out.strip() == (
+        "Reminder: enhance banner + governance tail apply (SSOT prompt-auto-enhance.md); "
+        "full text shown at turn 1."
+    ), f"turn 2+ of the same session must render only the one-line pointer, got: {out!r}"
+
+
+def test_plugin_reminder_full_text_again_on_a_different_session_id(tmp_path):
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-session-a", home=tmp_path)  # turn 1 of A
+    out = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-session-b", home=tmp_path)  # turn 1 of B
+    assert "REMINDER" in out, "a new session_id must get its own turn-1 full reminder"
+
+
+def test_plugin_reminder_gate_skipped_when_session_id_absent(tmp_path):
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    out1 = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id=None, home=tmp_path)
+    out2 = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id=None, home=tmp_path)
+    assert "REMINDER" in out1 and "REMINDER" in out2, (
+        "no session_id -> gating skipped, full text renders every turn (pre-existing behavior)"
+    )
+
+
+def test_plugin_reminder_once_per_session_setting_false_disables_gate(tmp_path):
+    import json
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    default_settings = ROOT / "plugins" / "prompt-auto-enhance" / "enhance-settings.default.json"
+    cfg = json.loads(default_settings.read_text(encoding="utf-8"))
+    cfg["reminder_full_text_once_per_session"] = False
+    settings_path = tmp_path / "settings-gate-off.json"
+    settings_path.write_text(json.dumps(cfg), encoding="utf-8")
+
+    def run_plugin(sid: str) -> str:
+        return _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id=sid, home=tmp_path,
+                                     settings_file=settings_path)
+
+    out1 = run_plugin("pae-gate-off")
+    out2 = run_plugin("pae-gate-off")
+    assert "REMINDER" in out1 and "REMINDER" in out2, (
+        "reminder_full_text_once_per_session=false must render the full text on every turn"
+    )
+
+
+def test_plugin_default_settings_has_once_per_session_key():
+    import json
+    default_settings = ROOT / "plugins" / "prompt-auto-enhance" / "enhance-settings.default.json"
+    cfg = json.loads(default_settings.read_text(encoding="utf-8"))
+    assert cfg.get("reminder_full_text_once_per_session") is True, (
+        "reminder_full_text_once_per_session must default to true"
+    )
+    assert "reminder_full_text_once_per_session" in cfg.get("_help", {}), (
+        "the setting must be documented in _help"
+    )
 
 
 def _os_environ() -> dict:

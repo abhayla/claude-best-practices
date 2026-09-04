@@ -44,6 +44,7 @@ explains each one in one line. Quick reference:
 | `when_to_run` = `automatic` \| `ask_first` \| `off` | Improve every prompt / only when you reply `enhance` / never |
 | `after_improving` = `run_immediately` \| `let_me_review_first` | Run the improved prompt right away, or show it and **wait for you** to approve/edit/trigger |
 | `full_process_scope` = `human-prompts` \| `everywhere` \| `weak-only` | **Which turns get the full visible process.** `human-prompts` (default) = only prompts *you* typed; a machine turn (background task-notification, scheduled wakeup, skill-execution turn, system-reminder-only turn) still runs but skips the score-table/reviewer ceremony. `everywhere` = full process on every substantive turn. `weak-only` = human prompts, and among those only the weak ones. |
+| `reminder_full_text_once_per_session` | `true` (default) = show the full reminder only on the **first** real turn of a session; every later turn in that same session gets one short pointer line instead of repeating the whole thing — saves ~1-1.5k tokens/turn on long sessions. `false` = show it in full every turn. |
 | `enhance_slash_commands` | `false` (default) = never improve a `/command` or saved custom prompt (yours or Anthropic's) — run as-is |
 | `when_to_enhance.skip_short_prompts` (count_by, minimum) | Don't bother improving tiny prompts |
 | `when_to_enhance.skip_these_phrases` / `skip_phrases_starting_with` | Don't improve continuations like "yes" / "now do …" |
@@ -62,8 +63,9 @@ explains each one in one line. Quick reference:
 | `background_research` = `light` \| `normal` \| `deep` | How much project context to read first |
 
 **Deterministic vs guided:** the hooks deterministically enforce `enabled`, `when_to_run`,
-`enhance_slash_commands`, the `skip_*` length/phrase rules, `display.show_the_process`/`how_much_to_show`/`show.*`,
-and `make_sure_steps_were_shown`. The intent-based ones (`skip_if_just_a_question`,
+`enhance_slash_commands`, `reminder_full_text_once_per_session`, the `skip_*` length/phrase rules,
+`display.show_the_process`/`how_much_to_show`/`show.*`, and `make_sure_steps_were_shown`. The
+intent-based ones (`skip_if_just_a_question`,
 `skip_tip_for_simple_tasks`, `also_check_when_short_prompt_makes_big_work`, `show_step_log_only_for_multipart`,
 `always_add_a_role`, `improving.*`, `scoring_criteria`, `ask_clarifying_questions.*`, `background_research`)
 are **guided** — the hook injects the instruction and the model follows it (a bash hook can't tell if a
