@@ -12,8 +12,10 @@ size (`enhance_slash_commands: false` is the canonical plugin default — SSOT
 (`turn-origin.sh` `classify_turn()` = `machine` — task-notification, scheduled-wakeup,
 skill-execution, system-reminder-only); a ≤15-char prompt; or a known continuation phrase.
 The **governance tail** (plan-before-coding, decide-don't-ask, grill-when-unsure,
-narrate-and-stop, git) is emitted on every turn regardless, including slash/machine ones —
-it is not part of the pipeline this rule governs.
+narrate-and-stop, git) renders in full on the first non-exempt turn of a session, then a
+one-line pointer on every later turn of that session (T-445, 2026-09-04); a slash/machine
+turn gets the same pointer-only treatment once its session has already seen turn 1. It is
+not part of the pipeline this rule governs.
 
 ## Output-side gate (what's actually checked) — `no-overask-guard.sh`
 
