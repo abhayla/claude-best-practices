@@ -277,6 +277,92 @@ def test_plugin_reminder_honors_full_process_scope(tmp_path):
     assert "REMINDER" in run_plugin(machine, everywhere)
 
 
+# ── T-445 round 2: plugin copy — once-per-session full-text gate ──
+def _run_plugin_reminder(prompt: str, cwd: Path, session_id: str | None = None) -> str:
+    import json
+    payload = {"prompt": prompt}
+    if session_id is not None:
+        payload["session_id"] = session_id
+    return subprocess.run(
+        [BASH, str(PLUGIN_REMINDER)],
+        input=json.dumps(payload),
+        capture_output=True, text=True, cwd=str(cwd), env=_os_environ(),
+    ).stdout
+
+
+def test_plugin_reminder_full_text_on_first_turn_of_session(tmp_path):
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    out = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-first-turn")
+    assert "REMINDER" in out, "turn 1 of a new session must get the full reminder"
+
+
+def test_plugin_reminder_one_line_pointer_on_second_turn_same_session(tmp_path):
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-second-turn")  # turn 1
+    out = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-second-turn")  # turn 2
+    assert out.strip() == (
+        "Reminder: enhance banner + governance tail apply (SSOT prompt-auto-enhance.md); "
+        "full text shown at turn 1."
+    ), f"turn 2+ of the same session must render only the one-line pointer, got: {out!r}"
+
+
+def test_plugin_reminder_full_text_again_on_a_different_session_id(tmp_path):
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-session-a")  # turn 1 of A
+    out = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id="pae-session-b")  # turn 1 of B
+    assert "REMINDER" in out, "a new session_id must get its own turn-1 full reminder"
+
+
+def test_plugin_reminder_gate_skipped_when_session_id_absent(tmp_path):
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    out1 = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id=None)
+    out2 = _run_plugin_reminder(HUMAN_CASES["long_human"], neutral, session_id=None)
+    assert "REMINDER" in out1 and "REMINDER" in out2, (
+        "no session_id -> gating skipped, full text renders every turn (pre-existing behavior)"
+    )
+
+
+def test_plugin_reminder_once_per_session_setting_false_disables_gate(tmp_path):
+    import json
+    neutral = tmp_path / "neutral-project"
+    neutral.mkdir()
+    default_settings = ROOT / "plugins" / "prompt-auto-enhance" / "enhance-settings.default.json"
+    cfg = json.loads(default_settings.read_text(encoding="utf-8"))
+    cfg["reminder_full_text_once_per_session"] = False
+    settings_path = tmp_path / "settings-gate-off.json"
+    settings_path.write_text(json.dumps(cfg), encoding="utf-8")
+
+    def run_plugin(sid: str) -> str:
+        env = {**_os_environ(), "ENHANCE_SETTINGS_FILE": str(settings_path)}
+        return subprocess.run(
+            [BASH, str(PLUGIN_REMINDER)],
+            input=__import__("json").dumps({"prompt": HUMAN_CASES["long_human"], "session_id": sid}),
+            capture_output=True, text=True, cwd=str(neutral), env=env,
+        ).stdout
+
+    out1 = run_plugin("pae-gate-off")
+    out2 = run_plugin("pae-gate-off")
+    assert "REMINDER" in out1 and "REMINDER" in out2, (
+        "reminder_full_text_once_per_session=false must render the full text on every turn"
+    )
+
+
+def test_plugin_default_settings_has_once_per_session_key():
+    import json
+    default_settings = ROOT / "plugins" / "prompt-auto-enhance" / "enhance-settings.default.json"
+    cfg = json.loads(default_settings.read_text(encoding="utf-8"))
+    assert cfg.get("reminder_full_text_once_per_session") is True, (
+        "reminder_full_text_once_per_session must default to true"
+    )
+    assert "reminder_full_text_once_per_session" in cfg.get("_help", {}), (
+        "the setting must be documented in _help"
+    )
+
+
 def _os_environ() -> dict:
     import os
     return dict(os.environ)

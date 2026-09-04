@@ -25,7 +25,8 @@
     "ask_clarifying_questions": "Whether to ask you a question when the request is ambiguous. method = which skill it uses (grill-me asks one question at a time). ask_until_confidence = how sure it must be before proceeding; max_questions 0 = no limit.",
     "make_sure_steps_were_shown": "The plugin's self-check that it actually showed its work. strict = stop and redo if a step is missing; relaxed = just keep a note; off = don't check.",
     "keep_a_quiet_log": "true = quietly record whenever a step got skipped, so you can review later.",
-    "background_research": "How much surrounding info (your project files, settings, history) to read before answering. light / normal / deep."
+    "background_research": "How much surrounding info (your project files, settings, history) to read before answering. light / normal / deep.",
+    "reminder_full_text_once_per_session": "true (default) = show the full reminder (all the parts display.show turns on) only on the FIRST real turn of a session; every later turn in that same session gets one short line instead, pointing back at turn 1 — saves repeating ~1-1.5k tokens of identical instructions on every single turn of a long session. false = show the full reminder every turn, like before this setting existed."
   },
 
   "enabled": true,
@@ -35,6 +36,8 @@
   "after_improving": "run_immediately",
 
   "full_process_scope": "human-prompts",
+
+  "reminder_full_text_once_per_session": true,
 
   "enhance_slash_commands": false,
 

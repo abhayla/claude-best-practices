@@ -131,6 +131,27 @@ if [ "$(getj '.when_to_enhance.skip_phrases_starting_with.enabled')" = "true" ];
   fi
 fi
 
+# ── T-445 round 2: once-per-session full-text gate ──
+# reminder_full_text_once_per_session (default true): the full reminder is re-sent verbatim on
+# EVERY turn and stays in context for the rest of the session, so a long session (the IPODhan
+# case, 900k-token contexts) re-pays ~1-1.5k identical tokens per call. Render the full text once
+# per session_id (same marker filename pattern as the hub's .claude/hooks copy, so a project that
+# happens to have both never juggles two files); every later non-exempt turn in that session gets
+# one line instead. When session_id is absent from stdin (older harness), skip gating and render
+# full text every turn — unchanged pre-existing behavior; a marker keyed on "no session" would
+# wrongly collapse unrelated turns into one.
+once_per_session="$(jq -r '.reminder_full_text_once_per_session' "$settings" 2>/dev/null)"
+[ "$once_per_session" = "false" ] || once_per_session="true"
+if [ "$once_per_session" = "true" ] && [ -n "$_sid" ]; then
+  reminder_marker="$root/.claude/.enhance-reminder-shown.$_sid"
+  if [ -f "$reminder_marker" ]; then
+    echo "Reminder: enhance banner + governance tail apply (SSOT prompt-auto-enhance.md); full text shown at turn 1."
+    exit 0
+  fi
+  mkdir -p "$root/.claude" 2>/dev/null
+  touch "$reminder_marker" 2>/dev/null
+fi
+
 # ── Display condition (adaptive verbosity) ──
 howmuch="$(getj '.display.how_much_to_show')"; [ -z "$howmuch" ] && howmuch="every_time"
 wmax="$(getj '.display.weak_prompt_score_below')"; case "$wmax" in ''|*[!0-9.]*) wmax=7 ;; esac
