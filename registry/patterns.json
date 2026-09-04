@@ -5846,7 +5846,7 @@
     }
   },
   "independent-test-verification": {
-    "hash": "b1332a196464c4de2cd3e5819fa75782061165fbbab04c9a8d459e3e2424152e",
+    "hash": "09b06523057d49500bcb6df5027a59fe49e86d2e647d3af51a00f96df18ab7df",
     "type": "rule",
     "category": "core",
     "version": "1.1.0",
