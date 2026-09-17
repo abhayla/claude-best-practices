@@ -1,5 +1,5 @@
 # Claude Best Practices Hub — Dashboard
-> Last updated: 2026-09-04 14:02 UTC (auto-generated)
+> Last updated: 2026-09-17 09:12 UTC (auto-generated)
 
 ## At a Glance
 | Metric | Value |
@@ -184,7 +184,7 @@
 | session-summarizer-agent | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-author-agent | agent | 1.1.0 | hub:abhayla/claude-best-practices | writing-skills, pattern-structure |
 | skill-authoring-workflow | skill | 3.0.0 | hub:abhayla/claude-best-practices | claude-guardian, skill-author-agent, skill-master, workflow-contracts, writing-skills |
-| skill-evaluator | skill | 2.6.0 | hub:abhayla/claude-best-practices | — |
+| skill-evaluator | skill | 2.7.0 | hub:abhayla/claude-best-practices | — |
 | skill-factory | skill | 4.0.0 | hub:abhayla/claude-best-practices | — |
 | skill-master | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | ssot-audit | skill | 1.3.0 | hub:abhayla/claude-best-practices | configuration-ssot |
@@ -229,7 +229,7 @@
 | workflow-contracts | config | 1.0.0 | hub:abhayla/claude-best-practices | — |
 | workflow-master-template | agent | 2.0.0 | hub:abhayla/claude-best-practices | — |
 | writing-plans | skill | 1.3.0 | hub:abhayla/claude-best-practices | — |
-| writing-skills | skill | 3.3.0 | hub:abhayla/claude-best-practices | skill-evaluator |
+| writing-skills | skill | 3.4.0 | hub:abhayla/claude-best-practices | skill-evaluator |
 | youtube-transcript | skill | 1.1.0 | hub:abhayla/claude-best-practices | — |
 | zoom-out | skill | 1.1.0 | upstream:mattpocock/skills@engineering/zoom-out | — |
 
