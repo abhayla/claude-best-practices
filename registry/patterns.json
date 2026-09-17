@@ -4632,13 +4632,13 @@
     }
   },
   "skill-evaluator": {
-    "hash": "e5d68efecf6b012c3f208f7b4bbb5c2777fde86ee61742cf151b13787aaa4cbc",
+    "hash": "e4586c8821a7101afe8f7dcecfba722391169c90db52cb12f68fa48ffca176b3",
     "type": "skill",
     "category": "core",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-04-02",
-    "last_updated": "2026-08-06",
+    "last_updated": "2026-09-17",
     "dependencies": [],
     "visibility": "public",
     "description": "Evaluate Claude Code skills for trigger reliability, output quality, and cross-skill conflicts. Includes pre-flight checks for registry sync, frontmatter completeness, structural integrity, and v8 platform compliance. Trap mode (v2.4.0) certifies an asset (skill, manual, rule) still produces disciplined, correct behavior when driven by a cheap model, via a planted-defect exam + blind judging. For structural pattern-file validation (frontmatter, portability, registry sync) use /pattern-quality instead.",
@@ -5653,13 +5653,13 @@
     }
   },
   "writing-skills": {
-    "hash": "c63af13904ce53335c8fa5d651b0450361f7635979fbb86222943ce7d48cd99d",
+    "hash": "465cba40319337145a54ce796943c3a25172eab290240308f5f5c0a7e482493a",
     "type": "skill",
     "category": "core",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "source": "hub:abhayla/claude-best-practices",
     "discovered": "2026-03-12",
-    "last_updated": "2026-07-26",
+    "last_updated": "2026-09-17",
     "dependencies": [
       "skill-evaluator"
     ],

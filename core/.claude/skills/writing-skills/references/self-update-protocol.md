@@ -24,7 +24,7 @@ Review the conversation for knowledge worth capturing:
 | Domain patterns discovered | "All endpoints require X header" |
 | Edge cases encountered and resolved | "Timeout at 30 items, batch at 10" |
 | API behaviors differing from docs | "v2 flag required, undocumented" |
-| Corrections to assumptions in existing references | "Reference says X, but Y is true now" |
+| Corrections to assumptions in existing references | "Reference says X, but Y is true now" — a FOLD, see N.5b, never an appended entry |
 | Recurring failure patterns | "This error always means Z" |
 
 ## N.3 Admission Gate
@@ -163,6 +163,41 @@ For each observation that passes the gate, format as:
 - ...
 ```
 
+## N.5b Fold, Do Not Append (both modes; added 2026-09-17)
+
+An entry that contradicts or refines an instruction the skill already gives (a number, a limit, a template line, a
+step, a MUST/MUST NOT item, a default) is not new knowledge sitting beside the old; it is a correction of the old.
+Appending it as an observation leaves two instructions in force, and the next invocation follows whichever it reads
+first. This is how a production skill sat five episodes behind its own log (VideoGen finance line, 2026-09-16/17: the
+lessons file said 150-160 words and no approval stop; the skill body still said 100-120 words and "await approval",
+and every new run was built on the stale numbers).
+
+For each entry that passes the gate:
+
+| Question | Action |
+|---|---|
+| Does SKILL.md or any reference already state something this entry changes? | **FOLD:** edit that sentence, number, table row or template in place; the entry's log line records `Folded-Into: <file>#<heading>` |
+| Is it a rule for a stage another skill authors (the pack, the prompt, the caption)? | Fold it into THAT skill's file and bump that skill's marker; log it here with `Folded-Into: <other-skill>/...` |
+| Nothing existing covers it? | Append as an Active Observation (N.5) |
+
+Then bump `lessons_folded: <today YYYY-MM-DD>` in the frontmatter of every skill whose files changed. A log entry
+without a fold and a marker bump is a defect, not a lesson.
+
+**Markers and fan-out:**
+
+- `lessons_folded: YYYY-MM-DD` lives in SKILL.md frontmatter (top level or under `metadata:`), the date of the newest
+  lesson that has been folded.
+- A lessons or observations file that feeds sibling skills declares `applies_to: skill-a, skill-b` in its first 20
+  lines (`"applies_to": [...]` on a CHANGELOG.jsonl line); each named skill carries its own marker.
+- Drift = the newest dated entry in any `references/*lesson*.md` or `references/CHANGELOG.jsonl` is newer than a
+  consumer's marker. The user-level SessionStart hook `skill-lessons-drift.py` prints `SKILL-DRIFT:` lines for it, and a
+  project may carry `tests/test_skill_lessons_drift.py` as a gate. At invocation start, if the hook reported drift for
+  this skill, fold first, run second.
+
+**Sample data is not a rule.** A worked example from one run (its figures, names, paths) lives in a file whose name says
+so (`golden-sample-*.md`, `example-*.md`) with a first line saying which run it records; it never sits in a rules
+reference where a reader takes "₹1 per bucket, loan ₹8,000" as the current instruction.
+
 ## N.6 Consolidation Check (STANDALONE mode only)
 
 FULL mode inherits learn-n-improve's existing staleness detection. STANDALONE mode checks these triggers after writing entries:
@@ -186,4 +221,5 @@ If no triggers fire → skip.
 
 If any reference files were modified in this step:
 - Bump the skill's **patch version** in SKILL.md frontmatter (e.g., 1.2.3 → 1.2.4)
+- Set `lessons_folded:` to today's date in the same frontmatter (N.5b)
 - Log `VERSION_BUMP` in CHANGELOG.jsonl

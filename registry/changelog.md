@@ -4,6 +4,12 @@ All notable pattern additions, updates, and removals.
 
 ## [Unreleased]
 
+### 2026-09-17 — Lessons must be folded into the authoring skill, not only logged (writing-skills 3.4.0, skill-evaluator 2.7.0)
+
+- **changed** skill `writing-skills` — self-update protocol N.5b "Fold, Do Not Append": a correction edits the instruction it contradicts in place, `lessons_folded: YYYY-MM-DD` frontmatter marker, `applies_to` fan-out, sample data confined to `golden-sample-*` / `example-*` files; quality checklist rows for marker, single-run data, body-vs-rule contradiction; MUST DO / MUST NOT items.
+- **changed** skill `skill-evaluator` — pre-flight checks 0.4 #11-13 (marker vs newest lesson incl. CHANGELOG.jsonl `ts`, single-run data in rules references, body contradicting `.claude/rules/`), Test F fold-not-append, report lines; EVAL-LEARNINGS #17.
+- Why: VideoGen's finance skills passed checks 1-10 while 14 dated lessons (2026-09-16/17) sat in their log and the story skill's body still carried episode 01's rupee table, 100-120 words and "awaiting approval"; five episodes were built on stale limits and fixed in render rounds. Mechanical detection lives outside the hub: user-level SessionStart hook `~/.claude/hooks/skill-lessons-drift.py` and the project gate `tests/test_skill_lessons_drift.py` (VideoGen T-560).
+
 ### 2026-07-26 — prerequisites-contract compliance sweep, waves 1–2 (112 skills)
 
 First execution phase of the sweep (plan: `plans/prereq-contract-sweep.md`; standing tool:

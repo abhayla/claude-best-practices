@@ -20,7 +20,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<skill-name or 'from-session' to extract from conversation>"
 type: workflow
-version: "3.3.0"
+version: "3.4.0"
 ---
 
 # Writing Skills — The Skill Authoring Guide
@@ -201,6 +201,7 @@ scoring, gating, and consolidation workflow.
 ```
 
 3. **Create** an empty `references/CHANGELOG.jsonl` in the new skill's references
+4. **Add** `lessons_folded: <today>` to the new skill's frontmatter and make the Reference Completeness Check FOLD corrections into the existing instruction (protocol N.5b) — a lesson that is only appended leaves the stale instruction in force
 
 #### When to Skip
 
@@ -416,6 +417,8 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - Always create an empty `references/CHANGELOG.jsonl` alongside the protocol file — Why: the audit sidecar enables rollback, mode detection, and mode upgrade (STANDALONE → FULL) when learn-n-improve is later installed
 - Always require user approval before writing reference updates — Why: unreviewed auto-updates can introduce incorrect or low-quality content into the knowledge base
 - Always verify the protocol file's admission gate filters generic knowledge — Why: without filtering, references accumulate noise that degrades rather than improves future invocations
+- Always fold a correction into the instruction it changes and bump `lessons_folded` in the same edit (protocol N.5b) — Why: an appended lesson beside a stale number leaves two instructions in force; a production skill ran five episodes on stale limits this way (2026-09-17) while its log was up to date
+- Always keep one run's figures in a `golden-sample-*` / `example-*` file, never in a rules reference — Why: a reader cannot tell episode 01's rupee table from the current rule
 
 ## MUST NOT DO
 
@@ -437,4 +440,5 @@ Pre-built starting skeletons for common skill types. Copy the appropriate templa
 - MUST NOT auto-update references without user approval — present findings and wait for confirmation before writing — Why: unreviewed writes can introduce incorrect knowledge that persists across all future invocations
 - MUST NOT add generic programming knowledge to references — only domain-specific patterns, edge cases, and gotchas per the admission gate in the protocol — Why: generic entries (use try/catch, validate inputs) add noise without value
 - MUST NOT skip the Reference Completeness Check for skills with `references/` — the step is what makes skills self-improving rather than static — Why: each skipped invocation is lost domain knowledge that could have improved future runs
+- MUST NOT log a lesson without editing the sentence, number or template it contradicts — the `skill-lessons-drift` hook reports the skill as behind its log until the marker is bumped — Why: logging feels like learning and is not
 - MUST NOT write reference entries with confidence below 0.70 — the admission gate rejects insufficient evidence — Why: low-confidence entries degrade trust in the reference base and require costly cleanup later

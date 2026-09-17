@@ -21,7 +21,7 @@ triggers:
 allowed-tools: "Bash Read Write Edit Grep Glob Agent"
 argument-hint: "<trigger|output|full|conflicts|trap> <skill-path> [--baseline] [--model sonnet] [--cases <path>] [--bar all|0.9]"
 type: workflow
-version: "2.6.0"
+version: "2.7.0"
 ---
 
 # Skill Evaluator — Evaluate Skill Quality
@@ -104,8 +104,11 @@ For skills that have a `references/` directory, verify the full self-update prot
 | 8 | Scoring mechanism present | STANDALONE mode has independent scoring (haiku subagent or equivalent); FULL mode routes through learnings.json | No quality gate beyond user approval | MAJOR |
 | 9 | Two-tier file structure | Protocol defines Consolidated Principles + Active Observations sections | Missing two-tier structure | MINOR |
 | 10 | User approval gate | Protocol requires user approval before any reference writes | Auto-writes without approval | CRITICAL |
+| 11 | Lessons folded, not only logged | Read `lessons_folded:` from frontmatter (top level or `metadata:`); compute the newest date in every `references/*lesson*.md` (lines starting `## `, `### `, `- `, `* `, `1. `) and the newest `ts[:10]` in `references/CHANGELOG.jsonl`; honour `applies_to` fan-out | Marker missing, or older than the newest lesson | MAJOR |
+| 12 | Rules references carry no single-run data | Grep references (excluding `golden-sample-*`, `example-*`) for "this episode", "this run", and figure tables tied to one dated run | A rules reference states one run's figures as the instruction | MAJOR |
+| 13 | Body agrees with governing rules | Grep SKILL.md for `wait for approval`, `stop and ask`, `awaiting`, `on by default`, and check each against `.claude/rules/*.md` and CLAUDE.md of the project the skill ships in | A rule says no stop / off by default and the skill still says the opposite | MAJOR |
 
-**Overall severity:** Skills with `references/` that lack the self-update mechanism entirely get a **MAJOR** finding. Missing user approval gate is **CRITICAL**.
+**Overall severity:** Skills with `references/` that lack the self-update mechanism entirely get a **MAJOR** finding. Missing user approval gate is **CRITICAL**. Checks 11-13 exist because a production skill (VideoGen finance line, 2026-09-17) passed checks 1-10 while its log held 14 lessons its body contradicted.
 
 ### 0.5 Prerequisites & Preflight Contract
 
@@ -284,6 +287,10 @@ For skills that have a `references/` directory and a self-update-protocol.md fil
 - Auto-writing without approval is a **CRITICAL** failure
 - Verify the presentation includes: what was found, target file, proposed action, and score
 
+**Test F — Fold, Not Append:** Feed the skill a correction that contradicts a number or template line already in a reference (e.g. "the cap is 165 words, not 120").
+- PASS only if the existing line changes in place, the log entry carries `Folded-Into:`, and `lessons_folded` is bumped
+- An appended entry with the old number still present is a MAJOR failure
+
 **Test E — Post-Update Integrity:** After approved updates:
 - Verify patch version bumped in SKILL.md frontmatter
 - Verify `CHANGELOG.jsonl` has a new entry with CREATE action
@@ -297,6 +304,7 @@ For skills that have a `references/` directory and a self-update-protocol.md fil
 | C: Admission + scoring | Generic content filtered; valid content scored independently | MAJOR |
 | D: User approval gate | Findings presented, writes blocked until approval | CRITICAL |
 | E: Post-update integrity | Version bumped, CHANGELOG updated, two-tier structure intact | MINOR |
+| F: Fold, not append | Contradicted instruction edited in place; marker bumped; old value gone | MAJOR |
 
 Add results to the evaluation report under the `REFERENCE SELF-UPDATE` section.
 
@@ -431,6 +439,8 @@ REFERENCE SELF-UPDATE (skills with references/ only)
   Test C (gate+score): <PASS — generic filtered, valid scored | MAJOR>
   Test D (approval): <PASS — waited for user | CRITICAL — auto-wrote>
   Test E (integrity): <PASS — version bumped, CHANGELOG updated | MINOR>
+  Test F (fold):     <PASS — stale line replaced, marker bumped | MAJOR — appended beside stale>
+  Drift (0.4 #11):   <lessons_folded YYYY-MM-DD vs newest lesson YYYY-MM-DD | MAJOR>
   Self-update verdict: <PASS | FIX | FAIL>
 
 MODEL COVERAGE
@@ -502,8 +512,8 @@ in August because nothing forced a re-read.
 - Always check description is third-person in pre-flight — Why: first/second person causes discovery problems per platform docs
 - Always check reference depth ≤1 from SKILL.md in pre-flight — Why: Claude partially reads deeply nested files
 - Always run the prerequisites-contract check (0.5) — Why: a skill that discovers a missing tool, credential, or user input mid-run stalls unattended sessions; a NEW skill without the declare→verify→hard-stop contract must not pass evaluation
-- Always run all 10 pre-flight checks (0.4) for skills with `references/` — Why: the protocol file, CHANGELOG, entry format, mode detection, admission gate, scoring, two-tier structure, and approval gate must all be present for the self-update mechanism to work
-- Always run Tests A-E (3.4b) for skills with `references/` during output evaluation — Why: structural presence is not enough; mode detection, gap detection, scoring, approval gating, and post-update integrity must all work at runtime
+- Always run all 13 pre-flight checks (0.4) for skills with `references/` — Why: the protocol file, CHANGELOG, entry format, mode detection, admission gate, scoring, two-tier structure, and approval gate must all be present for the self-update mechanism to work
+- Always run Tests A-F (3.4b) for skills with `references/` during output evaluation — Why: structural presence is not enough; mode detection, gap detection, scoring, approval gating, and post-update integrity must all work at runtime
 - Always test both FULL and STANDALONE modes when learn-n-improve is available in the project — Why: downstream projects may or may not have learn-n-improve; skills must work correctly in both environments
 - Always freeze trap-mode cases before dispatching any arm — Why: cases edited after seeing results are no longer a certification, they're a curve-fit
 - Always pin trap-mode arms to the target `--model` (never the T0 frontier model) — Why: the whole point is proving the asset works under the CHEAP model a downstream user will actually run

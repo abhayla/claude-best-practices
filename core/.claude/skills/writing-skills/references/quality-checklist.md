@@ -15,6 +15,9 @@
 | `argument-hint` uses `<>` and `[]` correctly | Required in angle brackets, optional in square brackets |
 | No placeholder markers | No TODO/FIXME/PLACEHOLDER HTML comment markers in the body |
 | Reference self-update mechanism present | Skills with `references/` include: (1) `references/self-update-protocol.md` copied from this skill, (2) a Reference Completeness Check step pointing to it, (3) an empty `references/CHANGELOG.jsonl` |
+| `lessons_folded` marker present | Skills with `references/` carry `lessons_folded: YYYY-MM-DD` in frontmatter (top level or under `metadata:`), not older than the newest dated entry in any `references/*lesson*.md` or `CHANGELOG.jsonl` (protocol N.5b) |
+| No single-run data in rules references | Figures, names or paths from one run appear only in a file named `golden-sample-*` / `example-*` with a first line naming the run; a rules reference states current limits, not one episode's table |
+| No instruction that contradicts a governing rule | Grep the body for stop phrases (`wait for approval`, `stop and ask`, `awaiting`) and defaults, and check them against the project's `.claude/rules/` and CLAUDE.md; a rule that says "no stop" or "off by default" wins and the skill text is changed, not annotated |
 
 ### 5.2 Content Validation
 

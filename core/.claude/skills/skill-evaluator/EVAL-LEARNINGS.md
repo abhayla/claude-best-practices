@@ -369,3 +369,21 @@ This batch fix addresses the mechanical registry drift that was the most common 
 **Fixes applied:**
 - Added 5 triggers for session management intent
 - Registry hash sync
+
+## Skill #17: quote-to-finance-kahani + finance-kahani-video, VideoGen (2026-09-17, owner-triggered)
+
+**Verdict:** FIX (found by the owner asking "why did the skill not self-improve", not by an evaluation)
+
+**What the evaluator would have caught:** nothing. Both skills had references, a lessons file with dated entries, and
+the story skill's body did not contradict itself. Checks 1-10 test that the append mechanism exists.
+
+**What it missed:**
+1. 14 dated lessons (2026-09-16/17) in `finance-kahani-video/references/lessons-from-production.md` while the skill
+   that authors those artifacts (`quote-to-finance-kahani`, last edited 2026-09-16 09:49) still said 100-120 words,
+   8-11 shots and "awaiting story approval". The log was current; the instructions were five episodes stale.
+2. A rules reference (`hindi-narration.md`) carried episode 01's rupee table as "the locked table".
+3. The body said "wait for approval" where the project rule (`finance-kahani-line.md` item 8) says no stop.
+
+**Evaluator improvements applied (v2.7.0):** checks 0.4 #11-13, Test F, report lines. Detection is also mechanical
+outside the evaluator: user-level hook `skill-lessons-drift.py` (SessionStart) and the project gate
+`tests/test_skill_lessons_drift.py`. Registry row: GetWorkDone `lesson-recorded-authoring-skill-not-updated` (T-560).
