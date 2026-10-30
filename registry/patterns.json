@@ -85,7 +85,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "a11y-audit": {
@@ -114,7 +114,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "adr": {
@@ -140,7 +140,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "adversarial-review": {
@@ -163,7 +163,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "agent-evaluator": {
@@ -189,7 +189,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "agent-orchestration": {
@@ -214,7 +214,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "ai-gemini-api": {
@@ -237,7 +237,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android": {
@@ -258,7 +258,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-adb-test": {
@@ -283,7 +283,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-arch": {
@@ -313,7 +313,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-build-fixer-agent": {
@@ -342,7 +342,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-compose-agent": {
@@ -363,7 +363,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-compose-ui": {
@@ -384,7 +384,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-gradle": {
@@ -408,7 +408,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-kotlin": {
@@ -435,7 +435,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-kotlin-reviewer-agent": {
@@ -463,7 +463,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-mvi-scaffold": {
@@ -491,7 +491,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-run-e2e": {
@@ -516,7 +516,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-run-tests": {
@@ -541,7 +541,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "android-test-patterns": {
@@ -573,7 +573,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "anthropic-agent-orchestration-guide": {
@@ -599,7 +599,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "anthropic-multi-agent-research-system-skill": {
@@ -629,7 +629,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "anthropic-multi-agent-reviewer-agent": {
@@ -658,7 +658,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "api-docs-generator": {
@@ -684,7 +684,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "architecture-fitness": {
@@ -710,7 +710,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "auto-format": {
@@ -752,7 +752,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "batch": {
@@ -775,7 +775,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "brainstorm": {
@@ -798,7 +798,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "branching": {
@@ -821,7 +821,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "bun-elysia": {
@@ -846,7 +846,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "bun-elysia-test": {
@@ -871,7 +871,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "change-risk-scoring": {
@@ -897,7 +897,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "changelog-contributing": {
@@ -923,7 +923,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "chaos-resilience": {
@@ -949,7 +949,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "ci-cd-setup": {
@@ -973,7 +973,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "claude-behavior": {
@@ -994,7 +994,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "claude-guardian": {
@@ -1017,7 +1017,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "code-quality-gate": {
@@ -1044,7 +1044,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "code-readability": {
@@ -1069,7 +1069,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "code-review-workflow": {
@@ -1101,7 +1101,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "code-reviewer-agent": {
@@ -1122,7 +1122,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "compose-ui": {
@@ -1146,7 +1146,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "configuration-ssot": {
@@ -1173,7 +1173,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "context-management": {
@@ -1194,7 +1194,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "context-reducer-agent": {
@@ -1215,7 +1215,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "context-window-monitor": {
@@ -1285,7 +1285,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "contract-test": {
@@ -1312,7 +1312,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "contribute-practice": {
@@ -1335,7 +1335,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "coverage-analysis": {
@@ -1360,7 +1360,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "create-github-issue": {
@@ -1386,7 +1386,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "cross-platform-visual": {
@@ -1409,7 +1409,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "d3-viz": {
@@ -1432,7 +1432,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "dangerous-command-blocker": {
@@ -1477,7 +1477,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "db-migrate": {
@@ -1507,7 +1507,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "db-migrate-verify": {
@@ -1530,7 +1530,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "debugger-agent": {
@@ -1551,7 +1551,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "debugging-loop": {
@@ -1584,7 +1584,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "deploy-strategy": {
@@ -1615,7 +1615,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "design-principles": {
@@ -1641,7 +1641,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "design-ssot": {
@@ -1668,7 +1668,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "development-loop": {
@@ -1701,7 +1701,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "diataxis-docs": {
@@ -1727,7 +1727,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "disaster-recovery": {
@@ -1758,7 +1758,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "doc-staleness": {
@@ -1784,7 +1784,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "doc-structure-enforcer": {
@@ -1811,7 +1811,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "docker-optimize": {
@@ -1835,7 +1835,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "docs-manager-agent": {
@@ -1856,7 +1856,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "documentation-workflow": {
@@ -1888,7 +1888,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "drizzle-orm": {
@@ -1913,7 +1913,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "e2e-best-practices": {
@@ -1939,7 +1939,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "e2e-pipeline": {
@@ -1985,7 +1985,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "e2e-visual-run": {
@@ -2021,7 +2021,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "error-handling": {
@@ -2046,7 +2046,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "escalation-report": {
@@ -2071,7 +2071,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "executing-plans": {
@@ -2094,7 +2094,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "expo-dev": {
@@ -2117,7 +2117,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fastapi-api-tester-agent": {
@@ -2138,7 +2138,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fastapi-backend": {
@@ -2159,7 +2159,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fastapi-database": {
@@ -2180,7 +2180,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fastapi-database-admin-agent": {
@@ -2201,7 +2201,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fastapi-db-migrate": {
@@ -2227,7 +2227,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fastapi-deploy": {
@@ -2255,7 +2255,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fastapi-run-backend-tests": {
@@ -2282,7 +2282,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "feature-flag": {
@@ -2307,7 +2307,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "five-advisors": {
@@ -2334,7 +2334,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "firebase": {
@@ -2359,7 +2359,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "firebase-ai": {
@@ -2383,7 +2383,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "firebase-data-connect": {
@@ -2407,7 +2407,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "firebase-dev": {
@@ -2431,7 +2431,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "firebase-test": {
@@ -2457,7 +2457,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fix-github-issue": {
@@ -2485,7 +2485,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "fix-loop": {
@@ -2520,7 +2520,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "flutter": {
@@ -2545,7 +2545,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "flutter-dart-agent": {
@@ -2570,7 +2570,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "flutter-dev": {
@@ -2594,7 +2594,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "flutter-e2e-test": {
@@ -2619,7 +2619,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "git-collaboration": {
@@ -2645,7 +2645,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "git-manager-agent": {
@@ -2666,7 +2666,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "git-worktrees": {
@@ -2689,7 +2689,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "github": {
@@ -2714,7 +2714,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "github-issue-manager-agent": {
@@ -2742,7 +2742,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "grill-me": {
@@ -2766,7 +2766,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "handover": {
@@ -2789,7 +2789,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "hono-backend": {
@@ -2814,7 +2814,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "html-prototype": {
@@ -2841,7 +2841,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "iac-deploy": {
@@ -2865,7 +2865,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "implement": {
@@ -2890,7 +2890,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "incident-response": {
@@ -2913,7 +2913,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "integration-test": {
@@ -2938,7 +2938,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "jest-dev": {
@@ -2964,7 +2964,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "k8s-deploy": {
@@ -2988,7 +2988,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "learn-n-improve": {
@@ -3014,7 +3014,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "learning-self-improvement": {
@@ -3046,7 +3046,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "mcp-server-builder": {
@@ -3069,7 +3069,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "merge-strategy": {
@@ -3097,7 +3097,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "middleware-test": {
@@ -3121,7 +3121,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "mobile-a11y-test": {
@@ -3148,7 +3148,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "mock-server": {
@@ -3174,7 +3174,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "monitoring-setup": {
@@ -3197,7 +3197,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "monorepo": {
@@ -3222,7 +3222,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "nextjs-dev": {
@@ -3247,7 +3247,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "node-backend-dev": {
@@ -3274,7 +3274,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "nuxt-dev": {
@@ -3297,7 +3297,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "obsidian": {
@@ -3320,7 +3320,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "orchestrator-responsibility-allowlist": {
@@ -3365,7 +3365,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "pattern-portability": {
@@ -3390,7 +3390,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "pattern-self-containment": {
@@ -3415,7 +3415,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "pattern-structure": {
@@ -3440,7 +3440,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "perf-test": {
@@ -3469,7 +3469,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "pg-query": {
@@ -3492,7 +3492,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "pipeline-fix-pr": {
@@ -3520,7 +3520,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "pipeline-orchestrator": {
@@ -3547,7 +3547,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "plan-executor-agent": {
@@ -3568,7 +3568,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "plan-to-issues": {
@@ -3591,7 +3591,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "planner-researcher-agent": {
@@ -3612,7 +3612,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "playwright": {
@@ -3635,7 +3635,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "pm2-deploy": {
@@ -3660,7 +3660,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "post-fix-pipeline": {
@@ -3688,7 +3688,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "pr-standards": {
@@ -3711,7 +3711,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "prd-parser": {
@@ -3739,7 +3739,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "prisma-orm": {
@@ -3765,7 +3765,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "project-manager-agent": {
@@ -3793,7 +3793,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "project-scaffold": {
@@ -3821,7 +3821,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "prompt-auto-enhance": {
@@ -3856,7 +3856,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "prompt-logger": {
@@ -3902,7 +3902,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "quality-gate-evaluator-agent": {
@@ -3927,7 +3927,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "react-native-dev": {
@@ -3951,7 +3951,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "react-native-e2e": {
@@ -3976,7 +3976,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "react-nextjs": {
@@ -4001,7 +4001,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "react-test-patterns": {
@@ -4027,7 +4027,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "receive-code-review": {
@@ -4050,7 +4050,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "reddit": {
@@ -4074,7 +4074,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "redis-patterns": {
@@ -4097,7 +4097,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "regression-test": {
@@ -4122,7 +4122,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "remotion-video": {
@@ -4145,7 +4145,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "request-code-review": {
@@ -4168,7 +4168,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "research-mode": {
@@ -4196,7 +4196,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "review-gate": {
@@ -4228,7 +4228,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "rule-curation": {
@@ -4257,7 +4257,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "rule-writing-meta": {
@@ -4282,7 +4282,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "end-session": {
@@ -4307,7 +4307,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "save-session": {
@@ -4332,7 +4332,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     },
     "deprecated": true,
     "deprecated_by": "end-session"
@@ -4363,7 +4363,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "secret-scanner": {
@@ -4402,7 +4402,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "security-auditor-agent": {
@@ -4423,7 +4423,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "security-baseline": {
@@ -4448,7 +4448,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "semgrep-rules": {
@@ -4471,7 +4471,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "serialize-fixes": {
@@ -4497,7 +4497,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "session-continuity": {
@@ -4528,7 +4528,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "session-reminder": {
@@ -4568,7 +4568,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "skill-author-agent": {
@@ -4597,7 +4597,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "skill-authoring-workflow": {
@@ -4628,7 +4628,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "skill-evaluator": {
@@ -4655,7 +4655,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "skill-factory": {
@@ -4678,7 +4678,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "skill-master": {
@@ -4701,7 +4701,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "solidity-audit": {
@@ -4725,7 +4725,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "ssot-audit": {
@@ -4754,7 +4754,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "start-session": {
@@ -4781,7 +4781,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "status": {
@@ -4804,7 +4804,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "strategic-architect": {
@@ -4827,7 +4827,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "subagent-driven-dev": {
@@ -4852,7 +4852,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "supply-chain-audit": {
@@ -4876,7 +4876,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "systematic-debugging": {
@@ -4899,7 +4899,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "tailwind-dev": {
@@ -4924,7 +4924,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "tdd": {
@@ -4949,7 +4949,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "tdd-failing-test-generator": {
@@ -4979,7 +4979,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "tdd-rule": {
@@ -5003,7 +5003,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "test-data-management": {
@@ -5029,7 +5029,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "test-failure-analyzer-agent": {
@@ -5050,7 +5050,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "test-healer-agent": {
@@ -5079,7 +5079,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "test-knowledge": {
@@ -5103,7 +5103,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "test-maintenance": {
@@ -5129,7 +5129,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "test-pipeline": {
@@ -5167,7 +5167,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "test-scout-agent": {
@@ -5193,7 +5193,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "tester-agent": {
@@ -5214,7 +5214,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "testing": {
@@ -5235,7 +5235,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "trace-test": {
@@ -5259,7 +5259,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "twitter-x": {
@@ -5283,7 +5283,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "ui-ux-pro-max": {
@@ -5307,7 +5307,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "update-practices": {
@@ -5330,7 +5330,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "verify-screenshots": {
@@ -5353,7 +5353,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "visual-inspector-agent": {
@@ -5382,7 +5382,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "vitest-dev": {
@@ -5407,7 +5407,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "vue": {
@@ -5432,7 +5432,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "vue-dev": {
@@ -5456,7 +5456,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "vue-test": {
@@ -5482,7 +5482,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "web-quality": {
@@ -5505,7 +5505,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "web-research-specialist-agent": {
@@ -5530,7 +5530,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "web-scraper": {
@@ -5555,7 +5555,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "websocket-patterns": {
@@ -5579,7 +5579,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "workflow": {
@@ -5600,7 +5600,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "workflow-master-template": {
@@ -5626,7 +5626,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "writing-plans": {
@@ -5649,7 +5649,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "writing-skills": {
@@ -5677,7 +5677,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "xml-to-compose": {
@@ -5701,7 +5701,7 @@
       "adoption_rate": 0.5,
       "retention_days_p50": 0.0,
       "sample_size": 2,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "improve-codebase-architecture": {
@@ -5731,7 +5731,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "grill-with-docs": {
@@ -5760,7 +5760,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "zoom-out": {
@@ -5786,7 +5786,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "to-prd": {
@@ -5815,7 +5815,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "output-plausibility-verification": {
@@ -5842,7 +5842,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "independent-test-verification": {
@@ -5869,7 +5869,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "supervisor-verification": {
@@ -5896,7 +5896,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "decision-authority": {
@@ -5922,7 +5922,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "goal-anchored-decisions": {
@@ -5949,7 +5949,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "bug-triage-discipline": {
@@ -5976,7 +5976,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "environment-validation": {
@@ -6003,7 +6003,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "e2e-readiness-signal": {
@@ -6030,7 +6030,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "e2e-persistence-verification": {
@@ -6057,7 +6057,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "dod-verbs": {
@@ -6083,7 +6083,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "learnings-routing": {
@@ -6110,7 +6110,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "hono-conventions": {
@@ -6137,7 +6137,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "prisma-conventions": {
@@ -6164,7 +6164,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "vue-e2e": {
@@ -6192,7 +6192,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "goal-creator": {
@@ -6221,7 +6221,7 @@
       "adoption_rate": 0.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "_meta": {
@@ -6252,7 +6252,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "engineering-roles": {
@@ -6278,7 +6278,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "no-overask-guard": {
@@ -6368,7 +6368,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "workflow-contracts": {
@@ -6427,7 +6427,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "ba-discovery-checklist": {
@@ -6572,7 +6572,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "karpathy-advisor": {
@@ -6724,7 +6724,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "team-task-created-deliverable": {
@@ -6812,7 +6812,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "web-deploy-readiness": {
@@ -6841,7 +6841,7 @@
       "adoption_rate": 1.0,
       "retention_days_p50": 0,
       "sample_size": 1,
-      "last_updated": "2026-09-04"
+      "last_updated": "2026-10-30"
     }
   },
   "youtube-transcript": {
